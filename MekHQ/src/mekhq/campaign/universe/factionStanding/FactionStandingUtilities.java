@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -40,11 +41,13 @@ import java.util.List;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -621,5 +624,109 @@ public class FactionStandingUtilities {
         // Add additional conditionals here as necessary.
 
         return THE + ' ' + baseName;
+    }
+
+    /**
+     * Generates a localized, in-character narrative text for a faction standing event, dynamically incorporating
+     * identity and pronoun information for one or two characters, as well as campaign and faction context.
+     *
+     * <p>This method prepares a set of arguments including hyperlinked titles, given names, context-aware pronouns
+     * (subject, object, possessive), and additional identifiers for the commander and (optionally) a secondary
+     * individual. It also includes campaign-specific details like the campaign and faction name. The arguments are
+     * formatted into a resource bundle string for display within campaign dialogs.</p>
+     *
+     * @param resourceBundleAddress the resource bundle key for localization
+     * @param commander             the main commander or subject of the censure event; may be {@code null} if no
+     *                              commander is cited in the dialog.
+     * @param secondCharacter       optional secondary character affected by the event; may be {@code null} if there
+     *                              isn't a second character in the scene.
+     * @param factionName           the name of any relevant faction
+     * @param campaignName          the name of the current campaign
+     * @param locationName          the name of the current system or planet; may be {@code null} if there isn't any
+     *                              locational information in the scene.
+     *
+     * @return a formatted narrative {@link String} populated with character and context
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getInCharacterText(String resourceBundleAddress, @Nullable Person commander,
+          Person secondCharacter, String factionName, String campaignName, String locationName) {
+        // We use fallback values so that we don't have to deal with null values
+        final Gender FALLBACK_GENDER = Gender.MALE;
+        final String FALLBACK_NAME_FULL = "";
+        final String FALLBACK_NAME_FIRST_NAME = "";
+        final String FALLBACK_LOCATION_NAME = "";
+
+        // COMMANDER pronoun/identity context
+        final PronounData commanderPronounData = new PronounData(commander == null
+                                                                       ? FALLBACK_GENDER
+                                                                       : commander.getGender());
+        // {0} hyperlinked full title
+        final String commanderHyperlinkedFullTitle = commander == null
+                                                           ? FALLBACK_NAME_FULL
+                                                           : commander.getHyperlinkedFullTitle();
+        // {1} first name
+        final String commanderFirstName = commander == null
+                                                ? FALLBACK_NAME_FULL
+                                                : commander.getHyperlinkedFullTitle();
+        // {2} = He/She/They
+        final String commanderHeSheTheyCapitalized = commanderPronounData.subjectPronoun();
+        // {3} = he/she/they
+        final String commanderHeSheTheyLowercase = commanderPronounData.subjectPronounLowerCase();
+        // {4} = Him/Her/Them
+        final String commanderHimHerThemCapitalized = commanderPronounData.objectPronoun();
+        // {5} = him/her/them
+        final String commanderHimHerThemLowercase = commanderPronounData.objectPronounLowerCase();
+        // {6} = His/Her/Their
+        final String commanderHisHerTheirCapitalized = commanderPronounData.possessivePronoun();
+        // {7} = his/her/their
+        final String commanderHisHerTheirLowercase = commanderPronounData.possessivePronounLowerCase();
+        // {8} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
+        final int commanderPluralizer = commander == null ? 0 : commanderPronounData.pluralizer();
+
+        // SECOND pronoun/identity context
+        final PronounData secondPronounData = new PronounData(secondCharacter == null
+                                                                    ? FALLBACK_GENDER
+                                                                    : secondCharacter.getGender());
+        // {9} hyperlinked full title
+        final String secondHyperlinkedFullTitle = secondCharacter == null
+                                                        ? FALLBACK_NAME_FULL
+                                                        : secondCharacter.getHyperlinkedFullTitle();
+        // {10} first name
+        final String secondFirstName = secondCharacter == null
+                                             ? FALLBACK_NAME_FIRST_NAME
+                                             : secondCharacter.getGivenName();
+        // {11} = He/She/They
+        final String secondHeSheTheyCapitalized = secondPronounData.subjectPronoun();
+        // {12} = he/she/they
+        final String secondHeSheTheyLowercase = secondPronounData.subjectPronounLowerCase();
+        // {13} = Him/Her/Them
+        final String secondHimHerThemCapitalized = secondPronounData.objectPronoun();
+        // {14} = him/her/them
+        final String secondHimHerThemLowercase = secondPronounData.objectPronounLowerCase();
+        // {15} = His/Her/Their
+        final String secondHisHerTheirCapitalized = secondPronounData.possessivePronoun();
+        // {16} = his/her/their
+        final String secondHisHerTheirLowercase = secondPronounData.possessivePronounLowerCase();
+        // {17} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
+        final int secondPluralizer = secondCharacter == null ? 0 : secondPronounData.pluralizer();
+
+        // Miscellaneous campaign context
+        // {18} = campaign name
+        // {19} = faction name
+        // {20} = current location name
+        if (locationName == null) {
+            locationName = FALLBACK_LOCATION_NAME;
+        }
+
+        // Format and return the localized dialog text with the current context.
+        return getFormattedTextAt(RESOURCE_BUNDLE, resourceBundleAddress, commanderHyperlinkedFullTitle,
+              commanderFirstName, commanderHeSheTheyCapitalized, commanderHeSheTheyLowercase,
+              commanderHimHerThemCapitalized, commanderHimHerThemLowercase, commanderHisHerTheirCapitalized,
+              commanderHisHerTheirLowercase, commanderPluralizer, secondHyperlinkedFullTitle, secondFirstName,
+              secondHeSheTheyCapitalized, secondHeSheTheyLowercase, secondHimHerThemCapitalized,
+              secondHimHerThemLowercase, secondHisHerTheirCapitalized, secondHisHerTheirLowercase, secondPluralizer,
+              campaignName, factionName, locationName);
     }
 }

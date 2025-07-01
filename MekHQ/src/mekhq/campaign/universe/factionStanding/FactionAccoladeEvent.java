@@ -33,14 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_0;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_1;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_2;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_3;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_4;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE_0;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE_1;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
@@ -65,7 +58,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
-import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -94,17 +87,17 @@ public class FactionAccoladeEvent {
      * new units awarded by the accolade.</p>
      *
      * @param campaign      the campaign receiving the accolade
-     * @param faction       the faction granting the accolade
+     * @param accoladingFaction       the faction granting the accolade
      * @param accoladeLevel the type/level of accolade
      * @param isSameFaction whether the campaign's commander currently belongs to the awarding faction
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionAccoladeEvent(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
+    public FactionAccoladeEvent(Campaign campaign, Faction accoladingFaction, FactionAccoladeLevel accoladeLevel,
           boolean isSameFaction) {
         this.campaign = campaign;
-        this.factionCode = faction.getShortName();
+        this.factionCode = accoladingFaction.getShortName();
 
         // This is a silent accolade level, it gets logged internally, but the player isn't made aware of it
         if (accoladeLevel.is(TAKING_NOTICE_0) || accoladeLevel.is(TAKING_NOTICE_1)) {
@@ -114,20 +107,38 @@ public class FactionAccoladeEvent {
         // If the faction isn't playable, we don't want to give the player a chance to join.
         boolean isAdoptionOrLance = accoladeLevel.is(ADOPTION_OR_MEKS);
         if (isAdoptionOrLance) {
-            if (!faction.isPlayable()) {
+            if (!accoladingFaction.isPlayable()) {
                 return;
             }
         }
 
         Person commander = campaign.getCommander();
 
-        FactionAccoladeDialog initialDialog = new FactionAccoladeDialog(campaign, faction, accoladeLevel, commander);
+        boolean isClan = accoladingFaction.isClan() && !accoladingFaction.isMercenaryOrganization();
+        boolean isPressRecognition = accoladeLevel.is(PRESS_RECOGNITION);
+        boolean isPropagandaReel = accoladeLevel.is(PROPAGANDA_REEL);
+        boolean isTriumphOrRemembrance = accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE);
+        boolean isStatueOrSibko = accoladeLevel.is(STATUE_OR_SIBKO);
+        boolean isMOC = accoladingFaction.getShortName().equals("MOC");
+        boolean isComStarOrWoB = accoladingFaction.isComStarOrWoB();
+
+        boolean triggerNewsArticle = isPressRecognition
+                                           || (!isClan && isPropagandaReel)
+                                           || (isTriumphOrRemembrance && !isMOC)
+                                           || (isStatueOrSibko && !isMOC && !isComStarOrWoB);
+        if (triggerNewsArticle) {
+            new FactionJudgmentNewsArticle(campaign, commander, null, accoladeLevel.getLookupName(),
+                  accoladingFaction, FactionCensureJudgmentType.ACCOLADE);
+            return;
+        } else {
+            // TODO Trigger normal dialog called initialDialog
+        }
 
         if (isAdoptionOrLance) {
             FactionAccoladeConfirmationDialog confirmationDialog = new FactionAccoladeConfirmationDialog(campaign,
                   accoladeLevel);
             if (!confirmationDialog.wasConfirmed()) {
-                new FactionAccoladeEvent(campaign, faction, accoladeLevel, isSameFaction);
+                new FactionAccoladeEvent(campaign, accoladingFaction, accoladeLevel, isSameFaction);
                 return;
             }
 
@@ -136,7 +147,7 @@ public class FactionAccoladeEvent {
             }
 
             if (!isSameFaction) {
-                GoingRogue.processGoingRogue(campaign, faction, campaign.getCommander(), null);
+                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getCommander(), null);
             }
 
             List<Entity> generatedEntities = generateUnits();

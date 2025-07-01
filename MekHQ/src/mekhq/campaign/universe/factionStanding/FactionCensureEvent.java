@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
-import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureNewsArticle;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 
 /**
@@ -137,7 +137,7 @@ public class FactionCensureEvent {
         boolean isSeppuku = false;
         switch (censureAction) {
             case BARRED, COMMANDER_REMOVAL, COMMANDER_RETIREMENT, DISBAND, FINE, FORMAL_WARNING,
-                 LEADERSHIP_REPLACEMENT -> {
+                 LEADERSHIP_REPLACEMENT, LEGAL_CHALLENGE -> {
                 // We keep presenting the user with the dialog until they confirm their choice
                 while (true) {
                     FactionCensureDialog censureDialog = new FactionCensureDialog(campaign, censureAction, commander,
@@ -154,19 +154,17 @@ public class FactionCensureEvent {
                     }
                 }
             }
-            case CHATTERWEB_DISCUSSION, CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, LEGAL_CHALLENGE -> {
-                FactionJudgmentSceneType sceneType = switch (censureAction) {
-                    case CHATTERWEB_DISCUSSION -> FactionJudgmentSceneType.CHATTERWEB_DISCUSSION;
-                    case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL ->
-                          FactionJudgmentSceneType.CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL;
-                    case LEGAL_CHALLENGE -> FactionJudgmentSceneType.LEGAL_CHALLENGE;
-                    default -> throw new IllegalStateException("Unexpected value: " + censureAction);
-                };
-
+            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL -> {
+                FactionJudgmentSceneType sceneType = FactionJudgmentSceneType.CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL;
                 new FactionJudgmentSceneDialog(campaign, commander, secondInCommand, sceneType, censuringFaction);
             }
-            case COMMANDER_MURDERED, COMMANDER_IMPRISONMENT, LEADERSHIP_IMPRISONED, NEWS_ARTICLE ->
-                  new FactionCensureNewsArticle(campaign, commander, secondInCommand, censureAction, censuringFaction);
+            case COMMANDER_MURDERED,
+                 COMMANDER_IMPRISONMENT,
+                 LEADERSHIP_IMPRISONED,
+                 NEWS_ARTICLE,
+                 CHATTERWEB_DISCUSSION ->
+                  new FactionJudgmentNewsArticle(campaign, commander, secondInCommand, censureAction.getLookupName(),
+                        censuringFaction, FactionCensureJudgmentType.CENSURE);
         }
 
         if (isGoingRogue) {

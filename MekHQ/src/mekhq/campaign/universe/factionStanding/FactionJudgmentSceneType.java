@@ -44,15 +44,9 @@ package mekhq.campaign.universe.factionStanding;
  */
 public enum FactionJudgmentSceneType {
     /**
-     * Scene type representing a discussion involving the Chatterweb platform or system.
-     */
-    CHATTERWEB_DISCUSSION("CHATTERWEB_DISCUSSION"),
-
-    /**
      * Scene type representing an unsuccessful trial for clan leadership during a faction censure event.
      */
     CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL("CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL"),
-
     /**
      * Scene type representing the disbanding of a unit or force.
      */
@@ -61,10 +55,6 @@ public enum FactionJudgmentSceneType {
      * Scene type where the player goes rogue.
      */
     GO_ROGUE("GO_ROGUE"),
-    /**
-     * Scene type representing a legal challenge during a faction censure event.
-     */
-    LEGAL_CHALLENGE("LEGAL_CHALLENGE"),
     /**
      * Scene type where the player responded to a {@link FactionCensureEvent} by committing seppuku
      */
