@@ -42,7 +42,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.factionStanding.FactionCensureJudgmentType;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.utilities.MHQInternationalization;
 
@@ -55,45 +56,52 @@ public class FactionJudgmentNewsArticle {
     private final static String KEY_AFFIX_PERIPHERY = "periphery";
     private final static String KEY_AFFIX_CLAN = "clan";
 
-    public FactionJudgmentNewsArticle(Campaign campaign, Person commander, Person secondInCommand,
-          String lookupName, Faction censuringFaction, FactionCensureJudgmentType judgmentType) {
+    public FactionJudgmentNewsArticle(Campaign campaign, Person commander, Person secondInCommand, String lookupName,
+          Faction censuringFaction, FactionStandingJudgmentType judgmentType, boolean useFactionCapitalAsLocation) {
 
         String dialogKey = getDialogKey(judgmentType, lookupName, censuringFaction);
         String factionName = getFactionName(censuringFaction, campaign.getGameYear());
 
         LocalDate today = campaign.getLocalDate();
         CurrentLocation location = campaign.getLocation();
-        boolean isPlanetside = location.isOnPlanet();
-        String locationName = isPlanetside
-                                    ? location.getPlanet().getName(today)
-                                    : location.getCurrentSystem().getName(today);
 
-        String newsReport = getInCharacterText(dialogKey, commander, secondInCommand, factionName, campaign.getName(),
-              locationName);
+        String locationName;
+        if (useFactionCapitalAsLocation) {
+            PlanetarySystem capital = censuringFaction.getStartingPlanet(campaign, today);
+            locationName = capital.getName(today);
+        } else {
+            boolean isPlanetside = location.isOnPlanet();
+            locationName = isPlanetside
+                                 ? location.getPlanet().getName(today)
+                                 : location.getCurrentSystem().getName(today);
+        }
+
+        String commanderAddress = campaign.getCommanderAddress(false);
+
+        String newsReport = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, secondInCommand, factionName,
+              campaign.getName(), locationName, null, commanderAddress);
 
         new NewsDialog(campaign, newsReport);
     }
 
-    private static String getDialogKey(FactionCensureJudgmentType judgmentType, String lookupName,
-          Faction censuringFaction) {
-        String censuringFactionCode = censuringFaction.getShortName();
-
+    private static String getDialogKey(FactionStandingJudgmentType judgmentType, String lookupName,
+          Faction judgingFaction) {
+        String censuringFactionCode = judgingFaction.getShortName();
         String dialogKey = KEY_FORWARD + judgmentType.getLookupName() + '.' + lookupName + '.' + censuringFactionCode;
 
-        String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
-
         // If testReturn fails, we use a fallback value
+        String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
         if (!MHQInternationalization.isResourceKeyValid(testReturn)) {
             String affixKey;
-            if (censuringFaction.isClan()) {
+            if (judgingFaction.isClan()) {
                 affixKey = KEY_AFFIX_CLAN;
-            } else if (censuringFaction.isPeriphery()) {
+            } else if (judgingFaction.isPeriphery()) {
                 affixKey = KEY_AFFIX_PERIPHERY;
             } else {
                 affixKey = KEY_AFFIX_INNER_SPHERE;
             }
 
-            dialogKey = dialogKey.replace(censuringFactionCode, affixKey);
+            dialogKey = dialogKey.replace('.' + censuringFactionCode, '.' + affixKey);
         }
 
         return dialogKey;

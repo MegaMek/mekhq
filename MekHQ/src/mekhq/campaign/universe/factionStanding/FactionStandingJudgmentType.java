@@ -40,7 +40,7 @@ package mekhq.campaign.universe.factionStanding;
  * @author Illiani
  * @since 0.50.07
  */
-public enum FactionCensureJudgmentType {
+public enum FactionStandingJudgmentType {
     CENSURE("CENSURE"),
     ACCOLADE("ACCOLADE");
 
@@ -50,11 +50,11 @@ public enum FactionCensureJudgmentType {
     private final String lookupName;
 
     /**
-     * Constructs a {@link FactionCensureJudgmentType} with the specified lookup name.
+     * Constructs a {@link FactionStandingJudgmentType} with the specified lookup name.
      *
      * @param lookupName the lookup name associated with this type
      */
-    FactionCensureJudgmentType(String lookupName) {
+    FactionStandingJudgmentType(String lookupName) {
         this.lookupName = lookupName;
     }
 

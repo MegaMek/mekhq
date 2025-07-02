@@ -33,6 +33,8 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.NO_ACTION;
@@ -50,6 +52,7 @@ import java.util.Set;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
@@ -58,9 +61,11 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmationDialog;
-import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 
@@ -77,15 +82,13 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDial
  */
 public class FactionCensureEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionCensureEvent.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureEvent";
+
+    private static final String DIALOG_OOC_KEY = "FactionJudgmentDialog.message.CENSURE.";
+    private static final String DIALOG_OOC_KEY_AFFIX = ".ooc";
 
     private final static int GO_ROGUE_DIALOG_CHOICE_INDEX = 3;
     private final static int SEPPUKU_DIALOG_CHOICE_INDEX = 4;
-
-    /**
-     * Represents the minimum fine amount imposed during a faction censure event.
-     */
-    private final static Money MINIMUM_FINE = Money.of(10000000);
 
     private final Campaign campaign;
     private final Faction censuringFaction;
@@ -119,7 +122,9 @@ public class FactionCensureEvent {
             // If there isn't a commander in the campaign, we're going to invent someone. This avoids us needing to
             // add null protection throughout this class (and the dialogs it spawns). This clause should only trigger
             // in the event the campaign is effectively empty. So it shouldn't come up during normal play.
-            commander = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            commander = campaign.newPerson(PersonnelRole.MEKWARRIOR,
+                  campaign.getFaction().getShortName(),
+                  Gender.RANDOMIZE);
             LOGGER.warn("Commander was null in FactionCensureEvent. Using a fallback commander: {}.",
                   commander.getFullName());
         }
@@ -127,7 +132,9 @@ public class FactionCensureEvent {
         secondInCommand = campaign.getSecondInCommand(); // Can be null if the campaign is effectively empty
         if (secondInCommand == null) {
             // See comments for the 'commander == null' clause
-            secondInCommand = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            secondInCommand = campaign.newPerson(PersonnelRole.MEKWARRIOR,
+                  campaign.getFaction().getShortName(),
+                  Gender.RANDOMIZE);
             LOGGER.warn("Second in command was null in FactionCensureEvent. Using a fallback secondInCommand: {}.",
                   secondInCommand.getFullName());
         }
@@ -136,25 +143,38 @@ public class FactionCensureEvent {
         boolean isGoingRogue = false;
         boolean isSeppuku = false;
         switch (censureAction) {
-            case BARRED, COMMANDER_REMOVAL, COMMANDER_RETIREMENT, DISBAND, FINE, FORMAL_WARNING,
-                 LEADERSHIP_REPLACEMENT, LEGAL_CHALLENGE -> {
+            case BARRED,
+                 COMMANDER_RETIREMENT,
+                 DISBAND,
+                 FINE,
+                 FORMAL_WARNING,
+                 LEADERSHIP_REPLACEMENT,
+                 LEGAL_CHALLENGE -> {
                 // We keep presenting the user with the dialog until they confirm their choice
                 while (true) {
-                    FactionCensureDialog censureDialog = new FactionCensureDialog(campaign, censureAction, commander,
-                          censuringFaction);
+                    String outOfCharacterMessage = getOutOfCharacterMessage(censureAction);
 
-                    dialogChoice = censureDialog.getDialogChoiceIndex();
+                    PersonnelRole role = censuringFaction.isClan()
+                                               ? PersonnelRole.MEKWARRIOR
+                                               : PersonnelRole.MILITARY_LIAISON;
+                    Person speaker = campaign.newPerson(role, censuringFaction.getShortName(), Gender.RANDOMIZE);
+
+                    FactionJudgmentDialog censureDialog = new FactionJudgmentDialog(campaign, speaker, commander,
+                          censureAction.getLookupName(), censuringFaction, FactionStandingJudgmentType.CENSURE,
+                          ImmersiveDialogWidth.LARGE, outOfCharacterMessage, null);
+
+                    dialogChoice = censureDialog.getChoiceIndex();
                     isGoingRogue = dialogChoice == GO_ROGUE_DIALOG_CHOICE_INDEX;
                     isSeppuku = dialogChoice == SEPPUKU_DIALOG_CHOICE_INDEX;
 
-                    FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
-                          censureAction, commander, isSeppuku, isGoingRogue);
+                    FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign);
+
                     if (confirmationDialog.wasConfirmed()) {
                         break;
                     }
                 }
             }
-            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL -> {
+            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, CLAN_LEADERSHIP_TRIAL_SUCCESSFUL -> {
                 FactionJudgmentSceneType sceneType = FactionJudgmentSceneType.CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL;
                 new FactionJudgmentSceneDialog(campaign, commander, secondInCommand, sceneType, censuringFaction);
             }
@@ -164,7 +184,7 @@ public class FactionCensureEvent {
                  NEWS_ARTICLE,
                  CHATTERWEB_DISCUSSION ->
                   new FactionJudgmentNewsArticle(campaign, commander, secondInCommand, censureAction.getLookupName(),
-                        censuringFaction, FactionCensureJudgmentType.CENSURE);
+                        censuringFaction, FactionStandingJudgmentType.CENSURE, false);
         }
 
         if (isGoingRogue) {
@@ -177,6 +197,12 @@ public class FactionCensureEvent {
         }
 
         handleCensureEffects(censureAction, isSeppuku);
+    }
+
+    private static String getOutOfCharacterMessage(FactionCensureAction censureAction) {
+        String eventKey = DIALOG_OOC_KEY + censureAction.getLookupName() + DIALOG_OOC_KEY_AFFIX;
+        String resourceBundle = FactionJudgmentDialog.getFactionJudgmentDialogResourceBundle();
+        return getTextAt(resourceBundle, eventKey);
     }
 
     /**
@@ -211,7 +237,15 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processGoingRogue(Campaign campaign, FactionCensureLevel censureLevel, Faction censuringFaction) {
-        GoingRogue goingRogueDialog = new GoingRogue(campaign, commander, secondInCommand);
+        String campaignFactionCode = campaign.getFaction().getShortName();
+        boolean includeMercenary = !(campaignFactionCode.equals("MERC") || censuringFaction.isMercenary());
+        boolean includePirate = !(campaignFactionCode.equals("PIR") || censuringFaction.getShortName().equals("PIR"));
+
+        GoingRogue goingRogueDialog = new GoingRogue(campaign,
+              commander,
+              secondInCommand,
+              includeMercenary,
+              includePirate);
         if (goingRogueDialog.wasCanceled()) {
             new FactionCensureEvent(campaign, censureLevel, censuringFaction);
         }
@@ -222,9 +256,13 @@ public class FactionCensureEvent {
             case NO_ACTION -> {
                 return;
             }
-            case BARRED -> {}
-            case CHATTERWEB_DISCUSSION, CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, LEGAL_CHALLENGE, NEWS_ARTICLE,
-                 FORMAL_WARNING -> processMassLoyaltyChange(campaign, false, false);
+            case BARRED -> {
+                // TODO Barring
+            }
+            case CHATTERWEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
+                  processMassLoyaltyChange(campaign, false, false);
+            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL -> processClanTrial(false);
+            case CLAN_LEADERSHIP_TRIAL_SUCCESSFUL -> processClanTrial(true);
             case COMMANDER_MURDERED -> {
                 if (!isSeppuku) {
                     // The loyalty change is wrapped into the status change handling
@@ -238,12 +276,6 @@ public class FactionCensureEvent {
                     commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
                 }
             }
-            case COMMANDER_REMOVAL -> {
-                if (!isSeppuku) {
-                    // The loyalty change is wrapped into the status change handling
-                    commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DISHONORABLY_DISCHARGED);
-                }
-            }
             case COMMANDER_RETIREMENT -> {
                 if (!isSeppuku) {
                     // The loyalty change is wrapped into the status change handling
@@ -255,15 +287,11 @@ public class FactionCensureEvent {
             case FINE -> {
                 Finances finances = campaign.getFinances();
 
-                Money fine = finances.getProfits().multipliedBy(0.1);
-                if (fine.isLessThan(MINIMUM_FINE)) {
-                    fine = MINIMUM_FINE;
-                }
-                // TODO fine reason
-                finances.debit(TransactionType.FINE,
-                      campaign.getLocalDate(),
-                      fine,
-                      getTextAt(RESOURCE_BUNDLE, "fine_reason"));
+                Money fine = finances.getBalance().multipliedBy(0.1);
+                String fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.fine");
+
+                finances.debit(TransactionType.FINE, campaign.getLocalDate(), fine,
+                      getTextAt(RESOURCE_BUNDLE, fineMessage));
 
                 processMassLoyaltyChange(campaign, false, false);
             }
@@ -278,6 +306,42 @@ public class FactionCensureEvent {
         }
 
         processFactionStandingChange(isSeppuku);
+    }
+
+    private void processClanTrial(boolean isSuccessful) {
+        boolean useAdvancedMedical = campaign.getCampaignOptions().isUseAdvancedMedical();
+        int commanderInjuries = isSuccessful ? 6 : randomInt(5) + 1;
+        int secondInCommandInjuries = isSuccessful ? randomInt(3) + 1 : randomInt(6) + 1;
+        if (useAdvancedMedical) {
+            InjuryUtil.resolveCombatDamage(campaign, commander, commanderInjuries);
+            if (commander.getInjuries().size() > 5) {
+                commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
+            }
+
+            InjuryUtil.resolveCombatDamage(campaign, secondInCommand, secondInCommandInjuries);
+        } else {
+            int currentHits = commander.getHits();
+            int newHits = currentHits + commanderInjuries;
+            commander.setHits(newHits);
+            if (newHits > 5) {
+                commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
+            }
+
+            currentHits = secondInCommand.getHits();
+            newHits = currentHits + secondInCommandInjuries;
+            secondInCommand.setHits(newHits);
+            if (newHits > 5 && !isSuccessful) {
+                secondInCommand.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
+            }
+        }
+
+        if (isSuccessful) {
+            if (secondInCommand.getRecruitment() == null) {
+                campaign.recruitPerson(secondInCommand, true, true);
+            }
+
+            secondInCommand.setCommander(true);
+        }
     }
 
     /**
@@ -303,12 +367,8 @@ public class FactionCensureEvent {
         LocalDate today = campaign.getLocalDate();
         Set<Person> seniorPersonnel = getSeniorPersonnel(today);
 
+        boolean useExtraRandomness = campaign.getRandomSkillPreferences().randomizeSkill();
         for (Person seniorPerson : seniorPersonnel) {
-            // We shouldn't end up with any exempt people, but in case we do...
-            if (isExempt(seniorPerson, today)) {
-                continue;
-            }
-
             final int level = seniorPerson.getRankLevel();
             final int rank = seniorPerson.getRankNumeric();
 
@@ -361,14 +421,41 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private @Nullable Person getReplacementCharacter(Person seniorPerson) {
-        Person replacement = campaign.newPerson(seniorPerson.getPrimaryRole(), getPoliticalRole());
+        boolean useExtraRandomness = campaign.getRandomSkillPreferences().randomizeSkill();
+        boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
+
+        PersonnelRole primaryRole = seniorPerson.getPrimaryRole();
+        PersonnelRole politicalRole = getPoliticalRole();
+        Person replacement = campaign.newPerson(primaryRole, politicalRole);
+
+        overrideSkills(false,
+              false,
+              false,
+              isUseArtillery,
+              useExtraRandomness,
+              replacement,
+              primaryRole,
+              VETERAN);
+
+        overrideSkills(false,
+              false,
+              false,
+              isUseArtillery,
+              useExtraRandomness,
+              replacement,
+              politicalRole,
+              VETERAN);
+
         if (!replacement.hasSkill(S_LEADER)) {
             replacement.addSkill(S_LEADER, randomInt(3) + 1, 0);
         }
+
         if (!replacement.hasSkill(S_ADMIN)) {
             replacement.addSkill(S_ADMIN, randomInt(3) + 1, 0);
         }
+
         replacement.setLoyalty(Compute.d6(3) + 2);
+
         return replacement;
     }
 

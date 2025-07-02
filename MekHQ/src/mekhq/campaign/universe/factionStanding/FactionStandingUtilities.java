@@ -627,6 +627,89 @@ public class FactionStandingUtilities {
     }
 
     /**
+     * Constructs and returns the full display name for a given person.
+     *
+     * <p>The name is assembled in the following order: if present: rank title, given name, bloodname (if available),
+     * or surname (if bloodname is not present). This attempts to produce a canonical or ceremonial name as used in
+     * settings with titles and bloodnames.</p>
+     *
+     * @param person the {@link Person} whose full name should be generated
+     *
+     * @return the assembled full display name as a {@link String}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getCharacterFullName(Person person) {
+        String name = "";
+
+        String title = person.getRankName();
+        if (title != null && !title.isBlank()) {
+            name = title;
+        }
+
+        String firstName = person.getGivenName();
+        if (!name.isBlank()) {
+            name += " " + firstName;
+        } else {
+            name = firstName;
+        }
+
+        String bloodname = person.getBloodname();
+        if (bloodname != null && !bloodname.isBlank()) {
+            name += " " + bloodname;
+        }
+
+        String surname = person.getSurname();
+        if ((bloodname == null || bloodname.isBlank())
+                  && (surname != null && !surname.isBlank())) {
+            name += " " + surname;
+        }
+
+        return name;
+    }
+
+    /**
+     * Returns the display name for a person, combining rank/title and the best available family name.
+     *
+     * <p>Prefers to use the person's bloodname if available, or falls back to surname if not. Appends the person's
+     * rank/title at the end if present. If neither bloodname nor surname exist, will return the rank/title appended to
+     * the person's given name.</p>
+     *
+     * @param person the {@link Person} whose name should be generated
+     *
+     * @return a string combining the rank/title and surname or bloodname (if available)
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getTitleAndSurnameOrBloodname(Person person) {
+        String name = "";
+
+        String bloodname = person.getBloodname();
+        if (bloodname != null && !bloodname.isBlank()) {
+            name += bloodname;
+        }
+
+        String surname = person.getSurname();
+        if ((bloodname == null || bloodname.isBlank())
+                  && (surname != null && !surname.isBlank())) {
+            name += surname;
+        }
+
+        if (name.isBlank()) {
+            name = person.getGivenName();
+        }
+
+        String rankName = person.getRankName();
+        if (rankName != null && !rankName.isBlank()) {
+            name = rankName + " " + name;
+        }
+
+        return name;
+    }
+
+    /**
      * Generates a localized, in-character narrative text for a faction standing event, dynamically incorporating
      * identity and pronoun information for one or two characters, as well as campaign and faction context.
      *
@@ -635,23 +718,26 @@ public class FactionStandingUtilities {
      * individual. It also includes campaign-specific details like the campaign and faction name. The arguments are
      * formatted into a resource bundle string for display within campaign dialogs.</p>
      *
-     * @param resourceBundleAddress the resource bundle key for localization
+     * @param resourceBundle        the resource bundle address for localization
+     * @param resourceBundleAddress the resource bundle reference key
      * @param commander             the main commander or subject of the censure event; may be {@code null} if no
      *                              commander is cited in the dialog.
      * @param secondCharacter       optional secondary character affected by the event; may be {@code null} if there
      *                              isn't a second character in the scene.
      * @param factionName           the name of any relevant faction
      * @param campaignName          the name of the current campaign
-     * @param locationName          the name of the current system or planet; may be {@code null} if there isn't any
-     *                              locational information in the scene.
+     * @param locationName          the name of the relevant system or planet; may be {@code null} if there isn't any
+     *                             locational information in the scene.
      *
      * @return a formatted narrative {@link String} populated with character and context
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static String getInCharacterText(String resourceBundleAddress, @Nullable Person commander,
-          Person secondCharacter, String factionName, String campaignName, String locationName) {
+    public static String getInCharacterText(@Nullable String resourceBundle, String resourceBundleAddress,
+          @Nullable Person commander, @Nullable Person secondCharacter, String factionName, String campaignName,
+          String locationName, @Nullable Integer cashValue, String commanderAddress) {
+
         // We use fallback values so that we don't have to deal with null values
         final Gender FALLBACK_GENDER = Gender.MALE;
         final String FALLBACK_NAME_FULL = "";
@@ -662,14 +748,14 @@ public class FactionStandingUtilities {
         final PronounData commanderPronounData = new PronounData(commander == null
                                                                        ? FALLBACK_GENDER
                                                                        : commander.getGender());
-        // {0} hyperlinked full title
+        // {0} full title
         final String commanderHyperlinkedFullTitle = commander == null
                                                            ? FALLBACK_NAME_FULL
-                                                           : commander.getHyperlinkedFullTitle();
+                                                           : getCharacterFullName(commander);
         // {1} first name
         final String commanderFirstName = commander == null
                                                 ? FALLBACK_NAME_FULL
-                                                : commander.getHyperlinkedFullTitle();
+                                                : getTitleAndSurnameOrBloodname(commander);
         // {2} = He/She/They
         final String commanderHeSheTheyCapitalized = commanderPronounData.subjectPronoun();
         // {3} = he/she/they
@@ -689,14 +775,14 @@ public class FactionStandingUtilities {
         final PronounData secondPronounData = new PronounData(secondCharacter == null
                                                                     ? FALLBACK_GENDER
                                                                     : secondCharacter.getGender());
-        // {9} hyperlinked full title
+        // {9} full title
         final String secondHyperlinkedFullTitle = secondCharacter == null
                                                         ? FALLBACK_NAME_FULL
-                                                        : secondCharacter.getHyperlinkedFullTitle();
+                                                        : getCharacterFullName(secondCharacter);
         // {10} first name
         final String secondFirstName = secondCharacter == null
                                              ? FALLBACK_NAME_FIRST_NAME
-                                             : secondCharacter.getGivenName();
+                                             : getTitleAndSurnameOrBloodname(secondCharacter);
         // {11} = He/She/They
         final String secondHeSheTheyCapitalized = secondPronounData.subjectPronoun();
         // {12} = he/she/they
@@ -715,18 +801,24 @@ public class FactionStandingUtilities {
         // Miscellaneous campaign context
         // {18} = campaign name
         // {19} = faction name
-        // {20} = current location name
+        // {20} = location name
         if (locationName == null) {
             locationName = FALLBACK_LOCATION_NAME;
         }
+        // {21} = cash value (in millions)
+        if (cashValue == null) {
+            cashValue = 0;
+        }
+        // {22} = commander address
 
         // Format and return the localized dialog text with the current context.
-        return getFormattedTextAt(RESOURCE_BUNDLE, resourceBundleAddress, commanderHyperlinkedFullTitle,
-              commanderFirstName, commanderHeSheTheyCapitalized, commanderHeSheTheyLowercase,
-              commanderHimHerThemCapitalized, commanderHimHerThemLowercase, commanderHisHerTheirCapitalized,
-              commanderHisHerTheirLowercase, commanderPluralizer, secondHyperlinkedFullTitle, secondFirstName,
-              secondHeSheTheyCapitalized, secondHeSheTheyLowercase, secondHimHerThemCapitalized,
-              secondHimHerThemLowercase, secondHisHerTheirCapitalized, secondHisHerTheirLowercase, secondPluralizer,
-              campaignName, factionName, locationName);
+        return getFormattedTextAt(resourceBundle == null ? RESOURCE_BUNDLE : resourceBundle, resourceBundleAddress,
+              commanderHyperlinkedFullTitle, commanderFirstName, commanderHeSheTheyCapitalized,
+              commanderHeSheTheyLowercase, commanderHimHerThemCapitalized, commanderHimHerThemLowercase,
+              commanderHisHerTheirCapitalized, commanderHisHerTheirLowercase, commanderPluralizer,
+              secondHyperlinkedFullTitle, secondFirstName, secondHeSheTheyCapitalized, secondHeSheTheyLowercase,
+              secondHimHerThemCapitalized, secondHimHerThemLowercase, secondHisHerTheirCapitalized,
+              secondHisHerTheirLowercase, secondPluralizer, campaignName, factionName, locationName, cashValue,
+              commanderAddress);
     }
 }

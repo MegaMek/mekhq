@@ -41,21 +41,21 @@ package mekhq.campaign.universe.factionStanding;
  * @since 0.50.07
  */
 public enum FactionCensureAction {
-    NO_ACTION("NO_ACTION", true, true),
     BARRED("BARRED", true, true),
     CHATTERWEB_DISCUSSION("CHATTERWEB_DISCUSSION", true, true),
+    CLAN_LEADERSHIP_TRIAL_SUCCESSFUL("CLAN_LEADERSHIP_TRIAL_SUCCESSFUL", false, true),
     CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL("CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL", true, true),
-    COMMANDER_MURDERED("COMMANDER_MURDERED", false, true),
     COMMANDER_IMPRISONMENT("COMMANDER_IMPRISONMENT", false, false),
-    COMMANDER_REMOVAL("COMMANDER_REMOVAL", false, true),
+    COMMANDER_MURDERED("COMMANDER_MURDERED", false, true),
     COMMANDER_RETIREMENT("COMMANDER_RETIREMENT", false, true),
     DISBAND("DISBAND", false, true),
     FINE("FINE", true, true),
     FORMAL_WARNING("FORMAL_WARNING", true, true),
-    LEADERSHIP_REPLACEMENT("LEADERSHIP_REPLACEMENT", false, false),
     LEADERSHIP_IMPRISONED("LEADERSHIP_IMPRISONED", false, false),
+    LEADERSHIP_REPLACEMENT("LEADERSHIP_REPLACEMENT", false, false),
     LEGAL_CHALLENGE("LEGAL_CHALLENGE", true, true),
-    NEWS_ARTICLE("NEWS_ARTICLE", true, true);
+    NEWS_ARTICLE("NEWS_ARTICLE", true, true),
+    NO_ACTION("NO_ACTION", true, true);
 
     /** String representation for lookup purposes (usually the enum name itself). */
     private final String lookupName;

@@ -225,7 +225,7 @@ public class FactionJudgmentSceneDialog {
      */
     private static List<String> getButtonLabels(FactionJudgmentSceneType sceneType) {
         return switch (sceneType) {
-            case CHATTERWEB_DISCUSSION, CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, LEGAL_CHALLENGE -> null;
+            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL -> null;
             case DISBAND, GO_ROGUE, SEPPUKU -> {
                 String key = "FactionJudgmentSceneDialog.button.";
                 key += sceneType.getLookUpName();

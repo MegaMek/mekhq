@@ -45,7 +45,9 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
 import megamek.common.UnitType;
+import megamek.common.enums.Gender;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.universe.FactionLeaderData;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
@@ -54,10 +56,13 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 
 /**
@@ -75,7 +80,15 @@ public class FactionAccoladeEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionAccoladeEvent.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
 
+    static final String LOOKUP_AFFIX_ADOPTION = ".adoption";
+    static final String LOOKUP_AFFIX_MEKS = ".meks";
+    static final String MAGISTRACY_HOLO_STAR_GIVEN_NAME = "Mia";
+    static final String MAGISTRACY_HOLO_STAR_SURNAME = "Meklove";
+
     static final double C_BILL_MULTIPLIER = 5000000.0;
+    static final int C_BILL_MULTIPLIER_TEXT = (int) (C_BILL_MULTIPLIER / 1000000);
+
+    static final int REFUSE_ACCOLADE_RESPONSE_INDEX = 2;
 
     final Campaign campaign;
     final String factionCode;
@@ -112,26 +125,51 @@ public class FactionAccoladeEvent {
             }
         }
 
+        boolean isCashReward = accoladeLevel.is(CASH_BONUS_0) ||
+                                     accoladeLevel.is(CASH_BONUS_1) ||
+                                     accoladeLevel.is(CASH_BONUS_2) ||
+                                     accoladeLevel.is(CASH_BONUS_3) ||
+                                     accoladeLevel.is(CASH_BONUS_4);
+
         Person commander = campaign.getCommander();
 
-        boolean isClan = accoladingFaction.isClan() && !accoladingFaction.isMercenaryOrganization();
-        boolean isPressRecognition = accoladeLevel.is(PRESS_RECOGNITION);
-        boolean isPropagandaReel = accoladeLevel.is(PROPAGANDA_REEL);
-        boolean isTriumphOrRemembrance = accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE);
-        boolean isStatueOrSibko = accoladeLevel.is(STATUE_OR_SIBKO);
-        boolean isMOC = accoladingFaction.getShortName().equals("MOC");
-        boolean isComStarOrWoB = accoladingFaction.isComStarOrWoB();
+        boolean accoladeWasRefused;
 
-        boolean triggerNewsArticle = isPressRecognition
-                                           || (!isClan && isPropagandaReel)
-                                           || (isTriumphOrRemembrance && !isMOC)
-                                           || (isStatueOrSibko && !isMOC && !isComStarOrWoB);
+        boolean triggerNewsArticle = isTriggerNewsArticle(accoladingFaction, accoladeLevel);
         if (triggerNewsArticle) {
+            boolean useFactionCapitalAsLocation = accoladeLevel.is(STATUE_OR_SIBKO);
             new FactionJudgmentNewsArticle(campaign, commander, null, accoladeLevel.getLookupName(),
-                  accoladingFaction, FactionCensureJudgmentType.ACCOLADE);
+                  accoladingFaction, FactionStandingJudgmentType.ACCOLADE, useFactionCapitalAsLocation);
             return;
         } else {
-            // TODO Trigger normal dialog called initialDialog
+            String lookupName = accoladeLevel.getLookupName();
+            String oocText = null;
+            if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
+                lookupName += isSameFaction ? LOOKUP_AFFIX_MEKS : LOOKUP_AFFIX_ADOPTION;
+
+                String oocTextKey = isSameFaction
+                                          ? "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.meks.ooc"
+                                          : "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.adoption.ooc";
+                oocText = getTextAt(FactionJudgmentDialog.getFactionJudgmentDialogResourceBundle(), oocTextKey);
+            }
+
+            ImmersiveDialogWidth dialogWidth;
+            if (accoladeLevel.is(APPEARING_IN_SEARCHES) || isCashReward) {
+                dialogWidth = ImmersiveDialogWidth.MEDIUM;
+            } else {
+                dialogWidth = ImmersiveDialogWidth.LARGE;
+            }
+
+            Integer moneyReward = null;
+            if (isCashReward) {
+                moneyReward = accoladeLevel.getRecognition() * C_BILL_MULTIPLIER_TEXT;
+            }
+
+            Person speaker = getSpeaker(campaign, accoladingFaction, accoladeLevel);
+
+            FactionJudgmentDialog initialDialog = new FactionJudgmentDialog(campaign, speaker, commander, lookupName,
+                  accoladingFaction, FactionStandingJudgmentType.ACCOLADE, dialogWidth, oocText, moneyReward);
+            accoladeWasRefused = initialDialog.getChoiceIndex() == REFUSE_ACCOLADE_RESPONSE_INDEX;
         }
 
         if (isAdoptionOrLance) {
@@ -142,7 +180,7 @@ public class FactionAccoladeEvent {
                 return;
             }
 
-            if (initialDialog.wasRefused()) {
+            if (accoladeWasRefused) {
                 return;
             }
 
@@ -157,15 +195,72 @@ public class FactionAccoladeEvent {
             return;
         }
 
-        if (accoladeLevel.is(CASH_BONUS_0) ||
-                  accoladeLevel.is(CASH_BONUS_1) ||
-                  accoladeLevel.is(CASH_BONUS_2) ||
-                  accoladeLevel.is(CASH_BONUS_3) ||
-                  accoladeLevel.is(CASH_BONUS_4)) {
+        if (isCashReward) {
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
                   Money.of(accoladeLevel.getRecognition() * C_BILL_MULTIPLIER),
                   getTextAt(RESOURCE_BUNDLE, "FactionAccoladeDialog.credit"));
         }
+    }
+
+    private static Person getSpeaker(Campaign campaign, Faction accoladingFaction, FactionAccoladeLevel accoladeLevel) {
+        Person speaker;
+        if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
+            speaker = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
+        } else {
+            boolean isLetterFromHeadOfState = accoladeLevel.is(LETTER_FROM_HEAD_OF_STATE);
+            boolean isMagistracySpecialCase = accoladingFaction.getShortName().equals("MOC")
+                                                    && (accoladeLevel.is(ADOPTION_OR_MEKS) ||
+                                                              accoladeLevel.is(STATUE_OR_SIBKO) ||
+                                                              accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE));
+
+            PersonnelRole personnelRole = accoladingFaction.isClan()
+                                                ? PersonnelRole.MEKWARRIOR
+                                                : PersonnelRole.MILITARY_LIAISON;
+            if (isMagistracySpecialCase) {
+                personnelRole = PersonnelRole.HOLO_STAR;
+            } else if (accoladingFaction.isClan() && accoladingFaction.isMercenaryOrganization()) {
+                personnelRole = PersonnelRole.MERCHANT;
+            } else if (!accoladingFaction.isClan() && isLetterFromHeadOfState) {
+                personnelRole = PersonnelRole.NOBLE;
+            } else if (accoladingFaction.isClan() && accoladeLevel.is(PROPAGANDA_REEL)) {
+                personnelRole = PersonnelRole.MILITARY_HOLO_FILMER;
+            }
+
+            speaker = campaign.newPerson(personnelRole, accoladingFaction.getShortName(), Gender.RANDOMIZE);
+            if (isMagistracySpecialCase) {
+                speaker.setGender(Gender.FEMALE);
+                speaker.setGivenName(MAGISTRACY_HOLO_STAR_GIVEN_NAME);
+                speaker.setSurname(MAGISTRACY_HOLO_STAR_SURNAME);
+                speaker.setSecondaryRole(PersonnelRole.MILITARY_PROMOTER);
+            } else if (isLetterFromHeadOfState) {
+                FactionLeaderData leaderData = accoladingFaction.getLeaderForYear(campaign.getGameYear());
+                if (leaderData != null) {
+                    String name = leaderData.getFullTitle(true);
+                    speaker.setGivenName(name);
+                    speaker.setSurname("");
+                    speaker.setGender(leaderData.gender());
+                }
+            }
+        }
+        return speaker;
+    }
+
+    private static boolean isTriggerNewsArticle(Faction accoladingFaction, FactionAccoladeLevel accoladeLevel) {
+        boolean isClan = accoladingFaction.isClan() && !accoladingFaction.isMercenaryOrganization();
+
+        final String MAGISTRACY_OF_CANOPUS = "MOC";
+        boolean isMOC = accoladingFaction.getShortName().equals(MAGISTRACY_OF_CANOPUS);
+        boolean isComStar = accoladingFaction.isComStar();
+        boolean isWordOfBlake = accoladingFaction.isWoB();
+
+        return switch (accoladeLevel) {
+            case NO_ACCOLADE, CASH_BONUS_4, LETTER_FROM_HEAD_OF_STATE, CASH_BONUS_3, CASH_BONUS_2, ADOPTION_OR_MEKS,
+                 CASH_BONUS_1, CASH_BONUS_0, APPEARING_IN_SEARCHES, TAKING_NOTICE_1, TAKING_NOTICE_0 -> false;
+            case PRESS_RECOGNITION -> true;
+            case PROPAGANDA_REEL -> !isClan;
+            case TRIUMPH_OR_REMEMBRANCE -> !(isMOC || isClan);
+            case STATUE_OR_SIBKO -> !(isMOC || isComStar || isWordOfBlake || isClan);
+        };
     }
 
     /**
