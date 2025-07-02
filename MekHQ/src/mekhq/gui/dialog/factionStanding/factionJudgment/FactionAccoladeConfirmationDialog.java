@@ -53,12 +53,12 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since 0.50.07
  */
 public class FactionAccoladeConfirmationDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
 
-    private static final String IN_CHARACTER_KEY = "FactionAccoladeDialog.confirmation.inCharacter";
-    private static final String OUT_OF_CHARACTER_KEY = "FactionAccoladeDialog.confirmation.outOfCharacter";
-    private static final String BUTTON_CONFIRM = "FactionAccoladeDialog.confirmation.button.confirm";
-    private static final String BUTTON_CANCEL = "FactionAccoladeDialog.confirmation.button.cancel";
+    private static final String IN_CHARACTER_KEY = "FactionCensureDialog.confirmation.inCharacter";
+    private static final String OUT_OF_CHARACTER_KEY = "FactionCensureDialog.confirmation.outOfCharacter";
+    private static final String BUTTON_CONFIRM = "FactionCensureDialog.confirmation.button.confirm";
+    private static final String BUTTON_CANCEL = "FactionCensureDialog.confirmation.button.cancel";
 
     private static final int CONFIRMED_DIALOG_INDEX = 1;
 

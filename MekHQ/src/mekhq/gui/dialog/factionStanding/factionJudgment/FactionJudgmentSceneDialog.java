@@ -33,7 +33,6 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType.SEPPUKU;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -45,14 +44,10 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -94,95 +89,26 @@ public class FactionJudgmentSceneDialog {
           FactionJudgmentSceneType sceneType, Faction censuringFaction) {
         this.campaign = campaign;
 
-        new ImmersiveDialogSimple(
-              campaign,
-              commander,
-              secondCharacter,
-              getInCharacterText(commander, secondCharacter, sceneType, censuringFaction),
-              getButtonLabels(sceneType),
-              null,
-              null,
-              false,
-              ImmersiveDialogWidth.MEDIUM);
+        boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        String dialogKey = getDialogKey(sceneType, censuringFaction, isPlanetside);
+
+        //        new ImmersiveDialogSimple(
+        //              campaign,
+        //              commander,
+        //              secondCharacter,
+        //              getInCharacterText(commander, secondCharacter, sceneType, censuringFaction),
+        //              getButtonLabels(sceneType),
+        //              null,
+        //              null,
+        //              false,
+        //              ImmersiveDialogWidth.MEDIUM);
     }
 
-    /**
-     * Constructs the full in-character dialog text for a faction judgment scene by formatting a localized template with
-     * campaign and personnel context.
-     *
-     * @param commander       the primary character for pronoun/identity substitution
-     * @param secondCharacter the secondary character for pronoun/identity substitution (nullable)
-     * @param sceneType       the type of scene used to select the appropriate template
-     *
-     * @return the formatted, story-driven dialog text to be displayed
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private String getInCharacterText(Person commander, @Nullable Person secondCharacter,
-          FactionJudgmentSceneType sceneType, Faction censuringFaction) {
-        // COMMANDER pronoun/identity context
-        final PronounData commanderPronounData = new PronounData(commander.getGender());
-        // {0} hyperlinked full title
-        final String commanderHyperlinkedFullTitle = commander.getHyperlinkedFullTitle();
-        // {1} first name
-        final String commanderFirstName = commander.getGivenName();
-        // {2} = He/She/They
-        final String commanderHeSheTheyCapitalized = commanderPronounData.subjectPronoun();
-        // {3} = he/she/they
-        final String commanderHeSheTheyLowercase = commanderPronounData.subjectPronounLowerCase();
-        // {4} = Him/Her/Them
-        final String commanderHimHerThemCapitalized = commanderPronounData.objectPronoun();
-        // {5} = him/her/them
-        final String commanderHimHerThemLowercase = commanderPronounData.objectPronounLowerCase();
-        // {6} = His/Her/Their
-        final String commanderHisHerTheirCapitalized = commanderPronounData.possessivePronoun();
-        // {7} = his/her/their
-        final String commanderHisHerTheirLowercase = commanderPronounData.possessivePronounLowerCase();
-        // {8} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
-        final int commanderPluralizer = commanderPronounData.pluralizer();
+    private static String getDialogKey(FactionJudgmentSceneType sceneType, Faction censuringFaction,
+          boolean isPlanetside) {
+        String variant = "." + randomInt(10);
 
-        // SECOND pronoun/identity context
-        final PronounData secondPronounData = new PronounData(secondCharacter == null
-                                                                    ? Gender.MALE
-                                                                    : secondCharacter.getGender());
-        // {9} hyperlinked full title
-        final String secondHyperlinkedFullTitle = secondCharacter == null
-                                                        ? "Sergeant Smith"
-                                                        : secondCharacter.getHyperlinkedFullTitle();
-        // {10} first name
-        final String secondFirstName = secondCharacter == null ? "Smith" : secondCharacter.getGivenName();
-        // {11} = He/She/They
-        final String secondHeSheTheyCapitalized = secondPronounData.subjectPronoun();
-        // {12} = he/she/they
-        final String secondHeSheTheyLowercase = secondPronounData.subjectPronounLowerCase();
-        // {13} = Him/Her/Them
-        final String secondHimHerThemCapitalized = secondPronounData.objectPronoun();
-        // {14} = him/her/them
-        final String secondHimHerThemLowercase = secondPronounData.objectPronounLowerCase();
-        // {15} = His/Her/Their
-        final String secondHisHerTheirCapitalized = secondPronounData.possessivePronoun();
-        // {16} = his/her/their
-        final String secondHisHerTheirLowercase = secondPronounData.possessivePronounLowerCase();
-        // {17} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
-        final int secondPluralizer = secondCharacter == null ? 0 : secondPronounData.pluralizer();
-
-        boolean isPlanetside = campaign.getLocation().isOnPlanet();
-
-        // Miscellaneous campaign context
-        // {18} = campaign name
-        String campaignName = campaign.getName();
-        // {19} = planet name
-        String planetName = isPlanetside ? campaign.getLocation().getPlanet().getName(campaign.getLocalDate()) : "";
-        // {20} = commander address
-        String commanderAddress = campaign.getCommanderAddress(false);
-
-        String seppukuVariant = "." + randomInt(10);
-        String dialogKey = DIALOG_KEY_FORWARD
-                                 + sceneType.getLookUpName() + '.'
-                                 + (isPlanetside ? DIALOG_KEY_AFFIX_PLANETSIDE : DIALOG_KEY_AFFIX_IN_TRANSIT) + '.'
-                                 + censuringFaction.getShortName()
-                                 + (sceneType == SEPPUKU ? seppukuVariant : "");
+        String dialogKey = "";
 
         // Attempt a faction-localized template first, then fall back to general grouping
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
@@ -196,21 +122,13 @@ public class FactionJudgmentSceneDialog {
                 affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
             }
 
-            dialogKey = DIALOG_KEY_FORWARD
-                              + sceneType.getLookUpName() + '.'
-                              + (isPlanetside ? DIALOG_KEY_AFFIX_PLANETSIDE : DIALOG_KEY_AFFIX_IN_TRANSIT) + '.'
-                              + affixKey
-                              + (sceneType == SEPPUKU ? seppukuVariant : "");
+            //            dialogKey = DIALOG_KEY_FORWARD
+            //                              + sceneType.getLookUpName() + '.'
+            //                              + (isPlanetside ? DIALOG_KEY_AFFIX_PLANETSIDE : DIALOG_KEY_AFFIX_IN_TRANSIT) + '.'
+            //                              + affixKey
+            //                              + (sceneType == SEPPUKU ? seppukuVariant : "");
         }
-
-        // Format and return the localized dialog text with the current context.
-        return getFormattedTextAt(RESOURCE_BUNDLE, dialogKey, commanderHyperlinkedFullTitle, commanderFirstName,
-              commanderHeSheTheyCapitalized, commanderHeSheTheyLowercase, commanderHimHerThemCapitalized,
-              commanderHimHerThemLowercase, commanderHisHerTheirCapitalized, commanderHisHerTheirLowercase,
-              commanderPluralizer, secondHyperlinkedFullTitle, secondFirstName, secondHeSheTheyCapitalized,
-              secondHeSheTheyLowercase, secondHimHerThemCapitalized, secondHimHerThemLowercase,
-              secondHisHerTheirCapitalized, secondHisHerTheirLowercase, secondPluralizer, campaignName, planetName,
-              commanderAddress);
+        return dialogKey;
     }
 
     /**
@@ -224,21 +142,16 @@ public class FactionJudgmentSceneDialog {
      * @since 0.50.07
      */
     private static List<String> getButtonLabels(FactionJudgmentSceneType sceneType) {
-        return switch (sceneType) {
-            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL -> null;
-            case DISBAND, GO_ROGUE, SEPPUKU -> {
-                String key = "FactionJudgmentSceneDialog.button.";
-                key += sceneType.getLookUpName();
-                String color = switch (sceneType) {
-                    case DISBAND -> getNegativeColor();
-                    case GO_ROGUE -> getPositiveColor();
-                    case SEPPUKU -> getWarningColor();
-                    default -> throw new IllegalStateException("Unexpected value: " + sceneType);
-                };
+        String key = "FactionJudgmentSceneDialog.button.";
+        key += sceneType.getLookUpName();
 
-                yield List.of(getFormattedTextAt(RESOURCE_BUNDLE, key, spanOpeningWithCustomColor(color),
-                      CLOSING_SPAN_TAG));
-            }
+        String color = switch (sceneType) {
+            case BARRED, CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL, DISBAND, SEPPUKU -> getNegativeColor();
+            case GO_ROGUE -> getPositiveColor();
+            case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL -> getWarningColor();
         };
+
+        return List.of(getFormattedTextAt(RESOURCE_BUNDLE, key, spanOpeningWithCustomColor(color),
+              CLOSING_SPAN_TAG));
     }
 }

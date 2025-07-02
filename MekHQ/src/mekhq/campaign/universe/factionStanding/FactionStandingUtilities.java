@@ -56,7 +56,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 
 public class FactionStandingUtilities {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUtilities.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
 
     /**
      * List of personnel roles considered political in the context of censure effects.

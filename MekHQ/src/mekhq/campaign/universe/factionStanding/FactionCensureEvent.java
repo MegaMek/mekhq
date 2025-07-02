@@ -37,6 +37,7 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionCensureAction.CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.NO_ACTION;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.isExempt;
@@ -174,9 +175,19 @@ public class FactionCensureEvent {
                     }
                 }
             }
-            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, CLAN_LEADERSHIP_TRIAL_SUCCESSFUL -> {
-                FactionJudgmentSceneType sceneType = FactionJudgmentSceneType.CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL;
-                new FactionJudgmentSceneDialog(campaign, commander, secondInCommand, sceneType, censuringFaction);
+            case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL -> {
+                FactionJudgmentSceneType sceneType = censureAction.equals(CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL)
+                                                           ?
+                                                           FactionJudgmentSceneType.CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL
+                                                           :
+                                                           FactionJudgmentSceneType.CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL;
+                new FactionJudgmentSceneDialog(
+                      campaign,
+                      commander,
+                      secondInCommand,
+                      sceneType,
+                      censuringFaction
+                );
             }
             case COMMANDER_MURDERED,
                  COMMANDER_IMPRISONMENT,
@@ -256,13 +267,12 @@ public class FactionCensureEvent {
             case NO_ACTION -> {
                 return;
             }
-            case BARRED -> {
-                // TODO Barring
-            }
+            case BARRED -> new FactionJudgmentSceneDialog(campaign, commander, secondInCommand,
+                  FactionJudgmentSceneType.BARRED, censuringFaction);
             case CHATTERWEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
                   processMassLoyaltyChange(campaign, false, false);
-            case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL -> processClanTrial(false);
-            case CLAN_LEADERSHIP_TRIAL_SUCCESSFUL -> processClanTrial(true);
+            case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL -> processClanTrial(false);
+            case CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL -> processClanTrial(true);
             case COMMANDER_MURDERED -> {
                 if (!isSeppuku) {
                     // The loyalty change is wrapped into the status change handling

@@ -44,37 +44,48 @@ package mekhq.campaign.universe.factionStanding;
  */
 public enum FactionJudgmentSceneType {
     /**
-     * Scene type representing an unsuccessful trial for clan leadership during a faction censure event.
+     * Scene type where the campaign is barred from a mercenary organization
      */
-    CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL("CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL"),
+    BARRED("BARRED", false, false),
+    /**
+     * Scene type representing a successful Trial of Grievance during a faction censure event.
+     */
+    CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL("CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL", true, true),
+    /**
+     * Scene type representing an unsuccessful Trial of Grievance during a faction censure event.
+     */
+    CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL("CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL", true, true),
     /**
      * Scene type representing the disbanding of a unit or force.
      */
-    DISBAND("DISBAND"),
+    DISBAND("DISBAND", false, false),
     /**
-     * Scene type where the player goes rogue.
+     * Scene type where the player responded to a {@link FactionCensureEvent} by going rogue
      */
-    GO_ROGUE("GO_ROGUE"),
+    GO_ROGUE("GO_ROGUE", true, false),
     /**
      * Scene type where the player responded to a {@link FactionCensureEvent} by committing seppuku
      */
-    SEPPUKU("SEPPUKU");
+    SEPPUKU("SEPPUKU", true, true);
 
-    /**
-     * The unique lookup name associated with this scene type.
-     */
     private final String lookUpName;
+    private final boolean locationSpecificVariants;
+    private final boolean hasRandomVariants;
 
     /**
      * Constructs a {@link FactionJudgmentSceneType} with the specified lookup name.
      *
      * @param lookUp the lookup name associated with the scene type
+     * @param locationSpecificVariants {@code true} if the scene has different variants for on a planet or in transit
+     * @param hasRandomVariants {@code true} if the scene has 10 random variants, otherwise false
      *
      * @author Illiani
      * @since 0.50.07
      */
-    FactionJudgmentSceneType(String lookUp) {
+    FactionJudgmentSceneType(String lookUp, boolean locationSpecificVariants, boolean hasRandomVariants) {
         this.lookUpName = lookUp;
+        this.locationSpecificVariants = locationSpecificVariants;
+        this.hasRandomVariants = hasRandomVariants;
     }
 
     /**
@@ -87,5 +98,30 @@ public enum FactionJudgmentSceneType {
      */
     public String getLookUpName() {
         return lookUpName;
+    }
+
+    /**
+     * Indicates whether the scene type has location-specific variants.
+     *
+     * @return {@code true} if the scene type has variants dependent on the location (e.g., on a planet or in transit),
+     *       otherwise {@code false}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean hasLocationSpecificVariants() {
+        return locationSpecificVariants;
+    }
+
+    /**
+     * Determines whether the scene type has random variants.
+     *
+     * @return {@code true} if the scene has random variants, otherwise {@code false}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean hasRandomVariants() {
+        return hasRandomVariants;
     }
 }

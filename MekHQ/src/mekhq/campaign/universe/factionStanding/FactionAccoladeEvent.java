@@ -78,7 +78,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArtic
  */
 public class FactionAccoladeEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionAccoladeEvent.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
 
     static final String LOOKUP_AFFIX_ADOPTION = ".adoption";
     static final String LOOKUP_AFFIX_MEKS = ".meks";
