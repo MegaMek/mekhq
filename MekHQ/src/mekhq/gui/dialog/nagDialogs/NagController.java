@@ -96,7 +96,7 @@ public class NagController {
         }
 
         // No Commander
-        if (NoCommanderNagDialog.checkNag(campaign.getFlaggedCommander())) {
+        if (NoCommanderNagDialog.checkNag(campaign.getCommander())) {
             NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(campaign);
             if (noCommanderNagDialog.shouldCancelAdvanceDay()) {
                 return true;

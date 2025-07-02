@@ -3604,71 +3604,78 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Determines the commander of the unit.
+     * Retrieves the current campaign commander.
      *
-     * <p>If a flagged commander exists, that person is returned. Otherwise, the highest-ranking member among the
-     * unit's active personnel is selected as commander. In case of a rank tie, a skill-based tiebreaker is used to
-     * determine precedence.</p>
+     * <p>If a commander is specifically flagged, that person will be returned. Otherwise, the highest-ranking member
+     * among the unit's active personnel is selected.</p>
      *
-     * @return the {@link Person} serving as commander, or {@code null} if no eligible personnel are found.
+     * @return the {@link Person} who is the commander, or {@code null} if there are no suitable candidates.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public @Nullable Person getCommander() {
-        Person commander = getFlaggedCommander();
-
-        if (commander != null) {
-            return commander;
-        }
-
-        for (Person person : getActivePersonnel(false)) {
-            if (commander == null) {
-                commander = person;
-                continue;
-            }
-
-            if (person.outRanksUsingSkillTiebreaker(this, commander)) {
-                commander = person;
-            }
-        }
-
-        return commander;
+        return findTopCommanders()[0];
     }
 
     /**
      * Retrieves the second-in-command among the unit's active personnel.
      *
      * <p>The second-in-command is determined as the highest-ranking active personnel member who is not the flagged
-     * commander. If more than one candidate has the same rank, a skill-based tiebreaker is used to determine which
-     * person outranks the others.</p>
+     * commander (if one exists). If multiple candidates have the same rank, a skill-based tiebreaker is used.</p>
      *
      * @return the {@link Person} who is considered the second-in-command, or {@code null} if there are no suitable
-     *       candidates.
+     * candidates.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public @Nullable Person getSecondInCommand() {
-        Person commander = getCommander();
+        return findTopCommanders()[1];
+    }
 
+    /**
+     * Finds the current top two candidates for command among active personnel.
+     *
+     * <p>In a single pass, this method determines the commander and the second-in-command using a flagged commander
+     * if one is specified, otherwise relying on rank and skill tiebreakers.</p>
+     *
+     * @return an array where index 0 is the commander (may be the flagged commander), and index 1 is the
+     *       second-in-command; either or both may be {@code null} if no suitable personnel are available.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Person[] findTopCommanders() {
+        Person flaggedCommander = getFlaggedCommander();
+        Person commander = flaggedCommander;
         Person secondInCommand = null;
+
         for (Person person : getActivePersonnel(false)) {
-            if (person.equals(commander)) {
-                continue;
-            }
-
-            if (secondInCommand == null) {
-                secondInCommand = person;
-                continue;
-            }
-
-            if (person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                secondInCommand = person;
+            // If we have a flagged commander, skip them
+            if (flaggedCommander != null) {
+                if (person.equals(flaggedCommander)) {
+                    continue;
+                }
+                // Second in command is best among non-flagged
+                if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    secondInCommand = person;
+                }
+            } else {
+                if (commander == null) {
+                    commander = person;
+                } else if (person.outRanksUsingSkillTiebreaker(this, commander)) {
+                    secondInCommand = commander;
+                    commander = person;
+                } else if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    if (!person.equals(commander)) {
+                        secondInCommand = person;
+                    }
+                }
             }
         }
 
-        return secondInCommand;
+        return new Person[] { commander, secondInCommand};
     }
 
     /**
@@ -5118,7 +5125,7 @@ public class Campaign implements ITechManager {
                 String enemyFactionCode = contract.getEnemyCode();
 
                 boolean allowBatchalls = true;
-                if (campaignOptions.isUseFactionStandingBatchallRestrictions()) {
+                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
                     double regard = factionStandings.getRegardForFaction(enemyFactionCode, true);
                     allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
                 }
@@ -5233,7 +5240,7 @@ public class Campaign implements ITechManager {
         int peopleWhoCelebrateCommandersDay = 0;
         int commanderDayTargetNumber = 5;
         boolean isCommandersDay = isCommandersDay(currentDay) &&
-                                        getFlaggedCommander() != null &&
+                                        getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
@@ -7272,7 +7279,7 @@ public class Campaign implements ITechManager {
 
                 // Skip systems where the campaign is outlawed
                 if (!skipAccessCheck
-                          && campaignOptions.isUseFactionStandingOutlawed()) {
+                          && campaignOptions.isUseFactionStandingOutlawedSafe()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
                           getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts, factionHints);
                     if (!canAccessSystem) {
@@ -8459,7 +8466,7 @@ public class Campaign implements ITechManager {
      */
     public int getCommanderStrategy() {
         int commanderStrategy = 0;
-        Person commander = getFlaggedCommander();
+        Person commander = getCommander();
 
         if (commander == null || !commander.hasSkill(S_STRATEGY)) {
             return commanderStrategy;

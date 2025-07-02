@@ -630,7 +630,7 @@ public class AtBContract extends Contract {
             FactionStandings factionStandings = campaign.getFactionStandings();
 
             boolean allowBatchalls = true;
-            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictions()) {
+            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
                 double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }

@@ -59,7 +59,9 @@ public enum ImmersiveDialogWidth {
      */
     LARGE(800);
 
-    /** The scaled pixel width for this dialog size. */
+    /**
+     * The scaled pixel width for this dialog size.
+     */
     private final int width;
 
     /**

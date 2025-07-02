@@ -179,11 +179,11 @@ public class ForceViewPanel extends JScrollablePanel {
         String type = null;
 
         Person commanderPerson = campaign.getPerson(force.getForceCommanderID());
-        String commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
 
         if (force.getId() == 0) {
-            commander = campaign.getFlaggedCommander() != null ? campaign.getFlaggedCommander().getFullTitle() : "";
+            commanderPerson = campaign.getCommander();
         }
+        String commanderName = commanderPerson != null ? commanderPerson.getFullTitle() : "";
 
         for (UUID uid : force.getAllUnits(false)) {
             Unit unit = campaign.getUnit(uid);
@@ -239,7 +239,7 @@ public class ForceViewPanel extends JScrollablePanel {
             nexty++;
         }
 
-        if (!commander.isBlank()) {
+        if (!commanderName.isBlank()) {
             lblCommander1.setName("lblCommander1");
             lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -250,7 +250,7 @@ public class ForceViewPanel extends JScrollablePanel {
             pnlStats.add(lblCommander1, gridBagConstraints);
 
             lblCommander2.setName("lblCommander2");
-            lblCommander2.setText(commander);
+            lblCommander2.setText(commanderName);
             lblCommander1.setLabelFor(lblCommander2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
