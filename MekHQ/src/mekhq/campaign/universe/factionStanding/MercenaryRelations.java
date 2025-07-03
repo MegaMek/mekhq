@@ -33,10 +33,10 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_REGARD;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ENEMY_FACTION_AT_WAR;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ENEMY_FACTION_RIVAL;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
 import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.ABOVE_AVERAGE;
 import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.AVERAGE;
 import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.AWFUL;
@@ -174,11 +174,11 @@ public class MercenaryRelations {
      * @since 0.50.07
      */
     enum StandingModifier {
-        AWFUL(STARTING_REGARD_ENEMY_FACTION_AT_WAR),
-        BELOW_AVERAGE(STARTING_REGARD_ENEMY_FACTION_RIVAL),
+        AWFUL(REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 10),
+        BELOW_AVERAGE(REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * 10),
         AVERAGE(DEFAULT_REGARD),
-        ABOVE_AVERAGE(STARTING_REGARD_ALLIED_FACTION),
-        AMAZING(STARTING_REGARD_SAME_FACTION);
+        ABOVE_AVERAGE(REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER * 10),
+        AMAZING(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 10);
 
         private final double modifier;
 
@@ -243,6 +243,9 @@ public class MercenaryRelations {
         }
 
         double defaultModifier = faction.isClan() ? CLAN_FALLBACK_VALUE : INNER_SPHERE_FALLBACK_VALUE;
+        if (faction.isMercenaryOrganization()) {
+            defaultModifier = INNER_SPHERE_FALLBACK_VALUE;
+        }
 
         String factionCode = faction.getShortName();
         List<MercenaryRelation> mercenaryRelations = CLIMATE_FACTION_STANDING_MODIFIERS.get(factionCode);

@@ -30,32 +30,40 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.factionStanding.gmToolsDialog;
+package mekhq.campaign.universe.factionStanding;
 
 /**
- * Enum representing the types of actions that can be performed on faction standings through GM (Game Master) tools.
+ * Enum representing the type of action taken during a faction judgment event.
+ *
+ * <p>Each constant has a unique lookup name for identification.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
-public enum FactionStandingsGMToolsActionType {
+public enum FactionStandingJudgmentType {
+    CENSURE("CENSURE"),
+    ACCOLADE("ACCOLADE");
+
     /**
-     * Resets all faction regard values to their default state, as defined by the campaign faction and game date.
+     * The unique lookup name associated with this type.
      */
-    RESET_ALL_REGARD,
+    private final String lookupName;
+
     /**
-     * Sets all faction regard values to zero.
+     * Constructs a {@link FactionStandingJudgmentType} with the specified lookup name.
+     *
+     * @param lookupName the lookup name associated with this type
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    ZERO_ALL_REGARD,
+    FactionStandingJudgmentType(String lookupName) {
+        this.lookupName = lookupName;
+    }
+
     /**
-     * Updates the regard value for a specific faction. This action is typically performed to adjust the standings of a
-     * particular faction to a desired value.
+     * Returns the lookup name for this type.
+     *
+     * @return the lookup name
      */
-    SET_SPECIFIC_REGARD,
-    /**
-     * Updates faction standings based on historical contract data (i.e., completed
-     * {@link mekhq.campaign.mission.Mission} objects).
-     */
-    UPDATE_HISTORIC_CONTRACTS
+    public String getLookupName() {
+        return lookupName;
+    }
 }

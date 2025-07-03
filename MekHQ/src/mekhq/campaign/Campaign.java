@@ -244,6 +244,10 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
+import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
+import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
@@ -5685,6 +5689,7 @@ public class Campaign implements ITechManager {
         // Advance the day by one
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
+        boolean isMonday = currentDay.getDayOfWeek() == DayOfWeek.MONDAY;
         boolean isFirstOfMonth = currentDay.getDayOfMonth() == 1;
         boolean isNewYear = currentDay.getDayOfYear() == 1;
 
@@ -5764,7 +5769,7 @@ public class Campaign implements ITechManager {
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the
         // type of event
-        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || isFirstOfMonth) {
+        if (isMonday || isFirstOfMonth) {
             new PrisonerEventManager(this);
         }
 
@@ -5794,7 +5799,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (topUpWeekly && currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (topUpWeekly && isMonday) {
             int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, false, ignoreSparesUnderQuality));
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
@@ -5805,14 +5810,83 @@ public class Campaign implements ITechManager {
         }
 
         // Faction Standing
-        if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
-            String report = factionStandings.updateClimateRegard(faction, currentDay);
-            addReport(report);
+        if (campaignOptions.isTrackFactionStanding()) {
+            performFactionStandingChecks(isFirstOfMonth);
         }
 
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Performs all daily and periodic standing checks for factions relevant to this campaign.
+     *
+     * <p>On the first day of the month, this method updates the climate regard for the active campaign faction,
+     * storing a summary report. It then iterates once through all faction standings and, for each faction:</p>
+     *
+     * <ul>
+     *     <li>Checks for new censure actions and handles the creation of related events.</li>
+     *     <li>Evaluates for new accolade levels, creating corresponding events.</li>
+     *     <li>Warns if any referenced faction cannot be resolved.</li>
+     * </ul>
+     *
+     * <p>Finally, at the end of the checks, it processes censure degradation for all factions.</p>
+     *
+     * @param isFirstOfMonth {@code true} if called on the first day of the month.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void performFactionStandingChecks(boolean isFirstOfMonth) {
+        if (isFirstOfMonth) {
+            String report = factionStandings.updateClimateRegard(faction, currentDay);
+            addReport(report);
+        }
+
+        List<Mission> activeMissions = getActiveMissions(false);
+        boolean isInTransit = !location.isOnPlanet();
+        Factions factions = Factions.getInstance();
+
+        for (Entry<String, Double> standing : factionStandings.getAllFactionStandings().entrySet()) {
+            String factionCode = standing.getKey();
+            Faction relevantFaction = factions.getFaction(factionCode);
+            if (relevantFaction == null) {
+                logger.warn("Unable to fetch faction standing for faction: {}", factionCode);
+                continue;
+            }
+
+            // Censure check
+            if (relevantFaction.equals(faction)
+                      || (faction.getShortName().equals("MERC") && relevantFaction.isMercenaryOrganization())) {
+                FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(
+                      relevantFaction, currentDay, activeMissions, isInTransit);
+                if (newCensureLevel != null) {
+                    new FactionCensureEvent(this, newCensureLevel, relevantFaction);
+                }
+            }
+
+            // Accolade check
+            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
+            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
+                  !isInTransit,
+                  getActiveAtBContracts(),
+                  activeMissions,
+                  relevantFaction.getShortName(),
+                  location.getCurrentSystem(),
+                  ignoreEmployer);
+
+            FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(
+                  relevantFaction, currentDay, isOnMission);
+
+            if (newAccoladeLevel != null) {
+                new FactionAccoladeEvent(this, relevantFaction, newAccoladeLevel,
+                      faction.equals(relevantFaction));
+            }
+        }
+
+        // Censure degradation
+        factionStandings.processCensureDegradation(currentDay);
     }
 
     public void refreshPersonnelMarkets() {
@@ -6025,6 +6099,13 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Retrieves the flagged commander from the personnel list. If no flagged commander is found returns {@code null}.
+     *
+     * <p><b>Usage:</b> consider using {@link #getCommander()} instead.</p>
+     *
+     * @return the flagged commander if present, otherwise {@code null}
+     */
     public @Nullable Person getFlaggedCommander() {
         return getPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
     }

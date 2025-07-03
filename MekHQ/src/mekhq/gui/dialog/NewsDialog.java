@@ -48,6 +48,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
 /**
  * NewsDialog is a dialog window for displaying news items within the context of a campaign. It includes information
@@ -81,7 +82,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
               null, centerMessage,
               List.of(getTextAt(RESOURCE_BUNDLE, "newsReport.button")),
               null,
-              null, false);
+              null, false, ImmersiveDialogWidth.MEDIUM);
     }
 
     @Override

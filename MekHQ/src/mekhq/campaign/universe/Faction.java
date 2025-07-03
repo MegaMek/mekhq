@@ -310,6 +310,27 @@ public class Faction {
         return is(FactionTag.MERC);
     }
 
+    /**
+     * Determines whether the faction is a mercenary organization based on its short name.
+     *
+     * <p>Currently this checks whether the faction is the Mercenary Guild, Mercenary Review Board, Mercenary Review
+     * and Bonding Commission, or the Mercenary Bondy Authority.</p>
+     *
+     * @return {@code true} if the faction's short name matches any of the predefined mercenary organization identifiers
+     *       ("MG", "MRB", "MRBC", "MBA"); {@code false} otherwise.
+     */
+    public boolean isMercenaryOrganization() {
+        final String MERCENARY_GUILD = "MG";
+        final String MERCENARY_REVIEW_BOARD = "MRB";
+        final String MERCENARY_REVIEW_BONDING_COMMISSION = "MRBC";
+        final String MERCENARY_BONDY_AUTHORITY = "MBA";
+
+        return Objects.equals(shortName, MERCENARY_GUILD) ||
+                     Objects.equals(shortName, MERCENARY_REVIEW_BOARD) ||
+                     Objects.equals(shortName, MERCENARY_REVIEW_BONDING_COMMISSION) ||
+                     Objects.equals(shortName, MERCENARY_BONDY_AUTHORITY);
+    }
+
     public boolean isPirate() {
         return is(FactionTag.PIRATE);
     }

@@ -66,22 +66,22 @@ import mekhq.gui.dialog.factionStanding.FactionStandingReport;
  * @since 0.50.07
  */
 public enum FactionStandingLevel {
-    STANDING_LEVEL_0(0, Integer.MIN_VALUE, -50, -4, 0.0, false, true, false, 0, -2, 3.0, -3, 0.6, -2, -4),
-    STANDING_LEVEL_1(1, -50, -40, -3, 0.25, false, true, false, 0, -1, 2.0, -2, 0.7, -1, -3),
-    STANDING_LEVEL_2(2, -40, -25, -2, 0.5, false, false, true, 1, 0, 1.75, -1, 0.8, -1, -2),
-    STANDING_LEVEL_3(3, -25, -10, -1, 0.75, false, false, true, 2, 0, 1.5, 0, 0.9, 0, -1),
+    STANDING_LEVEL_0(0, -60, -51, -4, 0.0, false, true, false, 0, -2, 3.0, -3, 0.6, -2, -4),
+    STANDING_LEVEL_1(1, -50, -41, -3, 0.25, false, true, false, 0, -1, 2.0, -2, 0.7, -1, -3),
+    STANDING_LEVEL_2(2, -40, -26, -2, 0.5, false, false, true, 1, 0, 1.75, -1, 0.8, -1, -2),
+    STANDING_LEVEL_3(3, -25, -11, -1, 0.75, false, false, true, 2, 0, 1.5, 0, 0.9, 0, -1),
     STANDING_LEVEL_4(4, -10, 10, 0, 1.0, false, false, true, 3, 0, 1.0, 0, 1.0, 0, 0),
-    STANDING_LEVEL_5(5, 10, 25, 1, 1.25, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
-    STANDING_LEVEL_6(6, 25, 40, 2, 1.5, false, false, true, 5, 0, 0.85, 1, 1.1, 1, 1),
-    STANDING_LEVEL_7(7, 40, 50, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
-    STANDING_LEVEL_8(8, 50, Integer.MAX_VALUE, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
+    STANDING_LEVEL_5(5, 11, 25, 1, 1.25, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
+    STANDING_LEVEL_6(6, 26, 40, 2, 1.5, false, false, true, 5, 0, 0.85, 1, 1.1, 1, 1),
+    STANDING_LEVEL_7(7, 41, 50, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
+    STANDING_LEVEL_8(8, 51, 60, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingLevel.class);
 
-    private final static String FALLBACK_LABEL_SUFFIX_INNER_SPHERE = "innerSphere";
-    private final static String FALLBACK_LABEL_SUFFIX_CLAN = "clan";
-    private final static String FALLBACK_LABEL_SUFFIX_PERIPHERY = "periphery";
+    final static String FALLBACK_LABEL_SUFFIX_INNER_SPHERE = "innerSphere";
+    final static String FALLBACK_LABEL_SUFFIX_CLAN = "clan";
+    final static String FALLBACK_LABEL_SUFFIX_PERIPHERY = "periphery";
 
     private final static int MINIMUM_STANDING_LEVEL = 0;
     private final static int MAXIMUM_STANDING_LEVEL = 8;
@@ -504,7 +504,7 @@ public enum FactionStandingLevel {
         return String.join(", ", effects);
     }
 
-    private static String getPolarityOfModifier(int modifier) {
+    static String getPolarityOfModifier(int modifier) {
         if (modifier >= 0) {
             return "+" + modifier;
         }
@@ -524,7 +524,7 @@ public enum FactionStandingLevel {
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getFallbackSuffix(Faction relevantFaction) {
+    static String getFallbackSuffix(Faction relevantFaction) {
         if (relevantFaction.isClan()) {
             return FALLBACK_LABEL_SUFFIX_CLAN;
         } else if (relevantFaction.isPeriphery()) {
