@@ -46,6 +46,7 @@ public enum FactionStandingsGMToolsActionType {
     /**
      * Sets all faction regard values to zero.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     ZERO_ALL_REGARD,
     /**
      * Updates the regard value for a specific faction. This action is typically performed to adjust the standings of a

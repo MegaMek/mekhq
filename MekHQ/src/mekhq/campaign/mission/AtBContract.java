@@ -630,7 +630,7 @@ public class AtBContract extends Contract {
             FactionStandings factionStandings = campaign.getFactionStandings();
 
             boolean allowBatchalls = true;
-            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictions()) {
+            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
                 double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
@@ -653,7 +653,10 @@ public class AtBContract extends Contract {
 
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
-                factionStandings.processContractAccept(campaignFactionCode, faction, today);
+                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today);
+                if (report != null) {
+                    campaign.addReport(report);
+                }
             }
         }
     }

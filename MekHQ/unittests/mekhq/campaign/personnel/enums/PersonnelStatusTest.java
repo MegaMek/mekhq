@@ -110,8 +110,7 @@ public class PersonnelStatusTest {
 
     @Test
     public void testIsAbsent() {
-        List<PersonnelStatus> validStatuses = List.of(MIA, POW, ENEMY_BONDSMAN, ON_LEAVE,
-            ON_MATERNITY_LEAVE, AWOL, STUDENT, MISSING);
+        List<PersonnelStatus> validStatuses = List.of(MIA, POW, ON_LEAVE, ON_MATERNITY_LEAVE, AWOL, STUDENT);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean isAbsent = validStatuses.contains(status);
@@ -122,17 +121,10 @@ public class PersonnelStatusTest {
 
     @Test
     public void testIsDepartedUnit() {
-        List<PersonnelStatus> deadStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
-            NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
-              SUICIDE,
-              BONDSREF,
-              SEPPUKU);
-        List<PersonnelStatus> validStatuses = List.of(RETIRED, RESIGNED, SACKED, DESERTED,
-              DEFECTED,
-              MISSING,
-              LEFT,
-              ENEMY_BONDSMAN,
-              BACKGROUND_CHARACTER);
+        List<PersonnelStatus> deadStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL, NATURAL_CAUSES,
+              OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED, SUICIDE, BONDSREF, SEPPUKU);
+        List<PersonnelStatus> validStatuses = List.of(RETIRED, RESIGNED, SACKED, DESERTED, DEFECTED, MISSING, LEFT,
+              ENEMY_BONDSMAN, BACKGROUND_CHARACTER, IMPRISONED, DISHONORABLY_DISCHARGED);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean hasDepartedUnit = validStatuses.contains(status) || deadStatuses.contains(status);

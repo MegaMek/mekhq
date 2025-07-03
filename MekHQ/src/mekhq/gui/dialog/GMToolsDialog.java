@@ -1111,7 +1111,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
               "btnGenerateCompanyName.toolTipText",
               evt -> {
                   lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(gui.getCampaign()
-                                                                                       .getFlaggedCommander());
+                                                                                       .getCommander());
                   txtCompanyNamesGenerated.setText(lastGeneratedCompanyName);
               });
     }

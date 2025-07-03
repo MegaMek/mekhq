@@ -45,7 +45,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
@@ -375,11 +374,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // initialize starting faction standings
                 if (campaign.getCampaignOptions().isTrackFactionStanding()) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
-                    List<String> standingReports = factionStandings.initializeStartingRegardValues(campaign.getFaction(),
-                          campaign.getLocalDate());
-                    for (String report : standingReports) {
-                        campaign.addReport(report);
-                    }
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
                           campaign.getLocalDate());
                     campaign.addReport(report);

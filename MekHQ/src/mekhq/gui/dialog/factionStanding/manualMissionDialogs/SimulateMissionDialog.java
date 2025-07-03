@@ -558,7 +558,7 @@ public class SimulateMissionDialog extends JDialog {
      * Calculates and describes updates to faction regard values in response to mission simulation parameters, for
      * both employer and enemy.
      *
-     * @param campaignFactionCode the unique identifier for the current campaign faction
+     * @param campaignFaction the current campaign faction
      * @param employer        the employer faction, or {@code null} if not specified
      * @param enemy           the enemy faction, or {@code null} if not specified
      * @param status          the mission status applied to the simulation
@@ -569,16 +569,19 @@ public class SimulateMissionDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public static List<String> handleFactionRegardUpdates(@Nullable String campaignFactionCode,
+    public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
           @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
           final LocalDate today, final FactionStandings factionStandings) {
         List<String> reports = new ArrayList<>();
         if (enemy != null) { // Null means the faction isn't tracked
-            reports.addAll(factionStandings.processContractAccept(campaignFactionCode, enemy, today));
+            String report = factionStandings.processContractAccept(campaignFaction.getShortName(), enemy, today);
+            if (report != null) {
+                reports.add(report);
+            }
         }
 
         if (employer != null) {
-            reports.addAll(factionStandings.processContractCompletion(campaignFactionCode, employer, today, status));
+            reports.addAll(factionStandings.processContractCompletion(campaignFaction, employer, today, status));
         }
 
         return reports;
