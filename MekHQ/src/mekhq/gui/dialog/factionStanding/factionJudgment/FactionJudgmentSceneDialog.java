@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -69,9 +70,6 @@ public class FactionJudgmentSceneDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionJudgmentSceneDialog";
 
     private final static String DIALOG_KEY_FORWARD = "FactionJudgmentSceneDialog.";
-    private final static String DIALOG_KEY_AFFIX_INNER_SPHERE = "innerSphere";
-    private final static String DIALOG_KEY_AFFIX_PERIPHERY = "periphery";
-    private final static String DIALOG_KEY_AFFIX_CLAN = "clan";
 
     /**
      * Constructs a faction judgment scene dialog and displays it immediately.
@@ -114,6 +112,23 @@ public class FactionJudgmentSceneDialog {
               ImmersiveDialogWidth.LARGE);
     }
 
+    /**
+     * Constructs and returns the dialog key used to look up text resources for a given judgment scene type and judging
+     * faction. If a specific dialog key does not exist in the resource bundle, a fallback key will be generated based
+     * on the judging faction.
+     *
+     * <p>For certain scene types, such as SEPPUKU, a random variant is appended to the key. The method checks if the
+     * generated key maps to a valid resource; if not, it falls back to a generic version using
+     * {@code getFallbackFactionKey}.
+     *
+     * @param sceneType      the type of judgment scene
+     * @param judgingFaction the faction making the judgment
+     *
+     * @return the appropriate dialog key for resource lookup, or a fallback if none is found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static String getDialogKey(FactionJudgmentSceneType sceneType, Faction judgingFaction) {
         String judgmentTypeLookupName = sceneType.getLookUpName();
         String judgingFactionCode = judgingFaction.getShortName();
@@ -128,20 +143,12 @@ public class FactionJudgmentSceneDialog {
 
         // If testReturn fails, we use a fallback value
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
-        if (!MHQInternationalization.isResourceKeyValid(testReturn)) {
-            String affixKey;
-            if (judgingFaction.isClan()) {
-                affixKey = DIALOG_KEY_AFFIX_CLAN;
-            } else if (judgingFaction.isPeriphery()) {
-                affixKey = DIALOG_KEY_AFFIX_PERIPHERY;
-            } else {
-                affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
-            }
-
-            dialogKey = dialogKey.replace('.' + judgingFactionCode, '.' + affixKey);
+        boolean testReturnIsValid = MHQInternationalization.isResourceKeyValid(testReturn);
+        if (testReturnIsValid) {
+            return dialogKey;
         }
 
-        return dialogKey;
+        return getFallbackFactionKey(dialogKey, judgingFaction);
     }
 
     /**

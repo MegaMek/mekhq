@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -67,10 +68,6 @@ public class FactionJudgmentDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionJudgmentDialog";
 
     private final static String DIALOG_KEY_FORWARD = "FactionJudgmentDialog.message";
-    private final static String DIALOG_KEY_AFFIX_INNER_SPHERE = "innerSphere";
-    private final static String DIALOG_KEY_AFFIX_PERIPHERY = "periphery";
-    private final static String DIALOG_KEY_AFFIX_CLAN = "clan";
-
     private final static String BUTTON_KEY_FORWARD = "FactionJudgmentDialog.button";
     private final static String BUTTON_KEY_POSITIVE = "positive";
     private final static String BUTTON_KEY_NEUTRAL = "neutral";
@@ -185,21 +182,14 @@ public class FactionJudgmentDialog {
                                  '.' +
                                  censuringFactionCode;
 
-        // If resource key is not valid, use a group-based fallback (clan, periphery, or Inner Sphere)
+        // If testReturn fails, we use a fallback value
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
-        if (!MHQInternationalization.isResourceKeyValid(testReturn)) {
-            String affixKey;
-            if (judgingFaction.isClan()) {
-                affixKey = DIALOG_KEY_AFFIX_CLAN;
-            } else if (judgingFaction.isPeriphery()) {
-                affixKey = DIALOG_KEY_AFFIX_PERIPHERY;
-            } else {
-                affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
-            }
-            dialogKey = dialogKey.replace('.' + censuringFactionCode, '.' + affixKey);
+        boolean testReturnIsValid = MHQInternationalization.isResourceKeyValid(testReturn);
+        if (testReturnIsValid) {
+            return dialogKey;
         }
 
-        return dialogKey;
+        return getFallbackFactionKey(dialogKey, judgingFaction);
     }
 
     /**

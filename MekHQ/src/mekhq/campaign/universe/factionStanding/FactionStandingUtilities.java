@@ -58,6 +58,10 @@ public class FactionStandingUtilities {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUtilities.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
 
+    private final static String DIALOG_KEY_AFFIX_INNER_SPHERE = "innerSphere";
+    private final static String DIALOG_KEY_AFFIX_PERIPHERY = "periphery";
+    private final static String DIALOG_KEY_AFFIX_CLAN = "clan";
+
     /**
      * List of personnel roles considered political in the context of censure effects.
      */
@@ -782,5 +786,37 @@ public class FactionStandingUtilities {
               secondHimHerThemCapitalized, secondHimHerThemLowercase, secondHisHerTheirCapitalized,
               secondHisHerTheirLowercase, secondPluralizer, campaignName, factionName, locationName, cashValue,
               commanderAddress, commanderFullName);
+    }
+
+    /**
+     * Generates a fallback dialog key by replacing the judging faction's code in the original dialog key with a
+     * suitable default affix, based on the general type of the judging faction.
+     *
+     * <p>If the judging faction is a Clan, Periphery, or Inner Sphere, the corresponding constant affix is
+     * substituted. This is useful for providing default or generic dialog text when no faction-specific version is
+     * available.</p>
+     *
+     * @param dialogKey      the original dialog key, typically with a faction code suffix
+     * @param judgingFaction the {@link Faction} being used to determine the fallback key
+     *
+     * @return a fallback dialog key string with the appropriate affix for the faction type
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getFallbackFactionKey(String dialogKey, Faction judgingFaction) {
+        String affixKey;
+
+        if (judgingFaction.isClan()) {
+            affixKey = DIALOG_KEY_AFFIX_CLAN;
+        } else if (judgingFaction.isPeriphery()) {
+            affixKey = DIALOG_KEY_AFFIX_PERIPHERY;
+        } else {
+            affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
+        }
+
+        String judgingFactionCode = judgingFaction.getShortName();
+
+        return dialogKey.replace('.' + judgingFactionCode, '.' + affixKey);
     }
 }

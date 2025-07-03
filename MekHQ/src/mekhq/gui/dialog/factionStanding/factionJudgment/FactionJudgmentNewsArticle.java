@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -61,10 +62,6 @@ public class FactionJudgmentNewsArticle {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionJudgmentNewsArticle";
 
     private final static String KEY_FORWARD = "FactionCensureNewsArticle.";
-
-    private final static String KEY_AFFIX_INNER_SPHERE = "innerSphere";
-    private final static String KEY_AFFIX_PERIPHERY = "periphery";
-    private final static String KEY_AFFIX_CLAN = "clan";
 
     /**
      * Constructs and immediately displays a news dialog representing a faction judgment event, assembling the news
@@ -131,19 +128,11 @@ public class FactionJudgmentNewsArticle {
 
         // If testReturn fails, we use a fallback value
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
-        if (!MHQInternationalization.isResourceKeyValid(testReturn)) {
-            String affixKey;
-            if (judgingFaction.isClan()) {
-                affixKey = KEY_AFFIX_CLAN;
-            } else if (judgingFaction.isPeriphery()) {
-                affixKey = KEY_AFFIX_PERIPHERY;
-            } else {
-                affixKey = KEY_AFFIX_INNER_SPHERE;
-            }
-
-            dialogKey = dialogKey.replace('.' + censuringFactionCode, '.' + affixKey);
+        boolean testReturnIsValid = MHQInternationalization.isResourceKeyValid(testReturn);
+        if (testReturnIsValid) {
+            return dialogKey;
         }
 
-        return dialogKey;
+        return getFallbackFactionKey(dialogKey, judgingFaction);
     }
 }

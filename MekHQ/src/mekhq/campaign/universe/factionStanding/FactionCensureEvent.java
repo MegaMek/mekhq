@@ -254,15 +254,9 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processGoingRogue(Campaign campaign, FactionCensureLevel censureLevel, Faction censuringFaction) {
-        String campaignFactionCode = campaign.getFaction().getShortName();
-        boolean includeMercenary = !(campaignFactionCode.equals("MERC") || censuringFaction.isMercenary());
-        boolean includePirate = !(campaignFactionCode.equals("PIR") || censuringFaction.getShortName().equals("PIR"));
-
         GoingRogue goingRogueDialog = new GoingRogue(campaign,
               commander,
-              secondInCommand,
-              includeMercenary,
-              includePirate);
+              secondInCommand);
         if (goingRogueDialog.wasCanceled()) {
             new FactionCensureEvent(campaign, censureLevel, censuringFaction);
         }

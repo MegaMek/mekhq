@@ -1066,11 +1066,7 @@ public class FactionStandings {
             return getMissingFactionReport();
         }
 
-        List<String> regardChangeReports = new ArrayList<>();
-
         int gameYear = today.getYear();
-
-        Collection<Faction> allFactions = Factions.getInstance().getFactions();
 
         if (enemyFaction.isAggregate()) {
             return null;

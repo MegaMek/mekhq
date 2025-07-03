@@ -97,8 +97,7 @@ public class GoingRogue {
      * @author Illiani
      * @since 0.50.07
      */
-    public GoingRogue(Campaign campaign, Person commander, @Nullable Person second, boolean includeMercenary,
-          boolean includePirate) {
+    public GoingRogue(Campaign campaign, Person commander, @Nullable Person second) {
         FactionCensureGoingRogueDialog dialog = new FactionCensureGoingRogueDialog(campaign);
         wasConfirmed = dialog.wasConfirmed();
         if (!wasConfirmed) {
