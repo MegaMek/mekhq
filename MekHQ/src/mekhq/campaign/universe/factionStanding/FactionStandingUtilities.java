@@ -670,46 +670,6 @@ public class FactionStandingUtilities {
     }
 
     /**
-     * Returns the display name for a person, combining rank/title and the best available family name.
-     *
-     * <p>Prefers to use the person's bloodname if available, or falls back to surname if not. Appends the person's
-     * rank/title at the end if present. If neither bloodname nor surname exist, will return the rank/title appended to
-     * the person's given name.</p>
-     *
-     * @param person the {@link Person} whose name should be generated
-     *
-     * @return a string combining the rank/title and surname or bloodname (if available)
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public static String getTitleAndSurnameOrBloodname(Person person) {
-        String name = "";
-
-        String bloodname = person.getBloodname();
-        if (bloodname != null && !bloodname.isBlank()) {
-            name += bloodname;
-        }
-
-        String surname = person.getSurname();
-        if ((bloodname == null || bloodname.isBlank())
-                  && (surname != null && !surname.isBlank())) {
-            name += surname;
-        }
-
-        if (name.isBlank()) {
-            name = person.getGivenName();
-        }
-
-        String rankName = person.getRankName();
-        if (rankName != null && !rankName.isBlank()) {
-            name = rankName + " " + name;
-        }
-
-        return name;
-    }
-
-    /**
      * Generates a localized, in-character narrative text for a faction standing event, dynamically incorporating
      * identity and pronoun information for one or two characters, as well as campaign and faction context.
      *
@@ -740,9 +700,7 @@ public class FactionStandingUtilities {
 
         // We use fallback values so that we don't have to deal with null values
         final Gender FALLBACK_GENDER = Gender.MALE;
-        final String FALLBACK_NAME_FULL = "";
-        final String FALLBACK_NAME_FIRST_NAME = "";
-        final String FALLBACK_LOCATION_NAME = "";
+        final String FALLBACK_NAME = "";
 
         // COMMANDER pronoun/identity context
         final PronounData commanderPronounData = new PronounData(commander == null
@@ -750,12 +708,16 @@ public class FactionStandingUtilities {
                                                                        : commander.getGender());
         // {0} full title
         final String commanderHyperlinkedFullTitle = commander == null
-                                                           ? FALLBACK_NAME_FULL
+                                                           ? FALLBACK_NAME
                                                            : getCharacterFullName(commander);
         // {1} first name
         final String commanderFirstName = commander == null
-                                                ? FALLBACK_NAME_FULL
-                                                : getTitleAndSurnameOrBloodname(commander);
+                                                ? FALLBACK_NAME
+                                                : commander.getGivenName();
+        // {23} = full name, no title (out of numerical order because it was added much later)
+        final String commanderFullName = commander == null
+                                               ? FALLBACK_NAME
+                                               : commander.getFullName();
         // {2} = He/She/They
         final String commanderHeSheTheyCapitalized = commanderPronounData.subjectPronoun();
         // {3} = he/she/they
@@ -777,12 +739,12 @@ public class FactionStandingUtilities {
                                                                     : secondCharacter.getGender());
         // {9} full title
         final String secondHyperlinkedFullTitle = secondCharacter == null
-                                                        ? FALLBACK_NAME_FULL
+                                                        ? FALLBACK_NAME
                                                         : getCharacterFullName(secondCharacter);
         // {10} first name
         final String secondFirstName = secondCharacter == null
-                                             ? FALLBACK_NAME_FIRST_NAME
-                                             : getTitleAndSurnameOrBloodname(secondCharacter);
+                                             ? FALLBACK_NAME
+                                             : secondCharacter.getGivenName();
         // {11} = He/She/They
         final String secondHeSheTheyCapitalized = secondPronounData.subjectPronoun();
         // {12} = he/she/they
@@ -803,7 +765,7 @@ public class FactionStandingUtilities {
         // {19} = faction name
         // {20} = location name
         if (locationName == null) {
-            locationName = FALLBACK_LOCATION_NAME;
+            locationName = FALLBACK_NAME;
         }
         // {21} = cash value (in millions)
         if (cashValue == null) {
@@ -819,6 +781,6 @@ public class FactionStandingUtilities {
               secondHyperlinkedFullTitle, secondFirstName, secondHeSheTheyCapitalized, secondHeSheTheyLowercase,
               secondHimHerThemCapitalized, secondHimHerThemLowercase, secondHisHerTheirCapitalized,
               secondHisHerTheirLowercase, secondPluralizer, campaignName, factionName, locationName, cashValue,
-              commanderAddress);
+              commanderAddress, commanderFullName);
     }
 }

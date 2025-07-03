@@ -68,7 +68,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  */
 public class FactionCensureGoingRogueDialog {
     static MMLogger LOGGER = MMLogger.create(FactionCensureGoingRogueDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
 
     /** Button index returned by the dialog when the 'confirm' action is selected. */
     private static final int CONFIRMED_DIALOG_INDEX = 1;

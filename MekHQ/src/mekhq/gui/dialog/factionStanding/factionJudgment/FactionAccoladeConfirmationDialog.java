@@ -53,7 +53,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since 0.50.07
  */
 public class FactionAccoladeConfirmationDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionJudgmentDialog";
 
     private static final String IN_CHARACTER_KEY = "FactionCensureDialog.confirmation.inCharacter";
     private static final String OUT_OF_CHARACTER_KEY = "FactionCensureDialog.confirmation.outOfCharacter";

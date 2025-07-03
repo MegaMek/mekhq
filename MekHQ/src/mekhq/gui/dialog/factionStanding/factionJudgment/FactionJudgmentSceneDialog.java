@@ -33,21 +33,25 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -68,10 +72,6 @@ public class FactionJudgmentSceneDialog {
     private final static String DIALOG_KEY_AFFIX_INNER_SPHERE = "innerSphere";
     private final static String DIALOG_KEY_AFFIX_PERIPHERY = "periphery";
     private final static String DIALOG_KEY_AFFIX_CLAN = "clan";
-    private final static String DIALOG_KEY_AFFIX_PLANETSIDE = "planetside";
-    private final static String DIALOG_KEY_AFFIX_IN_TRANSIT = "inTransit";
-
-    private final Campaign campaign;
 
     /**
      * Constructs a faction judgment scene dialog and displays it immediately.
@@ -80,54 +80,67 @@ public class FactionJudgmentSceneDialog {
      * @param commander       the primary character representing the command
      * @param secondCharacter a secondary character involved in the scene (nullable)
      * @param sceneType       the type of judgment scene to display
-     * @param censuringFaction the faction performing the censure
+     * @param judgingFaction the faction performing the judgment
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionJudgmentSceneDialog(Campaign campaign, Person commander, @Nullable Person secondCharacter,
-          FactionJudgmentSceneType sceneType, Faction censuringFaction) {
-        this.campaign = campaign;
+          FactionJudgmentSceneType sceneType, Faction judgingFaction) {
+        LocalDate today = campaign.getLocalDate();
+        String factionName = judgingFaction.getFullName(today.getYear());
+        String campaignName = campaign.getName();
+        CurrentLocation location = campaign.getLocation();
+        boolean isPlanetside = location.isOnPlanet();
+        String locationName = isPlanetside
+                                    ? location.getPlanet().getName(today)
+                                    : location.getCurrentSystem().getName(today);
+        String commanderAddress = campaign.getCommanderAddress(false);
 
-        boolean isPlanetside = campaign.getLocation().isOnPlanet();
-        String dialogKey = getDialogKey(sceneType, censuringFaction, isPlanetside);
 
-        //        new ImmersiveDialogSimple(
-        //              campaign,
-        //              commander,
-        //              secondCharacter,
-        //              getInCharacterText(commander, secondCharacter, sceneType, censuringFaction),
-        //              getButtonLabels(sceneType),
-        //              null,
-        //              null,
-        //              false,
-        //              ImmersiveDialogWidth.MEDIUM);
+        String dialogKey = getDialogKey(sceneType, judgingFaction);
+        String inCharacterText = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, secondCharacter,
+              factionName, campaignName, locationName, 0, commanderAddress);
+
+        new ImmersiveDialogSimple(
+              campaign,
+              commander,
+              secondCharacter,
+              inCharacterText,
+              getButtonLabels(sceneType),
+              null,
+              null,
+              false,
+              ImmersiveDialogWidth.LARGE);
     }
 
-    private static String getDialogKey(FactionJudgmentSceneType sceneType, Faction censuringFaction,
-          boolean isPlanetside) {
-        String variant = "." + randomInt(10);
+    private static String getDialogKey(FactionJudgmentSceneType sceneType, Faction judgingFaction) {
+        String judgmentTypeLookupName = sceneType.getLookUpName();
+        String judgingFactionCode = judgingFaction.getShortName();
+        String dialogKey = DIALOG_KEY_FORWARD +
+                                 judgmentTypeLookupName + '.' +
+                                 judgingFactionCode;
 
-        String dialogKey = "";
+        if (sceneType.equals(FactionJudgmentSceneType.SEPPUKU)) {
+            int variant = randomInt(10);
+            dialogKey += "." + variant;
+        }
 
-        // Attempt a faction-localized template first, then fall back to general grouping
+        // If testReturn fails, we use a fallback value
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
         if (!MHQInternationalization.isResourceKeyValid(testReturn)) {
             String affixKey;
-            if (censuringFaction.isClan()) {
+            if (judgingFaction.isClan()) {
                 affixKey = DIALOG_KEY_AFFIX_CLAN;
-            } else if (censuringFaction.isPeriphery()) {
+            } else if (judgingFaction.isPeriphery()) {
                 affixKey = DIALOG_KEY_AFFIX_PERIPHERY;
             } else {
                 affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
             }
 
-            //            dialogKey = DIALOG_KEY_FORWARD
-            //                              + sceneType.getLookUpName() + '.'
-            //                              + (isPlanetside ? DIALOG_KEY_AFFIX_PLANETSIDE : DIALOG_KEY_AFFIX_IN_TRANSIT) + '.'
-            //                              + affixKey
-            //                              + (sceneType == SEPPUKU ? seppukuVariant : "");
+            dialogKey = dialogKey.replace('.' + judgingFactionCode, '.' + affixKey);
         }
+
         return dialogKey;
     }
 
@@ -146,9 +159,8 @@ public class FactionJudgmentSceneDialog {
         key += sceneType.getLookUpName();
 
         String color = switch (sceneType) {
-            case BARRED, CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL, DISBAND, SEPPUKU -> getNegativeColor();
+            case BARRED, DISBAND, SEPPUKU -> getNegativeColor();
             case GO_ROGUE -> getPositiveColor();
-            case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL -> getWarningColor();
         };
 
         return List.of(getFormattedTextAt(RESOURCE_BUNDLE, key, spanOpeningWithCustomColor(color),

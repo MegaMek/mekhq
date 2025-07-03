@@ -37,13 +37,13 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.universe.factionStanding.FactionCensureAction.CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.NO_ACTION;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.isExempt;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.processMassLoyaltyChange;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
@@ -176,18 +177,10 @@ public class FactionCensureEvent {
                 }
             }
             case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL -> {
-                FactionJudgmentSceneType sceneType = censureAction.equals(CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL)
-                                                           ?
-                                                           FactionJudgmentSceneType.CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL
-                                                           :
-                                                           FactionJudgmentSceneType.CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL;
-                new FactionJudgmentSceneDialog(
-                      campaign,
-                      commander,
-                      secondInCommand,
-                      sceneType,
-                      censuringFaction
-                );
+                String dialogKey = DIALOG_OOC_KEY + censureAction.getLookupName();
+                String message = getFormattedTextAt(RESOURCE_BUNDLE, dialogKey, commander.getFullName(),
+                      commander.getGivenName(), secondInCommand.getFullName(), secondInCommand.getGivenName());
+                new ImmersiveDialogSimple(campaign, commander, secondInCommand, message, null, null, null, false);
             }
             case COMMANDER_MURDERED,
                  COMMANDER_IMPRISONMENT,
@@ -267,7 +260,7 @@ public class FactionCensureEvent {
             case NO_ACTION -> {
                 return;
             }
-            case BARRED -> new FactionJudgmentSceneDialog(campaign, commander, secondInCommand,
+            case BARRED -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.BARRED, censuringFaction);
             case CHATTERWEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
                   processMassLoyaltyChange(campaign, false, false);
@@ -292,7 +285,7 @@ public class FactionCensureEvent {
                     commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
                 }
             }
-            case DISBAND -> new FactionJudgmentSceneDialog(campaign, commander, secondInCommand,
+            case DISBAND -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.DISBAND, censuringFaction);
             case FINE -> {
                 Finances finances = campaign.getFinances();
@@ -377,7 +370,6 @@ public class FactionCensureEvent {
         LocalDate today = campaign.getLocalDate();
         Set<Person> seniorPersonnel = getSeniorPersonnel(today);
 
-        boolean useExtraRandomness = campaign.getRandomSkillPreferences().randomizeSkill();
         for (Person seniorPerson : seniorPersonnel) {
             final int level = seniorPerson.getRankLevel();
             final int rank = seniorPerson.getRankNumeric();

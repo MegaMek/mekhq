@@ -51,7 +51,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since 0.50.07
  */
 public class FactionCensureConfirmationDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
 
     private static final String IN_CHARACTER_KEY = "FactionCensureConfirmationDialog.inCharacter";
     private static final int CONFIRMED_DIALOG_INDEX = 1;
