@@ -248,6 +248,7 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
+import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
@@ -262,7 +263,9 @@ import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -5810,9 +5813,7 @@ public class Campaign implements ITechManager {
         }
 
         // Faction Standing
-        if (campaignOptions.isTrackFactionStanding()) {
-            performFactionStandingChecks(isFirstOfMonth);
-        }
+        performFactionStandingChecks(isFirstOfMonth, isNewYear);
 
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
@@ -5834,11 +5835,20 @@ public class Campaign implements ITechManager {
      * <p>Finally, at the end of the checks, it processes censure degradation for all factions.</p>
      *
      * @param isFirstOfMonth {@code true} if called on the first day of the month.
+     * @param isNewYear {@code true} if called on the first day of a new year
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void performFactionStandingChecks(boolean isFirstOfMonth) {
+    private void performFactionStandingChecks(boolean isFirstOfMonth, boolean isNewYear) {
+        if (isNewYear && faction.getShortName().equals("MERC")) {
+            checkForNewMercenaryOrganizationStartUp(false);
+        }
+
+        if (!campaignOptions.isTrackFactionStanding()) {
+            return;
+        }
+
         if (isFirstOfMonth) {
             String report = factionStandings.updateClimateRegard(faction, currentDay);
             addReport(report);
@@ -5887,6 +5897,62 @@ public class Campaign implements ITechManager {
 
         // Censure degradation
         factionStandings.processCensureDegradation(currentDay);
+    }
+
+    /**
+     * Checks if a new mercenary organization is starting up in the current game year, and, if so, triggers a welcome
+     * dialog introducing the organization's representative.
+     *
+     * <p>This method examines a prioritized list of known mercenary-related factions for their respective founding
+     * (start) years matching the current year. The list is evaluated in the following order: Mercenary Review Board
+     * (MRB), Mercenary Review Bonding Commission (MRBC), Mercenary Bonding Authority (MBA), and Mercenary Guild (MG),
+     * with MG as the default fallback. If a matching faction is found (and is recognized as a mercenary organization),
+     * it generates an appropriate speaker (as either a merchant or military liaison, depending on the faction) and
+     * opens a welcome dialog for the player.</p>
+     *
+     * <p>The dialog serves to introduce the player to the new mercenary organization, using an in-universe character
+     * as the spokesperson.</p>
+     *
+     * @param bypassStartYear {@code true} if the method should be checking if the mercenary organization is currently
+     *                        active, rather than just checking whether it was founded in the current game year.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear) {
+        Factions factions = Factions.getInstance();
+        int currentYear = getGameYear();
+        Faction[] possibleFactions = new Faction[] {
+              factions.getFaction("MRB"),
+              factions.getFaction("MRBC"),
+              factions.getFaction("MBA"),
+              factions.getFaction("MG")
+        };
+
+        Faction chosenFaction = null;
+        for (Faction faction : possibleFactions) {
+            if (faction != null) {
+                boolean isValidInYear = bypassStartYear && faction.validIn(currentYear);
+                boolean isFoundedInYear = !bypassStartYear && faction.getStartYear() == currentYear;
+
+                if (isValidInYear || isFoundedInYear) {
+                    chosenFaction = faction;
+                    break;
+                }
+            }
+        }
+
+        if (chosenFaction == null) {
+            chosenFaction = factions.getFaction("MG"); // fallback
+        }
+
+        if (chosenFaction != null && chosenFaction.isMercenaryOrganization()) {
+            PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
+            Person speaker = newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
+            new FactionJudgmentDialog(this, speaker, getCommander(),
+                  "HELLO", chosenFaction,
+                  FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
+        }
     }
 
     public void refreshPersonnelMarkets() {
