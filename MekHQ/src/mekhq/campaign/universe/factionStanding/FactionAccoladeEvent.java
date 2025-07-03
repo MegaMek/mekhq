@@ -202,6 +202,23 @@ public class FactionAccoladeEvent {
         }
     }
 
+    /**
+     * Determines and constructs the {@link Person} who will serve as the speaker for a given accolade event based on
+     * the campaign state, the awarding faction, and the level of the accolade.
+     *
+     * <p>This method applies special rules for certain factions (such as the Magistracy of Canopus) and accolade
+     * types, including adjusting the speaker's role, name, and gender when appropriate. For head-of-state letters, it
+     * attempts to use the real leader's data if available.
+     *
+     * @param campaign          the current {@link Campaign} context in which the accolade is awarded
+     * @param accoladingFaction the {@link Faction} granting the accolade
+     * @param accoladeLevel     the {@link FactionAccoladeLevel} of the accolade being issued
+     *
+     * @return the generated {@link Person} to act as the speaker for this accolade event
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static Person getSpeaker(Campaign campaign, Faction accoladingFaction, FactionAccoladeLevel accoladeLevel) {
         Person speaker;
         if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
@@ -245,6 +262,20 @@ public class FactionAccoladeEvent {
         return speaker;
     }
 
+    /**
+     * Determines whether receiving an accolade of the given {@link FactionAccoladeLevel} from a specific
+     * {@link Faction} should trigger the creation of a news article.
+     *
+     * <p>The result is based on the combination of the accolade level and the attributes of the awarding faction,
+     * with special cases for Clans, the Magistracy of Canopus, ComStar, and Word of Blake.</p>
+     *
+     * @param accoladingFaction  the {@link Faction} giving the accolade
+     * @param accoladeLevel      the level of accolade as a {@link FactionAccoladeLevel}
+     * @return {@code true} if a news article should be triggered as a result of this accolade, {@code false} otherwise
+     *
+     * @since 0.50.07
+     * @author Illiani
+     */
     private static boolean isTriggerNewsArticle(Faction accoladingFaction, FactionAccoladeLevel accoladeLevel) {
         boolean isClan = accoladingFaction.isClan() && !accoladingFaction.isMercenaryOrganization();
 

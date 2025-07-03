@@ -203,6 +203,19 @@ public class FactionCensureEvent {
         handleCensureEffects(censureAction, isSeppuku);
     }
 
+    /**
+     * Generates an out-of-character message based on the given censure action.
+     *
+     * <p>This message is retrieved using a resource bundle and the lookup name of the censure action.</p>
+     *
+     * @param censureAction the {@link FactionCensureAction} that determines the content of the out-of-character
+     *                      message
+     *
+     * @return the out-of-character message corresponding to the given censure action
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static String getOutOfCharacterMessage(FactionCensureAction censureAction) {
         String eventKey = DIALOG_OOC_KEY + censureAction.getLookupName() + DIALOG_OOC_KEY_AFFIX;
         String resourceBundle = FactionJudgmentDialog.getFactionJudgmentDialogResourceBundle();

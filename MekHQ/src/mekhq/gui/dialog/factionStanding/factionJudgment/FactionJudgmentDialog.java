@@ -50,6 +50,19 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQInternationalization;
 
+/**
+ * Provides a dialog for rendering the result of a factional judgment event in the campaign. This dialog allows the
+ * player to interact with faction decisions, such as being censured, by presenting immersive in-character text and
+ * contextual button choices. The available choices can vary depending on the type of judgment, the judging faction, and
+ * the specific conditions in the campaign scenario.
+ *
+ * <p>This class is primarily responsible for assembling the dialog, populating it with localized text and button
+ * labels, and capturing the user's response. It is typically invoked when a campaign event triggers a significant
+ * factional standing change or disciplinary judgment.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionJudgmentDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionJudgmentDialog";
 
@@ -69,20 +82,55 @@ public class FactionJudgmentDialog {
 
     int responseIndex;
 
+    /**
+     * Gets the index of the button chosen by the user as a response to the faction judgment dialog.
+     *
+     * @return the numeric index of the selected button, corresponding to the choices presented.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public int getChoiceIndex() {
         return responseIndex;
     }
 
+    /**
+     * Returns the resource bundle location used for obtaining localized string values.
+     *
+     * @return a string key that identifies the dialog's resource bundle.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public static String getFactionJudgmentDialogResourceBundle() {
         return RESOURCE_BUNDLE;
     }
 
+    /**
+     * Constructs and displays a FactionJudgmentDialog based on a set of campaign and judgment parameters.
+     *
+     * <p>This method determines the dialog and button text based on faction, type of judgment, and campaign context,
+     * and presents the dialog to the user, capturing their selected option.</p>
+     *
+     * @param campaign           the current {@link Campaign} instance in which the judgment is occurring
+     * @param speaker            the {@link Person} who will give the dialog speech (can be null)
+     * @param commander          the {@link Person} who is being judged or associated with the dialog (can be null)
+     * @param judgmentLookupName a string identifier for the specific type of judgment event
+     * @param judgingFaction     the {@link Faction} making the judgment
+     * @param judgmentType       the {@link FactionStandingJudgmentType} describing the type of judgment
+     * @param dialogWidth        the width to use for the dialog UI
+     * @param outOfCharacterText any additional text to be shown outside of character context (can be null)
+     * @param moneyReward        an optional monetary reward tied to the judgment (can be null)
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public FactionJudgmentDialog(Campaign campaign, @Nullable Person speaker, @Nullable Person commander,
           String judgmentLookupName, Faction judgingFaction, FactionStandingJudgmentType judgmentType,
           ImmersiveDialogWidth dialogWidth, @Nullable String outOfCharacterText, @Nullable Integer moneyReward) {
         final String judgmentTypeLookupName = judgmentType.getLookupName();
 
-        // Dialog
+        // Assembles dialog components
         String commanderAddress = campaign.getCommanderAddress(false);
         String dialogKey = getDialogKey(judgmentTypeLookupName, judgmentLookupName, judgingFaction);
         String factionName = getFactionName(judgingFaction, campaign.getGameYear());
@@ -94,24 +142,39 @@ public class FactionJudgmentDialog {
                                     ? location.getPlanet().getName(today)
                                     : location.getCurrentSystem().getName(today);
 
-        String dialogText = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, null, factionName,
+        String dialogText = getInCharacterText(
+              RESOURCE_BUNDLE, dialogKey, commander, null, factionName,
               campaign.getName(), locationName, moneyReward, commanderAddress);
 
-        // Buttons
+        // Determine available button choices
         boolean includeGoRogueOption = judgmentType.equals(FactionStandingJudgmentType.CENSURE);
-
         boolean isDraconisCombineCampaign = campaign.getFaction().getShortName().equals(DRACONIS_COMBINE_FACTION_CODE);
         boolean includeSeppukuOption = includeGoRogueOption && isDraconisCombineCampaign;
 
         List<String> buttonLabels = getButtonLabels(judgmentLookupName, includeGoRogueOption, includeSeppukuOption);
 
-        // Dialog
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null, dialogText,
+        // Display dialog and store selection
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
+              campaign, speaker, null, dialogText,
               buttonLabels, outOfCharacterText, null, true, dialogWidth);
 
         responseIndex = dialog.getDialogChoice();
     }
 
+    /**
+     * Generates a lookup key for the dialog string resource based on the judgment type, event, and judging faction.
+     *
+     * <p>If a faction-specific dialog string is unavailable, it falls back to generic group-based (e.g., clan,
+     * periphery) dialog strings.</p>
+     *
+     * @param judgmentTypeLookupName the lookup name for the type of judgment
+     * @param lookupName a unique name referring to the specific judgment event/action
+     * @param judgingFaction the {@link Faction} making the judgment
+     * @return the constructed string resource key for dialog text lookup
+     *
+     * @since 0.50.07
+     * @author Illiani
+     */
     private static String getDialogKey(String judgmentTypeLookupName, String lookupName, Faction judgingFaction) {
         String censuringFactionCode = judgingFaction.getShortName();
         String dialogKey = DIALOG_KEY_FORWARD +
@@ -122,7 +185,7 @@ public class FactionJudgmentDialog {
                                  '.' +
                                  censuringFactionCode;
 
-        // If testReturn fails, we use a fallback value
+        // If resource key is not valid, use a group-based fallback (clan, periphery, or Inner Sphere)
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
         if (!MHQInternationalization.isResourceKeyValid(testReturn)) {
             String affixKey;
@@ -133,13 +196,26 @@ public class FactionJudgmentDialog {
             } else {
                 affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
             }
-
             dialogKey = dialogKey.replace('.' + censuringFactionCode, '.' + affixKey);
         }
 
         return dialogKey;
     }
 
+    /**
+     * Gathers the set of button labels to be displayed in the dialog based on the judgment scenario.
+     *
+     * <p>The returned order of options matches their visual and logical order in the dialog interface.</p>
+     *
+     * @param judgmentLookupName the identifier for this judgment scenario
+     * @param includeGoRogueOption if {@code true}, adds a "go rogue" button to the dialog
+     * @param includeSeppukuOption if {@code true}, adds a "commit seppuku" button to the dialog (only if "go rogue"
+     *                             is present and faction is correct)
+     * @return a list of button label strings as shown to the user
+     *
+     * @since 0.50.07
+     * @author Illiani
+     */
     private static List<String> getButtonLabels(String judgmentLookupName, boolean includeGoRogueOption,
           boolean includeSeppukuOption) {
         List<String> buttonLabels = new ArrayList<>();
@@ -161,9 +237,8 @@ public class FactionJudgmentDialog {
             String goRogueButtonLabel = getTextAt(RESOURCE_BUNDLE, buttonKey);
             buttonLabels.add(goRogueButtonLabel);
 
-            // You shouldn't have the seppuku option without the going rogue option due to the way options index.
-            // Otherwise, we run the risk of players selecting 'commit seppuku' and it being treated as the campaign
-            // going rogue.
+            // The "commit seppuku" option is only valid when the "go rogue" option is displayed, and the campaign
+            // faction is Draconis Combine
             if (includeSeppukuOption) {
                 buttonKey = BUTTON_KEY_FORWARD + '.' + BUTTON_KEY_SEPPUKU + '.' + judgmentLookupName;
                 String seppukuButtonLabel = getTextAt(RESOURCE_BUNDLE, buttonKey);

@@ -47,6 +47,16 @@ import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.utilities.MHQInternationalization;
 
+/**
+ * Generates and displays a news article dialog related to a judgment event against a faction, including contextual
+ * details such as faction name, location, and participants.
+ *
+ * <p>This class is used to create immersive, in-character news reports that notify the player about significant
+ * faction standings within the campaign.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionJudgmentNewsArticle {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionJudgmentNewsArticle";
 
@@ -56,10 +66,27 @@ public class FactionJudgmentNewsArticle {
     private final static String KEY_AFFIX_PERIPHERY = "periphery";
     private final static String KEY_AFFIX_CLAN = "clan";
 
-    public FactionJudgmentNewsArticle(Campaign campaign, Person commander, Person secondInCommand, String lookupName,
+    /**
+     * Constructs and immediately displays a news dialog representing a faction judgment event, assembling the news
+     * article based on campaign state, involved personnel, and faction information.
+     *
+     * @param campaign                    The current campaign instance.
+     * @param commander                   The commander referenced in the article.
+     * @param secondInCommand             The second-in-command personnel, optionally referenced in the article.
+     * @param judgmentLookupName          Used to fetch the article
+     * @param censuringFaction            The faction issuing the judgment.
+     * @param judgmentType                The specific type of judgment.
+     * @param useFactionCapitalAsLocation If {@code true}, the faction's capital planet is used as the event location;
+     *                                    otherwise, the campaign's current location is used.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionJudgmentNewsArticle(Campaign campaign, Person commander, Person secondInCommand,
+          String judgmentLookupName,
           Faction censuringFaction, FactionStandingJudgmentType judgmentType, boolean useFactionCapitalAsLocation) {
 
-        String dialogKey = getDialogKey(judgmentType, lookupName, censuringFaction);
+        String dialogKey = getDialogKey(judgmentType, judgmentLookupName, censuringFaction);
         String factionName = getFactionName(censuringFaction, campaign.getGameYear());
 
         LocalDate today = campaign.getLocalDate();
@@ -84,10 +111,23 @@ public class FactionJudgmentNewsArticle {
         new NewsDialog(campaign, newsReport);
     }
 
-    private static String getDialogKey(FactionStandingJudgmentType judgmentType, String lookupName,
+    /**
+     * Determines the correct localization key used to fetch the appropriate news template, falling back to general
+     * groupings if a specific key is not available.
+     *
+     * @param judgmentType       The type of judgment or censure.
+     * @param judgmentLookupName Added detail to refine the key.
+     * @param judgingFaction     The faction issuing the judgment.
+     *
+     * @return The appropriate resource bundle key for the news article.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static String getDialogKey(FactionStandingJudgmentType judgmentType, String judgmentLookupName,
           Faction judgingFaction) {
         String censuringFactionCode = judgingFaction.getShortName();
-        String dialogKey = KEY_FORWARD + judgmentType.getLookupName() + '.' + lookupName + '.' + censuringFactionCode;
+        String dialogKey = KEY_FORWARD + judgmentType.getLookupName() + '.' + judgmentLookupName + '.' + censuringFactionCode;
 
         // If testReturn fails, we use a fallback value
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);

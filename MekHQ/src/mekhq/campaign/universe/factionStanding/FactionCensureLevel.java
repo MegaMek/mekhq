@@ -135,24 +135,6 @@ public enum FactionCensureLevel {
     }
 
     /**
-     * Resolves and returns the string lookup name for the censure action most appropriate for a given faction.
-     *
-     * <p>Internally, this method calls {@link #getFactionAppropriateAction(Faction)} to select the correct action,
-     * then returns its lookup name.</p>
-     *
-     * @param censuringFaction the {@link Faction} issuing the censure
-     *
-     * @return a {@link String} representing the lookup name of the censure action appropriate for this faction
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public String getLookupNameForFactionCensureAction(Faction censuringFaction) {
-        FactionCensureAction censureAction = getFactionAppropriateAction(censuringFaction);
-        return censureAction.getLookupName();
-    }
-
-    /**
      * Determines if this censure is the same as the provided censure.
      *
      * @param other the censure to compare with
