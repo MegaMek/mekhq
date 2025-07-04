@@ -160,7 +160,7 @@ public class FactionCensureGoingRogueDialog {
      */
     private String getInCharacterText() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.inCharacter",
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
     }
 
     /**

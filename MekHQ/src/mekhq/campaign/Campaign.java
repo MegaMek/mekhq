@@ -7229,7 +7229,7 @@ public class Campaign implements ITechManager {
                   && isAvoidingEmptySystems
                   && end.getPopulation(currentDay) == 0) {
             new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
-                  String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress(false)),
+                  String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress()),
                   null, resources.getString("unableToEnterSystem.abandoned.ooc"), null, false);
 
             return new JumpPath();
@@ -7244,7 +7244,7 @@ public class Campaign implements ITechManager {
                   getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
-                      String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress(false)),
+                      String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
                       null, resources.getString("unableToEnterSystem.outlawed.ooc"), null, false);
 
                 return new JumpPath();
@@ -9991,6 +9991,18 @@ public class Campaign implements ITechManager {
 
     public void setAutoResolveBehaviorSettings(BehaviorSettings settings) {
         autoResolveBehaviorSettings = settings;
+    }
+
+    /**
+     * Retrieves the address or form of address for the commander.
+     *
+     * <p>This method determines the appropriate address based on whether the campaign is considered a pirate campaign.
+     * It delegates to {@link #getCommanderAddress(boolean)} with the result of {@code isPirateCampaign()}.</p>
+     *
+     * @return the string used to address the commander
+     */
+    public String getCommanderAddress() {
+        return getCommanderAddress(isPirateCampaign());
     }
 
     /**

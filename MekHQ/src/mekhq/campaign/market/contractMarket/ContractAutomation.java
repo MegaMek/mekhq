@@ -85,7 +85,7 @@ public class ContractAutomation {
         }
 
         // Initial setup
-        final String commanderAddress = campaign.getCommanderAddress(false);
+        final String commanderAddress = campaign.getCommanderAddress();
         final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
         final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
