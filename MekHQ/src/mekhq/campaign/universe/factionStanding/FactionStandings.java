@@ -591,8 +591,10 @@ public class FactionStandings {
 
         factionRegard.put(factionCode, regardValue);
 
+        double change = regardValue - currentRegard;
+
         if (includeReport) {
-            return getRegardChangedReport(-currentRegard, gameYear, factionCode, regardValue, currentRegard);
+            return getRegardChangedReport(change, gameYear, factionCode, regardValue, currentRegard);
         }
 
         return "";
@@ -757,7 +759,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today) {
-        Collection<Faction> allFactions = Factions.getInstance().getFactions();
+        Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
         FactionHints factionHints = FactionHints.defaultFactionHints();
         boolean isPirate = campaignFaction.isPirate();
 
@@ -765,15 +767,15 @@ public class FactionStandings {
         climateRegard.clear();
 
         for (Faction otherFaction : allFactions) {
-            if (!otherFaction.validIn(today.getYear())) {
+            if (otherFaction.isAggregate()) {
+                continue;
+            }
+
+            if (otherFaction.isMercenaryOrganization()) {
                 continue;
             }
 
             String otherFactionCode = otherFaction.getShortName();
-
-            if (otherFaction.isAggregate()) {
-                continue;
-            }
 
             if (otherFaction.equals(campaignFaction)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_SAME_FACTION);
@@ -840,6 +842,7 @@ public class FactionStandings {
         Collections.sort(sortedFactionCodes);
         for (String factionCode : sortedFactionCodes) {
             regard = climateRegard.get(factionCode);
+            String rounded = String.format("%.2f", regard);
 
             // We don't report negative Regard for pirates because they're always negative.
             if (campaignIsPirate && regard < 0) {
@@ -856,7 +859,7 @@ public class FactionStandings {
             factionName = FactionStandingUtilities.getFactionName(faction, today.getYear());
             String color = regard >= 0 ? getPositiveColor() : getNegativeColor();
 
-            report.append(String.format(reportFormat, factionName, color, regard));
+            report.append(String.format(reportFormat, factionName, color, rounded));
         }
 
         if (!report.isEmpty()) {
@@ -902,7 +905,8 @@ public class FactionStandings {
      */
     private String getRegardChangedReport(final double delta, final int gameYear, final String factionCode,
           final double newRegard, final double originalRegard) {
-        Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
+        Factions factions = Factions.getInstance();
+        Faction relevantFaction = factions.getFaction(factionCode);
         FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalRegard);
         FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newRegard);
 
@@ -910,7 +914,7 @@ public class FactionStandings {
         String milestoneChangeReport;
         if (originalMilestone != newMilestone) {
             if (relevantFaction == null) {
-                relevantFaction = Factions.getInstance().getDefaultFaction();
+                relevantFaction = factions.getDefaultFaction();
             }
 
             if (newMilestone.getStandingLevel() > originalMilestone.getStandingLevel()) {
@@ -947,11 +951,12 @@ public class FactionStandings {
         if (!factionName.contains(getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.check"))) {
             factionName = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.prefix") + ' ' + factionName;
         }
+        String deltaRounded = String.format("%.2f", delta);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "factionStandings.change.report", factionName, spanOpeningWithCustomColor(reportingColor),
               deltaDirection,
-              CLOSING_SPAN_TAG, delta,
+              CLOSING_SPAN_TAG, deltaRounded,
               milestoneChangeReport);
     }
 

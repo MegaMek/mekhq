@@ -566,6 +566,10 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
+        if (!campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            return;
+        }
+
         LocalDate today = campaign.getLocalDate();
         for (Person person : campaign.getPersonnel()) {
             if (isExempt(person, today)) {
