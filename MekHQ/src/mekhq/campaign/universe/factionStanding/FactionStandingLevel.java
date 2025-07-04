@@ -44,7 +44,6 @@ import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 
 /**
  * Represents a standing level within the Faction Standing reputation system.
@@ -410,39 +409,64 @@ public enum FactionStandingLevel {
     }
 
     /**
-     * Use {@link #getEffectsDescription(boolean, CampaignOptions)} instead
+     * Use {@link #getEffectsDescription(boolean, boolean, CampaignOptions)} instead
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public String getEffectsDescription() {
-        return getEffectsDescription(false, new CampaignOptions());
+        return getEffectsDescription(false, false, new CampaignOptions());
     }
 
     /**
-     * Generates a textual description of all effects based on the current faction standing modifiers.
-     *
-     * <p>This method inspects various modifiers (such as negotiation, resupply, command circuit access, outlaw status,
-     * batchall permission, recruitment popularity, barracks cost, unit market rarity, contract pay, and support point
-     * modifiers) and compiles their effects into a comma-separated string. Only effects that deviate from their default
-     * values are included in the output.</p>
-     *
-     * @return a comma-separated {@link String} listing all active faction standing effects; returns
-     * an empty string if there are no effects.
+     * Use {@link #getEffectsDescription(boolean, boolean, CampaignOptions)} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String getEffectsDescription(boolean isClan, CampaignOptions campaignOptions) {
-        MMLogger logger = MMLogger.create(FactionStandingReport.class);
-        logger.info(this);
+        return getEffectsDescription(isClan, false, campaignOptions);
+    }
+
+    /**
+     * Generates a textual summary of all currently active effects resulting from faction standing modifiers.
+     *
+     * <p>This method evaluates a range of standing-related modifiers and permissions - including negotiation,
+     * resupply, command circuit access, outlaw status, batchall rights, recruitment popularity and rolls, barracks
+     * costs, unit market rarity, contract pay, and support point modifiers.</p>
+     *
+     * <p></p>Only effects that differ from their default or neutral values, and that are allowed by the current
+     * campaign options, are included in the output.</p>
+     *
+     * <p></p>Each effect is represented as a localized formatted string, and all applicable effects are concatenated
+     * into a comma-separated result.</p>
+     *
+     * <p>The result provides a concise overview for the user or UI, listing only those standing effects that are
+     * relevant for the given context (e.g., depending on whether the organization is a Clan or on available campaign
+     * options).</p>
+     *
+     * @param isClan           {@code true} if the organization being described is a Clan; enables consideration of
+     *                                     Clan-specific modifiers.
+     * @param isPirateOrMercenaryOrganization           {@code true} if the organization being described is a pirate
+     *                                                              or mercenary organization
+     * @param campaignOptions  the current {@link CampaignOptions} that determine which standing effects are in use.
+     * @return a comma-separated {@link String} listing all non-default, active faction standing effects;
+     *         returns an empty string if there are no applicable effects.
+     */
+    public String getEffectsDescription(boolean isClan, boolean isPirateOrMercenaryOrganization,
+          CampaignOptions campaignOptions) {
+        if (isPirateOrMercenaryOrganization) {
+            return getTextAt(RESOURCE_BUNDLE, "factionStandingLevel.pirateOrMercenary");
+        }
+
         List<String> effects = new ArrayList<>();
 
         if (hasCommandCircuitAccess && campaignOptions.isUseFactionStandingCommandCircuitSafe()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit"));
+            effects.add(getTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit"));
         }
 
         if (isOutlawed && campaignOptions.isUseFactionStandingOutlawedSafe()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed"));
+            effects.add(getTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed"));
         }
 
         if (isClan && !isBatchallAllowed && campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.batchall"));
+            effects.add(getTextAt(RESOURCE_BUNDLE, "factionStandingLevel.batchall"));
         }
 
         if (negotiationModifier != 0 && campaignOptions.isUseFactionStandingNegotiationSafe()) {
