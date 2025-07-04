@@ -431,10 +431,10 @@ public enum FactionStandingLevel {
      * resupply, command circuit access, outlaw status, batchall rights, recruitment popularity and rolls, barracks
      * costs, unit market rarity, contract pay, and support point modifiers.</p>
      *
-     * <p></p>Only effects that differ from their default or neutral values, and that are allowed by the current
+     * <p>Only effects that differ from their default or neutral values, and that are allowed by the current
      * campaign options, are included in the output.</p>
      *
-     * <p></p>Each effect is represented as a localized formatted string, and all applicable effects are concatenated
+     * <p>Each effect is represented as a localized formatted string, and all applicable effects are concatenated
      * into a comma-separated result.</p>
      *
      * <p>The result provides a concise overview for the user or UI, listing only those standing effects that are
