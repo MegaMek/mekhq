@@ -1,0 +1,8 @@
+key: PHI
+name: Piracy Success Index
+capital: Terra
+tags:
+  - PIRATE
+  - SPECIAL
+fallBackFactions:
+  - PIR

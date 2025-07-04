@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -207,12 +209,12 @@ public class FactionCensureGoingRogueDialog {
         Factions factions = Factions.getInstance();
         Collection<Faction> activeFactions = factions.getActiveFactions(today);
 
-        Faction mercenaries = factions.getFaction("MERC");
+        Faction mercenaries = factions.getFaction(MERCENARY_FACTION_CODE);
         if (!campaignFaction.equals(mercenaries)) {
             possibleFactions.add(mercenaries);
         }
 
-        Faction pirates = factions.getFaction("PIR");
+        Faction pirates = factions.getFaction(PIRATE_FACTION_CODE);
         if (!campaignFaction.equals(pirates)) {
             possibleFactions.add(pirates);
         }

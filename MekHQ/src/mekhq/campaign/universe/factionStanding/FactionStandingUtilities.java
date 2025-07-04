@@ -62,6 +62,8 @@ public class FactionStandingUtilities {
     private final static String DIALOG_KEY_AFFIX_PERIPHERY = "periphery";
     private final static String DIALOG_KEY_AFFIX_CLAN = "clan";
 
+    public final static String PIRACY_SUCCESS_INDEX_FACTION_CODE = "PSI";
+
     /**
      * List of personnel roles considered political in the context of censure effects.
      */

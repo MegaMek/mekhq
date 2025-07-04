@@ -151,7 +151,7 @@ public class DialogContractStart extends JDialog {
         String convoyMessage;
         String commanderTitle = campaign.getCommanderAddress(false);
 
-        if (contract.getContractType().isGuerrillaWarfare()) {
+        if (contract.getContractType().isGuerrillaWarfare() || campaign.isPirateCampaign()) {
             String convoyMessageTemplate = "contractStartMessageGuerrilla.text";
             convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE, convoyMessageTemplate, commanderTitle);
         } else {

@@ -34,6 +34,7 @@
 package mekhq.campaign.universe;
 
 import static mekhq.MHQConstants.FORTRESS_REPUBLIC;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -313,6 +314,18 @@ public class RandomFactionGenerator {
      */
     protected WeightedIntMap<Faction> buildEnemyMap(Faction employer) {
         WeightedIntMap<Faction> enemyMap = new WeightedIntMap<>();
+
+        // If the employer is a pirate, return all border factions as "enemies"
+        if (employer.getShortName().equals(PIRATE_FACTION_CODE)) {
+            for (Faction enemy : borderTracker.getFactionsInRegion()) {
+                if (FactionHints.isEmptyFaction(enemy) || enemy.getShortName().equals("CLAN")) {
+                    continue;
+                }
+                enemyMap.add(1, enemy); // weight (1) can be adjusted as needed
+            }
+            return enemyMap;
+        }
+
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
             if (FactionHints.isEmptyFaction(enemy) || enemy.getShortName().equals("CLAN")) {
                 continue;
@@ -350,6 +363,7 @@ public class RandomFactionGenerator {
             count = adjustBorderWeight(count, employer, enemy, getCurrentDate());
             enemyMap.add((int) Math.floor(count + 0.5), enemy);
         }
+
         return enemyMap;
     }
 
@@ -540,11 +554,9 @@ public class RandomFactionGenerator {
      * @return A list of potential mission targets
      */
     public List<PlanetarySystem> getMissionTargetList(Faction attacker, Faction defender) {
-        // If the attacker or defender are not in the set of factions that control
-        // planets,
-        // and they are not rebels or pirates, they will be a faction contained within
-        // another
-        // (e.g. Nova Cat in the Draconis Combine, or Wolf-in-Exile in Lyran space
+        // If the attacker or defender are not in the set of factions that control planets, and they are not rebels
+        // or pirates, they will be a faction contained within another (e.g. Nova Cat in the Draconis Combine, or
+        // Wolf-in-Exile in Lyran space
         if (!borderTracker.getFactionsInRegion().contains(attacker) && !attacker.isPirate()) {
             attacker = factionHints.getContainedFactionHost(attacker, getCurrentDate());
         }
@@ -555,6 +567,12 @@ public class RandomFactionGenerator {
 
         if ((null == attacker) || (null == defender)) {
             return Collections.emptyList();
+        }
+
+        // If the attacker is a pirate, any planet controlled by the defender is viable
+        if (attacker.isPirate()) {
+            final FactionBorders defenderBorders = borderTracker.getBorders(defender);
+            return (defenderBorders == null) ? new ArrayList<>() : new ArrayList<>(defenderBorders.getSystems());
         }
 
         // Locate rebels on any of the attacker's planet

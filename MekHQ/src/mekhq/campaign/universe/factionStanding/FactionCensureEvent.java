@@ -149,6 +149,7 @@ public class FactionCensureEvent {
                  COMMANDER_RETIREMENT,
                  DISBAND,
                  FINE,
+                 BRIBE_OFFICIALS,
                  FORMAL_WARNING,
                  LEADERSHIP_REPLACEMENT,
                  LEGAL_CHALLENGE -> {
@@ -294,11 +295,16 @@ public class FactionCensureEvent {
             }
             case DISBAND -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.DISBAND, censuringFaction);
-            case FINE -> {
+            case FINE, BRIBE_OFFICIALS -> {
                 Finances finances = campaign.getFinances();
 
                 Money fine = finances.getBalance().multipliedBy(0.1);
-                String fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.fine");
+                String fineMessage;
+                if (censureAction.equals(FactionCensureAction.BRIBE_OFFICIALS)) {
+                    fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.bribe");
+                } else {
+                    fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.fine");
+                }
 
                 finances.debit(TransactionType.FINE, campaign.getLocalDate(), fine,
                       getTextAt(RESOURCE_BUNDLE, fineMessage));
