@@ -24,13 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -38,19 +51,21 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
+import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 
 /**
  * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel.
@@ -112,11 +127,11 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         final JPanel panel = new JPanel(new GridLayout(2, 3));
 
         setOkButton(new MMButton("btnGenerate", resources, "Generate.text",
-                "CompanyGenerationDialog.btnGenerate.toolTipText", this::okButtonActionPerformed));
+              "CompanyGenerationDialog.btnGenerate.toolTipText", this::confirmationActionListener));
         panel.add(getOkButton());
 
         panel.add(new MMButton("btnApply", resources, "Apply.text",
-                "CompanyGenerationDialog.btnApply.toolTipText", this::okButtonActionPerformed));
+              "CompanyGenerationDialog.btnApply.toolTipText", this::confirmationActionListener));
 
         panel.add(new MMButton("btnCancel", resources, "Cancel.text",
                 "Cancel.toolTipText", this::cancelActionPerformed));
@@ -134,6 +149,20 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                 evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML()));
 
         return panel;
+    }
+
+    private void confirmationActionListener(final ActionEvent evt) {
+        Faction campaignFaction = campaign.getFaction();
+        String campaignFactionCode = campaignFaction.getShortName();
+        if (campaignFactionCode.equals("MERC")) {
+            campaign.checkForNewMercenaryOrganizationStartUp(true);
+        }
+
+        PersonnelRole role = campaignFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
+        Person speaker = campaign.newPerson(role, campaignFactionCode, Gender.RANDOMIZE);
+        new FactionJudgmentDialog(campaign, speaker, campaign.getCommander(), "HELLO", campaignFaction,
+              FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
+        okButtonActionPerformed(evt);
     }
     //endregion Initialization
 

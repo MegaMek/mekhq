@@ -121,6 +121,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -197,6 +198,9 @@ public class CampaignGUI extends JPanel {
     private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
     private final RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
     private final RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+    private final RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
+    private final RoundedJButton btnCompanyGenerator = new RoundedJButton(resourceMap.getString(
+          "btnCompanyGenerator.text"));
     private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
@@ -1317,11 +1321,34 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 3, 3, 15);
         pnlButton.add(btnGlossary, gridBagConstraints);
 
-        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
-        btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
+        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
+              getCampaign().getSecondInCommand()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        pnlButton.add(btnGoRogue, gridBagConstraints);
+
+        btnCompanyGenerator.addActionListener(e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(
+              true));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        pnlButton.add(btnCompanyGenerator, gridBagConstraints);
+
+        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
+        btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1333,7 +1360,7 @@ public class CampaignGUI extends JPanel {
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1344,7 +1371,7 @@ public class CampaignGUI extends JPanel {
 
         btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1356,7 +1383,7 @@ public class CampaignGUI extends JPanel {
         btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
         btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1390,7 +1417,7 @@ public class CampaignGUI extends JPanel {
         });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weightx = 0.0;
