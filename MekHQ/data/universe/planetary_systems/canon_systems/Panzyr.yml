@@ -143,9 +143,9 @@ planet:
           source: canon
           value:
             - ARC
-      - date: '3022-01-01'
+      - date: '3022-02-01'
         faction:
-          source: canon
+          source: This is the earliest the directorate could have taken over
           value:
             - ARD
       - date: '3025-02-15'

@@ -75,9 +75,9 @@ planet:
             - IND
         population: 2020.0
         socioIndustrial: D-F-B-D-B
-      - date: '3022-01-01'
+      - date: '3022-02-01'
         faction:
-          source: canon
+          source: This is the earliest the directorate could have taken over
           value:
             - ARD
         population: 25836.0

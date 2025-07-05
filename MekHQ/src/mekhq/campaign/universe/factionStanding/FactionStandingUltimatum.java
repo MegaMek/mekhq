@@ -67,13 +67,26 @@ import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
  */
 public class FactionStandingUltimatum {
     /**
+     * Represents the earliest possible date for when Lord Espinosa overthrew the legitimate heir of the Arano
+     * Coalition
+     *
+     * <p>This date was determined by comparing dates in the House Arano manual, as well as dates in HBS'
+     * Battletech.</p>
+     */
+    private static final LocalDate ESPINOSA_COUP = LocalDate.of(3022, Month.FEBRUARY, 1);
+    private static final FactionStandingAgitatorData SANTIAGO_ESPINOSA =
+          new FactionStandingAgitatorData("Lord Santiago Espinosa", PersonnelRole.NOBLE, "ARD");
+    private static final FactionStandingAgitatorData KAMEA_ARANO =
+          new FactionStandingAgitatorData("High Lady Kamea Arano", PersonnelRole.NOBLE, "ARC");
+
+    /**
      * Represents the date marking the beginning of the Federated Commonwealth Civil War.
      *
      * <p>I opted to go with the month Katherine Steiner-Davion chose to secede from the alliance.</p>
      */
     private static final LocalDate FED_COM_CIVIL_WAR = LocalDate.of(3057, Month.SEPTEMBER, 18);
     private static final FactionStandingAgitatorData KATRINA_STEINER =
-          new FactionStandingAgitatorData("Archon Katrina Steiner", PersonnelRole.NOBLE, "LA");
+          new FactionStandingAgitatorData("Archon Katrina Steiner", PersonnelRole.NOBLE, "ARD");
     private static final FactionStandingAgitatorData VICTOR_STEINER_DAVION =
           new FactionStandingAgitatorData("Archon-Prince Victor Steiner-Davion", PersonnelRole.NOBLE, "FS");
     /**
@@ -104,6 +117,7 @@ public class FactionStandingUltimatum {
      * ultimatum event.</p>
      */
     private final static Map<LocalDate, FactionStandingUltimatumData> FACTION_STANDING_ULTIMATUMS = Map.of(
+          ESPINOSA_COUP, new FactionStandingUltimatumData("ARC", SANTIAGO_ESPINOSA, KAMEA_ARANO, true),
           FED_COM_CIVIL_WAR, new FactionStandingUltimatumData("FC", KATRINA_STEINER, VICTOR_STEINER_DAVION, false),
           COMSTAR_SCHISM, new FactionStandingUltimatumData("CS", DEMONA_AZIZ, ANASTASIUS_FOCHT, true)
     );

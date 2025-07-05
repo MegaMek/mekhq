@@ -249,10 +249,21 @@ planet:
         population: 115789602.0
       - date: '3020-01-01'
         population: 113983051.0
+      - date: '3022-02-01'
+        faction:
+          source: non-canon (ARC moved here as government in exile, in mhq. They need control of a system to generate contracts)
+          value:
+            - MOC
+            - ARC
       - date: '3025-01-01'
         population:
           source: canon
           value: 114000000.0
+      - date: '3025-09-01'
+        faction:
+          source: canon
+          value:
+            - MOC
       - date: '3030-01-01'
         population: 114972957.0
       - date: '3040-01-01'
