@@ -84,7 +84,7 @@ public enum FactionStandingLevel {
     final static String FALLBACK_LABEL_SUFFIX_PERIPHERY = "periphery";
 
     private final static int MINIMUM_STANDING_LEVEL = 0;
-    private final static int MAXIMUM_STANDING_LEVEL = 8;
+    final static int MAXIMUM_STANDING_LEVEL = 8;
 
     private final int standingLevel;
     private final double minimumRegard;
