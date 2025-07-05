@@ -289,7 +289,7 @@ public class CapturePrisoners {
      */
     private String createInCharacterMessage(Person defector, boolean isBondsman) {
         String typeKey = isBondsman ? "bondsman" : "defector";
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
 
         if (isBondsman) {
             String originFaction = defector.getOriginFaction().getFullName(campaign.getGameYear());

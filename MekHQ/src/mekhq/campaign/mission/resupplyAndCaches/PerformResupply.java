@@ -445,7 +445,7 @@ public class PerformResupply {
             final String STATUS_AFTERWARD = ".text";
 
             AtBMoraleLevel morale = contract.getMoraleLevel();
-            String commanderAddress = campaign.getCommanderAddress(false);
+            String commanderAddress = campaign.getCommanderAddress();
 
             String eventText;
             if (Compute.d6() <= 2) {
@@ -631,7 +631,7 @@ public class PerformResupply {
     private static void displayDialog(Force targetConvoy, Campaign campaign, AtBContract contract) {
         Person speaker;
         String inCharacterMessage = "";
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         if (targetConvoy != null) {
             speaker = campaign.getPerson(targetConvoy.getForceCommanderID());
 
@@ -650,7 +650,7 @@ public class PerformResupply {
         if (inCharacterMessage.isBlank()) {
             inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                   "statusUpdateIntercepted" + randomInt(20) + ".text",
-                  campaign.getCommanderAddress(false));
+                  campaign.getCommanderAddress());
         }
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.intercepted");

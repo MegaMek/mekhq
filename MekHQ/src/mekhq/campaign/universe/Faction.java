@@ -60,6 +60,8 @@ public class Faction {
 
     // region Variable Declarations
     public static final String DEFAULT_CODE = "???";
+    public static final String MERCENARY_FACTION_CODE = "MERC";
+    public static final String PIRATE_FACTION_CODE = "PIR";
 
     private Faction2 faction2;
 
@@ -329,6 +331,54 @@ public class Faction {
                      Objects.equals(shortName, MERCENARY_REVIEW_BOARD) ||
                      Objects.equals(shortName, MERCENARY_REVIEW_BONDING_COMMISSION) ||
                      Objects.equals(shortName, MERCENARY_BONDY_AUTHORITY);
+    }
+
+    /**
+     * Returns the currently active mercenary organization for the given game year.
+     *
+     * <p>This method checks a prioritized list of known mercenary organizations and returns the first one found to
+     * be valid for the specified year. The search order is:</p>
+     *
+     * <ol>
+     *     <li>Mercenary Guild</li>
+     *     <li>Mercenary Review Board</li>
+     *     <li>Mercenary Review and Bonding Commission</li>
+     *     <li>Mercenary Bondy Authority</li>
+     * </ol>
+     *
+     * <p>If none of the organizations other than the Mercenary Guild are valid in the given year, the Mercenary
+     * Guild is returned by default.</p>
+     *
+     * @param gameYear the year to check for an active organization
+     *
+     * @return the {@code Faction} object representing the active mercenary organization
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static Faction getActiveMercenaryOrganization(int gameYear) {
+        final Factions factions = Factions.getInstance();
+        final Faction MERCENARY_GUILD = factions.getFaction("MG");
+        if (MERCENARY_GUILD.validIn(gameYear)) {
+            return MERCENARY_GUILD;
+        }
+
+        final Faction MERCENARY_REVIEW_BOARD = factions.getFaction("MRB");
+        if (MERCENARY_REVIEW_BOARD.validIn(gameYear)) {
+            return MERCENARY_REVIEW_BOARD;
+        }
+
+        final Faction MERCENARY_REVIEW_BONDING_COMMISSION = factions.getFaction("MRBC");
+        if (MERCENARY_REVIEW_BONDING_COMMISSION.validIn(gameYear)) {
+            return MERCENARY_REVIEW_BONDING_COMMISSION;
+        }
+
+        final Faction MERCENARY_BONDY_AUTHORITY = factions.getFaction("MBA");
+        if (MERCENARY_BONDY_AUTHORITY.validIn(gameYear)) {
+            return MERCENARY_BONDY_AUTHORITY;
+        }
+
+        return MERCENARY_GUILD;
     }
 
     public boolean isPirate() {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
@@ -139,7 +144,7 @@ public class ImmersiveDialogNag {
         return new ImmersiveDialogCore(campaign,
               getSpeaker(campaign, specialization),
               null,
-              getInCharacterMessage(campaign, messageKey, campaign.getCommanderAddress(false)),
+              getInCharacterMessage(campaign, messageKey, campaign.getCommanderAddress()),
               createButtons(),
               getOutOfCharacterMessage(messageKey),
               null,

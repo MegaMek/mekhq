@@ -78,7 +78,7 @@ public class ReplacementLimbDialog {
 
         String inCharacterMessage = createInCharacterMessage(isPlanetside,
               hasQualifiedDoctors,
-              campaign.getCommanderAddress(false),
+              campaign.getCommanderAddress(),
               patient,
               cost,
               hasSufficientFunds);

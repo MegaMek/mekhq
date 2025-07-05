@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
@@ -117,7 +122,7 @@ public class PrisonerEventDialog extends ImmersiveDialogCore {
      * @return A formatted string containing the in-character message describing the event.
      */
     private static String createInCharacterMessage(Campaign campaign, PrisonerEvent event) {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         return getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_EVENT + event.name() + SUFFIX_MESSAGE, commanderAddress);
     }
 

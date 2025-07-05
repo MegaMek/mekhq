@@ -229,18 +229,20 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
              * If located on a faction's capital (interpreted as the starting planet for that faction),
              * generate one contract offer for that faction.
              */
-            for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
-                try {
-                    if (f.getStartingPlanet(campaign.getLocalDate()).equals(campaign.getCurrentSystem().getId()) &&
-                              RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
-                        AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
-                        if (c != null) {
-                            contracts.add(c);
-                            break;
+            if (!campaign.isPirateCampaign()) {
+                for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
+                    try {
+                        if (f.getStartingPlanet(campaign.getLocalDate()).equals(campaign.getCurrentSystem().getId()) &&
+                                  RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
+                            AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
+                            if (c != null) {
+                                contracts.add(c);
+                                break;
+                            }
                         }
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        // no starting planet in current era; continue to next faction
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    // no starting planet in current era; continue to next faction
                 }
             }
 
@@ -355,8 +357,22 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
-        contract.setContractType(findMissionType(unitRatingMod,
-              Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
+        if (campaign.isPirateCampaign()) {
+            int connections = 0;
+            Person commander = campaign.getCommander();
+            if (commander != null) {
+                connections = commander.getConnections();
+            }
+            int roll = d6(2) + connections;
+            if (roll < 6) {
+                contract.setContractType(AtBContractType.RECON_RAID);
+            } else {
+                contract.setContractType(AtBContractType.OBJECTIVE_RAID);
+            }
+        } else {
+            contract.setContractType(findMissionType(unitRatingMod,
+                  Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
+        }
 
         setEnemyCode(contract);
         setIsRiotDuty(contract);
@@ -704,6 +720,17 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         ClauseMods mods = new ClauseMods();
         clauseMods.put(contract.getId(), mods);
 
+        boolean isPirateCampaign = campaign.isPirateCampaign();
+        if (isPirateCampaign) {
+            contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+            contract.setSalvageExchange(false);
+            contract.setSalvagePct(100);
+            contract.setTransportComp(0);
+            contract.setStraightSupport(0);
+            contract.setBattleLossComp(0);
+            return;
+        }
+
         /*
          * AtB rules seem to indicate one admin in each role (though this
          * is not explicitly stated that I have seen) but MekHQ allows
@@ -855,7 +882,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         mods.mods[CLAUSE_TRANSPORT] -= modifier;
 
         rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getFaction().isMercenary());
-
         rollSalvageClause(contract,
               mods.mods[CLAUSE_SALVAGE],
               campaign.getCampaignOptions().getContractMaxSalvagePercentage());

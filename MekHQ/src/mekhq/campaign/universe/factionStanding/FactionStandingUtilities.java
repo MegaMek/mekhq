@@ -62,6 +62,8 @@ public class FactionStandingUtilities {
     private final static String DIALOG_KEY_AFFIX_PERIPHERY = "periphery";
     private final static String DIALOG_KEY_AFFIX_CLAN = "clan";
 
+    public final static String PIRACY_SUCCESS_INDEX_FACTION_CODE = "PSI";
+
     /**
      * List of personnel roles considered political in the context of censure effects.
      */
@@ -564,6 +566,10 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
+        if (!campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            return;
+        }
+
         LocalDate today = campaign.getLocalDate();
         for (Person person : campaign.getPersonnel()) {
             if (isExempt(person, today)) {

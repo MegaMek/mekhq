@@ -417,12 +417,11 @@ public class CurrentLocation {
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "contract.arrivedEarly.ic." + randomInt(10),
-                      campaign.getCommanderAddress(false),
+                      campaign.getCommanderAddress(),
                       daysTillStart);
 
                 String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "contract.arrivedEarly.ooc",
-                      campaign.getCommanderAddress(false));
+                      "contract.arrivedEarly.ooc");
 
                 new ImmersiveDialogSimple(campaign,
                       campaign.getSeniorAdminPerson(TRANSPORT),

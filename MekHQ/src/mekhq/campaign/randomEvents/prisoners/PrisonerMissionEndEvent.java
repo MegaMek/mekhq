@@ -101,7 +101,7 @@ public class PrisonerMissionEndEvent {
      * @return An integer representing the player's choice in the defector-handling dialog.
      */
     public int handlePrisonerDefectors() {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.message", commanderAddress);
 
         List<String> dialogOptions = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button"),
@@ -150,7 +150,7 @@ public class PrisonerMissionEndEvent {
                            '.' +
                            randomInt(50);
 
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress, ransom.toAmountString());
 
         String outOfCharacterMessage = null;

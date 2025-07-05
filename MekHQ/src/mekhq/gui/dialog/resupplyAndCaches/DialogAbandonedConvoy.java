@@ -142,7 +142,7 @@ public class DialogAbandonedConvoy extends JDialog {
 
         String message = getFormattedTextAt(RESOURCE_BUNDLE,
               "statusUpdateAbandoned" + randomInt(20) + ".text",
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
 
         JLabel rightDescription = new JLabel(String.format(
               "<html><div style='width: %s; text-align:center;'>%s</div></html>",

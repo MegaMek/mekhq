@@ -38,6 +38,7 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -586,6 +587,15 @@ public final class BriefingTab extends CampaignGuiTab {
         // Resolve any outstanding scenarios
         for (Scenario scenario : mission.getCurrentScenarios()) {
             scenario.setStatus(REFUSED_ENGAGEMENT);
+        }
+
+        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+            if (mission instanceof AtBContract contract) {
+                if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
+                    // CamOps 'other crimes' value
+                    getCampaign().changeCrimePirateModifier(10);
+                }
+            }
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();

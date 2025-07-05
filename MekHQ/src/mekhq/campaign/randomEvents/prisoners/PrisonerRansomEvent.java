@@ -139,7 +139,7 @@ public class PrisonerRansomEvent {
      */
     private static int getChoiceIndex(Campaign campaign, boolean isFriendlyPOWs, Money totalRansom,
           List<Person> ransomList) {
-        String inCharacterMessage = createInCharacterMessage(campaign.getCommanderAddress(false),
+        String inCharacterMessage = createInCharacterMessage(campaign.getCommanderAddress(),
               totalRansom,
               ransomList,
               isFriendlyPOWs);

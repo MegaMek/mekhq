@@ -317,7 +317,7 @@ public class PerformBatchall {
      * @since 0.50.07
      */
     private String getAreYouSureDialogText() {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         return getFormattedTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.inCharacter", commanderAddress);
     }
 

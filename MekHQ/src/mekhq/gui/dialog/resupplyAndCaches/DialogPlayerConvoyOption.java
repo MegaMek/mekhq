@@ -180,7 +180,7 @@ public class DialogPlayerConvoyOption extends JDialog {
 
             message = getFormattedTextAt(RESOURCE_BUNDLE,
                   messageResource,
-                  campaign.getCommanderAddress(false),
+                  campaign.getCommanderAddress(),
                   resupply.getTargetCargoTonnagePlayerConvoy(),
                   resupply.getTotalPlayerCargoCapacity(),
                   playerConvoyCount,
@@ -190,7 +190,7 @@ public class DialogPlayerConvoyOption extends JDialog {
 
             message = getFormattedTextAt(RESOURCE_BUNDLE,
                   messageResource,
-                  campaign.getCommanderAddress(false),
+                  campaign.getCommanderAddress(),
                   resupply.getTargetCargoTonnagePlayerConvoy(),
                   resupply.getTotalPlayerCargoCapacity(),
                   playerConvoyCount,

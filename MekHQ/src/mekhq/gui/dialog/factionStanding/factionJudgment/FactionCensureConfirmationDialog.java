@@ -120,6 +120,6 @@ public class FactionCensureConfirmationDialog {
      */
     public String getInCharacterText(final Campaign campaign) {
         return getFormattedTextAt(RESOURCE_BUNDLE, IN_CHARACTER_KEY,
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
     }
 }

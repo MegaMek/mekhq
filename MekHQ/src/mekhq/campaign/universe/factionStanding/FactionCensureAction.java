@@ -50,6 +50,7 @@ public enum FactionCensureAction {
     COMMANDER_RETIREMENT("COMMANDER_RETIREMENT", false, true),
     DISBAND("DISBAND", false, true),
     FINE("FINE", true, true),
+    BRIBE_OFFICIALS("BRIBE_OFFICIALS", true, true),
     FORMAL_WARNING("FORMAL_WARNING", true, true),
     LEADERSHIP_IMPRISONED("LEADERSHIP_IMPRISONED", false, false),
     LEADERSHIP_REPLACEMENT("LEADERSHIP_REPLACEMENT", false, false),

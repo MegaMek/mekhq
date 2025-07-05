@@ -145,7 +145,7 @@ public class RoninOffer {
      */
     private void displayAndProcessConversation(Campaign campaign, Person ronin, StratconCampaignState campaignState,
           int requiredCombatTeams) {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         int response = displayInitialMessage(commanderAddress, ronin.getCallsign());
         if (response != ACCEPT_DIALOG_CHOICE_INDEX) {
             return;

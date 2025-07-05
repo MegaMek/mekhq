@@ -106,7 +106,7 @@ public class NewYearsDayAnnouncement {
      * @return the generated IC message as a {@link String}
      */
     private String getInCharacterMessage() {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         return getFormattedTextAt(RESOURCE_BUNDLE, "newYear.message.ic", commanderAddress);
     }
 

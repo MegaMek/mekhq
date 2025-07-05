@@ -363,7 +363,7 @@ public class PrisonerEventManager {
      * @since 0.50.06
      */
     private void showDialog(boolean isSuccessful, int choiceIndex, PrisonerEvent event, String eventReport) {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String suffix = isSuccessful ? ".success" : ".failure";
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "response." + choiceIndex + '.' + event.name() + suffix,
@@ -387,7 +387,7 @@ public class PrisonerEventManager {
      * @since 0.50.06
      */
     private int getChoiceIndex(PrisonerEvent event) {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "event." + event.name() + ".message",
               commanderAddress);
@@ -424,7 +424,7 @@ public class PrisonerEventManager {
         int executions = max(1, (int) round(prisoners.size() * 0.1));
         executions = min(executions, prisoners.size());
 
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "warning.message", commanderAddress);
 
         int choice = getChoiceIndex(setFree, executions, inCharacterMessage);

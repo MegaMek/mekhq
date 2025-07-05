@@ -32,12 +32,14 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
@@ -45,11 +47,9 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
@@ -67,7 +67,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * @since 0.50.07
  */
 public class FactionCensureGoingRogueDialog {
-    static MMLogger LOGGER = MMLogger.create(FactionCensureGoingRogueDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
 
     /** Button index returned by the dialog when the 'confirm' action is selected. */
@@ -111,21 +110,22 @@ public class FactionCensureGoingRogueDialog {
      * completes upon construction.
      *
      * @param campaign the campaign context to use for available factions and dialog content.
+     * @param isUsingFactionStandings {@code true} if the campaign has faction standings enabled.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionCensureGoingRogueDialog(Campaign campaign) {
+    public FactionCensureGoingRogueDialog(Campaign campaign, boolean isUsingFactionStandings) {
         this.campaign = campaign;
 
-        getPossibleFactions();
+        getPossibleFactions(isUsingFactionStandings);
 
         ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
               getSpeaker(),
               null,
               getInCharacterText(),
               getButtons(),
-              getOutOfCharacterText(),
+              isUsingFactionStandings ? getOutOfCharacterText() : null,
               null,
               false,
               getFactionPanel(),
@@ -158,7 +158,7 @@ public class FactionCensureGoingRogueDialog {
      */
     private String getInCharacterText() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.inCharacter",
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
     }
 
     /**
@@ -191,55 +191,67 @@ public class FactionCensureGoingRogueDialog {
     }
 
     /**
-     * Fills the possibleFactions list with available choices based on the current campaign state.
+     * Determines and populates the list of factions the player may join after leaving their current faction.
      *
-     * <p>Only factions the campaign is not currently a member of are considered, with priority given to mercenaries,
-     * pirates, and factions at war or rival with the current faction. Logging is used to trace faction relationships
-     * and the resulting options.</p>
+     * <p>The method collects all factions active on the current in-game date and filters them based on eligibility,
+     * including campaign-specific restrictions, such as Inner Sphere and Clan alignment rules. Factions representing
+     * mercenaries and pirates are added to the top of the list if eligible, followed by other active factions.
+     * Aggregate and mercenary organization factions are excluded.</p>
+     *
+     * <p>This process ensures that only appropriate and permissible choices are presented to the player, with special
+     * factions given priority in the list.</p>
+     *
+     * @param isUsingFactionStandings {@code true} if the campaign has faction standings enabled.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void getPossibleFactions() {
+    private void getPossibleFactions(boolean isUsingFactionStandings) {
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();
-
         Factions factions = Factions.getInstance();
-        Collection<Faction> activeFactions = factions.getActiveFactions(today);
 
-        Faction mercenaries = factions.getFaction("MERC");
-        if (!campaignFaction.equals(mercenaries)) {
+        // Clear previous results (shouldn't be necessary but doesn't hurt)
+        possibleFactions.clear();
+
+        Faction mercenaries = factions.getFaction(MERCENARY_FACTION_CODE);
+        Faction pirates = factions.getFaction(PIRATE_FACTION_CODE);
+
+        boolean isMerc = campaignFaction.equals(mercenaries);
+        boolean isPirate = campaignFaction.equals(pirates);
+
+        // Handle special campaign factions
+        if (isMerc && isUsingFactionStandings) {
+            possibleFactions.add(pirates);
+            return;
+        }
+        if (isPirate && isUsingFactionStandings) {
+            possibleFactions.add(mercenaries);
+            return;
+        }
+
+        List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
+        activeFactions.remove(campaignFaction);
+
+        boolean isBeforeTukayyid = today.isBefore(BATTLE_OF_TUKAYYID);
+        boolean removeClanFactions = isBeforeTukayyid && !campaignFaction.isClan();
+        boolean removeInnerSphereFactions = isBeforeTukayyid && campaignFaction.isClan();
+
+        activeFactions.removeIf(faction -> !faction.isPlayable() ||
+                                                 (faction.isClan() && removeClanFactions) ||
+                                                 (!faction.isClan() && removeInnerSphereFactions) ||
+                                                 faction.equals(mercenaries) ||
+                                                 faction.equals(pirates)
+        );
+
+        // Add in order: mercenaries, pirates, then other valid factions
+        if (!isMerc) {
             possibleFactions.add(mercenaries);
         }
-
-        Faction pirates = factions.getFaction("PIR");
-        if (!campaignFaction.equals(pirates)) {
+        if (!isPirate) {
             possibleFactions.add(pirates);
         }
-
-        FactionHints factionHints = FactionHints.defaultFactionHints();
-        for (Faction otherFaction : activeFactions) {
-            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                possibleFactions.add(otherFaction);
-                LOGGER.debug("Faction {} is at war with {}",
-                      otherFaction.getFullName(campaign.getGameYear()),
-                      campaignFaction.getFullName(campaign.getGameYear()));
-                continue;
-            }
-
-            if (factionHints.isRivalOf(otherFaction, campaignFaction, today)) {
-                LOGGER.debug("Faction {} is rival of {}",
-                      otherFaction.getFullName(campaign.getGameYear()),
-                      campaignFaction.getFullName(campaign.getGameYear()));
-                possibleFactions.add(otherFaction);
-            }
-
-            LOGGER.debug("Faction {} is not at war with {}",
-                  otherFaction.getFullName(campaign.getGameYear()),
-                  campaignFaction.getFullName(campaign.getGameYear()));
-        }
-
-        LOGGER.debug("Possible factions: {}", possibleFactions);
+        possibleFactions.addAll(activeFactions);
     }
 
     /**
