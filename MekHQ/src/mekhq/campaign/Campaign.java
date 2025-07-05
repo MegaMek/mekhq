@@ -5861,7 +5861,7 @@ public class Campaign implements ITechManager {
         boolean isInTransit = !location.isOnPlanet();
         Factions factions = Factions.getInstance();
 
-        for (Entry<String, Double> standing : factionStandings.getAllFactionStandings().entrySet()) {
+        for (Entry<String, Double> standing : new HashMap<>(factionStandings.getAllFactionStandings()).entrySet()) {
             String relevantFactionCode = standing.getKey();
             Faction relevantFaction = factions.getFaction(relevantFactionCode);
             if (relevantFaction == null) {

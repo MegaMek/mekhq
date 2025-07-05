@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.*;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
@@ -51,7 +51,7 @@ import mekhq.campaign.universe.Faction;
  */
 public enum FactionCensureLevel {
     CENSURE_LEVEL_0(0, NO_ACTION, NO_ACTION, NO_ACTION, NO_ACTION),
-    CENSURE_LEVEL_1(1, FORMAL_WARNING, CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, LEGAL_CHALLENGE, FORMAL_WARNING),
+    CENSURE_LEVEL_1(1, FORMAL_WARNING, CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, LEGAL_CHALLENGE, BRIBE_OFFICIALS),
     CENSURE_LEVEL_2(2, NEWS_ARTICLE, CHATTERWEB_DISCUSSION, NEWS_ARTICLE, NEWS_ARTICLE),
     CENSURE_LEVEL_3(3,
           COMMANDER_RETIREMENT,
@@ -128,7 +128,7 @@ public enum FactionCensureLevel {
             return mercenaryAction;
         }
 
-        if (censuringFaction.getShortName().equals(PIRATE_FACTION_CODE)) {
+        if (censuringFaction.getShortName().equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
             return pirateAction;
         }
 

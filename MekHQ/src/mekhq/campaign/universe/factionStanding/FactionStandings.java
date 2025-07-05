@@ -776,6 +776,9 @@ public class FactionStandings {
             }
 
             String otherFactionCode = otherFaction.getShortName();
+            if (otherFactionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
+                continue;
+            }
 
             if (otherFaction.equals(campaignFaction)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_SAME_FACTION);
@@ -795,15 +798,22 @@ public class FactionStandings {
                 }
             }
 
+            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
+            }
+
             if ((isPirate && otherFaction.isPirate()) ||
                       factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
                 continue;
             }
 
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
+            if (isPirate) {
+                if (otherFaction.isClan()) {
+                    climateRegard.put(otherFactionCode, REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 10);
+                } else {
+                    climateRegard.put(otherFactionCode, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * 10);
+                }
             }
         }
 
@@ -873,7 +883,7 @@ public class FactionStandings {
                         spanOpeningWithCustomColor(getWarningColor()),
                         CLOSING_SPAN_TAG,
                         spanOpeningWithCustomColor(getNegativeColor()),
-                        CLIMATE_REGARD_ENEMY_FACTION_AT_WAR,
+                        REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * 10,
                         CLOSING_SPAN_TAG));
         }
         return report;
@@ -1121,12 +1131,15 @@ public class FactionStandings {
         String campaignFactionCode = campaignFaction.getShortName();
         int gameYear = today.getYear();
 
-        String report = changeRegardForFaction(campaignFactionCode,
-              employerFaction.getShortName(),
-              regardDeltaEmployer,
-              gameYear);
-        if (!report.isBlank()) {
-            regardChangeReports.add(report);
+        String report;
+        if (!employerFaction.isAggregate()) {
+            report = changeRegardForFaction(campaignFactionCode,
+                  employerFaction.getShortName(),
+                  regardDeltaEmployer,
+                  gameYear);
+            if (!report.isBlank()) {
+                regardChangeReports.add(report);
+            }
         }
 
         if (campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
