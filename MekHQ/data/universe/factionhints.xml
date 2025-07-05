@@ -248,7 +248,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
   <parties>ARC,MOC</parties>
   <parties>ARD,TC</parties>
   </alliance>
-  <war name="Fourth Succession War" start="3026-01-01" end="3025-12-30">
+  <war name="Fourth Succession War" start="3026-01-01" end="3030-12-31">
     <parties>FS,CC</parties>
     <parties>FS,DC</parties>
     <parties>LA,CC</parties>
