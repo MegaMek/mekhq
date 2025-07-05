@@ -248,6 +248,7 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
+import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
@@ -5826,6 +5827,7 @@ public class Campaign implements ITechManager {
      * storing a summary report. It then iterates once through all faction standings and, for each faction:</p>
      *
      * <ul>
+     *     <li>Checks for new ultimatum events.</li>
      *     <li>Checks for new censure actions and handles the creation of related events.</li>
      *     <li>Evaluates for new accolade levels, creating corresponding events.</li>
      *     <li>Warns if any referenced faction cannot be resolved.</li>
@@ -5839,6 +5841,11 @@ public class Campaign implements ITechManager {
      * @since 0.50.07
      */
     private void performFactionStandingChecks(boolean isFirstOfMonth) {
+        String campaignFactionCode = faction.getShortName();
+        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay, campaignFactionCode)) {
+            new FactionStandingUltimatum(currentDay, this);
+        }
+
         if (isFirstOfMonth) {
             String report = factionStandings.updateClimateRegard(faction, currentDay);
             addReport(report);
@@ -5858,7 +5865,7 @@ public class Campaign implements ITechManager {
 
             // Censure check
             if (relevantFaction.equals(faction)
-                      || (faction.getShortName().equals("MERC") && relevantFaction.isMercenaryOrganization())) {
+                      || (campaignFactionCode.equals("MERC") && relevantFaction.isMercenaryOrganization())) {
                 FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(
                       relevantFaction, currentDay, activeMissions, isInTransit);
                 if (newCensureLevel != null) {
