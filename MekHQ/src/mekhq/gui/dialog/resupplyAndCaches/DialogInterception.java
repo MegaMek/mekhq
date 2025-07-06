@@ -169,7 +169,7 @@ public class DialogInterception extends JDialog {
                       targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 message = getFormattedTextAt(RESOURCE_BUNDLE,
                       "statusUpdateIntercepted.boilerplate",
-                      campaign.getCommanderAddress(false),
+                      campaign.getCommanderAddress(),
                       getFormattedTextAt(RESOURCE_BUNDLE, "interceptionInstructions.text"));
             }
         }
@@ -177,7 +177,7 @@ public class DialogInterception extends JDialog {
         if (message.isBlank()) {
             message = getFormattedTextAt(RESOURCE_BUNDLE,
                   "statusUpdateIntercepted" + randomInt(20) + ".text",
-                  campaign.getCommanderAddress(false),
+                  campaign.getCommanderAddress(),
                   getFormattedTextAt(RESOURCE_BUNDLE, "interceptionInstructions.text"));
         }
 

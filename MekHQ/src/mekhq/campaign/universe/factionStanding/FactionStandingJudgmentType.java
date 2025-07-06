@@ -42,7 +42,8 @@ package mekhq.campaign.universe.factionStanding;
  */
 public enum FactionStandingJudgmentType {
     CENSURE("CENSURE"),
-    ACCOLADE("ACCOLADE");
+    ACCOLADE("ACCOLADE"),
+    WELCOME("WELCOME");
 
     /**
      * The unique lookup name associated with this type.

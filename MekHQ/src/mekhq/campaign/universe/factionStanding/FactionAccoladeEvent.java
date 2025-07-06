@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.*;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
@@ -166,6 +167,11 @@ public class FactionAccoladeEvent {
             }
 
             Person speaker = getSpeaker(campaign, accoladingFaction, accoladeLevel);
+            if (speaker != null &&
+                      isCashReward &&
+                      accoladingFaction.getShortName().equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
+                speaker = null;
+            }
 
             FactionJudgmentDialog initialDialog = new FactionJudgmentDialog(campaign, speaker, commander, lookupName,
                   accoladingFaction, FactionStandingJudgmentType.ACCOLADE, dialogWidth, oocText, moneyReward);
@@ -185,7 +191,8 @@ public class FactionAccoladeEvent {
             }
 
             if (!isSameFaction) {
-                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getCommander(), null);
+                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getCommander(), null,
+                      campaign.getCampaignOptions().isTrackFactionStanding());
             }
 
             List<Entity> generatedEntities = generateUnits();

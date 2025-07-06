@@ -137,7 +137,7 @@ public class GrayMonday {
             return;
         }
 
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "dialog.ooc");
 

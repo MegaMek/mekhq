@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.factionStanding.events;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -96,6 +97,10 @@ public class FactionStandingGreeting {
     public FactionStandingGreeting(Campaign campaign, Contract contract) {
         if (!(contract instanceof AtBContract atBContract)) {
             new FactionStandingGreeting(campaign);
+            return;
+        }
+
+        if (atBContract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
             return;
         }
 

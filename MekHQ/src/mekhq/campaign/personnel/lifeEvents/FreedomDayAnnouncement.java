@@ -118,7 +118,7 @@ public class FreedomDayAnnouncement {
      * @return the generated IC message as a {@link String}
      */
     private String getInCharacterMessage() {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         return getFormattedTextAt(RESOURCE_BUNDLE, "freedomDay.message.ic", commanderAddress);
     }
 

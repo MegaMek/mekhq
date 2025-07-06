@@ -169,7 +169,7 @@ public class DialogResupplyFocus extends JDialog {
 
         String message = getFormattedTextAt(RESOURCE_BUNDLE,
               "focusDescription.text",
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
 
         JLabel rightDescription = new JLabel(String.format(
               "<html><div style='width: %s; text-align:center;'>%s</div></html>",
