@@ -83,7 +83,10 @@ import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamic
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -5858,17 +5861,21 @@ public class Campaign implements ITechManager {
         boolean isInTransit = !location.isOnPlanet();
         Factions factions = Factions.getInstance();
 
-        for (Entry<String, Double> standing : factionStandings.getAllFactionStandings().entrySet()) {
-            String factionCode = standing.getKey();
-            Faction relevantFaction = factions.getFaction(factionCode);
+        for (Entry<String, Double> standing : new HashMap<>(factionStandings.getAllFactionStandings()).entrySet()) {
+            String relevantFactionCode = standing.getKey();
+            Faction relevantFaction = factions.getFaction(relevantFactionCode);
             if (relevantFaction == null) {
-                logger.warn("Unable to fetch faction standing for faction: {}", factionCode);
+                logger.warn("Unable to fetch faction standing for faction: {}", relevantFactionCode);
                 continue;
             }
 
             // Censure check
-            if (relevantFaction.equals(faction)
-                      || (faction.getShortName().equals("MERC") && relevantFaction.isMercenaryOrganization())) {
+            String campaignFactionCode = faction.getShortName();
+            boolean isMercenarySpecialCase = campaignFactionCode.equals(MERCENARY_FACTION_CODE) &&
+                                                   relevantFaction.isMercenaryOrganization();
+            boolean isPirateSpecialCase = isPirateCampaign() &&
+                                                relevantFactionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE);
+            if (relevantFaction.equals(faction) || isMercenarySpecialCase || isPirateSpecialCase) {
                 FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(
                       relevantFaction, currentDay, activeMissions, isInTransit);
                 if (newCensureLevel != null) {
@@ -5882,7 +5889,7 @@ public class Campaign implements ITechManager {
                   !isInTransit,
                   getActiveAtBContracts(),
                   activeMissions,
-                  relevantFaction.getShortName(),
+                  relevantFactionCode,
                   location.getCurrentSystem(),
                   ignoreEmployer);
 
@@ -6579,6 +6586,21 @@ public class Campaign implements ITechManager {
         return faction.isClan();
     }
 
+    /**
+     * Determines whether the current campaign is a pirate campaign.
+     *
+     * <p>This method checks if the faction associated with the campaign is Pirates, returning {@code true} if it is,
+     * and {@code false} otherwise.</p>
+     *
+     * @return {@code true} if the campaign is Pirates, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isPirateCampaign() {
+        return faction.getShortName().equals(PIRATE_FACTION_CODE);
+    }
+
     public void setFaction(final Faction faction) {
         setFactionDirect(faction);
         updateTechFactionCode();
@@ -7273,7 +7295,7 @@ public class Campaign implements ITechManager {
                   && isAvoidingEmptySystems
                   && end.getPopulation(currentDay) == 0) {
             new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
-                  String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress(false)),
+                  String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress()),
                   null, resources.getString("unableToEnterSystem.abandoned.ooc"), null, false);
 
             return new JumpPath();
@@ -7288,7 +7310,7 @@ public class Campaign implements ITechManager {
                   getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
-                      String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress(false)),
+                      String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
                       null, resources.getString("unableToEnterSystem.outlawed.ooc"), null, false);
 
                 return new JumpPath();
@@ -10035,6 +10057,18 @@ public class Campaign implements ITechManager {
 
     public void setAutoResolveBehaviorSettings(BehaviorSettings settings) {
         autoResolveBehaviorSettings = settings;
+    }
+
+    /**
+     * Retrieves the address or form of address for the commander.
+     *
+     * <p>This method determines the appropriate address based on whether the campaign is considered a pirate campaign.
+     * It delegates to {@link #getCommanderAddress(boolean)} with the result of {@code isPirateCampaign()}.</p>
+     *
+     * @return the string used to address the commander
+     */
+    public String getCommanderAddress() {
+        return getCommanderAddress(isPirateCampaign());
     }
 
     /**

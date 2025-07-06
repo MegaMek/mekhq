@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -156,7 +158,7 @@ public class FactionCensureGoingRogueDialog {
      */
     private String getInCharacterText() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.inCharacter",
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
     }
 
     /**
@@ -212,8 +214,8 @@ public class FactionCensureGoingRogueDialog {
         // Clear previous results (shouldn't be necessary but doesn't hurt)
         possibleFactions.clear();
 
-        Faction mercenaries = factions.getFaction("MERC");
-        Faction pirates = factions.getFaction("PIR");
+        Faction mercenaries = factions.getFaction(MERCENARY_FACTION_CODE);
+        Faction pirates = factions.getFaction(PIRATE_FACTION_CODE);
 
         boolean isMerc = campaignFaction.equals(mercenaries);
         boolean isPirate = campaignFaction.equals(pirates);

@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -152,17 +154,20 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     }
 
     private void confirmationActionListener(final ActionEvent evt) {
+        okButtonActionPerformed(evt);
+
         Faction campaignFaction = campaign.getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
         if (campaignFactionCode.equals("MERC")) {
             campaign.checkForNewMercenaryOrganizationStartUp(true);
+        } else if (campaignFactionCode.equals(PIRATE_FACTION_CODE)) {
+            return;
         }
 
         PersonnelRole role = campaignFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
         Person speaker = campaign.newPerson(role, campaignFactionCode, Gender.RANDOMIZE);
         new FactionJudgmentDialog(campaign, speaker, campaign.getCommander(), "HELLO", campaignFaction,
               FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-        okButtonActionPerformed(evt);
     }
     //endregion Initialization
 

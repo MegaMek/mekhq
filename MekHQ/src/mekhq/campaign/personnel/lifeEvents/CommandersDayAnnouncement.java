@@ -113,7 +113,7 @@ public class CommandersDayAnnouncement {
     private String getInCharacterMessage() {
         // Commander Data
         Person commander = campaign.getCommander();
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
 
         String commanderSurname = commander.getSurname();
         if (commanderSurname.isBlank()) {

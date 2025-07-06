@@ -166,7 +166,7 @@ public class ComingOfAgeAnnouncement {
               birthdayHaverPronounData.subjectPronounLowerCase(),
               birthdayHaverPronounData.objectPronounLowerCase(),
               birthdayHaverPronounData.possessivePronounLowerCase(),
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
     }
 
     /**

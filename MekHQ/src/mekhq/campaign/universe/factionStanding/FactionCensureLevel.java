@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.*;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
@@ -50,9 +51,13 @@ import mekhq.campaign.universe.Faction;
  */
 public enum FactionCensureLevel {
     CENSURE_LEVEL_0(0, NO_ACTION, NO_ACTION, NO_ACTION, NO_ACTION),
-    CENSURE_LEVEL_1(1, FORMAL_WARNING, CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, LEGAL_CHALLENGE, NEWS_ARTICLE),
-    CENSURE_LEVEL_2(2, NEWS_ARTICLE, CHATTERWEB_DISCUSSION, NEWS_ARTICLE, COMMANDER_IMPRISONMENT),
-    CENSURE_LEVEL_3(3, COMMANDER_RETIREMENT, CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL, FORMAL_WARNING, COMMANDER_MURDERED),
+    CENSURE_LEVEL_1(1, FORMAL_WARNING, CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, LEGAL_CHALLENGE, BRIBE_OFFICIALS),
+    CENSURE_LEVEL_2(2, NEWS_ARTICLE, CHATTERWEB_DISCUSSION, NEWS_ARTICLE, NEWS_ARTICLE),
+    CENSURE_LEVEL_3(3,
+          COMMANDER_RETIREMENT,
+          CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL,
+          FORMAL_WARNING,
+          COMMANDER_IMPRISONMENT),
     CENSURE_LEVEL_4(4, LEADERSHIP_REPLACEMENT, LEADERSHIP_REPLACEMENT, FINE, COMMANDER_MURDERED),
     CENSURE_LEVEL_5(5, DISBAND, DISBAND, BARRED, LEADERSHIP_IMPRISONED);
 
@@ -123,7 +128,7 @@ public enum FactionCensureLevel {
             return mercenaryAction;
         }
 
-        if (censuringFaction.getShortName().equals("PIR")) {
+        if (censuringFaction.getShortName().equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
             return pirateAction;
         }
 

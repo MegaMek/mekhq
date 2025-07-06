@@ -108,7 +108,7 @@ public class ResupplyUtilities {
             if (force.isForceType(CONVOY) && force.getScenarioId() == scenarioId) {
                 Person speaker = campaign.getPerson(force.getForceCommanderID());
 
-                String commanderAddress = campaign.getCommanderAddress(false);
+                String commanderAddress = campaign.getCommanderAddress();
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "statusUpdateAbandoned" + randomInt(20) + ".text",
                       commanderAddress);

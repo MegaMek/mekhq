@@ -3005,7 +3005,7 @@ public class CampaignGUI extends JPanel {
 
             String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogOverdueLoans.ic",
-                  campaign.getCommanderAddress(false));
+                  campaign.getCommanderAddress());
             String outOfCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogOverdueLoans.ooc");
 
@@ -3047,7 +3047,7 @@ public class CampaignGUI extends JPanel {
         if (!campaignFaction.validIn(currentDate)) {
             String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogInvalidFaction.ic",
-                  campaign.getCommanderAddress(false));
+                  campaign.getCommanderAddress());
             String outOfCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogInvalidFaction.ooc");
 
