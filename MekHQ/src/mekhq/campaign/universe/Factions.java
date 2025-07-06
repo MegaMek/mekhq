@@ -259,7 +259,7 @@ public class Factions {
                     yield "logo_clan_ghost_bear";
                 }
             }
-            case "CGS" -> "logo_clan_goliath_scorpion";
+            case "CGS", "SE" -> "logo_clan_goliath_scorpion";
             case "CHH" -> "logo_clan_hells_horses";
             case "CIH" -> "logo_clan_ice_hellion";
             case "CJF" -> "logo_clan_jade_falcon";
