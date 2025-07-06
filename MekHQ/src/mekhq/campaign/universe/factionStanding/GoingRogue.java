@@ -138,15 +138,16 @@ public class GoingRogue {
      *                      faction
      * @param commander     the commanding officer of the force
      * @param second        the second-in-command, may be {@code null}
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
      * @since 0.50.07
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
-          @Nullable Person second) {
+          @Nullable Person second, boolean isUsingFactionStandings) {
         boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
 
-        processGoingRogue(campaign, chosenFaction, commander, second, isDefection);
+        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUsingFactionStandings);
     }
 
     /**
@@ -182,7 +183,7 @@ public class GoingRogue {
         processMassLoyaltyChange(campaign, true, true);
 
         if (isDefection) {
-            new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, campaignFaction,
+            new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
                   FactionStandingJudgmentType.WELCOME, false);
 
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MEKWARRIOR : PersonnelRole.MILITARY_LIAISON;
