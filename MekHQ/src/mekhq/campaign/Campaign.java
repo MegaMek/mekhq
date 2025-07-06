@@ -251,6 +251,7 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
+import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -5830,6 +5831,7 @@ public class Campaign implements ITechManager {
      * storing a summary report. It then iterates once through all faction standings and, for each faction:</p>
      *
      * <ul>
+     *     <li>Checks for new ultimatum events.</li>
      *     <li>Checks for new censure actions and handles the creation of related events.</li>
      *     <li>Evaluates for new accolade levels, creating corresponding events.</li>
      *     <li>Warns if any referenced faction cannot be resolved.</li>
@@ -5844,12 +5846,17 @@ public class Campaign implements ITechManager {
      * @since 0.50.07
      */
     private void performFactionStandingChecks(boolean isFirstOfMonth, boolean isNewYear) {
-        if (isNewYear && faction.getShortName().equals("MERC")) {
+        String campaignFactionCode = faction.getShortName();
+        if (isNewYear && campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
             checkForNewMercenaryOrganizationStartUp(false);
         }
 
         if (!campaignOptions.isTrackFactionStanding()) {
             return;
+        }
+
+        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay, campaignFactionCode)) {
+            new FactionStandingUltimatum(currentDay, this);
         }
 
         if (isFirstOfMonth) {
@@ -5870,7 +5877,6 @@ public class Campaign implements ITechManager {
             }
 
             // Censure check
-            String campaignFactionCode = faction.getShortName();
             boolean isMercenarySpecialCase = campaignFactionCode.equals(MERCENARY_FACTION_CODE) &&
                                                    relevantFaction.isMercenaryOrganization();
             boolean isPirateSpecialCase = isPirateCampaign() &&

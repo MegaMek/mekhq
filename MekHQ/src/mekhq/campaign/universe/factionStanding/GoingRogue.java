@@ -33,7 +33,9 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.MAXIMUM_STANDING_LEVEL;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.calculateFactionStandingLevel;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.processMassLoyaltyChange;
 
 import java.time.LocalDate;
@@ -127,34 +129,61 @@ public class GoingRogue {
     }
 
     /**
-     * Carries out the narrative and data changes when the force goes rogue.
+     * Handles the processing of forces going rogue by transitioning their alignment to a new faction and determining
+     * the nature of the event (defection or not). It delegates further handling and the consequences to other
+     * specialized methods within the class.
      *
-     * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
-     *
-     * @param campaign                the current campaign context
-     * @param chosenFaction           the new faction may be the same or a new one
-     * @param commander               the force commander
-     * @param second                  secondary command personnel
+     * @param campaign      the current campaign context
+     * @param chosenFaction the new faction the force is aligning with; may be the same or different from the old
+     *                      faction
+     * @param commander     the commanding officer of the force
+     * @param second        the second-in-command, may be {@code null}
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
      * @since 0.50.07
      */
-    static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander, Person second,
-          boolean isUsingFactionStandings) {
-        Faction campaignFaction = campaign.getFaction();
-        boolean isDefection = !chosenFaction.isAggregate() && !campaignFaction.isAggregate();
+    public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
+          @Nullable Person second, boolean isUsingFactionStandings) {
+        boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
+
+        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUsingFactionStandings);
+    }
+
+    /**
+     * Carries out the narrative and data changes when the force goes rogue.
+     *
+     * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
+     *
+     * @param campaign      the current campaign context
+     * @param chosenFaction the new faction may be the same or a new one
+     * @param commander     the force commander
+     * @param second        secondary command personnel
+     * @param isDefection   whether the 'going rogue' action counts as defection
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
+          @Nullable Person second, boolean isDefection, boolean isUsingFactionStandings) {
+        Faction currentFaction = campaign.getFaction();
+
         if (isUsingFactionStandings) {
             processPersonnel(campaign, isDefection, commander, second);
 
-            processFactionStandingChangeForOldFaction(campaign);
+            if (currentFaction.equals(chosenFaction)) {
+                processRegardBump(campaign);
+            } else {
+                processFactionStandingChangeForOldFaction(campaign);
+            }
             processFactionStandingChangeForNewFaction(campaign, chosenFaction);
         }
 
         processMassLoyaltyChange(campaign, true, true);
 
         if (isDefection) {
-            new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, campaignFaction,
+            new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
                   FactionStandingJudgmentType.WELCOME, false);
 
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MEKWARRIOR : PersonnelRole.MILITARY_LIAISON;
@@ -169,6 +198,7 @@ public class GoingRogue {
                       FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
             }
         }
+
 
         campaign.setFaction(chosenFaction);
     }
@@ -290,36 +320,103 @@ public class GoingRogue {
         }
     }
 
+
+    /**
+     * Processes the standing change for the current campaign with its old faction, using the campaign's default
+     * faction.
+     *
+     * @param campaign the current campaign context
+     */
+    private static void processFactionStandingChangeForOldFaction(Campaign campaign) {
+        processFactionStandingChangeForOldFaction(campaign, campaign.getFaction());
+    }
+
     /**
      * Adjusts the campaign's standing with the old faction, if leaving, reducing regard to the minimum allowed for
      * {@link FactionStandingLevel#STANDING_LEVEL_1} if necessary.
      *
      * @param campaign the current campaign context
+     * @param oldFaction the faction the campaign is departing
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static void processFactionStandingChangeForOldFaction(Campaign campaign) {
-        Faction faction = campaign.getFaction();
+    public static void processFactionStandingChangeForOldFaction(Campaign campaign, Faction oldFaction) {
+        if (oldFaction.isAggregate()) {
+            return;
+        }
 
+        String factionCode = oldFaction.getShortName();
+        FactionStandings factionStandings = campaign.getFactionStandings();
+
+        double targetRegard = FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard();
+        double currentRegard = factionStandings.getRegardForFaction(factionCode, false);
+        if (currentRegard <= targetRegard) {
+            return;
+        }
+
+        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(),
+              factionCode,
+              targetRegard,
+              campaign.getGameYear(),
+              true);
+        campaign.addReport(report);
+    }
+
+    /**
+     * Increases the standing (regard) of the campaign's active faction by a single level if possible, as part of
+     * resolving a Faction Standing ultimatum event.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *   <li>Checks that the faction is not aggregate (i.e., not a combined or abstract group).</li>
+     *   <li>Calculates the next standing level for the faction, if above the current level and within the maximum
+     *   allowed.</li>
+     *   <li>If the faction's current regard is below the minimum threshold for the next standing level, updates it
+     *   to exactly that threshold.</li>
+     *   <li>Generates and adds an appropriate standing report to the campaign.</li>
+     *   <li>If the faction is already at or above the new target level, or at the maximum standing, no changes are
+     *   made.</li>
+     * </ul>
+     *
+     * @param campaign the {@link Campaign} instance whose faction standing should be bumped up in response to an
+     *                 ultimatum
+     */
+    public static void processRegardBump(Campaign campaign) {
+        Faction faction = campaign.getFaction();
         if (faction.isAggregate()) {
             return;
         }
 
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getFactionStandings();
-
-        double targetRegard = FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard();
         double currentRegard = factionStandings.getRegardForFaction(factionCode, false);
-        if (currentRegard < targetRegard) {
+        FactionStandingLevel currentStanding = calculateFactionStandingLevel(currentRegard);
+        int nextLevel = currentStanding.getStandingLevel() + 1;
+
+        if (nextLevel > MAXIMUM_STANDING_LEVEL) {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(factionCode,
+        FactionStandingLevel newStanding = FactionStandingLevel.fromString(String.valueOf(nextLevel));
+        if (newStanding == null) {
+            // Defensive: Can't find the next standing
+            return;
+        }
+
+        double targetRegard = newStanding.getMinimumRegard();
+        if (currentRegard >= targetRegard) {
+            // No bump needed
+            return;
+        }
+
+        String report = factionStandings.setRegardForFaction(
+              campaign.getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),
-              true);
+              true
+        );
         campaign.addReport(report);
     }
 
