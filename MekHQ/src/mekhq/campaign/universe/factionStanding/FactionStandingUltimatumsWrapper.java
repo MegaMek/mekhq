@@ -32,41 +32,38 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.util.List;
 
 /**
- * Holds data for Faction Standing ultimatum event.
+ * A wrapper class for managing a list of {@link FactionStandingUltimatumData}.
  *
- * @param name                the name of the ultimatum.
- * @param date                the date of the ultimatum. Stored as a {@link String} for ease of loading
- * @param affectedFactionCode the code for the faction affected by the ultimatum
- * @param challenger          information about initiating the challenger
- * @param incumbent           information about the faction leader being challenged
- * @param isViolentTransition {@code true} if the transition is violent
+ * <p>This class provides methods to retrieve and update the list of ultimatums.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
-public record FactionStandingUltimatumData(
-      String name,
-      String date,
-      String affectedFactionCode,
-      FactionStandingAgitatorData challenger,
-      FactionStandingAgitatorData incumbent,
-      boolean isViolentTransition
-) {
+class FactionStandingUltimatumsWrapper {
+    private List<FactionStandingUltimatumData> ultimatums;
+
     /**
-     * Returns the date as a {@link LocalDate}, parsed from the date string.
+     * @return a {@link List} of {@link FactionStandingUltimatumData} representing the ultimatums.
      *
-     * @return {@link LocalDate} representation of the date.
-     *
-     * @throws DateTimeParseException if the date format is invalid
      * @author Illiani
      * @since 0.50.07
      */
-    public LocalDate getDate() {
-        return LocalDate.parse(date);
+    List<FactionStandingUltimatumData> getUltimatums() {
+        return ultimatums;
+    }
+
+    /**
+     * Sets the list of {@link FactionStandingUltimatumData} for this wrapper.
+     *
+     * @param ultimatums a {@link List} of {@link FactionStandingUltimatumData} to associate.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void setUltimatums(List<FactionStandingUltimatumData> ultimatums) {
+        this.ultimatums = ultimatums;
     }
 }
-

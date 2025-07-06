@@ -33,7 +33,6 @@
 package mekhq.campaign.universe.factionStanding;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.Map;
 
 import megamek.common.enums.Gender;
@@ -43,7 +42,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
 
 /**
- * Handles the orchestration and presentation of faction standing ultimatum events.
+ * Handles the orchestration and presentation of Faction Standing ultimatum events.
  *
  * <p>This class manages the association between significant historical dates and their respective Faction Standing
  * ultimatum scenarios, triggering appropriate in-game dialogs and transitions when such events are detected for the
@@ -66,62 +65,6 @@ import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
  * @since 0.50.07
  */
 public class FactionStandingUltimatum {
-    /**
-     * Represents the earliest possible date for when Lord Espinosa overthrew the legitimate heir of the Arano
-     * Coalition
-     *
-     * <p>This date was determined by comparing dates in the House Arano manual, as well as dates in HBS'
-     * Battletech.</p>
-     */
-    private static final LocalDate ESPINOSA_COUP = LocalDate.of(3022, Month.FEBRUARY, 1);
-    private static final FactionStandingAgitatorData SANTIAGO_ESPINOSA =
-          new FactionStandingAgitatorData("Lord Santiago Espinosa", PersonnelRole.NOBLE, "ARD");
-    private static final FactionStandingAgitatorData KAMEA_ARANO =
-          new FactionStandingAgitatorData("High Lady Kamea Arano", PersonnelRole.NOBLE, "ARC");
-
-    /**
-     * Represents the date marking the beginning of the Federated Commonwealth Civil War.
-     *
-     * <p>I opted to go with the month Katherine Steiner-Davion chose to secede from the alliance.</p>
-     */
-    private static final LocalDate FED_COM_CIVIL_WAR = LocalDate.of(3057, Month.SEPTEMBER, 18);
-    private static final FactionStandingAgitatorData KATRINA_STEINER =
-          new FactionStandingAgitatorData("Archon Katrina Steiner", PersonnelRole.NOBLE, "ARD");
-    private static final FactionStandingAgitatorData VICTOR_STEINER_DAVION =
-          new FactionStandingAgitatorData("Archon-Prince Victor Steiner-Davion", PersonnelRole.NOBLE, "FS");
-    /**
-     * Represents the date commemorating the schism within ComStar.
-     *
-     * <p>Primus Myndo Waterly was killed June 6th 3025, a week later (June 13th) Sharilar Mori was elected as Primus.
-     * This caused Precentor Demona Aziz to head to Atreus (FWL) and kick off the ComStar Schism. It's a 100-day journey
-     * from Terra to Atreus, which is how we got this date.</p>
-     *
-     * <p>There is an argument to be made that Precentor Aziz probably could have traveled via command circuit or
-     * similar. I think that's very valid, however, I still went with the below date as it factors time needed to get a
-     * meeting with Thomas Marik and then to arrange the HPG message that officially starts the schism.</p>
-     */
-    private static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, Month.SEPTEMBER, 21);
-    private static final FactionStandingAgitatorData DEMONA_AZIZ =
-          new FactionStandingAgitatorData("Precentor Demona Aziz", PersonnelRole.RELIGIOUS_LEADER, "WOB");
-    private static final FactionStandingAgitatorData ANASTASIUS_FOCHT =
-          new FactionStandingAgitatorData("Precentor Martial Anastasius Focht", PersonnelRole.NOBLE, "CS");
-
-    /**
-     * A mapping of specific historical dates to their corresponding faction standing ultimatum events.
-     *
-     * <p>This map associates significant events in faction history with their respective data regarding the faction
-     * affected, the challenger, the incumbent leader, and whether the transition is non-violent.</p>
-     *
-     * <p>Each entry in the map uses a {@link LocalDate} as the key, representing the date of the faction ultimatum,
-     * and a {@link FactionStandingUltimatumData} object as the value, capturing the relevant contextual data for the
-     * ultimatum event.</p>
-     */
-    private final static Map<LocalDate, FactionStandingUltimatumData> FACTION_STANDING_ULTIMATUMS = Map.of(
-          ESPINOSA_COUP, new FactionStandingUltimatumData("ARC", SANTIAGO_ESPINOSA, KAMEA_ARANO, true),
-          FED_COM_CIVIL_WAR, new FactionStandingUltimatumData("FC", KATRINA_STEINER, VICTOR_STEINER_DAVION, false),
-          COMSTAR_SCHISM, new FactionStandingUltimatumData("CS", DEMONA_AZIZ, ANASTASIUS_FOCHT, true)
-    );
-
     private final Campaign campaign;
 
     /**
@@ -133,19 +76,44 @@ public class FactionStandingUltimatum {
      *
      * @param date                the date to check for a faction ultimatum
      * @param campaignFactionCode the faction code to check for association with the ultimatum
+     * @param ultimatumsLibrary   the library of ultimatums. Created in {@link Campaign} during initialization
      *
      * @return {@code true} if an ultimatum for the given date matches the specified faction code, {@code false}
      *       otherwise
      */
-    public static boolean checkUltimatumForDate(final LocalDate date, final String campaignFactionCode) {
-        FactionStandingUltimatumData ultimatum = FACTION_STANDING_ULTIMATUMS.get(date);
+    public static boolean checkUltimatumForDate(final LocalDate date, final String campaignFactionCode,
+          FactionStandingUltimatumsLibrary ultimatumsLibrary) {
+        Map<LocalDate, FactionStandingUltimatumData> ultimatums = ultimatumsLibrary.getUltimatums();
+        FactionStandingUltimatumData ultimatum = ultimatums.get(date);
         return ultimatum != null && campaignFactionCode.equals(ultimatum.affectedFactionCode());
     }
 
-    public FactionStandingUltimatum(final LocalDate date, final Campaign campaign) {
+    /**
+     * Initializes and processes a Faction Standing ultimatum event for the specified date and campaign.
+     *
+     * <p>This constructor checks if a faction ultimatum is present for the given date and whether it applies to the
+     * current campaign's faction. If both checks pass, it instantiates and presents a dialog to the player detailing
+     * the scenario, complete with participants represented as {@link Person} entities. If no relevant ultimatum is
+     * found or the event does not pertain to the campaign's faction, the constructor exits without further action.</p>
+     *
+     * <p><b>Usage:</b> Should be preceded by a call to
+     * {@link #checkUltimatumForDate(LocalDate, String, FactionStandingUltimatumsLibrary)} to avoid needing to pass
+     * around a {@link Campaign} object unnecessarily.</p>
+     *
+     * @param date              the date for which to check and process a Faction Standing ultimatum event
+     * @param campaign          the current {@link Campaign} context in which the event occurs
+     * @param ultimatumsLibrary the data source containing all available Faction Standing ultimatum events
+     *
+     * @author Illiani
+     * @see #checkUltimatumForDate(LocalDate, String, FactionStandingUltimatumsLibrary)
+     * @since 0.50.07
+     */
+    public FactionStandingUltimatum(final LocalDate date, final Campaign campaign,
+          FactionStandingUltimatumsLibrary ultimatumsLibrary) {
         this.campaign = campaign;
+        Map<LocalDate, FactionStandingUltimatumData> ultimatums = ultimatumsLibrary.getUltimatums();
 
-        FactionStandingUltimatumData ultimatum = FACTION_STANDING_ULTIMATUMS.get(date);
+        FactionStandingUltimatumData ultimatum = ultimatums.get(date);
 
         // We should have used 'checkUltimatumForDate' before initializing 'FactionStandingUltimatum', so we should
         // never return here. However, I opted to include this check as added security.
@@ -154,7 +122,7 @@ public class FactionStandingUltimatum {
         }
 
         // Or here...
-        String affectedFactionCode = FACTION_STANDING_ULTIMATUMS.get(date).affectedFactionCode();
+        String affectedFactionCode = ultimatum.affectedFactionCode();
         String campaignFactionCode = campaign.getFaction().getShortName();
         if (!campaignFactionCode.equals(affectedFactionCode)) {
             return;

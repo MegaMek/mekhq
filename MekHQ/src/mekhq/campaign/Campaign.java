@@ -247,15 +247,7 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
-import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
-import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
-import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
-import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
-import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.universe.factionStanding.PerformBatchall;
+import mekhq.campaign.universe.factionStanding.*;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -433,6 +425,7 @@ public class Campaign implements ITechManager {
     // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
+    FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
 
     /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
@@ -528,6 +521,7 @@ public class Campaign implements ITechManager {
 
         // Library initialization
         randomEventLibraries = new RandomEventLibraries();
+        factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
     }
 
     /**
@@ -5855,8 +5849,10 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay, campaignFactionCode)) {
-            new FactionStandingUltimatum(currentDay, this);
+        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay,
+              campaignFactionCode,
+              factionStandingUltimatumsLibrary)) {
+            new FactionStandingUltimatum(currentDay, this, factionStandingUltimatumsLibrary);
         }
 
         if (isFirstOfMonth) {
@@ -6916,6 +6912,10 @@ public class Campaign implements ITechManager {
 
     public RandomEventLibraries getRandomEventLibraries() {
         return randomEventLibraries;
+    }
+
+    public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
+        return factionStandingUltimatumsLibrary;
     }
 
     public void writeToXML(final PrintWriter writer) {
