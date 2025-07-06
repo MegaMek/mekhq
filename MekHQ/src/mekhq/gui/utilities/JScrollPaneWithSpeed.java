@@ -24,24 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
 import java.awt.Component;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.utilities.FastJScrollPane;
 
 /**
- * Use the version housed in MegaMek, instead
+ * Use {@link FastJScrollPane} instead
  */
 @Deprecated(since = "0.50.07")
 public class JScrollPaneWithSpeed extends JScrollPane {
     static final int BASE_INCREMENT = 16;
 
     /**
-     * @see JPanel#JPanel()
+     * Use {@link FastJScrollPane#FastJScrollPane()} instead
      */
     public JScrollPaneWithSpeed() {
         super(null);
@@ -49,7 +54,7 @@ public class JScrollPaneWithSpeed extends JScrollPane {
     }
 
     /**
-     * @see JPanel#JPanel()
+     * Use {@link FastJScrollPane#FastJScrollPane()} instead
      */
     public JScrollPaneWithSpeed(Component view) {
         super(view);
@@ -57,7 +62,7 @@ public class JScrollPaneWithSpeed extends JScrollPane {
     }
 
     /**
-     * @see JPanel#JPanel()
+     * Use {@link FastJScrollPane#FastJScrollPane()} instead
      */
     public JScrollPaneWithSpeed(Component view, int vsbPolicy, int hsbPolicy) {
         super(view, vsbPolicy, hsbPolicy);
