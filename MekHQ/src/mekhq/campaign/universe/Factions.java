@@ -272,6 +272,7 @@ public class Factions {
                     yield "logo_clan_diamond_sharks";
                 }
             }
+            case "MBA" -> "logo_clan_sea_fox";
             case "CSJ" -> "logo_clan_smoke_jaguar";
             case "CSR" -> "logo_clan_snow_raven";
             case "CSA" -> "logo_clan_star_adder";
@@ -279,7 +280,7 @@ public class Factions {
             case "CSL" -> "logo_clan_stone_lion";
             case "CW", "CWE", "CWIE" -> "logo_clan_wolf";
             case "CWOV" -> "logo_clan_wolverine";
-            case "CS" -> "logo_comstar";
+            case "CS", "MRB" -> "logo_comstar";
             case "DC" -> "logo_draconis_combine";
             case "DA" -> "logo_duchy_of_andurien";
             case "DTA" -> "logo_duchy_of_tamarind_abbey";
@@ -302,7 +303,7 @@ public class Factions {
             case "NC" -> "logo_nueva_castile";
             case "OC" -> "logo_oberon_confederation";
             case "OA" -> "logo_outworld_alliance";
-            case "PIR" -> "logo_pirates";
+            case "PIR", "PSI" -> "logo_pirates";
             case "RD" -> "logo_rasalhague_dominion";
             case "RF" -> "logo_regulan_fiefs";
             case "ROS" -> "logo_republic_of_the_sphere";
