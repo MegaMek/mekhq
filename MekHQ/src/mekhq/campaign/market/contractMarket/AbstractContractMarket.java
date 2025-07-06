@@ -36,16 +36,20 @@ import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -537,6 +541,11 @@ public abstract class AbstractContractMarket {
             contract.setEnemyCode("PIR");
         } else if (contract.getContractType().isRiotDuty()) {
             contract.setEnemyCode("REB");
+        } else if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
+            RandomFactionGenerator factionGenerator = RandomFactionGenerator.getInstance();
+            Set<String> localFactions = new HashSet<>(factionGenerator.getCurrentFactions());
+            String enemyCode = ObjectUtility.getRandomItem(localFactions);
+            contract.setEnemyCode(enemyCode);
         } else {
             contract.setEnemyCode(RandomFactionGenerator.getInstance()
                                         .getEnemy(contract.getEmployerCode(),
@@ -552,7 +561,6 @@ public abstract class AbstractContractMarket {
     }
 
     protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
-        // FIXME : Windchild : I don't work properly
         if (contract.isAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
                                        .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));

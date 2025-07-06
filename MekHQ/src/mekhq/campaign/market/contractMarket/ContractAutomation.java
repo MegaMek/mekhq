@@ -33,6 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -49,6 +50,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -57,10 +59,10 @@ import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * The ContractAutomation class provides a suite of methods
- * used in automating actions when a contract starts.
- * This includes actions like mothballing of units,
- * transit to mission location and the automated activation of units when arriving in system.
+ * The {@link ContractAutomation} class provides a suite of methods used in automating actions when a contract starts.
+ *
+ * <p>This includes actions like mothballing of units, transit to mission location and the automated activation of
+ * units when arriving in the system.</p>
  */
 public class ContractAutomation {
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + ContractAutomation.class.getSimpleName();
@@ -77,19 +79,27 @@ public class ContractAutomation {
      * @param contract Selected contract.
      */
     public static void contractStartPrompt(Campaign campaign, Contract contract) {
-        // If we're already in the right system there is no need to automate these actions
+        // If we're already in the right system, there is no need to automate these actions
         if (Objects.equals(campaign.getLocation().getCurrentSystem(), contract.getSystem())) {
             return;
         }
 
         // Initial setup
-        final String commanderAddress = campaign.getCommanderAddress(false);
+        final String commanderAddress = campaign.getCommanderAddress();
         final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
         final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
 
         // Mothballing
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text", commanderAddress);
+        if (contract instanceof AtBContract atBContract) {
+            String employerCode = atBContract.getEmployerCode();
+            if (employerCode.equals(PIRATE_FACTION_CODE)) {
+                inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text.PIR",
+                      commanderAddress);
+            }
+        }
+
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.addendum");
 
         ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
@@ -107,12 +117,6 @@ public class ContractAutomation {
 
         // Transit
         String targetSystem = contract.getSystemName(campaign.getLocalDate());
-        String employerName = contract.getEmployer();
-
-        if (!employerName.contains("Clan")) {
-            employerName = getFormattedTextAt(RESOURCE_BUNDLE, "generalNonClan.text", employerName);
-        }
-
         JumpPath jumpPath = contract.getJumpPath(campaign);
         int travelDays = contract.getTravelDays(campaign);
 
@@ -124,7 +128,6 @@ public class ContractAutomation {
         inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "transitDescription.text",
               targetSystem,
-              employerName,
               travelDays,
               totalCost);
 

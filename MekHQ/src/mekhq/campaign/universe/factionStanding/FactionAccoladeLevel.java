@@ -58,82 +58,83 @@ public enum FactionAccoladeLevel {
     /**
      * No accolade awarded.
      */
-    NO_ACCOLADE("NO_ACCOLADE", 0, STANDING_LEVEL_0.getStandingLevel(), true),
+    NO_ACCOLADE("NO_ACCOLADE", 0, STANDING_LEVEL_0.getStandingLevel(), true, true),
 
     /**
      * Typically signifies the first recognition by a faction.
      */
-    TAKING_NOTICE_0("TAKING_NOTICE", 1, STANDING_LEVEL_5.getStandingLevel(), true),
+    TAKING_NOTICE_0("TAKING_NOTICE", 1, STANDING_LEVEL_5.getStandingLevel(), true, true),
 
     /**
      * Represents later recognition by a faction at higher standing.
      */
-    TAKING_NOTICE_1("TAKING_NOTICE", 2, STANDING_LEVEL_5.getStandingLevel(), true),
+    TAKING_NOTICE_1("TAKING_NOTICE", 2, STANDING_LEVEL_5.getStandingLevel(), true, true),
 
     /**
      * The unit or individual becomes notable enough to be indexed by faction or public searches.
      */
-    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 3, STANDING_LEVEL_6.getStandingLevel(), true),
+    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 3, STANDING_LEVEL_6.getStandingLevel(), true, true),
 
     /**
      * The recipient is awarded a monetary reward based on their standing.
      */
-    CASH_BONUS_0("CASH_BONUS", 4, STANDING_LEVEL_6.getStandingLevel(), true),
+    CASH_BONUS_0("CASH_BONUS", 4, STANDING_LEVEL_6.getStandingLevel(), true, true),
 
     /**
      * The unit or individual receives media attention for their achievements.
      */
-    PRESS_RECOGNITION("PRESS_RECOGNITION", 5, STANDING_LEVEL_6.getStandingLevel(), true),
+    PRESS_RECOGNITION("PRESS_RECOGNITION", 5, STANDING_LEVEL_6.getStandingLevel(), true, true),
 
     /**
      * An additional or higher monetary reward recognizing continued accomplishments.
      */
-    CASH_BONUS_1("CASH_BONUS", 6, STANDING_LEVEL_6.getStandingLevel(), true),
+    CASH_BONUS_1("CASH_BONUS", 6, STANDING_LEVEL_6.getStandingLevel(), true, true),
 
     /**
      * The unit or individual is featured in promotional or morale-boosting media.
      */
-    PROPAGANDA_REEL("PROPAGANDA_REEL", 7, STANDING_LEVEL_6.getStandingLevel(), true),
+    PROPAGANDA_REEL("PROPAGANDA_REEL", 7, STANDING_LEVEL_6.getStandingLevel(), true, true),
 
     /**
      * Recognizes significant honor through factional adoption or Mek gift.
      */
-    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 8, STANDING_LEVEL_6.getStandingLevel(), false),
+    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 8, STANDING_LEVEL_6.getStandingLevel(), false, false),
 
     /**
      * Reflects further increased monetary rewards at higher standing.
      */
-    CASH_BONUS_2("CASH_BONUS", 9, STANDING_LEVEL_7.getStandingLevel(), false),
+    CASH_BONUS_2("CASH_BONUS", 9, STANDING_LEVEL_7.getStandingLevel(), false, false),
 
     /**
      * Granted in recognition of major victories or in memorial of distinguished service.
      */
-    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 10, STANDING_LEVEL_7.getStandingLevel(), false),
+    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 10, STANDING_LEVEL_7.getStandingLevel(), false, false),
 
     /**
      * An even more significant monetary reward corresponding to greater achievements.
      */
-    CASH_BONUS_3("CASH_BONUS", 11, STANDING_LEVEL_7.getStandingLevel(), false),
+    CASH_BONUS_3("CASH_BONUS", 11, STANDING_LEVEL_7.getStandingLevel(), false, false),
 
     /**
      * Represents one of the highest honors, signifying legendary status.
      */
-    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 12, STANDING_LEVEL_8.getStandingLevel(), false),
+    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 12, STANDING_LEVEL_8.getStandingLevel(), false, false),
 
     /**
      * The highest level of monetary recognition afforded by the awarding faction.
      */
-    CASH_BONUS_4("CASH_BONUS", 13, STANDING_LEVEL_8.getStandingLevel(), false),
+    CASH_BONUS_4("CASH_BONUS", 13, STANDING_LEVEL_8.getStandingLevel(), false, false),
 
     /**
      * A highly prestigious honor indicating direct recognition from the faction’s leader.
      */
-    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 14, STANDING_LEVEL_8.getStandingLevel(), false);
+    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 14, STANDING_LEVEL_8.getStandingLevel(), false, false);
 
     private final String lookupName;
     private final int recognition;
     private final int requiredStandingLevel;
     private final boolean mercenarySuitable;
+    private final boolean pirateSuitable;
 
     /**
      * Constructs a new {@link FactionAccoladeLevel} constant.
@@ -146,11 +147,13 @@ public enum FactionAccoladeLevel {
      * @author Illiani
      * @since 0.50.07
      */
-    FactionAccoladeLevel(String lookupName, int recognition, int requiredStandingLevel, boolean mercenarySuitable) {
+    FactionAccoladeLevel(String lookupName, int recognition, int requiredStandingLevel, boolean mercenarySuitable,
+          boolean pirateSuitable) {
         this.lookupName = lookupName;
         this.recognition = recognition;
         this.requiredStandingLevel = requiredStandingLevel;
         this.mercenarySuitable = mercenarySuitable;
+        this.pirateSuitable = pirateSuitable;
     }
 
     /**
@@ -196,6 +199,15 @@ public enum FactionAccoladeLevel {
      */
     public boolean isMercenarySuitable() {
         return mercenarySuitable;
+    }
+
+    /**
+     * Determines whether this accolade is suitable for a pirate faction.
+     *
+     * @return {@code true} if the accolade is deemed suitable for pirates, {@code false} otherwise.
+     */
+    public boolean isPirateSuitable() {
+        return pirateSuitable;
     }
 
     /**

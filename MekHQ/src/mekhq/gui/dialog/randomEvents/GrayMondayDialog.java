@@ -104,7 +104,7 @@ public class GrayMondayDialog extends ImmersiveDialogCore {
     }
 
     private static String createInCharacterMessage(Campaign campaign, boolean isClarionNote, int eventIndex) {
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String eventType = isClarionNote ? "clarionNote" : "grayMonday";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, eventType + "Event" + eventIndex + ".message", commanderAddress);

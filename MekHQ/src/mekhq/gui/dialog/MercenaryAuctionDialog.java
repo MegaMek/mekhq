@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -122,7 +127,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
     private static String createCenterMessage(Campaign campaign, String shortName) {
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "auction.ic.hasFunds",
-              campaign.getCommanderAddress(false),
+              campaign.getCommanderAddress(),
               shortName);
     }
 

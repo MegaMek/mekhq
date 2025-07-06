@@ -297,7 +297,7 @@ public class PrisonEscapeScenario {
         }
 
         // Trigger a dialog to inform the user that an interception has taken place
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "escapeeScenario.report",
               commanderAddress,

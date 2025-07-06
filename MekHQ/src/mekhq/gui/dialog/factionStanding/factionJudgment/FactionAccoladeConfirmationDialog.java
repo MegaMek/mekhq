@@ -129,7 +129,7 @@ public class FactionAccoladeConfirmationDialog {
      */
     public String getInCharacterText() {
         return getFormattedTextAt(RESOURCE_BUNDLE, IN_CHARACTER_KEY,
-              campaign.getCommanderAddress(false));
+              campaign.getCommanderAddress());
     }
 
     /**

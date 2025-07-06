@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.universe.Faction.getActiveMercenaryOrganization;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -54,6 +56,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
+import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -73,7 +76,6 @@ import mekhq.gui.dialog.factionStanding.events.FactionStandingGreeting;
 import mekhq.gui.dialog.resupplyAndCaches.DialogContractStart;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ContractSummaryPanel;
 
 /**
@@ -92,10 +94,10 @@ public class ContractMarketDialog extends JDialog {
     private static int signingBonus = 0;
     private static int sharePct = 20;
 
-    private Campaign campaign;
-    private AbstractContractMarket contractMarket;
+    private final Campaign campaign;
+    private final AbstractContractMarket contractMarket;
     private Contract selectedContract = null;
-    private List<String> possibleRetainerContracts;
+    private final List<String> possibleRetainerContracts;
 
     private JScrollPane scrollContractView;
     private ContractSummaryPanel contractView;
@@ -191,8 +193,8 @@ public class ContractMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-        JScrollPane scrollTableContracts = new JScrollPaneWithSpeed();
-        scrollContractView = new JScrollPaneWithSpeed();
+        JScrollPane scrollTableContracts = new FastJScrollPane();
+        scrollContractView = new FastJScrollPane();
         JPanel panelTable = new JPanel();
         JPanel panelFees = new JPanel();
         JPanel panelRetainer = new JPanel();
@@ -273,7 +275,13 @@ public class ContractMarketDialog extends JDialog {
         scrollTableContracts.setPreferredSize(new Dimension(500, 400));
 
         chkMRBC.setName("chkMRBC");
-        chkMRBC.setText(resourceMap.getString("checkMRBC.text"));
+        if (campaign.isPirateCampaign()) {
+            chkMRBC.setText(resourceMap.getString("checkMRBC.text.pirate"));
+        } else {
+            Faction mercenaryOrganization = getActiveMercenaryOrganization(campaign.getGameYear());
+            String organizationInitials = mercenaryOrganization.getShortName();
+            chkMRBC.setText(String.format(resourceMap.getString("checkMRBC.text"), organizationInitials));
+        }
         chkMRBC.setSelected(payMRBC);
         panelFees.add(chkMRBC);
 
@@ -723,7 +731,8 @@ public class ContractMarketDialog extends JDialog {
               campaign,
               campaign.getCampaignOptions().isUseAtB() &&
                     selectedContract instanceof AtBContract &&
-                    !((AtBContract) selectedContract).isSubcontract());
+                    !((AtBContract) selectedContract).isSubcontract() &&
+                    !campaign.isPirateCampaign());
         scrollContractView.setViewportView(contractView);
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere later

@@ -33,9 +33,12 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -60,7 +63,6 @@ import javax.swing.ImageIcon;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -89,14 +91,6 @@ import org.w3c.dom.NodeList;
 public class FactionStandings {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandings.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
-
-    /**
-     * The unique identifier for the mercenary faction.
-     *
-     * <p>We can't use {@link Faction#isMercenary()} because we only want the specific, agnostic, Mercenary faction.
-     * Not all factions with the {@link FactionTag#MERC} tag.</p>
-     */
-    static final String MERCENARY_FACTION = "MERC";
 
     /**
      * This value defines the upper limit of Regard a campaign can achieve with the campaign's faction.
@@ -782,6 +776,9 @@ public class FactionStandings {
             }
 
             String otherFactionCode = otherFaction.getShortName();
+            if (otherFactionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
+                continue;
+            }
 
             if (otherFaction.equals(campaignFaction)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_SAME_FACTION);
@@ -792,7 +789,7 @@ public class FactionStandings {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
 
-            if (campaignFaction.getShortName().equals(MERCENARY_FACTION)) {
+            if (campaignFaction.getShortName().equals(MERCENARY_FACTION_CODE)) {
                 double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
                       today);
 
@@ -801,15 +798,22 @@ public class FactionStandings {
                 }
             }
 
+            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
+            }
+
             if ((isPirate && otherFaction.isPirate()) ||
                       factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
                 continue;
             }
 
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
+            if (isPirate) {
+                if (otherFaction.isClan()) {
+                    climateRegard.put(otherFactionCode, REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 10);
+                } else {
+                    climateRegard.put(otherFactionCode, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * 10);
+                }
             }
         }
 
@@ -879,7 +883,7 @@ public class FactionStandings {
                         spanOpeningWithCustomColor(getWarningColor()),
                         CLOSING_SPAN_TAG,
                         spanOpeningWithCustomColor(getNegativeColor()),
-                        CLIMATE_REGARD_ENEMY_FACTION_AT_WAR,
+                        REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * 10,
                         CLOSING_SPAN_TAG));
         }
         return report;
@@ -1114,8 +1118,7 @@ public class FactionStandings {
             return new ArrayList<>();
         }
 
-        double regardDeltaEmployer;
-        regardDeltaEmployer = switch (missionStatus) {
+        double regardDeltaEmployer = switch (missionStatus) {
             case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
             case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
             case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
@@ -1128,16 +1131,28 @@ public class FactionStandings {
         String campaignFactionCode = campaignFaction.getShortName();
         int gameYear = today.getYear();
 
-        String report = changeRegardForFaction(campaignFactionCode,
-              employerFaction.getShortName(),
-              regardDeltaEmployer,
-              gameYear);
-        if (!report.isBlank()) {
-            regardChangeReports.add(report);
+        String report;
+        if (!employerFaction.isAggregate()) {
+            report = changeRegardForFaction(campaignFactionCode,
+                  employerFaction.getShortName(),
+                  regardDeltaEmployer,
+                  gameYear);
+            if (!report.isBlank()) {
+                regardChangeReports.add(report);
+            }
         }
 
-        if (campaignFactionCode.equals(MERCENARY_FACTION)) {
+        if (campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
             report = processMercenaryOrganizationRegardUpdate(gameYear, campaignFactionCode, regardDeltaEmployer);
+
+            if (!report.isBlank()) {
+                regardChangeReports.add(report);
+            }
+        } else if (campaignFactionCode.equals(PIRATE_FACTION_CODE)) {
+            report = changeRegardForFaction(campaignFactionCode,
+                  PIRACY_SUCCESS_INDEX_FACTION_CODE,
+                  regardDeltaEmployer,
+                  gameYear);
 
             if (!report.isBlank()) {
                 regardChangeReports.add(report);

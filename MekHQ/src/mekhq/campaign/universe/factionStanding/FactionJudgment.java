@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -297,6 +298,11 @@ public class FactionJudgment {
 
         if (faction.isMercenaryOrganization() && !updatedAccoladeLevel.isMercenarySuitable()) {
             LOGGER.debug("Faction {} cannot improve accolade due to mercenary suitability", factionCode);
+            return null;
+        }
+
+        if (factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE) && !updatedAccoladeLevel.isPirateSuitable()) {
+            LOGGER.debug("Faction {} cannot improve accolade due to pirate suitability", factionCode);
             return null;
         }
 

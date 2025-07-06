@@ -34,6 +34,7 @@ package mekhq.gui.dialog.factionStanding;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -131,6 +132,7 @@ public class FactionStandingReport extends JDialog {
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
     private final List<String> peripheryFactions = new ArrayList<>();
+    private final List<String> specialFactions = new ArrayList<>();
     private final List<String> deadFactions = new ArrayList<>();
 
     private final List<String> reports = new ArrayList<>();
@@ -237,6 +239,8 @@ public class FactionStandingReport extends JDialog {
 
             if (!faction.validIn(gameYear)) {
                 deadFactions.add(factionCode);
+            } else if (faction.isMercenaryOrganization() || factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
+                specialFactions.add(factionCode);
             } else if (faction.isClan()) {
                 clanFactions.add(factionCode);
             } else if (faction.isPeriphery()) {
@@ -266,6 +270,7 @@ public class FactionStandingReport extends JDialog {
         String innerSphereTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere");
         String clanTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.clan");
         String peripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.periphery");
+        String specialTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.special");
         String deadTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.dead");
 
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -273,6 +278,7 @@ public class FactionStandingReport extends JDialog {
         tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
         tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
         tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
+        tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
         tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
         setFontScaling(tabbedPane, true, 1.5);
 
@@ -471,7 +477,8 @@ public class FactionStandingReport extends JDialog {
         // Parent panel
         boolean isMercenaryOrganization = faction.isMercenaryOrganization();
         boolean isClan = !isMercenaryOrganization && faction.isClan();
-        boolean isPirateOrMercenaryOrganization = isMercenaryOrganization || factionCode.equals("PIR");
+        boolean isPirateOrMercenaryOrganization = isMercenaryOrganization ||
+                                                        factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE);
 
         JPanel pnlFactionStanding = new JPanel();
         pnlFactionStanding.setName("pnlFactionStanding" + factionCode);
@@ -579,6 +586,7 @@ public class FactionStandingReport extends JDialog {
         boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);
         boolean isRival = factionHints.isRivalOf(campaignFaction, faction, firstOfMonth);
         boolean isSame = campaignFaction.getShortName().equals(faction.getShortName());
+        boolean isOutlawed = factionStanding.isOutlawed();
 
         String addendum = " "; // The whitespace is important to ensure consistent GUI spacing.
         String color = "";
@@ -586,6 +594,9 @@ public class FactionStandingReport extends JDialog {
         if (isSame) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
             color = getAmazingColor();
+        } else if (isOutlawed) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.outlawed");
+            color = getNegativeColor();
         } else if (isAtWar) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
             color = getNegativeColor();

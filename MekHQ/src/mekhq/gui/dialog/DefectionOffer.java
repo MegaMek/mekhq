@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -94,7 +99,7 @@ public class DefectionOffer extends ImmersiveDialogCore {
      */
     private static String createInCharacterMessage(Campaign campaign, Person defector, boolean isBondsman) {
         String typeKey = isBondsman ? "bondsman" : "defector";
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
 
         if (isBondsman) {
             String originFaction = defector.getOriginFaction().getFullName(campaign.getGameYear());

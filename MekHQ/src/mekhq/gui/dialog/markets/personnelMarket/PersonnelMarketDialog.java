@@ -546,7 +546,7 @@ public class PersonnelMarketDialog extends JDialog {
                   address.toUpperCase()));
         } else if (campaignFaction.isMercenary()) {
             setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
-        } else if (campaignFaction.isMercenary()) {
+        } else {
             setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
         }
     }
