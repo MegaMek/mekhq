@@ -185,7 +185,8 @@ public class FactionAccoladeEvent {
             }
 
             if (!isSameFaction) {
-                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getCommander(), null);
+                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getCommander(), null,
+                      campaign.getCampaignOptions().isTrackFactionStanding());
             }
 
             List<Entity> generatedEntities = generateUnits();
