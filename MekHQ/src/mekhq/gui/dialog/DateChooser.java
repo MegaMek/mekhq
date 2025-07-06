@@ -763,8 +763,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 4 -> {
-                turningPoints = List.of("ThirdSuccessionWarEnds", "FourthSuccessionWar", "FRRFounded", "WarOf3039");
-                turningPointDates = List.of(LocalDate.of(3025, 1, 1),
+                turningPoints = List.of("RestorationWarBegins", "ThirdSuccessionWarEnds", "FourthSuccessionWar",
+                      "FRRFounded", "WarOf3039");
+                turningPointDates = List.of(LocalDate.of(3022, 1, 31),
+                      LocalDate.of(3025, 1, 1),
                       LocalDate.of(3028, 8, 20),
                       LocalDate.of(3034, 3, 13),
                       LocalDate.of(3039, 4, 16));
@@ -780,8 +782,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_claninvasion" + LOGO_FILE_TYPE);
             }
             case 6 -> {
-                turningPoints = List.of("FCCWStarts", "JadeFalconOffensive");
-                turningPointDates = List.of(LocalDate.of(3062, 11, 16), LocalDate.of(3064, 5, 10));
+                turningPoints = List.of("LyranSecession", "FCCWStarts", "JadeFalconOffensive");
+                turningPointDates = List.of(LocalDate.of(3057, 9, 17),
+                      LocalDate.of(3062, 11, 16),
+                      LocalDate.of(3064, 5, 10));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_civilwar" + LOGO_FILE_TYPE);
             }
             case 7 -> {

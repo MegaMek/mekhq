@@ -237,6 +237,17 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
     <parties>ARC,ARD</parties>
     <parties start="3025-05-09" end="3025-08-15">ARC,TC</parties>
   </war>
+  <!-- This is for the 'government in exile' period -->
+  <location start="3022-02-01" end="3025-09-01">
+  <outer>MOC</outer>
+  <inner>ARC</inner>
+  <opponents>ARD</opponents>
+  </location>
+  <!-- We don't have a clean end to when the MOC stopped overtly supporting ARC, so I just went with a decade -->
+  <alliance start="3021-01-01" end="3035-12-30">
+  <parties>ARC,MOC</parties>
+  <parties>ARD,TC</parties>
+  </alliance>
   <war name="Fourth Succession War" start="3026-01-01" end="3030-12-31">
     <parties>FS,CC</parties>
     <parties>FS,DC</parties>
