@@ -88,7 +88,7 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
     private static String createInCharacterMessage(Campaign campaign) {
         List<Person> personnelWhoAdvanced = campaign.getPersonnelWhoAdvancedInXP();
 
-        String commanderAddress = campaign.getCommanderAddress(false);
+        String commanderAddress = campaign.getCommanderAddress();
 
         StringBuilder message = new StringBuilder();
         message.append(commanderAddress);

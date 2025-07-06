@@ -46,12 +46,17 @@ import java.util.Set;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 
 /**
@@ -69,6 +74,8 @@ public class GoingRogue {
     private final static int LOYALTY_TARGET_NUMBER = 6;
     /** Die size used to resolve chances of homicide in defection scenarios. */
     private final static int MURDER_DIE_SIZE = 10;
+    private final static String DEFECTION_GREETING_LOOKUP = "HELLO";
+    private final static String DEFECTION_NEWS_ARTICLE_LOOKUP = "LEAVE";
 
     /** Stores whether the user confirmed the "going rogue" action. */
     private final boolean wasConfirmed;
@@ -100,7 +107,8 @@ public class GoingRogue {
      * @since 0.50.07
      */
     public GoingRogue(Campaign campaign, Person commander, @Nullable Person second) {
-        FactionCensureGoingRogueDialog dialog = new FactionCensureGoingRogueDialog(campaign);
+        boolean isUsingFactionStandings = campaign.getCampaignOptions().isTrackFactionStanding();
+        FactionCensureGoingRogueDialog dialog = new FactionCensureGoingRogueDialog(campaign, isUsingFactionStandings);
         wasConfirmed = dialog.wasConfirmed();
         if (!wasConfirmed) {
             return;
@@ -117,7 +125,7 @@ public class GoingRogue {
               FactionJudgmentSceneType.GO_ROGUE,
               campaign.getFaction());
 
-        processGoingRogue(campaign, chosenFaction, commander, second);
+        processGoingRogue(campaign, chosenFaction, commander, second, isUsingFactionStandings);
     }
 
     /**
@@ -130,15 +138,16 @@ public class GoingRogue {
      *                      faction
      * @param commander     the commanding officer of the force
      * @param second        the second-in-command, may be {@code null}
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
      * @since 0.50.07
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
-          @Nullable Person second) {
+          @Nullable Person second, boolean isUsingFactionStandings) {
         boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
 
-        processGoingRogue(campaign, chosenFaction, commander, second, isDefection);
+        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUsingFactionStandings);
     }
 
     /**
@@ -151,23 +160,45 @@ public class GoingRogue {
      * @param commander     the force commander
      * @param second        secondary command personnel
      * @param isDefection   whether the 'going rogue' action counts as defection
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
      * @since 0.50.07
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
-          @Nullable Person second, boolean isDefection) {
-        processPersonnel(campaign, isDefection, commander, second);
-        processMassLoyaltyChange(campaign, true, true);
-
+          @Nullable Person second, boolean isDefection, boolean isUsingFactionStandings) {
         Faction currentFaction = campaign.getFaction();
-        if (currentFaction.equals(chosenFaction)) {
-            processRegardBump(campaign);
-        } else {
-            processFactionStandingChangeForOldFaction(campaign);
+
+        if (isUsingFactionStandings) {
+            processPersonnel(campaign, isDefection, commander, second);
+
+            if (currentFaction.equals(chosenFaction)) {
+                processRegardBump(campaign);
+            } else {
+                processFactionStandingChangeForOldFaction(campaign);
+            }
+            processFactionStandingChangeForNewFaction(campaign, chosenFaction);
         }
 
-        processFactionStandingChangeForNewFaction(campaign, chosenFaction);
+        processMassLoyaltyChange(campaign, true, true);
+
+        if (isDefection) {
+            new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
+                  FactionStandingJudgmentType.WELCOME, false);
+
+            PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MEKWARRIOR : PersonnelRole.MILITARY_LIAISON;
+            Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
+            new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
+                  FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
+        } else {
+            if (chosenFaction.isMercenaryOrganization()) {
+                PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
+                Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
+                new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
+                      FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
+            }
+        }
+
 
         campaign.setFaction(chosenFaction);
     }

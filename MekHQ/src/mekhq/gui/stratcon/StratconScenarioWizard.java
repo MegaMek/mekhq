@@ -839,7 +839,7 @@ public class StratconScenarioWizard extends JDialog {
 
         StringBuilder rightDescriptionMessage = new StringBuilder();
         rightDescriptionMessage.append(String.format(resources.getString("reinforcementConfirmation.introduction"),
-              campaign.getCommanderAddress(false)));
+              campaign.getCommanderAddress()));
         rightDescriptionMessage.append(resources.getString("reinforcementConfirmation.breakdown"));
 
         StringBuilder breakdownContents = new StringBuilder();

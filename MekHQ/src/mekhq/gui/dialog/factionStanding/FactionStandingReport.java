@@ -34,6 +34,7 @@ package mekhq.gui.dialog.factionStanding;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -64,6 +65,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
+import megamek.utilities.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
@@ -81,7 +83,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.factionStanding.gmToolsDialog.GMTools;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -131,6 +132,7 @@ public class FactionStandingReport extends JDialog {
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
     private final List<String> peripheryFactions = new ArrayList<>();
+    private final List<String> specialFactions = new ArrayList<>();
     private final List<String> deadFactions = new ArrayList<>();
 
     private final List<String> reports = new ArrayList<>();
@@ -237,6 +239,8 @@ public class FactionStandingReport extends JDialog {
 
             if (!faction.validIn(gameYear)) {
                 deadFactions.add(factionCode);
+            } else if (faction.isMercenaryOrganization() || factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
+                specialFactions.add(factionCode);
             } else if (faction.isClan()) {
                 clanFactions.add(factionCode);
             } else if (faction.isPeriphery()) {
@@ -266,6 +270,7 @@ public class FactionStandingReport extends JDialog {
         String innerSphereTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere");
         String clanTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.clan");
         String peripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.periphery");
+        String specialTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.special");
         String deadTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.dead");
 
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -273,6 +278,7 @@ public class FactionStandingReport extends JDialog {
         tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
         tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
         tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
+        tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
         tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
         setFontScaling(tabbedPane, true, 1.5);
 
@@ -322,7 +328,7 @@ public class FactionStandingReport extends JDialog {
             JPanel factionPanel = createFactionPanel(faction);
             groupPanel.add(factionPanel);
         }
-        JScrollPane groupScrollPane = new JScrollPaneWithSpeed(groupPanel,
+        JScrollPane groupScrollPane = new FastJScrollPane(groupPanel,
               JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         groupScrollPane.setName("factionReportGroupScrollPane" + factions);
@@ -469,14 +475,19 @@ public class FactionStandingReport extends JDialog {
               climateRegard);
 
         // Parent panel
+        boolean isMercenaryOrganization = faction.isMercenaryOrganization();
+        boolean isClan = !isMercenaryOrganization && faction.isClan();
+        boolean isPirateOrMercenaryOrganization = isMercenaryOrganization ||
+                                                        factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE);
+
         JPanel pnlFactionStanding = new JPanel();
         pnlFactionStanding.setName("pnlFactionStanding" + factionCode);
         pnlFactionStanding.setLayout(new BoxLayout(pnlFactionStanding, BoxLayout.Y_AXIS));
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
         pnlFactionStanding.setPreferredSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
         pnlFactionStanding.setMaximumSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
-        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(faction.isClan(),
-              climateRegard)));
+        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(isClan,
+              isPirateOrMercenaryOrganization, climateRegard)));
 
         // Faction Logo
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
@@ -531,12 +542,8 @@ public class FactionStandingReport extends JDialog {
         Border compound = BorderFactory.createCompoundBorder(rounded, padding);
 
         int stars = factionStandingLevel + 1;
-        StringBuilder title = new StringBuilder();
-        for (int i = 0; i < stars; i++) {
-            title.append("\u2605 ");
-        }
 
-        return BorderFactory.createTitledBorder(compound, title.toString());
+        return BorderFactory.createTitledBorder(compound, "\u2605 ".repeat(Math.max(0, stars)));
     }
 
     private static Border getRoundedBorder(int factionStandingLevel) {
@@ -579,6 +586,7 @@ public class FactionStandingReport extends JDialog {
         boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);
         boolean isRival = factionHints.isRivalOf(campaignFaction, faction, firstOfMonth);
         boolean isSame = campaignFaction.getShortName().equals(faction.getShortName());
+        boolean isOutlawed = factionStanding.isOutlawed();
 
         String addendum = " "; // The whitespace is important to ensure consistent GUI spacing.
         String color = "";
@@ -586,6 +594,9 @@ public class FactionStandingReport extends JDialog {
         if (isSame) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
             color = getAmazingColor();
+        } else if (isOutlawed) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.outlawed");
+            color = getNegativeColor();
         } else if (isAtWar) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
             color = getNegativeColor();
@@ -647,6 +658,7 @@ public class FactionStandingReport extends JDialog {
      * Calculates the standing effects description string for a given faction regard value.
      *
      * @param isClan {@code true} if the faction is a Clan faction, otherwise {@code false}
+     * @param isPirateOrMercenaryOrganization {@code true} if the faction is a pirate or mercenary organization
      * @param factionRegard the regard value of the faction
      *
      * @return the standing effects description for the corresponding {@link FactionStandingLevel}
@@ -654,9 +666,10 @@ public class FactionStandingReport extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    private String getEffectsDescription(boolean isClan, double factionRegard) {
+    private String getEffectsDescription(boolean isClan, boolean isPirateOrMercenaryOrganization,
+          double factionRegard) {
         FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionRegard);
-        return factionStanding.getEffectsDescription(isClan, campaignOptions);
+        return factionStanding.getEffectsDescription(isClan, isPirateOrMercenaryOrganization, campaignOptions);
     }
 
     /**

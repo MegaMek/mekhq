@@ -37,6 +37,8 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionCensureAction.FINE;
+import static mekhq.campaign.universe.factionStanding.FactionCensureAction.FORMAL_WARNING;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.NO_ACTION;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.isExempt;
@@ -84,7 +86,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDial
  */
 public class FactionCensureEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionCensureEvent.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureEvent";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
 
     private static final String DIALOG_OOC_KEY = "FactionJudgmentDialog.message.CENSURE.";
     private static final String DIALOG_OOC_KEY_AFFIX = ".ooc";
@@ -149,6 +151,7 @@ public class FactionCensureEvent {
                  COMMANDER_RETIREMENT,
                  DISBAND,
                  FINE,
+                 BRIBE_OFFICIALS,
                  FORMAL_WARNING,
                  LEADERSHIP_REPLACEMENT,
                  LEGAL_CHALLENGE -> {
@@ -161,9 +164,16 @@ public class FactionCensureEvent {
                                                : PersonnelRole.MILITARY_LIAISON;
                     Person speaker = campaign.newPerson(role, censuringFaction.getShortName(), Gender.RANDOMIZE);
 
+                    ImmersiveDialogWidth dialogWidth;
+                    if (censureAction.equals(FINE) || censureAction.equals(FORMAL_WARNING)) {
+                        dialogWidth = ImmersiveDialogWidth.LARGE;
+                    } else {
+                        dialogWidth = ImmersiveDialogWidth.MEDIUM;
+                    }
+
                     FactionJudgmentDialog censureDialog = new FactionJudgmentDialog(campaign, speaker, commander,
                           censureAction.getLookupName(), censuringFaction, FactionStandingJudgmentType.CENSURE,
-                          ImmersiveDialogWidth.LARGE, outOfCharacterMessage, null);
+                          dialogWidth, outOfCharacterMessage, null);
 
                     dialogChoice = censureDialog.getChoiceIndex();
                     isGoingRogue = dialogChoice == GO_ROGUE_DIALOG_CHOICE_INDEX;
@@ -294,14 +304,18 @@ public class FactionCensureEvent {
             }
             case DISBAND -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.DISBAND, censuringFaction);
-            case FINE -> {
+            case FINE, BRIBE_OFFICIALS -> {
                 Finances finances = campaign.getFinances();
 
                 Money fine = finances.getBalance().multipliedBy(0.1);
-                String fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.fine");
+                String fineMessage;
+                if (censureAction.equals(FactionCensureAction.BRIBE_OFFICIALS)) {
+                    fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.bribe");
+                } else {
+                    fineMessage = getTextAt(RESOURCE_BUNDLE, "FactionCensureEvent.fine");
+                }
 
-                finances.debit(TransactionType.FINE, campaign.getLocalDate(), fine,
-                      getTextAt(RESOURCE_BUNDLE, fineMessage));
+                finances.debit(TransactionType.FINE, campaign.getLocalDate(), fine, fineMessage);
 
                 processMassLoyaltyChange(campaign, false, false);
             }
