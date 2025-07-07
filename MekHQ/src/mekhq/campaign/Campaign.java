@@ -6603,6 +6603,21 @@ public class Campaign implements ITechManager {
         return faction.getShortName().equals(PIRATE_FACTION_CODE);
     }
 
+    /**
+     * Determines whether the current campaign is a mercenary campaign.
+     *
+     * <p>This method checks if the faction associated with the campaign is Mercenary, returning {@code true} if it is,
+     * and {@code false} otherwise.</p>
+     *
+     * @return {@code true} if the campaign is Mercenary, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isMercenaryCampaign() {
+        return faction.getShortName().equals(MERCENARY_FACTION_CODE);
+    }
+
     public void setFaction(final Faction faction) {
         setFactionDirect(faction);
         updateTechFactionCode();
@@ -10275,79 +10290,136 @@ public class Campaign implements ITechManager {
         return units;
     }
 
-
     /**
-     * Determines the appropriate starting planet for a new campaign.
+     * Determines the appropriate starting planet for a new campaign based on campaign type, faction, and various
+     * fallback scenarios.
      *
-     * <p>This method first attempts to obtain the starting planet from the campaign's primary method. If no valid
-     * system is found, or if the result is "Terra" (which is the default value used when no system is set), it selects
-     * a fallback faction's starting planet using the following logic:</p>
+     * <p>This method first checks if the campaign is classified as a mercenary or pirate campaign. If so, it
+     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String)}, which implements
+     * special logic to handle those campaign types.</p>
      *
-     * <ul>
-     *     <li>If the faction is "PIR", a random pirate faction (other than "PIR" itself) with an available starting
-     *     planet is chosen, if available.</li>
-     *     <li>If the faction is a clan, the generic "CLAN" faction is used as the fallback.</li>
-     *     <li>If the faction is mercenary, 75% of the time the campaign will begin on the mercenary faction
-     *     capital. Otherwise, they will begin on the capital of another playable faction.</li>
-     *     <li>Otherwise, the default faction (Mercenary) is used as the fallback.</li>
-     * </ul>
+     * <p>For all other campaign types, it uses the current campaign's faction to attempt to retrieve that faction’s
+     * canonical starting system for the current game date. If no valid system can be found (due to, for example, the
+     * faction not having a valid capital), the logic falls back to a default faction’s starting planet, and, if
+     * necessary, ultimately falls back to the planet Terra as a default universal location.</p>
      *
-     * <p>The returned result is always the system's primary planet.</p>
+     * <p>The method also includes special handling for Clan campaigns: if the fallback logic would result in the
+     * campaign starting on Terra but the campaign is clan-based, it attempts to relocate the starting planet to
+     * Strana Mechty.</p>
      *
-     * @return the {@link Planet} object representing the new campaign's starting planet
+     * @return the {@link Planet} instance where the campaign should start
      *
-     * @author Illiani
      * @since 0.50.07
+     * @author Illiani
      */
     public Planet getNewCampaignStartingPlanet() {
         Factions factions = Factions.getInstance();
 
-        PlanetarySystem startingSystem = faction.getStartingPlanet(this, currentDay);
+        final String TERRA_ID = "Terra";
+        final String CLAN_CODE = "CLAN";
 
+        Faction startingFaction;
+        PlanetarySystem startingSystem;
+
+        if (isMercenaryCampaign() || isPirateCampaign()) {
+            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID);
+        }
+
+        // Default for non-merc/pirate campaigns
+        startingFaction = faction;
+        startingSystem = startingFaction.getStartingPlanet(this, currentDay);
+
+        // Fallback if the system is unavailable
         if (startingSystem == null) {
-            Faction fallbackFaction = factions.getDefaultFaction();
-            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
-        } else if (startingSystem.getId().equalsIgnoreCase("Terra")) {
-            Faction fallbackFaction = factions.getDefaultFaction();
+            startingFaction = factions.getDefaultFaction();
+            startingSystem = startingFaction.getStartingPlanet(this, currentDay);
+            if (startingSystem == null) {
+                startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+            }
+        }
 
-            if (faction.getShortName().equalsIgnoreCase("PIR")) {
-                List<Faction> pirateFactions = new ArrayList<>();
-                for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
-                    if (activeFaction.isPirate() &&
-                              !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
-                        pirateFactions.add(activeFaction);
-                    }
-                }
-
-                if (!pirateFactions.isEmpty()) {
-                    fallbackFaction = ObjectUtility.getRandomItem(pirateFactions);
-                }
-            } else if (faction.isClan()) {
-                fallbackFaction = factions.getFaction("CLAN");
-            } else if (faction.getShortName().equalsIgnoreCase("MERC")) {
-                // Most of the time, mercenary campaigns will begin on their faction capital (Galatea, etc.).
-                // However, there is a 25% chance they begin in another faction's territory
-                int roll = randomInt(4);
-
-                if (roll == 0) {
-                    fallbackFaction = factions.getFaction("MERC");
-                } else {
-                    List<Faction> recruitingFaction = new ArrayList<>();
-                    for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
-                        if (activeFaction.isPlayable() && !activeFaction.isClan() && !activeFaction.isDeepPeriphery()) {
-                            recruitingFaction.add(activeFaction);
-                        }
-                    }
-
-                    if (!recruitingFaction.isEmpty()) {
-                        fallbackFaction = ObjectUtility.getRandomItem(recruitingFaction);
-                    }
+        // Special case: Clan campaign starting on Terra, swap to Clan homeworld
+        if (TERRA_ID.equals(startingSystem.getId()) && isClanCampaign()) {
+            Faction clanFaction = factions.getFaction(CLAN_CODE);
+            if (clanFaction != null) {
+                PlanetarySystem clanSystem = clanFaction.getStartingPlanet(this, currentDay);
+                if (clanSystem != null) {
+                    startingSystem = clanSystem;
                 }
             }
-
-            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
         }
 
         return startingSystem.getPrimaryPlanet();
+    }
+
+    /**
+     * Selects a starting planet for mercenary or pirate campaigns by considering eligible factions, campaign date, and
+     * appropriate weighting for periphery factions (if pirate).
+     *
+     * <p>For mercenary campaigns, the designated mercenary faction is used as the initial fallback. For pirate
+     * campaigns, the Tortuga Dominions are preferred, but only if they are active at the campaign's start date;
+     * otherwise, the game's configured default faction is used (usually Mercenary, but I opted not to hardcode
+     * mercenary here incase the default changes).</p>
+     *
+     * <p>There is a two-thirds probability that the starting faction will be selected from all factions, subject to
+     * several filters (playability, not a Clan, not deep periphery). For pirate campaigns, eligible periphery factions
+     * are intentionally added multiple times to the selection pool to increase their likelihood of being chosen
+     * (weighted randomness).</p>
+     *
+     * <p>After the faction is chosen, this method attempts to get that faction’s canonical starting world. If no
+     * valid system is found, the logic falls back to Terra, ensuring that the campaign always has a valid starting
+     * world even in case of missing data.</p>
+     *
+     * @param factions The {@link Factions} manager supplying access to all faction data.
+     * @param TERRA_ID The globally unique identifier for the planet Terra, used for the ultimate fallback.
+     *
+     * @return the {@link Planet} used as the campaign start location.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID) {
+        final String TORTUGA_CODE = "TD";
+
+        PlanetarySystem startingSystem;
+        Faction startingFaction;
+        // Determine fallback faction for merc/pirate
+        startingFaction = isMercenaryCampaign()
+                                ? factions.getFaction(MERCENARY_FACTION_CODE)
+                                : factions.getFaction(TORTUGA_CODE);
+
+        // If pirate fallback is unavailable at the campaign's start date, use the default faction
+        if (isPirateCampaign() && !startingFaction.validIn(currentDay)) {
+            startingFaction = factions.getDefaultFaction();
+        }
+
+        // 33% chance to start in fallback faction's capital
+        if (randomInt(3) != 0) {
+            // Pick a random, eligible recruiting faction
+            List<Faction> recruitingFactions = new ArrayList<>();
+            for (Faction possibleFaction : factions.getActiveFactions(currentDay)) {
+                if (possibleFaction.isPlayable() && !possibleFaction.isClan() && !possibleFaction.isDeepPeriphery()) {
+                    recruitingFactions.add(possibleFaction);
+
+                    // If we're playing a pirate campaign, we want to triple the chance that we start in the periphery
+                    if (possibleFaction.isPeriphery() && isPirateCampaign()) {
+                        recruitingFactions.add(possibleFaction);
+                        recruitingFactions.add(possibleFaction);
+                    }
+                }
+            }
+            if (!recruitingFactions.isEmpty()) {
+                startingFaction = ObjectUtility.getRandomItem(recruitingFactions);
+            }
+        }
+
+        startingSystem = startingFaction.getStartingPlanet(this, currentDay);
+        if (startingSystem != null) {
+            return startingSystem.getPrimaryPlanet();
+        }
+
+        // Fallback if no startingSystem
+        startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+        return startingSystem != null ? startingSystem.getPrimaryPlanet() : null;
     }
 }

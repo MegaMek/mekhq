@@ -40,7 +40,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JMenuItem;
 
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.ConvFighter;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.Mek;
+import megamek.common.ProtoMek;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
+import megamek.common.VTOL;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -354,6 +362,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         }
                     }
 
+                    pilotMenu.add(legendaryMenu);
+                    pilotMenu.add(heroicMenu);
                     pilotMenu.add(eliteMenu);
                     pilotMenu.add(veteranMenu);
                     pilotMenu.add(regularMenu);
@@ -433,6 +443,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         }
                     }
 
+                    driverMenu.add(legendaryMenu);
+                    driverMenu.add(heroicMenu);
                     driverMenu.add(eliteMenu);
                     driverMenu.add(veteranMenu);
                     driverMenu.add(regularMenu);
@@ -523,6 +535,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
                 }
 
+                gunnerMenu.add(legendaryMenu);
+                gunnerMenu.add(heroicMenu);
                 gunnerMenu.add(eliteMenu);
                 gunnerMenu.add(veteranMenu);
                 gunnerMenu.add(regularMenu);
@@ -599,6 +613,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
                 }
 
+                crewmemberMenu.add(legendaryMenu);
+                crewmemberMenu.add(heroicMenu);
                 crewmemberMenu.add(eliteMenu);
                 crewmemberMenu.add(veteranMenu);
                 crewmemberMenu.add(regularMenu);
@@ -721,6 +737,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
                 }
 
+                soldierMenu.add(legendaryMenu);
+                soldierMenu.add(heroicMenu);
                 soldierMenu.add(eliteMenu);
                 soldierMenu.add(veteranMenu);
                 soldierMenu.add(regularMenu);
@@ -793,6 +811,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
                 }
 
+                navigatorMenu.add(legendaryMenu);
+                navigatorMenu.add(heroicMenu);
                 navigatorMenu.add(eliteMenu);
                 navigatorMenu.add(veteranMenu);
                 navigatorMenu.add(regularMenu);
