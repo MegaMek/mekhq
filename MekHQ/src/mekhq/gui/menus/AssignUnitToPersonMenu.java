@@ -342,7 +342,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         }
 
                         if (subMenu != null) {
-                            final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
+                            final JMenuItem miPilot = new JMenuItem(person.getFullTitleAndProfessions());
                             miPilot.setName("miPilot");
                             miPilot.addActionListener(evt -> {
                                 final Unit oldUnit = person.getUnit();
@@ -350,6 +350,10 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 if (oldUnit != null) {
                                     oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
+                                }
+
+                                if (person.getRecruitment() == null) {
+                                    person.setRecruitment(campaign.getLocalDate());
                                 }
 
                                 if (isVTOL || isSmallCraftOrJumpShip) {
@@ -428,7 +432,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         }
 
                         if (subMenu != null) {
-                            final JMenuItem miDriver = new JMenuItem(person.getFullTitle());
+                            final JMenuItem miDriver = new JMenuItem(person.getFullTitleAndProfessions());
                             miDriver.setName("miDriver");
                             miDriver.addActionListener(evt -> {
                                 final Unit oldUnit = person.getUnit();
@@ -437,6 +441,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                     oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
+
+                                if (person.getRecruitment() == null) {
+                                    person.setRecruitment(campaign.getLocalDate());
+                                }
+
                                 units[0].addDriver(person, useTransfers);
                             });
                             subMenu.add(miDriver);
@@ -520,7 +529,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
 
                     if (subMenu != null) {
-                        final JMenuItem miGunner = new JMenuItem(person.getFullTitle());
+                        final JMenuItem miGunner = new JMenuItem(person.getFullTitleAndProfessions());
                         miGunner.setName("miGunner");
                         miGunner.addActionListener(evt -> {
                             final Unit oldUnit = person.getUnit();
@@ -529,6 +538,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
+
+                            if (person.getRecruitment() == null) {
+                                person.setRecruitment(campaign.getLocalDate());
+                            }
+
                             units[0].addGunner(person, useTransfers);
                         });
                         subMenu.add(miGunner);
@@ -548,9 +562,31 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Crewmember Menu
         if (units[0].canTakeMoreVesselCrew() && (isAero || units[0].getEntity().isSupportVehicle())) {
             filteredPersonnel = personnel.stream()
-                                      .filter(person -> person.hasRole(isAero ?
-                                                                             PersonnelRole.VESSEL_CREW :
-                                                                             PersonnelRole.VEHICLE_CREW))
+                                      .filter(person -> isAero
+                                                              ? person.hasRole(PersonnelRole.VESSEL_CREW)
+                                                              : (person.hasRole(PersonnelRole.MEK_TECH)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.AERO_TEK)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.MECHANIC)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.BA_TECH)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.ASTECH)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.DOCTOR)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.MEDIC)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.COMMS_OPERATOR)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.TECH_COMMUNICATIONS)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.SENSOR_TECHNICIAN)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.CHEF)
+                                                                       ||
+                                                                       person.hasRole(PersonnelRole.VEHICLE_CREW)))
                                       .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
@@ -566,39 +602,22 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
-                    final JScrollableMenu subMenu;
-                    switch (person.getSkillLevel(campaign,
+                    final JScrollableMenu subMenu = switch (person.getSkillLevel(campaign,
                           isAero ?
                                 !person.getPrimaryRole().isVesselCrew() :
-                                !person.getPrimaryRole().isVehicleCrew())) {
-                        case LEGENDARY:
-                            subMenu = legendaryMenu;
-                            break;
-                        case HEROIC:
-                            subMenu = heroicMenu;
-                            break;
-                        case ELITE:
-                            subMenu = eliteMenu;
-                            break;
-                        case VETERAN:
-                            subMenu = veteranMenu;
-                            break;
-                        case REGULAR:
-                            subMenu = regularMenu;
-                            break;
-                        case GREEN:
-                            subMenu = greenMenu;
-                            break;
-                        case ULTRA_GREEN:
-                            subMenu = ultraGreenMenu;
-                            break;
-                        default:
-                            subMenu = null;
-                            break;
-                    }
+                                !person.getPrimaryRole().isVehicleCrewExtended())) {
+                        case LEGENDARY -> legendaryMenu;
+                        case HEROIC -> heroicMenu;
+                        case ELITE -> eliteMenu;
+                        case VETERAN -> veteranMenu;
+                        case REGULAR -> regularMenu;
+                        case GREEN -> greenMenu;
+                        case ULTRA_GREEN -> ultraGreenMenu;
+                        default -> null;
+                    };
 
                     if (subMenu != null) {
-                        final JMenuItem miCrewmember = new JMenuItem(person.getFullTitle());
+                        final JMenuItem miCrewmember = new JMenuItem(person.getFullTitleAndProfessions());
                         miCrewmember.setName("miCrewmember");
                         miCrewmember.addActionListener(evt -> {
                             final Unit oldUnit = person.getUnit();
@@ -607,6 +626,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
+
+                            if (person.getRecruitment() == null) {
+                                person.setRecruitment(campaign.getLocalDate());
+                            }
+
                             units[0].addVesselCrew(person, useTransfers);
                         });
                         subMenu.add(miCrewmember);
@@ -638,7 +662,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // or a gunner, but not necessarily both
                 if (isTank) {
                     if (person.canDrive(units[0].getEntity()) || person.canGun(units[0].getEntity())) {
-                        final JMenuItem miConsoleCommander = new JMenuItem(person.getFullTitle());
+                        final JMenuItem miConsoleCommander = new JMenuItem(person.getFullTitleAndProfessions());
                         miConsoleCommander.setName("miConsoleCommander");
                         miConsoleCommander.addActionListener(evt -> {
                             final Unit oldUnit = person.getUnit();
@@ -647,12 +671,17 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
+
+                            if (person.getRecruitment() == null) {
+                                person.setRecruitment(campaign.getLocalDate());
+                            }
+
                             units[0].setTechOfficer(person, useTransfers);
                         });
                         consoleCommanderMenu.add(miConsoleCommander);
                     }
                 } else if (person.canDrive(units[0].getEntity()) && person.canGun(units[0].getEntity())) {
-                    final JMenuItem miTechOfficer = new JMenuItem(person.getFullTitle());
+                    final JMenuItem miTechOfficer = new JMenuItem(person.getFullTitleAndProfessions());
                     miTechOfficer.setName("miTechOfficer");
                     miTechOfficer.addActionListener(evt -> {
                         final Unit oldUnit = person.getUnit();
@@ -661,6 +690,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                             useTransfers = campaign.getCampaignOptions().isUseTransfers();
                         }
+
+                        if (person.getRecruitment() == null) {
+                            person.setRecruitment(campaign.getLocalDate());
+                        }
+
                         units[0].setTechOfficer(person, useTransfers);
                     });
                     techOfficerMenu.add(miTechOfficer);
@@ -722,7 +756,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
 
                     if (subMenu != null) {
-                        final JMenuItem miSoldier = new JMenuItem(person.getFullTitle());
+                        final JMenuItem miSoldier = new JMenuItem(person.getFullTitleAndProfessions());
                         miSoldier.setName("miSoldier");
                         miSoldier.addActionListener(evt -> {
                             final Unit oldUnit = person.getUnit();
@@ -731,6 +765,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
+
+                            if (person.getRecruitment() == null) {
+                                person.setRecruitment(campaign.getLocalDate());
+                            }
+
                             units[0].addPilotOrSoldier(person, useTransfers);
                         });
                         subMenu.add(miSoldier);
@@ -796,7 +835,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     }
 
                     if (subMenu != null) {
-                        final JMenuItem miNavigator = new JMenuItem(person.getFullTitle());
+                        final JMenuItem miNavigator = new JMenuItem(person.getFullTitleAndProfessions());
                         miNavigator.setName("miNavigator");
                         miNavigator.addActionListener(evt -> {
                             final Unit oldUnit = person.getUnit();
@@ -805,6 +844,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
+
+                            if (person.getRecruitment() == null) {
+                                person.setRecruitment(campaign.getLocalDate());
+                            }
+
                             units[0].setNavigator(person, useTransfers);
                         });
                         subMenu.add(miNavigator);

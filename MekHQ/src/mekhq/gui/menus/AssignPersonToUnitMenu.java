@@ -172,7 +172,18 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             final boolean areAllVesselCrew = Stream.of(people)
                                                    .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_CREW));
             final boolean areAllVehicleCrew = Stream.of(people)
-                                                    .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW));
+                                                    .allMatch(person -> person.hasRole(PersonnelRole.MEK_TECH) ||
+                                                                              person.hasRole(PersonnelRole.AERO_TEK) ||
+                                                                              person.hasRole(PersonnelRole.MECHANIC) ||
+                                                                              person.hasRole(PersonnelRole.BA_TECH) ||
+                                                                              person.hasRole(PersonnelRole.ASTECH) ||
+                                                                              person.hasRole(PersonnelRole.DOCTOR) ||
+                                                                              person.hasRole(PersonnelRole.MEDIC) ||
+                                                                              person.hasRole(PersonnelRole.COMMS_OPERATOR) ||
+                                                                              person.hasRole(PersonnelRole.TECH_COMMUNICATIONS) ||
+                                                                              person.hasRole(PersonnelRole.SENSOR_TECHNICIAN) ||
+                                                                              person.hasRole(PersonnelRole.CHEF) ||
+                                                                              person.hasRole(PersonnelRole.VEHICLE_CREW));
             final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
             final boolean areAllBattleArmourPilots = Stream.of(people)
                                                            .allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
@@ -303,6 +314,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 } else {
                                     unit.addPilotOrSoldier(people[0], useTransfers);
                                 }
+
+                                if (people[0].getRecruitment() == null) {
+                                    people[0].setRecruitment(campaign.getLocalDate());
+                                }
                             });
                             pilotEntityWeightMenu.add(miPilot);
                         }
@@ -326,6 +341,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addDriver(person, useTransfers);
+                                    if (person.getRecruitment() == null) {
+                                        person.setRecruitment(campaign.getLocalDate());
+                                    }
                                 }
                             }
                         });
@@ -349,6 +367,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 unit.addDriver(people[0], useTransfers);
+                                if (people[0].getRecruitment() == null) {
+                                    people[0].setRecruitment(campaign.getLocalDate());
+                                }
                             });
                             driverEntityWeightMenu.add(miDriver);
                         }
@@ -385,6 +406,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addGunner(person, useTransfers);
+                                    if (person.getRecruitment() == null) {
+                                        person.setRecruitment(campaign.getLocalDate());
+                                    }
                                 }
                             }
                         });
@@ -423,6 +447,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addVesselCrew(person, useTransfers);
+                                    if (person.getRecruitment() == null) {
+                                        person.setRecruitment(campaign.getLocalDate());
+                                    }
                                 }
                             }
                         });
@@ -452,6 +479,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 unit.setTechOfficer(people[0], useTransfers);
+                                if (people[0].getRecruitment() == null) {
+                                    people[0].setRecruitment(campaign.getLocalDate());
+                                }
                             });
                             consoleCommanderEntityWeightMenu.add(miConsoleCommander);
                         }
@@ -468,6 +498,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             unit.setTechOfficer(people[0], useTransfers);
+                            if (people[0].getRecruitment() == null) {
+                                people[0].setRecruitment(campaign.getLocalDate());
+                            }
                         });
                         techOfficerEntityWeightMenu.add(miTechOfficer);
                     }
@@ -494,6 +527,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addPilotOrSoldier(person, useTransfers);
+                                    if (person.getRecruitment() == null) {
+                                        person.setRecruitment(campaign.getLocalDate());
+                                    }
                                 }
                             }
                         });
@@ -515,6 +551,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             useTransfers = campaign.getCampaignOptions().isUseTransfers();
                         }
                         unit.setNavigator(people[0], useTransfers);
+                        if (people[0].getRecruitment() == null) {
+                            people[0].setRecruitment(campaign.getLocalDate());
+                        }
                     });
                     navigatorEntityWeightMenu.add(miNavigator);
                 }

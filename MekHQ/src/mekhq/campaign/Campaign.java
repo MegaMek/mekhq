@@ -4770,7 +4770,7 @@ public class Campaign implements ITechManager {
                              // if a legendary, primary tech and destroy by margin is NOT on
                              &&
                              ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
-                                    tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
+                                    tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
                 roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();

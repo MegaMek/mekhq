@@ -1029,6 +1029,29 @@ public enum PersonnelRole {
     }
 
     /**
+     * Returns {@code true} if this profession is suitable for vehicle crew positions.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isVehicleCrewExtended() {
+        return this == VEHICLE_CREW ||
+                     this == MEK_TECH ||
+                     this == AERO_TEK ||
+                     this == MECHANIC ||
+                     this == BA_TECH ||
+                     this == ASTECH ||
+                     this == DOCTOR ||
+                     this == MEDIC ||
+                     this == COMMS_OPERATOR ||
+                     this == TECH_COMMUNICATIONS ||
+                     this == SENSOR_TECHNICIAN ||
+                     this == CHEF;
+    }
+
+
+
+    /**
      * @return {@code true} if the personnel has the Aerospace Pilot role, {@code false} otherwise.
      */
     public boolean isAerospacePilot() {
@@ -1222,7 +1245,7 @@ public enum PersonnelRole {
      *       Crew role, {@code false} otherwise.
      */
     public boolean isGroundVehicleCrew() {
-        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrew();
+        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
     }
 
     /**
@@ -1230,7 +1253,7 @@ public enum PersonnelRole {
      *       Crew role, {@code false} otherwise.
      */
     public boolean isNavalVehicleCrew() {
-        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrew();
+        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
     }
 
     /**
@@ -1238,7 +1261,7 @@ public enum PersonnelRole {
      *       {@code false} otherwise.
      */
     public boolean isVTOLCrew() {
-        return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
+        return isVTOLPilot() || isVehicleGunner() || isVehicleCrewExtended();
     }
 
     /**
