@@ -33,12 +33,12 @@
 package mekhq.campaign.universe.factionStanding;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
 
 /**
@@ -83,9 +83,8 @@ public class FactionStandingUltimatum {
      */
     public static boolean checkUltimatumForDate(final LocalDate date, final String campaignFactionCode,
           FactionStandingUltimatumsLibrary ultimatumsLibrary) {
-        Map<LocalDate, FactionStandingUltimatumData> ultimatums = ultimatumsLibrary.getUltimatums();
-        FactionStandingUltimatumData ultimatum = ultimatums.get(date);
-        return ultimatum != null && campaignFactionCode.equals(ultimatum.affectedFactionCode());
+        FactionStandingUltimatumData ultimatum = ultimatumsLibrary.getUltimatums(date, campaignFactionCode);
+        return ultimatum != null;
     }
 
     /**
@@ -111,20 +110,13 @@ public class FactionStandingUltimatum {
     public FactionStandingUltimatum(final LocalDate date, final Campaign campaign,
           FactionStandingUltimatumsLibrary ultimatumsLibrary) {
         this.campaign = campaign;
-        Map<LocalDate, FactionStandingUltimatumData> ultimatums = ultimatumsLibrary.getUltimatums();
-
-        FactionStandingUltimatumData ultimatum = ultimatums.get(date);
+        Faction campaignFaction = campaign.getFaction();
+        String campaignFactionCode = campaignFaction.getShortName();
 
         // We should have used 'checkUltimatumForDate' before initializing 'FactionStandingUltimatum', so we should
         // never return here. However, I opted to include this check as added security.
+        FactionStandingUltimatumData ultimatum = ultimatumsLibrary.getUltimatums(date, campaignFactionCode);
         if (ultimatum == null) {
-            return;
-        }
-
-        // Or here...
-        String affectedFactionCode = ultimatum.affectedFactionCode();
-        String campaignFactionCode = campaign.getFaction().getShortName();
-        if (!campaignFactionCode.equals(affectedFactionCode)) {
             return;
         }
 

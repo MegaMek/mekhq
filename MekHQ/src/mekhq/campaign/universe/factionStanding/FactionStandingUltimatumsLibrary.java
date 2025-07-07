@@ -41,6 +41,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import megamek.common.annotations.Nullable;
 
 /**
  * Manages a library of {@link FactionStandingUltimatumData} objects loaded from a YAML file.
@@ -58,8 +59,11 @@ public class FactionStandingUltimatumsLibrary {
     private static final String EXTENSION = ".yml";
     private static final String ULTIMATUMS_FILE = DIRECTORY + "factionStandingUltimatums" + EXTENSION;
 
-    /** Map storing Faction Standing ultimatums, keyed by their date. */
-    private final Map<LocalDate, FactionStandingUltimatumData> ultimatumMap = new HashMap<>();
+    /**
+     * Map storing Faction Standing ultimatums, keyed by date, then by affected faction code, with a list of all
+     * matching ultimatums.
+     */
+    private final Map<LocalDate, Map<String, FactionStandingUltimatumData>> ultimatumMap = new HashMap<>();
 
     /**
      * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums from the YAML data file.
@@ -74,15 +78,41 @@ public class FactionStandingUltimatumsLibrary {
     /**
      * Returns an unmodifiable map of all loaded Faction Standing ultimatums.
      *
-     * <p>The map is keyed by {@link LocalDate} and values are {@link FactionStandingUltimatumData} instances.</p>
+     * <p>The map is keyed by {@link LocalDate} and affected faction code.</p>
      *
      * @return unmodifiable map of ultimatums by date
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public Map<LocalDate, FactionStandingUltimatumData> getUltimatums() {
-        return Collections.unmodifiableMap(ultimatumMap);
+    public Map<LocalDate, Map<String, FactionStandingUltimatumData>> getUltimatums() {
+        // Deeply unmodifiable for outside callers
+        Map<LocalDate, Map<String, FactionStandingUltimatumData>> outer = new HashMap<>();
+        for (var entry : ultimatumMap.entrySet()) {
+            outer.put(entry.getKey(), Collections.unmodifiableMap(entry.getValue()));
+        }
+
+        return Collections.unmodifiableMap(outer);
+    }
+
+    /**
+     * Looks up all {@link FactionStandingUltimatumData} for a given date and faction code.
+     *
+     * @param date                The date of interest
+     * @param affectedFactionCode The code for the affected faction
+     *
+     * @return the matching {@link FactionStandingUltimatumData} or {@code null} if none is found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionStandingUltimatumData getUltimatums(LocalDate date, String affectedFactionCode) {
+        Map<String, FactionStandingUltimatumData> ultimatumsOnDate = ultimatumMap.get(date);
+        if (ultimatumsOnDate == null) {
+            return null;
+        }
+
+        return ultimatumsOnDate.get(affectedFactionCode);
     }
 
     /**
@@ -103,7 +133,10 @@ public class FactionStandingUltimatumsLibrary {
 
             for (FactionStandingUltimatumData data : wrapper.getUltimatums()) {
                 LocalDate date = data.getDate();
-                ultimatumMap.put(date, data);
+                String faction = data.affectedFactionCode();
+                ultimatumMap
+                      .computeIfAbsent(date, d -> new HashMap<>())
+                      .put(faction, data);
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not read ultimatums YAML: " + ULTIMATUMS_FILE, e);
