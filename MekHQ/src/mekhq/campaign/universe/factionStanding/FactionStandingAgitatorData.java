@@ -44,7 +44,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * @author Illiani
  * @since 0.50.07
  */
-public record FactionStandingAgitatorData(
+record FactionStandingAgitatorData(
       String name,
       PersonnelRole role,
       String factionCode
