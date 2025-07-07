@@ -1847,8 +1847,6 @@ public class CampaignGUI extends JPanel {
         // We need to handle it like this for now, as the options above get written to
         // currently
         boolean atb = oldOptions.isUseAtB();
-        boolean timeIn = oldOptions.isUseTimeInService();
-        boolean rankIn = oldOptions.isUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
@@ -1859,26 +1857,6 @@ public class CampaignGUI extends JPanel {
         optionsDialog.setVisible(true);
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
-
-        if (timeIn != newOptions.isUseTimeInService()) {
-            if (newOptions.isUseTimeInService()) {
-                getCampaign().initTimeInService();
-            } else {
-                for (Person person : getCampaign().getPersonnel()) {
-                    person.setRecruitment(null);
-                }
-            }
-        }
-
-        if (rankIn != newOptions.isUseTimeInRank()) {
-            if (newOptions.isUseTimeInRank()) {
-                getCampaign().initTimeInRank();
-            } else {
-                for (Person person : getCampaign().getPersonnel()) {
-                    person.setLastRankChangeDate(null);
-                }
-            }
-        }
 
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
             getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));

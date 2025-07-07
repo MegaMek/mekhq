@@ -624,12 +624,8 @@ public class Person {
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
-                    if (campaign.getCampaignOptions().isUseTimeInService()) {
-                        setRecruitment(campaign.getLocalDate());
-                    }
-                    if (campaign.getCampaignOptions().isUseTimeInRank()) {
-                        setLastRankChangeDate(campaign.getLocalDate());
-                    }
+                    setRecruitment(campaign.getLocalDate());
+                    setLastRankChangeDate(campaign.getLocalDate());
                 }
 
                 if (log) {
@@ -927,8 +923,9 @@ public class Person {
         }
 
         // Now, we can perform the time in service and last rank change tracking change for dependents
-        if (!primaryRole.isCivilian() && recruitment != null) {
+        if (!primaryRole.isCivilian() && recruitment == null) {
             setRecruitment(campaign.getLocalDate());
+            setLastRankChangeDate(campaign.getLocalDate());
         }
 
         // Finally, we can set the primary role
@@ -3671,12 +3668,10 @@ public class Person {
         setRank(rankNumeric);
         setRankLevel(rankLevel);
 
-        if (campaign.getCampaignOptions().isUseTimeInRank()) {
-            if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
-                setLastRankChangeDate(campaign.getLocalDate());
-            } else {
-                setLastRankChangeDate(null);
-            }
+        if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
+            setLastRankChangeDate(campaign.getLocalDate());
+        } else {
+            setLastRankChangeDate(null);
         }
 
         campaign.personUpdated(this);
@@ -6114,6 +6109,56 @@ public class Person {
             if (skillType.isSubTypeOf(subType)) {
                 removeSkill(skillType.getName());
             }
+        }
+    }
+
+    public void updateTimeData(LocalDate today) {
+        boolean updateRecruitment = recruitment == null;
+        boolean updateLastRankChange = lastRankChangeDate == null;
+
+        // Nothing to update
+        if (!updateRecruitment && !updateLastRankChange) {
+            return;
+        }
+
+        if (employed) {
+            LocalDate estimatedJoinDate = null;
+            for (LogEntry logEntry : getPersonalLog()) {
+                if (estimatedJoinDate == null) {
+                    // If by some nightmare there is no Joined date just use the first entry.
+                    estimatedJoinDate = logEntry.getDate();
+                }
+                if (logEntry.getDesc().startsWith("Joined ") ||
+                          logEntry.getDesc().startsWith("Freed ") ||
+                          logEntry.getDesc().startsWith("Promoted ") ||
+                          logEntry.getDesc().startsWith("Demoted ")) {
+                    estimatedJoinDate = logEntry.getDate();
+                    break;
+                }
+            }
+
+            if (estimatedJoinDate != null) {
+                if (updateRecruitment) {
+                    recruitment = estimatedJoinDate;
+                }
+                if (updateLastRankChange) {
+                    lastRankChangeDate = estimatedJoinDate;
+                }
+                return;
+            }
+
+            if (joinedCampaign != null) {
+                if (updateRecruitment) {
+                    recruitment = estimatedJoinDate;
+                }
+                if (updateLastRankChange) {
+                    lastRankChangeDate = estimatedJoinDate;
+                }
+                recruitment = joinedCampaign;
+                return;
+            }
+
+            recruitment = today;
         }
     }
 }
