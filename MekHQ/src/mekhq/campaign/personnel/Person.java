@@ -937,7 +937,7 @@ public class Person {
      *     <li>Triggers a {@link PersonChangedEvent} so that relevant systems are notified of the change.</li>
      * </ul>
      *
-     * <b>Usage tip:</b> If it’s unclear whether this person is eligible for the new role, call
+     * <p><b>Usage tip:</b> If it’s unclear whether this person is eligible for the new role, call
      * {@code canPerformRole(LocalDate, PersonnelRole, boolean)} before this method.</p>
      *
      * @param today       the current in-game date, used for setting recruitment and rank-change dates if required
