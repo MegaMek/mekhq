@@ -903,19 +903,9 @@ public class Person {
     }
 
     /**
-     * Sets the primary role for this person within the specified {@link Campaign}.
-     *
-     * <p>If the new primary role is different from the current one, this method performs any necessary updates, such
-     * as adjusting recruitment-related dates for non-civilian roles, updating the primary role, and triggering a
-     * {@link PersonChangedEvent}.</p>
-     *
-     * <p><b>Usage:</b> if there is any uncertainty as to whether the character is eligible for the role they are
-     * being assigned, make sure to call {@link #canPerformRole(LocalDate, PersonnelRole, boolean)} prior to this
-     * method.</p>
-     *
-     * @param campaign    the {@link Campaign} context, used for date retrieval and event tracking
-     * @param primaryRole the new {@link PersonnelRole} to be set as primary for this person
+     * Use {@link #setPrimaryRole(LocalDate, PersonnelRole)} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = false) // we need to remove the uses before removal
     public void setPrimaryRole(final Campaign campaign, final PersonnelRole primaryRole) {
         // don't need to do any processing for no changes
         if (primaryRole == getPrimaryRole()) {
@@ -934,6 +924,45 @@ public class Person {
         // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
+
+    /**
+     * Sets the primary role for this person as of the given date.
+     *
+     * <p>If the new primary role differs from the current primary role, this method updates internal state as
+     * follows:</p>
+     * <ul>
+     *     <li>If the new role is not civilian and this person does not already have a recruitment date, assigns
+     *     the provided date as both recruitment and last-rank-change dates.</li>
+     *     <li>Updates the person's primary role to the provided value.</li>
+     *     <li>Triggers a {@link PersonChangedEvent} so that relevant systems are notified of the change.</li>
+     * </ul>
+     *
+     * <b>Usage tip:</b> If it’s unclear whether this person is eligible for the new role, call
+     * {@code canPerformRole(LocalDate, PersonnelRole, boolean)} before this method.</p>
+     *
+     * @param today       the current in-game date, used for setting recruitment and rank-change dates if required
+     * @param primaryRole the new {@link PersonnelRole} to be set as primary for this person
+     */
+    public void setPrimaryRole(final LocalDate today, final PersonnelRole primaryRole) {
+        // don't need to do any processing for no changes
+        if (primaryRole == getPrimaryRole()) {
+            return;
+        }
+
+        // Now, we can perform the time in service and last rank change tracking change for dependents
+        if (!primaryRole.isCivilian() && recruitment == null) {
+            setRecruitment(today);
+            setLastRankChangeDate(today);
+        }
+
+        // Finally, we can set the primary role
+        setPrimaryRoleDirect(primaryRole);
+
+        // and trigger the update event
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+
 
     public void setPrimaryRoleDirect(final PersonnelRole primaryRole) {
         this.primaryRole = primaryRole;
