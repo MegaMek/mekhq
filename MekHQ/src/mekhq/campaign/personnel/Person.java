@@ -1659,6 +1659,7 @@ public class Person {
     }
 
     public @Nullable LocalDate getRecruitment() {
+
         return recruitment;
     }
 
@@ -3332,7 +3333,12 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("employed")) {
-                    person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    // Fixes a <50.07 bug
+                    if (!person.isCivilian()) { // Non-civilians are always employed
+                        person.setEmployed(true);
+                    } else {
+                        person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    }
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
