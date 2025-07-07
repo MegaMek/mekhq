@@ -117,7 +117,7 @@ public class SupportRating {
 
             if (isAdult &&
                       (person.isAdministrator() ||
-                             (person.isCivilian() && !person.isDependent()) ||
+                             (person.isCivilian() && person.isEmployed() && !person.isDependent()) ||
                              person.isDoctor())) {
                 administratorCount++;
             }

@@ -5185,7 +5185,7 @@ public class Person {
     }
 
     public boolean isCivilian() {
-        return (getPrimaryRole().isCivilian() || getSecondaryRole().isCivilian());
+        return (getPrimaryRole().isCivilian() && getSecondaryRole().isCivilian());
     }
 
     public boolean isTaskOvertime(final IPartWork partWork) {
