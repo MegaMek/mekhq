@@ -4142,7 +4142,7 @@ public class Unit implements ITechnology {
                 } else {
                     infantryArmor = new InfantryArmorPart(0,
                           getCampaign(),
-                          ((Infantry) entity).getArmorDamageDivisor(),
+                          ((Infantry) entity).getCustomArmorDamageDivisor(),
                           ((Infantry) entity).isArmorEncumbering(),
                           ((Infantry) entity).hasDEST(),
                           ((Infantry) entity).hasSneakCamo(),
@@ -4155,7 +4155,7 @@ public class Unit implements ITechnology {
                     while (number > 0) {
                         infantryArmor = new InfantryArmorPart(0,
                               getCampaign(),
-                              ((Infantry) entity).getArmorDamageDivisor(),
+                              ((Infantry) entity).getCustomArmorDamageDivisor(),
                               ((Infantry) entity).isArmorEncumbering(),
                               ((Infantry) entity).hasDEST(),
                               ((Infantry) entity).hasSneakCamo(),
