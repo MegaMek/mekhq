@@ -9740,48 +9740,56 @@ public class Campaign implements ITechManager {
         return partReport;
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInService() {
-        for (Person p : getPersonnel()) {
-            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
+        for (Person person : getPersonnel()) {
+            if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonalLog()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no Joined date just use the first entry.
-                        join = e.getDate();
+                        join = logEntry.getDate();
                     }
-                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
-                        join = e.getDate();
+                    if (logEntry.getDesc().startsWith("Joined ") || logEntry.getDesc().startsWith("Freed ")) {
+                        join = logEntry.getDate();
                         break;
                     }
                 }
 
-                p.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
+                person.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInRank() {
-        for (Person p : getPersonnel()) {
-            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
+        for (Person person : getPersonnel()) {
+            if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonalLog()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no date from the below, just use the first
                         // entry.
-                        join = e.getDate();
+                        join = logEntry.getDate();
                     }
 
-                    if (e.getDesc().startsWith("Joined ") ||
-                              e.getDesc().startsWith("Freed ") ||
-                              e.getDesc().startsWith("Promoted ") ||
-                              e.getDesc().startsWith("Demoted ")) {
-                        join = e.getDate();
+                    if (logEntry.getDesc().startsWith("Joined ") ||
+                              logEntry.getDesc().startsWith("Freed ") ||
+                              logEntry.getDesc().startsWith("Promoted ") ||
+                              logEntry.getDesc().startsWith("Demoted ")) {
+                        join = logEntry.getDate();
                     }
                 }
 
                 // For that one in a billion chance the log is empty. Clone today's date and
                 // subtract a year
-                p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
+                person.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
