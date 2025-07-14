@@ -42,6 +42,8 @@ import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
+import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
+import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -92,6 +94,7 @@ import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
@@ -664,9 +667,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             int attributeScore = person.getAttributeScore(attribute);
-            // TODO enable once attribute modifier sare implemented
-            //            int modifier = getIndividualAttributeModifier(attributeScore);
-            int modifier = 0;
+            int modifier = getIndividualAttributeModifier(attributeScore);
             if (modifier != 0) {
                 relevantAttributes.put(attribute, modifier);
             }
@@ -1866,9 +1867,7 @@ public class PersonViewPanel extends JScrollablePanel {
             JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
                   skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
 
-            // TODO enable once attribute modifier sare implemented
-            //            int attributeModifier = skill.getTotalAttributeModifier(attributes, skill.getType());
-            int attributeModifier = 0;
+            int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int ageModifier = skill.getAgingModifier();
             int totalModifier = attributeModifier + spaModifier + ageModifier;
@@ -1887,8 +1886,6 @@ public class PersonViewPanel extends JScrollablePanel {
                 adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
             }
 
-            // TODO enable once attribute modifier sare implemented
-            //            JLabel lblValue = new JLabel(String.format("<html>%s%s</html>", skill.toString(options, attributes, adjustedReputation), adjustment));
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(options, attributes, adjustedReputation),
                   adjustment));
