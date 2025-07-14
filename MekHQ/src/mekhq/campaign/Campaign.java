@@ -64,6 +64,7 @@ import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreed
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
+import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
@@ -73,6 +74,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKi
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.processFatigueRecovery;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.RETIREMENT_AGE;
 import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
 import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -220,6 +222,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -5417,13 +5420,49 @@ public class Campaign implements ITechManager {
         boolean isBirthday = birthday != null && birthday.equals(currentDay);
         int age = person.getAge(currentDay);
 
+        boolean isUseEducation = campaignOptions.isUseEducationModule();
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseTurnover = campaignOptions.isUseRandomRetirement();
+
         if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
             if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
-                addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                String report = String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       person.getAge(getLocalDate()),
-                      CLOSING_SPAN_TAG));
+                      CLOSING_SPAN_TAG);
+
+                // Aging Effects
+                AgingMilestone milestone = getMilestone(age);
+                String milestoneText = "";
+                if (isUseAgingEffects && milestone.getMinimumAge() == age) {
+                    String milestoneLabel = milestone.getLabel();
+                    milestoneText = String.format(resources.getString("anniversaryBirthday.milestone"), milestoneLabel);
+                }
+                if (!milestoneText.isBlank()) {
+                    report += " " + milestoneText;
+                }
+
+                // Special Ages
+                String addendum = "";
+                if (isUseEducation && age == 3) {
+                    addendum = resources.getString("anniversaryBirthday.third");
+                } else if (isUseEducation && age == 10) {
+                    addendum = resources.getString("anniversaryBirthday.tenth");
+                } else if (age == 16) { // This age is always relevant
+                    addendum = resources.getString("anniversaryBirthday.sixteenth");
+                }
+
+                if (!addendum.isBlank()) {
+                    report += " " + addendum;
+                }
+
+                // Retirement
+                if (isUseTurnover && age >= RETIREMENT_AGE) {
+                    report += " " + resources.getString("anniversaryBirthday.retirement");
+                }
+
+                addReport(report);
             }
 
             LocalDate recruitmentDate = person.getRecruitment();
