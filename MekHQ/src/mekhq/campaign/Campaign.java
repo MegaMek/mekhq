@@ -247,15 +247,7 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
-import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
-import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
-import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
-import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
-import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.universe.factionStanding.PerformBatchall;
+import mekhq.campaign.universe.factionStanding.*;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -433,6 +425,7 @@ public class Campaign implements ITechManager {
     // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
+    FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
 
     /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
@@ -528,6 +521,7 @@ public class Campaign implements ITechManager {
 
         // Library initialization
         randomEventLibraries = new RandomEventLibraries();
+        factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
     }
 
     /**
@@ -5855,8 +5849,10 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay, campaignFactionCode)) {
-            new FactionStandingUltimatum(currentDay, this);
+        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay,
+              campaignFactionCode,
+              factionStandingUltimatumsLibrary)) {
+            new FactionStandingUltimatum(currentDay, this, factionStandingUltimatumsLibrary);
         }
 
         if (isFirstOfMonth) {
@@ -6931,6 +6927,10 @@ public class Campaign implements ITechManager {
 
     public RandomEventLibraries getRandomEventLibraries() {
         return randomEventLibraries;
+    }
+
+    public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
+        return factionStandingUltimatumsLibrary;
     }
 
     public void writeToXML(final PrintWriter writer) {
@@ -9740,48 +9740,56 @@ public class Campaign implements ITechManager {
         return partReport;
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInService() {
-        for (Person p : getPersonnel()) {
-            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
+        for (Person person : getPersonnel()) {
+            if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonalLog()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no Joined date just use the first entry.
-                        join = e.getDate();
+                        join = logEntry.getDate();
                     }
-                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
-                        join = e.getDate();
+                    if (logEntry.getDesc().startsWith("Joined ") || logEntry.getDesc().startsWith("Freed ")) {
+                        join = logEntry.getDate();
                         break;
                     }
                 }
 
-                p.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
+                person.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInRank() {
-        for (Person p : getPersonnel()) {
-            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
+        for (Person person : getPersonnel()) {
+            if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonalLog()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no date from the below, just use the first
                         // entry.
-                        join = e.getDate();
+                        join = logEntry.getDate();
                     }
 
-                    if (e.getDesc().startsWith("Joined ") ||
-                              e.getDesc().startsWith("Freed ") ||
-                              e.getDesc().startsWith("Promoted ") ||
-                              e.getDesc().startsWith("Demoted ")) {
-                        join = e.getDate();
+                    if (logEntry.getDesc().startsWith("Joined ") ||
+                              logEntry.getDesc().startsWith("Freed ") ||
+                              logEntry.getDesc().startsWith("Promoted ") ||
+                              logEntry.getDesc().startsWith("Demoted ")) {
+                        join = logEntry.getDate();
                     }
                 }
 
                 // For that one in a billion chance the log is empty. Clone today's date and
                 // subtract a year
-                p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
+                person.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
