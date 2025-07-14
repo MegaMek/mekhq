@@ -233,7 +233,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         final CampaignOptionsPresetPicker campaignOptionsPresetPicker = new CampaignOptionsPresetPicker(getFrame(),
               false);
         if (!campaignOptionsPresetPicker.wasCanceled()) {
-            campaignOptionsPane.applyPreset(campaignOptionsPresetPicker.getSelectedPreset());
+            campaignOptionsPane.applyPreset(campaignOptionsPresetPicker.getSelectedPreset(), false);
         }
     }
 
@@ -244,7 +244,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param preset the {@link CampaignPreset} instance to apply
      */
     public void applyPreset(CampaignPreset preset) {
-        campaignOptionsPane.applyPreset(preset);
+        campaignOptionsPane.applyPreset(preset, true);
     }
 
     /**
