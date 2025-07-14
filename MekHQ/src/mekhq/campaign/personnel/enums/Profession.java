@@ -261,47 +261,18 @@ public enum Profession {
      * @return the profession for the role
      */
     public static Profession getProfessionFromPersonnelRole(final PersonnelRole role) {
-        switch (role) {
-            case AEROSPACE_PILOT:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return AEROSPACE;
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-                return VEHICLE;
-            case BATTLE_ARMOUR:
-            case SOLDIER:
-                return INFANTRY;
-            case VESSEL_PILOT:
-            case VESSEL_CREW:
-            case VESSEL_GUNNER:
-            case VESSEL_NAVIGATOR:
-                return NAVAL;
-            case MEK_TECH:
-            case MECHANIC:
-            case AERO_TEK:
-            case BA_TECH:
-            case ASTECH:
-                return TECH;
-            case DOCTOR:
-            case MEDIC:
-                return MEDICAL;
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_HR:
-            case ADMINISTRATOR_TRANSPORT:
-                return ADMINISTRATOR;
-            case DEPENDENT:
-            case NONE:
-                return CIVILIAN;
-            case MEKWARRIOR:
-            case LAM_PILOT:
-            case PROTOMEK_PILOT:
-            default:
-                return MEKWARRIOR;
-        }
+        return switch (role) {
+            case AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT -> AEROSPACE;
+            case GROUND_VEHICLE_DRIVER, NAVAL_VEHICLE_DRIVER, VTOL_PILOT, VEHICLE_GUNNER, VEHICLE_CREW -> VEHICLE;
+            case BATTLE_ARMOUR, SOLDIER -> INFANTRY;
+            case VESSEL_PILOT, VESSEL_CREW, VESSEL_GUNNER, VESSEL_NAVIGATOR -> NAVAL;
+            case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH -> TECH;
+            case DOCTOR, MEDIC -> MEDICAL;
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, ADMINISTRATOR_TRANSPORT ->
+                    ADMINISTRATOR;
+            case MEKWARRIOR, LAM_PILOT, PROTOMEK_PILOT -> MEKWARRIOR;
+            default -> CIVILIAN;
+        };
     }
 
     @Override
