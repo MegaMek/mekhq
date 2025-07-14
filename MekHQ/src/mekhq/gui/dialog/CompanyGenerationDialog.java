@@ -159,7 +159,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         Faction campaignFaction = campaign.getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
         if (campaignFactionCode.equals("MERC")) {
-            campaign.checkForNewMercenaryOrganizationStartUp(true);
+            campaign.checkForNewMercenaryOrganizationStartUp(true, true);
             return;
         } else if (campaignFactionCode.equals(PIRATE_FACTION_CODE)) {
             return;

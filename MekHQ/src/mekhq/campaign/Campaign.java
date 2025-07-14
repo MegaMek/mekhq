@@ -5842,7 +5842,7 @@ public class Campaign implements ITechManager {
     private void performFactionStandingChecks(boolean isFirstOfMonth, boolean isNewYear) {
         String campaignFactionCode = faction.getShortName();
         if (isNewYear && campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
-            checkForNewMercenaryOrganizationStartUp(false);
+            checkForNewMercenaryOrganizationStartUp(false, false);
         }
 
         if (!campaignOptions.isTrackFactionStanding()) {
@@ -5909,6 +5909,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Use {@link #checkForNewMercenaryOrganizationStartUp(boolean, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear) {
+        checkForNewMercenaryOrganizationStartUp(bypassStartYear, false);
+    }
+
+    /**
      * Checks if a new mercenary organization is starting up in the current game year, and, if so, triggers a welcome
      * dialog introducing the organization's representative.
      *
@@ -5928,7 +5936,7 @@ public class Campaign implements ITechManager {
      * @author Illiani
      * @since 0.50.07
      */
-    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear) {
+    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear, boolean isStartUp) {
         Factions factions = Factions.getInstance();
         int currentYear = getGameYear();
         Faction[] possibleFactions = new Faction[] {
@@ -5955,7 +5963,9 @@ public class Campaign implements ITechManager {
             chosenFaction = factions.getFaction("MG"); // fallback
         }
 
-        if (chosenFaction != null && chosenFaction.isMercenaryOrganization()) {
+        if (chosenFaction != null
+                  && (chosenFaction.getStartYear() == currentYear || isStartUp)
+                  && chosenFaction.isMercenaryOrganization()) {
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
             Person speaker = newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
             new FactionJudgmentDialog(this, speaker, getCommander(),
