@@ -184,7 +184,7 @@ public class GoingRogue {
 
         if (isDefection) {
             new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
-                  FactionStandingJudgmentType.WELCOME, false);
+                  FactionStandingJudgmentType.WELCOME, false, chosenFaction);
 
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MEKWARRIOR : PersonnelRole.MILITARY_LIAISON;
             Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
@@ -198,7 +198,6 @@ public class GoingRogue {
                       FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
             }
         }
-
 
         campaign.setFaction(chosenFaction);
     }
