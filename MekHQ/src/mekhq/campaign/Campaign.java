@@ -9740,6 +9740,10 @@ public class Campaign implements ITechManager {
         return partReport;
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInService() {
         for (Person person : getPersonnel()) {
             if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
@@ -9760,6 +9764,10 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInRank() {
         for (Person person : getPersonnel()) {
             if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
