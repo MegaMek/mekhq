@@ -137,12 +137,19 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll random secondary skill
         if (Utilities.rollProbability(skillPreferences.getSecondSkillProb())) {
+            boolean isUseArtillery = campaignOptions.isUseArtillery();
             List<String> possibleSkills = new ArrayList<>();
             for (String skillType : SkillType.skillList) {
                 SkillType type = SkillType.getType(skillType);
-                if (!person.getSkills().hasSkill(skillType) && !DEPRECATED_SKILLS.contains(type)
+                if (!person.getSkills().hasSkill(skillType)
+                          && !DEPRECATED_SKILLS.contains(type)
                           // The next two are to prevent double-dipping
-                          && !type.isSubTypeOf(SUPPORT_COMMAND) && !type.isRoleplaySkill()) {
+                          && !type.isSubTypeOf(SUPPORT_COMMAND)
+                          && !type.isRoleplaySkill()) {
+                    if (SkillType.S_ARTILLERY.equals(type.getName()) && !isUseArtillery) {
+                        continue;
+                    }
+
                     possibleSkills.add(skillType);
                 }
             }
