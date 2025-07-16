@@ -5429,7 +5429,7 @@ public class Campaign implements ITechManager {
                 String report = String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                      person.getAge(getLocalDate()),
+                      age,
                       CLOSING_SPAN_TAG);
 
                 // Aging Effects
