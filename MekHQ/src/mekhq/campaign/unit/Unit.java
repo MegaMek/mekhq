@@ -6489,12 +6489,17 @@ public class Unit implements ITechnology {
         Money fuelCost = Money.zero();
         double hydrogenUsage = 0;
 
+        // Check if the engine is null. This can occur if the entity does not have an engine installed.
+        Engine engine = entity.getEngine();
+        if (engine == null) {
+            return Money.zero();
+        }
+
         // Calculate base fuel costs by entity type
         if (entity.isLargeCraft() || entity.isSmallCraft()) {
             hydrogenUsage = getCraftMonthlyHydrogenUsage(entity);
         } else if (entity.isConventionalFighter()) {
-            Engine engine = entity.getEngine();
-            if (engine != null && engine.isFusion()) {
+            if (engine.isFusion()) {
                 hydrogenUsage = ((Aero) entity).getFuelTonnage() * 4.0;
             } else {
                 fuelCost = fuelCost.plus(getFighterFuelCost(entity));
