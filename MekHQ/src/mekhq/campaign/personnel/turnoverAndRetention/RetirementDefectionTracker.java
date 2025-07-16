@@ -79,7 +79,7 @@ import org.w3c.dom.NodeList;
 public class RetirementDefectionTracker {
     private static final MMLogger logger = MMLogger.create(RetirementDefectionTracker.class);
 
-    final static public int RETIREMENT_AGE = 50;
+    public static final int RETIREMENT_AGE = 50;
 
     /*
      * In case the dialog is closed after making the retirement rolls
