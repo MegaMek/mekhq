@@ -115,7 +115,7 @@ public class FactionStandings {
     /**
      * The amount by which regard degrades over time.
      */
-    static final double DEFAULT_REGARD_DEGRADATION = 0.25;
+    static final double DEFAULT_REGARD_DEGRADATION = 0.375;
 
     /**
      * The starting regard for the campaign's faction
@@ -197,7 +197,7 @@ public class FactionStandings {
     /**
      * Regard penalty for breaching a contract (employer).
      */
-    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 2);
+    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 3);
 
     /**
      * Regard penalty for breaching a contract (employer's allies).
