@@ -5424,6 +5424,10 @@ public class Campaign implements ITechManager {
         boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
         boolean isUseTurnover = campaignOptions.isUseRandomRetirement();
 
+        final int JUNIOR_SCHOOL_AGE = 3;
+        final int HIGH_SCHOOL_AGE = 10;
+        final int EMPLOYMENT_AGE = 16;
+
         if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
             if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
                 String report = String.format(resources.getString("anniversaryBirthday.text"),
@@ -5445,11 +5449,11 @@ public class Campaign implements ITechManager {
 
                 // Special Ages
                 String addendum = "";
-                if (isUseEducation && age == 3) {
+                if (isUseEducation && age == JUNIOR_SCHOOL_AGE) {
                     addendum = resources.getString("anniversaryBirthday.third");
-                } else if (isUseEducation && age == 10) {
+                } else if (isUseEducation && age == HIGH_SCHOOL_AGE) {
                     addendum = resources.getString("anniversaryBirthday.tenth");
-                } else if (age == 16) { // This age is always relevant
+                } else if (age == EMPLOYMENT_AGE) { // This age is always relevant
                     addendum = resources.getString("anniversaryBirthday.sixteenth");
                 }
 
