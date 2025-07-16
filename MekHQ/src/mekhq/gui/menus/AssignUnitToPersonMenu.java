@@ -34,6 +34,7 @@ package mekhq.gui.menus;
 
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -352,9 +353,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
-                                if (person.getRecruitment() == null) {
-                                    person.setRecruitment(campaign.getLocalDate());
-                                }
+                                ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                                 if (isVTOL || isSmallCraftOrJumpShip) {
                                     units[0].addDriver(person, useTransfers);
@@ -442,9 +441,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
-                                if (person.getRecruitment() == null) {
-                                    person.setRecruitment(campaign.getLocalDate());
-                                }
+                                ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                                 units[0].addDriver(person, useTransfers);
                             });
@@ -539,9 +536,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
 
-                            if (person.getRecruitment() == null) {
-                                person.setRecruitment(campaign.getLocalDate());
-                            }
+                            ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                             units[0].addGunner(person, useTransfers);
                         });
@@ -562,31 +557,10 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Crewmember Menu
         if (units[0].canTakeMoreVesselCrew() && (isAero || units[0].getEntity().isSupportVehicle())) {
             filteredPersonnel = personnel.stream()
-                                      .filter(person -> isAero
-                                                              ? person.hasRole(PersonnelRole.VESSEL_CREW)
-                                                              : (person.hasRole(PersonnelRole.MEK_TECH)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.AERO_TEK)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.MECHANIC)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.BA_TECH)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.ASTECH)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.DOCTOR)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.MEDIC)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.COMMS_OPERATOR)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.TECH_COMMUNICATIONS)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.SENSOR_TECHNICIAN)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.CHEF)
-                                                                       ||
-                                                                       person.hasRole(PersonnelRole.VEHICLE_CREW)))
+                                      .filter(person -> isAero ? person.hasRole(PersonnelRole.VESSEL_CREW)
+                                                              : (person.getPrimaryRole().isVehicleCrewExtended() ||
+                                                                       person.getSecondaryRole()
+                                                                             .isVehicleCrewExtended()))
                                       .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
@@ -627,9 +601,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
 
-                            if (person.getRecruitment() == null) {
-                                person.setRecruitment(campaign.getLocalDate());
-                            }
+                            ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                             units[0].addVesselCrew(person, useTransfers);
                         });
@@ -672,9 +644,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
 
-                            if (person.getRecruitment() == null) {
-                                person.setRecruitment(campaign.getLocalDate());
-                            }
+                            ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                             units[0].setTechOfficer(person, useTransfers);
                         });
@@ -691,9 +661,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             useTransfers = campaign.getCampaignOptions().isUseTransfers();
                         }
 
-                        if (person.getRecruitment() == null) {
-                            person.setRecruitment(campaign.getLocalDate());
-                        }
+                        ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                         units[0].setTechOfficer(person, useTransfers);
                     });
@@ -766,9 +734,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
 
-                            if (person.getRecruitment() == null) {
-                                person.setRecruitment(campaign.getLocalDate());
-                            }
+                            ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                             units[0].addPilotOrSoldier(person, useTransfers);
                         });
@@ -845,9 +811,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
 
-                            if (person.getRecruitment() == null) {
-                                person.setRecruitment(campaign.getLocalDate());
-                            }
+                            ensureRecruitmentDate(campaign.getLocalDate(), person);
 
                             units[0].setNavigator(person, useTransfers);
                         });
@@ -873,6 +837,24 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         add(consoleCommanderMenu);
         add(soldierMenu);
         add(navigatorMenu);
+    }
+
+    /**
+     * Ensures that the given person's recruitment date is set.
+     *
+     * <p>If the {@code Person} does not already have a recruitment date assigned, this method assigns the provided
+     * date as their recruitment date.</p>
+     *
+     * @param today  the {@link LocalDate} to set as the recruitment date if not already set
+     * @param person the {@link Person} whose recruitment date is to be checked and possibly updated
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static void ensureRecruitmentDate(LocalDate today, Person person) {
+        if (person.getRecruitment() == null) {
+            person.setRecruitment(today);
+        }
     }
     // endregion Initialization
 }
