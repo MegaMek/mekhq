@@ -2112,8 +2112,8 @@ public class Campaign implements ITechManager {
      * @deprecated use {@link #recruitPerson(Person, PrisonerStatus, boolean)} instead
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
-        return recruitPerson(p, prisonerStatus, false, true);
+    public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus) {
+        return recruitPerson(person, prisonerStatus, false, true);
     }
 
     /**
@@ -2616,11 +2616,11 @@ public class Campaign implements ITechManager {
     /**
      * Imports a {@link Person} into a campaign.
      *
-     * @param p A {@link Person} to import into the campaign.
+     * @param person A {@link Person} to import into the campaign.
      */
-    public void importPerson(Person p) {
-        personnel.put(p.getId(), p);
-        MekHQ.triggerEvent(new PersonNewEvent(p));
+    public void importPerson(Person person) {
+        personnel.put(person.getId(), person);
+        MekHQ.triggerEvent(new PersonNewEvent(person));
     }
 
     public @Nullable Person getPerson(final UUID id) {
@@ -2826,12 +2826,12 @@ public class Campaign implements ITechManager {
 
     public List<Person> getPatients() {
         List<Person> patients = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.needsFixing() ||
+        for (Person person : getPersonnel()) {
+            if (person.needsFixing() ||
                       (getCampaignOptions().isUseAdvancedMedical() &&
-                             p.hasInjuries(true) &&
-                             p.getStatus().isActive())) {
-                patients.add(p);
+                             person.hasInjuries(true) &&
+                             person.getStatus().isActive())) {
+                patients.add(person);
             }
         }
         return patients;
@@ -3392,26 +3392,26 @@ public class Campaign implements ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person p : getActivePersonnel(true)) {
-            if (p.isAdministrator()) {
-                admins.add(p);
+        for (Person person : getActivePersonnel(true)) {
+            if (person.isAdministrator()) {
+                admins.add(person);
             }
         }
         return admins;
     }
 
-    public boolean isWorkingOnRefit(Person p) {
-        Objects.requireNonNull(p);
+    public boolean isWorkingOnRefit(Person person) {
+        Objects.requireNonNull(person);
 
-        Unit unit = getHangar().findUnit(u -> u.isRefitting() && p.equals(u.getRefit().getTech()));
+        Unit unit = getHangar().findUnit(u -> u.isRefitting() && person.equals(u.getRefit().getTech()));
         return unit != null;
     }
 
     public List<Person> getDoctors() {
         List<Person> docs = new ArrayList<>();
-        for (Person p : getActivePersonnel(true)) {
-            if (p.isDoctor()) {
-                docs.add(p);
+        for (Person person : getActivePersonnel(true)) {
+            if (person.isDoctor()) {
+                docs.add(person);
             }
         }
         return docs;
@@ -6191,12 +6191,12 @@ public class Campaign implements ITechManager {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person p : getActivePersonnel(true)) {
-            if (p.isCommander()) {
-                return p;
+        for (Person person : getActivePersonnel(true)) {
+            if (person.isCommander()) {
+                return person;
             }
-            if (null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
-                commander = p;
+            if (null == commander || person.getRankNumeric() > commander.getRankNumeric()) {
+                commander = person;
             }
         }
         return commander;
@@ -6214,8 +6214,8 @@ public class Campaign implements ITechManager {
         }
 
         // remove any personnel from this unit
-        for (Person p : unit.getCrew()) {
-            unit.remove(p, true);
+        for (Person person : unit.getCrew()) {
+            unit.remove(person, true);
         }
 
         Person tech = unit.getTech();
@@ -6304,9 +6304,9 @@ public class Campaign implements ITechManager {
     }
 
     public void removeAllPatientsFor(Person doctor) {
-        for (Person p : getPersonnel()) {
-            if (null != p.getDoctorId() && p.getDoctorId().equals(doctor.getId())) {
-                p.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
+        for (Person person : getPersonnel()) {
+            if (null != person.getDoctorId() && person.getDoctorId().equals(doctor.getId())) {
+                person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
         }
     }
@@ -7848,18 +7848,18 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public void personUpdated(Person p) {
-        Unit u = p.getUnit();
+    public void personUpdated(Person person) {
+        Unit u = person.getUnit();
         if (null != u) {
             u.resetPilotAndEntity();
         }
 
-        Force force = getForceFor(p);
+        Force force = getForceFor(person);
         if (force != null) {
             force.updateCommander(this);
         }
 
-        MekHQ.triggerEvent(new PersonChangedEvent(p));
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     /**
@@ -8470,10 +8470,10 @@ public class Campaign implements ITechManager {
 
         if ((getCampaignOptions().getKillsForXP() > 0) && (getCampaignOptions().getKillXPAward() > 0)) {
             if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions().getKillsForXP()) == 0) {
-                Person p = getPerson(k.getPilotId());
-                if (null != p) {
-                    p.awardXP(this, getCampaignOptions().getKillXPAward());
-                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                Person person = getPerson(k.getPilotId());
+                if (null != person) {
+                    person.awardXP(this, getCampaignOptions().getKillXPAward());
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
             }
         }
@@ -9815,10 +9815,10 @@ public class Campaign implements ITechManager {
              * the unit was founded.
              */
             LocalDate founding = null;
-            for (Person p : getPersonnel()) {
-                for (LogEntry e : p.getPersonalLog()) {
-                    if ((founding == null) || e.getDate().isBefore(founding)) {
-                        founding = e.getDate();
+            for (Person person : getPersonnel()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
+                    if ((founding == null) || logEntry.getDate().isBefore(founding)) {
+                        founding = logEntry.getDate();
                     }
                 }
             }
@@ -9827,35 +9827,35 @@ public class Campaign implements ITechManager {
              * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
              * they joined came with that `Mek (which is a less certain assumption)
              */
-            for (Person p : getPersonnel()) {
-                LocalDate join = p.getPersonalLog()
+            for (Person person : getPersonnel()) {
+                LocalDate join = person.getPersonalLog()
                                        .stream()
                                        .filter(e -> e.getDesc().startsWith("Joined "))
                                        .findFirst()
                                        .map(LogEntry::getDate)
                                        .orElse(null);
                 if ((join != null) && join.equals(founding)) {
-                    p.setFounder(true);
+                    person.setFounder(true);
                 }
-                if (p.getPrimaryRole().isMekWarrior() ||
-                          (p.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits()) ||
-                          p.getPrimaryRole().isProtoMekPilot()) {
-                    for (LogEntry e : p.getPersonalLog()) {
-                        if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
-                            String mek = e.getDesc().substring(12);
+                if (person.getPrimaryRole().isMekWarrior() ||
+                          (person.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits()) ||
+                          person.getPrimaryRole().isProtoMekPilot()) {
+                    for (LogEntry logEntry : person.getPersonalLog()) {
+                        if (logEntry.getDate().equals(join) && logEntry.getDesc().startsWith("Assigned to ")) {
+                            String mek = logEntry.getDesc().substring(12);
                             MekSummary ms = MekSummaryCache.getInstance().getMek(mek);
                             if (null != ms &&
-                                      (p.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
-                                p.setOriginalUnitWeight(ms.getWeightClass());
+                                      (person.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
+                                person.setOriginalUnitWeight(ms.getWeightClass());
                                 if (ms.isClan()) {
-                                    p.setOriginalUnitTech(Person.TECH_CLAN);
+                                    person.setOriginalUnitTech(Person.TECH_CLAN);
                                 } else if (ms.getYear() > 3050) {
                                     // TODO : Fix this so we aren't using a hack that just assumes IS2
-                                    p.setOriginalUnitTech(Person.TECH_IS2);
+                                    person.setOriginalUnitTech(Person.TECH_IS2);
                                 }
-                                if ((null != p.getUnit()) &&
-                                          ms.getName().equals(p.getUnit().getEntity().getShortNameRaw())) {
-                                    p.setOriginalUnitId(p.getUnit().getId());
+                                if ((null != person.getUnit()) &&
+                                          ms.getName().equals(person.getUnit().getEntity().getShortNameRaw())) {
+                                    person.setOriginalUnitId(person.getUnit().getId());
                                 }
                             }
                         }
