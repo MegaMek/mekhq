@@ -4178,6 +4178,10 @@ public class Person {
         return String.format("<a href='PERSON:%s'>%s</a>", getId(), getFullTitle());
     }
 
+    public String getFullTitleAndProfessions() {
+        return getFullTitle() + " (" + getPrimaryRoleDesc() + " / " + getSecondaryRoleDesc() + ')';
+    }
+
     /**
      * @return the primaryDesignator
      */

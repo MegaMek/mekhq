@@ -32,6 +32,7 @@
  */
 package mekhq.gui.menus;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -172,7 +173,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             final boolean areAllVesselCrew = Stream.of(people)
                                                    .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_CREW));
             final boolean areAllVehicleCrew = Stream.of(people)
-                                                    .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW));
+                                                    .allMatch(person -> person.getPrimaryRole()
+                                                                              .isVehicleCrewExtended() ||
+                                                                              person.getSecondaryRole()
+                                                                                    .isVehicleCrewExtended());
             final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
             final boolean areAllBattleArmourPilots = Stream.of(people)
                                                            .allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
@@ -303,6 +307,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 } else {
                                     unit.addPilotOrSoldier(people[0], useTransfers);
                                 }
+
+                                Person person = people[0];
+                                ensureRecruitmentDate(campaign.getLocalDate(), person);
                             });
                             pilotEntityWeightMenu.add(miPilot);
                         }
@@ -326,6 +333,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addDriver(person, useTransfers);
+                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
                                 }
                             }
                         });
@@ -349,6 +357,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 unit.addDriver(people[0], useTransfers);
+
+                                Person person = people[0];
+                                ensureRecruitmentDate(campaign.getLocalDate(), person);
                             });
                             driverEntityWeightMenu.add(miDriver);
                         }
@@ -385,6 +396,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addGunner(person, useTransfers);
+                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
                                 }
                             }
                         });
@@ -423,6 +435,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addVesselCrew(person, useTransfers);
+                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
                                 }
                             }
                         });
@@ -452,6 +465,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 unit.setTechOfficer(people[0], useTransfers);
+
+                                Person person = people[0];
+                                ensureRecruitmentDate(campaign.getLocalDate(), person);
                             });
                             consoleCommanderEntityWeightMenu.add(miConsoleCommander);
                         }
@@ -468,6 +484,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             unit.setTechOfficer(people[0], useTransfers);
+
+                            Person person = people[0];
+                            ensureRecruitmentDate(campaign.getLocalDate(), person);
                         });
                         techOfficerEntityWeightMenu.add(miTechOfficer);
                     }
@@ -494,6 +513,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addPilotOrSoldier(person, useTransfers);
+                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
                                 }
                             }
                         });
@@ -515,6 +535,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             useTransfers = campaign.getCampaignOptions().isUseTransfers();
                         }
                         unit.setNavigator(people[0], useTransfers);
+
+                        Person person = people[0];
+                        ensureRecruitmentDate(campaign.getLocalDate(), person);
                     });
                     navigatorEntityWeightMenu.add(miNavigator);
                 }
@@ -571,6 +594,24 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 }
             });
             add(miUnassignPerson);
+        }
+    }
+
+    /**
+     * Ensures that the given person's recruitment date is set.
+     *
+     * <p>If the {@code Person} does not already have a recruitment date assigned, this method assigns the provided
+     * date as their recruitment date.</p>
+     *
+     * @param today  the {@link LocalDate} to set as the recruitment date if not already set
+     * @param person the {@link Person} whose recruitment date is to be checked and possibly updated
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static void ensureRecruitmentDate(LocalDate today, Person person) {
+        if (person.getRecruitment() == null) {
+            person.setRecruitment(today);
         }
     }
     //endregion Initialization
