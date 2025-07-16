@@ -48,7 +48,7 @@ public enum AgingMilestone {
     SEVENTY_ONE(71, 81, -100, -125, 0, -100, 0, -50, -75, 2, true, true),
     EIGHTY_ONE(81, 91, -150, -150, -100, -100, -100, -50, -100, 2, true, true),
     NINETY_ONE(91, 101, -150, -175, -150, -125, -150, -100, -100, 2, true, true),
-    ONE_HUNDRED_ONE(101, MAX_VALUE, -200, -200, -200, -150, -200, -100, -1500, 2, true, true);
+    ONE_HUNDRED_ONE(101, MAX_VALUE, -200, -200, -200, -150, -200, -100, -150, 2, true, true);
 
     private static final MMLogger logger = MMLogger.create(AgingMilestone.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AgingMilestone";

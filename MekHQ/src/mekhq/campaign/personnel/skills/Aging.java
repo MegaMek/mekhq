@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static java.lang.Math.round;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FAST_LEARNER;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
@@ -250,7 +251,9 @@ public class Aging {
             reputationMultiplier--;
         }
 
-        return reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
+        int modifier = reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
+        double totalModifier = (double) modifier / AGING_SKILL_MODIFIER_DIVIDER;
+        return (int) round(totalModifier);
     }
 
     /**
@@ -336,6 +339,6 @@ public class Aging {
      * @return the adjusted skill attribute modifier after applying aging rules
      */
     private static int applyAgingModifier(int modifierSum) {
-        return (int) Math.round((double) modifierSum / AGING_SKILL_MODIFIER_DIVIDER);
+        return (int) round((double) modifierSum / AGING_SKILL_MODIFIER_DIVIDER);
     }
 }
