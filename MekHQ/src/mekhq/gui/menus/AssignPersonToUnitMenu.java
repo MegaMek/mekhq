@@ -439,7 +439,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 }
                             }
                         });
-                        pilotEntityWeightMenu.add(miCrewmember);
+                        crewmemberEntityWeightMenu.add(miCrewmember);
                     }
                 }
 
