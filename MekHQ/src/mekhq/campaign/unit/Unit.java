@@ -6531,13 +6531,19 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * On average, how much does this spaceshift spend burning fuel per month? Based on CO p. 24
+     * Calculates the average monthly hydrogen fuel usage for a given spacefaring entity.
      *
-     * @param entity
+     * <p>The calculation is based on the entity's class and mass, with values derived from CamOps. Different formulas
+     * are applied depending on whether the entity is a DropShip (with subtypes and weight considerations), Small
+     * Craft, Jumpship, or Warship.</p>
      *
-     * @return fuel cost for operating this Entity for a month
+     * @param entity the {@link Entity} representing the spacecraft whose monthly hydrogen usage is to be calculated
+     * @return the total tons of hydrogen fuel consumed in an average month for the provided entity
      */
     public double getCraftMonthlyHydrogenUsage(Entity entity) {
+        final int NON_JUMPSHIP_BURN_PER_DAY = 15;
+        final int JUMPSHIP_BURN_PER_DAY = 3;
+
         double tonsburnday = 0;
         if (entity instanceof Dropship) {
             if (((SmallCraft) entity).getDesignType() != Dropship.MILITARY) {
@@ -6563,9 +6569,9 @@ public class Unit implements ITechnology {
             } else {
                 tonsburnday = 1.84;
             }
-            return tonsburnday * 15;
+            return tonsburnday * NON_JUMPSHIP_BURN_PER_DAY;
         } else if ((entity instanceof SmallCraft)) {
-            return 1.84 * 15;
+            return 1.84 * NON_JUMPSHIP_BURN_PER_DAY;
         } else if (entity instanceof Jumpship) {
             if (entity.getWeight() < 50000) {
                 tonsburnday = 2.82;
@@ -6577,9 +6583,9 @@ public class Unit implements ITechnology {
                 tonsburnday = 39.52;
             }
             if (entity instanceof Warship) {
-                return tonsburnday * 15;
+                return tonsburnday * NON_JUMPSHIP_BURN_PER_DAY;
             }
-            return tonsburnday * 3;
+            return tonsburnday * JUMPSHIP_BURN_PER_DAY;
         }
         return tonsburnday;
     }
