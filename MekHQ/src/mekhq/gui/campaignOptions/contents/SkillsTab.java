@@ -34,6 +34,8 @@ package mekhq.gui.campaignOptions.contents;
 
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.HEROIC;
+import static megamek.common.enums.SkillLevel.LEGENDARY;
 import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
@@ -168,7 +170,7 @@ public class SkillsTab {
     public JPanel createSkillsTab(SkillSubType category) {
         // Header
         CampaignOptionsHeaderPanel headerPanel;
-        String panelName = "";
+        String panelName;
         switch (category) {
             case COMBAT_GUNNERY -> {
                 headerPanel = new CampaignOptionsHeaderPanel("GunnerySkillsTab",
@@ -274,7 +276,6 @@ public class SkillsTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        int tableCounter = 0;
         int rows = (int) Math.ceil(skillPanels.size() / 5.0);
         for (int i = 0; i < rows; i++) {
             layout.gridy++;
@@ -401,6 +402,8 @@ public class SkillsTab {
             comboBox.addItem(REGULAR);
             comboBox.addItem(VETERAN);
             comboBox.addItem(ELITE);
+            comboBox.addItem(HEROIC);
+            comboBox.addItem(LEGENDARY);
             comboBox.addActionListener(e -> milestoneActionListener(comboBoxes, comboBox));
             comboBox.setVisible(false);
             comboBoxes.add(comboBox);
@@ -592,13 +595,17 @@ public class SkillsTab {
                 int regularIndex = skill.getRegularLevel();
                 int veteranIndex = skill.getVeteranLevel();
                 int eliteIndex = skill.getEliteLevel();
+                int heroicIndex = skill.getHeroicLevel();
+                int legendaryIndex = skill.getLegendaryLevel();
 
                 for (int i = 0; i < milestones.size(); i++) {
                     SkillLevel levelToSet = determineMilestoneLevel(i,
                           greenIndex,
                           regularIndex,
                           veteranIndex,
-                          eliteIndex);
+                          eliteIndex,
+                          heroicIndex,
+                          legendaryIndex);
                     milestones.get(i).setSelectedItem(levelToSet);
                 }
             }
@@ -615,29 +622,37 @@ public class SkillsTab {
      * assignments for milestone thresholds.
      * </p>
      *
-     * @param index        the position in the milestone sequence.
+     * @param currentIndex        the position in the milestone sequence.
      * @param greenIndex   the index where Green begins.
      * @param regularIndex the index where Regular begins.
      * @param veteranIndex the index where Veteran begins.
      * @param eliteIndex   the index where Elite begins.
+     * @param heroicIndex   the index where Heroic begins.
+     * @param legendaryIndex   the index where Legendary begins.
      *
      * @return the corresponding {@link SkillLevel} for the given milestone.
      */
-    private SkillLevel determineMilestoneLevel(int index, int greenIndex, int regularIndex, int veteranIndex,
-          int eliteIndex) {
-        if (index < greenIndex) {
+    private SkillLevel determineMilestoneLevel(int currentIndex, int greenIndex, int regularIndex, int veteranIndex,
+          int eliteIndex, int heroicIndex, int legendaryIndex) {
+        if (currentIndex < greenIndex) {
             return ULTRA_GREEN;
         }
-        if (index < regularIndex) {
+        if (currentIndex < regularIndex) {
             return GREEN;
         }
-        if (index < veteranIndex) {
+        if (currentIndex < veteranIndex) {
             return REGULAR;
         }
-        if (index < eliteIndex) {
+        if (currentIndex < eliteIndex) {
             return VETERAN;
         }
-        return ELITE;
+        if (currentIndex < heroicIndex) {
+            return ELITE;
+        }
+        if (currentIndex < legendaryIndex) {
+            return HEROIC;
+        }
+        return LEGENDARY;
     }
 
     /**
@@ -734,10 +749,12 @@ public class SkillsTab {
         List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type.getName());
 
         // These allow us to ensure the full array of milestones has been assigned
-        type.setGreenLevel(skillMilestones.size() - 4);
-        type.setRegularLevel(skillMilestones.size() - 3);
-        type.setVeteranLevel(skillMilestones.size() - 2);
-        type.setEliteLevel(skillMilestones.size() - 1);
+        type.setGreenLevel(skillMilestones.size() - 6);
+        type.setRegularLevel(skillMilestones.size() - 5);
+        type.setVeteranLevel(skillMilestones.size() - 4);
+        type.setEliteLevel(skillMilestones.size() - 3);
+        type.setHeroicLevel(skillMilestones.size() - 2);
+        type.setLegendaryLevel(skillMilestones.size() - 1);
 
         // Then we overwrite those insurance values with the actual values
         SkillLevel lastAssignment = ULTRA_GREEN;
@@ -755,6 +772,8 @@ public class SkillsTab {
                         case REGULAR -> type.setRegularLevel(i);
                         case VETERAN -> type.setVeteranLevel(i);
                         case ELITE -> type.setEliteLevel(i);
+                        case HEROIC -> type.setHeroicLevel(i);
+                        case LEGENDARY -> type.setLegendaryLevel(i);
                         default -> {
                         }
                     }
