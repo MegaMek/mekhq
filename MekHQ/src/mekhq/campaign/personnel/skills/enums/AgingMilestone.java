@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.skills.enums;
 
 import static java.lang.Integer.MAX_VALUE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_SKILL_ATTRIBUTE;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
 
@@ -50,6 +51,7 @@ public enum AgingMilestone {
     ONE_HUNDRED_ONE(101, MAX_VALUE, -200, -200, -200, -150, -200, -100, -1500, 2, true, true);
 
     private static final MMLogger logger = MMLogger.create(AgingMilestone.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AgingMilestone";
 
     public static final int CLAN_REPUTATION_MULTIPLIER = 150;
     public static final int STAR_CAPTAIN_RANK_INDEX = 34;
@@ -153,7 +155,16 @@ public enum AgingMilestone {
     }
 
     // Getters
+
+    /**
+     * Use {@link #getMinimumAge()} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getMilestone() {
+        return milestone;
+    }
+
+    public int getMinimumAge() {
         return milestone;
     }
 
@@ -188,5 +199,9 @@ public enum AgingMilestone {
 
     public boolean isGlassJaw() {
         return glassJaw;
+    }
+
+    public String getLabel() {
+        return getTextAt(RESOURCE_BUNDLE, "AgingMilestone." + name() + ".label");
     }
 }

@@ -269,7 +269,7 @@ public class Aging {
     public static void applyAgingSPA(int characterAge, Person person) {
         PersonnelOptions options = person.getOptions();
         for (AgingMilestone milestone : AgingMilestone.values()) {
-            if (characterAge == milestone.getMilestone()) {
+            if (characterAge == milestone.getMinimumAge()) {
                 // Glass Jaw
                 if (milestone.isGlassJaw()) {
                     boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
@@ -312,12 +312,12 @@ public class Aging {
      */
     public static AgingMilestone getMilestone(int characterAge) {
         // Early exit, so we don't need to loop through all values for young characters
-        if (characterAge < TWENTY_FIVE.getMilestone()) {
+        if (characterAge < TWENTY_FIVE.getMinimumAge()) {
             return NONE;
         }
 
         for (AgingMilestone milestone : AgingMilestone.values()) {
-            if ((characterAge >= milestone.getMilestone()) && (characterAge < milestone.getMaximumAge())) {
+            if ((characterAge >= milestone.getMinimumAge()) && (characterAge < milestone.getMaximumAge())) {
                 return milestone;
             }
         }
