@@ -119,7 +119,7 @@ class AgingMilestoneTest {
 
             int expected = 0;
             for (AgingMilestone validMilestone : AgingMilestone.values()) {
-                if (validMilestone.getMilestone() <= age) {
+                if (validMilestone.getMinimumAge() <= age) {
                     expected += validMilestone.getAttribute(attribute);
                 }
             }
@@ -160,7 +160,7 @@ class AgingMilestoneTest {
 
         int expected = 0;
         for (AgingMilestone validMilestone : AgingMilestone.values()) {
-            if (validMilestone.getMilestone() <= personAge) {
+            if (validMilestone.getMinimumAge() <= personAge) {
                 expected += validMilestone.getAttribute(attribute);
             }
         }

@@ -155,6 +155,11 @@ public enum AgingMilestone {
     }
 
     // Getters
+
+    /**
+     * Use {@link #getMinimumAge()} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getMilestone() {
         return milestone;
     }
