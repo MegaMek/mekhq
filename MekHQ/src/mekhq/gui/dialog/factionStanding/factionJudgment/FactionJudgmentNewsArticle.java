@@ -80,11 +80,79 @@ public class FactionJudgmentNewsArticle {
      * @since 0.50.07
      */
     public FactionJudgmentNewsArticle(Campaign campaign, Person commander, Person secondInCommand,
-          String judgmentLookupName,
-          Faction censuringFaction, FactionStandingJudgmentType judgmentType, boolean useFactionCapitalAsLocation) {
-
-        String dialogKey = getDialogKey(judgmentType, judgmentLookupName, censuringFaction);
+          String judgmentLookupName, Faction censuringFaction, FactionStandingJudgmentType judgmentType,
+          boolean useFactionCapitalAsLocation) {
         String factionName = getFactionName(censuringFaction, campaign.getGameYear());
+
+        constructDialog(campaign,
+              commander,
+              secondInCommand,
+              judgmentLookupName,
+              censuringFaction,
+              judgmentType,
+              useFactionCapitalAsLocation,
+              factionName);
+    }
+
+    /**
+     * Constructs and immediately displays a news dialog representing a faction judgment event, assembling the news
+     * article based on campaign state, involved personnel, and faction information.
+     *
+     * @param campaign                    The current campaign instance.
+     * @param commander                   The commander referenced in the article.
+     * @param secondInCommand             The second-in-command personnel, optionally referenced in the article.
+     * @param judgmentLookupName          Used to fetch the article
+     * @param censuringFaction            The faction issuing the judgment.
+     * @param judgmentType                The specific type of judgment.
+     * @param useFactionCapitalAsLocation If {@code true}, the faction's capital planet is used as the event location;
+     *                                    otherwise, the campaign's current location is used.
+     * @param newFaction                  The faction the campaign is changing to (for going rogue events)
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionJudgmentNewsArticle(Campaign campaign, Person commander, Person secondInCommand,
+          String judgmentLookupName, Faction censuringFaction, FactionStandingJudgmentType judgmentType,
+          boolean useFactionCapitalAsLocation, Faction newFaction) {
+        String factionName = getFactionName(newFaction, campaign.getGameYear());
+
+        constructDialog(campaign,
+              commander,
+              secondInCommand,
+              judgmentLookupName,
+              censuringFaction,
+              judgmentType,
+              useFactionCapitalAsLocation,
+              factionName);
+    }
+
+    /**
+     * Constructs and displays the faction judgment news dialog with contextualized in-character content.
+     *
+     * <p>This method gathers relevant campaign data—including commander identity, faction names, location details,
+     * and judgment information—and uses it to generate a formatted news article for display to the player.</p>
+     *
+     * <p>It determines the location of the event based on either the faction’s capital or the current campaign
+     * position, then formats a localized article using the resource bundle and launches a {@link NewsDialog}.</p>
+     *
+     * @param campaign                    The current {@link Campaign} instance containing game state and context.
+     * @param commander                   The {@link Person} identified as the commander in the article.
+     * @param secondInCommand             The optional second-in-command {@link Person}; may be {@code null}.
+     * @param judgmentLookupName          The string identifier used to select the specific judgment article.
+     * @param censuringFaction            The {@link Faction} issuing the judgment or censure.
+     * @param judgmentType                The {@link FactionStandingJudgmentType} describing the kind of judgment.
+     * @param useFactionCapitalAsLocation If {@code true}, the location will use the faction’s capital planet; if
+     *                                    {@code false}, the campaign’s current location will be used instead.
+     * @param factionName                 The name of the faction being referenced in the article (may differ from the
+     *                                    censuring faction in rogue events).
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static void constructDialog(Campaign campaign, Person commander, Person secondInCommand,
+          String judgmentLookupName, Faction censuringFaction, FactionStandingJudgmentType judgmentType,
+          boolean useFactionCapitalAsLocation, String factionName) {
+        String dialogKey = getDialogKey(judgmentType, judgmentLookupName, censuringFaction);
 
         LocalDate today = campaign.getLocalDate();
         CurrentLocation location = campaign.getLocation();
