@@ -2327,7 +2327,7 @@ public class Campaign implements ITechManager {
             }
 
             if ((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
-                currentChildren.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
+                currentChildren.addAll(getProcreation().birthHistoric(this, currentDate, person, babysFather));
                 babysFather = null;
             }
 
@@ -2335,7 +2335,7 @@ public class Campaign implements ITechManager {
                       (currentSpouse.isPregnant()) &&
                       (currentDate.isAfter(currentSpouse.getDueDate()))) {
                 currentChildren.addAll(getProcreation().birthHistoric(this,
-                      localDate,
+                      currentDate,
                       currentSpouse,
                       spousesBabysFather));
                 spousesBabysFather = null;
