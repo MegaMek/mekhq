@@ -777,19 +777,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
+                new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                     yield false;
                 } else {
                     if (isPostScenario) {
@@ -802,15 +802,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, TANK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, MEK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
