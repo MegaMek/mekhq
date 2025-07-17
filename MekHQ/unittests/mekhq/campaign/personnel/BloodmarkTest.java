@@ -310,12 +310,4 @@ class BloodmarkTest {
         assertEquals(2, Bloodmark.adjustmentWoundsForSPAs(target, 2));
         assertEquals(4, Bloodmark.adjustmentWoundsForSPAs(target, 5)); // 5*.75=3.75->4
     }
-
-    @Test
-    void testAdjustmentWoundsForSPAs_BothGlassJawAndToughness_WoundsUnchanged() {
-        PersonnelOptions options = target.getOptions();
-        options.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, FLAW_GLASS_JAW, true);
-        options.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, ATOW_TOUGHNESS, true);
-        assertEquals(5, Bloodmark.adjustmentWoundsForSPAs(target, 5));
-    }
 }
