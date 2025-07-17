@@ -1304,7 +1304,7 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>compulsion_faction_loyalty</lookupName>
     <displayName>Significant Compulsion - Excessive Faction Loyalty (ATOW)</displayName>
-    <desc><![CDATA[Improve Loyalty by 2 if the character's faction matches the campaign faction. Otherwise, reduce Loyalty by 3.
+    <desc><![CDATA[Improve Loyalty by 1 if the character's faction matches the campaign faction. Otherwise, reduce Loyalty by 4.
 
 This SPA reflects the various 'loyalty to x faction' ATOW compulsions.
 
@@ -1385,7 +1385,7 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <lookupName>madness_split_personality</lookupName>
     <displayName>Minor Psychosis - Split Personality (ATOW)</displayName>
     <desc><![CDATA[The character gains a number of random personalities. Each week they have a chance to switch to one of their personalities.
-        
+
 While the character's personality has switched, they temporarily lose all levels in the Connections Trait.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
@@ -1421,7 +1421,7 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <lookupName>madness_hysteria</lookupName>
     <displayName>Major Psychosis - Hysteria (ATOW)</displayName>
     <desc><![CDATA[Incurs a weekly chance of the character temporarily being affected by the Berserker, Confusion, or Clinical Paranoia effects.
-        
+
 - Berserker: The character gets into a fight with another character. Both characters suffer 1d6 Hits and may be killed.
 - Confusion: The character receives the 'Confusion' injury, or 2 Hits if Advanced Medical is disabled.
 - Clinical Paranoia: The character temporarily loses all levels in the Connections Trait, and suffers a -2 penalty on all Charisma-based checks for the week.
