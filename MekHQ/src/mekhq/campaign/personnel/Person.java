@@ -5485,13 +5485,17 @@ public class Person {
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankLevel) {
-        int modifier = isUseAgingEffects ?
+        int modifiers = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
                                    !isNullOrBlank(bloodname),
                                    rankLevel) :
                              0;
-        return reputation + modifier;
+
+        boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
+        modifiers -= hasRacism ? 1 : 0;
+
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
