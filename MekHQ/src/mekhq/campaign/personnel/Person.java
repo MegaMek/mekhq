@@ -5403,6 +5403,26 @@ public class Person {
         return connections;
     }
 
+    /**
+     * Calculates and returns the character's adjusted Connections value.
+     *
+     * <p>If the character has the {@link PersonnelOptions#COMPULSION_XENOPHOBIA} SPA their Connections value is
+     * decreased by 1.</p>
+     *
+     * <p>The connections value is clamped within the allowed minimum and maximum range before being returned.</p>
+     *
+     * @return the character's Connections value, clamped within the minimum and maximum limits
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedConnections() {
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+
+        int modifiers = (hasXenophobia ? -1 : 0);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
     public void setConnections(final int connections) {
         this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
@@ -5485,13 +5505,17 @@ public class Person {
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankLevel) {
-        int modifier = isUseAgingEffects ?
+        int modifiers = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
                                    !isNullOrBlank(bloodname),
                                    rankLevel) :
                              0;
-        return reputation + modifier;
+
+        boolean hasXenopbobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        modifiers -= hasXenopbobia ? 1 : 0;
+
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
