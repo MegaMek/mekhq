@@ -553,6 +553,18 @@ They can make one additional procurement attempt per day.]]></desc>
 While this SPA does exist in ATOW (and that's where you'll find its description), these effects are unique to MekHQ.]]></desc>
         <xpCost>200</xpCost>
         <weight>1</weight>
+        <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>atow_citizenship</lookupName>
+    <displayName>Citizenship/Trueborn (ATOW)</displayName>
+    <desc><![CDATA[Unlocks additional options during character creation.
+
+Increases Connections by 1.
+
+While this SPA does exist in ATOW, the Connections modifier is unique to MekHQ. We use that to abstract the kinds of bonuses this SPA would incur in a tabletop game.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
         <skillPrereq/>
     </ability>
     <ability>

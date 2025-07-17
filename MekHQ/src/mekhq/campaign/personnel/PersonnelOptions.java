@@ -67,6 +67,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_SLOW_LEARNER = "flaw_slow_learner";
     public static final String ATOW_FAST_LEARNER = "atow_fast_learner";
     public static final String ATOW_ALTERNATE_ID = "atow_alternate_id";
+    public static final String ATOW_CITIZENSHIP = "atow_citizenship";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -158,6 +159,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_SLOW_LEARNER, false);
         addOption(l3a, ATOW_FAST_LEARNER, false);
         addOption(l3a, ATOW_ALTERNATE_ID, false);
+        addOption(l3a, ATOW_CITIZENSHIP, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

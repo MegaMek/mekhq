@@ -2048,7 +2048,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlOther.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.traits")));
 
         JLabel lblConnections = null;
-        int connections = person.getConnections();
+        int connections = person.getAdjustedConnections();
         if (connections != 0) {
             String connectionsLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblConnections.text"),
