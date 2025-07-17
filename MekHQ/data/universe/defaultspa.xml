@@ -1461,7 +1461,7 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
 This SPA is also known as 'Clan Pilot Training' in MegaMek.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
-        <xpCost>-1</xpCost>
+        <xpCost>-100</xpCost>
         <weight>0</weight>
     </ability>
 
