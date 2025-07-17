@@ -3681,6 +3681,11 @@ public class Person {
         return getRankSystem().getRank(getRankNumeric());
     }
 
+    /**
+     * Retrieves the index of the character's rank
+     *
+     * @return the numeric value of the rank as an {@link Integer}
+     */
     public int getRankNumeric() {
         return rank;
     }
@@ -3689,6 +3694,13 @@ public class Person {
         this.rank = rank;
     }
 
+    /**
+     * Retrieves the character's rank <b>sub-level</b>. Predominantly used in ComStar rank styles.
+     *
+     * <p><b>Important:</b> You almost always want to use {@link #getRankNumeric()} instead.</p>
+     *
+     * @return the rank level as an integer
+     */
     public int getRankLevel() {
         return rankLevel;
     }
@@ -3902,7 +3914,7 @@ public class Person {
         final int adjustedReputation = getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              rankLevel);
+              rank);
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -4264,7 +4276,7 @@ public class Person {
           LocalDate today) {
         final Skill skill = getSkill(skillName);
 
-        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankLevel);
+        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
         return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
     }
@@ -5477,19 +5489,19 @@ public class Person {
      * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankLevel         The rank index of the character, which can adjust the reputation modifier in clan-based
+     * @param rankNumeric       The rank index of the character, which can adjust the reputation modifier in clan-based
      *                          campaigns.
      *
      * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
      *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankLevel) {
+          int rankNumeric) {
         int modifier = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
                                    !isNullOrBlank(bloodname),
-                                   rankLevel) :
+                                   rankNumeric) :
                              0;
         return reputation + modifier;
     }

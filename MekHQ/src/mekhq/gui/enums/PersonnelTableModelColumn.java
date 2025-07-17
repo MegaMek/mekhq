@@ -873,7 +873,7 @@ public enum PersonnelTableModelColumn {
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,
-                                                                person.getRankLevel()))) :
+                                                                person.getRankNumeric()))) :
                              "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
@@ -936,7 +936,7 @@ public enum PersonnelTableModelColumn {
                 return Integer.toString(person.getAdjustedReputation(isUseAgeEffects,
                       isClanCampaign,
                       today,
-                      person.getRankLevel()));
+                      person.getRankNumeric()));
             case UNLUCKY:
                 return Integer.toString(person.getUnlucky());
             case FATIGUE:

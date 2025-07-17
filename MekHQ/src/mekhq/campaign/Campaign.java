@@ -3217,7 +3217,7 @@ public class Campaign implements ITechManager {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   currentDay,
-                  person.getRankLevel());
+                  person.getRankNumeric());
 
             if (((person.getPrimaryRole() == role) || (person.getSecondaryRole() == role)) &&
                       (person.getSkill(primary) != null)) {
@@ -3249,7 +3249,7 @@ public class Campaign implements ITechManager {
                         int bestInRoleAdjustedReputation = bestInRole.getAdjustedReputation(isUseAgingEffects,
                               isClanCampaign,
                               currentDay,
-                              bestInRole.getRankLevel());
+                              bestInRole.getRankNumeric());
                         bestInRoleSecondarySkill = secondarySkill.getTotalSkillLevel(bestInRole.getOptions(),
                               bestInRole.getATOWAttributes(),
                               bestInRoleAdjustedReputation);
@@ -3287,7 +3287,7 @@ public class Campaign implements ITechManager {
             int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                   isClanCampaign(),
                   currentDay,
-                  person.getRankLevel());
+                  person.getRankNumeric());
             Skill skill = person.getSkill(skillName);
 
             int totalSkillLevel = Integer.MIN_VALUE;
@@ -3478,7 +3478,7 @@ public class Campaign implements ITechManager {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       isClanCampaign(),
                       currentDay,
-                      person.getRankLevel());
+                      person.getRankNumeric());
                 Skill skill = person.getSkill(skillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
@@ -3510,7 +3510,7 @@ public class Campaign implements ITechManager {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       isClanCampaign(),
                       currentDay,
-                      person.getRankLevel());
+                      person.getRankNumeric());
                 Skill skill = person.getSkill(skillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
@@ -3745,7 +3745,7 @@ public class Campaign implements ITechManager {
                     int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person1.getRankLevel());
+                          person1.getRankNumeric());
                     Skill skill = person1.getBestTechSkill();
 
                     int person1SkillLevel = Integer.MIN_VALUE;
@@ -3759,7 +3759,7 @@ public class Campaign implements ITechManager {
                     adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person2.getRankLevel());
+                          person2.getRankNumeric());
                     skill = person2.getBestTechSkill();
 
                     int person2SkillLevel = Integer.MIN_VALUE;
@@ -3775,7 +3775,7 @@ public class Campaign implements ITechManager {
                     int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person1.getRankLevel());
+                          person1.getRankNumeric());
                     Skill skill = person1.getSkill(S_TECH);
 
                     int person1SkillLevel = Integer.MIN_VALUE;
@@ -3789,7 +3789,7 @@ public class Campaign implements ITechManager {
                     adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person2.getRankLevel());
+                          person2.getRankNumeric());
                     skill = person2.getSkill(S_TECH);
 
                     int person2SkillLevel = Integer.MIN_VALUE;
@@ -8216,7 +8216,7 @@ public class Campaign implements ITechManager {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               isClanCampaign(),
               currentDay,
-              person.getRankLevel());
+              person.getRankNumeric());
 
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()),
               skill.getSkillLevel(person.getOptions(), person.getATOWAttributes(), adjustedReputation).toString());

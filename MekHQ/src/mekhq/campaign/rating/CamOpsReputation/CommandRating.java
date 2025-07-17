@@ -145,7 +145,7 @@ public class CommandRating {
         int reputation = commander.getAdjustedReputation(isUseAgingEffects,
               isClanCampaign,
               today,
-              commander.getRankLevel());
+              commander.getRankNumeric());
         if (reputation < 0) {
             traitScore -= 1;
         } else if (reputation > 0) {
