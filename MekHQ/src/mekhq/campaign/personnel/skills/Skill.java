@@ -39,6 +39,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
+import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
@@ -362,6 +363,10 @@ public class Skill {
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
                 modifier += 2;
             }
+
+            if (characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM)) {
+                modifier -= 1;
+            }
         }
 
         // Poor Hearing, Good Hearing, Poor Vision, Good Vision, Sixth Sense, Cat Girl
@@ -425,6 +430,13 @@ public class Skill {
 
             if (characterOptions.booleanOption(ATOW_PATIENT)) {
                 modifier += 1;
+            }
+        }
+
+        // Trivial Compulsion - Religious Fanaticism
+        if (Objects.equals(S_INTEREST_THEOLOGY, name)) {
+            if (characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM)) {
+                modifier += 2;
             }
         }
 
