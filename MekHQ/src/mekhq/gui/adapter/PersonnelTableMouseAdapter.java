@@ -119,15 +119,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.MergingSurnameStyle;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
-import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -220,6 +212,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_SACK = "SACK";
     private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
+    private static final String CMD_CLAIM_BOUNTY = "CLAIM_BOUNTY";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
@@ -1180,6 +1173,43 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
+                }
+                break;
+            }
+            case CMD_CLAIM_BOUNTY: {
+                String question = resources.getString("bloodmark.confirmation");
+
+                if (JOptionPane.NO_OPTION ==
+                          JOptionPane.showConfirmDialog(null,
+                                question,
+                                resources.getString("bloodmark.claimBounty"),
+                                JOptionPane.YES_NO_OPTION)) {
+                    return;
+                }
+
+                LocalDate today = getCampaign().getLocalDate();
+                boolean validBounty = false;
+                for (Person person : people) {
+                    if (person.getStatus().isDead()) {
+                        continue;
+                    }
+
+                    int level = person.getBloodmark();
+                    if (level <= BloodmarkLevel.BLOODMARK_ZERO.getLevel()) {
+                        continue;
+                    }
+
+                    BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(level);
+                    Money bounty = bloodmark.getBounty();
+                    String bountyReport = String.format(resources.getString("bloodmark.transaction"),
+                          person.getFullName());
+                    getCampaign().getFinances().credit(TransactionType.RANSOM, today, bounty, bountyReport);
+                    person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
+                    validBounty = true;
+                }
+
+                if (validBounty) {
+                    performMassForcedDirectionLoyaltyChange(getCampaign(), false, false);
                 }
                 break;
             }
@@ -3923,6 +3953,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(StaticChecks.areAnyActive(selected) && StaticChecks.areAnyFreeOrBondsman(selected));
         }
         menuItem.setActionCommand(CMD_SPENDING_SPREE);
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem(resources.getString("bloodmark.claimBounty"));
+        menuItem.setActionCommand(CMD_CLAIM_BOUNTY);
         menuItem.addActionListener(this);
         popup.add(menuItem);
 

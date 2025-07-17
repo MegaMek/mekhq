@@ -1558,6 +1558,39 @@ public class Person {
     }
 
     /**
+     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     *
+     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
+     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
+     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
+     * group loyalty change is added to the campaign reports.</p>
+     *
+     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
+     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
+     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     */
+    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
+          boolean isMajor) {
+        for (Person person : campaign.getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
+                  ReportingUtilities.CLOSING_SPAN_TAG));
+        }
+    }
+
+    /**
      * Reports the change in loyalty.
      *
      * @param campaign        The campaign for which the loyalty change is being reported.
