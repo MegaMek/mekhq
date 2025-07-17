@@ -4580,7 +4580,9 @@ public class Person {
      * @return The adjusted edge value after accounting for the person's level of bad luck.
      */
     public int getAdjustedEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
+        boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
+        int modifier = hasTraumaticPast ? -1 : 0;
+        return getOptions().intOption(OptionsConstants.EDGE) - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
