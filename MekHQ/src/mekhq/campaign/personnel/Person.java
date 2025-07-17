@@ -5418,7 +5418,9 @@ public class Person {
      */
     public int getAdjustedConnections() {
         boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
-        return clamp(connections + (hasCitizenship ? 1 : 0), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+
+        int modifiers = (hasCitizenship ? 1 : 0);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public void setConnections(final int connections) {
