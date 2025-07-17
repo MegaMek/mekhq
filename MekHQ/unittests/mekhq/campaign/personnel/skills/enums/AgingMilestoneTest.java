@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.personnel.skills.enums;
 
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +49,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class AgingMilestoneTest {
@@ -116,7 +119,7 @@ class AgingMilestoneTest {
 
             int expected = 0;
             for (AgingMilestone validMilestone : AgingMilestone.values()) {
-                if (validMilestone.getMilestone() <= age) {
+                if (validMilestone.getMinimumAge() <= age) {
                     expected += validMilestone.getAttribute(attribute);
                 }
             }
@@ -157,7 +160,7 @@ class AgingMilestoneTest {
 
         int expected = 0;
         for (AgingMilestone validMilestone : AgingMilestone.values()) {
-            if (validMilestone.getMilestone() <= personAge) {
+            if (validMilestone.getMinimumAge() <= personAge) {
                 expected += validMilestone.getAttribute(attribute);
             }
         }
@@ -171,5 +174,12 @@ class AgingMilestoneTest {
                     attribute.name() +
                     " and age: " +
                     age);
+    }
+
+    @ParameterizedTest
+    @EnumSource(AgingMilestone.class)
+    void testGetLabel(AgingMilestone milestone) {
+        String label = milestone.getLabel();
+        assertTrue(isResourceKeyValid(label), "Invalid resource key for milestone: " + label);
     }
 }

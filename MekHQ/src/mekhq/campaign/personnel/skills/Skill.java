@@ -817,10 +817,8 @@ public class Skill {
         }
 
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
-        // TODO enable once attribute modifier sare implemented
-        //        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
+        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
-        int firstLinkedAttributeModifier = 0;
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
               firstLinkedAttribute.getLabel(),
@@ -828,9 +826,7 @@ public class Skill {
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
-            // TODO enable once attribute modifier sare implemented
-            //            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
-            int secondLinkedAttributeModifier = 0;
+            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),

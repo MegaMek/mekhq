@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static java.lang.Math.round;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
@@ -63,6 +62,7 @@ import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.MapSettings;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -71,9 +71,8 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import megamek.common.universe.HonorRating;
-import mekhq.utilities.ReportingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles events and processes related to capturing prisoners.
@@ -234,7 +233,7 @@ public class CapturePrisoners {
         Faction campaignFaction = campaign.getFaction();
         processPrisoner(prisoner, campaignFaction, prisonerCaptureStyle.isMekHQ(), true);
 
-        // Have they been removed via Bondsref?
+        // Have they been removed via Bondsref or Seppuku?
         if (prisoner.getStatus().isDead()) {
             return;
         }
@@ -330,43 +329,44 @@ public class CapturePrisoners {
         HonorRating prisonerHonorRating = prisoner.getOriginFaction().getHonorRating(campaign);
 
         int bondsmanRoll = d6(1);
-        if (capturingFaction != null && capturingFaction.isClan()) {
-            if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll + d6(1) == 2)) {
-                if (isNPC) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "bondsref.report",
-                          prisoner.getFullName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          CLOSING_SPAN_TAG));
+        if (prisoner.isClanPersonnel()) {
+            if (capturingFaction != null && capturingFaction.isClan()) {
+                if (isMekHQCaptureStyle && (bondsmanRoll + d6(1) == 2)) {
+                    if (isNPC) {
+                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "bondsref.report",
+                              prisoner.getFullName(),
+                              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                              CLOSING_SPAN_TAG));
+                        prisoner.setStatus(BONDSREF);
+                    } else {
+                        prisoner.changeStatus(campaign, today, BONDSREF);
+                    }
+                    return;
+                } else if (d6(1) >= prisonerHonorRating.getBondsmanTargetNumber()) {
+                    if (isNPC) {
+                        prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+                        prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
+                    } else {
+                        prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
+                    }
+                    return;
+                }
+            } else if (capturingFaction != null && capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
+                if (bondsmanRoll == 1) {
+                    if (isNPC) {
+                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "bondsref.report",
+                              prisoner.getFullName(),
+                              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                              CLOSING_SPAN_TAG));
 
-                    campaign.removePerson(prisoner);
-                } else {
-                    prisoner.changeStatus(campaign, today, BONDSREF);
+                        prisoner.setStatus(BONDSREF);
+                    } else {
+                        prisoner.changeStatus(campaign, today, POW);
+                    }
+                    return;
                 }
-                return;
-            } else if (d6(1) >= prisonerHonorRating.getBondsmanTargetNumber()) {
-                if (isNPC) {
-                    prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
-                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
-                } else {
-                    prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
-                }
-                return;
-            }
-        } else if (capturingFaction != null && capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
-            if (bondsmanRoll == 1) {
-                if (isNPC) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "bondsref.report",
-                          prisoner.getFullName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          CLOSING_SPAN_TAG));
-
-                    campaign.removePerson(prisoner);
-                } else {
-                    prisoner.changeStatus(campaign, today, POW);
-                }
-                return;
             }
         }
 
@@ -380,7 +380,7 @@ public class CapturePrisoners {
                               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                               CLOSING_SPAN_TAG));
 
-                        campaign.removePerson(prisoner);
+                        prisoner.setStatus(SEPPUKU);
                     } else {
                         prisoner.changeStatus(campaign, today, SEPPUKU);
                     }

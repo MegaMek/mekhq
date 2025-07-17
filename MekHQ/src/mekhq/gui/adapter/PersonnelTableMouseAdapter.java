@@ -142,7 +142,9 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -230,6 +232,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO";
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
+    private static final String CMD_REFUND_SKILL = "REFUND_SKILL";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
@@ -654,6 +657,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
+
+                getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_REFUND_SKILL: {
+                String typeLabel = data[1];
+                SkillType skillType = SkillType.getType(typeLabel);
+                Skills skills = selectedPerson.getSkills();
+                int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.getName());
+
+                selectedPerson.removeSkill(skillType.getName());
+                selectedPerson.awardXP(getCampaign(), refundValue);
 
                 getCampaign().personUpdated(selectedPerson);
                 break;
@@ -4179,6 +4194,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_REMOVE);
             menuItem.addActionListener(this);
             menu.add(menuItem);
+
+            if (oneSelected) {
+                JMenu subMenu = new JMenu(resources.getString("refundSkill.text"));
+                for (Skill skill : person.getSkills().getSkills()) {
+                    String label = skill.getType().getName();
+                    JMenuItem menuSkill = new JMenuItem(label);
+                    menuSkill.setActionCommand(makeCommand(CMD_REFUND_SKILL, label));
+                    menuSkill.addActionListener(this);
+                    subMenu.add(menuSkill);
+                }
+                menu.add(subMenu);
+            }
 
             if (!getCampaignOptions().isUseAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("editHits.text"));

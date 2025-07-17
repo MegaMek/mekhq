@@ -147,7 +147,7 @@ public class SkillDeprecationTool {
      *
      * @return the total XP refund value for the deprecated skill
      */
-    public int getRefundValue(Skills skills, SkillType skillType, String skillName) {
+    public static int getRefundValue(Skills skills, SkillType skillType, String skillName) {
         Skill skill = skills.getSkill(skillName);
         int level = skill.getLevel();
 
