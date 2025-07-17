@@ -1211,6 +1211,236 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
             <skill>Tech/BattleArmor::Regular</skill>
         </skillPrereq>
     </ability>
+    <ability>
+    <lookupName>compulsion_unpleasant_personality</lookupName>
+    <displayName>Trivial Compulsion - Unpleasant Personality (ATOW)</displayName>
+    <desc><![CDATA[-1 to all Charisma-based Skill Checks.
+
+This SPA represents ATOW compulsions such as arrogance and pride.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_mild_paranoia</lookupName>
+    <displayName>Trivial Compulsion - Mild Paranoia (ATOW)</displayName>
+    <desc><![CDATA[-1 Connections.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_racism</lookupName>
+    <displayName>Trivial Compulsion - Racism (ATOW)</displayName>
+    <desc><![CDATA[-1 Reputation.
+
+This SPA represents the various 'Distrusts x Faction' compulsions in ATOW.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_religious_fanaticism</lookupName>
+    <displayName>Trivial Compulsion - Religious Fanaticism (ATOW)</displayName>
+    <desc><![CDATA[+2 to Interest/Theology checks, -1 to all Charisma-based skill checks.
+
+This SPA reflects the ATOW compulsion 'Religious' and has been renamed so as not to negatively reflect on religious persons.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_traumatic_past</lookupName>
+    <displayName>Trivial Compulsion - Traumatic Past (ATOW)</displayName>
+    <desc><![CDATA[-1 Edge.
+
+This SPA reflects the ATOW compulsion 'Trauma'.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_faction_pride</lookupName>
+    <displayName>Trivial Compulsion - Excessive Faction Pride (ATOW)</displayName>
+    <desc><![CDATA[Improve Loyalty by 1 if the character's faction matches the campaign faction. Otherwise, reduce Loyalty by 2.
+
+This SPA reflects the various 'faction x pride' ATOW compulsions.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_gambling</lookupName>
+    <displayName>Trivial Compulsion - Gambling (ATOW)</displayName>
+    <desc><![CDATA[Each month the character's Wealth Trait will randomly improve or decrease.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_hatred_authority</lookupName>
+    <displayName>Trivial Compulsion - Hatred of Authority (ATOW)</displayName>
+    <desc><![CDATA[Decreases Loyalty by 2, unless this character is the campaign commander.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_faction_loyalty</lookupName>
+    <displayName>Significant Compulsion - Excessive Faction Loyalty (ATOW)</displayName>
+    <desc><![CDATA[Improve Loyalty by 2 if the character's faction matches the campaign faction. Otherwise, reduce Loyalty by 3.
+
+This SPA reflects the various 'loyalty to x faction' ATOW compulsions.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-200</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_pathologic_racism</lookupName>
+    <displayName>Significant Compulsion - Pathologic Racism (ATOW)</displayName>
+    <desc><![CDATA[-2 Reputation.
+
+This SPA reflects the various 'hatred of x faction' ATOW compulsions.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-200</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_xenophobia</lookupName>
+    <displayName>Significant Compulsion - Xenophobia (ATOW)</displayName>
+    <desc><![CDATA[-1 Reputation, -1 Connections.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-200</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>compulsion_addiction</lookupName>
+    <displayName>Significant Compulsion - Addiction (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Drug Withdrawal' injury.
+
+If Advanced Medical is disabled, there is a weekly chance the character suffers a single Hit, instead.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-200</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_flashbacks</lookupName>
+    <displayName>Minor Psychosis - Flashbacks (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Flashbacks' injury.
+
+If Advanced Medical is disabled, there is a weekly chance the character suffers two Hits, instead.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-300</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_confusion</lookupName>
+    <displayName>Minor Psychosis - Confusion (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Confusion' injury.
+
+If Advanced Medical is disabled, there is a weekly chance the character hurts themselves in their confusion. Suffering two Hits, instead.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-300</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_clinical_paranoia</lookupName>
+    <displayName>Minor Psychosis - Clinical Paranoia (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character temporarily loses all levels in the Connections Trait, and suffering a -2 penalty on all Charisma-based checks for the week.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-300</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_split_personality</lookupName>
+    <displayName>Minor Psychosis - Split Personality (ATOW)</displayName>
+    <desc><![CDATA[The character gains a number of random personalities. Each week they have a chance to switch to one of their personalities.
+        
+While the character's personality has switched, they temporarily lose all levels in the Connections Trait.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-300</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_catatonia</lookupName>
+    <displayName>Major Psychosis - Catatonia (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Catatonia' injury.
+
+If Advanced Medical is disabled, there is a weekly chance the character suffers three Hits, instead.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-400</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_regression</lookupName>
+    <displayName>Major Psychosis - Regression (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character temporarily loses all Edge for the week.
+
+If Advanced Medical is disabled, there is a weekly chance the character suffers three Hits, instead.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-400</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_hysteria</lookupName>
+    <displayName>Major Psychosis - Hysteria (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character temporarily being affected by the Berserker, Confusion, or Clinical Paranoia effects.
+        
+- Berserker: The character gets into a fight with another character. Both characters suffer 1d6 Hits and may be killed.
+- Confusion: The character receives the 'Confusion' injury, or 2 Hits if Advanced Medical is disabled.
+- Clinical Paranoia: The character temporarily loses all levels in the Connections Trait, and suffers a -2 penalty on all Charisma-based checks for the week.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-400</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>madness_berserker</lookupName>
+    <displayName>Clinical Insanity - Berserker (ATOW)</displayName>
+    <desc><![CDATA[Incurs a weekly chance of the character getting into a fight with another character. Both characters suffer 1d6 Hits and may be killed.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
+    <xpCost>-500</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
 
     <!-- OTHER SPA -->
     <ability>
@@ -1225,6 +1455,12 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     </ability>
     <ability>
         <lookupName>clan_pilot_training</lookupName>
+        <displayName>Trivial Compulsion - Clan Honor (ATOW)</displayName>
+        <desc><![CDATA[-1 to melee attack rolls.
+
+This SPA is also known as 'Clan Pilot Training' in MegaMek.
+
+While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
         <xpCost>-1</xpCost>
         <weight>0</weight>
     </ability>
