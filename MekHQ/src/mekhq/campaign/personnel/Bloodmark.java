@@ -370,8 +370,6 @@ public class Bloodmark {
     static void processWounds(Campaign campaign, Person person, LocalDate today, int wounds) {
         boolean isUseAdvancedMedical = campaign.getCampaignOptions().isUseAdvancedMedical();
         if (isUseAdvancedMedical) {
-            // We want an injury count between 1 and 5 (inclusive), so use randomInt instead of d6.
-            // At 6 injuries, the character should be dead, and we don't want to kill anyone.
             if (wounds > 0) {
                 InjuryUtil.resolveCombatDamage(campaign, person, wounds);
             }
