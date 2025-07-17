@@ -878,6 +878,7 @@ public class PersonnelTableModelColumnTest {
                      WEALTH,
                      REPUTATION,
                      UNLUCKY,
+                     BLOODMARK,
                      EDGE,
                      SPA_COUNT,
                      IMPLANT_COUNT,

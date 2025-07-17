@@ -154,6 +154,11 @@ public class Person {
     public static final String UNLUCKY_LABEL = "UNLUCKY";
     public static final int MINIMUM_UNLUCKY = 0;
     public static final int MAXIMUM_UNLUCKY = 5;
+
+    public static final String BLOODMARK_LABEL = "BLOODMARK";
+    public static final int MINIMUM_BLOODMARK = 0;
+    public static final int MAXIMUM_BLOODMARK = 5;
+
     private static final String DELIMITER = "::";
 
 
@@ -220,6 +225,8 @@ public class Person {
     private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
+    private int bloodmark;
+    private List<LocalDate> bloodhuntSchedule;
     private Attributes atowAttributes;
 
     private PersonnelStatus status;
@@ -457,6 +464,8 @@ public class Person {
         hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
+        bloodmark = 0;
+        bloodhuntSchedule = new ArrayList<>();
         atowAttributes = new Attributes();
         dateOfDeath = null;
         recruitment = null;
@@ -2636,6 +2645,18 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
             }
 
+            if (bloodmark != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodmark", bloodmark);
+            }
+
+            if (!bloodhuntSchedule.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "bloodhuntSchedule");
+                for (LocalDate attemptDate : bloodhuntSchedule) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attemptDate", attemptDate);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "bloodhuntSchedule");
+            }
+
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "atowAttributes");
             atowAttributes.writeAttributesToXML(pw, indent);
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "atowAttributes");
@@ -3054,6 +3075,24 @@ public class Person {
                     person.reputation = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
                     person.unlucky = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("bloodmark")) {
+                    person.bloodmark = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("bloodhuntSchedule")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("attemptDate")) {
+                            logger.error("(techUnitIds) Unknown node type not loaded in bloodhuntSchedule nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+                        person.addBloodhuntDate(LocalDate.parse(wn3.getTextContent().trim()));
+                    }
                 } else if (nodeName.equalsIgnoreCase("atowAttributes")) {
                     person.atowAttributes = new Attributes().generateAttributesFromXML(wn2);
                 } else if (nodeName.equalsIgnoreCase("pilotHits")) {
@@ -5518,6 +5557,35 @@ public class Person {
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
         unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    public int getBloodmark() {
+        return bloodmark;
+    }
+
+    public Money getBloodmarkValue() {
+        return Money.of(bloodmark);
+    }
+
+    public void setBloodmark(final int unlucky) {
+        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+    }
+
+    public void changeBloodmark(final int delta) {
+        int newValue = bloodmark + delta;
+        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+    }
+
+    public List<LocalDate> getBloodhuntSchedule() {
+        return bloodhuntSchedule;
+    }
+
+    public void addBloodhuntDate(final LocalDate date) {
+        bloodhuntSchedule.add(date);
+    }
+
+    public void removeBloodhuntDate(final LocalDate date) {
+        bloodhuntSchedule.remove(date);
     }
 
     /**

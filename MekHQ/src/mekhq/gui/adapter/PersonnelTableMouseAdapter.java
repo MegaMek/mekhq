@@ -668,6 +668,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     case REPUTATION_LABEL -> selectedPerson.setReputation(target);
                     case WEALTH_LABEL -> selectedPerson.setWealth(target);
                     case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
+                    case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
                     default -> logger.error("Invalid trait type: {}", type);
                 }
 
@@ -3350,6 +3351,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target < MAXIMUM_UNLUCKY);
+            traitsMenu.add(menuItem);
+            menu.add(traitsMenu);
+
+            // Bloodmark
+            int bloodmark = person.getBloodmark();
+            target = bloodmark + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnBloodmark.text"), target, -traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  BLOODMARK_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target < MAXIMUM_BLOODMARK);
             traitsMenu.add(menuItem);
             menu.add(traitsMenu);
 
