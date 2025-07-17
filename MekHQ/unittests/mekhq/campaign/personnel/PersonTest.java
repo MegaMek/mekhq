@@ -27,6 +27,22 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
+import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
@@ -35,18 +51,10 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-
-import java.time.LocalDate;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 public class PersonTest {
     private Person mockPerson;
@@ -57,11 +65,11 @@ public class PersonTest {
         initAwards();
 
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
-        Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
-        Mockito.when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
+        when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
                 LocalDate.parse("3000-01-01"));
@@ -95,11 +103,11 @@ public class PersonTest {
         initAwards();
 
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
-        Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
-        Mockito.when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
+        when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
                 LocalDate.parse("3000-01-01"));
@@ -129,13 +137,13 @@ public class PersonTest {
         int is1WeightClass = EntityWeightClass.WEIGHT_LIGHT;
 
         Unit is1 = Mockito.mock(Unit.class);
-        Mockito.when(is1.getId()).thenReturn(is1Id);
+        when(is1.getId()).thenReturn(is1Id);
 
         Entity is1Entity = Mockito.mock(Entity.class);
-        Mockito.when(is1Entity.isClan()).thenReturn(false);
-        Mockito.when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOXSET);
-        Mockito.when(is1Entity.getWeightClass()).thenReturn(is1WeightClass);
-        Mockito.when(is1.getEntity()).thenReturn(is1Entity);
+        when(is1Entity.isClan()).thenReturn(false);
+        when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOXSET);
+        when(is1Entity.getWeightClass()).thenReturn(is1WeightClass);
+        when(is1.getEntity()).thenReturn(is1Entity);
 
         mockPerson.setOriginalUnit(is1);
         assertEquals(Person.TECH_IS1, mockPerson.getOriginalUnitTech());
@@ -154,13 +162,13 @@ public class PersonTest {
             int is2WeightClass = EntityWeightClass.WEIGHT_HEAVY;
 
             Unit is2 = Mockito.mock(Unit.class);
-            Mockito.when(is2.getId()).thenReturn(is2Id);
+            when(is2.getId()).thenReturn(is2Id);
 
             Entity is2Entity = Mockito.mock(Entity.class);
-            Mockito.when(is2Entity.isClan()).thenReturn(false);
-            Mockito.when(is2Entity.getTechLevel()).thenReturn(is2TechLevel);
-            Mockito.when(is2Entity.getWeightClass()).thenReturn(is2WeightClass);
-            Mockito.when(is2.getEntity()).thenReturn(is2Entity);
+            when(is2Entity.isClan()).thenReturn(false);
+            when(is2Entity.getTechLevel()).thenReturn(is2TechLevel);
+            when(is2Entity.getWeightClass()).thenReturn(is2WeightClass);
+            when(is2.getEntity()).thenReturn(is2Entity);
 
             mockPerson.setOriginalUnit(is2);
             assertEquals(Person.TECH_IS2, mockPerson.getOriginalUnitTech());
@@ -179,13 +187,13 @@ public class PersonTest {
             int clanWeightClass = EntityWeightClass.WEIGHT_MEDIUM;
 
             Unit clan = Mockito.mock(Unit.class);
-            Mockito.when(clan.getId()).thenReturn(clanId);
+            when(clan.getId()).thenReturn(clanId);
 
             Entity clanEntity = Mockito.mock(Entity.class);
-            Mockito.when(clanEntity.isClan()).thenReturn(true);
-            Mockito.when(clanEntity.getTechLevel()).thenReturn(clanTech);
-            Mockito.when(clanEntity.getWeightClass()).thenReturn(clanWeightClass);
-            Mockito.when(clan.getEntity()).thenReturn(clanEntity);
+            when(clanEntity.isClan()).thenReturn(true);
+            when(clanEntity.getTechLevel()).thenReturn(clanTech);
+            when(clanEntity.getWeightClass()).thenReturn(clanWeightClass);
+            when(clan.getEntity()).thenReturn(clanEntity);
 
             mockPerson.setOriginalUnit(clan);
             assertEquals(Person.TECH_CLAN, mockPerson.getOriginalUnitTech());
@@ -200,11 +208,11 @@ public class PersonTest {
 
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
+        when(unit0.getId()).thenReturn(id0);
 
         UUID id1 = UUID.randomUUID();
         Unit unit1 = Mockito.mock(Unit.class);
-        Mockito.when(unit1.getId()).thenReturn(id1);
+        when(unit1.getId()).thenReturn(id1);
 
         // Add a tech unit
         mockPerson.addTechUnit(unit0);
@@ -243,8 +251,8 @@ public class PersonTest {
 
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
-        Mockito.when(unit0.getScenarioId()).thenReturn(-1);
+        when(unit0.getId()).thenReturn(id0);
+        when(unit0.getScenarioId()).thenReturn(-1);
 
         mockPerson.setUnit(unit0);
         assertEquals(unit0, mockPerson.getUnit());
@@ -253,7 +261,7 @@ public class PersonTest {
         assertFalse(mockPerson.isDeployed());
 
         // Deploy the unit
-        Mockito.when(unit0.getScenarioId()).thenReturn(1);
+        when(unit0.getScenarioId()).thenReturn(1);
 
         // The person should now be deployed
         assertTrue(mockPerson.isDeployed());
@@ -270,7 +278,7 @@ public class PersonTest {
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
+        when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
 
@@ -289,14 +297,14 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
+        when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
 
@@ -313,14 +321,14 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
+        when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
 
@@ -337,14 +345,14 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
+        when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
 
@@ -361,14 +369,14 @@ public class PersonTest {
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
-        Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
+        when(mockCampaign.getName()).thenReturn("Campaign");
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
-        Mockito.when(unit0.getId()).thenReturn(id0);
+        when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
 
@@ -385,4 +393,115 @@ public class PersonTest {
     private void initAwards() {
         AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(), "TestSet");
     }
+
+    @Test
+    void testGambleWealth_rollLoosesWealth() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(3);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(2); // Simulate losing roll
+            gambler.gambleWealth();
+        }
+
+        int expected = 2;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_rollGainsWealth() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(3);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(6); // Simulate winning roll
+            gambler.gambleWealth();
+        }
+
+        int expected = 4;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_noWealthChange() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(3);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(4); // Simulate neutral roll
+            gambler.gambleWealth();
+        }
+
+        int expected = 3;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_noWealthChange_wealthTooHighForGain() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(MAXIMUM_WEALTH);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(6); // Simulate winning roll
+            gambler.gambleWealth();
+        }
+
+        int expected = MAXIMUM_WEALTH;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_noWealthChange_wealthTooLowForLoss() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(MINIMUM_WEALTH);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(1); // Simulate losing roll
+            gambler.gambleWealth();
+        }
+
+        int expected = MINIMUM_WEALTH;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
 }
