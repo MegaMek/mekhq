@@ -107,11 +107,17 @@ public class Bloodmark {
      * @author Illiani
      * @since 0.50.07
      */
-    public static List<LocalDate> getBloodhuntSchedule(final BloodmarkLevel level, LocalDate today) {
+    public static List<LocalDate> getBloodhuntSchedule(final BloodmarkLevel level, LocalDate today,
+          boolean characterHasAlternativeIDSPA) {
         LocalDate currentDate = today;
 
         // How often do bloodhunts occur?
         int frequency = level.getRollFrequency();
+
+        if (characterHasAlternativeIDSPA) {
+            frequency *= 2;
+        }
+
         if (frequency == 0) {
             return List.of();
         }

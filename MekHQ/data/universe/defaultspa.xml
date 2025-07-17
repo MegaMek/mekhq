@@ -548,7 +548,9 @@ They can make one additional procurement attempt per day.]]></desc>
     <ability>
         <lookupName>atow_alternate_id</lookupName>
         <displayName>Alternate ID (ATOW)</displayName>
-        <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streetwise and Protocols skill checks. This SPA reduces that penalty by 2.
+        <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streetwise, and Protocols skill checks. While ranks in the Bloodmark trait cause the character to be hunted by assassins.
+
+This SPA reduces the penalty from low Reputation by 2 and reduces the chance of an assassination attempt occurring by half.
 
 While this SPA does exist in ATOW (and that's where you'll find its description), these effects are unique to MekHQ.]]></desc>
         <xpCost>200</xpCost>

@@ -84,7 +84,7 @@ class BloodmarkTest {
     void testGetBloodhuntSchedule_NoBloodhuntDueToZeroFrequency() {
         BloodmarkLevel level = BloodmarkLevel.BLOODMARK_ZERO;
 
-        List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE);
+        List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
         assertTrue(result.isEmpty(), "Expected no assassination schedule for BLOODMARK_ZERO level.");
     }
@@ -96,7 +96,7 @@ class BloodmarkTest {
         try (MockedStatic<megamek.common.Compute> mockedCompute = mockStatic(megamek.common.Compute.class)) {
             mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(1);
 
-            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE);
+            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
             assertTrue(result.isEmpty(), "Expected no assassination schedule when the bloodhunt roll is not zero.");
         }
@@ -110,7 +110,7 @@ class BloodmarkTest {
             mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(0);
             mockedCompute.when(() -> megamek.common.Compute.d6(1)).thenReturn(0); // Divisor should prevent attempts
 
-            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE);
+            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
             assertTrue(result.isEmpty(), "Expected no assassination schedule due to zero divisor.");
         }
@@ -124,7 +124,7 @@ class BloodmarkTest {
             mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(0);
             mockedCompute.when(() -> megamek.common.Compute.d6(1)).thenReturn(2, 3); // One attempt with 3-day lag
 
-            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE);
+            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
             assertEquals(1, result.size(), "Expected one assassination attempt.");
             assertEquals(CURRENT_DATE.plusDays(3), result.get(0), "Incorrect date for assassination attempt.");
@@ -139,7 +139,7 @@ class BloodmarkTest {
             mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(0);
             mockedCompute.when(() -> megamek.common.Compute.d6(1)).thenReturn(6, 2, 3); // 2 assassination attempts
 
-            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE);
+            List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
             assertEquals(2, result.size(), "Expected two assassination attempts.");
             assertEquals(CURRENT_DATE.plusDays(2), result.get(0), "Incorrect date for first assassination attempt.");

@@ -57,6 +57,7 @@ import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -5321,7 +5322,8 @@ public class Campaign implements ITechManager {
                 int bloodmarkLevel = person.getBloodmark();
                 if (bloodmarkLevel > BLOODMARK_ZERO.getLevel()) {
                     BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
-                    List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay);
+                    boolean hasAlternativeID = person.getOptions().booleanOption(ATOW_ALTERNATE_ID);
+                    List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay, hasAlternativeID);
                     for (LocalDate assassinationAttempt : bloodmarkSchedule) {
                         person.addBloodhuntDate(assassinationAttempt);
                     }
