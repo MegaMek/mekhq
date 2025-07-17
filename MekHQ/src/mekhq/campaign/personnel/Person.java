@@ -1863,7 +1863,7 @@ public class Person {
 
         boolean hasFactionLoyalty = options.booleanOption(COMPULSION_FACTION_LOYALTY);
         if (hasFactionLoyalty) {
-            modifier += campaignFactionMatchesOriginFaction ? 1 : -3;
+            modifier += campaignFactionMatchesOriginFaction ? 1 : -4;
         }
 
         return loyalty + modifier;
