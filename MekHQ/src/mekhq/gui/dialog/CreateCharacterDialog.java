@@ -73,12 +73,12 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.clientGUI.DialogOptionListener;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.panels.DialogOptionComponentYPanel;
-import megamek.client.ui.clientGUI.DialogOptionListener;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
@@ -778,7 +778,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
         lblLoyalty.setName("lblLoyalty");
 
-        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setText(Integer.toString(person.getBaseLoyalty()));
         textLoyalty.setName("textLoyalty");
 
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
@@ -1671,7 +1671,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
         person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
-        person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getLoyalty()));
+        person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());

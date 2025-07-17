@@ -1842,8 +1842,41 @@ public class Person {
         this.retirement = retirement;
     }
 
+    /**
+     * Use {@link #getBaseLoyalty()} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getLoyalty() {
+        return getBaseLoyalty();
+    }
+
+    /**
+     * This method returns the character's base loyalty score.
+     *
+     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction)} instead.</p>
+     *
+     * @return the loyalty value as an {@link Integer}
+     */
+    public int getBaseLoyalty() {
         return loyalty;
+    }
+
+    /**
+     * Calculates and returns the adjusted loyalty value for the given campaign faction.
+     *
+     * @param campaignFaction the campaign {@link Faction} being compared with the origin {@link Faction}
+     *
+     * @return the loyalty value adjusted based on the provided campaign {@link Faction}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedLoyalty(Faction campaignFaction) {
+        boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
+
+        int modifier = 0;
+
+        return loyalty + modifier;
     }
 
     public void setLoyalty(int loyalty) {
@@ -2653,7 +2686,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {

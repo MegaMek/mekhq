@@ -2113,7 +2113,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction()));
         if ((campaignOptions.isUseLoyaltyModifiers()) &&
                   (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {
