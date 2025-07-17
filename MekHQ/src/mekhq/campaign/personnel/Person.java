@@ -1846,6 +1846,28 @@ public class Person {
         return loyalty;
     }
 
+    /**
+     * Calculates and returns the adjusted loyalty value for the given campaign faction.
+     *
+     * @param campaignFaction the campaign {@link Faction} being compared with the origin {@link Faction}
+     *
+     * @return the loyalty value adjusted based on the provided campaign {@link Faction}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedLoyalty(Faction campaignFaction) {
+        boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
+
+        int modifier = 0;
+        boolean hasHatredForAuthority = options.booleanOption(COMPULSION_ANARCHIST);
+        if (hasHatredForAuthority) {
+            modifier += commander ? 0 : -2;
+        }
+
+        return loyalty + modifier;
+    }
+
     public void setLoyalty(int loyalty) {
         this.loyalty = loyalty;
     }
