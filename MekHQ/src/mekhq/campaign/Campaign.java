@@ -53,12 +53,15 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
@@ -182,6 +185,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -193,6 +197,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -3217,7 +3222,7 @@ public class Campaign implements ITechManager {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   currentDay,
-                  person.getRankLevel());
+                  person.getRankNumeric());
 
             if (((person.getPrimaryRole() == role) || (person.getSecondaryRole() == role)) &&
                       (person.getSkill(primary) != null)) {
@@ -3249,7 +3254,7 @@ public class Campaign implements ITechManager {
                         int bestInRoleAdjustedReputation = bestInRole.getAdjustedReputation(isUseAgingEffects,
                               isClanCampaign,
                               currentDay,
-                              bestInRole.getRankLevel());
+                              bestInRole.getRankNumeric());
                         bestInRoleSecondarySkill = secondarySkill.getTotalSkillLevel(bestInRole.getOptions(),
                               bestInRole.getATOWAttributes(),
                               bestInRoleAdjustedReputation);
@@ -3287,7 +3292,7 @@ public class Campaign implements ITechManager {
             int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                   isClanCampaign(),
                   currentDay,
-                  person.getRankLevel());
+                  person.getRankNumeric());
             Skill skill = person.getSkill(skillName);
 
             int totalSkillLevel = Integer.MIN_VALUE;
@@ -3478,7 +3483,7 @@ public class Campaign implements ITechManager {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       isClanCampaign(),
                       currentDay,
-                      person.getRankLevel());
+                      person.getRankNumeric());
                 Skill skill = person.getSkill(skillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
@@ -3497,8 +3502,6 @@ public class Campaign implements ITechManager {
             for (Person person : getActivePersonnel(false)) {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
-                PersonnelOptions options = person.getOptions();
-
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3510,7 +3513,7 @@ public class Campaign implements ITechManager {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       isClanCampaign(),
                       currentDay,
-                      person.getRankLevel());
+                      person.getRankNumeric());
                 Skill skill = person.getSkill(skillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
@@ -3745,7 +3748,7 @@ public class Campaign implements ITechManager {
                     int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person1.getRankLevel());
+                          person1.getRankNumeric());
                     Skill skill = person1.getBestTechSkill();
 
                     int person1SkillLevel = Integer.MIN_VALUE;
@@ -3759,7 +3762,7 @@ public class Campaign implements ITechManager {
                     adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person2.getRankLevel());
+                          person2.getRankNumeric());
                     skill = person2.getBestTechSkill();
 
                     int person2SkillLevel = Integer.MIN_VALUE;
@@ -3775,7 +3778,7 @@ public class Campaign implements ITechManager {
                     int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person1.getRankLevel());
+                          person1.getRankNumeric());
                     Skill skill = person1.getSkill(S_TECH);
 
                     int person1SkillLevel = Integer.MIN_VALUE;
@@ -3789,7 +3792,7 @@ public class Campaign implements ITechManager {
                     adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person2.getRankLevel());
+                          person2.getRankNumeric());
                     skill = person2.getSkill(S_TECH);
 
                     int person2SkillLevel = Integer.MIN_VALUE;
@@ -5246,6 +5249,7 @@ public class Campaign implements ITechManager {
         boolean isCommandersDay = isCommandersDay(currentDay) &&
                                         getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
+        boolean isCampaignPlanetside = location.isOnPlanet();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
@@ -5272,7 +5276,10 @@ public class Campaign implements ITechManager {
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
-            medicalController.processMedicalEvents(person);
+            medicalController.processMedicalEvents(person,
+                  campaignOptions.isUseAgeEffects(),
+                  isClanCampaign(),
+                  currentDay);
 
             processAnniversaries(person);
 
@@ -5312,12 +5319,33 @@ public class Campaign implements ITechManager {
                 }
 
                 person.setHasPerformedExtremeExpenditure(false);
+
+                int bloodmarkLevel = person.getBloodmark();
+                if (bloodmarkLevel > BLOODMARK_ZERO.getLevel()) {
+                    BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
+                    boolean hasAlternativeID = person.getOptions().booleanOption(ATOW_ALTERNATE_ID);
+                    List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay, hasAlternativeID);
+                    for (LocalDate assassinationAttempt : bloodmarkSchedule) {
+                        person.addBloodhuntDate(assassinationAttempt);
+                    }
+                }
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
                 int age = person.getAge(currentDay);
                 if (age >= 6 && age <= 12) {
                     peopleWhoCelebrateCommandersDay++;
+                }
+            }
+
+            List<LocalDate> scheduledBloodhunts = person.getBloodhuntSchedule();
+            if (!scheduledBloodhunts.isEmpty()) {
+                boolean isDayOfBloodhunt = Bloodmark.checkForAssassinationAttempt(person,
+                      currentDay,
+                      isCampaignPlanetside);
+
+                if (isDayOfBloodhunt) {
+                    Bloodmark.performAssassinationAttempt(this, person, currentDay);
                 }
             }
         }
@@ -8216,7 +8244,7 @@ public class Campaign implements ITechManager {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               isClanCampaign(),
               currentDay,
-              person.getRankLevel());
+              person.getRankNumeric());
 
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()),
               skill.getSkillLevel(person.getOptions(), person.getATOWAttributes(), adjustedReputation).toString());
