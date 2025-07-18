@@ -1876,7 +1876,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              person.getRankLevel());
+              person.getRankNumeric());
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -2100,7 +2100,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              person.getRankLevel());
+              person.getRankNumeric());
         if (baseReputation != 0 || adjustedReputation != 0) {
             String adjustment = getTraitAdjustmentIcon(baseReputation, adjustedReputation);
             String reputationLabel = String.format(resourceMap.getString("format.traitValue"),

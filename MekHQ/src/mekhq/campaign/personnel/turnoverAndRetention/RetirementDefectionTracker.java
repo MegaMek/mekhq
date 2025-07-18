@@ -728,7 +728,7 @@ public class RetirementDefectionTracker {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   today,
-                  person.getRankLevel());
+                  person.getRankNumeric());
             int skillLevel = skill.getTotalSkillLevel(person.getOptions(),
                   person.getATOWAttributes(),
                   adjustedReputation);

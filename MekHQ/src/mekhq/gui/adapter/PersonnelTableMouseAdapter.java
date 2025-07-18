@@ -638,7 +638,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int adjustedReputation = selectedPerson.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
                       getCampaign().isClanCampaign(),
                       getCampaign().getLocalDate(),
-                      selectedPerson.getRankLevel());
+                      selectedPerson.getRankNumeric());
 
                 PerformanceLogger.improvedSkill(getCampaign(),
                       selectedPerson,
@@ -3170,7 +3170,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int adjustedReputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
                   getCampaign().isClanCampaign(),
                   getCampaign().getLocalDate(),
-                  person.getRankLevel());
+                  person.getRankNumeric());
 
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String typeName = SkillType.getSkillList()[i];
@@ -3331,10 +3331,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             traitsMenu.add(menuItem);
 
             // Reputation
-            int reputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
-                  getCampaign().isClanCampaign(),
-                  getCampaign().getLocalDate(),
-                  person.getRankLevel());
+            int reputation = person.getReputation();
             target = reputation + 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
