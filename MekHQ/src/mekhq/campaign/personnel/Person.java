@@ -1857,12 +1857,14 @@ public class Person {
      * @since 0.50.07
      */
     public int getAdjustedLoyalty(Faction campaignFaction) {
+        final int LOYALTY_PENALTY_FOR_ANARCHIST = -2;
+
         boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
 
         int modifier = 0;
         boolean hasHatredForAuthority = options.booleanOption(COMPULSION_ANARCHIST);
         if (hasHatredForAuthority) {
-            modifier += commander ? 0 : -2;
+            modifier += commander ? 0 : LOYALTY_PENALTY_FOR_ANARCHIST;
         }
 
         return loyalty + modifier;
