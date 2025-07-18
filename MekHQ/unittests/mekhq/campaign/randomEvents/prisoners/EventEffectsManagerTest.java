@@ -392,14 +392,14 @@ class EventEffectsManagerTest {
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
-        int oldLoyalty = prisoner.getLoyalty();
+        int oldLoyalty = prisoner.getBaseLoyalty();
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int expectedLoyalty = oldLoyalty + MAGNITUDE;
-        int actualLoyalty = prisoner.getLoyalty();
+        int actualLoyalty = prisoner.getBaseLoyalty();
 
         assertEquals(expectedLoyalty, actualLoyalty);
     }
@@ -430,10 +430,10 @@ class EventEffectsManagerTest {
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
-        List<Integer> oldLoyalties = List.of(prisoner0.getLoyalty(),
-              prisoner1.getLoyalty(),
-              prisoner2.getLoyalty(),
-              prisoner3.getLoyalty());
+        List<Integer> oldLoyalties = List.of(prisoner0.getBaseLoyalty(),
+                prisoner1.getBaseLoyalty(),
+                prisoner2.getBaseLoyalty(),
+                prisoner3.getBaseLoyalty());
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -442,7 +442,7 @@ class EventEffectsManagerTest {
         List<Person> currentPrisoners = mockCampaign.getCurrentPrisoners();
         for (int i = 0; i < currentPrisoners.size(); i++) {
             int expectedLoyalty = oldLoyalties.get(i) + MAGNITUDE;
-            int actualLoyalty = currentPrisoners.get(i).getLoyalty();
+            int actualLoyalty = currentPrisoners.get(i).getBaseLoyalty();
 
             assertEquals(expectedLoyalty, actualLoyalty);
         }

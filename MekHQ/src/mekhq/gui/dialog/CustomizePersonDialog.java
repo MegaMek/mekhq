@@ -878,7 +878,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
             lblLoyalty.setName("lblLoyalty");
 
-            textLoyalty.setText(Integer.toString(person.getLoyalty()));
+            textLoyalty.setText(Integer.toString(person.getBaseLoyalty()));
             textLoyalty.setName("textLoyalty");
 
             gridBagConstraints = new GridBagConstraints();
@@ -1446,7 +1446,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            currentValue = person.getLoyalty();
+            currentValue = person.getBaseLoyalty();
             person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), currentValue));
         }
 

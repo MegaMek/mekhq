@@ -1884,7 +1884,22 @@ public class Person {
         this.retirement = retirement;
     }
 
+    /**
+     * Use {@link #getBaseLoyalty()} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getLoyalty() {
+        return getBaseLoyalty();
+    }
+
+    /**
+     * This method returns the character's base loyalty score.
+     *
+     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction)} instead.</p>
+     *
+     * @return the loyalty value as an {@link Integer}
+     */
+    public int getBaseLoyalty() {
         return loyalty;
     }
 
@@ -2731,7 +2746,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
@@ -5613,13 +5628,14 @@ public class Person {
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankNumeric) {
-        int modifier = isUseAgingEffects ?
+        int modifiers = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
                                    !isNullOrBlank(bloodname),
                                    rankNumeric) :
                              0;
-        return reputation + modifier;
+
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
