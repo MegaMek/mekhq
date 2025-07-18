@@ -1362,7 +1362,7 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>madness_confusion</lookupName>
     <displayName>Minor Psychosis - Confusion (ATOW)</displayName>
-    <desc><![CDATA[Each week the character must pass a Willpower check (-4) or suffer one random Injury.
+    <desc><![CDATA[Each week the character must pass a Willpower check (with a -4 penalty) or suffer one random Injury.
 
 If Advanced Medical is disabled, the character suffers a single Hit instead of the Injury.
 
@@ -1422,7 +1422,7 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>madness_hysteria</lookupName>
     <displayName>Major Psychosis - Hysteria (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character temporarily being affected by the Berserker, Confusion, or Clinical Paranoia effects.
+    <desc><![CDATA[Each week the character is required to pass a Willpower check (with a -7 penalty) or become temporarily affected by the Berserker, Confusion, or Clinical Paranoia effects.
 
 - Berserker: The character flies into a berserker frenzy inflicting 1-2 random Injuries to themselves and up to 6 bystanders. If Advanced Medical is disabled, 1-2 Hits are inflicted, instead of Injuries.
 - Confusion: The character suffers one random Injury. If Advanced Medical is disabled, the character suffers a single Hit instead of the Injury.
