@@ -326,6 +326,7 @@ public class Skill {
             return modifier;
         }
 
+        final boolean hasReligiousFanaticism = characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM);
 
         String name = type.getName();
         // Reputation and Alternate ID
@@ -364,7 +365,7 @@ public class Skill {
                 modifier += 2;
             }
 
-            if (characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM)) {
+            if (hasReligiousFanaticism) {
                 modifier -= 1;
             }
         }
@@ -435,7 +436,7 @@ public class Skill {
 
         // Trivial Compulsion - Religious Fanaticism
         if (Objects.equals(S_INTEREST_THEOLOGY, name)) {
-            if (characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM)) {
+            if (hasReligiousFanaticism) {
                 modifier += 2;
             }
         }
