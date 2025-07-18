@@ -104,8 +104,14 @@ public class SkillCheckUtility {
           final boolean includeMarginsOfSuccessText) {
         this.person = person;
         this.skillName = skillName;
-        new SkillCheckUtility(person, skillName, externalModifiers, miscModifier, useEdge, includeMarginsOfSuccessText,
+        SkillCheckUtility proxy = new SkillCheckUtility(person, skillName, externalModifiers, miscModifier, useEdge,
+                includeMarginsOfSuccessText,
               false, false, LocalDate.of(3151, 1, 1));
+        marginOfSuccess = proxy.getMarginOfSuccess();
+        resultsText = proxy.getResultsText();
+        targetNumber = proxy.getTargetNumber();
+        roll = proxy.getRoll();
+        usedEdge = proxy.isUsedEdge();
     }
 
     /**
