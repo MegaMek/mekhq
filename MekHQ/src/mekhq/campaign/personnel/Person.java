@@ -6233,7 +6233,7 @@ public class Person {
                 Injury injury = CRIPPLING_FLASHBACKS.newInjury(campaign, this, INTERNAL, 1);
                 addInjury(injury);
             } else {
-                hits += 2;
+                hits += 1;
             }
 
             if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {

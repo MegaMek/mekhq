@@ -468,7 +468,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.setHits(4);
+        person.setHits(5);
 
         person.processCripplingFlashbacks(mockCampaign, false, true, true);
         assertEquals(0, person.getInjuries().size());
