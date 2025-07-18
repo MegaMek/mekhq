@@ -182,6 +182,7 @@ public class SkillCheckUtility {
     /**
      * Use {@link #performQuickSkillCheck(Person, String, List, int, boolean, boolean, LocalDate)} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static boolean performQuickSkillCheck(final Person person, final String skillName,
           final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier) {
         return performQuickSkillCheck(person, skillName, externalModifiers, miscModifier, false, false,
