@@ -447,11 +447,11 @@ public class AttributeCheckUtility {
      */
     private static void getAttributeModifiers(SkillAttribute firstSkillAttribute, SkillAttribute secondSkillAttribute,
           Attributes characterAttributes, TargetRoll targetNumber) {
-        int firstAttributeModifier = characterAttributes.getAttributeScore(firstSkillAttribute);
+        int firstAttributeModifier = -characterAttributes.getAttributeScore(firstSkillAttribute);
         targetNumber.addModifier(firstAttributeModifier, firstSkillAttribute.getLabel());
 
         if (secondSkillAttribute != null) {
-            int secondAttributeModifier = characterAttributes.getAttributeScore(secondSkillAttribute);
+            int secondAttributeModifier = -characterAttributes.getAttributeScore(secondSkillAttribute);
             targetNumber.addModifier(secondAttributeModifier, secondSkillAttribute.getLabel());
         }
     }
