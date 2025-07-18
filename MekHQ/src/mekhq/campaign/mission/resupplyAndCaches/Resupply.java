@@ -794,7 +794,7 @@ public class Resupply {
                 int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
                       campaign.isClanCampaign(),
                       campaign.getLocalDate(),
-                      negotiator.getRankLevel());
+                      negotiator.getRankNumeric());
                 int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(),
                       negotiator.getATOWAttributes(),
                       reputation);
