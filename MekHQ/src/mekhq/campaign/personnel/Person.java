@@ -357,22 +357,22 @@ public class Person {
         // no official AtB rules for really inexperienced scrubs, but...
         MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(5000));
 
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(10000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(25000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(50000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(100000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_HEROIC, Money.of(150000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_LEGENDARY, Money.of(200000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_GREEN, Money.of(10000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_REGULAR, Money.of(25000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_VETERAN, Money.of(50000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ELITE, Money.of(100000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_HEROIC, Money.of(150000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(200000));
 
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(1250));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(2500));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(5000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(10000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_HEROIC, Money.of(100000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_LEGENDARY, Money.of(150000));
+        OTHER_RANSOM_VALUES.put(EXP_NONE, Money.of(1250));
+        OTHER_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(2500));
+        OTHER_RANSOM_VALUES.put(EXP_GREEN, Money.of(5000));
+        OTHER_RANSOM_VALUES.put(EXP_REGULAR, Money.of(10000));
+        OTHER_RANSOM_VALUES.put(EXP_VETERAN, Money.of(25000));
+        OTHER_RANSOM_VALUES.put(EXP_ELITE, Money.of(50000));
+        OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
+        OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
     }
     // endregion Variable Declarations
 
@@ -1182,30 +1182,30 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
-                  SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS,
-                  SkillType.S_SENSOR_OPERATIONS,
-                  SkillType.S_ART_COOKING).anyMatch(this::hasSkill);
-            case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
-            case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
-            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
-            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
-            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
-            case DOCTOR -> hasSkill(SkillType.S_SURGERY);
+            case VEHICLE_CREW -> Stream.of(S_TECH_MEK,
+                  S_TECH_AERO,
+                  S_TECH_MECHANIC,
+                  S_TECH_BA,
+                  S_SURGERY,
+                  S_MEDTECH,
+                  S_ASTECH,
+                  S_COMMUNICATIONS,
+                  S_SENSOR_OPERATIONS,
+                  S_ART_COOKING).anyMatch(this::hasSkill);
+            case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
+            case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
+            case MEK_TECH -> hasSkill(S_TECH_MEK);
+            case AERO_TEK -> hasSkill(S_TECH_AERO);
+            case BA_TECH -> hasSkill(S_TECH_BA);
+            case DOCTOR -> hasSkill(S_SURGERY);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(SkillType.S_ADMIN);
+                  hasSkill(S_ADMIN);
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (isChild(today, true)) {
                     yield false;
                 } else {
-                    yield hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
+                    yield hasSkill(S_ART_OTHER) && hasSkill(S_ACTING);
                 }
             }
             case LUXURY_COMPANION -> {
@@ -1213,7 +1213,7 @@ public class Person {
                 if (isChild(today, true)) {
                     yield false;
                 } else {
-                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
+                    yield hasSkill(S_ACTING) && hasSkill(S_PROTOCOLS);
                 }
             }
             default -> {
@@ -1474,7 +1474,7 @@ public class Person {
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
                   "<span color=" + getWarningColor() + "'>",
-                  ReportingUtilities.CLOSING_SPAN_TAG));
+                  CLOSING_SPAN_TAG));
         }
     }
 
@@ -1570,7 +1570,7 @@ public class Person {
 
         // choose the color and string based on the loyalty comparison.
         if (originalLoyalty > loyalty) {
-            color = ReportingUtilities.getNegativeColor();
+            color = getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
             color = ReportingUtilities.getPositiveColor();
@@ -3468,7 +3468,7 @@ public class Person {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      spanOpeningWithCustomColor(getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -3938,32 +3938,32 @@ public class Person {
                           isAlternativeQualityAveraging,
                           adjustedReputation);
                 } else {
-                    if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
-                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
-                              (getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
-                    } else if (hasSkill(SkillType.S_GUN_VEE)) {
-                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes);
-                    } else if (hasSkill(SkillType.S_ARTILLERY)) {
-                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes);
+                    if ((hasSkill(S_GUN_VEE)) && (hasSkill(S_ARTILLERY))) {
+                        yield Math.max((getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
+                              (getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
+                    } else if (hasSkill(S_GUN_VEE)) {
+                        yield getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes);
+                    } else if (hasSkill(S_ARTILLERY)) {
+                        yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes);
                     } else {
-                        yield SkillType.EXP_NONE;
+                        yield EXP_NONE;
                     }
                 }
             }
             case VEHICLE_CREW -> {
                 // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
-                List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
-                      SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
-                      SkillType.S_TECH_BA,
-                      SkillType.S_SURGERY,
-                      SkillType.S_MEDTECH,
-                      SkillType.S_ASTECH,
-                      SkillType.S_COMMUNICATIONS,
-                      SkillType.S_ART_COOKING,
-                      SkillType.S_SENSOR_OPERATIONS);
-                int highestExperienceLevel = SkillType.EXP_NONE;
+                List<String> relevantSkills = List.of(S_TECH_MEK,
+                      S_TECH_AERO,
+                      S_TECH_MECHANIC,
+                      S_TECH_BA,
+                      S_SURGERY,
+                      S_MEDTECH,
+                      S_ASTECH,
+                      S_COMMUNICATIONS,
+                      S_ART_COOKING,
+                      S_SENSOR_OPERATIONS);
+                int highestExperienceLevel = EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
 
@@ -3980,10 +3980,10 @@ public class Person {
                 yield highestExperienceLevel;
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
 
-                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
+                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION);
                 negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
@@ -3998,7 +3998,7 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    yield SkillType.EXP_NONE;
+                    yield EXP_NONE;
                 } else {
                     yield Math.max(0, levelSum / divisor);
                 }
@@ -4043,7 +4043,7 @@ public class Person {
           int adjustedReputation) {
         if (skillNames.isEmpty()) {
             // If we're not tracking skills for this profession, it always counts as REGULAR
-            return SkillType.EXP_REGULAR;
+            return EXP_REGULAR;
         }
 
         int totalSkillLevel = 0;
@@ -4056,13 +4056,13 @@ public class Person {
                 // If a character is missing a skill, it means they're unqualified for a profession. They will lose
                 // that profession the next time the campaign is loaded. We don't remove it here as that would
                 // require passing in a bunch of extra information that is largely irrelevant.
-                return SkillType.EXP_NONE;
+                return EXP_NONE;
             }
 
-            SkillType skillType = SkillType.getType(skillName);
+            SkillType skillType = getType(skillName);
             if (skillType == null) {
                 logger.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
-                return SkillType.EXP_NONE;
+                return EXP_NONE;
             }
 
             int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
@@ -4082,11 +4082,11 @@ public class Person {
             return expectedExperienceLevel;
         }
 
-        int averageSkillLevel = (int) Math.floor((double) totalSkillLevel / skillNames.size());
+        int averageSkillLevel = (int) floor((double) totalSkillLevel / skillNames.size());
 
         Skill skill = getSkill(skillNames.get(0));
         if (skill == null) {
-            return SkillType.EXP_NONE;
+            return EXP_NONE;
         }
 
         return skill.getType().getExperienceLevel(averageSkillLevel);
@@ -4244,7 +4244,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b>Failed to heal.</b></font>";
+        return " <font color='" + getNegativeColor() + "'><b>Failed to heal.</b></font>";
     }
 
     // region skill
@@ -5168,7 +5168,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        Skill administration = skills.getSkill(S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -5185,7 +5185,7 @@ public class Person {
     }
 
     public boolean isDoctor() {
-        return hasSkill(SkillType.S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+        return hasSkill(S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
     }
 
     /**
@@ -5216,7 +5216,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        Skill administration = skills.getSkill(S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -6463,6 +6463,30 @@ public class Person {
         }
 
         sufferingFromClinicalParanoia = false;
+        return "";
+    }
+
+    public String processHysteria(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasHysteria, boolean failedWillpowerCheck) {
+
+        if (hasHysteria && failedWillpowerCheck) {
+            int roll = d6(1);
+            String report = switch (roll) {
+                case 1, 2 -> processBerserkerFrenzy(campaign, useAdvancedMedical, true, true);
+                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, true, true);
+                case 5, 6 -> processClinicalParanoia(true, true);
+                default -> throw new IllegalStateException("Unexpected value: " + roll);
+            };
+
+            // Reset paranoia
+            if (roll < 5) {
+                sufferingFromClinicalParanoia = false;
+            }
+
+            return report;
+        }
+
         return "";
     }
 }

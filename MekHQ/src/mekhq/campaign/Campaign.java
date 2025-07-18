@@ -56,6 +56,8 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_HYSTERIA;
+import static mekhq.campaign.personnel.PersonnelOptions.getCompulsionCheckModifier;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -66,6 +68,7 @@ import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWi
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
@@ -223,6 +226,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -5246,10 +5250,13 @@ public class Campaign implements ITechManager {
         boolean isCommandersDay = isCommandersDay(currentDay) &&
                                         getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
+        boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
+
+            PersonnelOptions personnelOptions = person.getOptions();
 
             // Daily events
             if (person.getStatus().isMIA()) {
@@ -5287,6 +5294,20 @@ public class Campaign implements ITechManager {
 
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
+                }
+
+                if (personnelOptions.booleanOption(MADNESS_HYSTERIA)) {
+                    int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    String report = person.processHysteria(this, true, isUseAdvancedMedical, failedWillpowerCheck);
+                    if (!report.isBlank()) {
+                        addReport(report);
+                    }
+                } else {
+                    // This is necessary to stop a character from getting permanently locked in a paranoia state if
+                    // their madness is removed.
+                    person.setSufferingFromClinicalParanoia(false);
                 }
             }
 
