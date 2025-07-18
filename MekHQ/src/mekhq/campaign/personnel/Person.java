@@ -321,6 +321,8 @@ public class Person {
     private String personalityInterviewNotes;
     // endregion Personality
 
+    private boolean sufferingFromClinicalParanoia;
+
     // region Flags
     private boolean clanPersonnel;
     private boolean commander;
@@ -512,6 +514,7 @@ public class Person {
         reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
         personalityInterviewNotes = "";
+        sufferingFromClinicalParanoia = false;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -2390,6 +2393,14 @@ public class Person {
         this.personalityInterviewNotes = personalityInterviewNotes;
     }
 
+    public boolean isSufferingFromClinicalParanoia() {
+        return sufferingFromClinicalParanoia;
+    }
+
+    public void setSufferingFromClinicalParanoia(final boolean sufferingFromClinicalParanoia) {
+        this.sufferingFromClinicalParanoia = sufferingFromClinicalParanoia;
+    }
+
     // region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -2866,6 +2877,13 @@ public class Person {
 
             if (!isNullOrBlank(personalityInterviewNotes)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
+            }
+
+            if (sufferingFromClinicalParanoia) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "sufferingFromClinicalParanoia",
+                      sufferingFromClinicalParanoia);
             }
 
             // region Flags
@@ -3354,6 +3372,8 @@ public class Person {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
                     person.personalityInterviewNotes = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
+                    person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
@@ -5406,6 +5426,33 @@ public class Person {
         return connections;
     }
 
+    /**
+     * Calculates and returns the character's adjusted Connections value.
+     *
+     * <p>If the character is suffering from an episode of Clinical Paranoia, their Connections value is fixed as
+     * 0.</p>
+     *
+     * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
+     * increased by 1.</p>
+     *
+     * <p>The connections value is clamped within the allowed minimum and maximum range before being returned.</p>
+     *
+     * @return the character's Connections value, clamped within the minimum and maximum limits
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedConnections() {
+        if (sufferingFromClinicalParanoia) {
+            return 0;
+        }
+
+        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+
+        int modifiers = (hasCitizenship ? 1 : 0);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
     public void setConnections(final int connections) {
         this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
@@ -6388,5 +6435,34 @@ public class Person {
             potentialVictims.remove(victim);
             victims.add(victim);
         }
+    }
+
+    /**
+     * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
+     * check, and returns a formatted warning message if applicable.
+     *
+     * <p>If both {@code hasClinicalParanoia} and {@code failedWillpowerCheck} are {@code true}, this method sets the
+     * internal state indicating the member is suffering from clinical paranoia and returns a warning message.
+     * Otherwise, it resets the state and returns an empty string.</p>
+     *
+     * @param hasClinicalParanoia  {@code true} if the personnel member has the clinical paranoia condition
+     * @param failedWillpowerCheck {@code true} if the personnel member failed their willpower check
+     *
+     * @return A formatted warning message if clinical paranoia applies, or an empty string otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processClinicalParanoia(
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasClinicalParanoia, boolean failedWillpowerCheck) {
+        if (hasClinicalParanoia && failedWillpowerCheck) {
+            sufferingFromClinicalParanoia = true;
+            return String.format(resources.getString("compulsion.clinicalParanoia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        sufferingFromClinicalParanoia = false;
+        return "";
     }
 }
