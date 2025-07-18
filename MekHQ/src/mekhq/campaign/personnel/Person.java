@@ -4582,7 +4582,7 @@ public class Person {
     public int getAdjustedEdge() {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
         int modifier = hasTraumaticPast ? -1 : 0;
-        return getOptions().intOption(OptionsConstants.EDGE) - unlucky + modifier;
+        return options.intOption(OptionsConstants.EDGE) - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
