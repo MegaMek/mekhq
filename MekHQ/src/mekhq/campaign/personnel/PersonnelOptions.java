@@ -111,6 +111,34 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ADMIN_NETWORKER = "admin_networker";
     public static final String ADMIN_INTERSTELLAR_NEGOTIATOR = "admin_interstellar_negotiator";
 
+    public static final String COMPULSION_UNPLEASANT_PERSONALITY = "compulsion_unpleasant_personality";
+    public static final String COMPULSION_MILD_PARANOIA = "compulsion_mild_paranoia";
+    public static final String COMPULSION_RACISM = "compulsion_racism";
+    public static final String COMPULSION_RELIGIOUS_FANATICISM = "compulsion_religious_fanaticism";
+    public static final String COMPULSION_TRAUMATIC_PAST = "compulsion_traumatic_past";
+    public static final String COMPULSION_FACTION_PRIDE = "compulsion_faction_pride";
+    public static final String COMPULSION_GAMBLING = "compulsion_gambling";
+    public static final String COMPULSION_ANARCHIST = "compulsion_hatred_authority";
+    public static final String COMPULSION_FACTION_LOYALTY = "compulsion_faction_loyalty";
+    public static final String COMPULSION_PATHOLOGIC_RACISM = "compulsion_pathologic_racism";
+    public static final String COMPULSION_XENOPHOBIA = "compulsion_xenophobia";
+    public static final String COMPULSION_ADDICTION = "compulsion_addiction";
+
+    public static final String MADNESS_FLASHBACKS = "madness_flashbacks";
+    public static final String MADNESS_CONFUSION = "madness_confusion";
+    public static final String MADNESS_CLINICAL_PARANOIA = "madness_clinical_paranoia";
+    public static final String MADNESS_SPLIT_PERSONALITY = "madness_split_personality";
+    public static final String MADNESS_CATATONIA = "madness_catatonia";
+    public static final String MADNESS_REGRESSION = "madness_regression";
+    public static final String MADNESS_HYSTERIA = "madness_hysteria";
+    public static final String MADNESS_BERSERKER = "madness_berserker";
+
+    public static final int COMPULSION_CHECK_MODIFIER_TRIVIAL = 0; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_SIGNIFICANT = -2; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_MAJOR = -4; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_SEVERE = -7; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_EXTREME = -10; // ATOW pg 110
+
     @Override
     public void initialize() {
         super.initialize();
@@ -201,6 +229,28 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ADMIN_NETWORKER, false);
         addOption(l3a, ADMIN_INTERSTELLAR_NEGOTIATOR, false);
 
+        addOption(l3a, COMPULSION_UNPLEASANT_PERSONALITY, false);
+        addOption(l3a, COMPULSION_MILD_PARANOIA, false);
+        addOption(l3a, COMPULSION_RACISM, false);
+        addOption(l3a, COMPULSION_RELIGIOUS_FANATICISM, false);
+        addOption(l3a, COMPULSION_TRAUMATIC_PAST, false);
+        addOption(l3a, COMPULSION_FACTION_PRIDE, false);
+        addOption(l3a, COMPULSION_GAMBLING, false);
+        addOption(l3a, COMPULSION_ANARCHIST, false);
+        addOption(l3a, COMPULSION_FACTION_LOYALTY, false);
+        addOption(l3a, COMPULSION_PATHOLOGIC_RACISM, false);
+        addOption(l3a, COMPULSION_XENOPHOBIA, false);
+        addOption(l3a, COMPULSION_ADDICTION, false);
+
+        addOption(l3a, MADNESS_FLASHBACKS, false);
+        addOption(l3a, MADNESS_CONFUSION, false);
+        addOption(l3a, MADNESS_CLINICAL_PARANOIA, false);
+        addOption(l3a, MADNESS_SPLIT_PERSONALITY, false);
+        addOption(l3a, MADNESS_CATATONIA, false);
+        addOption(l3a, MADNESS_REGRESSION, false);
+        addOption(l3a, MADNESS_HYSTERIA, false);
+        addOption(l3a, MADNESS_BERSERKER, false);
+
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
@@ -275,6 +325,38 @@ public class PersonnelOptions extends PilotOptions {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the check modifier associated with a specific compulsion or mental state.
+     *
+     * <p>This method maps a given compulsion or madness name to its corresponding check modifier, representing the
+     * impact of various psychological traits or conditions on compulsion-related rolls. The modifier value reflects the
+     * severity of the condition, ranging from trivial to extreme.</p>
+     *
+     * @param name the name of the compulsion or mental state for which to retrieve the check modifier
+     *
+     * @return the {@link Integer} value representing the check modifier for the specified state
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static int getCompulsionCheckModifier(String name) {
+        return switch (name) {
+            case COMPULSION_UNPLEASANT_PERSONALITY, COMPULSION_MILD_PARANOIA, COMPULSION_RACISM,
+                 COMPULSION_RELIGIOUS_FANATICISM, COMPULSION_TRAUMATIC_PAST, COMPULSION_FACTION_PRIDE,
+                 COMPULSION_GAMBLING, COMPULSION_ANARCHIST -> COMPULSION_CHECK_MODIFIER_TRIVIAL;
+            case COMPULSION_FACTION_LOYALTY, COMPULSION_PATHOLOGIC_RACISM, COMPULSION_XENOPHOBIA,
+                 COMPULSION_ADDICTION -> COMPULSION_CHECK_MODIFIER_SIGNIFICANT;
+            case MADNESS_FLASHBACKS, MADNESS_CONFUSION, MADNESS_CLINICAL_PARANOIA, MADNESS_SPLIT_PERSONALITY ->
+                  COMPULSION_CHECK_MODIFIER_MAJOR;
+            case MADNESS_CATATONIA, MADNESS_REGRESSION, MADNESS_HYSTERIA -> COMPULSION_CHECK_MODIFIER_SEVERE;
+            case MADNESS_BERSERKER -> COMPULSION_CHECK_MODIFIER_EXTREME;
+            default -> {
+                logger.warn("Unexpected compulsion name provided: {}", name);
+                yield COMPULSION_CHECK_MODIFIER_TRIVIAL;
+            }
+        };
     }
 
     @Override
