@@ -66,7 +66,7 @@ import mekhq.utilities.ReportingUtilities;
  * @since 0.50.05
  */
 public class SkillCheckUtility {
-    private static final MMLogger logger = MMLogger.create(SkillCheckUtility.class);
+    private static final MMLogger LOGGER = MMLogger.create(SkillCheckUtility.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
 
     /**
@@ -246,7 +246,7 @@ public class SkillCheckUtility {
      */
     private boolean isPersonNull() {
         if (person == null) {
-            logger.debug("Null person passed into SkillCheckUtility." +
+            LOGGER.debug("Null person passed into SkillCheckUtility." +
                                " Auto-failing check with bogus results so the bug stands out.");
 
             marginOfSuccess = getMarginValue(DISASTROUS);
@@ -575,14 +575,9 @@ public class SkillCheckUtility {
         if (roll >= targetNumberValue || !useEdge || availableEdge < 1) {
             int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
 
-            logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.report"),
-                  skillName,
-                  roll,
-                  targetNumber,
-                  difference);
-
             marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
             resultsText = generateResultsText(includeMarginsOfSuccessText);
+            LOGGER.info(resultsText);
             return true;
         }
         return false;
@@ -656,7 +651,7 @@ public class SkillCheckUtility {
           final SkillType skillType) {
         // Validation
         if (targetNumber == null || characterAttributes == null || skillType == null) {
-            logger.error("Null parameter passed into SkillCheckUtility.getTotalAttributeScoreForSkill." +
+            LOGGER.error("Null parameter passed into SkillCheckUtility.getTotalAttributeScoreForSkill." +
                                " targetNumber: {}, characterAttributes: {}, skillType: {}", targetNumber, characterAttributes,
                   skillType);
             return 0;
