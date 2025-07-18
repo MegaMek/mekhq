@@ -46,14 +46,17 @@ import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.log.LogEntryType.SERVICE;
+import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
@@ -1467,7 +1470,7 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
+                  "<span color=" + getWarningColor() + "'>",
                   ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
@@ -3436,7 +3439,7 @@ public class Person {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -6199,5 +6202,43 @@ public class Person {
 
             recruitment = today;
         }
+    }
+
+    /**
+     * Processes the effects of childlike regression on the character, applying injuries or health complications based
+     * on specified conditions.
+     *
+     * <p>If the character has childlike regression and fails a willpower check, the method will apply either an
+     * injury (using advanced medical rules) or increment the number of "hits" (using basic rules). If the total number
+     * of injuries or hits exceeds a defined threshold, the personnel status is changed to indicate medical
+     * complications (killed).</p>
+     *
+     * @param campaign             the {@link Campaign} context in which the effects are processed
+     * @param useAdvancedMedical   {@code true} to use advanced medical injury processing
+     * @param hasRegression        {@code true} if the character is affected by childlike regression
+     * @param failedWillpowerCheck {@code true} if the character failed their willpower check
+     */
+    public String processChildlikeRegression(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasRegression, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasRegression && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.regression"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
     }
 }

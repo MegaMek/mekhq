@@ -80,6 +80,7 @@ public final class InjuryTypes {
     // New injury types go here (or extend the class)
     public static final InjuryType SEVERED_SPINE = new SeveredSpine();
     public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
+    public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
 
     // Replacement Limbs
     public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
@@ -116,6 +117,7 @@ public final class InjuryTypes {
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
             InjuryType.register("am:Postpartum_Recovery", POSTPARTUM_RECOVERY);
             InjuryType.register("am:Transit_Disorientation_Syndrome", TRANSIT_DISORIENTATION_SYNDROME);
+            InjuryType.register("am:Childlike_Regression", CHILDLIKE_REGRESSION);
             registered = true;
         }
     }
@@ -811,6 +813,23 @@ public final class InjuryTypes {
         public Collection<Modifier> getModifiers(Injury inj) {
             return List.of(new Modifier(GUNNERY, 1, null, InjuryType.MODTAG_INJURY),
                   new Modifier(PILOTING, 1, null, InjuryType.MODTAG_INJURY));
+        }
+    }
+
+    public static final class ChildlikeRegression extends AMInjuryType {
+        public ChildlikeRegression() {
+            recoveryTime = 7;
+            allowedLocations = EnumSet.of(BodyLocation.INTERNAL);
+            fluffText = "Childlike Regression";
+            simpleName = "Childlike Regression";
+            maxSeverity = 1;
+            level = InjuryLevel.MINOR;
+        }
+
+        @Override
+        public Collection<Modifier> getModifiers(Injury inj) {
+            return List.of(new Modifier(GUNNERY, 4, null, InjuryType.MODTAG_INJURY),
+                  new Modifier(PILOTING, 4, null, InjuryType.MODTAG_INJURY));
         }
     }
 }
