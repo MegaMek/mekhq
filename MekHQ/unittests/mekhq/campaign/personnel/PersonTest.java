@@ -395,7 +395,7 @@ public class PersonTest {
     }
 
     @Test
-    void testGambleWealth_rollLoosesWealth() {
+    void testGambleWealth_rollLosesWealth() {
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
