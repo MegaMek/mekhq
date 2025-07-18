@@ -746,7 +746,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         y++;
 
         lblBloodmark.setText(resourceMap.getString("lblBloodmark.text"));
-        lblReputation.setName("lblBloodmark");
+        lblBloodmark.setName("lblBloodmark");
 
         textBloodmark.setText(Integer.toString(person.getBloodmark()));
         textBloodmark.setName("textBloodmark");
