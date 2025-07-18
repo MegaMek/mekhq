@@ -34,6 +34,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -44,6 +45,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
@@ -75,7 +77,7 @@ public class SkillCheckDialog {
     private final Campaign campaign;
     private final Person character;
     boolean isSuccess = false;
-    private List<String> skillNames = new ArrayList<>();
+    private final List<String> skillNames = new ArrayList<>();
 
 
     /**
@@ -94,8 +96,12 @@ public class SkillCheckDialog {
         this.campaign = campaign;
         this.character = character;
 
+        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+
         // Initial Dialog
-        ImmersiveDialogCore dialog = getInitialDialog();
+        ImmersiveDialogCore dialog = getInitialDialog(isUseAgingEffects, isClanCampaign, today);
         int choiceIndex = dialog.getDialogChoice();
 
         if (choiceIndex == DIALOG_CANCEL_INDEX) {
@@ -103,7 +109,8 @@ public class SkillCheckDialog {
         }
 
         // Perform Check
-        String results = performSkillCheck(dialog.getComboBoxChoiceIndex(), dialog.getSpinnerValue(), choiceIndex);
+        String results = performSkillCheck(dialog.getComboBoxChoiceIndex(), dialog.getSpinnerValue(), choiceIndex,
+              isUseAgingEffects, isClanCampaign, today);
 
         // Results Dialog
         campaign.addReport(results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
@@ -121,7 +128,7 @@ public class SkillCheckDialog {
      * @author Illiani
      * @since 0.50.05
      */
-    private ImmersiveDialogCore getInitialDialog() {
+    private ImmersiveDialogCore getInitialDialog(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         return new ImmersiveDialogCore(campaign,
               character,
               null,
@@ -130,7 +137,7 @@ public class SkillCheckDialog {
               getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"),
               null,
               false,
-              getSupplementalPanel(),
+              getSupplementalPanel(isUseAgingEffects, isClanCampaign, today),
               new ImageIcon(DIALOG_IMAGE_FILENAME_DEFAULT),
               true);
     }
@@ -147,10 +154,12 @@ public class SkillCheckDialog {
      * @author Illiani
      * @since 0.50.05
      */
-    private String performSkillCheck(int selectedSkill, int selectedModifier, int choiceIndex) {
+    private String performSkillCheck(int selectedSkill, int selectedModifier, int choiceIndex,
+          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         String skillName = skillNames.get(selectedSkill);
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
-        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, null, selectedModifier, useEdge, true);
+        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, null, selectedModifier, useEdge, true,
+              isUseAgingEffects, isClanCampaign, today);
         isSuccess = utility.isSuccess();
 
         return utility.getResultsText();
@@ -226,7 +235,7 @@ public class SkillCheckDialog {
      * @author Illiani
      * @since 0.50.05
      */
-    private JPanel getSupplementalPanel() {
+    private JPanel getSupplementalPanel(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = createBaseConstraints();
 
@@ -235,7 +244,8 @@ public class SkillCheckDialog {
         addComponent(panel, lblSkills, constraints, 0, 0, 1, GridBagConstraints.NONE);
 
         // Add ComboBox
-        MMComboBox<String> cboSkills = new MMComboBox<>("cboSkills", getComboListItems());
+        MMComboBox<String> cboSkills = new MMComboBox<>("cboSkills",
+              getComboListItems(isUseAgingEffects, isClanCampaign, today));
         addComponent(panel, cboSkills, constraints, 1, 0, 2, GridBagConstraints.HORIZONTAL);
 
         // Add label for spinner
@@ -299,12 +309,18 @@ public class SkillCheckDialog {
      * @author Illiani
      * @since 0.50.05
      */
-    private String[] getComboListItems() {
+    private String[] getComboListItems(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         List<String> skills = new ArrayList<>();
 
         for (String skillName : SkillType.getSkillList()) {
             SkillType skillType = SkillType.getType(skillName);
-            int targetNumber = determineTargetNumber(character, skillType, 0).getValue();
+            TargetRoll targetRoll = determineTargetNumber(character,
+                  skillType,
+                  0,
+                  isUseAgingEffects,
+                  isClanCampaign,
+                  today);
+            int targetNumber = targetRoll.getValue();
             boolean isCountsUp = SkillType.getType(skillName).isCountUp();
 
             // Build the label with the target number
