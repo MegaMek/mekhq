@@ -27,26 +27,35 @@
  */
 package mekhq.campaign.personnel;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
+import mekhq.campaign.randomEvents.personalities.enums.Aggression;
+import mekhq.campaign.randomEvents.personalities.enums.Ambition;
+import mekhq.campaign.randomEvents.personalities.enums.Greed;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.time.LocalDate;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 public class PersonTest {
     private Person mockPerson;
@@ -385,4 +394,146 @@ public class PersonTest {
     private void initAwards() {
         AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(), "TestSet");
     }
+
+    @Test
+    void testSwitchPersonality_singleSwitch_allFieldsChanged() {
+        Person before = createPersonality();
+
+        Person after = createPersonality();
+        after.switchPersonality();
+
+        assertEquals(before.getStoredGivenName(), after.getGivenName());
+        assertEquals(before.getStoredSurname(), after.getSurname());
+        assertEquals(before.getStoredLoyalty(), after.getLoyalty());
+        assertEquals(before.getStoredOriginFaction().getShortName(), after.getOriginFaction().getShortName());
+        assertEquals(before.getStoredAggression(), after.getAggression());
+        assertEquals(before.getStoredAggressionDescriptionIndex(), after.getAggressionDescriptionIndex());
+        assertEquals(before.getStoredAmbition(), after.getAmbition());
+        assertEquals(before.getStoredAmbitionDescriptionIndex(), after.getAmbitionDescriptionIndex());
+        assertEquals(before.getStoredGreed(), after.getGreed());
+        assertEquals(before.getStoredGreedDescriptionIndex(), after.getGreedDescriptionIndex());
+        assertEquals(before.getStoredSocial(), after.getSocial());
+        assertEquals(before.getStoredSocialDescriptionIndex(), after.getSocialDescriptionIndex());
+        assertEquals(before.getStoredPersonalityQuirk(), after.getPersonalityQuirk());
+        assertEquals(before.getStoredPersonalityQuirkDescriptionIndex(), after.getPersonalityQuirkDescriptionIndex());
+        assertEquals(before.getStoredReasoning(), after.getReasoning());
+        assertEquals(before.getStoredReasoningDescriptionIndex(), after.getReasoningDescriptionIndex());
+    }
+
+    @Test
+    void testSwitchPersonality_singleSwitch_allFieldsStored() {
+        Person before = createPersonality();
+
+        Person after = createPersonality();
+        after.switchPersonality();
+
+        assertEquals(after.getStoredGivenName(), before.getGivenName());
+        assertEquals(after.getStoredSurname(), before.getSurname());
+        assertEquals(after.getStoredLoyalty(), before.getLoyalty());
+        assertEquals(after.getStoredOriginFaction().getShortName(), before.getOriginFaction().getShortName());
+        assertEquals(after.getStoredAggression(), before.getAggression());
+        assertEquals(after.getStoredAggressionDescriptionIndex(), before.getAggressionDescriptionIndex());
+        assertEquals(after.getStoredAmbition(), before.getAmbition());
+        assertEquals(after.getStoredAmbitionDescriptionIndex(), before.getAmbitionDescriptionIndex());
+        assertEquals(after.getStoredGreed(), before.getGreed());
+        assertEquals(after.getStoredGreedDescriptionIndex(), before.getGreedDescriptionIndex());
+        assertEquals(after.getStoredSocial(), before.getSocial());
+        assertEquals(after.getStoredSocialDescriptionIndex(), before.getSocialDescriptionIndex());
+        assertEquals(after.getStoredPersonalityQuirk(), before.getPersonalityQuirk());
+        assertEquals(after.getStoredPersonalityQuirkDescriptionIndex(), before.getPersonalityQuirkDescriptionIndex());
+        assertEquals(after.getStoredReasoning(), before.getReasoning());
+        assertEquals(after.getStoredReasoningDescriptionIndex(), before.getReasoningDescriptionIndex());
+    }
+
+    @Test
+    void testSwitchPersonality_doubleSwitch_personalityFullyRestored() {
+        Person before = createPersonality();
+
+        Person after = createPersonality();
+        after.switchPersonality();
+        after.switchPersonality();
+
+        assertEquals(before.getGivenName(), after.getGivenName());
+        assertEquals(before.getSurname(), after.getSurname());
+        assertEquals(before.getLoyalty(), after.getLoyalty());
+        assertEquals(before.getOriginFaction().getShortName(), after.getOriginFaction().getShortName());
+        assertEquals(before.getAggression(), after.getAggression());
+        assertEquals(before.getAggressionDescriptionIndex(), after.getAggressionDescriptionIndex());
+        assertEquals(before.getAmbition(), after.getAmbition());
+        assertEquals(before.getAmbitionDescriptionIndex(), after.getAmbitionDescriptionIndex());
+        assertEquals(before.getGreed(), after.getGreed());
+        assertEquals(before.getGreedDescriptionIndex(), after.getGreedDescriptionIndex());
+        assertEquals(before.getSocial(), after.getSocial());
+        assertEquals(before.getSocialDescriptionIndex(), after.getSocialDescriptionIndex());
+        assertEquals(before.getPersonalityQuirk(), after.getPersonalityQuirk());
+        assertEquals(before.getPersonalityQuirkDescriptionIndex(), after.getPersonalityQuirkDescriptionIndex());
+        assertEquals(before.getReasoning(), after.getReasoning());
+        assertEquals(before.getReasoningDescriptionIndex(), after.getReasoningDescriptionIndex());
+
+        assertEquals(before.getStoredGivenName(), after.getStoredGivenName());
+        assertEquals(before.getStoredSurname(), after.getStoredSurname());
+        assertEquals(before.getStoredLoyalty(), after.getStoredLoyalty());
+        assertEquals(before.getStoredOriginFaction().getShortName(), after.getStoredOriginFaction().getShortName());
+        assertEquals(before.getStoredAggression(), after.getStoredAggression());
+        assertEquals(before.getStoredAggressionDescriptionIndex(), after.getStoredAggressionDescriptionIndex());
+        assertEquals(before.getStoredAmbition(), after.getStoredAmbition());
+        assertEquals(before.getStoredAmbitionDescriptionIndex(), after.getStoredAmbitionDescriptionIndex());
+        assertEquals(before.getStoredGreed(), after.getStoredGreed());
+        assertEquals(before.getStoredGreedDescriptionIndex(), after.getStoredGreedDescriptionIndex());
+        assertEquals(before.getStoredSocial(), after.getStoredSocial());
+        assertEquals(before.getStoredSocialDescriptionIndex(), after.getStoredSocialDescriptionIndex());
+        assertEquals(before.getStoredPersonalityQuirk(), after.getStoredPersonalityQuirk());
+        assertEquals(before.getStoredPersonalityQuirkDescriptionIndex(),
+              after.getStoredPersonalityQuirkDescriptionIndex());
+        assertEquals(before.getStoredReasoning(), after.getStoredReasoning());
+        assertEquals(before.getStoredReasoningDescriptionIndex(), after.getStoredReasoningDescriptionIndex());
+    }
+
+    private Person createPersonality() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction originalMockFaction = mock(Faction.class);
+        Faction storedMockFaction = mock(Faction.class);
+
+        when(mockCampaign.getFaction()).thenReturn(originalMockFaction);
+        when(originalMockFaction.getShortName()).thenReturn("MERC");
+        when(storedMockFaction.getShortName()).thenReturn("DC");
+
+        Person personality = new Person(mockCampaign);
+        personality.setGivenName("Arnold");
+        personality.setSurname("Rimmer");
+        personality.setLoyalty(6);
+        personality.setOriginFaction(originalMockFaction);
+        personality.setAggression(Aggression.AGGRESSIVE);
+        personality.setAggressionDescriptionIndex(1);
+        personality.setAmbition(Ambition.AMBITIOUS);
+        personality.setAmbitionDescriptionIndex(1);
+        personality.setGreed(Greed.ADEPT);
+        personality.setGreedDescriptionIndex(1);
+        personality.setSocial(Social.ALTRUISTIC);
+        personality.setSocialDescriptionIndex(1);
+        personality.setPersonalityQuirk(PersonalityQuirk.ACROPHOBIA);
+        personality.setPersonalityQuirkDescriptionIndex(1);
+        personality.setReasoning(Reasoning.BRAIN_DEAD);
+        personality.setReasoningDescriptionIndex(1);
+
+        personality.setStoredGivenName("Mr.");
+        personality.setStoredSurname("Flibble");
+        personality.setStoredLoyalty(9);
+        personality.setStoredOriginFaction(storedMockFaction);
+        personality.setStoredAggression(Aggression.BLOODTHIRSTY);
+        personality.setStoredAggressionDescriptionIndex(0);
+        personality.setStoredAmbition(Ambition.CUTTHROAT);
+        personality.setStoredAmbitionDescriptionIndex(0);
+        personality.setStoredGreed(Greed.ENTERPRISING);
+        personality.setStoredGreedDescriptionIndex(0);
+        personality.setStoredSocial(Social.COMPASSIONATE);
+        personality.setStoredSocialDescriptionIndex(0);
+        personality.setStoredPersonalityQuirk(PersonalityQuirk.AMBUSH_LOVER);
+        personality.setStoredPersonalityQuirkDescriptionIndex(0);
+        personality.setStoredReasoning(Reasoning.DIMWITTED);
+        personality.setStoredReasoningDescriptionIndex(0);
+
+        return personality;
+    }
+
 }

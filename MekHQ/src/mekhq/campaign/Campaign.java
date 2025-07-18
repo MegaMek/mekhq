@@ -56,6 +56,8 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_SPLIT_PERSONALITY;
+import static mekhq.campaign.personnel.PersonnelOptions.getCompulsionCheckModifier;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -66,6 +68,7 @@ import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWi
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
@@ -223,6 +226,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -5251,6 +5255,8 @@ public class Campaign implements ITechManager {
                 continue;
             }
 
+            PersonnelOptions personnelOptions = person.getOptions();
+
             // Daily events
             if (person.getStatus().isMIA()) {
                 recovery.attemptRescueOfPlayerCharacter(person);
@@ -5287,6 +5293,17 @@ public class Campaign implements ITechManager {
 
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
+                }
+
+                if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
+                    int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    String report = person.processSplitPersonality(true,
+                          failedWillpowerCheck);
+                    if (!report.isBlank()) {
+                        addReport(report);
+                    }
                 }
             }
 
