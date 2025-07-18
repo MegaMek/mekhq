@@ -56,8 +56,8 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
-import megamek.common.MekView;
-import megamek.common.ViewFormatting;
+import megamek.client.ui.unitreadout.EntityReadout;
+import megamek.client.ui.util.ViewFormatting;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -166,7 +166,7 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setContentType("text/html");
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtOldUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
+        EntityReadout mv = new EntityReadout(unit.getEntity(), false, true, true, ViewFormatting.HTML);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
@@ -285,7 +285,7 @@ public class ChooseRefitDialog extends JDialog {
 
         lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
-        MekView mv = new MekView(r.getNewEntity(), false, true);
+        EntityReadout mv = new EntityReadout(r.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }

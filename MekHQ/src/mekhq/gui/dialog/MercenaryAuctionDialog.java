@@ -48,7 +48,7 @@ import javax.swing.event.HyperlinkEvent.EventType;
 import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
-import megamek.common.ViewFormatting;
+import megamek.client.ui.util.ViewFormatting;
 import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
 import mekhq.campaign.Campaign;

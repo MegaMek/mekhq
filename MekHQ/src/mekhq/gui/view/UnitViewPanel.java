@@ -46,7 +46,7 @@ import javax.swing.JTextPane;
 import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
-import megamek.common.MekView;
+import megamek.client.ui.unitreadout.EntityReadout;
 import megamek.common.TechConstants;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -149,7 +149,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        MekView mview = new MekView(entity, false, true);
+        EntityReadout mview = new EntityReadout(entity, false, true);
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);

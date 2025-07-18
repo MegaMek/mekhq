@@ -59,7 +59,7 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.MekView;
+import megamek.client.ui.unitreadout.EntityReadout;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
@@ -616,7 +616,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (selected > -1) {
             Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(selected));
             if (null != unit) {
-                MekView mv = new MekView(unit.getEntity(), true, true);
+                EntityReadout mv = new EntityReadout(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" +
                                                   mv.getMekReadoutBasic() +
                                                   "<br>" +
