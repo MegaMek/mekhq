@@ -758,7 +758,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             @Override
             public void mouseClicked(final MouseEvent evt) {
                 if (getLastRolledUnit() != null) {
-                    new EntityReadoutDialog(getFrame(), isModal(), getLastRolledUnit()).setVisible(true);
+                    EntityReadout.createReadoutDialog(getFrame(), isModal(), getLastRolledUnit()).setVisible(true);
                 }
             }
         });

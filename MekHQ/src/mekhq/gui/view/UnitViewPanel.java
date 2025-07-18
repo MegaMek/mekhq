@@ -149,12 +149,12 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        EntityReadout mview = new EntityReadout(entity, false, true);
+        EntityReadout mview = EntityReadout.createReadout(entity, false, true);
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMekReadoutBasic() + "<br>" + mview.getMekReadoutLoadout() + "</div>");
+        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getBasicSection() + "<br>" + mview.getLoadoutSection() + "</div>");
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

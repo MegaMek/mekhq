@@ -89,7 +89,7 @@ public class MekViewDialog extends JDialog {
         txtMek.setEditable(false);
         txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
         txtMek.setName("txtMek");
-        txtMek.setText(mekView.getMekReadout());
+        txtMek.setText(mekView.getReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text"));

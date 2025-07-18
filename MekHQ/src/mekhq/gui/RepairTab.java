@@ -616,11 +616,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (selected > -1) {
             Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(selected));
             if (null != unit) {
-                EntityReadout mv = new EntityReadout(unit.getEntity(), true, true);
+                EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" +
-                                                  mv.getMekReadoutBasic() +
+                                                  mv.getBasicSection() +
                                                   "<br>" +
-                                                  mv.getMekReadoutLoadout() +
+                                                  mv.getLoadoutSection() +
                                                   "</div>");
                 SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
                 if (!unit.equals(selectedUnit)) {
