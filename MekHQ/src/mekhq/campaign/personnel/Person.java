@@ -54,6 +54,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
@@ -68,6 +69,7 @@ import java.util.stream.Stream;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -6198,6 +6200,148 @@ public class Person {
             }
 
             recruitment = today;
+        }
+    }
+
+    /**
+     * Processes the effects of a berserker frenzy event for a character, potentially injuring themselves and other
+     * victims.
+     *
+     * <p>If the character has the berserker trait and fails a willpower check, this method determines who is
+     * affected by the frenzy (including the character and other victims depending on deployment). Each affected person
+     * may receive one or two wounds, applied either as advanced medical injuries or as simple hit increments.</p>
+     *
+     * <p>If the number of injuries or hits for any victim exceeds a defined threshold, the status for that person
+     * is updated to reflect medical complications (for the berserker) or homicide (for other victims). A formatted
+     * message describing the frenzy is returned.</p>
+     *
+     * @param campaign             the campaign context used for looking up personnel, applying wounds, and updating
+     *                             statuses
+     * @param useAdvancedMedical   if {@code true}, applies wounds using the advanced medical system; otherwise,
+     *                             increments hits directly
+     * @param hasBerserker         if {@code true}, indicates the character is capable of berserker frenzy
+     * @param failedWillpowerCheck if {@code true}, indicates the character failed their willpower check to resist
+     *                             frenzy
+     *
+     * @return a formatted message describing the frenzy if one occurs, or an empty string if there is no effect
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processBerserkerFrenzy(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasBerserker, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasBerserker && failedWillpowerCheck) {
+            Set<Person> victims = new HashSet<>();
+            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
+            if (isDeployed() && unit != null) {
+                getLocalVictims(allActivePersonnel, victims);
+            } else {
+                getNonDeployedVictims(allActivePersonnel, victims);
+            }
+
+            // The berserker hurts themselves
+            victims.add(this);
+
+            for (Person victim : victims) {
+                int wounds = randomInt(2) + 1; // (1-2)
+                if (useAdvancedMedical) {
+                    InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
+                } else {
+                    hits += wounds;
+                }
+
+                if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
+                    changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
+                                                                          PersonnelStatus.MEDICAL_COMPLICATIONS :
+                                                                          PersonnelStatus.HOMICIDE);
+                }
+            }
+
+            return String.format(resources.getString("compulsion.berserker"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Selects random victims from the list of all active, non-deployed personnel and adds them to the provided set of
+     * victims.
+     *
+     * <p>The number of victims selected is determined by a single six-sided die roll. For each count, a random
+     * non-deployed person is chosen from the available pool and added to the victims set. Once chosen, a victim will
+     * not be selected again.</p>
+     *
+     * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
+     * @param victims            the set to which randomly selected non-deployed victims will be added
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void getNonDeployedVictims(List<Person> allActivePersonnel, Set<Person> victims) {
+        Set<Person> potentialVictims = new HashSet<>();
+
+        for (Person bystander : allActivePersonnel) {
+            if (!bystander.isDeployed()) {
+                potentialVictims.add(bystander);
+            }
+        }
+
+        potentialVictims.remove(this);
+
+        int roll = d6(1);
+        for (int i = 0; i < roll; ++i) {
+            if (potentialVictims.isEmpty()) {
+                break;
+            }
+
+            Person victim = ObjectUtility.getRandomItem(potentialVictims);
+            potentialVictims.remove(victim);
+            victims.add(victim);
+        }
+    }
+
+    /**
+     * Selects random victims from deployed personnel who are in the same scenario as the caller and adds them to the
+     * provided set of victims.
+     *
+     * <p>Only personnel currently deployed in the same scenario (as determined by matching scenario IDs) are
+     * eligible to be selected. The number of victims chosen is based on a single six-sided die roll. For each count, a
+     * random eligible person is added to the victims set; once chosen, a victim will not be selected again.</p>
+     *
+     * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
+     * @param victims            the set to which randomly selected victims from the same scenario will be added
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void getLocalVictims(List<Person> allActivePersonnel, Set<Person> victims) {
+        Set<Person> potentialVictims = new HashSet<>();
+
+        int scenarioId = unit.getScenarioId();
+        for (Person bystander : allActivePersonnel) {
+            Unit bystanderUnit = bystander.getUnit();
+            if (bystanderUnit != null) {
+                if (scenarioId == bystanderUnit.getScenarioId()) {
+                    potentialVictims.add(bystander);
+                }
+            }
+        }
+
+        potentialVictims.remove(this);
+
+        int roll = d6(1);
+        for (int i = 0; i < roll; ++i) {
+            if (potentialVictims.isEmpty()) {
+                break;
+            }
+
+            Person victim = ObjectUtility.getRandomItem(potentialVictims);
+            potentialVictims.remove(victim);
+            victims.add(victim);
         }
     }
 }
