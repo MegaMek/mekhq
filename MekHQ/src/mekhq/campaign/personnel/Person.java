@@ -6342,11 +6342,12 @@ public class Person {
                 if (useAdvancedMedical) {
                     InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
                 } else {
-                    hits += wounds;
+                    int currentHits = victim.getHits();
+                    victim.setHits(currentHits + wounds);
                 }
 
                 if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
-                    changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
+                    victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
                                                                           PersonnelStatus.MEDICAL_COMPLICATIONS :
                                                                           PersonnelStatus.HOMICIDE);
                 }
