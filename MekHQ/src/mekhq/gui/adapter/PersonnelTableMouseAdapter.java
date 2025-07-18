@@ -163,6 +163,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     // region Variable Declarations
     private static final String CMD_SKILL_CHECK = "SKILL_CHECK";
+    private static final String CMD_ATTRIBUTE_CHECK = "ATTRIBUTE_CHECK";
     private static final String CMD_MEDICAL_RECORDS = "MEDICAL_RECORDS";
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
     private static final String CMD_RANK = "RANK";
@@ -357,6 +358,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_SKILL_CHECK: {
                 for (final Person person : people) {
                     new SkillCheckDialog(getCampaign(), person);
+                }
+                break;
+            }
+            case CMD_ATTRIBUTE_CHECK: {
+                for (final Person person : people) {
+                    new AttributeCheckDialog(getCampaign(), person);
                 }
                 break;
             }
@@ -1970,6 +1977,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // lets fill the pop up menu
         menuItem = new JMenuItem(resources.getString("makeSkillCheck.text"));
         menuItem.setActionCommand(makeCommand(CMD_SKILL_CHECK));
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem(resources.getString("makeAttributeCheck.text"));
+        menuItem.setActionCommand(makeCommand(CMD_ATTRIBUTE_CHECK));
         menuItem.addActionListener(this);
         popup.add(menuItem);
 
