@@ -5485,6 +5485,8 @@ public class Person {
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankLevel) {
+        final int PATHOLOGIC_RACISM_REPUTATION_PENALTY = -2;
+
         int modifiers = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
@@ -5493,7 +5495,7 @@ public class Person {
                              0;
 
         boolean hasPathologicRacism = options.booleanOption(COMPULSION_PATHOLOGIC_RACISM);
-        modifiers -= hasPathologicRacism ? 2 : 0;
+        modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_REPUTATION_PENALTY : 0;
 
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
