@@ -249,5 +249,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         } else {
             person.setUnlucky(0);
         }
+
+        // Bloodmark
+        // We want the chance of a Bloodmark to be low as it can be quite disruptive
+        roll = randomInt(person.getOriginFaction().isPirate() ? 50 : 100);
+        if (roll == 0) {
+            person.setBloodmark(1);
+        } else {
+            person.setBloodmark(0);
+        }
     }
 }
