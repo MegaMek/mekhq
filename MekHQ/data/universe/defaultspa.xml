@@ -1338,9 +1338,9 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>compulsion_addiction</lookupName>
     <displayName>Significant Compulsion - Addiction (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Drug Withdrawal' injury.
+    <desc><![CDATA[Once per week a Willpower check is made (with a -2 penalty). If failed, the character suffers the Discontinuation Syndrome Injury and gains two Fatigue (if Fatigue is enabled).
 
-If Advanced Medical is disabled, there is a weekly chance the character suffers a single Hit, instead.
+If Advanced Medical is disabled, the character suffers a single Hit, instead of the Injury.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-200</xpCost>
@@ -1350,9 +1350,9 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>madness_flashbacks</lookupName>
     <displayName>Minor Psychosis - Flashbacks (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Flashbacks' injury.
+    <desc><![CDATA[Each week the character is required to make a Willpower check (with a -4 penalty) or suffer the 'Crippling Flashbacks' Injury (-1 Piloting, -1 Gunnery).
 
-If Advanced Medical is disabled, there is a weekly chance the character suffers two Hits, instead.
+If Advanced Medical is disabled, the character suffers a single Hit, instead of the Injury.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-300</xpCost>
