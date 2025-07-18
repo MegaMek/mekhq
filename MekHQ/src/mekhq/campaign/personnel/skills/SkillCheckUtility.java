@@ -522,7 +522,7 @@ public class SkillCheckUtility {
         if (roll >= targetNumberValue || !useEdge || availableEdge < 1) {
             int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
 
-            logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.report"),
+            logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.results"),
                   skillName,
                   roll,
                   targetNumber,
