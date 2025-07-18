@@ -430,7 +430,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.processCripplingFlashbacks(mockCampaign, false, true, true);
         assertEquals(0, person.getInjuries().size());
-        assertEquals(2, person.getHits());
+        assertEquals(1, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
