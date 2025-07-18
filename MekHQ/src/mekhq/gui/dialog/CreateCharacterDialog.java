@@ -35,14 +35,7 @@ package mekhq.gui.dialog;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.Person.MAXIMUM_CONNECTIONS;
-import static mekhq.campaign.personnel.Person.MAXIMUM_REPUTATION;
-import static mekhq.campaign.personnel.Person.MAXIMUM_UNLUCKY;
-import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
-import static mekhq.campaign.personnel.Person.MINIMUM_CONNECTIONS;
-import static mekhq.campaign.personnel.Person.MINIMUM_REPUTATION;
-import static mekhq.campaign.personnel.Person.MINIMUM_UNLUCKY;
-import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
+import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
@@ -155,6 +148,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JTextField textWealth;
     private JTextField textReputation;
     private JTextField textUnlucky;
+    private JTextField textBloodmark;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
 
@@ -265,6 +259,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         JLabel lblReputation = new JLabel();
         textUnlucky = new JTextField();
         JLabel lblUnlucky = new JLabel();
+        textBloodmark = new JTextField();
+        JLabel lblBloodmark = new JLabel();
         textEducationLevel = new JComboBox<>();
         textLoyalty = new JTextField();
         JLabel lblLoyalty = new JLabel();
@@ -746,6 +742,27 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         demogPanel.add(textUnlucky, gridBagConstraints);
+
+        y++;
+
+        lblBloodmark.setText(resourceMap.getString("lblBloodmark.text"));
+        lblBloodmark.setName("lblBloodmark");
+
+        textBloodmark.setText(Integer.toString(person.getBloodmark()));
+        textBloodmark.setName("textBloodmark");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demogPanel.add(lblBloodmark, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demogPanel.add(textBloodmark, gridBagConstraints);
 
         y++;
 
@@ -1670,6 +1687,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
         person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+
+        newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
+        person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
