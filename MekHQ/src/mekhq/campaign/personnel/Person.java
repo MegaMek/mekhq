@@ -46,14 +46,18 @@ import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.log.LogEntryType.SERVICE;
+import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
@@ -1467,7 +1471,7 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
+                  "<span color=" + getWarningColor() + "'>",
                   ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
@@ -3436,7 +3440,7 @@ public class Person {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -6199,5 +6203,29 @@ public class Person {
 
             recruitment = today;
         }
+    }
+
+    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasCatatonia, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasCatatonia && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CATATONIA.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.catatonia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
     }
 }
