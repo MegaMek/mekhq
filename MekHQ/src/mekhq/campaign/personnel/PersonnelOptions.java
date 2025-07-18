@@ -277,6 +277,38 @@ public class PersonnelOptions extends PilotOptions {
         }
     }
 
+    /**
+     * Returns the check modifier associated with a specific compulsion or mental state.
+     *
+     * <p>This method maps a given compulsion or madness name to its corresponding check modifier, representing the
+     * impact of various psychological traits or conditions on compulsion-related rolls. The modifier value reflects the
+     * severity of the condition, ranging from trivial to extreme.</p>
+     *
+     * @param name the name of the compulsion or mental state for which to retrieve the check modifier
+     *
+     * @return the {@link Integer} value representing the check modifier for the specified state
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static int getCompulsionCheckModifier(String name) {
+        return switch (name) {
+            case COMPULSION_UNPLEASANT_PERSONALITY, COMPULSION_MILD_PARANOIA, COMPULSION_RACISM,
+                 COMPULSION_RELIGIOUS_FANATICISM, COMPULSION_TRAUMATIC_PAST, COMPULSION_FACTION_PRIDE,
+                 COMPULSION_GAMBLING, COMPULSION_ANARCHIST -> COMPULSION_CHECK_MODIFIER_TRIVIAL;
+            case COMPULSION_FACTION_LOYALTY, COMPULSION_PATHOLOGIC_RACISM, COMPULSION_XENOPHOBIA,
+                 COMPULSION_ADDICTION -> COMPULSION_CHECK_MODIFIER_SIGNIFICANT;
+            case MADNESS_FLASHBACKS, MADNESS_CONFUSION, MADNESS_CLINICAL_PARANOIA, MADNESS_SPLIT_PERSONALITY ->
+                  COMPULSION_CHECK_MODIFIER_MAJOR;
+            case MADNESS_CATATONIA, MADNESS_REGRESSION, MADNESS_HYSTERIA -> COMPULSION_CHECK_MODIFIER_SEVERE;
+            case MADNESS_BERSERKER -> COMPULSION_CHECK_MODIFIER_EXTREME;
+            default -> {
+                logger.warn("Unexpected compulsion name provided: {}", name);
+                yield COMPULSION_CHECK_MODIFIER_TRIVIAL;
+            }
+        };
+    }
+
     @Override
     protected AbstractOptionsInfo getOptionsInfoImp() {
         return PersonnelOptionsInfo.getInstance();
