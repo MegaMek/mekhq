@@ -69,7 +69,7 @@ import mekhq.utilities.ReportingUtilities;
  * @since 0.50.07
  */
 public class AttributeCheckUtility {
-    private static final MMLogger logger = MMLogger.create(AttributeCheckUtility.class);
+    private static final MMLogger LOGGER = MMLogger.create(AttributeCheckUtility.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AttributeCheckUtility";
 
     /**
@@ -210,7 +210,7 @@ public class AttributeCheckUtility {
      */
     private boolean isPersonNull() {
         if (person == null) {
-            logger.debug("Null person passed into AttributeCheckUtility." +
+            LOGGER.debug("Null person passed into AttributeCheckUtility." +
                                " Auto-failing check with bogus results so the bug stands out.");
 
             marginOfSuccess = getMarginValue(DISASTROUS);
@@ -545,15 +545,10 @@ public class AttributeCheckUtility {
         if (roll >= targetNumberValue || !useEdge || availableEdge < 1) {
             int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
 
-            String label = getAttributeCheckLabel();
-            logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "AttributeCheck.results"),
-                  label,
-                  roll,
-                  targetNumber,
-                  difference);
-
             marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
             resultsText = generateResultsText(includeMarginsOfSuccessText);
+
+            LOGGER.info(resultsText);
             return true;
         }
         return false;
