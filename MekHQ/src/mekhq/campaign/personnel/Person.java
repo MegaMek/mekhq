@@ -5512,8 +5512,8 @@ public class Person {
                                    rankLevel) :
                              0;
 
-        boolean hasXenopbobia = options.booleanOption(COMPULSION_XENOPHOBIA);
-        modifiers -= hasXenopbobia ? 1 : 0;
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        modifiers -= hasXenophobia ? 1 : 0;
 
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
