@@ -795,7 +795,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
         lblLoyalty.setName("lblLoyalty");
 
-        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setText(Integer.toString(person.getBaseLoyalty()));
         textLoyalty.setName("textLoyalty");
 
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
@@ -1691,7 +1691,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
         person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
 
-        person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getLoyalty()));
+        person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
