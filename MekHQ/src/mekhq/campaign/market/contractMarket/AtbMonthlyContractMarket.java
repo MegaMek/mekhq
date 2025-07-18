@@ -361,7 +361,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             int connections = 0;
             Person commander = campaign.getCommander();
             if (commander != null) {
-                connections = commander.getConnections();
+                connections = commander.getAdjustedConnections();
             }
             int roll = d6(2) + connections;
             if (roll < 6) {

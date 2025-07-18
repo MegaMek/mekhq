@@ -5475,6 +5475,26 @@ public class Person {
         return connections;
     }
 
+    /**
+     * Calculates and returns the character's adjusted Connections value.
+     *
+     * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
+     * increased by 1.</p>
+     *
+     * <p>The connections value is clamped within the allowed minimum and maximum range before being returned.</p>
+     *
+     * @return the character's Connections value, clamped within the minimum and maximum limits
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedConnections() {
+        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+
+        int modifiers = (hasCitizenship ? 1 : 0);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
     public void setConnections(final int connections) {
         this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }

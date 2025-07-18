@@ -934,7 +934,7 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:
-                return Integer.toString(person.getConnections());
+                return Integer.toString(person.getAdjustedConnections());
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case REPUTATION:
