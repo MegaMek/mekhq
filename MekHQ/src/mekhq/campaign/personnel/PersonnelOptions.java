@@ -111,6 +111,12 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ADMIN_NETWORKER = "admin_networker";
     public static final String ADMIN_INTERSTELLAR_NEGOTIATOR = "admin_interstellar_negotiator";
 
+    public static final int COMPULSION_CHECK_MODIFIER_TRIVIAL = 0; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_SIGNIFICANT = 2; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_MAJOR = 4; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_SEVERE = 7; // ATOW pg 110
+    public static final int COMPULSION_CHECK_MODIFIER_EXTREME = 10; // ATOW pg 110
+
     @Override
     public void initialize() {
         super.initialize();
