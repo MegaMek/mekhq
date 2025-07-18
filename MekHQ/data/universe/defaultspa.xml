@@ -1362,9 +1362,9 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>madness_confusion</lookupName>
     <displayName>Minor Psychosis - Confusion (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Confusion' injury.
+    <desc><![CDATA[Each week the character must pass a Willpower check (-4) or suffer one random Injury.
 
-If Advanced Medical is disabled, there is a weekly chance the character hurts themselves in their confusion. Suffering two Hits, instead.
+If Advanced Medical is disabled, the character suffers a single Hit instead of the Injury.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-300</xpCost>
