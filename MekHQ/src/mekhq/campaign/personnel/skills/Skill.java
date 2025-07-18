@@ -325,7 +325,6 @@ public class Skill {
             return modifier;
         }
 
-
         String name = type.getName();
         // Reputation and Alternate ID
         if (Objects.equals(name, S_NEGOTIATION) ||
@@ -356,6 +355,10 @@ public class Skill {
             }
 
             if (characterOptions.booleanOption(MUTATION_FREAKISH_STRENGTH)) {
+                modifier -= 2;
+            }
+
+            if (characterOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
                 modifier -= 2;
             }
 
