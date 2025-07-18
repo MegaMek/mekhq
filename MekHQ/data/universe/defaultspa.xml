@@ -1424,9 +1424,9 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <displayName>Major Psychosis - Hysteria (ATOW)</displayName>
     <desc><![CDATA[Incurs a weekly chance of the character temporarily being affected by the Berserker, Confusion, or Clinical Paranoia effects.
 
-- Berserker: The character gets into a fight with another character. Both characters suffer 1d6 Hits and may be killed.
-- Confusion: The character receives the 'Confusion' injury, or 2 Hits if Advanced Medical is disabled.
-- Clinical Paranoia: The character temporarily loses all levels in the Connections Trait, and suffers a -2 penalty on all Charisma-based checks for the week.
+- Berserker: The character flies into a berserker frenzy inflicting 1-2 random Injuries to themselves and up to 6 bystanders. If Advanced Medical is disabled, 1-2 Hits are inflicted, instead of Injuries.
+- Confusion: The character suffers one random Injury. If Advanced Medical is disabled, the character suffers a single Hit instead of the Injury.
+- Clinical Paranoia: The character temporarily loses all ranks in the Connections trait for one week.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-400</xpCost>
