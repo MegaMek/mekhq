@@ -154,6 +154,11 @@ public class Person {
     public static final String UNLUCKY_LABEL = "UNLUCKY";
     public static final int MINIMUM_UNLUCKY = 0;
     public static final int MAXIMUM_UNLUCKY = 5;
+
+    public static final String BLOODMARK_LABEL = "BLOODMARK";
+    public static final int MINIMUM_BLOODMARK = 0;
+    public static final int MAXIMUM_BLOODMARK = 5;
+
     private static final String DELIMITER = "::";
 
 
@@ -220,6 +225,8 @@ public class Person {
     private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
+    private int bloodmark;
+    private List<LocalDate> bloodhuntSchedule;
     private Attributes atowAttributes;
 
     private PersonnelStatus status;
@@ -457,6 +464,8 @@ public class Person {
         hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
+        bloodmark = 0;
+        bloodhuntSchedule = new ArrayList<>();
         atowAttributes = new Attributes();
         dateOfDeath = null;
         recruitment = null;
@@ -1549,6 +1558,39 @@ public class Person {
     }
 
     /**
+     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     *
+     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
+     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
+     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
+     * group loyalty change is added to the campaign reports.</p>
+     *
+     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
+     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
+     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     */
+    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
+          boolean isMajor) {
+        for (Person person : campaign.getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
+                  ReportingUtilities.CLOSING_SPAN_TAG));
+        }
+    }
+
+    /**
      * Reports the change in loyalty.
      *
      * @param campaign        The campaign for which the loyalty change is being reported.
@@ -1842,8 +1884,41 @@ public class Person {
         this.retirement = retirement;
     }
 
+    /**
+     * Use {@link #getBaseLoyalty()} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getLoyalty() {
+        return getBaseLoyalty();
+    }
+
+    /**
+     * This method returns the character's base loyalty score.
+     *
+     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction)} instead.</p>
+     *
+     * @return the loyalty value as an {@link Integer}
+     */
+    public int getBaseLoyalty() {
         return loyalty;
+    }
+
+    /**
+     * Calculates and returns the adjusted loyalty value for the given campaign faction.
+     *
+     * @param campaignFaction the campaign {@link Faction} being compared with the origin {@link Faction}
+     *
+     * @return the loyalty value adjusted based on the provided campaign {@link Faction}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedLoyalty(Faction campaignFaction) {
+        boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
+
+        int modifier = 0;
+
+        return loyalty + modifier;
     }
 
     public void setLoyalty(int loyalty) {
@@ -2636,6 +2711,18 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
             }
 
+            if (bloodmark != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodmark", bloodmark);
+            }
+
+            if (!bloodhuntSchedule.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "bloodhuntSchedule");
+                for (LocalDate attemptDate : bloodhuntSchedule) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attemptDate", attemptDate);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "bloodhuntSchedule");
+            }
+
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "atowAttributes");
             atowAttributes.writeAttributesToXML(pw, indent);
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "atowAttributes");
@@ -2653,7 +2740,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
@@ -3054,6 +3141,24 @@ public class Person {
                     person.reputation = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
                     person.unlucky = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("bloodmark")) {
+                    person.bloodmark = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("bloodhuntSchedule")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("attemptDate")) {
+                            logger.error("(techUnitIds) Unknown node type not loaded in bloodhuntSchedule nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+                        person.addBloodhuntDate(LocalDate.parse(wn3.getTextContent().trim()));
+                    }
                 } else if (nodeName.equalsIgnoreCase("atowAttributes")) {
                     person.atowAttributes = new Attributes().generateAttributesFromXML(wn2);
                 } else if (nodeName.equalsIgnoreCase("pilotHits")) {
@@ -3681,6 +3786,11 @@ public class Person {
         return getRankSystem().getRank(getRankNumeric());
     }
 
+    /**
+     * Retrieves the index of the character's rank
+     *
+     * @return the numeric value of the rank as an {@link Integer}
+     */
     public int getRankNumeric() {
         return rank;
     }
@@ -3689,6 +3799,13 @@ public class Person {
         this.rank = rank;
     }
 
+    /**
+     * Retrieves the character's rank <b>sub-level</b>. Predominantly used in ComStar rank styles.
+     *
+     * <p><b>Important:</b> You almost always want to use {@link #getRankNumeric()} instead.</p>
+     *
+     * @return the rank level as an integer
+     */
     public int getRankLevel() {
         return rankLevel;
     }
@@ -3902,7 +4019,7 @@ public class Person {
         final int adjustedReputation = getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              rankLevel);
+              rank);
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -4264,7 +4381,7 @@ public class Person {
           LocalDate today) {
         final Skill skill = getSkill(skillName);
 
-        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankLevel);
+        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
         return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
     }
@@ -5403,6 +5520,26 @@ public class Person {
         return connections;
     }
 
+    /**
+     * Calculates and returns the character's adjusted Connections value.
+     *
+     * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
+     * increased by 1.</p>
+     *
+     * <p>The connections value is clamped within the allowed minimum and maximum range before being returned.</p>
+     *
+     * @return the character's Connections value, clamped within the minimum and maximum limits
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedConnections() {
+        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+
+        int modifiers = (hasCitizenship ? 1 : 0);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
     public void setConnections(final int connections) {
         this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
@@ -5477,19 +5614,19 @@ public class Person {
      * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankLevel         The rank index of the character, which can adjust the reputation modifier in clan-based
+     * @param rankNumeric       The rank index of the character, which can adjust the reputation modifier in clan-based
      *                          campaigns.
      *
      * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
      *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankLevel) {
+          int rankNumeric) {
         int modifiers = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
                                    !isNullOrBlank(bloodname),
-                                   rankLevel) :
+                                   rankNumeric) :
                              0;
 
         boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
@@ -5526,6 +5663,35 @@ public class Person {
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
         unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    public int getBloodmark() {
+        return bloodmark;
+    }
+
+    public Money getBloodmarkValue() {
+        return Money.of(bloodmark);
+    }
+
+    public void setBloodmark(final int unlucky) {
+        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+    }
+
+    public void changeBloodmark(final int delta) {
+        int newValue = bloodmark + delta;
+        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+    }
+
+    public List<LocalDate> getBloodhuntSchedule() {
+        return bloodhuntSchedule;
+    }
+
+    public void addBloodhuntDate(final LocalDate date) {
+        bloodhuntSchedule.add(date);
+    }
+
+    public void removeBloodhuntDate(final LocalDate date) {
+        bloodhuntSchedule.remove(date);
     }
 
     /**
