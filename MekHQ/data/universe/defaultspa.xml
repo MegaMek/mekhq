@@ -1374,7 +1374,9 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>madness_clinical_paranoia</lookupName>
     <displayName>Minor Psychosis - Clinical Paranoia (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character temporarily loses all levels in the Connections Trait, and suffering a -2 penalty on all Charisma-based checks for the week.
+    <desc><![CDATA[Inflicts a -2 penalty to all Charisma-based skill checks.
+
+Each week the character must pass a Willpower check (with a -4 penalty) or temporarily lose all ranks in the Connections trait for the duration of the week.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-300</xpCost>
