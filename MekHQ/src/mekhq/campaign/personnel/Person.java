@@ -5492,7 +5492,6 @@ public class Person {
                                    rankLevel) :
                              0;
 
-
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
