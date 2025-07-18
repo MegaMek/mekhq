@@ -53,12 +53,15 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
@@ -182,6 +185,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -193,6 +197,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -5246,6 +5251,7 @@ public class Campaign implements ITechManager {
         boolean isCommandersDay = isCommandersDay(currentDay) &&
                                         getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
+        boolean isCampaignPlanetside = location.isOnPlanet();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
@@ -5312,12 +5318,33 @@ public class Campaign implements ITechManager {
                 }
 
                 person.setHasPerformedExtremeExpenditure(false);
+
+                int bloodmarkLevel = person.getBloodmark();
+                if (bloodmarkLevel > BLOODMARK_ZERO.getLevel()) {
+                    BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
+                    boolean hasAlternativeID = person.getOptions().booleanOption(ATOW_ALTERNATE_ID);
+                    List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay, hasAlternativeID);
+                    for (LocalDate assassinationAttempt : bloodmarkSchedule) {
+                        person.addBloodhuntDate(assassinationAttempt);
+                    }
+                }
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
                 int age = person.getAge(currentDay);
                 if (age >= 6 && age <= 12) {
                     peopleWhoCelebrateCommandersDay++;
+                }
+            }
+
+            List<LocalDate> scheduledBloodhunts = person.getBloodhuntSchedule();
+            if (!scheduledBloodhunts.isEmpty()) {
+                boolean isDayOfBloodhunt = Bloodmark.checkForAssassinationAttempt(person,
+                      currentDay,
+                      isCampaignPlanetside);
+
+                if (isDayOfBloodhunt) {
+                    Bloodmark.performAssassinationAttempt(this, person, currentDay);
                 }
             }
         }
