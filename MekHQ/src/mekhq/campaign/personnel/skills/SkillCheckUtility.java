@@ -43,6 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.TargetRoll;
@@ -93,6 +94,27 @@ public class SkillCheckUtility {
     private boolean usedEdge;
 
     /**
+     * Use
+     * {@link SkillCheckUtility#SkillCheckUtility(Person, String, List, int, boolean, boolean, boolean, boolean,
+     * LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public SkillCheckUtility(final Person person, final String skillName,
+          @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
+          final boolean includeMarginsOfSuccessText) {
+        this.person = person;
+        this.skillName = skillName;
+        SkillCheckUtility proxy = new SkillCheckUtility(person, skillName, externalModifiers, miscModifier, useEdge,
+                includeMarginsOfSuccessText,
+              false, false, LocalDate.of(3151, 1, 1));
+        marginOfSuccess = proxy.getMarginOfSuccess();
+        resultsText = proxy.getResultsText();
+        targetNumber = proxy.getTargetNumber();
+        roll = proxy.getRoll();
+        usedEdge = proxy.isUsedEdge();
+    }
+
+    /**
      * Executes a skill check for the specified person and skill type.
      *
      * <p>This constructor creates a {@code SkillCheckUtility} instance which calculates the target number
@@ -105,7 +127,8 @@ public class SkillCheckUtility {
      * include margins of success text as part of the results, if desired.</p>
      *
      * <p><b>Usage:</b> This constructor offers detailed control over the skill check process.
-     * For simpler use-cases, the {@link #performQuickSkillCheck(Person, String, List, int)} method
+     * For simpler use-cases, the
+     * {@link #performQuickSkillCheck(Person, String, List, int, boolean, boolean, LocalDate)} method
      * provides a more streamlined approach.</p>
      *
      * @param person                       the {@link Person} performing the skill check
@@ -125,13 +148,17 @@ public class SkillCheckUtility {
      *                                     attempt fails
      * @param includeMarginsOfSuccessText  whether to include detailed margins of success information
      *                                     in the results
+     * @param isUseAgingEffects            if {@code true}, considers aging effects during the check
+     * @param isClanCampaign               if {@code true}, applies rules specific to clan campaigns
+     * @param today                        the current date, used for time-dependent logic
      *
      * @author Illiani
      * @since 0.50.05
      */
     public SkillCheckUtility(final Person person, final String skillName,
           @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
-          final boolean includeMarginsOfSuccessText) {
+          final boolean includeMarginsOfSuccessText, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
         this.person = person;
         this.skillName = skillName;
 
@@ -141,7 +168,7 @@ public class SkillCheckUtility {
 
         final SkillType skillType = SkillType.getType(skillName);
         isCountUp = skillType.isCountUp();
-        targetNumber = determineTargetNumber(person, skillType, miscModifier);
+        targetNumber = determineTargetNumber(person, skillType, miscModifier, isUseAgingEffects, isClanCampaign, today);
 
         if (externalModifiers != null) {
             for (TargetRollModifier modifier : externalModifiers) {
@@ -150,6 +177,16 @@ public class SkillCheckUtility {
         }
 
         performCheck(useEdge, includeMarginsOfSuccessText);
+    }
+
+    /**
+     * Use {@link #performQuickSkillCheck(Person, String, List, int, boolean, boolean, LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static boolean performQuickSkillCheck(final Person person, final String skillName,
+          final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier) {
+        return performQuickSkillCheck(person, skillName, externalModifiers, miscModifier, false, false,
+              LocalDate.of(3151, 1, 1));
     }
 
     /**
@@ -175,6 +212,9 @@ public class SkillCheckUtility {
      *                              <li>For non-'count up' skills, this value is added to the target number
      *                                  (i.e., positive values are penalties).</li>
      *                          </ul>
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
+     * @param today             the current date, used for time-dependent logic
      *
      * @return {@code true} if the skill check succeeds, {@code false} otherwise
      *
@@ -184,9 +224,10 @@ public class SkillCheckUtility {
      * @since 0.50.05
      */
     public static boolean performQuickSkillCheck(final Person person, final String skillName,
-          final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier) {
+          final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier,
+          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         SkillCheckUtility skillCheck = new SkillCheckUtility(person, skillName, externalModifiers, miscModifier,
-              false, false);
+              false, false, isUseAgingEffects, isClanCampaign, today);
         return skillCheck.isSuccess();
     }
 
@@ -399,6 +440,14 @@ public class SkillCheckUtility {
     }
 
     /**
+     * Use {@link #determineTargetNumber(Person, SkillType, int, boolean, boolean, LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
+        return determineTargetNumber(person, skillType, miscModifier, false, false, LocalDate.of(3151, 1, 1));
+    }
+
+    /**
      * Determines the target number for a skill check based on the person's attributes, skill type, and whether they are
      * trained in the skill.
      *
@@ -412,11 +461,15 @@ public class SkillCheckUtility {
      *                     target number. This means negative values are bonuses, positive values are penalties.
      *
      * @return the target number for the skill check
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign if {@code true}, applies rules specific to clan campaigns
+     * @param today        the current date, used for time-dependent logic
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
+    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier,
+          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         final String skillName = skillType.getName();
         final Attributes characterAttributes = person.getATOWAttributes();
 
@@ -441,7 +494,7 @@ public class SkillCheckUtility {
             Skill skill = person.getSkill(skillName);
             int skillValue = skill.getFinalSkillValue(person.getOptions(),
                   person.getATOWAttributes(),
-                  person.getReputation());
+                  person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, person.getRankNumeric()));
             targetNumber.addModifier(skillValue, skillName);
         }
 

@@ -3502,8 +3502,6 @@ public class Campaign implements ITechManager {
             for (Person person : getActivePersonnel(false)) {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
-                PersonnelOptions options = person.getOptions();
-
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -5278,7 +5276,10 @@ public class Campaign implements ITechManager {
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
-            medicalController.processMedicalEvents(person);
+            medicalController.processMedicalEvents(person,
+                  campaignOptions.isUseAgeEffects(),
+                  isClanCampaign(),
+                  currentDay);
 
             processAnniversaries(person);
 
