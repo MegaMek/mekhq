@@ -1397,22 +1397,22 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     </ability>
     <ability>
     <lookupName>madness_catatonia</lookupName>
-    <displayName>Major Psychosis - Catatonia (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character receiving the 'Catatonia' injury.
+    <displayName>Clinical Insanity- Catatonia (ATOW)</displayName>
+    <desc><![CDATA[Each week the character must pass a Willpower check (with a -10 penalty) or gain the Catatonia Injury (-20 Piloting, -20 Gunnery).
 
-If Advanced Medical is disabled, there is a weekly chance the character suffers three Hits, instead.
+If Advanced Medical is disabled the character gains a single Hit, instead of the Injury.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
-    <xpCost>-400</xpCost>
+    <xpCost>-500</xpCost>
     <weight>1</weight>
     <skillPrereq />
     </ability>
     <ability>
     <lookupName>madness_regression</lookupName>
     <displayName>Major Psychosis - Regression (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character temporarily loses all Edge for the week.
+    <desc><![CDATA[Each week the character is required to pass a Willpower check (with a -7 penalty) or gain the Childlike Regression Injury (-4 Gunnery, -4 Piloting).
 
-If Advanced Medical is disabled, there is a weekly chance the character suffers three Hits, instead.
+If Advanced Medical is disabled the character suffers 1 Hit, instead of the Injury.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-400</xpCost>
@@ -1436,7 +1436,9 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <ability>
     <lookupName>madness_berserker</lookupName>
     <displayName>Clinical Insanity - Berserker (ATOW)</displayName>
-    <desc><![CDATA[Incurs a weekly chance of the character getting into a fight with another character. Both characters suffer 1d6 Hits and may be killed.
+    <desc><![CDATA[Once per week the character must pass a Willpower check (with a -10 penalty) or fly into a berserker frenzy inflicting 1-2 random Injuries to themselves and up to 6 bystanders.
+
+If Advanced Medical is disabled 1-2 Hits are inflicted, instead of Injuries.
 
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-500</xpCost>
