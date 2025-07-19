@@ -1918,6 +1918,11 @@ public class Person {
 
         int modifier = 0;
 
+        boolean hasFactionPride = options.booleanOption(COMPULSION_FACTION_PRIDE);
+        if (hasFactionPride) {
+            modifier += campaignFactionMatchesOriginFaction ? 1 : -2;
+        }
+
         return loyalty + modifier;
     }
 
