@@ -58,6 +58,8 @@ import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionar
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
+import static mekhq.campaign.personnel.PersonnelOptions.getCompulsionCheckModifier;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -69,6 +71,7 @@ import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWi
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
@@ -228,6 +231,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -5250,10 +5254,14 @@ public class Campaign implements ITechManager {
                                         getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         boolean isCampaignPlanetside = location.isOnPlanet();
+        boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
+
+            PersonnelOptions personnelOptions = person.getOptions();
 
             // Daily events
             if (person.getStatus().isMIA()) {
@@ -5299,6 +5307,17 @@ public class Campaign implements ITechManager {
                 String gamblingReport = person.gambleWealth();
                 if (!gamblingReport.isBlank()) {
                     addReport(gamblingReport);
+                }
+
+                if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
+                    int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    person.processDiscontinuationSyndrome(this,
+                          isUseAdvancedMedical,
+                          isUseFatigue,
+                          true,
+                          failedWillpowerCheck);
                 }
             }
 
