@@ -7120,6 +7120,49 @@ public class Person {
     }
 
     /**
+     * Processes the effects of "confusion" for a personnel based on their mental state.
+     *
+     * <p>If the personnel has both "madness confusion", and has failed a willpower check, applies random damage
+     * (injury or hit points depending on the medical system in use), and changes their status to medical complications
+     * if the number of injuries or hits exceeds a set threshold.</p>
+     *
+     * <p>Returns a formatted warning message describing the confusion compulsion, or an empty string if no action
+     * was taken.</p>
+     *
+     * @param campaign             The current campaign instance, used for logging and state updates.
+     * @param useAdvancedMedical   Whether the advanced medical system should be used.
+     * @param hasMadnessConfusion  Indicates if the personnel is afflicted with madness-induced confusion.
+     * @param failedWillpowerCheck Indicates if the required willpower check was failed.
+     *
+     * @return A formatted string with the confusion compulsion warning, or an empty string if not applicable.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processConfusion(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasMadnessConfusion, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasMadnessConfusion && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                InjuryUtil.resolveCombatDamage(campaign, this, 1);
+            } else {
+                hits++;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.confusion"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
      * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
      * check, and returns a formatted warning message if applicable.
      *
