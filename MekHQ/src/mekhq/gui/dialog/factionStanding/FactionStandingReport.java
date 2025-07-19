@@ -272,14 +272,19 @@ public class FactionStandingReport extends JDialog {
         String peripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.periphery");
         String specialTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.special");
         String deadTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.dead");
+        String disabledTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.disabled");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
-        tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
-        tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
-        tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
-        tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
-        tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+        if (isFactionStandingEnabled) {
+            tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
+            tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
+            tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
+            tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
+            tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+        } else {
+            tabbedPane.addTab(disabledTitle, createFactionStandingDisabledTab());
+        }
         setFontScaling(tabbedPane, true, 1.5);
 
         // If a tab only contains an empty Container, disable it. This will occur if the relevant faction list is empty.
@@ -337,6 +342,18 @@ public class FactionStandingReport extends JDialog {
         pnlFactionReport.add(groupScrollPane);
 
         return pnlFactionReport;
+    }
+
+    private JPanel createFactionStandingDisabledTab() {
+        JTextPane textPane = new JTextPane();
+        textPane.setText(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.disabled.blurb"));
+        textPane.setEditable(false);
+        textPane.setOpaque(false);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(textPane, BorderLayout.CENTER);
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        return panel;
     }
 
     /**
