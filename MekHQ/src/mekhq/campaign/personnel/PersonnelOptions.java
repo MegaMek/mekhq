@@ -89,6 +89,12 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
 
+    public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
+    public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
+    public static final String DARK_SECRET_MAJOR = "dark_secret_major";
+    public static final String DARK_SECRET_SEVERE = "dark_secret_severe";
+    public static final String DARK_SECRET_EXTREME = "dark_secret_extreme";
+
     public static final String MUTATION_FREAKISH_STRENGTH = "mutation_freakish_strength";
     public static final String MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM = "mutation_exceptional_immune_system";
     public static final String MUTATION_EXOTIC_APPEARANCE = "mutation_exotic_appearance";
@@ -208,6 +214,13 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_GREMLINS, false);
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
+
+        addOption(l3a, DARK_SECRET_TRIVIAL, false);
+        addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
+        addOption(l3a, DARK_SECRET_MAJOR, false);
+        addOption(l3a, DARK_SECRET_SEVERE, false);
+        addOption(l3a, DARK_SECRET_EXTREME, false);
+
         addOption(l3a, MUTATION_FREAKISH_STRENGTH, false);
         addOption(l3a, MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM, false);
         addOption(l3a, MUTATION_EXOTIC_APPEARANCE, false);
