@@ -1122,6 +1122,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
             comboReasoning.setSelectedItem(person.getReasoning());
 
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboReasoning, gridBagConstraints);
+
             y++;
         }
 
