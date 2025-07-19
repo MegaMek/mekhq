@@ -392,10 +392,10 @@ public class SystemsTab {
     }
 
     /**
-     * Creates the Faction Standing tab panel, containing grouped UI elements for Faction Standing options and its
+     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its
      * header.
      *
-     * @return a {@link JPanel} component representing the entire Faction Standing tab UI
+     * @return a {@link JPanel} component representing the entire ATOW tab UI
      *
      * @author Illiani
      * @since 0.50.07
