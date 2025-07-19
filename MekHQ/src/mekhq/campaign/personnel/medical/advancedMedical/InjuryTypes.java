@@ -80,6 +80,7 @@ public final class InjuryTypes {
     // New injury types go here (or extend the class)
     public static final InjuryType SEVERED_SPINE = new SeveredSpine();
     public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
+    public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
 
     // Replacement Limbs
@@ -117,6 +118,7 @@ public final class InjuryTypes {
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
             InjuryType.register("am:Postpartum_Recovery", POSTPARTUM_RECOVERY);
             InjuryType.register("am:Transit_Disorientation_Syndrome", TRANSIT_DISORIENTATION_SYNDROME);
+            InjuryType.register("am:DiscontinuationSyndrome", DISCONTINUATION_SYNDROME);
             InjuryType.register("am:Crippling_Flashbacks", CRIPPLING_FLASHBACKS);
             registered = true;
         }
@@ -830,6 +832,16 @@ public final class InjuryTypes {
         public Collection<Modifier> getModifiers(Injury inj) {
             return List.of(new Modifier(GUNNERY, 1, null, InjuryType.MODTAG_INJURY),
                   new Modifier(PILOTING, 1, null, InjuryType.MODTAG_INJURY));
+        }
+    }
+
+    public static final class DiscontinuationSyndrome extends AMInjuryType {
+        public DiscontinuationSyndrome() {
+            recoveryTime = 7;
+            allowedLocations = EnumSet.of(BodyLocation.INTERNAL);
+            fluffText = "Discontinuation Syndrome";
+            simpleName = "Discontinuation Syndrome";
+            maxSeverity = 1;
         }
     }
 }
