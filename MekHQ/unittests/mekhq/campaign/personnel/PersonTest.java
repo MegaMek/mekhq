@@ -27,11 +27,14 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
+import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +42,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
@@ -52,6 +56,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class PersonTest {
@@ -391,6 +396,117 @@ public class PersonTest {
     private void initAwards() {
         AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(), "TestSet");
     }
+
+    @Test
+    void testGambleWealth_rollLosesWealth() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(3);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(2); // Simulate losing roll
+            gambler.gambleWealth();
+        }
+
+        int expected = 2;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_rollGainsWealth() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(3);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(6); // Simulate winning roll
+            gambler.gambleWealth();
+        }
+
+        int expected = 4;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_noWealthChange() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(3);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(4); // Simulate neutral roll
+            gambler.gambleWealth();
+        }
+
+        int expected = 3;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_noWealthChange_wealthTooHighForGain() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(MAXIMUM_WEALTH);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(6); // Simulate winning roll
+            gambler.gambleWealth();
+        }
+
+        int expected = MAXIMUM_WEALTH;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
+    @Test
+    void testGambleWealth_noWealthChange_wealthTooLowForLoss() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person gambler = new Person(mockCampaign);
+        gambler.setWealth(MINIMUM_WEALTH);
+        gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
+              true);
+
+        try (MockedStatic<Compute> mockStatic = mockStatic(Compute.class)) {
+            mockStatic.when(Compute::d6).thenReturn(1); // Simulate losing roll
+            gambler.gambleWealth();
+        }
+
+        int expected = MINIMUM_WEALTH;
+        int actual = gambler.getWealth();
+        assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
+    }
+
 
     @Test
     void testProcessChildlikeRegression_noFlashbacks() {
