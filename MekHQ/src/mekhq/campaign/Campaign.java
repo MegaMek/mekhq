@@ -59,6 +59,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOT
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_REGRESSION;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CLINICAL_PARANOIA;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CONFUSION;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_SPLIT_PERSONALITY;
@@ -5343,6 +5344,21 @@ public class Campaign implements ITechManager {
                     if (!report.isBlank()) {
                         addReport(report);
                     }
+                }
+
+                if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
+                    int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    String report = person.processClinicalParanoia(true,
+                          failedWillpowerCheck);
+                    if (!report.isBlank()) {
+                        addReport(report);
+                    }
+                } else {
+                    // This is necessary to stop a character from getting permanently locked in a paranoia state if
+                    // their madness is removed.
+                    person.setSufferingFromClinicalParanoia(false);
                 }
 
                 if (personnelOptions.booleanOption(MADNESS_REGRESSION)) {
