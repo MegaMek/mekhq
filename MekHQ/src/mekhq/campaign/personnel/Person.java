@@ -358,6 +358,7 @@ public class Person {
     private Reasoning storedReasoning;
     private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
+    private LocalDate burnedConnectionsEndDate;
     // endregion Compulsions
 
     // region Flags
@@ -567,6 +568,7 @@ public class Person {
         storedReasoning = Reasoning.AVERAGE;
         storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
+        burnedConnectionsEndDate = null;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -2663,6 +2665,14 @@ public class Person {
         this.sufferingFromClinicalParanoia = sufferingFromClinicalParanoia;
     }
 
+    public @Nullable LocalDate getBurnedConnectionsEndDate() {
+        return burnedConnectionsEndDate;
+    }
+
+    public void setBurnedConnectionsEndDate(final @Nullable LocalDate burnedConnectionsEndDate) {
+        this.burnedConnectionsEndDate = burnedConnectionsEndDate;
+    }
+
     // region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -3239,6 +3249,13 @@ public class Person {
                       sufferingFromClinicalParanoia);
             }
 
+            if (burnedConnectionsEndDate != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "burnedConnectionsEndDate",
+                      burnedConnectionsEndDate);
+            }
+
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
@@ -3777,6 +3794,8 @@ public class Person {
                     person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("burnedConnectionsEndDate")) {
+                    person.setBurnedConnectionsEndDate(LocalDate.parse(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
