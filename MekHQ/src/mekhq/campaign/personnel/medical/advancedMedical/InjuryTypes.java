@@ -82,6 +82,7 @@ public final class InjuryTypes {
     public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
     public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
+    public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
     public static final InjuryType CATATONIA = new Catatonia();
 
     // Replacement Limbs
@@ -121,6 +122,7 @@ public final class InjuryTypes {
             InjuryType.register("am:Transit_Disorientation_Syndrome", TRANSIT_DISORIENTATION_SYNDROME);
             InjuryType.register("am:DiscontinuationSyndrome", DISCONTINUATION_SYNDROME);
             InjuryType.register("am:Crippling_Flashbacks", CRIPPLING_FLASHBACKS);
+            InjuryType.register("am:Childlike_Regression", CHILDLIKE_REGRESSION);
             InjuryType.register("am:Catatonia", CATATONIA);
             registered = true;
         }
@@ -844,6 +846,23 @@ public final class InjuryTypes {
             fluffText = "Discontinuation Syndrome";
             simpleName = "Discontinuation Syndrome";
             maxSeverity = 1;
+        }
+    }
+
+    public static final class ChildlikeRegression extends AMInjuryType {
+        public ChildlikeRegression() {
+            recoveryTime = 7;
+            allowedLocations = EnumSet.of(BodyLocation.INTERNAL);
+            fluffText = "Childlike Regression";
+            simpleName = "Childlike Regression";
+            maxSeverity = 1;
+            level = InjuryLevel.MINOR;
+        }
+
+        @Override
+        public Collection<Modifier> getModifiers(Injury inj) {
+            return List.of(new Modifier(GUNNERY, 4, null, InjuryType.MODTAG_INJURY),
+                  new Modifier(PILOTING, 4, null, InjuryType.MODTAG_INJURY));
         }
     }
 
