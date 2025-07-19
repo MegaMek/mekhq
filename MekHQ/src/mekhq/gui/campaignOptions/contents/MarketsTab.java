@@ -284,7 +284,6 @@ public class MarketsTab {
         // Contents
         lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle");
         lblPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketStyle"));
-        comboPersonnelMarketStyle = new MMComboBox<>("comboPersonnelMarketStyle", PersonnelMarketStyle.values());
         comboPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
                 "PersonnelMarketStyle"));
 
