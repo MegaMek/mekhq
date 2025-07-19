@@ -1666,7 +1666,8 @@ public class StratconRulesManager {
         int targetNumber = 9;
         Skill tactics = commander.getSkill(S_TACTICS);
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false);
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false,
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate());
         campaign.addReport(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
