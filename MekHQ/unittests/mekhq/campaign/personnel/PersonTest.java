@@ -812,7 +812,7 @@ public class PersonTest {
 
         assertEquals(after.getStoredGivenName(), before.getGivenName());
         assertEquals(after.getStoredSurname(), before.getSurname());
-        assertEquals(after.getStoredLoyalty(), before.getLoyalty());
+        assertEquals(after.getStoredLoyalty(), before.getBaseLoyalty());
         assertEquals(after.getStoredOriginFaction().getShortName(), before.getOriginFaction().getShortName());
         assertEquals(after.getStoredAggression(), before.getAggression());
         assertEquals(after.getStoredAggressionDescriptionIndex(), before.getAggressionDescriptionIndex());
@@ -838,7 +838,7 @@ public class PersonTest {
 
         assertEquals(before.getGivenName(), after.getGivenName());
         assertEquals(before.getSurname(), after.getSurname());
-        assertEquals(before.getLoyalty(), after.getLoyalty());
+        assertEquals(before.getBaseLoyalty(), after.getBaseLoyalty());
         assertEquals(before.getOriginFaction().getShortName(), after.getOriginFaction().getShortName());
         assertEquals(before.getAggression(), after.getAggression());
         assertEquals(before.getAggressionDescriptionIndex(), after.getAggressionDescriptionIndex());
