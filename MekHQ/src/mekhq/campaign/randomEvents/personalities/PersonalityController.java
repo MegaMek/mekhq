@@ -258,7 +258,7 @@ public class PersonalityController {
      *
      * @return a {@link String} representation of a valid trait index within the trait range
      */
-    private static String getTraitIndex(final int majorTraitsStartIndex) {
+    public static String getTraitIndex(final int majorTraitsStartIndex) {
         // This gives us a random number between 1 and the start of the major traits
         int traitRoll = randomInt(majorTraitsStartIndex) + 1;
 
@@ -509,7 +509,8 @@ public class PersonalityController {
      * @return the {@link Reasoning} enum value corresponding to the rolled range
      *
      * @throws IllegalStateException if the roll exceeds the expected value range
-     */ private static Reasoning generateReasoning(int roll) {
+     */
+    public static Reasoning generateReasoning(int roll) {
         if (roll < 1) {
             return BRAIN_DEAD;
         } else if (roll < 2) {
