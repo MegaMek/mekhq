@@ -7505,7 +7505,7 @@ public class Person {
      */
     public String isDarkSecretRevealed(boolean hasDarkSecret, boolean forceReveal) {
         // This boolean is here to ensure that we only ever pass in valid personnel
-        if (!hasDarkSecret) {
+        if (!hasDarkSecret || darkSecretRevealed) {
             return "";
         } else {
             final int BASE_TARGET_NUMBER = 10;
