@@ -291,7 +291,9 @@ public class TrainingCombatTeams {
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       targetSkill.getType().getName(),
-                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes())));
+                      targetSkill.getFinalSkillValue(trainee.getOptions(),
+                            trainee.getATOWAttributes(),
+                            trainee.isIlliterate())));
             }
         }
     }

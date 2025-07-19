@@ -380,7 +380,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        rerollsRemaining = tactics.getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
+        rerollsRemaining = tactics.getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes(),
+              commander.isIlliterate());
     }
 
     public int getModifiedTemperature() {

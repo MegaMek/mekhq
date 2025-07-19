@@ -1189,7 +1189,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 lblValue.setText(person.getSkill(type)
                                        .toString(person.getOptions(),
                                              person.getATOWAttributes(),
-                                             person.getReputation()));
+                                             person.getReputation(),
+                                             person.isIlliterate()));
             } else {
                 lblValue.setText("-");
             }

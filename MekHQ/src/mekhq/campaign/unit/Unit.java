@@ -4499,7 +4499,7 @@ public class Unit implements ITechnology {
                       .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
                                              .getTotalSkillLevel(commander.getOptions(),
                                                    commander.getATOWAttributes(),
-                                                   0));
+                                                   0, commander.isIlliterate()));
             }
         }
 
@@ -4711,11 +4711,12 @@ public class Unit implements ITechnology {
         for (Person person : drivers) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
+            boolean isIlliterate = person.isIlliterate();
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
             if (person.hasSkill(driveType)) {
-                sumPiloting += person.getSkill(driveType).getFinalSkillValue(options, attributes);
+                sumPiloting += person.getSkill(driveType).getFinalSkillValue(options, attributes, isIlliterate);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -4724,7 +4725,7 @@ public class Unit implements ITechnology {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes, isIlliterate);
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -4734,16 +4735,19 @@ public class Unit implements ITechnology {
         for (Person person : gunners) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
+            boolean isIlliterate = person.isIlliterate();
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
             if (person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes, isIlliterate);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
-                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes, isIlliterate) <
+                            artillery) {
+                artillery = person.getSkill(SkillType.S_ARTILLERY)
+                                  .getFinalSkillValue(options, attributes, isIlliterate);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += person.getInjuryModifiers(false);
@@ -4872,20 +4876,21 @@ public class Unit implements ITechnology {
 
         PersonnelOptions options = pilot.getOptions();
         Attributes attributes = pilot.getATOWAttributes();
+        boolean isIlliterate = pilot.isIlliterate();
         if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
-            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options, attributes);
+            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options, attributes, isIlliterate);
         }
         if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
-            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options, attributes);
+            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options, attributes, isIlliterate);
         }
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
-            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options, attributes);
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options, attributes, isIlliterate);
         }
         if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options, attributes);
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options, attributes, isIlliterate);
         }
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
-            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes, isIlliterate);
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -4916,6 +4921,7 @@ public class Unit implements ITechnology {
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
         PersonnelOptions options = person.getOptions();
         Attributes attributes = person.getATOWAttributes();
+        boolean isIlliterate = person.isIlliterate();
         entity.getCrew().setName(person.getFullTitle(), slot);
         entity.getCrew().setNickname(person.getCallsign(), slot);
         entity.getCrew().setGender(person.getGender(), slot);
@@ -4926,17 +4932,18 @@ public class Unit implements ITechnology {
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(options, attributes);
+            gunnery = person.getSkill(gunType).getFinalSkillValue(options, attributes, isIlliterate);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(options, attributes);
+            piloting = person.getSkill(driveType).getFinalSkillValue(options, attributes, isIlliterate);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
-            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes, isIlliterate) <
+                        artillery) {
+            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes, isIlliterate);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);

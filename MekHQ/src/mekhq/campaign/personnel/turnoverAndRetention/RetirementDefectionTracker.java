@@ -229,7 +229,8 @@ public class RetirementDefectionTracker {
                     if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
                         modifier -= commander.getSkill(SkillType.S_LEADER)
                                           .getFinalSkillValue(commander.getOptions(),
-                                                commander.getATOWAttributes());
+                                                commander.getATOWAttributes(),
+                                                commander.isIlliterate());
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -630,7 +631,9 @@ public class RetirementDefectionTracker {
     private static int getIndividualCommanderLeadership(Person commander) {
         if (commander.hasSkill(SkillType.S_LEADER)) {
             return commander.getSkill(SkillType.S_LEADER)
-                         .getFinalSkillValue(commander.getOptions(), commander.getATOWAttributes());
+                         .getFinalSkillValue(commander.getOptions(),
+                               commander.getATOWAttributes(),
+                               commander.isIlliterate());
         } else {
             return 0;
         }
@@ -731,7 +734,8 @@ public class RetirementDefectionTracker {
                   person.getRankNumeric());
             int skillLevel = skill.getTotalSkillLevel(person.getOptions(),
                   person.getATOWAttributes(),
-                  adjustedReputation);
+                  adjustedReputation,
+                  person.isIlliterate());
 
             combinedSkillValues += skillLevel + mediatorModifier;
         }

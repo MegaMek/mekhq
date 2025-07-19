@@ -758,7 +758,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         today,
                       adminCommand.getRankNumeric());
 
-                adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
+                adminCommandExp = skill.getExperienceLevel(options,
+                      attributes,
+                      adjustedReputation,
+                      adminCommand.isIlliterate());
             }
         }
         int adminTransportExp = SkillType.EXP_NONE;
@@ -772,7 +775,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         today,
                       adminTransport.getRankNumeric());
 
-                adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
+                adminTransportExp = skill.getExperienceLevel(options,
+                      attributes,
+                      adjustedReputation,
+                      adminTransport.isIlliterate());
             }
         }
         int adminLogisticsExp = SkillType.EXP_NONE;
@@ -786,7 +792,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         today,
                       adminLogistics.getRankNumeric());
 
-                adminLogisticsExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
+                adminLogisticsExp = skill.getExperienceLevel(options,
+                      attributes,
+                      adjustedReputation,
+                      adminLogistics.isIlliterate());
             }
         }
 

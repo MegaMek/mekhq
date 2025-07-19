@@ -45,6 +45,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -246,37 +247,56 @@ public class Skill {
     }
 
     /**
-     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes)} instead.
+     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, boolean)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public int getFinalSkillValue(PersonnelOptions characterOptions) {
-        return getFinalSkillValue(characterOptions, new Attributes(), 0);
+        return getFinalSkillValue(characterOptions, new Attributes(), 0, false);
+    }
+
+    /**
+     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes) {
+        return getFinalSkillValue(characterOptions, attributes, false);
     }
 
     /**
      * Calculates the final skill value for the character based on the default reputation modifier (zero).
      *
-     * <p>This is a convenience method that delegates to {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)}
+     * <p>This is a convenience method that delegates to
+     * {@link #getFinalSkillValue(PersonnelOptions, Attributes, int, boolean)}
      * with a default reputation value of {@code 0}.</p>
      *
      * <p><b>Usage:</b> This method is for when we know, 100%, that the targeted {@link Skill} is not affected by
-     * the character's Reputation. If unsure, use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)}
+     * the character's Reputation. If unsure, use
+     * {@link #getFinalSkillValue(PersonnelOptions, Attributes, int, boolean)}
      * instead.</p>
      *
      * @param characterOptions The {@link PersonnelOptions} to consider for determining skill value modifiers.
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return The final skill value after applying progression rules and using a default reputation of zero.
      */
-    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes) {
-        return getFinalSkillValue(characterOptions, attributes, 0);
+    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, boolean isIlliterate) {
+        return getFinalSkillValue(characterOptions, attributes, 0, isIlliterate);
     }
 
     /**
-     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)} instead.
+     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int, boolean)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public int getFinalSkillValue(PersonnelOptions characterOptions, int reputation) {
-        return getFinalSkillValue(characterOptions, new Attributes(), reputation);
+        return getFinalSkillValue(characterOptions, new Attributes(), reputation, false);
+    }
+
+    /**
+     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        return getFinalSkillValue(characterOptions, attributes, reputation, false);
     }
 
     /**
@@ -296,11 +316,13 @@ public class Skill {
      * @param characterOptions the {@link PersonnelOptions} that define modifiers and SPA specifics for the character
      * @param attributes       the {@link Attributes} object providing attribute values for the character
      * @param reputation       a numeric value influencing the skill, positive to improve or negative to penalize it
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
-    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int spaModifiers = getSPAModifiers(characterOptions, reputation);
+    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation,
+          boolean isIlliterate) {
+        int spaModifiers = getSPAModifiers(characterOptions, reputation, isIlliterate);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
 
         if (isCountUp()) {
@@ -315,10 +337,11 @@ public class Skill {
      *
      * @param characterOptions The {@link PersonnelOptions} with the character's attributes and options.
      * @param reputation       The character's reputation
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return The calculated skill modifier for the current skill type.
      */
-    public int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
+    public int getSPAModifiers(PersonnelOptions characterOptions, int reputation, boolean isIlliterate) {
         int modifier = 0;
 
         if (characterOptions == null) {
@@ -375,6 +398,13 @@ public class Skill {
 
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
                 modifier += 2;
+            }
+        }
+
+        // Illiterate
+        if (type.hasAttribute(INTELLIGENCE)) {
+            if (isIlliterate) {
+                modifier -= 4;
             }
         }
 
@@ -558,11 +588,19 @@ public class Skill {
     }
 
     /**
-     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, int)} instead.
+     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, int, boolean)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public int getTotalSkillLevel() {
         return level + bonus + agingModifier;
+    }
+
+    /**
+     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, int, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        return getTotalSkillLevel(characterOptions, attributes, reputation, false);
     }
 
     /**
@@ -578,27 +616,38 @@ public class Skill {
      *
      * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
      * @param attributes       the {@link Attributes} representing the character's current attribute values
-     * @param reputation       a numerical modifier for reputation affecting skill level (positive or negative)
+     * @param reputation       a numerical modifier for Reputation affecting skill level (positive or negative)
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return the complete skill level after all relevant modifiers have been applied
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation,
+          boolean isIlliterate) {
         int baseValue = level + bonus + agingModifier;
 
-        int spaModifiers = getSPAModifiers(characterOptions, reputation);
+        int spaModifiers = getSPAModifiers(characterOptions, reputation, isIlliterate);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
 
         return baseValue + spaModifiers + attributeModifiers;
     }
 
+
+    /**
+     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
+        return getTotalSkillLevel(characterOptions, attributes, false);
+    }
+
     /**
      * Calculates the total skill level for a character using the base level, bonuses, aging modifiers, SPA modifiers,
-     * and attribute modifiers. In this version, reputation is not considered.
+     * and attribute modifiers. In this version, Reputation is not considered.
      *
-     * <p>The computation sums:</p>
+     * <p>The computation sums up:</p>
      * <ul>
      *   <li>The base skill level, any additional bonuses, and modifiers due to aging.</li>
      *   <li>SPA modifiers, determined from the given character options (with a reputation value of zero).</li>
@@ -607,13 +656,14 @@ public class Skill {
      *
      * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
      * @param attributes       the {@link Attributes} representing the character's current attribute values
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
-     * @return the complete skill level after all relevant modifiers (excluding reputation) have been applied
+     * @return the complete skill level after all relevant modifiers (excluding Reputation) have been applied
      */
-    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
+    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, boolean isIlliterate) {
         int baseValue = level + bonus + agingModifier;
 
-        int spaModifiers = getSPAModifiers(characterOptions, 0);
+        int spaModifiers = getSPAModifiers(characterOptions, 0, isIlliterate);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
 
         return baseValue + spaModifiers + attributeModifiers;
@@ -654,11 +704,19 @@ public class Skill {
     }
 
     /**
-     * @deprecated use {@link #getSkillLevel(PersonnelOptions, Attributes, int)} instead.
+     * @deprecated use {@link #getSkillLevel(PersonnelOptions, Attributes, int, boolean)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public SkillLevel getSkillLevel() {
-        return getSkillLevel(new PersonnelOptions(), new Attributes(), 0);
+        return getSkillLevel(new PersonnelOptions(), new Attributes(), 0, false);
+    }
+
+    /**
+     * @deprecated use {@link #getSkillLevel(PersonnelOptions, Attributes, int, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        return getSkillLevel(characterOptions, attributes, reputation, false);
     }
 
     /**
@@ -672,12 +730,14 @@ public class Skill {
      * @param characterOptions the SPAs specific to the character
      * @param attributes       the character's attributes used in skill evaluation
      * @param reputation       the reputation value influencing skill evaluation
+     * @param isIlliterate     the return value of {@link Person#isIlliterate()}
      *
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
-    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation,
+          boolean isIlliterate) {
         // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return Skills.SKILL_LEVELS[getExperienceLevel(characterOptions, attributes, reputation) + 1];
+        return Skills.SKILL_LEVELS[getExperienceLevel(characterOptions, attributes, reputation, isIlliterate) + 1];
     }
 
     /**
@@ -689,21 +749,31 @@ public class Skill {
      *
      * @param characterOptions the SPAs specific to the character
      * @param attributes       the character's attributes used in skill evaluation
+     * @param isIlliterate     the return value of {@link Person#isIlliterate()}
      *
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
-    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
+    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes, boolean isIlliterate) {
         // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return getSkillLevel(characterOptions, attributes, 0);
+        return getSkillLevel(characterOptions, attributes, 0, isIlliterate);
     }
 
     /**
-     * @deprecated use {@link #getExperienceLevel(PersonnelOptions, Attributes, int)} or
-     *       {@link #getExperienceLevel(PersonnelOptions, Attributes)} instead.
+     * @deprecated use {@link #getExperienceLevel(PersonnelOptions, Attributes, int, boolean)} or
+     *       {@link #getExperienceLevel(PersonnelOptions, Attributes, boolean)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public int getExperienceLevel() {
-        return type.getExperienceLevel(getTotalSkillLevel(new PersonnelOptions(), new Attributes(), 0));
+        return type.getExperienceLevel(getTotalSkillLevel(new PersonnelOptions(), new Attributes(), 0, false));
+    }
+
+    /**
+     * @deprecated use {@link #getExperienceLevel(PersonnelOptions, Attributes, int, boolean)} or
+     *       {@link #getExperienceLevel(PersonnelOptions, Attributes, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        return getExperienceLevel(characterOptions, attributes, reputation, false);
     }
 
     /**
@@ -717,15 +787,26 @@ public class Skill {
      * @param characterOptions the {@link PersonnelOptions} representing character-specific options
      * @param attributes       the {@link Attributes} possessed by the character
      * @param reputation       the reputation value to factor into the skill calculation
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return the computed experience level as determined by the underlying skill type
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes, reputation);
+    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation,
+          boolean isIlliterate) {
+        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes, reputation, isIlliterate);
         return type.getExperienceLevel(totalSkillLevel);
+    }
+
+    /**
+     * @deprecated use {@link #getExperienceLevel(PersonnelOptions, Attributes, int, boolean)} or
+     *       {@link #getExperienceLevel(PersonnelOptions, Attributes, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes) {
+        return getExperienceLevel(characterOptions, attributes, false);
     }
 
     /**
@@ -737,32 +818,41 @@ public class Skill {
      *
      * @param characterOptions the {@link PersonnelOptions} representing character-specific options
      * @param attributes       the {@link Attributes} possessed by the character
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return the computed experience level as determined by the underlying skill type
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes) {
-        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes);
+    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes, boolean isIlliterate) {
+        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes, isIlliterate);
         return type.getExperienceLevel(totalSkillLevel);
     }
 
     /**
      * Returns a string representation of the object using default parameters.
      *
-     * <p>This method calls {@link #toString(PersonnelOptions, Attributes, int)} with a default
+     * <p>This method calls {@link #toString(PersonnelOptions, Attributes, int, boolean)} with a default
      * {@link PersonnelOptions} instance and a reputation value of {@code 0}.</p>
      *
      * <p><b>Usage:</b> Generally you want to use the above-cited method, and pass in the character's SPAs and
-     * Reputation. As those can have an effect on the skill's Target Number. If you don't care about SPAs and
-     * Reputation, though, this method is great shortcut.</p>
+     * Reputation. As those can affect the skill's Target Number. If you don't care about SPAs and Reputation,
+     * though, this method is great shortcut.</p>
      *
      * @return A string representation of the object based on default options and reputation.
      */
     @Override
     public String toString() {
-        return toString(new PersonnelOptions(), new Attributes(), 0);
+        return toString(new PersonnelOptions(), new Attributes(), 0, false);
+    }
+
+    /**
+     * @deprecated use {@link #toString(PersonnelOptions, Attributes, int, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
+        return toString(options, attributes, reputation, false);
     }
 
     /**
@@ -775,31 +865,40 @@ public class Skill {
      *
      * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
      * @param reputation The reputation value used in the calculation.
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
      *
      * @see #isCountUp()
-     * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
+     * @see #getFinalSkillValue(PersonnelOptions, Attributes, int, boolean)
      */
-    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
+    public String toString(PersonnelOptions options, Attributes attributes, int reputation, boolean isIlliterate) {
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, attributes, reputation);
+            return "+" + getFinalSkillValue(options, attributes, reputation, isIlliterate);
         } else {
-            return getFinalSkillValue(options, attributes, reputation) + "+";
+            return getFinalSkillValue(options, attributes, reputation, isIlliterate) + "+";
         }
     }
 
     /**
-     * * @deprecated use {@link #toString(PersonnelOptions, Attributes, int)} instead
+     * * @deprecated use {@link #toString(PersonnelOptions, Attributes, int, boolean)} instead
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public String toString(PersonnelOptions options, int reputation) {
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, new Attributes(), reputation);
+            return "+" + getFinalSkillValue(options, new Attributes(), reputation, false);
         } else {
-            return getFinalSkillValue(options, new Attributes(), reputation) + "+";
+            return getFinalSkillValue(options, new Attributes(), reputation, false) + "+";
         }
+    }
+
+    /**
+     * * @deprecated use {@link #getTooltip(PersonnelOptions, Attributes, int, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+        return getTooltip(options, attributes, adjustedReputation, false);
     }
 
     /**
@@ -810,13 +909,15 @@ public class Skill {
      * @param options            the personnel options affecting SPA calculation
      * @param attributes         the set of attributes used to determine modifier values
      * @param adjustedReputation the reputation value impacting the tooltip details
+     * @param isIlliterate     The return value of {@link Person#isIlliterate()}
      *
      * @return an HTML-formatted string representing the generated skill tooltip
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+    public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation,
+          boolean isIlliterate) {
         StringBuilder tooltip = new StringBuilder();
 
         String flavorText = getType().getFlavorText(false, false);
@@ -830,7 +931,7 @@ public class Skill {
                   (agingModifier > 0 ? "+" : "") + agingModifier));
         }
 
-        int spaModifier = getSPAModifiers(options, adjustedReputation);
+        int spaModifier = getSPAModifiers(options, adjustedReputation, isIlliterate);
         if (spaModifier != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.spa",

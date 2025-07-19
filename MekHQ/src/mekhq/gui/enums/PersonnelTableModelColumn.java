@@ -553,6 +553,7 @@ public enum PersonnelTableModelColumn {
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
         final PersonnelOptions options = person.getOptions();
         final Attributes attributes = person.getATOWAttributes();
+        final boolean isIlliterate = person.isIlliterate();
 
         // We define these here, as they're used in multiple cases
         int currentAttributeValue;
@@ -721,132 +722,132 @@ public enum PersonnelTableModelColumn {
             case MEK:
                 return (person.hasSkill(SkillType.S_GUN_MEK) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_MEK)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_MEK) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_MEK)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case GROUND_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case NAVAL_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case VTOL:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case AEROSPACE:
                 return (person.hasSkill(SkillType.S_GUN_AERO) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_AERO)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_AERO) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_AERO)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case CONVENTIONAL_AIRCRAFT:
                 return (person.hasSkill(SkillType.S_GUN_JET) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_JET)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_JET) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_JET)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case VESSEL:
                 return (person.hasSkill(SkillType.S_GUN_SPACE) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_SPACE)
-                                                     .getFinalSkillValue(options, attributes)) :
+                                                     .getFinalSkillValue(options, attributes, isIlliterate)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_SPACE) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE)
-                                                           .getFinalSkillValue(options, attributes)) :
+                                                           .getFinalSkillValue(options, attributes, isIlliterate)) :
                                     "-");
             case BATTLE_ARMOUR:
                 return person.hasSkill(SkillType.S_GUN_BA) ?
                              Integer.toString(person.getSkill(SkillType.S_GUN_BA)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case ANTI_MEK:
                 return person.hasSkill(SkillType.S_ANTI_MEK) ?
                              Integer.toString(person.getSkill(SkillType.S_ANTI_MEK)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case SMALL_ARMS:
                 return person.hasSkill(SkillType.S_SMALL_ARMS) ?
                              Integer.toString(person.getSkill(SkillType.S_SMALL_ARMS)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case ARTILLERY:
                 return person.hasSkill(SkillType.S_ARTILLERY) ?
                              Integer.toString(person.getSkill(SkillType.S_ARTILLERY)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TACTICS:
                 return person.hasSkill(SkillType.S_TACTICS) ?
                              Integer.toString(person.getSkill(SkillType.S_TACTICS)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case STRATEGY:
                 return person.hasSkill(SkillType.S_STRATEGY) ?
                              Integer.toString(person.getSkill(SkillType.S_STRATEGY)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case LEADERSHIP:
                 return person.hasSkill(SkillType.S_LEADER) ?
                              Integer.toString(person.getSkill(SkillType.S_LEADER)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TECH_MEK:
                 return person.hasSkill(SkillType.S_TECH_MEK) ?
                              Integer.toString(person.getSkill(SkillType.S_TECH_MEK)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TECH_AERO:
                 return person.hasSkill(SkillType.S_TECH_AERO) ?
                              Integer.toString(person.getSkill(SkillType.S_TECH_AERO)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TECH_MECHANIC:
                 return person.hasSkill(SkillType.S_TECH_MECHANIC) ?
                              Integer.toString(person.getSkill(SkillType.S_TECH_MECHANIC)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TECH_BA:
                 return person.hasSkill(SkillType.S_TECH_BA) ?
                              Integer.toString(person.getSkill(SkillType.S_TECH_BA)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TECH_VESSEL:
                 return person.hasSkill(SkillType.S_TECH_VESSEL) ?
                              Integer.toString(person.getSkill(SkillType.S_TECH_VESSEL)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case TECH_MINUTES:
                 if (person.isTechExpanded()) {
@@ -857,7 +858,7 @@ public enum PersonnelTableModelColumn {
             case MEDICAL:
                 return person.hasSkill(SkillType.S_SURGERY) ?
                              Integer.toString(person.getSkill(SkillType.S_SURGERY)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case MEDICAL_CAPACITY:
                 if (person.isDoctor()) {
@@ -868,7 +869,7 @@ public enum PersonnelTableModelColumn {
             case ADMINISTRATION:
                 return person.hasSkill(SkillType.S_ADMIN) ?
                              Integer.toString(person.getSkill(SkillType.S_ADMIN)
-                                                    .getFinalSkillValue(options, attributes)) :
+                                                    .getFinalSkillValue(options, attributes, isIlliterate)) :
                              "-";
             case NEGOTIATION:
                 return person.hasSkill(SkillType.S_NEGOTIATION) ?
@@ -878,7 +879,8 @@ public enum PersonnelTableModelColumn {
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,
-                                                                person.getRankNumeric()))) :
+                                                                person.getRankNumeric()),
+                                                          isIlliterate)) :
                              "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {

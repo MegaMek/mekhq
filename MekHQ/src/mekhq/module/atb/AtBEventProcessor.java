@@ -140,7 +140,8 @@ public class AtBEventProcessor {
         Skill adminSkill = adminHR.getSkill(S_ADMIN);
         int adminExperienceLevel = EXP_NONE;
         if (adminSkill != null) {
-            adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes());
+            adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes(),
+                  adminHR.isIlliterate());
         }
 
         modifier += adminExperienceLevel - 2;

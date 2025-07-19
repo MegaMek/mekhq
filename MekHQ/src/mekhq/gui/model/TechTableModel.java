@@ -157,7 +157,9 @@ public class TechTableModel extends DataTableModel {
                 toReturn.append("; ");
             }
 
-            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+            int experienceLevel = skill.getExperienceLevel(tech.getOptions(),
+                  tech.getATOWAttributes(),
+                  tech.isIlliterate());
 
             toReturn.append("<b>")
                     .append(SkillType.getColoredExperienceLevelName(experienceLevel))

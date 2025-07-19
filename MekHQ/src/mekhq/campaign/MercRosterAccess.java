@@ -658,6 +658,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 PersonnelOptions options = person.getOptions();
                 Attributes attributes = person.getATOWAttributes();
                 int reputation = person.getReputation();
+                boolean isIlliterate = person.isIlliterate();
                 for (int i = 0; i < SkillType.skillList.length; i++) {
                     if (person.hasSkill(SkillType.skillList[i])) {
                         Skill skill = person.getSkill(SkillType.skillList[i]);
@@ -666,7 +667,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                                                                            ".skills (person, skill, value) VALUES (?, ?, ?)");
                         preparedStatement.setInt(1, id);
                         preparedStatement.setInt(2, i + 1);
-                        preparedStatement.setInt(3, skill.getFinalSkillValue(options, attributes, reputation));
+                        preparedStatement.setInt(3,
+                              skill.getFinalSkillValue(options, attributes, reputation, isIlliterate));
                         preparedStatement.executeUpdate();
                     }
                 }

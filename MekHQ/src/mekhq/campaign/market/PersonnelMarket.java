@@ -560,7 +560,8 @@ public class PersonnelMarket {
         int experienceLevel = EXP_ULTRA_GREEN;
         if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
             Skill skill = logisticsAdmin.getSkill(S_ADMIN);
-            experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
+            experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(),
+                  logisticsAdmin.getATOWAttributes(), logisticsAdmin.isIlliterate());
         }
 
         target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
