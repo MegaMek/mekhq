@@ -32,8 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -162,8 +160,6 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             final boolean IS_STARTUP = true;
             final boolean IS_NEW_ORGANIZATION = true;
             campaign.checkForNewMercenaryOrganizationStartUp(IS_STARTUP, IS_NEW_ORGANIZATION);
-            return;
-        } else if (campaignFactionCode.equals(PIRATE_FACTION_CODE)) {
             return;
         }
 
