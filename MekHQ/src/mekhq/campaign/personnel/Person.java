@@ -51,6 +51,7 @@ import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
@@ -7227,6 +7228,30 @@ public class Person {
         }
 
         sufferingFromClinicalParanoia = false;
+        return "";
+    }
+
+    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasCatatonia, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasCatatonia && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CATATONIA.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.catatonia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
         return "";
     }
 }

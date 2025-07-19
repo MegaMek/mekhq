@@ -83,6 +83,7 @@ public final class InjuryTypes {
     public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
     public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
+    public static final InjuryType CATATONIA = new Catatonia();
 
     // Replacement Limbs
     public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
@@ -122,6 +123,7 @@ public final class InjuryTypes {
             InjuryType.register("am:DiscontinuationSyndrome", DISCONTINUATION_SYNDROME);
             InjuryType.register("am:Crippling_Flashbacks", CRIPPLING_FLASHBACKS);
             InjuryType.register("am:Childlike_Regression", CHILDLIKE_REGRESSION);
+            InjuryType.register("am:Catatonia", CATATONIA);
             registered = true;
         }
     }
@@ -861,6 +863,23 @@ public final class InjuryTypes {
         public Collection<Modifier> getModifiers(Injury inj) {
             return List.of(new Modifier(GUNNERY, 4, null, InjuryType.MODTAG_INJURY),
                   new Modifier(PILOTING, 4, null, InjuryType.MODTAG_INJURY));
+        }
+    }
+
+    public static final class Catatonia extends AMInjuryType {
+        public Catatonia() {
+            recoveryTime = 7;
+            allowedLocations = EnumSet.of(BodyLocation.INTERNAL);
+            fluffText = "Catatonia";
+            simpleName = "Catatonia";
+            maxSeverity = 1;
+            level = InjuryLevel.MINOR;
+        }
+
+        @Override
+        public Collection<Modifier> getModifiers(Injury inj) {
+            return List.of(new Modifier(GUNNERY, 20, null, InjuryType.MODTAG_INJURY),
+                  new Modifier(PILOTING, 20, null, InjuryType.MODTAG_INJURY));
         }
     }
 }
