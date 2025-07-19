@@ -53,6 +53,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -81,9 +83,19 @@ import org.mockito.Mockito;
  * @since 0.50.5
  */
 class SkillCheckUtilityTest {
+    private static final LocalDate CURRENT_DATE = LocalDate.of(3151, 1, 1);
+    
     @Test
     void testIsPersonNull_EdgeDisallowed() {
-        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, null, 0, false, false);
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null,
+              S_GUN_MEK,
+              null,
+              0,
+              false,
+              false,
+              false,
+              false,
+              CURRENT_DATE);
 
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
@@ -101,7 +113,15 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_EdgeAllowed() {
-        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, null, 0, true, false);
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null,
+              S_GUN_MEK,
+              null,
+              0,
+              true,
+              false,
+              false,
+              false,
+              CURRENT_DATE);
 
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
@@ -119,7 +139,7 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_PerformQuickSkillCheck() {
-        boolean results = performQuickSkillCheck(null, S_GUN_MEK, null, 0);
+        boolean results = performQuickSkillCheck(null, S_GUN_MEK, null, 0, false, false, CURRENT_DATE);
         assertFalse(results);
     }
 
@@ -235,7 +255,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE + UNTRAINED_SKILL_MODIFIER -
@@ -260,7 +280,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
@@ -298,7 +318,12 @@ class SkillCheckUtilityTest {
                 mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
                 // Act
-                TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
+                TargetRoll targetNumber = determineTargetNumber(mockPerson,
+                      testSkillType,
+                      0,
+                      false,
+                      false,
+                      CURRENT_DATE);
 
                 // Assert
                 int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
@@ -335,7 +360,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
             int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
@@ -370,7 +395,12 @@ class SkillCheckUtilityTest {
                 mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
                 // Act
-                TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
+                TargetRoll targetNumber = determineTargetNumber(mockPerson,
+                      testSkillType,
+                      0,
+                      false,
+                      false,
+                      CURRENT_DATE);
 
                 // Assert
                 int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
@@ -401,7 +431,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES + UNTRAINED_SKILL_MODIFIER -
@@ -431,7 +461,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(edgeCaseSkillType);
 
             // Act
-            TargetRoll targetNumber = determineTargetNumber(person, edgeCaseSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, edgeCaseSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE + UNTRAINED_SKILL_MODIFIER;
@@ -466,7 +496,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES + UNTRAINED_SKILL_MODIFIER -
