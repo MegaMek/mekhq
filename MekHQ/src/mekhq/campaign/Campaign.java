@@ -58,6 +58,7 @@ import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionar
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CONFUSION;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_SPLIT_PERSONALITY;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_FLASHBACKS;
