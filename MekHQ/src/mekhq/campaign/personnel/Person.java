@@ -50,10 +50,10 @@ import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
@@ -7122,49 +7122,6 @@ public class Person {
     }
 
     /**
-     * Processes the effects of "confusion" for a personnel based on their mental state.
-     *
-     * <p>If the personnel has both "madness confusion", and has failed a willpower check, applies random damage
-     * (injury or hit points depending on the medical system in use), and changes their status to medical complications
-     * if the number of injuries or hits exceeds a set threshold.</p>
-     *
-     * <p>Returns a formatted warning message describing the confusion compulsion, or an empty string if no action
-     * was taken.</p>
-     *
-     * @param campaign             The current campaign instance, used for logging and state updates.
-     * @param useAdvancedMedical   Whether the advanced medical system should be used.
-     * @param hasMadnessConfusion  Indicates if the personnel is afflicted with madness-induced confusion.
-     * @param failedWillpowerCheck Indicates if the required willpower check was failed.
-     *
-     * @return A formatted string with the confusion compulsion warning, or an empty string if not applicable.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public String processConfusion(Campaign campaign, boolean useAdvancedMedical,
-          // These boolean are here to ensure that we only ever pass in valid personnel
-          boolean hasMadnessConfusion, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
-        if (hasMadnessConfusion && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
-                InjuryUtil.resolveCombatDamage(campaign, this, 1);
-            } else {
-                hits++;
-            }
-
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
-                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
-            }
-
-            return String.format(resources.getString("compulsion.confusion"), getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
-        }
-
-        return "";
-    }
-
-    /**
      * Processes the effects of childlike regression on the character, applying injuries or health complications based
      * on specified conditions.
      *
@@ -7203,34 +7160,23 @@ public class Person {
     }
 
     /**
-     * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
-     * check, and returns a formatted warning message if applicable.
+     * Processes a potential catatonia episode fthe character, applying relevant effects and status changes.
      *
-     * <p>If both {@code hasClinicalParanoia} and {@code failedWillpowerCheck} are {@code true}, this method sets the
-     * internal state indicating the member is suffering from clinical paranoia and returns a warning message.
-     * Otherwise, it resets the state and returns an empty string.</p>
+     * <p>If both {@code hasCatatonia} and {@code failedWillpowerCheck} are {@code true}, this method applies an
+     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of
+     * injuries or trauma exceeds a predefined death threshold, the person's status is changed to indicate medical
+     * complications. In either case, the method returns a formatted string describing the catatonia episode. If the
+     * conditions are not met, it returns an empty string.</p>
      *
-     * @param hasClinicalParanoia  {@code true} if the personnel member has the clinical paranoia condition
-     * @param failedWillpowerCheck {@code true} if the personnel member failed their willpower check
-     *
-     * @return A formatted warning message if clinical paranoia applies, or an empty string otherwise
+     * @param campaign             the current campaign context
+     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param hasCatatonia         {@code true} if the person is suffering from catatonia
+     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     * @return description of the resulting catatonia episode, or an empty string if no episode occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String processClinicalParanoia(
-          // These boolean are here to ensure that we only ever pass in valid personnel
-          boolean hasClinicalParanoia, boolean failedWillpowerCheck) {
-        if (hasClinicalParanoia && failedWillpowerCheck) {
-            sufferingFromClinicalParanoia = true;
-            return String.format(resources.getString("compulsion.clinicalParanoia"), getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
-        }
-
-        sufferingFromClinicalParanoia = false;
-        return "";
-    }
-
     public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCatatonia, boolean failedWillpowerCheck) {
@@ -7365,84 +7311,6 @@ public class Person {
     }
 
     /**
-     * Selects random victims from the list of all active, non-deployed personnel and adds them to the provided set of
-     * victims.
-     *
-     * <p>The number of victims selected is determined by a single six-sided die roll. For each count, a random
-     * non-deployed person is chosen from the available pool and added to the victims set. Once chosen, a victim will
-     * not be selected again.</p>
-     *
-     * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
-     * @param victims            the set to which randomly selected non-deployed victims will be added
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void getNonDeployedVictims(List<Person> allActivePersonnel, Set<Person> victims) {
-        Set<Person> potentialVictims = new HashSet<>();
-
-        for (Person bystander : allActivePersonnel) {
-            if (!bystander.isDeployed()) {
-                potentialVictims.add(bystander);
-            }
-        }
-
-        potentialVictims.remove(this);
-
-        int roll = d6(1);
-        for (int i = 0; i < roll; ++i) {
-            if (potentialVictims.isEmpty()) {
-                break;
-            }
-
-            Person victim = ObjectUtility.getRandomItem(potentialVictims);
-            potentialVictims.remove(victim);
-            victims.add(victim);
-        }
-    }
-
-    /**
-     * Selects random victims from deployed personnel who are in the same scenario as the caller and adds them to the
-     * provided set of victims.
-     *
-     * <p>Only personnel currently deployed in the same scenario (as determined by matching scenario IDs) are
-     * eligible to be selected. The number of victims chosen is based on a single six-sided die roll. For each count, a
-     * random eligible person is added to the victims set; once chosen, a victim will not be selected again.</p>
-     *
-     * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
-     * @param victims            the set to which randomly selected victims from the same scenario will be added
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void getLocalVictims(List<Person> allActivePersonnel, Set<Person> victims) {
-        Set<Person> potentialVictims = new HashSet<>();
-
-        int scenarioId = unit.getScenarioId();
-        for (Person bystander : allActivePersonnel) {
-            Unit bystanderUnit = bystander.getUnit();
-            if (bystanderUnit != null) {
-                if (scenarioId == bystanderUnit.getScenarioId()) {
-                    potentialVictims.add(bystander);
-                }
-            }
-        }
-
-        potentialVictims.remove(this);
-
-        int roll = d6(1);
-        for (int i = 0; i < roll; ++i) {
-            if (potentialVictims.isEmpty()) {
-                break;
-            }
-
-            Person victim = ObjectUtility.getRandomItem(potentialVictims);
-            potentialVictims.remove(victim);
-            victims.add(victim);
-        }
-    }
-
-    /**
      * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
      * check, and returns a formatted warning message if applicable.
      *
@@ -7471,6 +7339,24 @@ public class Person {
         return "";
     }
 
+    /**
+     * Processes a hysteria episode for the character.
+     *
+     * <p>If both {@code hasHysteria} and {@code failedWillpowerCheck} are {@code true}, this method randomly
+     * determines (via die roll) which type of episode occurs: berserker frenzy, confusion, or clinical paranoia. The
+     * appropriate episode handler is called, and its result returned as a description string. When the episode is not
+     * paranoia, any paranoia flag is cleared. Otherwise, if the conditions are not met, returns an empty string.</p>
+     *
+     * @param campaign             the current campaign context
+     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param hasHysteria          {@code true} if the person is suffering from hysteria
+     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     *
+     * @return description of the resulting episode, or an empty string if no episode occurred
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public String processHysteria(Campaign campaign, boolean useAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasHysteria, boolean failedWillpowerCheck) {
@@ -7490,70 +7376,6 @@ public class Person {
             }
 
             return report;
-        }
-
-        return "";
-    }
-
-    /**
-     * Processes the effects of a berserker frenzy event for a character, potentially injuring themselves and other
-     * victims.
-     *
-     * <p>If the character has the berserker trait and fails a willpower check, this method determines who is
-     * affected by the frenzy (including the character and other victims depending on deployment). Each affected person
-     * may receive one or two wounds, applied either as advanced medical injuries or as simple hit increments.</p>
-     *
-     * <p>If the number of injuries or hits for any victim exceeds a defined threshold, the status for that person
-     * is updated to reflect medical complications (for the berserker) or homicide (for other victims). A formatted
-     * message describing the frenzy is returned.</p>
-     *
-     * @param campaign             the campaign context used for looking up personnel, applying wounds, and updating
-     *                             statuses
-     * @param useAdvancedMedical   if {@code true}, applies wounds using the advanced medical system; otherwise,
-     *                             increments hits directly
-     * @param hasBerserker         if {@code true}, indicates the character is capable of berserker frenzy
-     * @param failedWillpowerCheck if {@code true}, indicates the character failed their willpower check to resist
-     *                             frenzy
-     *
-     * @return a formatted message describing the frenzy if one occurs, or an empty string if there is no effect
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public String processBerserkerFrenzy(Campaign campaign, boolean useAdvancedMedical,
-          // These boolean are here to ensure that we only ever pass in valid personnel
-          boolean hasBerserker, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
-        if (hasBerserker && failedWillpowerCheck) {
-            Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
-            if (isDeployed() && unit != null) {
-                getLocalVictims(allActivePersonnel, victims);
-            } else {
-                getNonDeployedVictims(allActivePersonnel, victims);
-            }
-
-            // The berserker hurts themselves
-            victims.add(this);
-
-            for (Person victim : victims) {
-                int wounds = randomInt(2) + 1; // (1-2)
-                if (useAdvancedMedical) {
-                    InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
-                } else {
-                    hits += wounds;
-                }
-
-                if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
-                    changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
-                                                                          PersonnelStatus.MEDICAL_COMPLICATIONS :
-                                                                          PersonnelStatus.HOMICIDE);
-                }
-            }
-
-            return String.format(resources.getString("compulsion.berserker"), getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
         }
 
         return "";
