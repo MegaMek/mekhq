@@ -268,7 +268,7 @@ public class SupportPointNegotiation {
               isUseAgingEffects,
               isClanCampaign,
               today,
-              p2.getRankLevel()), getSkillValue(p1, isUseAgingEffects, isClanCampaign, today, p1.getRankLevel())));
+              p2.getRankNumeric()), getSkillValue(p1, isUseAgingEffects, isClanCampaign, today, p1.getRankNumeric())));
         return adminTransport;
     }
 

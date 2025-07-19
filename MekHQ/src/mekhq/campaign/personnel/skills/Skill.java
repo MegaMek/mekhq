@@ -348,7 +348,7 @@ public class Skill {
             }
         }
 
-        // Attractive, Unattractive, Freakish Strength
+        // Attractive, Unattractive, Freakish Strength, some compulsions
         if (type.hasAttribute(CHARISMA)) {
             if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
                 modifier -= 2;
@@ -364,6 +364,10 @@ public class Skill {
 
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
                 modifier += 2;
+            }
+
+            if (characterOptions.booleanOption(COMPULSION_UNPLEASANT_PERSONALITY)) {
+                modifier -= 1;
             }
         }
 

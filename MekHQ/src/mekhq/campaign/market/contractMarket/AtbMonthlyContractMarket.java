@@ -361,7 +361,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             int connections = 0;
             Person commander = campaign.getCommander();
             if (commander != null) {
-                connections = commander.getConnections();
+                connections = commander.getAdjustedConnections();
             }
             int roll = d6(2) + connections;
             if (roll < 6) {
@@ -756,7 +756,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 int adjustedReputation = adminCommand.getAdjustedReputation(isUseAgeEffects,
                         isClanCampaign,
                         today,
-                        adminCommand.getRankLevel());
+                      adminCommand.getRankNumeric());
 
                 adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
@@ -770,7 +770,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 int adjustedReputation = adminTransport.getAdjustedReputation(isUseAgeEffects,
                         isClanCampaign,
                         today,
-                        adminTransport.getRankLevel());
+                      adminTransport.getRankNumeric());
 
                 adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
@@ -784,7 +784,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 int adjustedReputation = adminLogistics.getAdjustedReputation(isUseAgeEffects,
                         isClanCampaign,
                         today,
-                        adminLogistics.getRankLevel());
+                      adminLogistics.getRankNumeric());
 
                 adminLogisticsExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
