@@ -595,7 +595,7 @@ public class BiographyTab {
               "ComingOfAgeRPSkills"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LifeEventsPanel", true, "LifeEventsPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("ComingOfAgePanel", true, "ComingOfAgePanel");
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
         layoutParent.gridwidth = 1;
