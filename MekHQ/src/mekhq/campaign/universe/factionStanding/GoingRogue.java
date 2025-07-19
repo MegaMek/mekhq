@@ -246,7 +246,7 @@ public class GoingRogue {
 
             // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain
             boolean loyaltyEnabled = campaign.getCampaignOptions().isUseLoyaltyModifiers();
-            int loyalty = loyaltyEnabled ? person.getLoyalty() : 0;
+            int loyalty = loyaltyEnabled ? person.getAdjustedLoyalty(campaign.getFaction()) : 0;
             int modifier = loyaltyEnabled ? person.getLoyaltyModifier(loyalty) : 0;
             int roll = Compute.d6(2);
 
