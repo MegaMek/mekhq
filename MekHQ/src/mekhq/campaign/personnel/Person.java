@@ -340,7 +340,7 @@ public class Person {
     private String personalityInterviewNotes;
     // endregion Personality
 
-    // region Compulsions
+    // region SPAs
     private String storedGivenName;
     private String storedSurname;
     private int storedLoyalty;
@@ -358,7 +358,8 @@ public class Person {
     private Reasoning storedReasoning;
     private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
-    // endregion Compulsions
+    private boolean darkSecretRevealed;
+    // endregion SPAs
 
     // region Flags
     private boolean clanPersonnel;
@@ -567,6 +568,7 @@ public class Person {
         storedReasoning = Reasoning.AVERAGE;
         storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
+        darkSecretRevealed = false;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -2663,6 +2665,14 @@ public class Person {
         this.sufferingFromClinicalParanoia = sufferingFromClinicalParanoia;
     }
 
+    public boolean isDarkSecretRevealed() {
+        return darkSecretRevealed;
+    }
+
+    public void setDarkSecretRevealed(final boolean darkSecretRevealed) {
+        this.darkSecretRevealed = darkSecretRevealed;
+    }
+
     // region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -3239,6 +3249,13 @@ public class Person {
                       sufferingFromClinicalParanoia);
             }
 
+            if (darkSecretRevealed) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "darkSecretRevealed",
+                      darkSecretRevealed);
+            }
+
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
@@ -3777,6 +3794,8 @@ public class Person {
                     person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
+                    person.setDarkSecretRevealed(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
