@@ -42,6 +42,7 @@ import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
@@ -56,6 +57,8 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -74,6 +77,7 @@ import java.util.stream.Stream;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -116,10 +120,12 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
@@ -332,6 +338,25 @@ public class Person {
     private String personalityInterviewNotes;
     // endregion Personality
 
+    // region Split Personality
+    private String storedGivenName;
+    private String storedSurname;
+    private int storedLoyalty;
+    private Faction storedOriginFaction;
+    private Aggression storedAggression;
+    private int storedAggressionDescriptionIndex;
+    private Ambition storedAmbition;
+    private int storedAmbitionDescriptionIndex;
+    private Greed storedGreed;
+    private int storedGreedDescriptionIndex;
+    private Social storedSocial;
+    private int storedSocialDescriptionIndex;
+    private PersonalityQuirk storedPersonalityQuirk;
+    private int storedPersonalityQuirkDescriptionIndex;
+    private Reasoning storedReasoning;
+    private int storedReasoningDescriptionIndex;
+    // endregion Split Personality
+
     // region Flags
     private boolean clanPersonnel;
     private boolean commander;
@@ -525,6 +550,19 @@ public class Person {
         reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
         personalityInterviewNotes = "";
+        storedLoyalty = 0;
+        storedAggression = Aggression.NONE;
+        storedAggressionDescriptionIndex = 0;
+        storedAmbition = Ambition.NONE;
+        storedAmbitionDescriptionIndex = 0;
+        storedGreed = Greed.NONE;
+        storedGreedDescriptionIndex = 0;
+        storedSocial = Social.NONE;
+        storedSocialDescriptionIndex = 0;
+        storedPersonalityQuirk = PersonalityQuirk.NONE;
+        storedPersonalityQuirkDescriptionIndex = 0;
+        storedReasoning = Reasoning.AVERAGE;
+        storedReasoningDescriptionIndex = 0;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -579,6 +617,14 @@ public class Person {
 
     public void setOriginFaction(final Faction originFaction) {
         this.originFaction = originFaction;
+    }
+
+    Faction getStoredOriginFaction() {
+        return storedOriginFaction;
+    }
+
+    void setStoredOriginFaction(final Faction originFaction) {
+        this.storedOriginFaction = originFaction;
     }
 
     public Planet getOriginPlanet() {
@@ -773,6 +819,14 @@ public class Person {
         this.givenName = givenName;
     }
 
+    String getStoredGivenName() {
+        return storedGivenName;
+    }
+
+    void setStoredGivenName(String storedGivenName) {
+        this.storedGivenName = storedGivenName;
+    }
+
     /**
      * @return the person's surname
      */
@@ -790,6 +844,14 @@ public class Person {
 
     protected void setSurnameDirect(final String surname) {
         this.surname = surname;
+    }
+
+    String getStoredSurname() {
+        return storedSurname;
+    }
+
+    void setStoredSurname(String storedSurname) {
+        this.storedSurname = storedSurname;
     }
 
     /**
@@ -1979,6 +2041,14 @@ public class Person {
         };
     }
 
+    int getStoredLoyalty() {
+        return storedLoyalty;
+    }
+
+    void setStoredLoyalty(int storedLoyalty) {
+        this.storedLoyalty = storedLoyalty;
+    }
+
     public int getFatigue() {
         return fatigue;
     }
@@ -2357,6 +2427,22 @@ public class Person {
         this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
+    Aggression getStoredAggression() {
+        return storedAggression;
+    }
+
+    void setStoredAggression(Aggression storedAggression) {
+        this.storedAggression = storedAggression;
+    }
+
+    int getStoredAggressionDescriptionIndex() {
+        return storedAggressionDescriptionIndex;
+    }
+
+    void setStoredAggressionDescriptionIndex(int storedAggressionDescriptionIndex) {
+        this.storedAggressionDescriptionIndex = storedAggressionDescriptionIndex;
+    }
+
     public Ambition getAmbition() {
         return ambition;
     }
@@ -2377,6 +2463,22 @@ public class Person {
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
         this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
+    }
+
+    Ambition getStoredAmbition() {
+        return storedAmbition;
+    }
+
+    void setStoredAmbition(Ambition storedAmbition) {
+        this.storedAmbition = storedAmbition;
+    }
+
+    int getStoredAmbitionDescriptionIndex() {
+        return storedAmbitionDescriptionIndex;
+    }
+
+    void setStoredAmbitionDescriptionIndex(int storedAmbitionDescriptionIndex) {
+        this.storedAmbitionDescriptionIndex = storedAmbitionDescriptionIndex;
     }
 
     public Greed getGreed() {
@@ -2401,6 +2503,22 @@ public class Person {
         this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
+    Greed getStoredGreed() {
+        return storedGreed;
+    }
+
+    void setStoredGreed(Greed storedGreed) {
+        this.storedGreed = storedGreed;
+    }
+
+    int getStoredGreedDescriptionIndex() {
+        return storedGreedDescriptionIndex;
+    }
+
+    void setStoredGreedDescriptionIndex(int storedGreedDescriptionIndex) {
+        this.storedGreedDescriptionIndex = storedGreedDescriptionIndex;
+    }
+
     public Social getSocial() {
         return social;
     }
@@ -2421,6 +2539,22 @@ public class Person {
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
         this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
+    }
+
+    Social getStoredSocial() {
+        return storedSocial;
+    }
+
+    void setStoredSocial(Social storedSocial) {
+        this.storedSocial = storedSocial;
+    }
+
+    int getStoredSocialDescriptionIndex() {
+        return storedSocialDescriptionIndex;
+    }
+
+    void setStoredSocialDescriptionIndex(int storedSocialDescriptionIndex) {
+        this.storedSocialDescriptionIndex = storedSocialDescriptionIndex;
     }
 
     public PersonalityQuirk getPersonalityQuirk() {
@@ -2447,6 +2581,22 @@ public class Person {
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
 
+    PersonalityQuirk getStoredPersonalityQuirk() {
+        return storedPersonalityQuirk;
+    }
+
+    void setStoredPersonalityQuirk(PersonalityQuirk storedPersonalityQuirk) {
+        this.storedPersonalityQuirk = storedPersonalityQuirk;
+    }
+
+    int getStoredPersonalityQuirkDescriptionIndex() {
+        return storedPersonalityQuirkDescriptionIndex;
+    }
+
+    void setStoredPersonalityQuirkDescriptionIndex(int storedPersonalityQuirkDescriptionIndex) {
+        this.storedPersonalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
+    }
+
     public Reasoning getReasoning() {
         return reasoning;
     }
@@ -2467,6 +2617,22 @@ public class Person {
      */
     public void setReasoningDescriptionIndex(final int reasoningDescriptionIndex) {
         this.reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, Reasoning.MAXIMUM_VARIATIONS - 1);
+    }
+
+    Reasoning getStoredReasoning() {
+        return storedReasoning;
+    }
+
+    void setStoredReasoning(Reasoning storedReasoning) {
+        this.storedReasoning = storedReasoning;
+    }
+
+    int getStoredReasoningDescriptionIndex() {
+        return storedReasoningDescriptionIndex;
+    }
+
+    void setStoredReasoningDescriptionIndex(int storedReasoningDescriptionIndex) {
+        this.storedReasoningDescriptionIndex = storedReasoningDescriptionIndex;
     }
 
     public String getPersonalityDescription() {
@@ -2975,6 +3141,85 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
             }
 
+            if (!isNullOrBlank(storedGivenName)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGivenName", storedGivenName);
+            }
+
+            if (!isNullOrBlank(storedSurname)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedSurname", storedSurname);
+            }
+
+            if (storedLoyalty != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedLoyalty", storedLoyalty);
+            }
+
+            if (storedOriginFaction != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedOriginFaction", storedOriginFaction.getShortName());
+            }
+
+            if (storedAggression != Aggression.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedAggression", storedAggression.name());
+            }
+
+            if (storedAggressionDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedAggressionDescriptionIndex",
+                      storedAggressionDescriptionIndex);
+            }
+
+            if (storedAmbition != Ambition.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedAmbition", storedAmbition.name());
+            }
+
+            if (storedAmbitionDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedAmbitionDescriptionIndex",
+                      storedAmbitionDescriptionIndex);
+            }
+
+            if (storedGreed != Greed.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGreed", storedGreed.name());
+            }
+
+            if (storedGreedDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGreedDescriptionIndex", storedGreedDescriptionIndex);
+            }
+
+            if (storedSocial != Social.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedSocial", storedSocial.name());
+            }
+
+            if (storedSocialDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedSocialDescriptionIndex",
+                      storedSocialDescriptionIndex);
+            }
+
+            if (storedPersonalityQuirk != PersonalityQuirk.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedPersonalityQuirk", storedPersonalityQuirk.name());
+            }
+
+            if (storedPersonalityQuirkDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedPersonalityQuirkDescriptionIndex",
+                      storedPersonalityQuirkDescriptionIndex);
+            }
+
+            if (storedReasoning != Reasoning.AVERAGE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedReasoning", storedReasoning.name());
+            }
+
+            if (storedReasoningDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedReasoningDescriptionIndex",
+                      storedReasoningDescriptionIndex);
+            }
+
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
@@ -3057,17 +3302,17 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("secondaryRole")) {
                     person.setSecondaryRoleDirect(PersonnelRole.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("acquisitions")) {
-                    person.acquisitions = MathUtility.parseInt(wn2.getTextContent());
+                    person.acquisitions = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("primaryDesignator")) {
                     person.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("secondaryDesignator")) {
                     person.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("daysToWaitForHealing")) {
-                    person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent());
+                    person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("vocationalXPTimer")) {
-                    person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent());
+                    person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("id")) {
-                    person.id = UUID.fromString(wn2.getTextContent());
+                    person.id = UUID.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("genealogy")) {
                     person.getGenealogy().fillFromXML(wn2.getChildNodes());
                 } else if (nodeName.equalsIgnoreCase("dueDate")) {
@@ -3081,11 +3326,11 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("totalXPEarnings")) {
                     person.setTotalXPEarnings(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("nTasks")) {
-                    person.nTasks = MathUtility.parseInt(wn2.getTextContent());
+                    person.nTasks = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hits")) {
-                    person.hits = MathUtility.parseInt(wn2.getTextContent());
+                    person.hits = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hitsPrior")) {
-                    person.hitsPrior = MathUtility.parseInt(wn2.getTextContent());
+                    person.hitsPrior = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("gender")) {
                     person.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("bloodGroup")) {
@@ -3106,11 +3351,11 @@ public class Person {
                     person.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("doctorId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        person.doctorId = UUID.fromString(wn2.getTextContent());
+                        person.doctorId = UUID.fromString(wn2.getTextContent().trim());
                     }
                 } else if (nodeName.equalsIgnoreCase("unitId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
+                        person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("status")) {
                     person.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
@@ -3121,9 +3366,9 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("totalEarnings")) {
                     person.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("minutesLeft")) {
-                    person.minutesLeft = MathUtility.parseInt(wn2.getTextContent());
+                    person.minutesLeft = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("overtimeLeft")) {
-                    person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent());
+                    person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("birthday")) {
                     person.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("deathday")) {
@@ -3141,7 +3386,7 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("loyalty")) {
                     person.loyalty = MathUtility.parseInt(wn2.getTextContent(), 9);
                 } else if (nodeName.equalsIgnoreCase("fatigue")) {
-                    person.fatigue = MathUtility.parseInt(wn2.getTextContent());
+                    person.fatigue = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("isRecoveringFromFatigue")) {
                     person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("advantages")) {
@@ -3153,17 +3398,17 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
-                    person.toughness = MathUtility.parseInt(wn2.getTextContent());
+                    person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("connections")) {
-                    person.connections = MathUtility.parseInt(wn2.getTextContent());
+                    person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
-                    person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                    person.wealth = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
-                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent());
+                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
-                    person.reputation = MathUtility.parseInt(wn2.getTextContent());
+                    person.reputation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
-                    person.unlucky = MathUtility.parseInt(wn2.getTextContent());
+                    person.unlucky = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodmark")) {
                     person.bloodmark = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("bloodhuntSchedule")) {
@@ -3185,7 +3430,7 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("atowAttributes")) {
                     person.atowAttributes = new Attributes().generateAttributesFromXML(wn2);
                 } else if (nodeName.equalsIgnoreCase("pilotHits")) {
-                    person.hits = MathUtility.parseInt(wn2.getTextContent());
+                    person.hits = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
@@ -3205,7 +3450,7 @@ public class Person {
                                   wn3.getNodeName());
                             continue;
                         }
-                        person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
+                        person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent().trim())));
                     }
                 } else if (nodeName.equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -3391,17 +3636,17 @@ public class Person {
                           .filter(inj -> (null == inj.getStart()))
                           .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
-                    person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent());
+                    person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
-                    person.originalUnitTech = MathUtility.parseInt(wn2.getTextContent());
+                    person.originalUnitTech = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitId")) {
-                    person.originalUnitId = UUID.fromString(wn2.getTextContent());
+                    person.originalUnitId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduHighestEducation")) {
-                    person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent());
+                    person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduJourneyTime")) {
-                    person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduDaysOfTravel")) {
-                    person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                     if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -3426,59 +3671,91 @@ public class Person {
                             Node node = nodes.item(j);
 
                             if (node.getNodeName().equalsIgnoreCase("eduFailedApplication")) {
-                                person.eduFailedApplications.add(node.getTextContent());
+                                person.eduFailedApplications.add(node.getTextContent().trim());
                             }
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
-                    person.eduAcademySystem = String.valueOf(wn2.getTextContent());
+                    person.eduAcademySystem = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyName")) {
-                    person.eduAcademyName = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyName = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
-                    person.eduAcademySet = String.valueOf(wn2.getTextContent());
+                    person.eduAcademySet = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyNameInSet")) {
-                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyFaction")) {
-                    person.eduAcademyFaction = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyFaction = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduCourseIndex")) {
-                    person.eduCourseIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduCourseIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduEducationStage")) {
-                    person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
+                    person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduEducationTime")) {
-                    person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggression")) {
-                    person.aggression = Aggression.fromString(wn2.getTextContent());
+                    person.aggression = Aggression.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggressionDescriptionIndex")) {
-                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("ambition")) {
-                    person.ambition = Ambition.fromString(wn2.getTextContent());
+                    person.ambition = Ambition.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("ambitionDescriptionIndex")) {
-                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("greed")) {
-                    person.greed = Greed.fromString(wn2.getTextContent());
+                    person.greed = Greed.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("greedDescriptionIndex")) {
-                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("social")) {
-                    person.social = Social.fromString(wn2.getTextContent());
+                    person.social = Social.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("socialDescriptionIndex")) {
-                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityQuirk")) {
-                    person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+                    person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
 
                     // < 50.07 compatibility handler
                     if (person.personalityQuirk == PersonalityQuirk.BROKEN) {
                         person.personalityQuirk = PersonalityQuirk.HAUNTED;
                     }
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
-                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
-                    person.reasoning = Reasoning.fromString(wn2.getTextContent());
+                    person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
-                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
                     person.personalityInterviewNotes = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("storedGivenName")) {
+                    person.storedGivenName = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("storedSurname")) {
+                    person.storedSurname = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("storedLoyalty")) {
+                    person.storedLoyalty = MathUtility.parseInt(wn2.getTextContent().trim(), 9);
+                } else if (nodeName.equalsIgnoreCase("storedOriginFaction")) {
+                    person.storedOriginFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAggression")) {
+                    person.storedAggression = Aggression.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAggressionDescriptionIndex")) {
+                    person.storedAggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAmbition")) {
+                    person.storedAmbition = Ambition.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAmbitionDescriptionIndex")) {
+                    person.storedAmbitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedGreed")) {
+                    person.storedGreed = Greed.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedGreedDescriptionIndex")) {
+                    person.storedGreedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedSocial")) {
+                    person.storedSocial = Social.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedSocialDescriptionIndex")) {
+                    person.storedSocialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirk")) {
+                    person.storedPersonalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirkDescriptionIndex")) {
+                    person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
+                    person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedReasoningDescriptionIndex")) {
+                    person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
@@ -6549,6 +6826,271 @@ public class Person {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
+    }
+
+    /**
+     * Processes the occurrence of a split personality event.
+     *
+     * <p>If the subject has split personality and fails a willpower check, an alternative personality is generated
+     * (if needed), the personality is switched, and a description of the resulting personality is written using the
+     * {@link PersonalityController}.</p>
+     *
+     * @param hasSplitPersonality  {@code true} if the subject is susceptible to having a split personality
+     * @param failedWillpowerCheck {@code true} if the subject failed the willpower check prompting the split
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processSplitPersonality(boolean hasSplitPersonality, boolean failedWillpowerCheck) {
+        if (hasSplitPersonality && failedWillpowerCheck) {
+            String originalName = getHyperlinkedFullTitle();
+
+            if (isNullOrBlank(storedGivenName)) {
+                generateAlternativePersonality();
+            }
+
+            switchPersonality();
+            PersonalityController.writePersonalityDescription(this);
+
+            return String.format(resources.getString("compulsion.personalityChange"), originalName,
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, getFullTitle());
+        }
+
+        return "";
+    }
+
+    /**
+     * Generates an alternative set of personality attributes (name, faction, traits) for the character.
+     *
+     * <p>This involves selecting a new faction of origin, generating a new name based on the faction, and creating a
+     * set of alternative personality characteristics.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void generateAlternativePersonality() {
+        Faction chosenFaction = generateSplitPersonalityOriginFaction();
+        generateSplitPersonalityName(chosenFaction);
+        generateSplitPersonalityPersonalityCharacteristics();
+        storedLoyalty = d6(3);
+    }
+
+    /**
+     * Generates alternative personality traits and applies them to the stored split personality profile.
+     *
+     * <p>Traits are randomly selected from
+     * {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social}, with potential for up to four traits
+     * total. Additional characteristics such as a {@link PersonalityQuirk} trait and {@link Reasoning} characteristics
+     * are randomly determined and stored.</p>
+     *
+     * @author Illiani
+     * @see PersonalityController#generatePersonality(Person, boolean)
+     * @since 0.50.07
+     */
+    private void generateSplitPersonalityPersonalityCharacteristics() {
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(PersonalityTraitType.AGGRESSION,
+              PersonalityTraitType.AMBITION,
+              PersonalityTraitType.GREED,
+              PersonalityTraitType.SOCIAL));
+
+        Collections.shuffle(possibleTraits);
+
+        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
+
+        PersonalityTraitType firstTrait = possibleTraits.get(0);
+        possibleTraits.remove(firstTrait);
+        chosenTraits.add(firstTrait);
+
+        PersonalityTraitType secondTrait = possibleTraits.get(0);
+        possibleTraits.remove(secondTrait);
+        chosenTraits.add(secondTrait);
+
+        if (randomInt(4) == 0) {
+            PersonalityTraitType thirdTrait = possibleTraits.get(0);
+            possibleTraits.remove(thirdTrait);
+            chosenTraits.add(thirdTrait);
+        }
+
+        if (randomInt(4) == 0) {
+            PersonalityTraitType forthTrait = possibleTraits.get(0);
+            chosenTraits.add(forthTrait);
+        }
+
+        for (PersonalityTraitType traitType : chosenTraits) {
+            storeSplitPersonality(traitType);
+        }
+
+        int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+        String traitIndex = String.valueOf(traitRoll);
+        storedPersonalityQuirk = PersonalityQuirk.fromString(traitIndex);
+        storedPersonalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
+
+        int reasoningRoll = randomInt(8346);
+        storedReasoning = generateReasoning(reasoningRoll);
+        storedReasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
+    }
+
+    /**
+     * Stores the specified personality trait type in the split personality profile.
+     *
+     * <p>Based on the provided {@link PersonalityTraitType}, this method assigns a randomly chosen trait value and
+     * description index to the corresponding stored split personality fields (such as {@link Aggression},
+     * {@link Ambition}, {@link Greed}, or {@link Social}). If the trait type does not match any known category, no
+     * action is taken.</p>
+     *
+     * @param traitType the {@link PersonalityTraitType} to store for the split personality profile
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void storeSplitPersonality(PersonalityTraitType traitType) {
+        switch (traitType) {
+            case AGGRESSION -> {
+                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                storedAggression = Aggression.fromString(traitIndex);
+                storedAggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
+            }
+            case AMBITION -> {
+                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                storedAmbition = Ambition.fromString(traitIndex);
+                storedAmbitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
+            }
+            case GREED -> {
+                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                storedGreed = Greed.fromString(traitIndex);
+                storedGreedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
+            }
+            case SOCIAL -> {
+                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                storedSocial = Social.fromString(traitIndex);
+                storedSocialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
+            }
+            default -> {}
+        }
+    }
+
+    /**
+     * Generates a new split personality name based on the provided faction.
+     *
+     * <p>Uses the random name generator to assign a given name and surname appropriate to the gender, personnel
+     * type, and the supplied faction's short name; stores the results.</p>
+     *
+     * @param chosenFaction the {@link Faction} selected as the origin of the split personality
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void generateSplitPersonalityName(Faction chosenFaction) {
+        RandomNameGenerator.getInstance().generate(gender, clanPersonnel, chosenFaction.getShortName());
+
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(gender,
+              clanPersonnel,
+              chosenFaction.getShortName());
+        storedGivenName = name[0];
+        storedSurname = name[1];
+    }
+
+    /**
+     * Randomly selects and returns a new faction to be used as the origin for a split personality.
+     *
+     * <p>Considers all active factions at the time of the subject's birthday, applying faction- and
+     * personnel-specific constraints, then randomly chooses one and stores it.</p>
+     *
+     * @return the chosen {@link Faction} for the split personality's origin
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Faction generateSplitPersonalityOriginFaction() {
+        Set<Faction> possibleNewFaction = new HashSet<>();
+        Collection<Faction> allActiveFactions = Factions.getInstance().getActiveFactions(birthday);
+        for (Faction faction : allActiveFactions) {
+            if (faction.isClan() &&
+                      birthday.isBefore(BATTLE_OF_TUKAYYID) &&
+                      !clanPersonnel) {
+                continue;
+            }
+            possibleNewFaction.add(faction);
+        }
+
+        Faction chosenFaction = ObjectUtility.getRandomItem(possibleNewFaction);
+        storedOriginFaction = chosenFaction;
+        return chosenFaction;
+    }
+
+    /**
+     * Switches the primary and stored personality attributes of the subject.
+     *
+     * <p>This method exchanges all major personal attributes, such as name, loyalty, origin faction, personality
+     * traits, and their associated descriptions, between the primary and split personality profiles.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void switchPersonality() {
+        String transitionaryGivenName = givenName;
+        setGivenName(storedGivenName);
+        storedGivenName = transitionaryGivenName;
+
+        String transitionarySurname = surname;
+        setSurname(storedSurname);
+        storedSurname = transitionarySurname;
+
+        int transitionaryLoyalty = loyalty;
+        loyalty = storedLoyalty;
+        storedLoyalty = transitionaryLoyalty;
+
+        Faction transitionaryOriginFaction = originFaction;
+        originFaction = storedOriginFaction;
+        storedOriginFaction = transitionaryOriginFaction;
+
+        Aggression transitionaryAggression = aggression;
+        aggression = storedAggression;
+        storedAggression = transitionaryAggression;
+
+        int transitionaryAggressionDescriptionIndex = aggressionDescriptionIndex;
+        aggressionDescriptionIndex = storedAggressionDescriptionIndex;
+        storedAggressionDescriptionIndex = transitionaryAggressionDescriptionIndex;
+
+        Ambition transitionaryAmbition = ambition;
+        ambition = storedAmbition;
+        storedAmbition = transitionaryAmbition;
+
+        int transitionaryAmbitionDescriptionIndex = ambitionDescriptionIndex;
+        ambitionDescriptionIndex = storedAmbitionDescriptionIndex;
+        storedAmbitionDescriptionIndex = transitionaryAmbitionDescriptionIndex;
+
+        Greed transitionaryGreed = greed;
+        greed = storedGreed;
+        storedGreed = transitionaryGreed;
+
+        int transitionaryGreedDescriptionIndex = greedDescriptionIndex;
+        greedDescriptionIndex = storedGreedDescriptionIndex;
+        storedGreedDescriptionIndex = transitionaryGreedDescriptionIndex;
+
+        Social transitionarySocial = social;
+        social = storedSocial;
+        storedSocial = transitionarySocial;
+
+        int transitionarySocialDescriptionIndex = socialDescriptionIndex;
+        socialDescriptionIndex = storedSocialDescriptionIndex;
+        storedSocialDescriptionIndex = transitionarySocialDescriptionIndex;
+
+        PersonalityQuirk transitionaryPersonalityQuirk = personalityQuirk;
+        personalityQuirk = storedPersonalityQuirk;
+        storedPersonalityQuirk = transitionaryPersonalityQuirk;
+
+        int transitionaryPersonalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
+        personalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
+        storedPersonalityQuirkDescriptionIndex = transitionaryPersonalityQuirkDescriptionIndex;
+
+        Reasoning transitionaryReasoning = reasoning;
+        reasoning = storedReasoning;
+        storedReasoning = transitionaryReasoning;
+
+        int transitionaryReasoningDescriptionIndex = reasoningDescriptionIndex;
+        reasoningDescriptionIndex = storedReasoningDescriptionIndex;
+        storedReasoningDescriptionIndex = transitionaryReasoningDescriptionIndex;
     }
 
     /**

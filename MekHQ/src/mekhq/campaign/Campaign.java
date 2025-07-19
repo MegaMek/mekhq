@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CONFUSION;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_SPLIT_PERSONALITY;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_FLASHBACKS;
 import static mekhq.campaign.personnel.PersonnelOptions.getCompulsionCheckModifier;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
@@ -5330,6 +5331,17 @@ public class Campaign implements ITechManager {
                           isUseAdvancedMedical,
                           true,
                           failedWillpowerCheck);
+                }
+
+                if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
+                    int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    String report = person.processSplitPersonality(true,
+                          failedWillpowerCheck);
+                    if (!report.isBlank()) {
+                        addReport(report);
+                    }
                 }
             }
 
