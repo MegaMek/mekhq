@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_REGRESSION;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CLINICAL_PARANOIA;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CATATONIA;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_HYSTERIA;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CONFUSION;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
@@ -5367,6 +5368,19 @@ public class Campaign implements ITechManager {
                     boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
                           null, modifier);
                     String report = person.processChildlikeRegression(this,
+                          isUseAdvancedMedical,
+                          true,
+                          failedWillpowerCheck);
+                    if (!report.isBlank()) {
+                        addReport(report);
+                    }
+                }
+
+                if (personnelOptions.booleanOption(MADNESS_CATATONIA)) {
+                    int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    String report = person.processCatatonia(this,
                           isUseAdvancedMedical,
                           true,
                           failedWillpowerCheck);
