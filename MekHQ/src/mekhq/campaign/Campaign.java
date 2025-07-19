@@ -5295,6 +5295,11 @@ public class Campaign implements ITechManager {
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
                 }
+
+                String gamblingReport = person.gambleWealth();
+                if (!gamblingReport.isBlank()) {
+                    addReport(gamblingReport);
+                }
             }
 
             // Monthly events
