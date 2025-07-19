@@ -157,11 +157,13 @@ public class CrewListModel extends AbstractListModel<Person> {
                               // Shooting and driving don't benefit from Reputation, so no need to pass that in.
                               +
                               (person.hasSkill(gunSkill) ?
-                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes, 0) :
+                                     person.getSkill(gunSkill)
+                                           .getFinalSkillValue(options, attributes, 0, person.isIlliterate()) :
                                      "-") +
                               '/' +
                               (person.hasSkill(driveSkill) ?
-                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes, 0) :
+                                     person.getSkill(driveSkill)
+                                           .getFinalSkillValue(options, attributes, 0, person.isIlliterate()) :
                                      "-") +
                               ")</font></html>";
             setHtmlText(sb);

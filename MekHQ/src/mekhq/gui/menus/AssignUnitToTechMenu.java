@@ -107,7 +107,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                                                         SkillLevel.NONE :
                                                         tech.getSkillForWorkingOn(units[0])
                                                               .getSkillLevel(tech.getOptions(),
-                                                                    tech.getATOWAttributes());
+                                                                    tech.getATOWAttributes(), tech.isIlliterate());
 
                     final JScrollableMenu subMenu = switch (skillLevel) {
                         case LEGENDARY -> legendaryMenu;

@@ -200,7 +200,8 @@ public class SupportPointNegotiation {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2) + modifier;
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes(),
+                  admin.isIlliterate());
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints++;
             }
@@ -327,7 +328,8 @@ public class SupportPointNegotiation {
         Skill skill = person.getSkill(S_ADMIN);
         return skill.getTotalSkillLevel(person.getOptions(),
               person.getATOWAttributes(),
-              person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankIndex));
+              person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankIndex),
+              person.isIlliterate());
     }
 
     /**
@@ -336,6 +338,6 @@ public class SupportPointNegotiation {
     @Deprecated(since = "0.50.06", forRemoval = true)
     private static int getSkillValue(Person person) {
         Skill skill = person.getSkill(S_ADMIN);
-        return skill.getTotalSkillLevel(person.getOptions(), person.getATOWAttributes(), 0);
+        return skill.getTotalSkillLevel(person.getOptions(), person.getATOWAttributes(), 0, person.isIlliterate());
     }
 }

@@ -316,7 +316,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int highestSkill = SkillType.EXP_ULTRA_GREEN;
         for (String skillname : skillNames) {
             if (tech.hasSkill(skillname)) {
-                int rank = tech.getSkill(skillname).getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+                int rank = tech.getSkill(skillname).getExperienceLevel(tech.getOptions(), tech.getATOWAttributes(),
+                      tech.isIlliterate());
                 if (rank > highestSkill) {
                     highestSkill = rank;
                 }
@@ -338,7 +339,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (doctorSkill == null) {
             return;
         }
-        int hours = getSupportHours(doctorSkill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes()));
+        int hours = getSupportHours(doctorSkill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes(),
+              doctor.isIlliterate()));
         if (doctor.getSecondaryRole().isDoctor()) {
             hours = (int) Math.floor(hours / 2.0);
         }
@@ -353,7 +355,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
         int hours = getSupportHours(adminSkill.getExperienceLevel(administrator.getOptions(),
-              administrator.getATOWAttributes()));
+              administrator.getATOWAttributes(), administrator.isIlliterate()));
         if (administrator.getSecondaryRole().isAdministrator()) {
             hours = (int) Math.floor(hours / 2.0);
         }

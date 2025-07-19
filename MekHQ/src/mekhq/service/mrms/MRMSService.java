@@ -749,7 +749,9 @@ public class MRMSService {
 
         for (Person tech : techs) {
             Skill skill = tech.getSkillForWorkingOn(partWork);
-            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+            int experienceLevel = skill.getExperienceLevel(tech.getOptions(),
+                  tech.getATOWAttributes(),
+                  tech.isIlliterate());
 
             if (experienceLevel > highestAvailableTechSkill) {
                 highestAvailableTechSkill = experienceLevel;
@@ -1089,16 +1091,17 @@ public class MRMSService {
 
             PersonnelOptions options = tech.getOptions();
             Attributes attributes = tech.getATOWAttributes();
+            boolean isIlliterate = tech.isIlliterate();
 
-            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
+            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(options, attributes, isIlliterate)) {
                 continue;
             }
 
-            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(options, attributes)) {
+            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(options, attributes, isIlliterate)) {
                 continue;
             }
 
-            if (partWork.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
+            if (partWork.getSkillMin() > skill.getExperienceLevel(options, attributes, isIlliterate)) {
                 continue;
             }
 
@@ -1170,7 +1173,8 @@ public class MRMSService {
                 int modePenalty = partWork.getMode().expReduction;
 
                 if (partWork.getSkillMin() >
-                          (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) - modePenalty)) {
+                          (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes(), tech.isIlliterate()) -
+                                 modePenalty)) {
                     debugLog(
                           "...... ending calculateNewMRMSWorktime with previousWorkTime due time reduction skill mod now being less that required skill - %s ns",
                           "calculateNewMRMSWorktime",
@@ -1192,7 +1196,7 @@ public class MRMSService {
                 if (targetRoll.getValue() <= mrmsOption.getTargetNumberMax()) {
                     wtc.setWorkTime(previousNewWorkTime);
                 }
-                if (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) >=
+                if (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes(), tech.isIlliterate()) >=
                           highestAvailableTechSkill) {
                     wtc.setReachedMaxSkill(true);
                 }
@@ -1309,8 +1313,8 @@ public class MRMSService {
             }
 
             int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1.getOptions(),
-                            tech1.getATOWAttributes()),
-                    skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes()));
+                        tech1.getATOWAttributes(), tech1.isIlliterate()),
+                  skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes(), tech2.isIlliterate()));
             if (experienceCompare != 0) {
                 return experienceCompare;
             }

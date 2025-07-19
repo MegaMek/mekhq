@@ -1894,7 +1894,7 @@ public class PersonViewPanel extends JScrollablePanel {
                   skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
 
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
-            int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
+            int spaModifier = skill.getSPAModifiers(options, adjustedReputation, person.isIlliterate());
             int ageModifier = skill.getAgingModifier();
             int totalModifier = attributeModifier + spaModifier + ageModifier;
 
@@ -1912,11 +1912,12 @@ public class PersonViewPanel extends JScrollablePanel {
                 adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
             }
 
+            boolean isIlliterate = person.isIlliterate();
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(options, attributes, adjustedReputation),
+                  skill.toString(options, attributes, adjustedReputation, isIlliterate),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));
+            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation, isIlliterate));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 

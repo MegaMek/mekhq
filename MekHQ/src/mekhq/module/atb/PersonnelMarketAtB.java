@@ -134,7 +134,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
                     Skill adminSkill = adminHR.getSkill(S_ADMIN);
                     adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(),
-                            adminHR.getATOWAttributes());
+                          adminHR.getATOWAttributes(), adminHR.isIlliterate());
                 }
 
                 int gunneryMod = 0;

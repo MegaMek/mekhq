@@ -787,7 +787,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 } else {
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
                                  (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                        (skill.getExperienceLevel(tech.getOptions(),
+                                              tech.getATOWAttributes(),
+                                              tech.isIlliterate()) -
                                                modePenalty));
                 }
             }

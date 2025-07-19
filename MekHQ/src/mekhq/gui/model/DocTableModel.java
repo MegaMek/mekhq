@@ -89,7 +89,9 @@ public class DocTableModel extends DataTableModel {
 
         Skill skill = doctor.getSkill(SkillType.S_SURGERY);
         if (null != skill) {
-            int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
+            int experienceLevel = skill.getExperienceLevel(doctor.getOptions(),
+                  doctor.getATOWAttributes(),
+                  doctor.isIlliterate());
 
             toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
                     .append("</b> " + SkillType.S_SURGERY);

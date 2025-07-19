@@ -436,7 +436,9 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((commander != null) &&
                 commander.hasSkill(skillType)) {
             skillValue = commander.getSkill(skillType)
-                               .getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
+                               .getTotalSkillLevel(commander.getOptions(),
+                                     commander.getATOWAttributes(),
+                                     commander.isIlliterate());
         }
 
         return skillValue;

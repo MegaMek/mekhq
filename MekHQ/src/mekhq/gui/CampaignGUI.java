@@ -2125,7 +2125,7 @@ public class CampaignGUI extends JPanel {
                              ", " +
                              getExperienceLevelName(tech.getSkillForWorkingOn(unit)
                                                           .getExperienceLevel(tech.getOptions(),
-                                                                tech.getATOWAttributes())) +
+                                                                tech.getATOWAttributes(), tech.isIlliterate())) +
                              " (" +
                              time +
                              "min)";

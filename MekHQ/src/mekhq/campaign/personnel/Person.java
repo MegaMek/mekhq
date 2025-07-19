@@ -4341,6 +4341,7 @@ public class Person {
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
               rank);
+        final boolean isIlliterate = isIlliterate();
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -4354,12 +4355,12 @@ public class Person {
                           adjustedReputation);
                 } else {
                     if ((hasSkill(S_GUN_VEE)) && (hasSkill(S_ARTILLERY))) {
-                        yield Math.max((getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
-                              (getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
+                        yield Math.max((getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes, isIlliterate)),
+                              (getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes, isIlliterate)));
                     } else if (hasSkill(S_GUN_VEE)) {
-                        yield getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes);
+                        yield getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes, isIlliterate);
                     } else if (hasSkill(S_ARTILLERY)) {
-                        yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes);
+                        yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes, isIlliterate);
                     } else {
                         yield EXP_NONE;
                     }
@@ -4386,7 +4387,7 @@ public class Person {
                         continue;
                     }
 
-                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
+                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes, isIlliterate);
                     if (currentExperienceLevel > highestExperienceLevel) {
                         highestExperienceLevel = currentExperienceLevel;
                     }
@@ -4480,11 +4481,14 @@ public class Person {
                 return EXP_NONE;
             }
 
-            int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
+            int individualSkillLevel = skill.getTotalSkillLevel(options,
+                  atowAttributes,
+                  adjustedReputation,
+                  isIlliterate());
             totalSkillLevel += individualSkillLevel;
 
             if (isAlternativeQualityAveraging) {
-                int expLevel = skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+                int expLevel = skill.getExperienceLevel(options, atowAttributes, adjustedReputation, isIlliterate());
                 if (expectedExperienceLevel == null) {
                     expectedExperienceLevel = expLevel;
                 } else if (!expectedExperienceLevel.equals(expLevel)) {
@@ -4681,7 +4685,7 @@ public class Person {
     @Deprecated(since = "0.50.06", forRemoval = true)
     public int getSkillLevel(final String skillName) {
         final Skill skill = getSkill(skillName);
-        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes);
+        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, isIlliterate());
     }
 
     /**
@@ -4704,7 +4708,9 @@ public class Person {
 
         int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
-        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+        return (skill == null) ?
+                     0 :
+                     skill.getExperienceLevel(options, atowAttributes, adjustedReputation, isIlliterate());
     }
 
     /**
@@ -4720,7 +4726,7 @@ public class Person {
      */
     public int getSkillLevelOrNegative(final String skillName) {
         if (hasSkill(skillName)) {
-            return getSkill(skillName).getExperienceLevel(options, atowAttributes);
+            return getSkill(skillName).getExperienceLevel(options, atowAttributes, isIlliterate());
         } else {
             return -1;
         }
@@ -5496,20 +5502,25 @@ public class Person {
         Skill skill = null;
         int level = EXP_NONE;
 
-        if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes) > level) {
+        boolean isIlliterate = isIlliterate();
+
+        if (hasSkill(S_TECH_MEK) &&
+                  getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes, isIlliterate) > level) {
             skill = getSkill(S_TECH_MEK);
-            level = getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes);
+            level = getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes, isIlliterate);
         }
-        if (hasSkill(S_TECH_AERO) && getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes) > level) {
+        if (hasSkill(S_TECH_AERO) &&
+                  getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes, isIlliterate) > level) {
             skill = getSkill(S_TECH_AERO);
-            level = getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes);
+            level = getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes, isIlliterate);
         }
         if (hasSkill(S_TECH_MECHANIC) &&
-                  getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes) > level) {
+                  getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes, isIlliterate) > level) {
             skill = getSkill(S_TECH_MECHANIC);
-            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes);
+            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes, isIlliterate);
         }
-        if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel(options, atowAttributes) > level) {
+        if (hasSkill(S_TECH_BA) &&
+                  getSkill(S_TECH_BA).getExperienceLevel(options, atowAttributes, isIlliterate) > level) {
             skill = getSkill(S_TECH_BA);
         }
         return skill;
@@ -5589,7 +5600,7 @@ public class Person {
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
-            experienceLevel = administration.getExperienceLevel(options, atowAttributes);
+            experienceLevel = administration.getExperienceLevel(options, atowAttributes, isIlliterate());
         }
 
         administrationMultiplier += experienceLevel * TECH_ADMINISTRATION_MULTIPLIER;
@@ -5637,7 +5648,7 @@ public class Person {
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
-            experienceLevel = administration.getExperienceLevel(options, atowAttributes);
+            experienceLevel = administration.getExperienceLevel(options, atowAttributes, isIlliterate());
         }
 
         administrationMultiplier += experienceLevel * DOCTOR_ADMINISTRATION_MULTIPLIER;
@@ -5677,34 +5688,47 @@ public class Person {
             skill = getSkill(S_TECH_MEK);
         }
 
+        boolean isIlliterate = isIlliterate();
         if (part.isRightTechType(S_TECH_BA) && hasSkill(S_TECH_BA)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_BA).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_BA);
             }
         }
 
         if (part.isRightTechType(S_TECH_AERO) && hasSkill(S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_AERO).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_AERO);
             }
         }
 
         if (part.isRightTechType(S_TECH_MECHANIC) && hasSkill(S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_MECHANIC);
             }
         }
 
         if (part.isRightTechType(S_TECH_VESSEL) && hasSkill(S_TECH_VESSEL)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_VESSEL);
             }
         }
@@ -5721,24 +5745,33 @@ public class Person {
 
         if (hasSkill(S_TECH_BA)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_BA).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_BA);
             }
         }
 
         if (hasSkill(S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_MECHANIC);
             }
         }
 
         if (hasSkill(S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation, isIlliterate) >
+                             getSkill(S_TECH_AERO).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation,
+                                   isIlliterate))) {
                 skill = getSkill(S_TECH_AERO);
             }
         }
@@ -7457,5 +7490,27 @@ public class Person {
             potentialVictims.remove(victim);
             victims.add(victim);
         }
+    }
+
+    /**
+     * Determines whether the character is considered illiterate.
+     *
+     * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
+     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
+     * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
+     *
+     * @return {@code true} if the person is considered illiterate; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isIlliterate() {
+        if (!options.booleanOption(FLAW_ILLITERATE)) {
+            return false;
+        }
+
+        Skill languages = skills.getSkill(S_LANGUAGES);
+        int level = languages.getLevel();
+        return level < ILLITERACY_LANGUAGES_THRESHOLD;
     }
 }

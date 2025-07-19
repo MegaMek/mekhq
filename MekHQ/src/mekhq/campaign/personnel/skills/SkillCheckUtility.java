@@ -494,7 +494,8 @@ public class SkillCheckUtility {
             Skill skill = person.getSkill(skillName);
             int skillValue = skill.getFinalSkillValue(person.getOptions(),
                   person.getATOWAttributes(),
-                  person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, person.getRankNumeric()));
+                  person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, person.getRankNumeric()),
+                  person.isIlliterate());
             targetNumber.addModifier(skillValue, skillName);
         }
 

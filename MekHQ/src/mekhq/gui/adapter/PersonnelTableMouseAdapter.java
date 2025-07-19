@@ -653,7 +653,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       skillType.getName(),
                       skill.toString(selectedPerson.getOptions(),
                             selectedPerson.getATOWAttributes(),
-                            adjustedReputation));
+                            adjustedReputation,
+                            selectedPerson.isIlliterate()));
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
@@ -1784,7 +1785,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = person.getSkill(S_SURGERY);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
+                          skill.getFinalSkillValue(person.getOptions(),
+                                person.getATOWAttributes(),
+                                person.isIlliterate()) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -3213,7 +3216,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                             String tooltip = wordWrap(skill.getTooltip(person.getOptions(),
                                   person.getATOWAttributes(),
-                                  adjustedReputation));
+                                  adjustedReputation,
+                                  person.isIlliterate()));
                             menuItem.setToolTipText(tooltip);
 
                             SkillSubType subType = skillType.getSubType();

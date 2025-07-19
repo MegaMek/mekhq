@@ -797,7 +797,8 @@ public class Resupply {
                       negotiator.getRankNumeric());
                 int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(),
                       negotiator.getATOWAttributes(),
-                      reputation);
+                      reputation,
+                      negotiator.isIlliterate());
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }

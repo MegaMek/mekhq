@@ -154,7 +154,9 @@ public class AverageExperienceRating {
                 if (person.hasSkill(SkillType.S_GUN_PROTO)) {
                     totalExperience += max(0,
                           person.getSkill(SkillType.S_GUN_PROTO)
-                                .getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                                .getFinalSkillValue(person.getOptions(),
+                                      person.getATOWAttributes(),
+                                      person.isIlliterate()));
                 }
 
                 personnelCount++;
@@ -230,12 +232,13 @@ public class AverageExperienceRating {
 
         PersonnelOptions options = person.getOptions();
         Attributes attributes = person.getATOWAttributes();
+        boolean isIlliterate = person.isIlliterate();
         if (unit.isDriver(person)) {
             skillType = SkillType.getDrivingSkillFor(entity);
             Skill skill = person.getSkill(skillType);
 
             if (skill != null) {
-                skillValue += max(0, skill.getFinalSkillValue(options, attributes));
+                skillValue += max(0, skill.getFinalSkillValue(options, attributes, isIlliterate));
                 skillCount++;
             } else {
                 logger.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
@@ -249,7 +252,7 @@ public class AverageExperienceRating {
 
             Skill skill = person.getSkill(skillType);
             if (skill != null) {
-                skillValue += max(0, skill.getFinalSkillValue(options, attributes));
+                skillValue += max(0, skill.getFinalSkillValue(options, attributes, isIlliterate));
                 skillCount++;
             } else {
                 logger.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",
