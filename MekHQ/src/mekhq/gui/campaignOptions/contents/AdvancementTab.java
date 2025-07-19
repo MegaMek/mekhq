@@ -121,8 +121,6 @@ public class AdvancementTab {
     //start Skill Randomization Tab
     private CampaignOptionsHeaderPanel skillRandomizationHeader;
     private JCheckBox chkExtraRandomness;
-    private JCheckBox chkComingOfAgeSPAs;
-    private JCheckBox chkRewardComingOfAgeRPSkills;
 
     private JPanel pnlPhenotype;
     private JLabel[] phenotypeLabels;
@@ -577,8 +575,6 @@ public class AdvancementTab {
 
         pnlATOWAttributes = new JPanel();
         chkRandomizeTraits = new JCheckBox();
-        chkComingOfAgeSPAs = new JCheckBox();
-        chkRewardComingOfAgeRPSkills = new JCheckBox();
 
         pnlPhenotype = new JPanel();
         phenotypeLabels = new JLabel[] {}; // This will be initialized properly later
@@ -667,13 +663,6 @@ public class AdvancementTab {
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
         chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
 
-        chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
-        chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ComingOfAgeAbilities"));
-
-        chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills");
-        chkRewardComingOfAgeRPSkills.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "ComingOfAgeRPSkills"));
-
         pnlPhenotype = createPhenotypePanel();
         pnlRandomAbilities = createAbilityPanel();
         pnlSkillGroups = createSkillGroupPanel();
@@ -689,12 +678,6 @@ public class AdvancementTab {
         layout.gridy++;
         layout.gridwidth = 1;
         panel.add(chkExtraRandomness, layout);
-
-        layout.gridy++;
-        panel.add(chkComingOfAgeSPAs, layout);
-
-        layout.gridy++;
-        panel.add(chkRewardComingOfAgeRPSkills, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1288,8 +1271,6 @@ public class AdvancementTab {
         chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
-        chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
-        chkRewardComingOfAgeRPSkills.setSelected(options.isRewardComingOfAgeRPSkills());
         final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
@@ -1382,8 +1363,6 @@ public class AdvancementTab {
         options.setContractNegotiationXP((int) spnContractNegotiationXP.getValue());
         options.setAdminXP((int) spnAdminWeeklyXP.getValue());
         options.setAdminXPPeriod((int) spnAdminWeeklyXPPeriod.getValue());
-        options.setRewardComingOfAgeAbilities(chkComingOfAgeSPAs.isSelected());
-        options.setRewardComingOfAgeRPSkills(chkRewardComingOfAgeRPSkills.isSelected());
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
