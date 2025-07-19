@@ -5547,6 +5547,9 @@ public class Person {
     /**
      * Calculates and returns the character's adjusted Connections value.
      *
+     * <p>If the character has the {@link PersonnelOptions#COMPULSION_XENOPHOBIA} SPA their Connections value is
+     * decreased by 1.</p>
+     *
      * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
      * increased by 1.</p>
      *
@@ -5561,11 +5564,15 @@ public class Person {
      * @since 0.50.07
      */
     public int getAdjustedConnections() {
-        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
-        boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        int modifiers = (hasXenophobia ? -1 : 0);
 
-        int modifiers = (hasCitizenship ? 1 : 0);
+        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+        modifiers += (hasCitizenship ? 1 : 0);
+
+        boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
         modifiers += (hasMildParanoia ? -1 : 0);
+
         return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
@@ -5665,6 +5672,9 @@ public class Person {
 
         boolean hasPathologicRacism = options.booleanOption(COMPULSION_PATHOLOGIC_RACISM);
         modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_REPUTATION_PENALTY : 0;
+
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        modifiers -= hasXenophobia ? 1 : 0;
 
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
