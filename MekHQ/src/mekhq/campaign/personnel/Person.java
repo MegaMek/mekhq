@@ -5898,6 +5898,8 @@ public class Person {
         boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
         modifiers += (hasMildParanoia ? -1 : 0);
 
+        modifiers += getDarkSecretModifier(false);
+
         return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
@@ -6001,11 +6003,9 @@ public class Person {
         boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
         modifiers -= hasXenophobia ? 1 : 0;
 
-        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
-    }
+        modifiers += getDarkSecretModifier(true);
 
-    public void setReputation(final int reputation) {
-        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     /**
@@ -7565,5 +7565,35 @@ public class Person {
                      || options.booleanOption(DARK_SECRET_MAJOR)
                      || options.booleanOption(DARK_SECRET_SEVERE)
                      || options.booleanOption(DARK_SECRET_EXTREME);
+    }
+
+    /**
+     * Calculates the modifier associated with a character's Dark Secret.
+     *
+     * <p>If the dark secret is not revealed and the character does not have a dark secret, the modifier is 0.
+     * Otherwise, returns a value based on enabled options and the type of modifier requested (reputation or
+     * other).</p>
+     *
+     * @param isReputation {@code true} to retrieve the Reputation modifier; {@code false} to retrieve the Connections
+     *                     modifier.
+     *
+     * @return the appropriate Dark Secret modifier, or 0 if no relevant option is enabled or the secret is not
+     *       present/revealed.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getDarkSecretModifier(final boolean isReputation) {
+        if (!darkSecretRevealed && !hasDarkSecret()) {
+            return 0;
+        }
+
+        for (Map.Entry<String, int[]> entry : DARK_SECRET_MODIFIERS.entrySet()) {
+            if (options.booleanOption(entry.getKey())) {
+                return isReputation ? entry.getValue()[0] : entry.getValue()[1];
+            }
+        }
+
+        return 0;
     }
 }

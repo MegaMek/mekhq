@@ -30,6 +30,7 @@ package mekhq.campaign.personnel;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import megamek.common.annotations.Nullable;
@@ -145,6 +146,16 @@ public class PersonnelOptions extends PilotOptions {
     public static final int COMPULSION_CHECK_MODIFIER_MAJOR = 4; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_SEVERE = 7; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_EXTREME = 10; // ATOW pg 110
+
+    // ATOW pg 112 (Reputation, Connections)
+    public static final Map<String, int[]> DARK_SECRET_MODIFIERS = Map.of(
+          DARK_SECRET_TRIVIAL, new int[] { -1, -1 },
+          DARK_SECRET_SIGNIFICANT, new int[] { -2, -1 },
+          DARK_SECRET_MAJOR, new int[] { -3, -2 },
+          DARK_SECRET_SEVERE, new int[] { -4, -2 },
+          DARK_SECRET_EXTREME, new int[] { -5, -3 }
+    );
+
 
     @Override
     public void initialize() {
