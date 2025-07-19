@@ -5634,6 +5634,9 @@ public class Person {
                                    rankNumeric) :
                              0;
 
+        boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
+        modifiers -= hasRacism ? 1 : 0;
+
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
