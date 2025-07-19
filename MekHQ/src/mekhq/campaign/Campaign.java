@@ -5303,6 +5303,11 @@ public class Campaign implements ITechManager {
                     processFatigueRecovery(this, person);
                 }
 
+                String gamblingReport = person.gambleWealth();
+                if (!gamblingReport.isBlank()) {
+                    addReport(gamblingReport);
+                }
+
                 if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
                     int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
                     boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
