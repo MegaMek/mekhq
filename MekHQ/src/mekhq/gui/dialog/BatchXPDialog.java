@@ -393,7 +393,7 @@ public final class BatchXPDialog extends JDialog {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       campaign.isClanCampaign(),
                       campaign.getLocalDate(),
-                      person.getRankLevel());
+                      person.getRankNumeric());
 
                 PerformanceLogger.improvedSkill(campaign,
                       person,
