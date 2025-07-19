@@ -55,6 +55,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -1920,9 +1921,25 @@ public class Person {
      * @since 0.50.07
      */
     public int getAdjustedLoyalty(Faction campaignFaction) {
+        final int LOYALTY_PENALTY_FOR_ANARCHIST = -2;
+
         boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
 
         int modifier = 0;
+        boolean hasHatredForAuthority = options.booleanOption(COMPULSION_ANARCHIST);
+        if (hasHatredForAuthority) {
+            modifier += commander ? 0 : LOYALTY_PENALTY_FOR_ANARCHIST;
+        }
+
+        boolean hasFactionPride = options.booleanOption(COMPULSION_FACTION_PRIDE);
+        if (hasFactionPride) {
+            modifier += campaignFactionMatchesOriginFaction ? 1 : -2;
+        }
+
+        boolean hasFactionLoyalty = options.booleanOption(COMPULSION_FACTION_LOYALTY);
+        if (hasFactionLoyalty) {
+            modifier += campaignFactionMatchesOriginFaction ? 1 : -4;
+        }
 
         return loyalty + modifier;
     }
@@ -4720,7 +4737,9 @@ public class Person {
      * @return The adjusted edge value after accounting for the person's level of bad luck.
      */
     public int getAdjustedEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
+        boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
+        int modifier = hasTraumaticPast ? -1 : 0;
+        return options.intOption(OptionsConstants.EDGE) - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
@@ -5552,7 +5571,10 @@ public class Person {
      * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
      * increased by 1.</p>
      *
-     * <p>The connections value is clamped within the allowed minimum and maximum range before being returned.</p>
+     * <p>If the character has the {@link PersonnelOptions#COMPULSION_MILD_PARANOIA} SPA their Connections value is
+     * reduced by 1.</p>
+     *
+     * <p>The Connections value is clamped within the allowed minimum and maximum range before being returned.</p>
      *
      * @return the character's Connections value, clamped within the minimum and maximum limits
      *
@@ -5565,8 +5587,10 @@ public class Person {
         }
 
         boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+        boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
 
         int modifiers = (hasCitizenship ? 1 : 0);
+        modifiers += (hasMildParanoia ? -1 : 0);
         return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
@@ -5658,6 +5682,9 @@ public class Person {
                                    !isNullOrBlank(bloodname),
                                    rankNumeric) :
                              0;
+
+        boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
+        modifiers -= hasRacism ? 1 : 0;
 
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
@@ -6396,6 +6423,53 @@ public class Person {
 
             recruitment = today;
         }
+    }
+
+    /**
+     * Resolves a gambling compulsion for the current person and adjusts their wealth accordingly.
+     *
+     * <p>If the person has the gambling compulsion option enabled, this method performs a d6 roll to determine
+     * whether wealth is gained, lost, or unchanged, and formats the result as a localized string with appropriate
+     * styling. If the gambling compulsion option is not present, the method returns an empty string.</p>
+     *
+     * <p>On a roll of 6, the person's wealth increases; on a roll of 4 or 5, it remains unchanged; and on a roll of
+     * 1, 2, or 3, the person's wealth decreases.</p>
+     *
+     * @return a formatted localized result {@link String} reflecting the outcome, or an empty {@link String} if not
+     *       applicable
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String gambleWealth() {
+        boolean hasGamblingCompulsion = options.booleanOption(COMPULSION_GAMBLING);
+        if (!hasGamblingCompulsion) {
+            return "";
+        }
+
+        String key;
+        String color;
+
+        int roll = d6();
+        switch (roll) {
+            case 4, 5 -> {
+                key = "neutral";
+                color = getWarningColor();
+            }
+            case 6 -> {
+                changeWealth(1);
+                key = "success";
+                color = getPositiveColor();
+            }
+            default -> { // 1, 2, 3
+                changeWealth(-1);
+                key = "failure";
+                color = getNegativeColor();
+            }
+        }
+
+        return String.format(resources.getString("gambling." + key), getHyperlinkedFullTitle(),
+              spanOpeningWithCustomColor(color), CLOSING_SPAN_TAG, wealth);
     }
 
     /**
