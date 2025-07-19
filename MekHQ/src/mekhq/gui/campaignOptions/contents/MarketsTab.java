@@ -246,7 +246,7 @@ public class MarketsTab {
     public JPanel createPersonnelMarketTab() {
         // Header
         personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-              getImageDirectory() + "logo_st_ives_compact.png", 3);
+                getImageDirectory() + "logo_st_ives_compact.png", 11);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -283,6 +283,9 @@ public class MarketsTab {
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
         lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle");
+        lblPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketStyle"));
+        comboPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
+                "PersonnelMarketStyle"));
 
         lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
         lblPersonnelMarketType.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketType"));
