@@ -55,18 +55,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.process
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
-import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
-import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_REGRESSION;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CLINICAL_PARANOIA;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_BERSERKER;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CATATONIA;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CONFUSION;
-import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_SPLIT_PERSONALITY;
-import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_FLASHBACKS;
-import static mekhq.campaign.personnel.PersonnelOptions.getCompulsionCheckModifier;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -5311,96 +5300,7 @@ public class Campaign implements ITechManager {
                     processFatigueRecovery(this, person);
                 }
 
-                String gamblingReport = person.gambleWealth();
-                if (!gamblingReport.isBlank()) {
-                    addReport(gamblingReport);
-                }
-
-                if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-                    int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    person.processDiscontinuationSyndrome(this,
-                          isUseAdvancedMedical,
-                          isUseFatigue,
-                          true,
-                          failedWillpowerCheck);
-                }
-
-                if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
-                    int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    person.processCripplingFlashbacks(this,
-                          isUseAdvancedMedical,
-                          true,
-                          failedWillpowerCheck);
-                }
-
-                if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
-                    int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    String report = person.processSplitPersonality(true,
-                          failedWillpowerCheck);
-                    if (!report.isBlank()) {
-                        addReport(report);
-                    }
-                }
-
-                if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
-                    int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    String report = person.processClinicalParanoia(true,
-                          failedWillpowerCheck);
-                    if (!report.isBlank()) {
-                        addReport(report);
-                    }
-                } else {
-                    // This is necessary to stop a character from getting permanently locked in a paranoia state if
-                    // their madness is removed.
-                    person.setSufferingFromClinicalParanoia(false);
-                }
-
-                if (personnelOptions.booleanOption(MADNESS_REGRESSION)) {
-                    int modifier = getCompulsionCheckModifier(MADNESS_REGRESSION);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    String report = person.processChildlikeRegression(this,
-                          isUseAdvancedMedical,
-                          true,
-                          failedWillpowerCheck);
-                    if (!report.isBlank()) {
-                        addReport(report);
-                    }
-                }
-
-                if (personnelOptions.booleanOption(MADNESS_CATATONIA)) {
-                    int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    String report = person.processCatatonia(this,
-                          isUseAdvancedMedical,
-                          true,
-                          failedWillpowerCheck);
-                    if (!report.isBlank()) {
-                        addReport(report);
-                    }
-                }
-
-                if (personnelOptions.booleanOption(MADNESS_BERSERKER)) {
-                    int modifier = getCompulsionCheckModifier(MADNESS_BERSERKER);
-                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                          null, modifier);
-                    String report = person.processBerserkerFrenzy(this,
-                          isUseAdvancedMedical,
-                          true,
-                          failedWillpowerCheck);
-                    if (!report.isBlank()) {
-                        addReport(report);
-                    }
-                }
+                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
             }
 
             // Monthly events
@@ -5471,6 +5371,138 @@ public class Campaign implements ITechManager {
         // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
             new OptimizeInfirmaryAssignments(this);
+        }
+    }
+
+    /**
+     * Processes all compulsions and madness-related effects for a given person, adjusting their status and generating
+     * reports as needed.
+     *
+     * <p>This method checks for various mental conditions or compulsions that a person might suffer from, such as
+     * addiction, flashbacks, split personality, paranoia, regression, catatonia, berserker rage, or hysteria. For each
+     * condition the person possesses, the relevant check is performed and any resulting effects—such as status changes,
+     * injuries, or event reports—are handled accordingly.</p>
+     *
+     * <p>The results of these checks may also generate narrative or status reports, which are added to the campaign
+     * as appropriate. If certain conditions are no longer present, some status flags (such as clinical paranoia) may be
+     * reset.</p>
+     *
+     * @param person               the person whose conditions are being processed
+     * @param personnelOptions     the set of personnel options or traits affecting which conditions are relevant
+     * @param isUseAdvancedMedical {@code true} if advanced medical rules are applied, {@code false} otherwise
+     * @param isUseFatigue         {@code true} if fatigue rules are applied, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
+          boolean isUseAdvancedMedical, boolean isUseFatigue) {
+        String gamblingReport = person.gambleWealth();
+        if (!gamblingReport.isBlank()) {
+            addReport(gamblingReport);
+        }
+
+        if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
+            int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            person.processDiscontinuationSyndrome(this,
+                  isUseAdvancedMedical,
+                  isUseFatigue,
+                  true,
+                  failedWillpowerCheck);
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            person.processCripplingFlashbacks(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processSplitPersonality(true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        boolean resetClinicalParanoia = true;
+        if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processClinicalParanoia(true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+
+            resetClinicalParanoia = false;
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_REGRESSION)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_REGRESSION);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processChildlikeRegression(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_CATATONIA)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processCatatonia(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_BERSERKER)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_BERSERKER);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processBerserkerFrenzy(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_HYSTERIA)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processHysteria(this, true, isUseAdvancedMedical, failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+
+            resetClinicalParanoia = false;
+        }
+
+        // This is necessary to stop a character from getting permanently locked in a paranoia state if the
+        // relevant madness are removed.
+        if (resetClinicalParanoia) {
+            person.setSufferingFromClinicalParanoia(false);
         }
     }
 

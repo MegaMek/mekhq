@@ -787,7 +787,7 @@ public class PersonTest {
 
         assertEquals(before.getStoredGivenName(), after.getGivenName());
         assertEquals(before.getStoredSurname(), after.getSurname());
-        assertEquals(before.getStoredLoyalty(), after.getLoyalty());
+        assertEquals(before.getStoredLoyalty(), after.getBaseLoyalty());
         assertEquals(before.getStoredOriginFaction().getShortName(), after.getOriginFaction().getShortName());
         assertEquals(before.getStoredAggression(), after.getAggression());
         assertEquals(before.getStoredAggressionDescriptionIndex(), after.getAggressionDescriptionIndex());
@@ -1041,7 +1041,7 @@ public class PersonTest {
     }
 
     @Test
-    void testProcessChildlikeRegression_noFlashbacks() {
+    void testProcessChildlikeRegression_noRegression() {
         Campaign mockCampaign = mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);

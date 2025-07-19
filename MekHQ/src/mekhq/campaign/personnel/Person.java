@@ -50,10 +50,10 @@ import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
@@ -1679,7 +1679,7 @@ public class Person {
 
         // choose the color and string based on the loyalty comparison.
         if (originalLoyalty > loyalty) {
-            color = ReportingUtilities.getNegativeColor();
+            color = getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
             color = ReportingUtilities.getPositiveColor();
@@ -3871,7 +3871,7 @@ public class Person {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      spanOpeningWithCustomColor(getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -4659,7 +4659,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b>Failed to heal.</b></font>";
+        return " <font color='" + getNegativeColor() + "'><b>Failed to heal.</b></font>";
     }
 
     // region skill
@@ -7122,6 +7122,86 @@ public class Person {
     }
 
     /**
+     * Processes the effects of childlike regression on the character, applying injuries or health complications based
+     * on specified conditions.
+     *
+     * <p>If the character has childlike regression and fails a willpower check, the method will apply either an
+     * injury (using advanced medical rules) or increment the number of "hits" (using basic rules). If the total number
+     * of injuries or hits exceeds a defined threshold, the personnel status is changed to indicate medical
+     * complications (killed).</p>
+     *
+     * @param campaign             the {@link Campaign} context in which the effects are processed
+     * @param useAdvancedMedical   {@code true} to use advanced medical injury processing
+     * @param hasRegression        {@code true} if the character is affected by childlike regression
+     * @param failedWillpowerCheck {@code true} if the character failed their willpower check
+     */
+    public String processChildlikeRegression(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasRegression, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasRegression && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.regression"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Processes a potential catatonia episode fthe character, applying relevant effects and status changes.
+     *
+     * <p>If both {@code hasCatatonia} and {@code failedWillpowerCheck} are {@code true}, this method applies an
+     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of
+     * injuries or trauma exceeds a predefined death threshold, the person's status is changed to indicate medical
+     * complications. In either case, the method returns a formatted string describing the catatonia episode. If the
+     * conditions are not met, it returns an empty string.</p>
+     *
+     * @param campaign             the current campaign context
+     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param hasCatatonia         {@code true} if the person is suffering from catatonia
+     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     * @return description of the resulting catatonia episode, or an empty string if no episode occurred
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasCatatonia, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasCatatonia && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CATATONIA.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.catatonia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
      * Processes the effects of "confusion" for a personnel based on their mental state.
      *
      * <p>If the personnel has both "madness confusion", and has failed a willpower check, applies random damage
@@ -7164,96 +7244,6 @@ public class Person {
         return "";
     }
 
-    /**
-     * Processes the effects of childlike regression on the character, applying injuries or health complications based
-     * on specified conditions.
-     *
-     * <p>If the character has childlike regression and fails a willpower check, the method will apply either an
-     * injury (using advanced medical rules) or increment the number of "hits" (using basic rules). If the total number
-     * of injuries or hits exceeds a defined threshold, the personnel status is changed to indicate medical
-     * complications (killed).</p>
-     *
-     * @param campaign             the {@link Campaign} context in which the effects are processed
-     * @param useAdvancedMedical   {@code true} to use advanced medical injury processing
-     * @param hasRegression        {@code true} if the character is affected by childlike regression
-     * @param failedWillpowerCheck {@code true} if the character failed their willpower check
-     */
-    public String processChildlikeRegression(Campaign campaign, boolean useAdvancedMedical,
-          // These boolean are here to ensure that we only ever pass in valid personnel
-          boolean hasRegression, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
-        if (hasRegression && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
-                Injury injury = CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
-                addInjury(injury);
-            } else {
-                hits += 1;
-            }
-
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
-                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
-            }
-
-            return String.format(resources.getString("compulsion.regression"), getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
-        }
-
-        return "";
-    }
-
-    /**
-     * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
-     * check, and returns a formatted warning message if applicable.
-     *
-     * <p>If both {@code hasClinicalParanoia} and {@code failedWillpowerCheck} are {@code true}, this method sets the
-     * internal state indicating the member is suffering from clinical paranoia and returns a warning message.
-     * Otherwise, it resets the state and returns an empty string.</p>
-     *
-     * @param hasClinicalParanoia  {@code true} if the personnel member has the clinical paranoia condition
-     * @param failedWillpowerCheck {@code true} if the personnel member failed their willpower check
-     *
-     * @return A formatted warning message if clinical paranoia applies, or an empty string otherwise
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public String processClinicalParanoia(
-          // These boolean are here to ensure that we only ever pass in valid personnel
-          boolean hasClinicalParanoia, boolean failedWillpowerCheck) {
-        if (hasClinicalParanoia && failedWillpowerCheck) {
-            sufferingFromClinicalParanoia = true;
-            return String.format(resources.getString("compulsion.clinicalParanoia"), getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
-        }
-
-        sufferingFromClinicalParanoia = false;
-        return "";
-    }
-
-    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
-          // These boolean are here to ensure that we only ever pass in valid personnel
-          boolean hasCatatonia, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
-        if (hasCatatonia && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
-                Injury injury = CATATONIA.newInjury(campaign, this, INTERNAL, 1);
-                addInjury(injury);
-            } else {
-                hits += 1;
-            }
-
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
-                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
-            }
-
-            return String.format(resources.getString("compulsion.catatonia"), getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
-        }
-
-        return "";
-    }
 
     /**
      * Processes the effects of a berserker frenzy event for a character, potentially injuring themselves and other
@@ -7302,11 +7292,12 @@ public class Person {
                 if (useAdvancedMedical) {
                     InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
                 } else {
-                    hits += wounds;
+                    int currentHits = victim.getHits();
+                    victim.setHits(currentHits + wounds);
                 }
 
                 if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
-                    changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
+                    victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
                                                                           PersonnelStatus.MEDICAL_COMPLICATIONS :
                                                                           PersonnelStatus.HOMICIDE);
                 }
@@ -7314,6 +7305,77 @@ public class Person {
 
             return String.format(resources.getString("compulsion.berserker"), getHyperlinkedFullTitle(),
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
+     * check, and returns a formatted warning message if applicable.
+     *
+     * <p>If both {@code hasClinicalParanoia} and {@code failedWillpowerCheck} are {@code true}, this method sets the
+     * internal state indicating the member is suffering from clinical paranoia and returns a warning message.
+     * Otherwise, it resets the state and returns an empty string.</p>
+     *
+     * @param hasClinicalParanoia  {@code true} if the personnel member has the clinical paranoia condition
+     * @param failedWillpowerCheck {@code true} if the personnel member failed their willpower check
+     *
+     * @return A formatted warning message if clinical paranoia applies, or an empty string otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processClinicalParanoia(
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasClinicalParanoia, boolean failedWillpowerCheck) {
+        if (hasClinicalParanoia && failedWillpowerCheck) {
+            sufferingFromClinicalParanoia = true;
+            return String.format(resources.getString("compulsion.clinicalParanoia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        sufferingFromClinicalParanoia = false;
+        return "";
+    }
+
+    /**
+     * Processes a hysteria episode for the character.
+     *
+     * <p>If both {@code hasHysteria} and {@code failedWillpowerCheck} are {@code true}, this method randomly
+     * determines (via die roll) which type of episode occurs: berserker frenzy, confusion, or clinical paranoia. The
+     * appropriate episode handler is called, and its result returned as a description string. When the episode is not
+     * paranoia, any paranoia flag is cleared. Otherwise, if the conditions are not met, returns an empty string.</p>
+     *
+     * @param campaign             the current campaign context
+     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param hasHysteria          {@code true} if the person is suffering from hysteria
+     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     *
+     * @return description of the resulting episode, or an empty string if no episode occurred
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processHysteria(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasHysteria, boolean failedWillpowerCheck) {
+
+        if (hasHysteria && failedWillpowerCheck) {
+            int roll = d6(1);
+            String report = switch (roll) {
+                case 1, 2 -> processBerserkerFrenzy(campaign, useAdvancedMedical, true, true);
+                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, true, true);
+                case 5, 6 -> processClinicalParanoia(true, true);
+                default -> throw new IllegalStateException("Unexpected value: " + roll);
+            };
+
+            // Reset paranoia
+            if (roll < 5) {
+                sufferingFromClinicalParanoia = false;
+            }
+
+            return report;
         }
 
         return "";
