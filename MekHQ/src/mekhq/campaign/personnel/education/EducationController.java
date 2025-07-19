@@ -1536,9 +1536,9 @@ public class EducationController {
         int roll = d6(1);
 
         if (roll == 1) {
-            person.setLoyalty(person.getLoyalty() - 1);
+            person.setLoyalty(person.getBaseLoyalty() - 1);
         } else if (roll >= 4) {
-            person.setLoyalty(person.getLoyalty() + 1);
+            person.setLoyalty(person.getBaseLoyalty() + 1);
         }
     }
 
