@@ -50,6 +50,7 @@ import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
@@ -5571,6 +5572,9 @@ public class Person {
      * <p>If the character is suffering from an episode of Clinical Paranoia, their Connections value is fixed as
      * 0.</p>
      *
+     * <p>If the character has the {@link PersonnelOptions#COMPULSION_XENOPHOBIA} SPA their Connections value is
+     * decreased by 1.</p>
+     *
      * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
      * increased by 1.</p>
      *
@@ -5589,11 +5593,15 @@ public class Person {
             return 0;
         }
 
-        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
-        boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        int modifiers = (hasXenophobia ? -1 : 0);
 
-        int modifiers = (hasCitizenship ? 1 : 0);
+        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+        modifiers += (hasCitizenship ? 1 : 0);
+
+        boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
         modifiers += (hasMildParanoia ? -1 : 0);
+
         return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
@@ -5693,6 +5701,9 @@ public class Person {
 
         boolean hasPathologicRacism = options.booleanOption(COMPULSION_PATHOLOGIC_RACISM);
         modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_REPUTATION_PENALTY : 0;
+
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        modifiers -= hasXenophobia ? 1 : 0;
 
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
@@ -6521,6 +6532,45 @@ public class Person {
 
             if (useFatigue) {
                 changeFatigue(FATIGUE_INCREASE);
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+        }
+    }
+
+    /**
+     * Processes the effects of crippling flashbacks.
+     *
+     * <p>If the personnel has flashbacks and fails a willpower check, this method determines the outcome:</p>
+     * <ul>
+     *     <li>If advanced medical care is available, a new injury related to crippling flashbacks is added.</li>
+     *     <li>Otherwise, the personnel takes additional damage (hits).</li>
+     * </ul>
+     *
+     * <p>If the number of injuries or hits exceeds a predefined threshold, the character's status is updated to
+     * {@link PersonnelStatus#MEDICAL_COMPLICATIONS} (killed).</p>
+     *
+     * @param campaign             The current campaign context.
+     * @param useAdvancedMedical   {@code true} if advanced medical care is available; {@code false} otherwise.
+     * @param hasFlashbacks        {@code true} if the personnel is suffering from flashbacks.
+     * @param failedWillpowerCheck {@code true} if the personnel failed their willpower check due to flashbacks.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processCripplingFlashbacks(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasFlashbacks, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasFlashbacks && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CRIPPLING_FLASHBACKS.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
             }
 
             if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
