@@ -4836,7 +4836,7 @@ public class Campaign implements ITechManager {
 
             if (relevantSkill != null) {
                 actualSkillLevel = relevantSkill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes(),
-                      tech.isEngineer());
+                      tech.isIlliterate());
             }
             int effectiveSkillLevel = actualSkillLevel - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
