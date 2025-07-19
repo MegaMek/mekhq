@@ -39,6 +39,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
+import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
@@ -325,6 +326,8 @@ public class Skill {
             return modifier;
         }
 
+        final boolean hasReligiousFanaticism = characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM);
+
         String name = type.getName();
         // Reputation and Alternate ID
         if (Objects.equals(name, S_NEGOTIATION) ||
@@ -362,12 +365,16 @@ public class Skill {
                 modifier -= 2;
             }
 
-            if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
-                modifier += 2;
+            if (hasReligiousFanaticism) {
+                modifier -= 1;
             }
 
-            if (characterOptions.booleanOption(COMPULSION_UNPLEASANT_PERSONALITY)) {
+            if (hasReligiousFanaticism) {
                 modifier -= 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
+                modifier += 2;
             }
         }
 
@@ -432,6 +439,13 @@ public class Skill {
 
             if (characterOptions.booleanOption(ATOW_PATIENT)) {
                 modifier += 1;
+            }
+        }
+
+        // Trivial Compulsion - Religious Fanaticism
+        if (Objects.equals(S_INTEREST_THEOLOGY, name)) {
+            if (hasReligiousFanaticism) {
+                modifier += 2;
             }
         }
 
