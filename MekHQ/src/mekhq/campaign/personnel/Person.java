@@ -6008,6 +6008,10 @@ public class Person {
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
+    public void setReputation(final int reputation) {
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
     /**
      * Adjusts the person's reputation by the specified amount.
      *
