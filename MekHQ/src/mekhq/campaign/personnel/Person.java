@@ -1547,7 +1547,7 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + getWarningColor() + "'>",
+                  spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG));
         }
     }
@@ -7159,6 +7159,35 @@ public class Person {
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
         }
 
+        return "";
+    }
+
+    /**
+     * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
+     * check, and returns a formatted warning message if applicable.
+     *
+     * <p>If both {@code hasClinicalParanoia} and {@code failedWillpowerCheck} are {@code true}, this method sets the
+     * internal state indicating the member is suffering from clinical paranoia and returns a warning message.
+     * Otherwise, it resets the state and returns an empty string.</p>
+     *
+     * @param hasClinicalParanoia  {@code true} if the personnel member has the clinical paranoia condition
+     * @param failedWillpowerCheck {@code true} if the personnel member failed their willpower check
+     *
+     * @return A formatted warning message if clinical paranoia applies, or an empty string otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processClinicalParanoia(
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasClinicalParanoia, boolean failedWillpowerCheck) {
+        if (hasClinicalParanoia && failedWillpowerCheck) {
+            sufferingFromClinicalParanoia = true;
+            return String.format(resources.getString("compulsion.clinicalParanoia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        sufferingFromClinicalParanoia = false;
         return "";
     }
 
