@@ -50,6 +50,7 @@ import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
@@ -7156,6 +7157,44 @@ public class Person {
             }
 
             return String.format(resources.getString("compulsion.confusion"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Processes the effects of childlike regression on the character, applying injuries or health complications based
+     * on specified conditions.
+     *
+     * <p>If the character has childlike regression and fails a willpower check, the method will apply either an
+     * injury (using advanced medical rules) or increment the number of "hits" (using basic rules). If the total number
+     * of injuries or hits exceeds a defined threshold, the personnel status is changed to indicate medical
+     * complications (killed).</p>
+     *
+     * @param campaign             the {@link Campaign} context in which the effects are processed
+     * @param useAdvancedMedical   {@code true} to use advanced medical injury processing
+     * @param hasRegression        {@code true} if the character is affected by childlike regression
+     * @param failedWillpowerCheck {@code true} if the character failed their willpower check
+     */
+    public String processChildlikeRegression(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasRegression, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasRegression && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.regression"), getHyperlinkedFullTitle(),
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
         }
 
