@@ -106,9 +106,9 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockDoctor.getOptions()).thenReturn(new PersonnelOptions());
         when(mockDoctor.getATOWAttributes()).thenReturn(new Attributes());
         when(mockDoctorSkillRegular.getExperienceLevel(mockDoctor.getOptions(),
-              mockDoctor.getATOWAttributes())).thenReturn(SkillType.EXP_REGULAR);
+              mockDoctor.getATOWAttributes(), false)).thenReturn(SkillType.EXP_REGULAR);
         when(mockDoctorSkillGreen.getExperienceLevel(mockDoctor.getOptions(),
-              mockDoctor.getATOWAttributes())).thenReturn(SkillType.EXP_GREEN);
+              mockDoctor.getATOWAttributes(), false)).thenReturn(SkillType.EXP_GREEN);
         when(mockDoctor.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
         when(mockDoctor.isDoctor()).thenReturn(true);
         when(mockDoctor.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
@@ -124,9 +124,9 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockTech.getOptions()).thenReturn(new PersonnelOptions());
         when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
         when(mockMekTechSkillVeteran.getExperienceLevel(mockTech.getOptions(),
-              mockTech.getATOWAttributes())).thenReturn(SkillType.EXP_VETERAN);
+              mockTech.getATOWAttributes(), false)).thenReturn(SkillType.EXP_VETERAN);
         when(mockMekTechSkillRegular.getExperienceLevel(mockTech.getOptions(),
-              mockTech.getATOWAttributes())).thenReturn(SkillType.EXP_REGULAR);
+              mockTech.getATOWAttributes(), false)).thenReturn(SkillType.EXP_REGULAR);
         when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTech.isTech()).thenReturn(true);
         when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
@@ -139,9 +139,9 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockTech.isEmployed()).thenReturn(true);
 
         when(mockMedicSkill.getExperienceLevel(new PersonnelOptions(),
-              new Attributes())).thenReturn(SkillType.EXP_REGULAR);
+              new Attributes(), false)).thenReturn(SkillType.EXP_REGULAR);
         when(mockAstechSkill.getExperienceLevel(new PersonnelOptions(),
-              new Attributes())).thenReturn(SkillType.EXP_REGULAR);
+              new Attributes(), false)).thenReturn(SkillType.EXP_REGULAR);
 
         mockPersonnelList.add(mockDoctor);
         mockPersonnelList.add(mockTech);
@@ -365,7 +365,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMekwarrior.getOptions()).thenReturn(new PersonnelOptions());
         when(mockMekwarrior.getATOWAttributes()).thenReturn(new Attributes());
         when(mockDoctorSkillGreen.getExperienceLevel(mockMekwarrior.getOptions(),
-              mockMekwarrior.getATOWAttributes())).thenReturn(SkillType.EXP_GREEN);
+              mockMekwarrior.getATOWAttributes(), false)).thenReturn(SkillType.EXP_GREEN);
         when(mockMekwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(mockMekwarrior.getSecondaryRole()).thenReturn(PersonnelRole.DOCTOR);
         when(mockMekwarrior.isDoctor()).thenReturn(true);
@@ -420,7 +420,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMekwarrior.getOptions()).thenReturn(new PersonnelOptions());
         when(mockMekwarrior.getATOWAttributes()).thenReturn(new Attributes());
         when(mockMekTechSkillRegular.getExperienceLevel(mockMekwarrior.getOptions(),
-              mockMekwarrior.getATOWAttributes())).thenReturn(SkillType.EXP_REGULAR);
+              mockMekwarrior.getATOWAttributes(), false)).thenReturn(SkillType.EXP_REGULAR);
         when(mockMekwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(mockMekwarrior.getSecondaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockMekwarrior.isTech()).thenReturn(true);
