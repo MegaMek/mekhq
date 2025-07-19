@@ -48,7 +48,10 @@ import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.personnel.enums.AwardBonus;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -70,11 +73,11 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
         when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
         when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
@@ -108,11 +111,11 @@ public class PersonTest {
         initPerson();
         initAwards();
 
-        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
         when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
         when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
@@ -142,10 +145,10 @@ public class PersonTest {
         UUID is1Id = UUID.randomUUID();
         int is1WeightClass = EntityWeightClass.WEIGHT_LIGHT;
 
-        Unit is1 = Mockito.mock(Unit.class);
+        Unit is1 = mock(Unit.class);
         when(is1.getId()).thenReturn(is1Id);
 
-        Entity is1Entity = Mockito.mock(Entity.class);
+        Entity is1Entity = mock(Entity.class);
         when(is1Entity.isClan()).thenReturn(false);
         when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOXSET);
         when(is1Entity.getWeightClass()).thenReturn(is1WeightClass);
@@ -167,10 +170,10 @@ public class PersonTest {
             UUID is2Id = UUID.randomUUID();
             int is2WeightClass = EntityWeightClass.WEIGHT_HEAVY;
 
-            Unit is2 = Mockito.mock(Unit.class);
+            Unit is2 = mock(Unit.class);
             when(is2.getId()).thenReturn(is2Id);
 
-            Entity is2Entity = Mockito.mock(Entity.class);
+            Entity is2Entity = mock(Entity.class);
             when(is2Entity.isClan()).thenReturn(false);
             when(is2Entity.getTechLevel()).thenReturn(is2TechLevel);
             when(is2Entity.getWeightClass()).thenReturn(is2WeightClass);
@@ -192,10 +195,10 @@ public class PersonTest {
             UUID clanId = UUID.randomUUID();
             int clanWeightClass = EntityWeightClass.WEIGHT_MEDIUM;
 
-            Unit clan = Mockito.mock(Unit.class);
+            Unit clan = mock(Unit.class);
             when(clan.getId()).thenReturn(clanId);
 
-            Entity clanEntity = Mockito.mock(Entity.class);
+            Entity clanEntity = mock(Entity.class);
             when(clanEntity.isClan()).thenReturn(true);
             when(clanEntity.getTechLevel()).thenReturn(clanTech);
             when(clanEntity.getWeightClass()).thenReturn(clanWeightClass);
@@ -213,11 +216,11 @@ public class PersonTest {
         initPerson();
 
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
 
         UUID id1 = UUID.randomUUID();
-        Unit unit1 = Mockito.mock(Unit.class);
+        Unit unit1 = mock(Unit.class);
         when(unit1.getId()).thenReturn(id1);
 
         // Add a tech unit
@@ -256,7 +259,7 @@ public class PersonTest {
         assertFalse(mockPerson.isDeployed());
 
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
         when(unit0.getScenarioId()).thenReturn(-1);
 
@@ -278,18 +281,18 @@ public class PersonTest {
         initPerson();
 
         // Add an injury without a unit
-        Injury injury0 = Mockito.mock(Injury.class);
+        Injury injury0 = mock(Injury.class);
         mockPerson.addInjury(injury0);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
 
         // Add an injury with a unit
-        Injury injury1 = Mockito.mock(Injury.class);
+        Injury injury1 = mock(Injury.class);
         mockPerson.addInjury(injury1);
 
         // Ensure the unit had its status reset to reflect crew damage
@@ -300,16 +303,16 @@ public class PersonTest {
     public void testPrisonerRemovedFromUnit() {
         initPerson();
 
-        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
 
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
@@ -324,16 +327,16 @@ public class PersonTest {
     public void testPrisonerDefectorRemovedFromUnit() {
         initPerson();
 
-        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
 
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
@@ -348,16 +351,16 @@ public class PersonTest {
     public void testBondsmanRemovedFromUnit() {
         initPerson();
 
-        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
 
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
@@ -372,16 +375,16 @@ public class PersonTest {
     public void testFreeNotRemovedFromUnit() {
         initPerson();
 
-        CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
+        CampaignOptions mockCampaignOpts = mock(CampaignOptions.class);
 
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.now());
         when(mockCampaign.getName()).thenReturn("Campaign");
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
-        Unit unit0 = Mockito.mock(Unit.class);
+        Unit unit0 = mock(Unit.class);
         when(unit0.getId()).thenReturn(id0);
 
         mockPerson.setUnit(unit0);
@@ -510,6 +513,160 @@ public class PersonTest {
         assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
     }
 
+
+    @Test
+    void testProcessDiscontinuationSyndrome_noAddiction() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.processDiscontinuationSyndrome(mockCampaign, false, true, false, false);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(0, person.getFatigue());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_passedWillpowerCheck() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.processDiscontinuationSyndrome(mockCampaign, false, true, true, false);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(0, person.getFatigue());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_useFatigue_noAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        person.processDiscontinuationSyndrome(mockCampaign, false, true, true, true);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(1, person.getHits());
+        assertEquals(2, person.getFatigue());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_useFatigue_useAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        person.processDiscontinuationSyndrome(mockCampaign, true, true, true, true);
+        assertEquals(1, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(2, person.getFatigue());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_noFatigue_noAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, true);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(1, person.getHits());
+        assertEquals(0, person.getFatigue());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_noFatigue_useAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, true);
+        assertEquals(1, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(0, person.getFatigue());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_characterKilled_noAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        Hangar mockHangar = mock(Hangar.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        person.setHits(5);
+
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, true);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(6, person.getHits());
+        assertEquals(0, person.getFatigue());
+        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
+    }
+
+    @Test
+    void testProcessDiscontinuationSyndrome_characterKilled_useAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        Hangar mockHangar = mock(Hangar.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        for (int i = 0; i < 5; i++) {
+            person.addInjury(new Injury());
+        }
+
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, true);
+        assertEquals(6, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(0, person.getFatigue());
+        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
+    }
 
     @Test
     void testSwitchPersonality_singleSwitch_allFieldsChanged() {
