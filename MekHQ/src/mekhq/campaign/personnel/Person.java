@@ -7490,7 +7490,8 @@ public class Person {
      *
      * <p>If the secret is not revealed, returns an empty string.</p>
      *
-     * @param hasDarkSecret {@code true} if the character has a dark secret, otherwise {@code false}
+     * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
+     * {@link #hasDarkSecret()}
      * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
      *
      * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise
@@ -7548,5 +7549,21 @@ public class Person {
 
             return report;
         }
+    }
+
+    /**
+     * Determines whether any dark secret options are enabled for this entity.
+     *
+     * @return {@code true} if the entity has any dark secret SPA enabled; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean hasDarkSecret() {
+        return options.booleanOption(DARK_SECRET_TRIVIAL)
+                     || options.booleanOption(DARK_SECRET_SIGNIFICANT)
+                     || options.booleanOption(DARK_SECRET_MAJOR)
+                     || options.booleanOption(DARK_SECRET_SEVERE)
+                     || options.booleanOption(DARK_SECRET_EXTREME);
     }
 }
