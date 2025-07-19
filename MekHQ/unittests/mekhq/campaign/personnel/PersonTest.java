@@ -663,6 +663,116 @@ public class PersonTest {
     }
 
     @Test
+    void testProcessCripplingFlashbacks_noFlashbacks() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.processCripplingFlashbacks(mockCampaign, false, false, false);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessCripplingFlashbacks_passedWillpowerCheck() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.processCripplingFlashbacks(mockCampaign, false, true, false);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessCripplingFlashbacks_noAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.processCripplingFlashbacks(mockCampaign, false, true, true);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(1, person.getHits());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessCripplingFlashbacks_useAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        person.processCripplingFlashbacks(mockCampaign, true, true, true);
+        assertEquals(1, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+    }
+
+    @Test
+    void testProcessCripplingFlashbacks_characterKilled_noAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        Hangar mockHangar = mock(Hangar.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        person.setHits(5);
+
+        person.processCripplingFlashbacks(mockCampaign, false, true, true);
+        assertEquals(0, person.getInjuries().size());
+        assertEquals(6, person.getHits());
+        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
+    }
+
+    @Test
+    void testProcessCripplingFlashbacks_characterKilled_useAdvancedMedical() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        LocalDate currentDate = LocalDate.of(3151, 1, 1);
+        Hangar mockHangar = mock(Hangar.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+        when(mockCampaign.getLocalDate()).thenReturn(currentDate);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        Person person = new Person(mockCampaign);
+        for (int i = 0; i < 5; i++) {
+            person.addInjury(new Injury());
+        }
+
+        person.processCripplingFlashbacks(mockCampaign, true, true, true);
+        assertEquals(6, person.getInjuries().size());
+        assertEquals(0, person.getHits());
+        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
+    }
+
+    @Test
     void testProcessConfusion_noConfusion() {
         Campaign mockCampaign = mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);

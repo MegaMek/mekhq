@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ALTERNATE_ID;
 import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_CONFUSION;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_ADDICTION;
+import static mekhq.campaign.personnel.PersonnelOptions.MADNESS_FLASHBACKS;
 import static mekhq.campaign.personnel.PersonnelOptions.getCompulsionCheckModifier;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -5317,6 +5318,16 @@ public class Campaign implements ITechManager {
                     person.processDiscontinuationSyndrome(this,
                           isUseAdvancedMedical,
                           isUseFatigue,
+                          true,
+                          failedWillpowerCheck);
+                }
+
+                if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
+                    int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
+                    boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                          null, modifier);
+                    person.processCripplingFlashbacks(this,
+                          isUseAdvancedMedical,
                           true,
                           failedWillpowerCheck);
                 }
