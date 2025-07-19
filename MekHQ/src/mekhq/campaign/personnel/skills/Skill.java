@@ -361,6 +361,10 @@ public class Skill {
                 modifier -= 2;
             }
 
+            if (characterOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
+                modifier -= 2;
+            }
+
             if (hasReligiousFanaticism) {
                 modifier -= 1;
             }
