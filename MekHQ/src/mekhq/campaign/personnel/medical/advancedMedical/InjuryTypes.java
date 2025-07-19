@@ -81,6 +81,7 @@ public final class InjuryTypes {
     public static final InjuryType SEVERED_SPINE = new SeveredSpine();
     public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
     public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
+    public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
 
     // Replacement Limbs
     public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
@@ -118,6 +119,7 @@ public final class InjuryTypes {
             InjuryType.register("am:Postpartum_Recovery", POSTPARTUM_RECOVERY);
             InjuryType.register("am:Transit_Disorientation_Syndrome", TRANSIT_DISORIENTATION_SYNDROME);
             InjuryType.register("am:DiscontinuationSyndrome", DISCONTINUATION_SYNDROME);
+            InjuryType.register("am:Crippling_Flashbacks", CRIPPLING_FLASHBACKS);
             registered = true;
         }
     }
@@ -807,6 +809,23 @@ public final class InjuryTypes {
                 return "Severe " + fluffText;
             }
             return fluffText;
+        }
+
+        @Override
+        public Collection<Modifier> getModifiers(Injury inj) {
+            return List.of(new Modifier(GUNNERY, 1, null, InjuryType.MODTAG_INJURY),
+                  new Modifier(PILOTING, 1, null, InjuryType.MODTAG_INJURY));
+        }
+    }
+
+    public static final class CripplingFlashbacks extends AMInjuryType {
+        public CripplingFlashbacks() {
+            recoveryTime = 7;
+            allowedLocations = EnumSet.of(BodyLocation.INTERNAL);
+            fluffText = "Crippling Flashbacks";
+            simpleName = "Crippling Flashbacks";
+            maxSeverity = 1;
+            level = InjuryLevel.MINOR;
         }
 
         @Override
