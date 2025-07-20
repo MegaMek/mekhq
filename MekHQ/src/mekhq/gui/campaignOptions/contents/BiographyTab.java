@@ -119,6 +119,9 @@ public class BiographyTab {
     private JCheckBox chkShowLifeEventDialogBirths;
     private JCheckBox chkShowLifeEventDialogComingOfAge;
     private JCheckBox chkShowLifeEventDialogCelebrations;
+    private JPanel pnlComingOfAge;
+    private JCheckBox chkComingOfAgeSPAs;
+    private JCheckBox chkRewardComingOfAgeRPSkills;
     //end General Tab
 
     //start Backgrounds Tab
@@ -392,6 +395,10 @@ public class BiographyTab {
         chkShowLifeEventDialogBirths = new JCheckBox();
         chkShowLifeEventDialogComingOfAge = new JCheckBox();
         chkShowLifeEventDialogCelebrations = new JCheckBox();
+
+        pnlComingOfAge = new JPanel();
+        chkComingOfAgeSPAs = new JCheckBox();
+        chkRewardComingOfAgeRPSkills = new JCheckBox();
     }
 
     /**
@@ -451,6 +458,8 @@ public class BiographyTab {
 
         pnlLifeEvents = createLifeEventsPanel();
 
+        pnlComingOfAge = createComingOfAgePanel();
+
         // Layout the Panel
         final JPanel panelLeft = new CampaignOptionsStandardPanel("BiographyGeneralTabLeft", true);
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
@@ -492,12 +501,12 @@ public class BiographyTab {
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
         panelParent.add(panelLeft, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(pnlAnniversariesPanel, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
         panelParent.add(pnlLifeEvents, layoutParent);
+        layoutParent.gridx++;
+        panelParent.add(pnlComingOfAge, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "BiographyGeneralTab");
@@ -572,6 +581,30 @@ public class BiographyTab {
         layoutParent.gridx = 0;
         layoutParent.gridy++;
         panel.add(chkShowLifeEventDialogCelebrations, layoutParent);
+
+        return panel;
+    }
+
+    private JPanel createComingOfAgePanel() {
+        // Contents
+        chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
+        chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(generalHeader, "ComingOfAgeAbilities"));
+
+        chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills");
+        chkRewardComingOfAgeRPSkills.addMouseListener(createTipPanelUpdater(generalHeader,
+              "ComingOfAgeRPSkills"));
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("ComingOfAgePanel", true, "ComingOfAgePanel");
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 1;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(chkComingOfAgeSPAs, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkRewardComingOfAgeRPSkills, layoutParent);
 
         return panel;
     }
@@ -1500,6 +1533,8 @@ public class BiographyTab {
         chkShowLifeEventDialogBirths.setSelected(options.isShowLifeEventDialogBirths());
         chkShowLifeEventDialogComingOfAge.setSelected(options.isShowLifeEventDialogComingOfAge());
         chkShowLifeEventDialogCelebrations.setSelected(options.isShowLifeEventDialogCelebrations());
+        chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
+        chkRewardComingOfAgeRPSkills.setSelected(options.isRewardComingOfAgeRPSkills());
 
         // Backgrounds
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
@@ -1599,6 +1634,8 @@ public class BiographyTab {
         options.setShowLifeEventDialogBirths(chkShowLifeEventDialogBirths.isSelected());
         options.setShowLifeEventDialogComingOfAge(chkShowLifeEventDialogComingOfAge.isSelected());
         options.setShowLifeEventDialogCelebrations(chkShowLifeEventDialogCelebrations.isSelected());
+        options.setRewardComingOfAgeAbilities(chkComingOfAgeSPAs.isSelected());
+        options.setRewardComingOfAgeRPSkills(chkRewardComingOfAgeRPSkills.isSelected());
 
         // Backgrounds
         options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
