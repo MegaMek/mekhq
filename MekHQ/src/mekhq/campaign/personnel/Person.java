@@ -97,7 +97,9 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
@@ -173,6 +175,8 @@ public class Person {
     public static final String BLOODMARK_LABEL = "BLOODMARK";
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
+
+    public static final int CONNECTIONS_TARGET_NUMBER = 10;
 
     private static final String DELIMITER = "::";
 
@@ -5865,6 +5869,8 @@ public class Person {
     /**
      * Calculates and returns the character's adjusted Connections value.
      *
+     * <p>If the character has burned their Connections, their Connections value is fixed as 0.</p>
+     *
      * <p>If the character is suffering from an episode of Clinical Paranoia, their Connections value is fixed as
      * 0.</p>
      *
@@ -5885,6 +5891,10 @@ public class Person {
      * @since 0.50.07
      */
     public int getAdjustedConnections() {
+        if (burnedConnectionsEndDate != null) {
+            return 0;
+        }
+
         if (sufferingFromClinicalParanoia) {
             return 0;
         }
@@ -7476,5 +7486,50 @@ public class Person {
             potentialVictims.remove(victim);
             victims.add(victim);
         }
+    }
+
+    public String performConnectionsWealthCheck(LocalDate today, Finances campaignFinances,
+          ConnectionsLevel connectionsLevel) {
+        // Non-commanders can't use their connections to generate wealth
+        if (!commander) {
+            return "";
+        }
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            Money donation = connectionsLevel.getWealth();
+            if (donation.isPositive()) {
+                int roll = d6(2);
+                if (roll >= CONNECTIONS_TARGET_NUMBER) {
+                    campaignFinances.credit(TransactionType.WEALTH, today, donation,
+                          resources.getString("connections.transaction"));
+                    return String.format(resources.getString("connections.wealth"), getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, donation.toAmountString());
+                }
+            }
+        }
+
+        return "";
+    }
+
+    private String checkForConnectionsReestablishContact(LocalDate today) {
+        if (burnedConnectionsEndDate != null && burnedConnectionsEndDate.isBefore(today)) {
+            burnedConnectionsEndDate = null;
+
+            return String.format(resources.getString("connections.reestablished"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
+        }
+        return "";
+    }
+
+    private String checkForBurnedContacts(LocalDate today, ConnectionsLevel connectionsLevel) {
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            int roll = d6(2);
+            if (roll <= connectionsLevel.getBurnChance()) {
+                burnedConnectionsEndDate = today.plusMonths(d6(1));
+                return String.format(resources.getString("connections.burned"), getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+            }
+        }
+        return "";
     }
 }

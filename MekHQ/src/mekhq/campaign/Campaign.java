@@ -5941,16 +5941,16 @@ public class Campaign implements ITechManager {
 
         location.newDay(this);
 
+        updateFieldKitchenCapacity();
+
+        processNewDayPersonnel();
+
         // Manage the Markets
         refreshPersonnelMarkets();
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
-
-        updateFieldKitchenCapacity();
-
-        processNewDayPersonnel();
 
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
         // moment they arrive via AtB Bonus Events

@@ -33,9 +33,15 @@
 package mekhq.campaign.market.personnelMarket.markets;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
+import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -56,6 +62,7 @@ import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -234,6 +241,49 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     public void generateApplicants() {
+    }
+
+    /**
+     * Performs the Connections recruits check for the given date and Connections level.
+     *
+     * <p>This method determines whether the commander gains additional recruits based on their Connections level. If
+     * the Connections level allows for additional recruit rolls and the roll is successful, the recruit bonus is
+     * awarded and a report is added to the campaign.</p>
+     *
+     * @return the number of additional recruits gained from the check, or {@code 0} if none are gained or if no
+     *       commander is present.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    int performConnectionsRecruitsCheck() {
+        Person commander = campaign.getCommander();
+        if (commander == null) {
+            return 0;
+        }
+
+        if (commander.getBurnedConnectionsEndDate() != null) {
+            return 0;
+        }
+
+        int adjustedConnections = commander.getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            int additionalRecruitRolls = connectionsLevel.getRecruits();
+            if (additionalRecruitRolls > 0) {
+                int roll = d6(2);
+                if (roll >= CONNECTIONS_TARGET_NUMBER) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "connections.recruits",
+                            commander.getHyperlinkedFullTitle(), additionalRecruitRolls,
+                            spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
+
+                    return additionalRecruitRolls;
+                }
+            }
+        }
+
+        return 0;
     }
 
     /**
