@@ -5335,6 +5335,17 @@ public class Campaign implements ITechManager {
                         person.addBloodhuntDate(assassinationAttempt);
                     }
                 }
+
+                if (person.getBurnedConnectionsEndDate() != null) {
+                    person.checkForConnectionsReestablishContact(currentDay);
+                }
+
+                if (campaignOptions.isAllowMonthlyConnections()) {
+                    String report = person.performConnectionsWealthCheck(currentDay, finances);
+                    if (!report.isBlank()) {
+                        addReport(report);
+                    }
+                }
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
@@ -5952,6 +5963,11 @@ public class Campaign implements ITechManager {
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
 
+        // This needs to be after both personnel and markets
+        if (campaignOptions.isAllowMonthlyConnections() && isFirstOfMonth) {
+            checkForBurnedContacts();
+        }
+
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
         // moment they arrive via AtB Bonus Events
         if (location.isOnPlanet() && isFirstOfMonth) {
@@ -6025,6 +6041,28 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Checks if the commander has any burned contacts, and if so, generates and records a report.
+     *
+     * <p>This method is only executed if monthly connections are allowed by campaign options. If the commander
+     * exists and their burned connections end date has not been set, it invokes the commander's check for burned
+     * contacts on the current day. If a non-blank report is returned, the report is added to the campaign logs.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void checkForBurnedContacts() {
+        if (campaignOptions.isAllowMonthlyConnections()) {
+            Person commander = getCommander();
+            if (commander != null && commander.getBurnedConnectionsEndDate() == null) {
+                String report = commander.checkForBurnedContacts(currentDay);
+                if (!report.isBlank()) {
+                    addReport(report);
+                }
+            }
+        }
     }
 
     /**

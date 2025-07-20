@@ -337,7 +337,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         }
 
         if (campaignOptions.isAllowMonthlyConnections()) {
-            int additionalRecruits = performConnectionsRecruitsCheck(getToday());
+            int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }
 

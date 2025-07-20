@@ -46,6 +46,8 @@ import mekhq.campaign.finances.Money;
  * {@link Integer} values to their corresponding {@code ConnectionsLevel}.</p>
  */
 public enum ConnectionsLevel {
+    // If these values are changed, you must update the CONNECTIONS glossary entry.
+
     /** Burn chance: 10 - Wealth: 0 - Recruits: 0 */
     CONNECTIONS_ZERO(0, 10, Money.of(0), 0),
     /** Burn chance: 7 - Wealth: 1000 - Recruits: 0 */

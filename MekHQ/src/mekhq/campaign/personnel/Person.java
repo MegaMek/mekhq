@@ -176,7 +176,7 @@ public class Person {
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
 
-    public static final int CONNECTIONS_TARGET_NUMBER = 10;
+    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitary value
 
     private static final String DELIMITER = "::";
 
@@ -387,7 +387,7 @@ public class Person {
 
     private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
           MekHQ.getMHQOptions().getLocale());
-    private static final MMLogger logger = MMLogger.create(Person.class);
+    private static final MMLogger LOGGER = MMLogger.create(Person.class);
 
     // initializes the AtB ransom values
     static {
@@ -3276,7 +3276,7 @@ public class Person {
                 extraData.writeToXml(pw);
             }
         } catch (Exception ex) {
-            logger.error(ex, "Failed to write {} to the XML File", getFullName());
+            LOGGER.error(ex, "Failed to write {} to the XML File", getFullName());
             throw ex; // we want to rethrow to ensure that the save fails
         }
         return indent;
@@ -3326,7 +3326,7 @@ public class Person {
                         }
                         person.originPlanet = p;
                     } catch (NullPointerException e) {
-                        logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
+                        LOGGER.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (nodeName.equalsIgnoreCase("becomingBondsmanEndDate")) {
                     person.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
@@ -3461,7 +3461,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("attemptDate")) {
-                            logger.error("(techUnitIds) Unknown node type not loaded in bloodhuntSchedule nodes: {}",
+                            LOGGER.error("(techUnitIds) Unknown node type not loaded in bloodhuntSchedule nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3486,7 +3486,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            logger.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
+                            LOGGER.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3502,7 +3502,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                            LOGGER.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3569,7 +3569,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                            LOGGER.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3589,7 +3589,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in scenario logEntry nodes: {}",
+                            LOGGER.error("Unknown node type not loaded in scenario logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3609,7 +3609,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                            LOGGER.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3629,7 +3629,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                            LOGGER.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3648,7 +3648,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            logger.error("Unknown node type not loaded in personnel award log nodes: {}",
+                            LOGGER.error("Unknown node type not loaded in personnel award log nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3666,7 +3666,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            logger.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
+                            LOGGER.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         person.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -3840,7 +3840,7 @@ public class Person {
                     try {
                         person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        logger.warn("Error restoring advantage: {}", adv);
+                        LOGGER.warn("Error restoring advantage: {}", adv);
                     }
                 }
             }
@@ -3865,7 +3865,7 @@ public class Person {
                     try {
                         person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        logger.error("Error restoring implants: {}", adv);
+                        LOGGER.error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -3899,7 +3899,7 @@ public class Person {
                       person.getHyperlinkedFullTitle()));
             }
         } catch (Exception e) {
-            logger.error(e, "Failed to read person {} from file", person.getFullName());
+            LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
 
@@ -4055,7 +4055,7 @@ public class Person {
                 retVal.getOptions().getOption(triggerName).setValue(value);
                 edgeOptionList.remove(triggerName);
             } catch (Exception e) {
-                logger.error("Error restoring edge trigger: {}", trigger);
+                LOGGER.error("Error restoring edge trigger: {}", trigger);
             }
         }
     }
@@ -4073,7 +4073,7 @@ public class Person {
             try {
                 retVal.getOptions().getOption(advName).setValue(false);
             } catch (Exception e) {
-                logger.error("Error disabling edge trigger: {}", edgeTrigger);
+                LOGGER.error("Error disabling edge trigger: {}", edgeTrigger);
             }
         }
     }
@@ -4499,7 +4499,7 @@ public class Person {
 
             SkillType skillType = getType(skillName);
             if (skillType == null) {
-                logger.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
+                LOGGER.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
                 return EXP_NONE;
             }
 
@@ -6103,7 +6103,7 @@ public class Person {
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
         if (attribute == null || attribute == SkillAttribute.NONE) {
-            logger.warn("(setAttributeScore) SkillAttribute is null or NONE.");
+            LOGGER.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
@@ -6122,7 +6122,7 @@ public class Person {
      */
     public int getAttributeScore(final SkillAttribute attribute) {
         if (attribute == null || attribute.isNone()) {
-            logger.error("(getAttributeScore) SkillAttribute is null or NONE.");
+            LOGGER.error("(getAttributeScore) SkillAttribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
         }
 
@@ -6185,7 +6185,7 @@ public class Person {
      */
     public int getAttributeCap(final SkillAttribute attribute) {
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(getAttributeCap) SkillAttribute is null or NONE.");
+            LOGGER.warn("(getAttributeCap) SkillAttribute is null or NONE.");
             return MAXIMUM_ATTRIBUTE_SCORE;
         }
 
@@ -6226,7 +6226,7 @@ public class Person {
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
+            LOGGER.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
@@ -6605,7 +6605,7 @@ public class Person {
             final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error("Person {} ('{}') references missing unit {}", getId(), getFullName(), id);
+                LOGGER.error("Person {} ('{}') references missing unit {}", getId(), getFullName(), id);
             }
         }
 
@@ -6616,7 +6616,7 @@ public class Person {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    logger.error("Person {} ('{}') techs missing unit {}", getId(), getFullName(), techUnit.getId());
+                    LOGGER.error("Person {} ('{}') techs missing unit {}", getId(), getFullName(), techUnit.getId());
                     techUnits.remove(ii);
                 }
             }
@@ -7488,30 +7488,21 @@ public class Person {
         }
     }
 
-    public String performConnectionsWealthCheck(LocalDate today, Finances campaignFinances,
-          ConnectionsLevel connectionsLevel) {
-        // Non-commanders can't use their connections to generate wealth
-        if (!commander) {
-            return "";
-        }
-
-        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
-            Money donation = connectionsLevel.getWealth();
-            if (donation.isPositive()) {
-                int roll = d6(2);
-                if (roll >= CONNECTIONS_TARGET_NUMBER) {
-                    campaignFinances.credit(TransactionType.WEALTH, today, donation,
-                          resources.getString("connections.transaction"));
-                    return String.format(resources.getString("connections.wealth"), getHyperlinkedFullTitle(),
-                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, donation.toAmountString());
-                }
-            }
-        }
-
-        return "";
-    }
-
-    private String checkForConnectionsReestablishContact(LocalDate today) {
+    /**
+     * Reestablishes connections if the cooldown has expired.
+     *
+     * <p>If burned connections exist and the specified date is after the cooldown period, this method clears the
+     * burned connections state and returns a formatted message  indicating that connections have been
+     * reestablished.</p>
+     *
+     * @param today the current date to check against the cooldown period
+     *
+     * @return a formatted message if connections are reestablished, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String checkForConnectionsReestablishContact(LocalDate today) {
         if (burnedConnectionsEndDate != null && burnedConnectionsEndDate.isBefore(today)) {
             burnedConnectionsEndDate = null;
 
@@ -7521,13 +7512,81 @@ public class Person {
         return "";
     }
 
-    private String checkForBurnedContacts(LocalDate today, ConnectionsLevel connectionsLevel) {
+    /**
+     * Attempts to generate wealth using connections for the given date and campaign finances.
+     *
+     * <p>Only commanders with active connections are eligible. If successful, a random roll is made to determine if
+     * wealth is generated, which is then added to the provided finances. Returns a formatted message if a wealth gain
+     * occurs, or an empty string if no wealth is generated.</p>
+     *
+     * @param today            the current date for the wealth check
+     * @param campaignFinances the finances object in which to credit any gained wealth
+     *
+     * @return a formatted message if wealth is gained, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String performConnectionsWealthCheck(LocalDate today, Finances campaignFinances) {
+        // Non-commanders can't use their connections to generate wealth
+        if (!commander) {
+            return "";
+        }
+
+        if (burnedConnectionsEndDate != null) {
+            LOGGER.info("Connections burned for {} unable to gain Connections wealth", getFullTitle());
+            return "";
+        }
+
+        int adjustedConnections = getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            Money donation = connectionsLevel.getWealth();
+            if (donation.isPositive()) {
+                int roll = d6(2);
+                LOGGER.info("Rolling to use connections to gain money {} {} vs. {}", getFullTitle(), roll,
+                      CONNECTIONS_TARGET_NUMBER);
+                if (roll >= CONNECTIONS_TARGET_NUMBER) {
+                    campaignFinances.credit(TransactionType.WEALTH, today, donation,
+                          resources.getString("connections.transaction"));
+                    return String.format(resources.getString("connections.wealth"), getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, donation.toAmountString());
+                }
+            } else {
+                LOGGER.info("Connections too low to generate Wealth");
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * Checks if there is a chance for the connections to be burned on the given date.
+     *
+     * <p>If the person has non-zero connections, a burn roll is performed. If the roll is equal to or below the burn
+     * chance, the connections are burned for a random number of months starting from the given date. Returns a
+     * formatted message if connections are burned, or an empty string otherwise.</p>
+     *
+     * @param today the current date to perform the burn check
+     *
+     * @return a formatted message if connections are burned, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String checkForBurnedContacts(LocalDate today) {
+        int adjustedConnections = getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
         if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
             int roll = d6(2);
+            int burnChance = connectionsLevel.getBurnChance();
+            LOGGER.info("Rolling to burn connections for {} {} vs. {}", getFullTitle(), roll, burnChance);
             if (roll <= connectionsLevel.getBurnChance()) {
                 burnedConnectionsEndDate = today.plusMonths(d6(1));
                 return String.format(resources.getString("connections.burned"), getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
             }
         }
         return "";

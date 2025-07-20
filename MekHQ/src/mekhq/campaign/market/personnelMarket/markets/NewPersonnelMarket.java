@@ -273,6 +273,8 @@ public class NewPersonnelMarket {
             int additionalRecruitRolls = connectionsLevel.getRecruits();
             if (additionalRecruitRolls > 0) {
                 int roll = d6(2);
+                logger.info("Rolling to use connections to get extra recruits {} {} vs. {}",
+                      commander.getFullTitle(), roll, CONNECTIONS_TARGET_NUMBER);
                 if (roll >= CONNECTIONS_TARGET_NUMBER) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "connections.recruits",
                             commander.getHyperlinkedFullTitle(), additionalRecruitRolls,

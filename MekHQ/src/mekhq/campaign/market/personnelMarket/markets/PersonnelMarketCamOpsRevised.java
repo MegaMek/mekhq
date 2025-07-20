@@ -175,7 +175,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         int rolls = getToday().getMonth().length(getToday().isLeapYear());
 
         if (getCampaign().getCampaignOptions().isAllowMonthlyConnections()) {
-            int additionalRecruits = performConnectionsRecruitsCheck(getToday());
+            int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }
 

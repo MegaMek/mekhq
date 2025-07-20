@@ -112,6 +112,7 @@ public class SystemsTab {
     private JCheckBox chkRandomizeAttributes;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
+    private JCheckBox chkAllowMonthlyConnections;
 
     /**
      * Constructs a new {@code SystemsTab} for the specified campaign.
@@ -443,6 +444,9 @@ public class SystemsTab {
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
         chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(atowHeader,
               "AllowMonthlyReinvestment"));
+        chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections");
+        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
+              "AllowMonthlyConnections"));
 
         final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -454,12 +458,14 @@ public class SystemsTab {
         panel.add(chkUseAttributes, layout);
         layout.gridx++;
         panel.add(chkRandomizeAttributes, layout);
+        layout.gridx++;
+        panel.add(chkRandomizeTraits, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkRandomizeTraits, layout);
-        layout.gridx++;
         panel.add(chkAllowMonthlyReinvestment, layout);
+        layout.gridx++;
+        panel.add(chkAllowMonthlyConnections, layout);
 
         return panel;
     }
@@ -525,6 +531,7 @@ public class SystemsTab {
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
+        chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
     }
 
     /**
@@ -583,5 +590,6 @@ public class SystemsTab {
         skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
+        options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
     }
 }

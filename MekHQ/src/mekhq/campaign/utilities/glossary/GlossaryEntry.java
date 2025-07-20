@@ -132,7 +132,8 @@ public enum GlossaryEntry {
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO"),
     VOCATIONAL_XP("VOCATIONAL_XP"),
     WINTER_HOLIDAY("WINTER_HOLIDAY"),
-    BLOODMARK("BLOODMARK");
+    BLOODMARK("BLOODMARK"),
+    CONNECTIONS("CONNECTIONS");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";
 
