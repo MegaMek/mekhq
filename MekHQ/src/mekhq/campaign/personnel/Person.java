@@ -176,7 +176,7 @@ public class Person {
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
 
-    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitary value
+    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
 
