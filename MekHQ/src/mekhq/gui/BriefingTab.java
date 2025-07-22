@@ -770,7 +770,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // First, we need to get all units assigned to the current scenario
-        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(false);
 
         // Then, we need to convert the ids to units, and filter out any units that are
         // null and
@@ -996,7 +996,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
 
     private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1368,7 +1368,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return;
         }
@@ -1423,7 +1423,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // First, we need to get all units assigned to the current scenario
-        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(false);
 
         // Then, we need to convert the ids to units, and filter out any units that are
         // null and
