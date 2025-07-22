@@ -45,6 +45,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
@@ -1258,6 +1259,20 @@ public class Campaign implements ITechManager {
 
         superForce.addSubForce(force, true);
         force.setScenarioId(superForce.getScenarioId(), this);
+
+        ForceType forceType = force.getForceType();
+
+        if (forceType.shouldStandardizeParents()) {
+            for (Force individualParentForce : force.getAllParents()) {
+                individualParentForce.setForceType(STANDARD, false);
+            }
+        }
+
+        if (forceType.shouldChildrenInherit()) {
+            for (Force childForce : force.getAllSubForces()) {
+                childForce.setForceType(forceType, false);
+            }
+        }
 
         // repopulate formation levels across the TO&E
         Force.populateFormationLevelsFromOrigin(this);
