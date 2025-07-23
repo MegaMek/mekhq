@@ -53,7 +53,7 @@ ultimatums:
     challenger:
       name: First Citizen Stefan Amaris
       role: NOBLE
-      factionCode: RWR
+      factionCode: TH
     incumbent:
       name: General Aleksandr Kerensky
       role: MEKWARRIOR
