@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.factionStanding;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.campaign.universe.factionStanding.GoingRogue.processGoingRogue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -44,11 +45,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 
 /**
  * Dialog logic for resolving a Faction Standing ultimatum event.
@@ -75,6 +79,8 @@ public class FactionStandingUltimatumDialog {
     private static final String KEY_NEWS_AGAINST = "newsAgainst.";
 
     private static final int CHOICE_INDEX_CHALLENGER = 0;
+    private static final int CHOICE_INDEX_INCUMBENT = 1;
+    private static final int CHOICE_INDEX_GO_ROGUE = 2;
 
     private final Campaign campaign;
 
@@ -120,7 +126,9 @@ public class FactionStandingUltimatumDialog {
                         challenger.getGivenName()),
                   getFormattedTextAt(RESOURCE_BUNDLE,
                         "FactionStandingUltimatumDialog.support",
-                        incumbent.getGivenName())
+                        incumbent.getGivenName()),
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "FactionStandingUltimatumDialog.goRogue")
             );
             ultimatumDialog = new ImmersiveDialogSimple(
                   campaign, challenger, incumbent,
@@ -128,6 +136,20 @@ public class FactionStandingUltimatumDialog {
                   buttons, null, null, true, ImmersiveDialogWidth.SMALL
             );
         } while (!new ImmersiveDialogConfirmation(campaign).wasConfirmed());
+
+        boolean choseGoRogue = ultimatumDialog.getDialogChoice() == CHOICE_INDEX_GO_ROGUE;
+        if (choseGoRogue) {
+            new FactionJudgmentSceneDialog(campaign,
+                  commander,
+                  secondInCommand,
+                  FactionJudgmentSceneType.GO_ROGUE,
+                  campaign.getFaction());
+
+            Faction faction = Factions.getInstance().getFaction(MERCENARY_FACTION_CODE);
+            GoingRogue.processGoingRogue(campaign, faction, commander, secondInCommand,
+                  false, campaign.getCampaignOptions().isTrackFactionStanding());
+            return;
+        }
 
         boolean choseChallenger = ultimatumDialog.getDialogChoice() == CHOICE_INDEX_CHALLENGER;
         String newsKey = choseChallenger ? KEY_NEWS_FOR : KEY_NEWS_AGAINST;
