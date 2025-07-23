@@ -2391,7 +2391,8 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (person != null) {
-                    getCampaign().recruitPerson(person, true, person.isEmployed());
+                    getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, person.isEmployed(),
+                          true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
