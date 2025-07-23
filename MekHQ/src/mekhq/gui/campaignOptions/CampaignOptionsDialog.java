@@ -135,6 +135,25 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
+    public CampaignOptionsDialog(final Campaign campaign, @Nullable CampaignPreset preset) {
+        super(null,
+              false,
+              ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
+              "CampaignOptionsDialog",
+              "campaignOptions.title");
+        this.campaign = campaign;
+        this.campaignOptionsPane = new CampaignOptionsPane(null, campaign, CampaignOptionsDialogMode.NORMAL);
+        this.mode = CampaignOptionsDialogMode.NORMAL;
+        initialize();
+
+        if (preset != null) {
+            applyPreset(preset);
+        }
+
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+
     /**
      * Indicates whether the dialog was canceled by the user.
      *
@@ -166,20 +185,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         // Apply Settings
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
-        btnApplySettings.addActionListener(evt -> {
-            wasCanceled = false;
-            boolean isStartup = mode == CampaignOptionsDialogMode.STARTUP ||
-                                      mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-            campaignOptionsPane.applyCampaignOptionsToCampaign(null, isStartup, false);
-            dispose();
-
-            if (isStartup) {
-                final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                if (campaignOptions.isUseStratCon()) {
-                    showStratConNotice();
-                }
-            }
-        });
+        btnApplySettings.addActionListener(evt -> processApplyAction());
         pnlButtons.add(btnApplySettings);
 
         // Save Preset
@@ -200,6 +206,35 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         pnlButtons.add(btnCancel);
 
         return pnlButtons;
+    }
+
+    /**
+     * Applies the selected campaign options to the current campaign and closes the dialog.
+     *
+     * <p>This method is typically called when the user confirms their option changes. It updates the campaign's
+     * configuration using the current selections in the options pane, taking into account whether the dialog is being
+     * used during campaign startup.</p>
+     * <p>If the dialog is in a startup mode and the "StratCon" setting is enabled for the campaign, an additional
+     * notice is displayed to inform the user of important details about this feature.</p>
+     *
+     * <p>The dialog is closed after applying the options. The result is recorded as not canceled.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processApplyAction() {
+        wasCanceled = false;
+        boolean isStartup = mode == CampaignOptionsDialogMode.STARTUP ||
+                                  mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED;
+        campaignOptionsPane.applyCampaignOptionsToCampaign(null, isStartup, false);
+        dispose();
+
+        if (isStartup) {
+            final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            if (campaignOptions.isUseStratCon()) {
+                showStratConNotice();
+            }
+        }
     }
 
     /**

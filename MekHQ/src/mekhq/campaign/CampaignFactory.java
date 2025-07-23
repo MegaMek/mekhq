@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -51,7 +56,15 @@ public class CampaignFactory {
         NONE,
         CANT_LOAD_FROM_NEWER_VERSION,
         CANT_LOAD_FROM_OLDER_VERSION,
+        /**
+         * No longer in use
+         */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         ACTIVE_OR_FUTURE_CONTRACT,
+        /**
+         * No longer in use
+         */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         NEW_VERSION_WITH_OLD_DATA
     }
 
@@ -128,34 +141,18 @@ public class CampaignFactory {
      *       detected; {@code null} if the user chooses to cancel
      */
     private static Campaign checkForLoadProblems(Campaign campaign) {
-        final Version mhqVersion = MHQConstants.VERSION;
-        final Version lastMilestone = MHQConstants.LAST_MILESTONE;
         final Version campaignVersion = campaign.getVersion();
 
         // Check if the campaign is from a newer version
-        if (campaignVersion.isHigherThan(mhqVersion)) {
+        if (campaignVersion.isHigherThan(MHQConstants.VERSION)) {
             if (triggerProblemDialog(campaign, CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION)) {
                 return null;
             }
         }
 
         // Check if the campaign is from an older, unsupported version
-        if (campaignVersion.isLowerThan(lastMilestone)) {
+        if (campaignVersion.isLowerThan(MHQConstants.LAST_MILESTONE)) {
             if (triggerProblemDialog(campaign, CampaignProblemType.CANT_LOAD_FROM_OLDER_VERSION)) {
-                return null;
-            }
-        }
-
-        // Check if the campaign has active or future AtB contracts (only if the user is changing versions)
-        if (!campaignVersion.equals(mhqVersion) && campaign.hasActiveAtBContract(true)) {
-            if (triggerProblemDialog(campaign, CampaignProblemType.ACTIVE_OR_FUTURE_CONTRACT)) {
-                return null;
-            }
-        }
-
-        // Check if the campaign has active or future AtB contracts (only if the user is changing versions)
-        if (campaignVersion.isLowerThan(mhqVersion)) {
-            if (triggerProblemDialog(campaign, CampaignProblemType.NEW_VERSION_WITH_OLD_DATA)) {
                 return null;
             }
         }
