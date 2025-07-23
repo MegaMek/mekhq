@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.factionStanding;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.campaign.universe.factionStanding.GoingRogue.processGoingRogue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -44,11 +45,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 
 /**
  * Dialog logic for resolving a Faction Standing ultimatum event.
@@ -75,6 +79,7 @@ public class FactionStandingUltimatumDialog {
     private static final String KEY_NEWS_AGAINST = "newsAgainst.";
 
     private static final int CHOICE_INDEX_CHALLENGER = 0;
+    private static final int CHOICE_INDEX_GO_ROGUE = 2;
 
     private final Campaign campaign;
 
@@ -121,7 +126,9 @@ public class FactionStandingUltimatumDialog {
                         challenger.getGivenName()),
                   getFormattedTextAt(RESOURCE_BUNDLE,
                         "FactionStandingUltimatumDialog.support",
-                        incumbent.getGivenName())
+                        incumbent.getGivenName()),
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "FactionStandingUltimatumDialog.goRogue")
             );
             ultimatumDialog = new ImmersiveDialogSimple(
                   campaign, challenger, incumbent,
@@ -130,6 +137,48 @@ public class FactionStandingUltimatumDialog {
             );
         } while (!new ImmersiveDialogConfirmation(campaign).wasConfirmed());
 
+        boolean choseGoRogue = ultimatumDialog.getDialogChoice() == CHOICE_INDEX_GO_ROGUE;
+        if (choseGoRogue) {
+            processBecomingMercenary(campaign, isViolentTransition, commander, secondInCommand, thirdInCommand);
+            return;
+        }
+
+        processChoosingAnUltimatum(campaign,
+              challenger,
+              incumbent,
+              isViolentTransition,
+              ultimatumDialog,
+              thirdInCommand,
+              secondInCommand,
+              campaignFactionCode,
+              commander,
+              campaignName,
+              commanderAddress);
+    }
+
+    /**
+     * Processes the decision made during an ultimatum scenario, updating news, personnel statuses, and faction
+     * standings based on the selected outcome.
+     *
+     * @param campaign            the current {@link Campaign} instance
+     * @param challenger          the {@link Person} issuing the challenge
+     * @param incumbent           the {@link Person} currently in command
+     * @param isViolentTransition {@code true} if the leadership transition involves violence, {@code false} otherwise
+     * @param ultimatumDialog     the {@link ImmersiveDialogSimple} capturing the user's choice
+     * @param thirdInCommand      the third-in-command {@link Person}, may be {@code null}
+     * @param secondInCommand     the second-in-command {@link Person}, may be {@code null}
+     * @param campaignFactionCode the code identifying the campaign's primary faction
+     * @param commander           the current commanding {@link Person}
+     * @param campaignName        the name of the campaign
+     * @param commanderAddress    the address or form of address for the commander
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void processChoosingAnUltimatum(Campaign campaign, Person challenger, Person incumbent,
+          boolean isViolentTransition,
+          ImmersiveDialogSimple ultimatumDialog, Person thirdInCommand, Person secondInCommand,
+          String campaignFactionCode, Person commander, String campaignName, String commanderAddress) {
         boolean choseChallenger = ultimatumDialog.getDialogChoice() == CHOICE_INDEX_CHALLENGER;
         String newsKey = choseChallenger ? KEY_NEWS_FOR : KEY_NEWS_AGAINST;
         Faction chosenFaction = choseChallenger ? challenger.getOriginFaction() : incumbent.getOriginFaction();
@@ -153,7 +202,7 @@ public class FactionStandingUltimatumDialog {
         // Process outcome
         processGoingRogue(campaign, chosenFaction, commander, supporter, isViolentTransition);
 
-        if (rival != null && !rival.getStatus().isDepartedUnit()) {
+        if (rival != null && !(rival.getStatus().isDepartedUnit() || rival.getStatus().isDead())) {
             rival.changeStatus(
                   campaign,
                   campaign.getLocalDate(),
@@ -162,6 +211,53 @@ public class FactionStandingUltimatumDialog {
         }
 
         GoingRogue.processFactionStandingChangeForOldFaction(campaign, otherFaction);
+    }
+
+    /**
+     * Handles the process of a unit and its commanders becoming mercenaries, including updating personnel statuses,
+     * displaying judgment scenes, and adjusting faction standings.
+     *
+     * @param campaign            the current {@link Campaign} instance
+     * @param isViolentTransition {@code true} if the transition involves violence, {@code false} otherwise
+     * @param commander           the current commanding {@link Person}
+     * @param secondInCommand     the second-in-command {@link Person}, may be {@code null}
+     * @param thirdInCommand      the third-in-command {@link Person}, may be {@code null}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static void processBecomingMercenary(Campaign campaign, boolean isViolentTransition, Person commander,
+          Person secondInCommand, Person thirdInCommand) {
+        new FactionJudgmentSceneDialog(campaign,
+              commander,
+              secondInCommand,
+              FactionJudgmentSceneType.GO_ROGUE,
+              campaign.getFaction());
+
+        Faction oldFaction = campaign.getFaction();
+        Faction newFaction = Factions.getInstance().getFaction(MERCENARY_FACTION_CODE);
+        GoingRogue.processGoingRogue(campaign, newFaction, commander, secondInCommand,
+              isViolentTransition, campaign.getCampaignOptions().isTrackFactionStanding());
+
+        if (secondInCommand != null &&
+                  !(secondInCommand.getStatus().isDepartedUnit() || secondInCommand.getStatus().isDead())) {
+            secondInCommand.changeStatus(
+                  campaign,
+                  campaign.getLocalDate(),
+                  isViolentTransition ? PersonnelStatus.HOMICIDE : PersonnelStatus.DESERTED
+            );
+        }
+
+        if (thirdInCommand != null &&
+                  !(thirdInCommand.getStatus().isDepartedUnit() || thirdInCommand.getStatus().isDead())) {
+            thirdInCommand.changeStatus(
+                  campaign,
+                  campaign.getLocalDate(),
+                  isViolentTransition ? PersonnelStatus.HOMICIDE : PersonnelStatus.DESERTED
+            );
+        }
+
+        GoingRogue.processFactionStandingChangeForOldFaction(campaign, oldFaction);
     }
 
     /**
