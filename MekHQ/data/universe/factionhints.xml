@@ -193,6 +193,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
   </war>
   <war name="Amaris Civil War" start="2767-08-01" end="2779-12-31">
     <parties>SL,RWR</parties>
+    <parties>SL,TH</parties>
   </war>
   <war name="The Republic-Commonwealth War" start="2773-04-01" end="2775-12-31">
     <parties>LA,RWR</parties>
