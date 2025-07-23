@@ -161,6 +161,7 @@ public class CampaignUpgradeDialog {
                 if (optionsDialog.wasCanceled()) {
                     exitApp(campaign.getApp());
                 }
+                runnable.run();
             }
         }
     }
