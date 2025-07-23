@@ -79,7 +79,6 @@ public class FactionStandingUltimatumDialog {
     private static final String KEY_NEWS_AGAINST = "newsAgainst.";
 
     private static final int CHOICE_INDEX_CHALLENGER = 0;
-    private static final int CHOICE_INDEX_INCUMBENT = 1;
     private static final int CHOICE_INDEX_GO_ROGUE = 2;
 
     private final Campaign campaign;
