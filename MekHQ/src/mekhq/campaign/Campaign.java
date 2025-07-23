@@ -480,7 +480,7 @@ public class Campaign implements ITechManager {
         gmMode = false;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputation = null;
+        reputation = new ReputationController();
         factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
