@@ -89,12 +89,13 @@ public class FactionStandingUltimatumDialog {
      * @param challenger          the person challenging the incumbent
      * @param incumbent           the person being challenged
      * @param isViolentTransition {@code true} if the leadership change is violent
+     * @param ultimatumName       the unique ultimatum name
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingUltimatumDialog(Campaign campaign, Person challenger, Person incumbent,
-          boolean isViolentTransition) {
+          boolean isViolentTransition, String ultimatumName) {
         this.campaign = campaign;
         String campaignFactionCode = campaign.getFaction().getShortName();
         Person commander = campaign.getCommander();
@@ -104,12 +105,12 @@ public class FactionStandingUltimatumDialog {
         String campaignName = campaign.getName();
 
         // Helper to show an ImmersiveDialogSimple with i18n text key
-        showDialog(KEY_INITIAL_OFFER, campaignFactionCode, commander, secondInCommand, challenger, null,
+        showDialog(ultimatumName, KEY_INITIAL_OFFER, campaignFactionCode, commander, secondInCommand, challenger, null,
               campaignName, commanderAddress);
-        showDialog(KEY_SUPPORT_FOR, campaignFactionCode, commander, secondInCommand, thirdInCommand, null,
-              campaignName, commanderAddress);
-        showDialog(KEY_SUPPORT_AGAINST, campaignFactionCode, commander, secondInCommand, null, secondInCommand,
-              campaignName, commanderAddress);
+        showDialog(ultimatumName, KEY_SUPPORT_FOR, campaignFactionCode, commander, secondInCommand, thirdInCommand,
+              null, campaignName, commanderAddress);
+        showDialog(ultimatumName, KEY_SUPPORT_AGAINST, campaignFactionCode, commander, secondInCommand, null,
+              secondInCommand, campaignName, commanderAddress);
 
         // Ultimatum decision dialog loop
         ImmersiveDialogSimple ultimatumDialog;
@@ -137,7 +138,7 @@ public class FactionStandingUltimatumDialog {
         Person rival = choseChallenger ? secondInCommand : thirdInCommand;
 
         // In-character news bulletin
-        String newsDialogKey = getDialogKey(newsKey, campaignFactionCode);
+        String newsDialogKey = getDialogKey(ultimatumName, newsKey, campaignFactionCode);
         String newsText = getInCharacterText(RESOURCE_BUNDLE,
               newsDialogKey,
               commander,
@@ -166,6 +167,7 @@ public class FactionStandingUltimatumDialog {
     /**
      * Displays an immersive dialog with campaign and personnel data, using a resource key for text localization.
      *
+     * @param ultimatumName    the unique ultumatum name
      * @param key              the dialog key suffix for localization
      * @param faction          the short name code of the faction
      * @param commander        the commander character
@@ -178,9 +180,9 @@ public class FactionStandingUltimatumDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    private void showDialog(String key, String faction, Person commander, Person second, @Nullable Person leftPerson,
-          @Nullable Person rightPerson, String campaignName, String commanderAddress) {
-        String dialogKey = getDialogKey(key, faction);
+    private void showDialog(String ultimatumName, String key, String faction, Person commander, Person second,
+          @Nullable Person leftPerson, @Nullable Person rightPerson, String campaignName, String commanderAddress) {
+        String dialogKey = getDialogKey(ultimatumName, key, faction);
         String text = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, second, "", campaignName, "",
               null, commanderAddress);
         String buttonLabel = getTextAt(RESOURCE_BUNDLE, "FactionStandingUltimatumDialog.continue");
@@ -191,6 +193,7 @@ public class FactionStandingUltimatumDialog {
     /**
      * Constructs a localization key for dialogs based on the affix and faction.
      *
+     * @param ultimatumName       the unique ultimatum name
      * @param affix               the key affix indicating dialog type
      * @param campaignFactionCode campaign faction's short code
      *
@@ -199,8 +202,8 @@ public class FactionStandingUltimatumDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public String getDialogKey(String affix, String campaignFactionCode) {
-        return KEY_ROOT + affix + campaignFactionCode;
+    private String getDialogKey(String ultimatumName, String affix, String campaignFactionCode) {
+        return KEY_ROOT + ultimatumName + '.' + affix + campaignFactionCode;
     }
 
     /**
