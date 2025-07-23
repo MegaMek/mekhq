@@ -447,10 +447,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Systems
         systemsTab = new SystemsTab(campaign);
 
-        JTabbedPane systemsContentTabs = createSubTabs(Map.of("reputationTab",
-              systemsTab.createReputationTab(),
-              "factionStanding",
-              systemsTab.createFactionStandingTab()));
+        JTabbedPane systemsContentTabs = createSubTabs(Map.of(
+              "reputationTab", systemsTab.createReputationTab(),
+              "factionStandingTab", systemsTab.createFactionStandingTab(),
+              "atowTab", systemsTab.createATOWTab()));
         systemsTab.loadValuesFromCampaignOptions();
 
         // Rulesets
@@ -529,7 +529,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         rulesetsTab.applyCampaignOptionsToCampaign(options);
 
         boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
-        systemsTab.applyCampaignOptionsToCampaign(options);
+        systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
 
         // Tidy up
         if (preset == null) {
@@ -565,20 +565,34 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
+     * Use {@link #applyPreset(CampaignPreset, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void applyPreset(@Nullable CampaignPreset campaignPreset) {
+        applyPreset(campaignPreset, false);
+    }
+
+    /**
      * Applies the values from a {@link CampaignPreset} to all tabs in the dialog. This propagates preset-specific
      * configuration to all associated components and sub-tabs, including campaign-related properties such as dates,
      * factions, and skills.
      *
      * @param campaignPreset the {@link CampaignPreset} containing the preset options to apply
+     * @param isStartUp      {@code true} if the preset is being loaded during new campaign startup
      */
-    public void applyPreset(@Nullable CampaignPreset campaignPreset) {
+    public void applyPreset(@Nullable CampaignPreset campaignPreset, boolean isStartUp) {
         if (campaignPreset == null) {
             return;
         }
 
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
-        LocalDate presetDate = campaignPreset.getDate();
-        Faction presetFaction = campaignPreset.getFaction();
+
+        LocalDate presetDate = campaign.getLocalDate();
+        Faction presetFaction = campaign.getFaction();
+        if (isStartUp) {
+            presetDate = campaignPreset.getDate();
+            presetFaction = campaignPreset.getFaction();
+        }
 
         generalTab.loadValuesFromCampaignOptions(presetDate, presetFaction);
 
@@ -604,6 +618,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        systemsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        systemsTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
     }
 }

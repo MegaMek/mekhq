@@ -39,6 +39,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
+import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
@@ -325,6 +326,7 @@ public class Skill {
             return modifier;
         }
 
+        final boolean hasReligiousFanaticism = characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM);
 
         String name = type.getName();
         // Reputation and Alternate ID
@@ -349,7 +351,7 @@ public class Skill {
             }
         }
 
-        // Attractive, Unattractive, Freakish Strength
+        // Attractive, Unattractive, Freakish Strength, some compulsions
         if (type.hasAttribute(CHARISMA)) {
             if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
                 modifier -= 2;
@@ -357,6 +359,18 @@ public class Skill {
 
             if (characterOptions.booleanOption(MUTATION_FREAKISH_STRENGTH)) {
                 modifier -= 2;
+            }
+
+            if (characterOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
+                modifier -= 2;
+            }
+
+            if (hasReligiousFanaticism) {
+                modifier -= 1;
+            }
+
+            if (hasReligiousFanaticism) {
+                modifier -= 1;
             }
 
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
@@ -425,6 +439,13 @@ public class Skill {
 
             if (characterOptions.booleanOption(ATOW_PATIENT)) {
                 modifier += 1;
+            }
+        }
+
+        // Trivial Compulsion - Religious Fanaticism
+        if (Objects.equals(S_INTEREST_THEOLOGY, name)) {
+            if (hasReligiousFanaticism) {
+                modifier += 2;
             }
         }
 
@@ -817,10 +838,8 @@ public class Skill {
         }
 
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
-        // TODO enable once attribute modifier sare implemented
-        //        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
+        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
-        int firstLinkedAttributeModifier = 0;
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
               firstLinkedAttribute.getLabel(),
@@ -828,9 +847,7 @@ public class Skill {
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
-            // TODO enable once attribute modifier sare implemented
-            //            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
-            int secondLinkedAttributeModifier = 0;
+            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),

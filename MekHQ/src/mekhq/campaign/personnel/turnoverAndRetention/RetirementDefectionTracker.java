@@ -79,6 +79,8 @@ import org.w3c.dom.NodeList;
 public class RetirementDefectionTracker {
     private static final MMLogger logger = MMLogger.create(RetirementDefectionTracker.class);
 
+    public static final int RETIREMENT_AGE = 50;
+
     /*
      * In case the dialog is closed after making the retirement rolls
      * and determining payouts, but before the retirees have been paid,
@@ -144,7 +146,7 @@ public class RetirementDefectionTracker {
             }
 
             if (person.isFounder()) {
-                if (person.getAge(campaign.getLocalDate()) < 50) {
+                if (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE) {
                     if (!campaign.getCampaignOptions().isUseRandomFounderTurnover()) {
                         continue;
                     }
@@ -179,7 +181,7 @@ public class RetirementDefectionTracker {
 
             // Desirability modifier
             if ((campaign.getCampaignOptions().isUseSkillModifiers()) &&
-                      (person.getAge(campaign.getLocalDate()) < 50)) {
+                      (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
                 targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2,
                       resources.getString("desirability.text"));
             }
@@ -298,7 +300,7 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                       (!campaign.getCampaignOptions().isUseHideLoyalty())) {
 
-                int loyaltyScore = person.getLoyalty();
+                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
 
                 if (person.isCommander()) {
                     loyaltyScore += 2;
@@ -726,7 +728,7 @@ public class RetirementDefectionTracker {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   today,
-                  person.getRankLevel());
+                  person.getRankNumeric());
             int skillLevel = skill.getTotalSkillLevel(person.getOptions(),
                   person.getATOWAttributes(),
                   adjustedReputation);
@@ -747,7 +749,7 @@ public class RetirementDefectionTracker {
     private int getBaseTargetNumber(Campaign campaign, Person person) {
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                   (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            int loyaltyScore = person.getLoyalty();
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
 
             if (person.isCommander()) {
                 loyaltyScore += 2;
@@ -1085,7 +1087,7 @@ public class RetirementDefectionTracker {
                   campaign.getCampaignOptions().getServiceContractDuration())) {
                 payoutAmount = Money.of(0);
                 // person is retiring
-            } else if (person.getAge(campaign.getLocalDate()) >= 50) {
+            } else if (person.getAge(campaign.getLocalDate()) >= RETIREMENT_AGE) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions()
                                                                                           .getPayoutRetirementMultiplier());
                 // person was sacked

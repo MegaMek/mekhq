@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static java.lang.Math.round;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FAST_LEARNER;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
@@ -250,7 +251,9 @@ public class Aging {
             reputationMultiplier--;
         }
 
-        return reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
+        int modifier = reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
+        double totalModifier = (double) modifier / AGING_SKILL_MODIFIER_DIVIDER;
+        return (int) round(totalModifier);
     }
 
     /**
@@ -269,7 +272,7 @@ public class Aging {
     public static void applyAgingSPA(int characterAge, Person person) {
         PersonnelOptions options = person.getOptions();
         for (AgingMilestone milestone : AgingMilestone.values()) {
-            if (characterAge == milestone.getMilestone()) {
+            if (characterAge == milestone.getMinimumAge()) {
                 // Glass Jaw
                 if (milestone.isGlassJaw()) {
                     boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
@@ -312,12 +315,12 @@ public class Aging {
      */
     public static AgingMilestone getMilestone(int characterAge) {
         // Early exit, so we don't need to loop through all values for young characters
-        if (characterAge < TWENTY_FIVE.getMilestone()) {
+        if (characterAge < TWENTY_FIVE.getMinimumAge()) {
             return NONE;
         }
 
         for (AgingMilestone milestone : AgingMilestone.values()) {
-            if ((characterAge >= milestone.getMilestone()) && (characterAge < milestone.getMaximumAge())) {
+            if ((characterAge >= milestone.getMinimumAge()) && (characterAge < milestone.getMaximumAge())) {
                 return milestone;
             }
         }
@@ -336,6 +339,6 @@ public class Aging {
      * @return the adjusted skill attribute modifier after applying aging rules
      */
     private static int applyAgingModifier(int modifierSum) {
-        return (int) Math.round((double) modifierSum / AGING_SKILL_MODIFIER_DIVIDER);
+        return (int) round((double) modifierSum / AGING_SKILL_MODIFIER_DIVIDER);
     }
 }

@@ -42,6 +42,8 @@ import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
+import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
+import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -54,6 +56,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
@@ -92,6 +95,7 @@ import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
@@ -112,6 +116,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -664,9 +669,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             int attributeScore = person.getAttributeScore(attribute);
-            // TODO enable once attribute modifier sare implemented
-            //            int modifier = getIndividualAttributeModifier(attributeScore);
-            int modifier = 0;
+            int modifier = getIndividualAttributeModifier(attributeScore);
             if (modifier != 0) {
                 relevantAttributes.put(attribute, modifier);
             }
@@ -987,6 +990,7 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel fillInfo() {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(person.getFullTitle()));
+        JLabel lblBounty = new JLabel();
         JLabel lblType = new JLabel();
         JLabel lblUnitNotResponsibleForSalary = new JLabel();
         JLabel lblStatus1 = new JLabel();
@@ -1013,6 +1017,29 @@ public class PersonViewPanel extends JScrollablePanel {
         int y = 0;
 
         GridBagConstraints gridBagConstraints;
+
+        int bloodmarkLevel = person.getBloodmark();
+        if (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel()) {
+            BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
+            Money bounty = bloodmark.getBounty();
+            String bountyText = String.format(resourceMap.getString("lblBounty.text"),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, bounty.toAmountString());
+
+            lblBounty.setName("lblBounty");
+            lblBounty.setText(bountyText);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 4;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblBounty, gridBagConstraints);
+            y++;
+        }
+
         if (!person.isEmployed()) {
             lblUnitNotResponsibleForSalary.setName("lblNotResponsibleForSalary");
             lblUnitNotResponsibleForSalary.setText(resourceMap.getString("lblNotEmployedByUnit.text"));
@@ -1849,7 +1876,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              person.getRankLevel());
+              person.getRankNumeric());
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -1866,9 +1893,7 @@ public class PersonViewPanel extends JScrollablePanel {
             JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
                   skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
 
-            // TODO enable once attribute modifier sare implemented
-            //            int attributeModifier = skill.getTotalAttributeModifier(attributes, skill.getType());
-            int attributeModifier = 0;
+            int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int ageModifier = skill.getAgingModifier();
             int totalModifier = attributeModifier + spaModifier + ageModifier;
@@ -1887,8 +1912,6 @@ public class PersonViewPanel extends JScrollablePanel {
                 adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
             }
 
-            // TODO enable once attribute modifier sare implemented
-            //            JLabel lblValue = new JLabel(String.format("<html>%s%s</html>", skill.toString(options, attributes, adjustedReputation), adjustment));
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(options, attributes, adjustedReputation),
                   adjustment));
@@ -2051,7 +2074,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlOther.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.traits")));
 
         JLabel lblConnections = null;
-        int connections = person.getConnections();
+        int connections = person.getAdjustedConnections();
         if (connections != 0) {
             String connectionsLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblConnections.text"),
@@ -2077,7 +2100,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              person.getRankLevel());
+              person.getRankNumeric());
         if (baseReputation != 0 || adjustedReputation != 0) {
             String adjustment = getTraitAdjustmentIcon(baseReputation, adjustedReputation);
             String reputationLabel = String.format(resourceMap.getString("format.traitValue"),
@@ -2116,7 +2139,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction()));
         if ((campaignOptions.isUseLoyaltyModifiers()) &&
                   (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {

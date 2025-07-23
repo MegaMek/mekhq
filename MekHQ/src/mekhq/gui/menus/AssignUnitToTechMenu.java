@@ -144,6 +144,8 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                 }
             }
 
+            add(legendaryMenu);
+            add(heroicMenu);
             add(eliteMenu);
             add(veteranMenu);
             add(regularMenu);

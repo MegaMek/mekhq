@@ -245,8 +245,6 @@ public class CampaignOptions {
     private boolean displayMedicalRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
-    private boolean rewardComingOfAgeAbilities;
-    private boolean rewardComingOfAgeRPSkills;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -339,6 +337,10 @@ public class CampaignOptions {
     private boolean showLifeEventDialogBirths;
     private boolean showLifeEventDialogComingOfAge;
     private boolean showLifeEventDialogCelebrations;
+
+    // Coming of Age
+    private boolean rewardComingOfAgeAbilities;
+    private boolean rewardComingOfAgeRPSkills;
 
     // Marriage
     private boolean useManualMarriages;

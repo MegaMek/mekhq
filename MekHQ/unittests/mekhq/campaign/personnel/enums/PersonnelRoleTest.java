@@ -447,61 +447,106 @@ class PersonnelRoleTest {
         }
     }
 
-    @Test
-    void testIsGroundVehicleCrew() {
-        for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER) ||
-                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
-                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
-                assertTrue(personnelRole.isGroundVehicleCrew());
-            } else {
-                assertFalse(personnelRole.isGroundVehicleCrew());
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(PersonnelRole.class)
+    void testIsGroundVehicleCrew(PersonnelRole personnelRole) {
+        boolean expected = switch (personnelRole) {
+            case GROUND_VEHICLE_DRIVER,
+                 VEHICLE_GUNNER,
+                 MEK_TECH,
+                 AERO_TEK,
+                 MECHANIC,
+                 BA_TECH,
+                 ASTECH,
+                 DOCTOR,
+                 MEDIC,
+                 COMMS_OPERATOR,
+                 TECH_COMMUNICATIONS,
+                 SENSOR_TECHNICIAN,
+                 CHEF,
+                 VEHICLE_CREW -> true;
+            default -> false;
+        };
+
+        assertEquals(expected, personnelRole.isGroundVehicleCrew(),
+              () -> "Failed for role: " + personnelRole);
     }
 
-    @Test
-    void testIsNavalVehicleCrew() {
-        for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER) ||
-                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
-                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
-                assertTrue(personnelRole.isNavalVehicleCrew());
-            } else {
-                assertFalse(personnelRole.isNavalVehicleCrew());
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(PersonnelRole.class)
+    void testIsNavalVehicleCrew(PersonnelRole personnelRole) {
+        boolean expected = switch (personnelRole) {
+            case NAVAL_VEHICLE_DRIVER,
+                 VEHICLE_GUNNER,
+                 MEK_TECH,
+                 AERO_TEK,
+                 MECHANIC,
+                 BA_TECH,
+                 ASTECH,
+                 DOCTOR,
+                 MEDIC,
+                 COMMS_OPERATOR,
+                 TECH_COMMUNICATIONS,
+                 SENSOR_TECHNICIAN,
+                 CHEF,
+                 VEHICLE_CREW -> true;
+            default -> false;
+        };
+
+        assertEquals(expected, personnelRole.isNavalVehicleCrew(),
+              () -> "Failed for role: " + personnelRole);
     }
 
-    @Test
-    void testIsVTOLCrew() {
-        for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.VTOL_PILOT) ||
-                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
-                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
-                assertTrue(personnelRole.isVTOLCrew());
-            } else {
-                assertFalse(personnelRole.isVTOLCrew());
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(PersonnelRole.class)
+    void testIsVTOLCrew(PersonnelRole personnelRole) {
+        boolean expected = switch (personnelRole) {
+            case VTOL_PILOT,
+                 VEHICLE_GUNNER,
+                 MEK_TECH,
+                 AERO_TEK,
+                 MECHANIC,
+                 BA_TECH,
+                 ASTECH,
+                 DOCTOR,
+                 MEDIC,
+                 COMMS_OPERATOR,
+                 TECH_COMMUNICATIONS,
+                 SENSOR_TECHNICIAN,
+                 CHEF,
+                 VEHICLE_CREW -> true;
+            default -> false;
+        };
+
+        assertEquals(expected, personnelRole.isVTOLCrew(),
+              () -> "Failed for role: " + personnelRole);
     }
 
-    @Test
-    void testIsVehicleCrewMember() {
-        for (final PersonnelRole personnelRole : roles) {
-            switch (personnelRole) {
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
-                    assertTrue(personnelRole.isVehicleCrewMember());
-                    break;
-                default:
-                    assertFalse(personnelRole.isVehicleCrewMember());
-                    break;
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(PersonnelRole.class)
+    void testIsVehicleCrewMember(PersonnelRole personnelRole) {
+        boolean expected = switch (personnelRole) {
+            case GROUND_VEHICLE_DRIVER,
+                 NAVAL_VEHICLE_DRIVER,
+                 VTOL_PILOT,
+                 VEHICLE_GUNNER,
+                 MEK_TECH,
+                 AERO_TEK,
+                 MECHANIC,
+                 BA_TECH,
+                 ASTECH,
+                 DOCTOR,
+                 MEDIC,
+                 COMMS_OPERATOR,
+                 TECH_COMMUNICATIONS,
+                 SENSOR_TECHNICIAN,
+                 CHEF,
+                 VEHICLE_CREW -> true;
+            default -> false;
+        };
+
+        assertEquals(expected, personnelRole.isVehicleCrewMember(),
+              () -> "Failed for role: " + personnelRole);
     }
 
     @Test

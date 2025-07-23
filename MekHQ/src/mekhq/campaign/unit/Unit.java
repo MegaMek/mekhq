@@ -4142,7 +4142,7 @@ public class Unit implements ITechnology {
                 } else {
                     infantryArmor = new InfantryArmorPart(0,
                           getCampaign(),
-                          ((Infantry) entity).getArmorDamageDivisor(),
+                          ((Infantry) entity).getCustomArmorDamageDivisor(),
                           ((Infantry) entity).isArmorEncumbering(),
                           ((Infantry) entity).hasDEST(),
                           ((Infantry) entity).hasSneakCamo(),
@@ -4155,7 +4155,7 @@ public class Unit implements ITechnology {
                     while (number > 0) {
                         infantryArmor = new InfantryArmorPart(0,
                               getCampaign(),
-                              ((Infantry) entity).getArmorDamageDivisor(),
+                              ((Infantry) entity).getCustomArmorDamageDivisor(),
                               ((Infantry) entity).isArmorEncumbering(),
                               ((Infantry) entity).hasDEST(),
                               ((Infantry) entity).hasSneakCamo(),
@@ -6484,14 +6484,26 @@ public class Unit implements ITechnology {
     public Money getFuelCost(int hydrogenProduction) {
         final int FUEL_COST_PER_HYDROGEN = 15000;
 
+        logger.debug("getFuelCost: {} hydrogen production", hydrogenProduction);
+
         Money fuelCost = Money.zero();
         double hydrogenUsage = 0;
 
+        // Check if the engine is null. This can occur if the entity does not have an engine installed.
+        Engine engine = entity.getEngine();
+        if (engine == null) {
+            return Money.zero();
+        }
+
         // Calculate base fuel costs by entity type
         if (entity.isLargeCraft() || entity.isSmallCraft()) {
-            fuelCost = fuelCost.plus(getTonsBurnMonthCost(entity));
+            hydrogenUsage = getCraftMonthlyHydrogenUsage(entity);
         } else if (entity.isConventionalFighter()) {
-            fuelCost = fuelCost.plus(getFighterFuelCost(entity));
+            if (engine.isFusion()) {
+                hydrogenUsage = ((Aero) entity).getFuelTonnage() * 4.0;
+            } else {
+                fuelCost = fuelCost.plus(getFighterFuelCost(entity));
+            }
         } else if (entity.isAerospaceFighter()) {
             try {
                 hydrogenUsage = ((AeroSpaceFighter) entity).getFuelTonnage() * 4.0;
@@ -6507,21 +6519,81 @@ public class Unit implements ITechnology {
 
         // Apply hydrogen production credit if there is any hydrogen usage
         if (hydrogenUsage > 0) {
+            logger.debug("getFuelCost: {} hydrogen usage", hydrogenUsage);
             // Ensure hydrogen usage doesn't go negative after applying production credit
             double actualHydrogenUsage = Math.max(0, hydrogenUsage - hydrogenProduction);
+            logger.debug("getFuelCost: {} hydrogen usage after production credit", actualHydrogenUsage);
             fuelCost = fuelCost.plus(Money.of(actualHydrogenUsage * FUEL_COST_PER_HYDROGEN));
+            logger.debug("getFuelCost: {} fuel cost", fuelCost);
         }
 
         return fuelCost;
     }
 
     /**
-     * On average, how much does this spaceshift spend burning fuel per month? Based on CO p. 24
+     * Calculates the average monthly hydrogen fuel usage for a given spacefaring entity.
      *
-     * @param entity
+     * <p>The calculation is based on the entity's class and mass, with values derived from CamOps. Different formulas
+     * are applied depending on whether the entity is a DropShip (with subtypes and weight considerations), Small
+     * Craft, Jumpship, or Warship.</p>
      *
-     * @return fuel cost for operating this Entity for a month
+     * @param entity the {@link Entity} representing the spacecraft whose monthly hydrogen usage is to be calculated
+     * @return the total tons of hydrogen fuel consumed in an average month for the provided entity
      */
+    public double getCraftMonthlyHydrogenUsage(Entity entity) {
+        final int NON_JUMPSHIP_BURN_PER_DAY = 15;
+        final int JUMPSHIP_BURN_PER_DAY = 3;
+
+        double tonsburnday = 0;
+        if (entity instanceof Dropship) {
+            if (((SmallCraft) entity).getDesignType() != Dropship.MILITARY) {
+                if (entity.getWeight() < 1000) {
+                    tonsburnday = 1.84;
+                } else if (entity.getWeight() < 4000) {
+                    tonsburnday = 2.82;
+                } else if (entity.getWeight() < 9000) {
+                    tonsburnday = 3.37;
+                } else if (entity.getWeight() < 20000) {
+                    tonsburnday = 4.22;
+                } else if (entity.getWeight() < 30000) {
+                    tonsburnday = 6.52;
+                } else if (entity.getWeight() < 40000) {
+                    tonsburnday = 7.71;
+                } else if (entity.getWeight() < 50000) {
+                    tonsburnday = 7.74;
+                } else if (entity.getWeight() < 70000) {
+                    tonsburnday = 8.37;
+                } else {
+                    tonsburnday = 8.83;
+                }
+            } else {
+                tonsburnday = 1.84;
+            }
+            return tonsburnday * NON_JUMPSHIP_BURN_PER_DAY;
+        } else if ((entity instanceof SmallCraft)) {
+            return 1.84 * NON_JUMPSHIP_BURN_PER_DAY;
+        } else if (entity instanceof Jumpship) {
+            if (entity.getWeight() < 50000) {
+                tonsburnday = 2.82;
+            } else if (entity.getWeight() < 100000) {
+                tonsburnday = 9.77;
+            } else if (entity.getWeight() < 200000) {
+                tonsburnday = 19.75;
+            } else {
+                tonsburnday = 39.52;
+            }
+            if (entity instanceof Warship) {
+                return tonsburnday * NON_JUMPSHIP_BURN_PER_DAY;
+            }
+            return tonsburnday * JUMPSHIP_BURN_PER_DAY;
+        }
+        return tonsburnday;
+    }
+
+    /**
+     * Use {@link #getCraftMonthlyHydrogenUsage(Entity)} instead, so that hydrogen discounts can be accounted for
+     */
+    @Deprecated(since = "0.50.077", forRemoval = true)
     public Money getTonsBurnMonthCost(Entity entity) {
         double tonsburnday = 0;
         if (entity instanceof Dropship) {
@@ -6569,13 +6641,8 @@ public class Unit implements ITechnology {
         return Money.of(tonsburnday);
     }
 
-    public Money getFighterFuelCost(Entity e) {
-        Engine en = e.getEngine();
-        if (en.isFusion()) {
-            return Money.of(((Aero) e).getFuelTonnage() * 4.0 * 15000.0);
-        } else {
-            return Money.of(((Aero) e).getFuelTonnage() * 4.0 * 1000.0);
-        }
+    public Money getFighterFuelCost(Entity entity) {
+        return Money.of(((Aero) entity).getFuelTonnage() * 4.0 * 1000.0);
     }
 
     public Money getVehicleFuelCost(Entity e) {

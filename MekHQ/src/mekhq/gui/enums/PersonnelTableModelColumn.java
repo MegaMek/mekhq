@@ -52,6 +52,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -116,6 +117,8 @@ public enum PersonnelTableModelColumn {
     TECH_BA("PersonnelTableModelColumn.TECH_BA.text"),
     TECH_VESSEL("PersonnelTableModelColumn.TECH_VESSEL.text"),
     MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
+    TECH_MINUTES("PersonnelTableModelColumn.TECH_MINUTES.text"),
+    MEDICAL_CAPACITY("PersonnelTableModelColumn.MEDICAL_CAPACITY.text"),
     ADMINISTRATION("PersonnelTableModelColumn.ADMINISTRATION.text"),
     NEGOTIATION("PersonnelTableModelColumn.NEGOTIATION.text"),
     INJURIES("PersonnelTableModelColumn.INJURIES.text"),
@@ -143,6 +146,7 @@ public enum PersonnelTableModelColumn {
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
     REPUTATION("PersonnelTableModelColumn.REPUTATION.text"),
     UNLUCKY("PersonnelTableModelColumn.UNLUCKY.text"),
+    BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
     FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
@@ -333,6 +337,14 @@ public enum PersonnelTableModelColumn {
         return this == MEDICAL;
     }
 
+    public boolean isTechMinutes() {
+        return this == TECH_MINUTES;
+    }
+
+    public boolean isMedicalCapacity() {
+        return this == MEDICAL_CAPACITY;
+    }
+
     public boolean isAdministration() {
         return this == ADMINISTRATION;
     }
@@ -441,6 +453,10 @@ public enum PersonnelTableModelColumn {
         return this == UNLUCKY;
     }
 
+    public boolean isBloodmark() {
+        return this == BLOODMARK;
+    }
+
     public boolean isFatigue() {
         return this == FATIGUE;
     }
@@ -544,9 +560,13 @@ public enum PersonnelTableModelColumn {
 
         String sign;
 
-        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
-        LocalDate today = campaign.getLocalDate();
+        final boolean isClanCampaign = campaign.isClanCampaign();
+        final LocalDate today = campaign.getLocalDate();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
+        final boolean isUseTechAdmin = campaignOptions.isTechsUseAdministration();
+        final int baseBedCapacity = campaignOptions.getMaximumPatients();
+        final boolean isUseMedicalAdmin = campaignOptions.isDoctorsUseAdministration();
 
         switch (this) {
             case PERSON:
@@ -828,11 +848,23 @@ public enum PersonnelTableModelColumn {
                              Integer.toString(person.getSkill(SkillType.S_TECH_VESSEL)
                                                     .getFinalSkillValue(options, attributes)) :
                              "-";
+            case TECH_MINUTES:
+                if (person.isTechExpanded()) {
+                    return String.valueOf(person.getDailyAvailableTechTime(isUseTechAdmin));
+                } else {
+                    return "0";
+                }
             case MEDICAL:
                 return person.hasSkill(SkillType.S_SURGERY) ?
                              Integer.toString(person.getSkill(SkillType.S_SURGERY)
                                                     .getFinalSkillValue(options, attributes)) :
                              "-";
+            case MEDICAL_CAPACITY:
+                if (person.isDoctor()) {
+                    return String.valueOf(person.getDoctorMedicalCapacity(isUseMedicalAdmin, baseBedCapacity));
+                } else {
+                    return "0";
+                }
             case ADMINISTRATION:
                 return person.hasSkill(SkillType.S_ADMIN) ?
                              Integer.toString(person.getSkill(SkillType.S_ADMIN)
@@ -846,7 +878,7 @@ public enum PersonnelTableModelColumn {
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,
-                                                                person.getRankLevel()))) :
+                                                                person.getRankNumeric()))) :
                              "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
@@ -902,16 +934,18 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:
-                return Integer.toString(person.getConnections());
+                return Integer.toString(person.getAdjustedConnections());
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case REPUTATION:
                 return Integer.toString(person.getAdjustedReputation(isUseAgeEffects,
                       isClanCampaign,
                       today,
-                      person.getRankLevel()));
+                      person.getRankNumeric()));
             case UNLUCKY:
                 return Integer.toString(person.getUnlucky());
+            case BLOODMARK:
+                return Integer.toString(person.getBloodmark());
             case FATIGUE:
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),
@@ -924,7 +958,7 @@ public enum PersonnelTableModelColumn {
             case IMPLANT_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case LOYALTY:
-                return String.valueOf(person.getLoyalty());
+                return String.valueOf(person.getAdjustedLoyalty(campaign.getFaction()));
             case EDUCATION:
                 return person.getEduHighestEducation().toString();
             case AGGRESSION:
@@ -1103,7 +1137,9 @@ public enum PersonnelTableModelColumn {
                      TECH_MECHANIC,
                      TECH_BA,
                      TECH_VESSEL,
-                     MEDICAL -> true;
+                     TECH_MINUTES,
+                     MEDICAL,
+                     MEDICAL_CAPACITY -> true;
                 default -> false;
             };
             case ADMINISTRATIVE_SKILLS -> switch (this) {
@@ -1168,7 +1204,7 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case TRAITS -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY -> true;
+                case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY, BLOODMARK -> true;
                 case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
@@ -1234,6 +1270,7 @@ public enum PersonnelTableModelColumn {
                  WEALTH,
                  REPUTATION,
                  UNLUCKY,
+                 BLOODMARK,
                  EDGE,
                  SPA_COUNT,
                  IMPLANT_COUNT,

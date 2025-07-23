@@ -53,18 +53,21 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
-import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
-import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
+import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
@@ -73,6 +76,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKi
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.processFatigueRecovery;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.RETIREMENT_AGE;
 import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
 import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -180,6 +184,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -191,6 +196,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -220,6 +226,8 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.AgingMilestone;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -2112,8 +2120,8 @@ public class Campaign implements ITechManager {
      * @deprecated use {@link #recruitPerson(Person, PrisonerStatus, boolean)} instead
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
-        return recruitPerson(p, prisonerStatus, false, true);
+    public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus) {
+        return recruitPerson(person, prisonerStatus, false, true);
     }
 
     /**
@@ -2327,7 +2335,7 @@ public class Campaign implements ITechManager {
             }
 
             if ((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
-                currentChildren.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
+                currentChildren.addAll(getProcreation().birthHistoric(this, currentDate, person, babysFather));
                 babysFather = null;
             }
 
@@ -2335,7 +2343,7 @@ public class Campaign implements ITechManager {
                       (currentSpouse.isPregnant()) &&
                       (currentDate.isAfter(currentSpouse.getDueDate()))) {
                 currentChildren.addAll(getProcreation().birthHistoric(this,
-                      localDate,
+                      currentDate,
                       currentSpouse,
                       spousesBabysFather));
                 spousesBabysFather = null;
@@ -2616,11 +2624,11 @@ public class Campaign implements ITechManager {
     /**
      * Imports a {@link Person} into a campaign.
      *
-     * @param p A {@link Person} to import into the campaign.
+     * @param person A {@link Person} to import into the campaign.
      */
-    public void importPerson(Person p) {
-        personnel.put(p.getId(), p);
-        MekHQ.triggerEvent(new PersonNewEvent(p));
+    public void importPerson(Person person) {
+        personnel.put(person.getId(), person);
+        MekHQ.triggerEvent(new PersonNewEvent(person));
     }
 
     public @Nullable Person getPerson(final UUID id) {
@@ -2826,12 +2834,12 @@ public class Campaign implements ITechManager {
 
     public List<Person> getPatients() {
         List<Person> patients = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.needsFixing() ||
+        for (Person person : getPersonnel()) {
+            if (person.needsFixing() ||
                       (getCampaignOptions().isUseAdvancedMedical() &&
-                             p.hasInjuries(true) &&
-                             p.getStatus().isActive())) {
-                patients.add(p);
+                             person.hasInjuries(true) &&
+                             person.getStatus().isActive())) {
+                patients.add(person);
             }
         }
         return patients;
@@ -3214,7 +3222,7 @@ public class Campaign implements ITechManager {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   currentDay,
-                  person.getRankLevel());
+                  person.getRankNumeric());
 
             if (((person.getPrimaryRole() == role) || (person.getSecondaryRole() == role)) &&
                       (person.getSkill(primary) != null)) {
@@ -3246,7 +3254,7 @@ public class Campaign implements ITechManager {
                         int bestInRoleAdjustedReputation = bestInRole.getAdjustedReputation(isUseAgingEffects,
                               isClanCampaign,
                               currentDay,
-                              bestInRole.getRankLevel());
+                              bestInRole.getRankNumeric());
                         bestInRoleSecondarySkill = secondarySkill.getTotalSkillLevel(bestInRole.getOptions(),
                               bestInRole.getATOWAttributes(),
                               bestInRoleAdjustedReputation);
@@ -3284,7 +3292,7 @@ public class Campaign implements ITechManager {
             int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                   isClanCampaign(),
                   currentDay,
-                  person.getRankLevel());
+                  person.getRankNumeric());
             Skill skill = person.getSkill(skillName);
 
             int totalSkillLevel = Integer.MIN_VALUE;
@@ -3392,26 +3400,26 @@ public class Campaign implements ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person p : getActivePersonnel(true)) {
-            if (p.isAdministrator()) {
-                admins.add(p);
+        for (Person person : getActivePersonnel(true)) {
+            if (person.isAdministrator()) {
+                admins.add(person);
             }
         }
         return admins;
     }
 
-    public boolean isWorkingOnRefit(Person p) {
-        Objects.requireNonNull(p);
+    public boolean isWorkingOnRefit(Person person) {
+        Objects.requireNonNull(person);
 
-        Unit unit = getHangar().findUnit(u -> u.isRefitting() && p.equals(u.getRefit().getTech()));
+        Unit unit = getHangar().findUnit(u -> u.isRefitting() && person.equals(u.getRefit().getTech()));
         return unit != null;
     }
 
     public List<Person> getDoctors() {
         List<Person> docs = new ArrayList<>();
-        for (Person p : getActivePersonnel(true)) {
-            if (p.isDoctor()) {
-                docs.add(p);
+        for (Person person : getActivePersonnel(true)) {
+            if (person.isDoctor()) {
+                docs.add(person);
             }
         }
         return docs;
@@ -3475,7 +3483,7 @@ public class Campaign implements ITechManager {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       isClanCampaign(),
                       currentDay,
-                      person.getRankLevel());
+                      person.getRankNumeric());
                 Skill skill = person.getSkill(skillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
@@ -3494,8 +3502,6 @@ public class Campaign implements ITechManager {
             for (Person person : getActivePersonnel(false)) {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
-                PersonnelOptions options = person.getOptions();
-
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3507,7 +3513,7 @@ public class Campaign implements ITechManager {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       isClanCampaign(),
                       currentDay,
-                      person.getRankLevel());
+                      person.getRankNumeric());
                 Skill skill = person.getSkill(skillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
@@ -3742,7 +3748,7 @@ public class Campaign implements ITechManager {
                     int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person1.getRankLevel());
+                          person1.getRankNumeric());
                     Skill skill = person1.getBestTechSkill();
 
                     int person1SkillLevel = Integer.MIN_VALUE;
@@ -3756,7 +3762,7 @@ public class Campaign implements ITechManager {
                     adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person2.getRankLevel());
+                          person2.getRankNumeric());
                     skill = person2.getBestTechSkill();
 
                     int person2SkillLevel = Integer.MIN_VALUE;
@@ -3772,7 +3778,7 @@ public class Campaign implements ITechManager {
                     int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person1.getRankLevel());
+                          person1.getRankNumeric());
                     Skill skill = person1.getSkill(S_TECH);
 
                     int person1SkillLevel = Integer.MIN_VALUE;
@@ -3786,7 +3792,7 @@ public class Campaign implements ITechManager {
                     adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                           isClanCampaign(),
                           currentDay,
-                          person2.getRankLevel());
+                          person2.getRankNumeric());
                     skill = person2.getSkill(S_TECH);
 
                     int person2SkillLevel = Integer.MIN_VALUE;
@@ -4764,7 +4770,7 @@ public class Campaign implements ITechManager {
                              // if a legendary, primary tech and destroy by margin is NOT on
                              &&
                              ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
-                                    tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
+                                    tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
                 roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
@@ -5243,10 +5249,15 @@ public class Campaign implements ITechManager {
         boolean isCommandersDay = isCommandersDay(currentDay) &&
                                         getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
+        boolean isCampaignPlanetside = location.isOnPlanet();
+        boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
+
+            PersonnelOptions personnelOptions = person.getOptions();
 
             // Daily events
             if (person.getStatus().isMIA()) {
@@ -5269,7 +5280,10 @@ public class Campaign implements ITechManager {
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
-            medicalController.processMedicalEvents(person);
+            medicalController.processMedicalEvents(person,
+                  campaignOptions.isUseAgeEffects(),
+                  isClanCampaign(),
+                  currentDay);
 
             processAnniversaries(person);
 
@@ -5285,6 +5299,8 @@ public class Campaign implements ITechManager {
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
                 }
+
+                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
             }
 
             // Monthly events
@@ -5309,12 +5325,33 @@ public class Campaign implements ITechManager {
                 }
 
                 person.setHasPerformedExtremeExpenditure(false);
+
+                int bloodmarkLevel = person.getBloodmark();
+                if (bloodmarkLevel > BLOODMARK_ZERO.getLevel()) {
+                    BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
+                    boolean hasAlternativeID = person.getOptions().booleanOption(ATOW_ALTERNATE_ID);
+                    List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay, hasAlternativeID);
+                    for (LocalDate assassinationAttempt : bloodmarkSchedule) {
+                        person.addBloodhuntDate(assassinationAttempt);
+                    }
+                }
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
                 int age = person.getAge(currentDay);
                 if (age >= 6 && age <= 12) {
                     peopleWhoCelebrateCommandersDay++;
+                }
+            }
+
+            List<LocalDate> scheduledBloodhunts = person.getBloodhuntSchedule();
+            if (!scheduledBloodhunts.isEmpty()) {
+                boolean isDayOfBloodhunt = Bloodmark.checkForAssassinationAttempt(person,
+                      currentDay,
+                      isCampaignPlanetside);
+
+                if (isDayOfBloodhunt) {
+                    Bloodmark.performAssassinationAttempt(this, person, currentDay);
                 }
             }
         }
@@ -5334,6 +5371,138 @@ public class Campaign implements ITechManager {
         // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
             new OptimizeInfirmaryAssignments(this);
+        }
+    }
+
+    /**
+     * Processes all compulsions and madness-related effects for a given person, adjusting their status and generating
+     * reports as needed.
+     *
+     * <p>This method checks for various mental conditions or compulsions that a person might suffer from, such as
+     * addiction, flashbacks, split personality, paranoia, regression, catatonia, berserker rage, or hysteria. For each
+     * condition the person possesses, the relevant check is performed and any resulting effects—such as status changes,
+     * injuries, or event reports—are handled accordingly.</p>
+     *
+     * <p>The results of these checks may also generate narrative or status reports, which are added to the campaign
+     * as appropriate. If certain conditions are no longer present, some status flags (such as clinical paranoia) may be
+     * reset.</p>
+     *
+     * @param person               the person whose conditions are being processed
+     * @param personnelOptions     the set of personnel options or traits affecting which conditions are relevant
+     * @param isUseAdvancedMedical {@code true} if advanced medical rules are applied, {@code false} otherwise
+     * @param isUseFatigue         {@code true} if fatigue rules are applied, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
+          boolean isUseAdvancedMedical, boolean isUseFatigue) {
+        String gamblingReport = person.gambleWealth();
+        if (!gamblingReport.isBlank()) {
+            addReport(gamblingReport);
+        }
+
+        if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
+            int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            person.processDiscontinuationSyndrome(this,
+                  isUseAdvancedMedical,
+                  isUseFatigue,
+                  true,
+                  failedWillpowerCheck);
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            person.processCripplingFlashbacks(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processSplitPersonality(true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        boolean resetClinicalParanoia = true;
+        if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processClinicalParanoia(true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+
+            resetClinicalParanoia = false;
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_REGRESSION)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_REGRESSION);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processChildlikeRegression(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_CATATONIA)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processCatatonia(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_BERSERKER)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_BERSERKER);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processBerserkerFrenzy(this,
+                  isUseAdvancedMedical,
+                  true,
+                  failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+        }
+
+        if (personnelOptions.booleanOption(MADNESS_HYSTERIA)) {
+            int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
+            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+                  null, modifier);
+            String report = person.processHysteria(this, true, isUseAdvancedMedical, failedWillpowerCheck);
+            if (!report.isBlank()) {
+                addReport(report);
+            }
+
+            resetClinicalParanoia = false;
+        }
+
+        // This is necessary to stop a character from getting permanently locked in a paranoia state if the
+        // relevant madness are removed.
+        if (resetClinicalParanoia) {
+            person.setSufferingFromClinicalParanoia(false);
         }
     }
 
@@ -5417,13 +5586,53 @@ public class Campaign implements ITechManager {
         boolean isBirthday = birthday != null && birthday.equals(currentDay);
         int age = person.getAge(currentDay);
 
+        boolean isUseEducation = campaignOptions.isUseEducationModule();
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseTurnover = campaignOptions.isUseRandomRetirement();
+
+        final int JUNIOR_SCHOOL_AGE = 3;
+        final int HIGH_SCHOOL_AGE = 10;
+        final int EMPLOYMENT_AGE = 16;
+
         if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
             if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
-                addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                String report = String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                      person.getAge(getLocalDate()),
-                      CLOSING_SPAN_TAG));
+                      age,
+                      CLOSING_SPAN_TAG);
+
+                // Aging Effects
+                AgingMilestone milestone = getMilestone(age);
+                String milestoneText = "";
+                if (isUseAgingEffects && milestone.getMinimumAge() == age) {
+                    String milestoneLabel = milestone.getLabel();
+                    milestoneText = String.format(resources.getString("anniversaryBirthday.milestone"), milestoneLabel);
+                }
+                if (!milestoneText.isBlank()) {
+                    report += " " + milestoneText;
+                }
+
+                // Special Ages
+                String addendum = "";
+                if (isUseEducation && age == JUNIOR_SCHOOL_AGE) {
+                    addendum = resources.getString("anniversaryBirthday.third");
+                } else if (isUseEducation && age == HIGH_SCHOOL_AGE) {
+                    addendum = resources.getString("anniversaryBirthday.tenth");
+                } else if (age == EMPLOYMENT_AGE) { // This age is always relevant
+                    addendum = resources.getString("anniversaryBirthday.sixteenth");
+                }
+
+                if (!addendum.isBlank()) {
+                    report += " " + addendum;
+                }
+
+                // Retirement
+                if (isUseTurnover && age >= RETIREMENT_AGE) {
+                    report += " " + resources.getString("anniversaryBirthday.retirement");
+                }
+
+                addReport(report);
             }
 
             LocalDate recruitmentDate = person.getRecruitment();
@@ -5842,7 +6051,7 @@ public class Campaign implements ITechManager {
     private void performFactionStandingChecks(boolean isFirstOfMonth, boolean isNewYear) {
         String campaignFactionCode = faction.getShortName();
         if (isNewYear && campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
-            checkForNewMercenaryOrganizationStartUp(false);
+            checkForNewMercenaryOrganizationStartUp(false, false);
         }
 
         if (!campaignOptions.isTrackFactionStanding()) {
@@ -5909,6 +6118,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Use {@link #checkForNewMercenaryOrganizationStartUp(boolean, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear) {
+        checkForNewMercenaryOrganizationStartUp(bypassStartYear, false);
+    }
+
+    /**
      * Checks if a new mercenary organization is starting up in the current game year, and, if so, triggers a welcome
      * dialog introducing the organization's representative.
      *
@@ -5928,7 +6145,7 @@ public class Campaign implements ITechManager {
      * @author Illiani
      * @since 0.50.07
      */
-    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear) {
+    public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear, boolean isStartUp) {
         Factions factions = Factions.getInstance();
         int currentYear = getGameYear();
         Faction[] possibleFactions = new Faction[] {
@@ -5955,12 +6172,16 @@ public class Campaign implements ITechManager {
             chosenFaction = factions.getFaction("MG"); // fallback
         }
 
-        if (chosenFaction != null && chosenFaction.isMercenaryOrganization()) {
+        if (chosenFaction != null
+                  && (chosenFaction.getStartYear() == currentYear || isStartUp)
+                  && chosenFaction.isMercenaryOrganization()) {
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
             Person speaker = newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
             new FactionJudgmentDialog(this, speaker, getCommander(),
                   "HELLO", chosenFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
+        } else if (chosenFaction == null) {
+            logger.warn("Unable to find a suitable faction for a new mercenary organization start up");
         }
     }
 
@@ -6191,12 +6412,12 @@ public class Campaign implements ITechManager {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person p : getActivePersonnel(true)) {
-            if (p.isCommander()) {
-                return p;
+        for (Person person : getActivePersonnel(true)) {
+            if (person.isCommander()) {
+                return person;
             }
-            if (null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
-                commander = p;
+            if (null == commander || person.getRankNumeric() > commander.getRankNumeric()) {
+                commander = person;
             }
         }
         return commander;
@@ -6214,8 +6435,8 @@ public class Campaign implements ITechManager {
         }
 
         // remove any personnel from this unit
-        for (Person p : unit.getCrew()) {
-            unit.remove(p, true);
+        for (Person person : unit.getCrew()) {
+            unit.remove(person, true);
         }
 
         Person tech = unit.getTech();
@@ -6304,9 +6525,9 @@ public class Campaign implements ITechManager {
     }
 
     public void removeAllPatientsFor(Person doctor) {
-        for (Person p : getPersonnel()) {
-            if (null != p.getDoctorId() && p.getDoctorId().equals(doctor.getId())) {
-                p.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
+        for (Person person : getPersonnel()) {
+            if (null != person.getDoctorId() && person.getDoctorId().equals(doctor.getId())) {
+                person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
         }
     }
@@ -6601,6 +6822,21 @@ public class Campaign implements ITechManager {
      */
     public boolean isPirateCampaign() {
         return faction.getShortName().equals(PIRATE_FACTION_CODE);
+    }
+
+    /**
+     * Determines whether the current campaign is a mercenary campaign.
+     *
+     * <p>This method checks if the faction associated with the campaign is Mercenary, returning {@code true} if it is,
+     * and {@code false} otherwise.</p>
+     *
+     * @return {@code true} if the campaign is Mercenary, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isMercenaryCampaign() {
+        return faction.getShortName().equals(MERCENARY_FACTION_CODE);
     }
 
     public void setFaction(final Faction faction) {
@@ -7833,18 +8069,18 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public void personUpdated(Person p) {
-        Unit u = p.getUnit();
+    public void personUpdated(Person person) {
+        Unit u = person.getUnit();
         if (null != u) {
             u.resetPilotAndEntity();
         }
 
-        Force force = getForceFor(p);
+        Force force = getForceFor(person);
         if (force != null) {
             force.updateCommander(this);
         }
 
-        MekHQ.triggerEvent(new PersonChangedEvent(p));
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     /**
@@ -8146,7 +8382,7 @@ public class Campaign implements ITechManager {
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               isClanCampaign(),
               currentDay,
-              person.getRankLevel());
+              person.getRankNumeric());
 
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()),
               skill.getSkillLevel(person.getOptions(), person.getATOWAttributes(), adjustedReputation).toString());
@@ -8455,10 +8691,10 @@ public class Campaign implements ITechManager {
 
         if ((getCampaignOptions().getKillsForXP() > 0) && (getCampaignOptions().getKillXPAward() > 0)) {
             if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions().getKillsForXP()) == 0) {
-                Person p = getPerson(k.getPilotId());
-                if (null != p) {
-                    p.awardXP(this, getCampaignOptions().getKillXPAward());
-                    MekHQ.triggerEvent(new PersonChangedEvent(p));
+                Person person = getPerson(k.getPilotId());
+                if (null != person) {
+                    person.awardXP(this, getCampaignOptions().getKillXPAward());
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
             }
         }
@@ -9725,48 +9961,56 @@ public class Campaign implements ITechManager {
         return partReport;
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInService() {
-        for (Person p : getPersonnel()) {
-            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
+        for (Person person : getPersonnel()) {
+            if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonalLog()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no Joined date just use the first entry.
-                        join = e.getDate();
+                        join = logEntry.getDate();
                     }
-                    if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
-                        join = e.getDate();
+                    if (logEntry.getDesc().startsWith("Joined ") || logEntry.getDesc().startsWith("Freed ")) {
+                        join = logEntry.getDate();
                         break;
                     }
                 }
 
-                p.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
+                person.setRecruitment((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
 
+    /**
+     * No longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInRank() {
-        for (Person p : getPersonnel()) {
-            if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
+        for (Person person : getPersonnel()) {
+            if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonalLog()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no date from the below, just use the first
                         // entry.
-                        join = e.getDate();
+                        join = logEntry.getDate();
                     }
 
-                    if (e.getDesc().startsWith("Joined ") ||
-                              e.getDesc().startsWith("Freed ") ||
-                              e.getDesc().startsWith("Promoted ") ||
-                              e.getDesc().startsWith("Demoted ")) {
-                        join = e.getDate();
+                    if (logEntry.getDesc().startsWith("Joined ") ||
+                              logEntry.getDesc().startsWith("Freed ") ||
+                              logEntry.getDesc().startsWith("Promoted ") ||
+                              logEntry.getDesc().startsWith("Demoted ")) {
+                        join = logEntry.getDate();
                     }
                 }
 
                 // For that one in a billion chance the log is empty. Clone today's date and
                 // subtract a year
-                p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
+                person.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
     }
@@ -9792,10 +10036,10 @@ public class Campaign implements ITechManager {
              * the unit was founded.
              */
             LocalDate founding = null;
-            for (Person p : getPersonnel()) {
-                for (LogEntry e : p.getPersonalLog()) {
-                    if ((founding == null) || e.getDate().isBefore(founding)) {
-                        founding = e.getDate();
+            for (Person person : getPersonnel()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
+                    if ((founding == null) || logEntry.getDate().isBefore(founding)) {
+                        founding = logEntry.getDate();
                     }
                 }
             }
@@ -9804,35 +10048,35 @@ public class Campaign implements ITechManager {
              * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
              * they joined came with that `Mek (which is a less certain assumption)
              */
-            for (Person p : getPersonnel()) {
-                LocalDate join = p.getPersonalLog()
+            for (Person person : getPersonnel()) {
+                LocalDate join = person.getPersonalLog()
                                        .stream()
                                        .filter(e -> e.getDesc().startsWith("Joined "))
                                        .findFirst()
                                        .map(LogEntry::getDate)
                                        .orElse(null);
                 if ((join != null) && join.equals(founding)) {
-                    p.setFounder(true);
+                    person.setFounder(true);
                 }
-                if (p.getPrimaryRole().isMekWarrior() ||
-                          (p.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits()) ||
-                          p.getPrimaryRole().isProtoMekPilot()) {
-                    for (LogEntry e : p.getPersonalLog()) {
-                        if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
-                            String mek = e.getDesc().substring(12);
+                if (person.getPrimaryRole().isMekWarrior() ||
+                          (person.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits()) ||
+                          person.getPrimaryRole().isProtoMekPilot()) {
+                    for (LogEntry logEntry : person.getPersonalLog()) {
+                        if (logEntry.getDate().equals(join) && logEntry.getDesc().startsWith("Assigned to ")) {
+                            String mek = logEntry.getDesc().substring(12);
                             MekSummary ms = MekSummaryCache.getInstance().getMek(mek);
                             if (null != ms &&
-                                      (p.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
-                                p.setOriginalUnitWeight(ms.getWeightClass());
+                                      (person.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
+                                person.setOriginalUnitWeight(ms.getWeightClass());
                                 if (ms.isClan()) {
-                                    p.setOriginalUnitTech(Person.TECH_CLAN);
+                                    person.setOriginalUnitTech(Person.TECH_CLAN);
                                 } else if (ms.getYear() > 3050) {
                                     // TODO : Fix this so we aren't using a hack that just assumes IS2
-                                    p.setOriginalUnitTech(Person.TECH_IS2);
+                                    person.setOriginalUnitTech(Person.TECH_IS2);
                                 }
-                                if ((null != p.getUnit()) &&
-                                          ms.getName().equals(p.getUnit().getEntity().getShortNameRaw())) {
-                                    p.setOriginalUnitId(p.getUnit().getId());
+                                if ((null != person.getUnit()) &&
+                                          ms.getName().equals(person.getUnit().getEntity().getShortNameRaw())) {
+                                    person.setOriginalUnitId(person.getUnit().getId());
                                 }
                             }
                         }
@@ -10275,79 +10519,136 @@ public class Campaign implements ITechManager {
         return units;
     }
 
-
     /**
-     * Determines the appropriate starting planet for a new campaign.
+     * Determines the appropriate starting planet for a new campaign based on campaign type, faction, and various
+     * fallback scenarios.
      *
-     * <p>This method first attempts to obtain the starting planet from the campaign's primary method. If no valid
-     * system is found, or if the result is "Terra" (which is the default value used when no system is set), it selects
-     * a fallback faction's starting planet using the following logic:</p>
+     * <p>This method first checks if the campaign is classified as a mercenary or pirate campaign. If so, it
+     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String)}, which implements
+     * special logic to handle those campaign types.</p>
      *
-     * <ul>
-     *     <li>If the faction is "PIR", a random pirate faction (other than "PIR" itself) with an available starting
-     *     planet is chosen, if available.</li>
-     *     <li>If the faction is a clan, the generic "CLAN" faction is used as the fallback.</li>
-     *     <li>If the faction is mercenary, 75% of the time the campaign will begin on the mercenary faction
-     *     capital. Otherwise, they will begin on the capital of another playable faction.</li>
-     *     <li>Otherwise, the default faction (Mercenary) is used as the fallback.</li>
-     * </ul>
+     * <p>For all other campaign types, it uses the current campaign's faction to attempt to retrieve that faction’s
+     * canonical starting system for the current game date. If no valid system can be found (due to, for example, the
+     * faction not having a valid capital), the logic falls back to a default faction’s starting planet, and, if
+     * necessary, ultimately falls back to the planet Terra as a default universal location.</p>
      *
-     * <p>The returned result is always the system's primary planet.</p>
+     * <p>The method also includes special handling for Clan campaigns: if the fallback logic would result in the
+     * campaign starting on Terra but the campaign is clan-based, it attempts to relocate the starting planet to
+     * Strana Mechty.</p>
      *
-     * @return the {@link Planet} object representing the new campaign's starting planet
+     * @return the {@link Planet} instance where the campaign should start
      *
-     * @author Illiani
      * @since 0.50.07
+     * @author Illiani
      */
     public Planet getNewCampaignStartingPlanet() {
         Factions factions = Factions.getInstance();
 
-        PlanetarySystem startingSystem = faction.getStartingPlanet(this, currentDay);
+        final String TERRA_ID = "Terra";
+        final String CLAN_CODE = "CLAN";
 
+        Faction startingFaction;
+        PlanetarySystem startingSystem;
+
+        if (isMercenaryCampaign() || isPirateCampaign()) {
+            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID);
+        }
+
+        // Default for non-merc/pirate campaigns
+        startingFaction = faction;
+        startingSystem = startingFaction.getStartingPlanet(this, currentDay);
+
+        // Fallback if the system is unavailable
         if (startingSystem == null) {
-            Faction fallbackFaction = factions.getDefaultFaction();
-            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
-        } else if (startingSystem.getId().equalsIgnoreCase("Terra")) {
-            Faction fallbackFaction = factions.getDefaultFaction();
+            startingFaction = factions.getDefaultFaction();
+            startingSystem = startingFaction.getStartingPlanet(this, currentDay);
+            if (startingSystem == null) {
+                startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+            }
+        }
 
-            if (faction.getShortName().equalsIgnoreCase("PIR")) {
-                List<Faction> pirateFactions = new ArrayList<>();
-                for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
-                    if (activeFaction.isPirate() &&
-                              !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
-                        pirateFactions.add(activeFaction);
-                    }
-                }
-
-                if (!pirateFactions.isEmpty()) {
-                    fallbackFaction = ObjectUtility.getRandomItem(pirateFactions);
-                }
-            } else if (faction.isClan()) {
-                fallbackFaction = factions.getFaction("CLAN");
-            } else if (faction.getShortName().equalsIgnoreCase("MERC")) {
-                // Most of the time, mercenary campaigns will begin on their faction capital (Galatea, etc.).
-                // However, there is a 25% chance they begin in another faction's territory
-                int roll = randomInt(4);
-
-                if (roll == 0) {
-                    fallbackFaction = factions.getFaction("MERC");
-                } else {
-                    List<Faction> recruitingFaction = new ArrayList<>();
-                    for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
-                        if (activeFaction.isPlayable() && !activeFaction.isClan() && !activeFaction.isDeepPeriphery()) {
-                            recruitingFaction.add(activeFaction);
-                        }
-                    }
-
-                    if (!recruitingFaction.isEmpty()) {
-                        fallbackFaction = ObjectUtility.getRandomItem(recruitingFaction);
-                    }
+        // Special case: Clan campaign starting on Terra, swap to Clan homeworld
+        if (TERRA_ID.equals(startingSystem.getId()) && isClanCampaign()) {
+            Faction clanFaction = factions.getFaction(CLAN_CODE);
+            if (clanFaction != null) {
+                PlanetarySystem clanSystem = clanFaction.getStartingPlanet(this, currentDay);
+                if (clanSystem != null) {
+                    startingSystem = clanSystem;
                 }
             }
-
-            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
         }
 
         return startingSystem.getPrimaryPlanet();
+    }
+
+    /**
+     * Selects a starting planet for mercenary or pirate campaigns by considering eligible factions, campaign date, and
+     * appropriate weighting for periphery factions (if pirate).
+     *
+     * <p>For mercenary campaigns, the designated mercenary faction is used as the initial fallback. For pirate
+     * campaigns, the Tortuga Dominions are preferred, but only if they are active at the campaign's start date;
+     * otherwise, the game's configured default faction is used (usually Mercenary, but I opted not to hardcode
+     * mercenary here incase the default changes).</p>
+     *
+     * <p>There is a two-thirds probability that the starting faction will be selected from all factions, subject to
+     * several filters (playability, not a Clan, not deep periphery). For pirate campaigns, eligible periphery factions
+     * are intentionally added multiple times to the selection pool to increase their likelihood of being chosen
+     * (weighted randomness).</p>
+     *
+     * <p>After the faction is chosen, this method attempts to get that faction’s canonical starting world. If no
+     * valid system is found, the logic falls back to Terra, ensuring that the campaign always has a valid starting
+     * world even in case of missing data.</p>
+     *
+     * @param factions The {@link Factions} manager supplying access to all faction data.
+     * @param TERRA_ID The globally unique identifier for the planet Terra, used for the ultimate fallback.
+     *
+     * @return the {@link Planet} used as the campaign start location.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID) {
+        final String TORTUGA_CODE = "TD";
+
+        PlanetarySystem startingSystem;
+        Faction startingFaction;
+        // Determine fallback faction for merc/pirate
+        startingFaction = isMercenaryCampaign()
+                                ? factions.getFaction(MERCENARY_FACTION_CODE)
+                                : factions.getFaction(TORTUGA_CODE);
+
+        // If pirate fallback is unavailable at the campaign's start date, use the default faction
+        if (isPirateCampaign() && !startingFaction.validIn(currentDay)) {
+            startingFaction = factions.getDefaultFaction();
+        }
+
+        // 33% chance to start in fallback faction's capital
+        if (randomInt(3) != 0) {
+            // Pick a random, eligible recruiting faction
+            List<Faction> recruitingFactions = new ArrayList<>();
+            for (Faction possibleFaction : factions.getActiveFactions(currentDay)) {
+                if (possibleFaction.isPlayable() && !possibleFaction.isClan() && !possibleFaction.isDeepPeriphery()) {
+                    recruitingFactions.add(possibleFaction);
+
+                    // If we're playing a pirate campaign, we want to triple the chance that we start in the periphery
+                    if (possibleFaction.isPeriphery() && isPirateCampaign()) {
+                        recruitingFactions.add(possibleFaction);
+                        recruitingFactions.add(possibleFaction);
+                    }
+                }
+            }
+            if (!recruitingFactions.isEmpty()) {
+                startingFaction = ObjectUtility.getRandomItem(recruitingFactions);
+            }
+        }
+
+        startingSystem = startingFaction.getStartingPlanet(this, currentDay);
+        if (startingSystem != null) {
+            return startingSystem.getPrimaryPlanet();
+        }
+
+        // Fallback if no startingSystem
+        startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+        return startingSystem != null ? startingSystem.getPrimaryPlanet() : null;
     }
 }

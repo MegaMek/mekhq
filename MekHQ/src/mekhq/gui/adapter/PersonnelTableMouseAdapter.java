@@ -119,15 +119,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.MergingSurnameStyle;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
-import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -142,7 +134,9 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -169,6 +163,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     // region Variable Declarations
     private static final String CMD_SKILL_CHECK = "SKILL_CHECK";
+    private static final String CMD_ATTRIBUTE_CHECK = "ATTRIBUTE_CHECK";
     private static final String CMD_MEDICAL_RECORDS = "MEDICAL_RECORDS";
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
     private static final String CMD_RANK = "RANK";
@@ -218,6 +213,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_SACK = "SACK";
     private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
+    private static final String CMD_CLAIM_BOUNTY = "CLAIM_BOUNTY";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
@@ -230,6 +226,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO";
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
+    private static final String CMD_REFUND_SKILL = "REFUND_SKILL";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
@@ -361,6 +358,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_SKILL_CHECK: {
                 for (final Person person : people) {
                     new SkillCheckDialog(getCampaign(), person);
+                }
+                break;
+            }
+            case CMD_ATTRIBUTE_CHECK: {
+                for (final Person person : people) {
+                    new AttributeCheckDialog(getCampaign(), person);
                 }
                 break;
             }
@@ -642,7 +645,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int adjustedReputation = selectedPerson.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
                       getCampaign().isClanCampaign(),
                       getCampaign().getLocalDate(),
-                      selectedPerson.getRankLevel());
+                      selectedPerson.getRankNumeric());
 
                 PerformanceLogger.improvedSkill(getCampaign(),
                       selectedPerson,
@@ -658,6 +661,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().personUpdated(selectedPerson);
                 break;
             }
+            case CMD_REFUND_SKILL: {
+                String typeLabel = data[1];
+                SkillType skillType = SkillType.getType(typeLabel);
+                Skills skills = selectedPerson.getSkills();
+                int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.getName());
+
+                selectedPerson.removeSkill(skillType.getName());
+                selectedPerson.awardXP(getCampaign(), refundValue);
+
+                getCampaign().personUpdated(selectedPerson);
+                break;
+            }
             case CMD_BUY_TRAIT: {
                 String type = data[1];
                 int cost = MathUtility.parseInt(data[2]);
@@ -668,6 +683,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     case REPUTATION_LABEL -> selectedPerson.setReputation(target);
                     case WEALTH_LABEL -> selectedPerson.setWealth(target);
                     case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
+                    case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
                     default -> logger.error("Invalid trait type: {}", type);
                 }
 
@@ -1164,6 +1180,43 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
+                }
+                break;
+            }
+            case CMD_CLAIM_BOUNTY: {
+                String question = resources.getString("bloodmark.confirmation");
+
+                if (JOptionPane.NO_OPTION ==
+                          JOptionPane.showConfirmDialog(null,
+                                question,
+                                resources.getString("bloodmark.claimBounty"),
+                                JOptionPane.YES_NO_OPTION)) {
+                    return;
+                }
+
+                LocalDate today = getCampaign().getLocalDate();
+                boolean validBounty = false;
+                for (Person person : people) {
+                    if (person.getStatus().isDead()) {
+                        continue;
+                    }
+
+                    int level = person.getBloodmark();
+                    if (level <= BloodmarkLevel.BLOODMARK_ZERO.getLevel()) {
+                        continue;
+                    }
+
+                    BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(level);
+                    Money bounty = bloodmark.getBounty();
+                    String bountyReport = String.format(resources.getString("bloodmark.transaction"),
+                          person.getFullName());
+                    getCampaign().getFinances().credit(TransactionType.RANSOM, today, bounty, bountyReport);
+                    person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
+                    validBounty = true;
+                }
+
+                if (validBounty) {
+                    performMassForcedDirectionLoyaltyChange(getCampaign(), false, false);
                 }
                 break;
             }
@@ -1924,6 +1977,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // lets fill the pop up menu
         menuItem = new JMenuItem(resources.getString("makeSkillCheck.text"));
         menuItem.setActionCommand(makeCommand(CMD_SKILL_CHECK));
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem(resources.getString("makeAttributeCheck.text"));
+        menuItem.setActionCommand(makeCommand(CMD_ATTRIBUTE_CHECK));
         menuItem.addActionListener(this);
         popup.add(menuItem);
 
@@ -3124,7 +3182,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int adjustedReputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
                   getCampaign().isClanCampaign(),
                   getCampaign().getLocalDate(),
-                  person.getRankLevel());
+                  person.getRankNumeric());
 
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String typeName = SkillType.getSkillList()[i];
@@ -3281,14 +3339,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target < MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             // Reputation
-            int reputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
-                  getCampaign().isClanCampaign(),
-                  getCampaign().getLocalDate(),
-                  person.getRankLevel());
+            int reputation = person.getReputation();
             target = reputation + 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
@@ -3299,7 +3354,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target < MAXIMUM_REPUTATION && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= MAXIMUM_REPUTATION && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = reputation - 1;
@@ -3312,7 +3367,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target > MINIMUM_REPUTATION);
+            menuItem.setEnabled(target >= MINIMUM_REPUTATION);
             traitsMenu.add(menuItem);
 
             // Wealth
@@ -3325,7 +3380,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target < MAXIMUM_WEALTH && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= MAXIMUM_WEALTH && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = wealth - 1;
@@ -3336,7 +3391,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target > MINIMUM_WEALTH);
+            menuItem.setEnabled(target >= MINIMUM_WEALTH);
             traitsMenu.add(menuItem);
 
             // Unlucky
@@ -3349,8 +3404,45 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target < MAXIMUM_UNLUCKY);
+            menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
             traitsMenu.add(menuItem);
+
+            target = unlucky - 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnUnlucky.text"), target, traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  UNLUCKY_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target >= MINIMUM_UNLUCKY && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
+            // Bloodmark
+            int bloodmark = person.getBloodmark();
+
+            target = bloodmark + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnBloodmark.text"), target, -traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  BLOODMARK_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_BLOODMARK);
+            traitsMenu.add(menuItem);
+
+            target = bloodmark - 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnBloodmark.text"), target, traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  BLOODMARK_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target >= MINIMUM_BLOODMARK && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
             menu.add(traitsMenu);
 
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
@@ -3873,6 +3965,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.addActionListener(this);
         popup.add(menuItem);
 
+        menuItem = new JMenuItem(resources.getString("bloodmark.claimBounty"));
+        menuItem.setActionCommand(CMD_CLAIM_BOUNTY);
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
         // region Flags Menu
         // This Menu contains the following flags, in the specified order:
         // 1) Clan Personnel
@@ -4141,6 +4238,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_REMOVE);
             menuItem.addActionListener(this);
             menu.add(menuItem);
+
+            if (oneSelected) {
+                JMenu subMenu = new JMenu(resources.getString("refundSkill.text"));
+                for (Skill skill : person.getSkills().getSkills()) {
+                    String label = skill.getType().getName();
+                    JMenuItem menuSkill = new JMenuItem(label);
+                    menuSkill.setActionCommand(makeCommand(CMD_REFUND_SKILL, label));
+                    menuSkill.addActionListener(this);
+                    subMenu.add(menuSkill);
+                }
+                menu.add(subMenu);
+            }
 
             if (!getCampaignOptions().isUseAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("editHits.text"));
