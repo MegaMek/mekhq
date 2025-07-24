@@ -96,7 +96,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode
 import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
-    private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(DataLoadingDialog.class);
 
     // region Variable Declarations
     private final MekHQ application;
@@ -321,7 +321,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             final Campaign campaign;
             if (getCampaignFile() == null) {
                 // region Progress 6
-                logger.info("Starting a new campaign");
+                LOGGER.info("Starting a new campaign");
                 campaign = new Campaign();
 
                 // Campaign Preset
@@ -428,7 +428,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // endregion Progress 7
             } else {
                 // region Progress 6
-                logger.info("Loading campaign file from XML file {}", getCampaignFile());
+                LOGGER.info("Loading campaign file from XML file {}", getCampaignFile());
 
                 // And then load the campaign object from it.
                 try (FileInputStream fis = new FileInputStream(getCampaignFile())) {
@@ -491,6 +491,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 latch.await();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                LOGGER.warn("Thread was interrupted during campaign upgrade", e);
             }
         }
 
@@ -530,7 +531,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             } catch (InterruptedException | CancellationException ignored) {
                 campaign = null;
             } catch (ExecutionException ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
                     JOptionPane.showMessageDialog(null,
                           String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),

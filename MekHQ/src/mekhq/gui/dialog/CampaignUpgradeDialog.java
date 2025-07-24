@@ -140,17 +140,17 @@ public class CampaignUpgradeDialog {
         switch (dialogChoiceIndex) {
             case PRESET_SELECTION_CANCELLED -> exitApp(campaign.getApp());
             case PRESET_SELECTION_SELECT -> {
-                CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
-                if (chosenPreset == null) {
+                if (comboChoiceIndex < 0 || comboChoiceIndex >= presets.size()) {
                     LOGGER.errorDialog("Error",
-                          "No campaign preset found for index {}. Please report to the MekHQ team",
+                          "Invalid campaign preset index {}. Please report to the MekHQ team",
                           comboChoiceIndex);
                     exitApp(campaign.getApp());
-                    // This is wholly unnecessary as the app will have already been closed. We include it because
-                    // otherwise the IDE complains.
+                    // This is wholly unnecessary as the app will have already been closed.
+                    // We include it because otherwise the IDE complains.
                     return;
                 }
 
+                CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
                 LOGGER.info("Applying {} during upgrade process", chosenPreset.getTitle());
 
                 triggerLoadingDialog(campaign, chosenPreset, runnable);
@@ -161,7 +161,7 @@ public class CampaignUpgradeDialog {
                 if (optionsDialog.wasCanceled()) {
                     exitApp(campaign.getApp());
                 }
-                runnable.run();
+                SwingUtilities.invokeLater(runnable);
             }
         }
     }
@@ -249,7 +249,7 @@ public class CampaignUpgradeDialog {
             return null;
         }
 
-        JLabel lblPresetName = new JLabel("Preset Name:");
+        JLabel lblPresetName = new JLabel(getTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.label.presetPicker"));
         MMComboBox<String> comboBox = new MMComboBox<>("cboPresets", convertPresetListModelToComboBoxModel());
 
         JPanel panel = new JPanel();
