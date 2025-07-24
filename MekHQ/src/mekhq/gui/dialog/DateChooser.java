@@ -751,7 +751,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                       "OperationKlondike",
                       "SecondSuccessionWar",
                       "ThirdSuccessionWar");
-                turningPointDates = List.of(LocalDate.of(2784, 2, 14),
+                turningPointDates = List.of(LocalDate.of(2784, 11, 4),
                       LocalDate.of(2821, 7, 2),
                       LocalDate.of(2830, 1, 1),
                       LocalDate.of(2866, 1, 1));
