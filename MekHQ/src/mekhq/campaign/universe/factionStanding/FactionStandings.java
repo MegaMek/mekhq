@@ -580,11 +580,13 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public String setRegardForFaction(@Nullable String campaignFactionCode, final String factionCode,
+    public String setRegardForFaction(@Nullable String campaignFactionCode, String factionCode,
           final double newRegard, final int gameYear, final boolean includeReport) {
         double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
                                      ? MAXIMUM_SAME_FACTION_REGARD
                                      : MAXIMUM_OTHER_FACTION_REGARD;
+
+        factionCode = convertSpecialFaction(factionCode, gameYear);
 
         double regardValue = clamp(newRegard, MINIMUM_REGARD, maximumRegard);
         double currentRegard = getRegardForFaction(factionCode, false);
@@ -598,6 +600,32 @@ public class FactionStandings {
         }
 
         return "";
+    }
+
+    /**
+     * Converts certain special faction codes into their game-context equivalents for a given year.
+     *
+     * <p>If the provided faction code indicates "Pirates," it is converted to the piracy success index code. If the
+     * code indicates "Mercenaries," it uses the {@link Faction#getActiveMercenaryOrganization(int)} method to determine
+     * the active mercenary group for the specified year and uses its short name. All other faction codes are returned
+     * unchanged.</p>
+     *
+     * @param factionCode the faction code to convert, such as "PIR" or "MERC"
+     * @param gameYear    the year used for resolving year-dependent special factions
+     *
+     * @return the resolved faction code for the given context and year
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static String convertSpecialFaction(String factionCode, int gameYear) {
+        if (factionCode.equals(PIRATE_FACTION_CODE)) {
+            factionCode = PIRACY_SUCCESS_INDEX_FACTION_CODE;
+        } else if (factionCode.equals(MERCENARY_FACTION_CODE)) {
+            Faction mercenaryOrganization = Faction.getActiveMercenaryOrganization(gameYear);
+            factionCode = mercenaryOrganization.getShortName();
+        }
+        return factionCode;
     }
 
     /**
@@ -622,12 +650,14 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public String changeRegardForFaction(@Nullable String campaignFactionCode, final String factionCode,
-          final double delta, final int gameYear) {
+    public String changeRegardForFaction(@Nullable String campaignFactionCode, String factionCode, final double delta,
+          final int gameYear) {
         if (delta == 0) {
             LOGGER.debug("A change of 0 Regard requested for {}. Shortcutting the method.", factionCode);
             return "";
         }
+
+        factionCode = convertSpecialFaction(factionCode, gameYear);
 
         double originalRegard = getRegardForFaction(factionCode, false);
 
@@ -668,6 +698,8 @@ public class FactionStandings {
         }
 
         String factionCode = faction.getShortName();
+        factionCode = convertSpecialFaction(factionCode, today.getYear());
+
         double regard = getRegardForFaction(factionCode, true);
 
         if (regard < FactionJudgment.THRESHOLD_FOR_CENSURE) {
@@ -1024,6 +1056,7 @@ public class FactionStandings {
             }
 
             if (isNotValidForTracking(faction, gameYear)) {
+                factionRegard.remove(factionCode);
                 continue;
             }
 
@@ -1057,7 +1090,7 @@ public class FactionStandings {
      * <p>This method determines the correct regard penalty based on whether the enemy faction is classified as a
      * clan or not. The penalty is then applied to the regard value between the campaign's faction and the enemy
      * faction. If the enemy faction is null or is an aggregate (grouping rather than a true faction), the method
-     * takes no action and an appropriate report is returned or null.</p>
+     * takes no action, and an appropriate report is returned or null.</p>
      *
      * @param campaignFactionCode the unique code for the campaign's faction
      * @param enemyFaction the {@link Faction} representing the targeted enemy against whom the contract is accepted
