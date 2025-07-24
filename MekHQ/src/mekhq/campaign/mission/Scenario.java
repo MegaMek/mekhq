@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -64,8 +69,6 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -875,7 +878,7 @@ public class Scenario implements IPlayerSettings {
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {
         int additionalQuantity = 0;
         for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits(true);
+            Vector<UUID> units = force.getAllUnits(false);
             for (UUID id : units) {
                 if (!canDeploy(c.getUnit(id), c)) {
                     return false;

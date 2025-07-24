@@ -5023,7 +5023,7 @@ public class Campaign implements ITechManager {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
+                        for (UUID uid : forceIds.get(forceId).getAllUnits(false)) {
                             Unit u = getHangar().getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
