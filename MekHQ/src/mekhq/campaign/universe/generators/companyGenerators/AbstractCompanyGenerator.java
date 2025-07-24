@@ -51,7 +51,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MekFileParser;
@@ -1340,7 +1339,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private int determineForceWeightClass(final Campaign campaign, final Force force,
             final boolean isLance) {
-        double weight = force.getAllUnits(true).stream().map(campaign::getUnit)
+        double weight = force.getAllUnits(false).stream().map(campaign::getUnit)
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
                 .mapToDouble(unit -> unit.getEntity().getWeight()).sum();
         weight = weight * 4.0 / (getOptions().getLanceSize() * (isLance ? 1 : getOptions().getLancesPerCompany()));

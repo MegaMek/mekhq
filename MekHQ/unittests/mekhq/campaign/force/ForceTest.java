@@ -24,15 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 import java.util.Vector;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class ForceTest {
     @Test
@@ -45,7 +50,7 @@ class ForceTest {
         force.addUnit(unit2);
 
         // Act
-        Vector<UUID> allUnits = force.getAllUnits(true);
+        Vector<UUID> allUnits = force.getAllUnits(false);
 
         // Assert
         assertEquals(2, allUnits.size());
@@ -70,7 +75,7 @@ class ForceTest {
         childForce.addSubForce(childForce2, true);
 
         // Act
-        Vector<UUID> allUnits = force.getAllUnits(true);
+        Vector<UUID> allUnits = force.getAllUnits(false);
 
         // Assert
         assertEquals(3, allUnits.size());
@@ -177,7 +182,7 @@ class ForceTest {
         childForce.addSubForce(childForce3, true);
 
         // Act
-        Vector<UUID> allUnits = force.getAllUnits(true);
+        Vector<UUID> allUnits = force.getAllUnits(false);
 
         // Assert
         assertEquals(3, allUnits.size());

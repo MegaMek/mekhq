@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -34,9 +39,6 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
@@ -45,6 +47,8 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class is optionally used by Scenario to determine any limits on the type
@@ -260,7 +264,7 @@ public class ScenarioDeploymentLimit {
     public int getForceQuantity(Force f, Campaign c) {
         int quantity = 0;
 
-        Vector<UUID> unitIds = f.getAllUnits(true);
+        Vector<UUID> unitIds = f.getAllUnits(false);
         for (UUID id : unitIds) {
             Unit u = c.getUnit(id);
             if ((null != u) && (null != u.getEntity()) && isAllowedType(u.getEntity().getUnitType())) {
@@ -377,7 +381,7 @@ public class ScenarioDeploymentLimit {
      *         is part of the force
      */
     public boolean isPersonInForce(UUID personId, Force force, Campaign c) {
-        Vector<UUID> unitIds = force.getAllUnits(true);
+        Vector<UUID> unitIds = force.getAllUnits(false);
         for (UUID unitId : unitIds) {
             Unit u = c.getUnit(unitId);
             for (Person p : u.getActiveCrew()) {
@@ -450,7 +454,7 @@ public class ScenarioDeploymentLimit {
      *         part of the force
      */
     public boolean isUnitInForce(UUID unitId, Force force, Campaign c) {
-        Vector<UUID> unitIds = force.getAllUnits(true);
+        Vector<UUID> unitIds = force.getAllUnits(false);
         for (UUID id : unitIds) {
             if (id.equals(unitId)) {
                 return true;
