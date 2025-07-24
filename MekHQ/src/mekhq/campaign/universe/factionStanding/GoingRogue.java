@@ -125,7 +125,7 @@ public class GoingRogue {
               FactionJudgmentSceneType.GO_ROGUE,
               campaign.getFaction());
 
-        processGoingRogue(campaign, chosenFaction, commander, second, isUsingFactionStandings);
+        processGoingRogue(campaign, chosenFaction, commander, second, isUsingFactionStandings, false);
     }
 
     /**
@@ -139,15 +139,23 @@ public class GoingRogue {
      * @param commander     the commanding officer of the force
      * @param second        the second-in-command, may be {@code null}
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
+     * @param isUltimatum   whether the 'going rogue' action was the result of an ultimatum (but not to the mercenary
+     *                      faction)
      *
      * @author Illiani
      * @since 0.50.07
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
-          @Nullable Person second, boolean isUsingFactionStandings) {
+          @Nullable Person second, boolean isUsingFactionStandings, boolean isUltimatum) {
         boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
 
-        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUsingFactionStandings);
+        processGoingRogue(campaign,
+              chosenFaction,
+              commander,
+              second,
+              isDefection,
+              isUsingFactionStandings,
+              isUltimatum);
     }
 
     /**
@@ -160,13 +168,15 @@ public class GoingRogue {
      * @param commander     the force commander
      * @param second        secondary command personnel
      * @param isDefection   whether the 'going rogue' action counts as defection
+     * @param isUltimatum   whether the 'going rogue' action was the result of an ultimatum (but not to the mercenary
+     *                      faction)
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
      * @since 0.50.07
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
-          @Nullable Person second, boolean isDefection, boolean isUsingFactionStandings) {
+          @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings) {
         Faction currentFaction = campaign.getFaction();
 
         if (isUsingFactionStandings) {
@@ -190,7 +200,7 @@ public class GoingRogue {
             Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
             new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-        } else {
+        } else if (!isUltimatum) {
             if (chosenFaction.isMercenaryOrganization()) {
                 PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
                 Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);

@@ -104,6 +104,7 @@ import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.SVArmor;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -649,6 +650,17 @@ public class CampaignXmlParser {
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
         for (Part part : campaign.getWarehouse().getParts()) {
+            // < 50.08 compatibility handler
+            if (part instanceof SVArmor svArmor) {
+                final int PROHIBITED_BAR_RATING = 0;
+
+                int bar = svArmor.getBAR();
+                if (bar == PROHIBITED_BAR_RATING) {
+                    LOGGER.info("Discarding untracked BAR 0 armor");
+                    continue;
+                }
+            }
+
             warehouse.addPart(part, true);
         }
 

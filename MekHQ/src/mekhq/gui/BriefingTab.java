@@ -94,6 +94,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -550,12 +551,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
                       status, regardMultiplier);
             } else {
-                SimulateMissionDialog dialog = new ManualMissionDialog(getFrame(),
-                      getCampaign().getCampaignFactionIcon(),
-                      getCampaign().getFaction(),
-                      getCampaign().getLocalDate(),
-                      status,
-                      mission.getName());
+                SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
 
                 Faction employerChoice = dialog.getEmployerChoice();
                 Faction enemyChoice = dialog.getEnemyChoice();
@@ -602,6 +598,49 @@ public final class BriefingTab extends CampaignGuiTab {
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+    }
+
+    /**
+     * Creates and returns a {@link SimulateMissionDialog} for the given mission and status.
+     *
+     * <p>Determines the start date for the dialog as follows:</p>
+     *
+     * <ul>
+     *   <li>If the mission is a contract, the contract's start date is used; otherwise, {@code null} is assigned.</li>
+     *   <li>If the start date equals the campaign's current local date, the method iterates through the mission's
+     *   scenarios and uses the earliest scenario date found.</li>
+     * </ul>
+     *
+     * <p>The returned dialog is initialized with campaign and mission details.</p>
+     *
+     * @param mission the mission for which the simulation dialog is created
+     * @param status  the status to preselect in the dialog
+     *
+     * @return a configured {@code ManualMissionDialog} for the mission
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private SimulateMissionDialog getSimulateMissionDialog(Mission mission, MissionStatus status) {
+        LocalDate startDate = mission instanceof Contract
+                                    ? ((Contract) mission).getStartDate()
+                                    : null;
+
+        if (startDate != null && startDate.equals(getCampaign().getLocalDate())) {
+            for (Scenario scenario : mission.getScenarios()) {
+                LocalDate scenarioDate = scenario.getDate();
+                if (scenarioDate.isBefore(startDate)) {
+                    startDate = scenarioDate;
+                }
+            }
+        }
+
+        return new ManualMissionDialog(getFrame(),
+              getCampaign().getCampaignFactionIcon(),
+              getCampaign().getFaction(),
+              startDate,
+              status,
+              mission.getName());
     }
 
     /**
@@ -772,7 +811,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // First, we need to get all units assigned to the current scenario
-        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(false);
 
         // Then, we need to convert the ids to units, and filter out any units that are
         // null and
@@ -998,7 +1037,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
 
     private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1370,7 +1409,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return;
         }
@@ -1425,7 +1464,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // First, we need to get all units assigned to the current scenario
-        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(false);
 
         // Then, we need to convert the ids to units, and filter out any units that are
         // null and

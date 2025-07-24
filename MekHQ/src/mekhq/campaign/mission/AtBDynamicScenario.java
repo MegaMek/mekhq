@@ -96,6 +96,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
     private int friendlyReinforcementDelayReduction;
     private List<UUID> friendlyDelayedReinforcements;
+    private List<UUID> friendlyInstantReinforcements;
     private int hostileReinforcementDelayReduction;
 
     // derived fields used for various calculations
@@ -125,6 +126,7 @@ public class AtBDynamicScenario extends AtBScenario {
         setEffectivePlayerBVMultiplier(0.0);
         setFriendlyReinforcementDelayReduction(0);
         setFriendlyDelayedReinforcements(new ArrayList<>());
+        setFriendlyInstantReinforcements(new ArrayList<>());
         setHostileReinforcementDelayReduction(0);
         setEffectiveOpforSkill(SkillLevel.REGULAR);
         setEffectiveOpforQuality(IUnitRating.DRAGOON_C);
@@ -353,6 +355,14 @@ public class AtBDynamicScenario extends AtBScenario {
         this.friendlyDelayedReinforcements = friendlyDelayedReinforcements;
     }
 
+    public List<UUID> getFriendlyInstantReinforcements() {
+        return friendlyInstantReinforcements;
+    }
+
+    public void setFriendlyInstantReinforcements(final List<UUID> friendlyInstantReinforcements) {
+        this.friendlyInstantReinforcements = friendlyInstantReinforcements;
+    }
+
     public int getFriendlyReinforcementDelayReduction() {
         return friendlyReinforcementDelayReduction;
     }
@@ -525,6 +535,10 @@ public class AtBDynamicScenario extends AtBScenario {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "friendlyDelayedReinforcements", getFriendlyDelayedReinforcements());
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "friendlyInstantReinforcements",
+                  getFriendlyInstantReinforcements());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
@@ -572,6 +586,11 @@ public class AtBDynamicScenario extends AtBScenario {
                 String[] values = wn2.getTextContent().split(",");
                 for (String value : values) {
                     getFriendlyDelayedReinforcements().add(UUID.fromString(value));
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("Instant")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (String value : values) {
+                    getFriendlyInstantReinforcements().add(UUID.fromString(value));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("hostileReinforcementDelayReduction")) {
                 setHostileReinforcementDelayReduction(Integer.parseInt(wn2.getTextContent().trim()));
