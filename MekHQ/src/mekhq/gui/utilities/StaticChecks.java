@@ -52,7 +52,7 @@ public class StaticChecks {
 
     public static boolean areAllForcesUndeployed(final Campaign campaign, final List<Force> forces) {
         return forces.stream().noneMatch(Force::isDeployed)
-                && forces.stream().flatMap(force -> force.getAllUnits(true).stream())
+                     && forces.stream().flatMap(force -> force.getAllUnits(false).stream())
                         .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 

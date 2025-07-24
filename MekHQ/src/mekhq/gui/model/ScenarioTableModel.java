@@ -174,7 +174,7 @@ public class ScenarioTableModel extends DataTableModel {
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(scenario.getDate());
             }
         } else if (col == COL_ASSIGN) {
-            return scenario.getForces(getCampaign()).getAllUnits(true).size();
+            return scenario.getForces(getCampaign()).getAllUnits(false).size();
         } else if (col == COL_SECTOR) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario) {
