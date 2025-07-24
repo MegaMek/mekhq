@@ -5335,6 +5335,15 @@ public class Campaign implements ITechManager {
                         person.addBloodhuntDate(assassinationAttempt);
                     }
                 }
+
+                if (currentDay.getMonthValue() % 3 == 0) {
+                    if (person.hasDarkSecret()) {
+                        String report = person.isDarkSecretRevealed(true, false);
+                        if (report != null) {
+                            addReport(report);
+                        }
+                    }
+                }
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
