@@ -1346,6 +1346,7 @@ public class CampaignGUI extends JPanel {
         pnlButton.add(btnCompanyGenerator, gridBagConstraints);
 
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
+        btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -1358,6 +1359,7 @@ public class CampaignGUI extends JPanel {
         pnlButton.add(btnGMMode, gridBagConstraints);
 
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;

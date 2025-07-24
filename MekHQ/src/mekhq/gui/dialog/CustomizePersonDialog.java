@@ -183,6 +183,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
     private MMComboBox<Reasoning> comboReasoning;
 
+    // Other
+    private JCheckBox chkDarkSecretRevealed;
+
     private final Campaign campaign;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
@@ -1129,7 +1132,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        y++;
+        if (person.hasDarkSecret()) {
+            chkDarkSecretRevealed = new JCheckBox("Dark Secret Revealed");
+            chkDarkSecretRevealed.setSelected(person.isDarkSecretRevealed());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+            panDemog.add(chkDarkSecretRevealed, gridBagConstraints);
+
+            y++;
+        }
 
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setMinimumSize(UIUtil.scaleForGUI(400, 200));
@@ -1472,6 +1488,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setReasoning(comboReasoning.getSelectedItem());
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
+        }
+
+        if (person.hasDarkSecret()) {
+            boolean darkSecretRevealed = chkDarkSecretRevealed.isSelected();
+            if (darkSecretRevealed != person.isDarkSecretRevealed()) {
+                if (!darkSecretRevealed) {
+                    person.setDarkSecretRevealed(false);
+                } else {
+                    String report = person.isDarkSecretRevealed(true, true);
+                    if (!report.isBlank()) {
+                        campaign.addReport(report);
+                    }
+                }
+            }
         }
 
         setSkills();
