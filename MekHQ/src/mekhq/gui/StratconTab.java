@@ -54,6 +54,7 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.NewDayEvent;
@@ -63,6 +64,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
@@ -282,7 +284,8 @@ public class StratconTab extends CampaignGuiTab {
         // current support points
         TrackDropdownItem currentTDI = listCurrentTrack.getSelectedValue();
         if (currentTDI == null) {
-            campaignStatusText.setText("No active contract selected, or contract has not started.");
+            campaignStatusText.setText("No active contract selected, contract has not started, or you are not in the " +
+                                             "target system.");
             expandedObjectivePanel.setVisible(false);
             return;
         }
@@ -476,7 +479,14 @@ public class StratconTab extends CampaignGuiTab {
         int currentTrackIndex = listCurrentTrack.getSelectedIndex();
         listModel.clear();
 
-        for (AtBContract contract : getCampaignGui().getCampaign().getActiveAtBContracts(true)) {
+        Campaign campaign = getCampaignGui().getCampaign();
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        for (AtBContract contract : campaign.getActiveAtBContracts(false)) {
+            PlanetarySystem targetSystem = contract.getSystem();
+            if (!currentSystem.equals(targetSystem)) {
+                continue;
+            }
+
             StratconCampaignState campaignState = contract.getStratconCampaignState();
             if (campaignState != null) {
                 for (StratconTrackState track : campaignState.getTracks()) {

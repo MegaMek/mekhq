@@ -4531,16 +4531,17 @@ public class Unit implements ITechnology {
                 }
             }
 
-            // For crew-served units, let's look at the abilities of the group. If more than
-            // half the crew
-            // (gunners and pilots only, for spacecraft) have an ability, grant the benefit
-            // to the unit
+            boolean commanderOnly = campaign.getCampaignOptions().isUseCommanderAbilitiesOnly();
+
+            // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
+            // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
             // TODO : Mobile structures, large naval support vehicles
-            if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
+            if (!commanderOnly &&
+                      (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
                       entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
                       entity.hasETypeFlag(Entity.ETYPE_TANK) ||
                       entity.hasETypeFlag(Entity.ETYPE_INFANTRY) ||
-                      entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK)) {
+                             entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK))) {
                 // If there is no crew, there's nothing left to do here.
                 if (null == commander) {
                     return;
@@ -4652,7 +4653,6 @@ public class Unit implements ITechnology {
                 // question
                 // of what to do with extra crew quarters and crewmember assignments beyond the
                 // minimum.
-
             } else {
                 // For other unit types, just use the unit commander's abilities.
                 PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb;
 
@@ -294,11 +299,11 @@ public class AtBScenarioModifierApplicator {
                     // we can hide the "commander tactics skill" number of units, but we must keep
                     // at least one visible
                     // as the bot is unable to handle an invisible opfor at the moment.
-                    int maxHiddenUnits = Math.min(playerForce.getAllUnits(true).size() - 1,
+                    int maxHiddenUnits = Math.min(playerForce.getAllUnits(false).size() - 1,
                           scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
                     int numHiddenUnits = 0;
 
-                    for (UUID unitID : playerForce.getAllUnits(true)) {
+                    for (UUID unitID : playerForce.getAllUnits(false)) {
                         if (numHiddenUnits >= maxHiddenUnits) {
                             break;
                         }
