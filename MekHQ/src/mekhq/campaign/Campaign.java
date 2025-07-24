@@ -5171,7 +5171,7 @@ public class Campaign implements ITechManager {
 
                     if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
                         List<String> reports = factionStandings.processRefusedBatchall(faction.getShortName(),
-                              enemyFactionCode, currentDay.getYear());
+                              enemyFactionCode, currentDay.getYear(), campaignOptions.getRegardMultiplier());
 
                         for (String report : reports) {
                             addReport(report);
@@ -5368,6 +5368,17 @@ public class Campaign implements ITechManager {
                         if (report != null) {
                             addReport(report);
                         }
+                    }
+                }
+
+                if (person.getBurnedConnectionsEndDate() != null) {
+                    person.checkForConnectionsReestablishContact(currentDay);
+                }
+
+                if (campaignOptions.isAllowMonthlyConnections()) {
+                    String report = person.performConnectionsWealthCheck(currentDay, finances);
+                    if (!report.isBlank()) {
+                        addReport(report);
                     }
                 }
             }
@@ -5966,7 +5977,7 @@ public class Campaign implements ITechManager {
 
             // Degrade Regard
             List<String> degradedRegardReports = factionStandings.processRegardDegradation(faction.getShortName(),
-                  currentDay.getYear());
+                  currentDay.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
                 addReport(report);
             }
@@ -5976,6 +5987,10 @@ public class Campaign implements ITechManager {
 
         location.newDay(this);
 
+        updateFieldKitchenCapacity();
+
+        processNewDayPersonnel();
+
         // Manage the Markets
         refreshPersonnelMarkets();
 
@@ -5983,9 +5998,10 @@ public class Campaign implements ITechManager {
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
 
-        updateFieldKitchenCapacity();
-
-        processNewDayPersonnel();
+        // This needs to be after both personnel and markets
+        if (campaignOptions.isAllowMonthlyConnections() && isFirstOfMonth) {
+            checkForBurnedContacts();
+        }
 
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
         // moment they arrive via AtB Bonus Events
@@ -6063,6 +6079,28 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Checks if the commander has any burned contacts, and if so, generates and records a report.
+     *
+     * <p>This method is only executed if monthly connections are allowed by campaign options. If the commander
+     * exists and their burned connections end date has not been set, it invokes the commander's check for burned
+     * contacts on the current day. If a non-blank report is returned, the report is added to the campaign logs.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void checkForBurnedContacts() {
+        if (campaignOptions.isAllowMonthlyConnections()) {
+            Person commander = getCommander();
+            if (commander != null && commander.getBurnedConnectionsEndDate() == null) {
+                String report = commander.checkForBurnedContacts(currentDay);
+                if (!report.isBlank()) {
+                    addReport(report);
+                }
+            }
+        }
+    }
+
+    /**
      * Performs all daily and periodic standing checks for factions relevant to this campaign.
      *
      * <p>On the first day of the month, this method updates the climate regard for the active campaign faction,
@@ -6100,7 +6138,9 @@ public class Campaign implements ITechManager {
         }
 
         if (isFirstOfMonth) {
-            String report = factionStandings.updateClimateRegard(faction, currentDay);
+            String report = factionStandings.updateClimateRegard(faction,
+                  currentDay,
+                  campaignOptions.getRegardMultiplier());
             addReport(report);
         }
 

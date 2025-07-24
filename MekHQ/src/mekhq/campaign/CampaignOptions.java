@@ -487,6 +487,7 @@ public class CampaignOptions {
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
     private boolean allowMonthlyReinvestment;
+    private boolean allowMonthlyConnections;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -662,6 +663,7 @@ public class CampaignOptions {
     private boolean useFactionStandingUnitMarket;
     private boolean useFactionStandingContractPay;
     private boolean useFactionStandingSupportPoints;
+    private double regardMultiplier;
     //endregion Faction Standing
     // endregion Variable Declarations
 
@@ -1112,6 +1114,7 @@ public class CampaignOptions {
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
         allowMonthlyReinvestment = false;
+        allowMonthlyConnections = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -1297,6 +1300,7 @@ public class CampaignOptions {
         useFactionStandingUnitMarket = true;
         useFactionStandingContractPay = true;
         useFactionStandingSupportPoints = true;
+        regardMultiplier = 1.0;
         // endregion Against the Bot Tab
     }
     // endregion Constructors
@@ -3509,6 +3513,14 @@ public class CampaignOptions {
         this.allowMonthlyReinvestment = allowMonthlyReinvestment;
     }
 
+    public boolean isAllowMonthlyConnections() {
+        return allowMonthlyConnections;
+    }
+
+    public void setAllowMonthlyConnections(final boolean allowMonthlyConnections) {
+        this.allowMonthlyConnections = allowMonthlyConnections;
+    }
+
     // region Price Multipliers
     public double getCommonPartPriceMultiplier() {
         return commonPartPriceMultiplier;
@@ -5422,6 +5434,7 @@ public class CampaignOptions {
               newFinancialYearFinancesToCSVExport);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", simulateGrayMonday);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyReinvestment", allowMonthlyReinvestment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyConnections", allowMonthlyConnections);
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
@@ -5592,6 +5605,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingUnitMarket", useFactionStandingUnitMarket);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingContractPay", useFactionStandingContractPay);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingSupportPoints", useFactionStandingSupportPoints);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionStandingGainMultiplier", regardMultiplier);
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
@@ -6440,6 +6454,8 @@ public class CampaignOptions {
                     campaignOptions.simulateGrayMonday = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
                     campaignOptions.allowMonthlyReinvestment = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("allowMonthlyConnections")) {
+                    campaignOptions.allowMonthlyConnections = Boolean.parseBoolean(nodeContents);
 
                     // region Price Multipliers
                 } else if (nodeName.equalsIgnoreCase("commonPartPriceMultiplier")) {
@@ -6690,6 +6706,8 @@ public class CampaignOptions {
                     campaignOptions.setUseFactionStandingContractPay(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFactionStandingSupportPoints")) {
                     campaignOptions.setUseFactionStandingSupportPoints(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("factionStandingGainMultiplier")) {
+                    campaignOptions.setRegardMultiplier(MathUtility.parseDouble(nodeContents, 1.0));
 
                     // region Legacy
                     // Removed in 0.49.*
@@ -7216,6 +7234,14 @@ public class CampaignOptions {
 
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
+    }
+
+    public double getRegardMultiplier() {
+        return regardMultiplier;
+    }
+
+    public void setRegardMultiplier(double regardMultiplier) {
+        this.regardMultiplier = regardMultiplier;
     }
     
     public boolean isAutoGenerateOpForCallsigns() {

@@ -548,7 +548,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                   campaign.getLocalDate(),
                   campaign.getFactionStandings(),
                   campaign.getMissions(),
-                  newIsTrackFactionStandings);
+                  newIsTrackFactionStandings,
+                  campaignOptions.getRegardMultiplier());
 
             List<String> reports = dialog.getReports();
             for (String report : reports) {

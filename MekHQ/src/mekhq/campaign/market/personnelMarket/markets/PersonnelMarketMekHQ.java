@@ -54,6 +54,7 @@ import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
@@ -330,8 +331,14 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
         getLogger().debug("Rolls modified for population: {}", rolls);
 
-        if (getCampaign().getCampaignOptions().isUseFactionStandingRecruitmentSafe()) {
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        if (campaignOptions.isUseFactionStandingRecruitmentSafe()) {
             rolls += getFactionStandingsRecruitmentModifier();
+        }
+
+        if (campaignOptions.isAllowMonthlyConnections()) {
+            int additionalRecruits = performConnectionsRecruitsCheck();
+            rolls += additionalRecruits;
         }
 
         setRecruitmentRolls(rolls);

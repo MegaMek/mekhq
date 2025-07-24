@@ -382,7 +382,7 @@ public class FactionCensureEvent {
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getFactionStandings();
         String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
-              delta, campaign.getGameYear());
+              delta, campaign.getGameYear(), campaign.getCampaignOptions().getRegardMultiplier());
 
         campaign.addReport(report);
     }

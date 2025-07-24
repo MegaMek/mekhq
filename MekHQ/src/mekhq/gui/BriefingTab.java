@@ -544,10 +544,12 @@ public final class BriefingTab extends CampaignGuiTab {
             FactionStandings factionStandings = getCampaign().getFactionStandings();
             List<String> reports = new ArrayList<>();
 
+            double regardMultiplier = campaignOptions.getRegardMultiplier();
+
             if (mission instanceof AtBContract contract) {
                 Faction employer = contract.getEmployerFaction();
                 reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
-                      status);
+                      status, regardMultiplier);
             } else {
                 SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
 
@@ -556,7 +558,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 MissionStatus statusChoice = dialog.getStatusChoice();
 
                 reports.addAll(handleFactionRegardUpdates(getCampaign().getFaction(), employerChoice, enemyChoice,
-                      statusChoice, today, factionStandings));
+                      statusChoice, today, factionStandings, regardMultiplier));
             }
 
             for (String report : reports) {

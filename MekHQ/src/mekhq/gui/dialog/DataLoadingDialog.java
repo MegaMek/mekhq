@@ -375,7 +375,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 if (campaign.getCampaignOptions().isTrackFactionStanding()) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                          campaign.getLocalDate());
+                          campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier());
                     campaign.addReport(report);
                 }
                 // endregion Progress 6
