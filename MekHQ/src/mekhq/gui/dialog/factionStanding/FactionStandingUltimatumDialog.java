@@ -263,7 +263,7 @@ public class FactionStandingUltimatumDialog {
     /**
      * Displays an immersive dialog with campaign and personnel data, using a resource key for text localization.
      *
-     * @param ultimatumName    the unique ultumatum name
+     * @param ultimatumName    the unique ultimatum name
      * @param key              the dialog key suffix for localization
      * @param faction          the short name code of the faction
      * @param commander        the commander character
