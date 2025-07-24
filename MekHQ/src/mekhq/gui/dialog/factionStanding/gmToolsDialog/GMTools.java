@@ -92,6 +92,7 @@ public class GMTools extends JDialog {
     private final int gameYear;
     private final FactionStandings factionStandings;
     private final List<Mission> missions;
+    private final double regardMultiplier;
 
     private final List<String> reports = new ArrayList<>();
 
@@ -104,18 +105,20 @@ public class GMTools extends JDialog {
      * @param today            the current in-game date
      * @param factionStandings the {@link FactionStandings} object to be modified
      * @param missions         list of missions to support historic contract updates
+     * @param regardMultiplier the regard multiplier set in campaign options
      *
      * @author Illiani
      * @since 0.50.07
      */
     public GMTools(JDialog parent, ImageIcon campaignIcon, Faction campaignFaction, LocalDate today,
-          FactionStandings factionStandings, List<Mission> missions) {
+          FactionStandings factionStandings, List<Mission> missions, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;
         this.today = today;
         this.gameYear = today.getYear();
         this.factionStandings = factionStandings;
         this.missions = missions;
+        this.regardMultiplier = regardMultiplier;
 
         populateDialog();
         initializeDialog(parent);
@@ -323,7 +326,7 @@ public class GMTools extends JDialog {
                 case RESET_ALL_REGARD, ZERO_ALL_REGARD -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today);
+                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
                 }
                 case SET_SPECIFIC_REGARD -> {
                     Faction selectedFaction = factionSelectionDialog.getSelectedFaction();
@@ -339,11 +342,12 @@ public class GMTools extends JDialog {
                 case UPDATE_HISTORIC_CONTRACTS -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today);
+                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
                     reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
                           campaignIcon,
                           campaignFaction,
-                          today));
+                          today,
+                          regardMultiplier));
                 }
             }
 

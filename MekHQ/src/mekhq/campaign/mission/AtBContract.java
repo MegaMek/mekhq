@@ -635,6 +635,7 @@ public class AtBContract extends Contract {
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
+            double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
             String campaignFactionCode = campaign.getFaction().getShortName();
             if (faction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
@@ -643,7 +644,7 @@ public class AtBContract extends Contract {
 
                 if (!batchallAccepted && tracksStanding) {
                     List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
-                          today.getYear());
+                          today.getYear(), regardMultiplier);
 
                     for (String report : reports) {
                         campaign.addReport(report);
@@ -653,7 +654,8 @@ public class AtBContract extends Contract {
 
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
-                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today);
+                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
+                      regardMultiplier);
                 if (report != null) {
                     campaign.addReport(report);
                 }

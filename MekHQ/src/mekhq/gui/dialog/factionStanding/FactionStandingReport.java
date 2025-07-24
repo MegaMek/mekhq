@@ -432,7 +432,8 @@ public class FactionStandingReport extends JDialog {
         btnGmTools.setEnabled(isFactionStandingEnabled && isGM);
         btnGmTools.addActionListener(e -> {
             setVisible(false);
-            GMTools gmTools = new GMTools(this, campaignIcon, campaignFaction, today, factionStandings, missions);
+            GMTools gmTools = new GMTools(this, campaignIcon, campaignFaction, today, factionStandings, missions,
+                  campaignOptions.getRegardMultiplier());
             reports.addAll(gmTools.getReports());
             setVisible(true);
         });
@@ -473,7 +474,7 @@ public class FactionStandingReport extends JDialog {
         MissionStatus statusChoice = dialog.getStatusChoice();
 
         reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice, enemyChoice, statusChoice, today,
-              factionStandings));
+              factionStandings, campaignOptions.getRegardMultiplier()));
     }
 
     /**

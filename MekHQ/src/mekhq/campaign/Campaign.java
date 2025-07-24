@@ -5171,7 +5171,7 @@ public class Campaign implements ITechManager {
 
                     if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
                         List<String> reports = factionStandings.processRefusedBatchall(faction.getShortName(),
-                              enemyFactionCode, currentDay.getYear());
+                              enemyFactionCode, currentDay.getYear(), campaignOptions.getRegardMultiplier());
 
                         for (String report : reports) {
                             addReport(report);
@@ -5975,7 +5975,7 @@ public class Campaign implements ITechManager {
 
             // Degrade Regard
             List<String> degradedRegardReports = factionStandings.processRegardDegradation(faction.getShortName(),
-                  currentDay.getYear());
+                  currentDay.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
                 addReport(report);
             }
@@ -6136,7 +6136,9 @@ public class Campaign implements ITechManager {
         }
 
         if (isFirstOfMonth) {
-            String report = factionStandings.updateClimateRegard(faction, currentDay);
+            String report = factionStandings.updateClimateRegard(faction,
+                  currentDay,
+                  campaignOptions.getRegardMultiplier());
             addReport(report);
         }
 

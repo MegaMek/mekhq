@@ -564,10 +564,11 @@ public class PrisonerEventManager {
      * @param prisoners  The list of prisoners involved in the execution.
      */
     private void processExecutions(int executions, List<Person> prisoners) {
-        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isTrackFactionStanding()) {
             FactionStandings factionStandings = campaign.getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getFaction().getShortName(),
-                  prisoners, campaign.getGameYear());
+                  prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
 
             for (String report : reports) {
                 campaign.addReport(report);

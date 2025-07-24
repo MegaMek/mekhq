@@ -91,6 +91,8 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
+    private JLabel lblRegardMultiplier;
+    private JSpinner spnRegardMultiplier;
 
     private JPanel pnlFactionStandingModifiersPanel;
     private JCheckBox chkUseFactionStandingNegotiation;
@@ -271,11 +273,16 @@ public class SystemsTab {
         // Header
         factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              3);
+              4);
 
         // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
+
+        lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
+        lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
+        spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
+        spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
         pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
 
@@ -292,6 +299,12 @@ public class SystemsTab {
         layoutParent.gridwidth = 1;
         panel.add(chkTrackFactionStanding, layoutParent);
 
+        layoutParent.gridy++;
+        panel.add(lblRegardMultiplier, layoutParent);
+        layoutParent.gridx++;
+        panel.add(spnRegardMultiplier, layoutParent);
+
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         layoutParent.gridwidth = 2;
         panel.add(pnlFactionStandingModifiersPanel, layoutParent);
@@ -358,9 +371,6 @@ public class SystemsTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(chkTrackFactionStanding, layout);
-
-        layout.gridy++;
         panel.add(chkUseFactionStandingNegotiation, layout);
         layout.gridx++;
         panel.add(chkUseFactionStandingResupply, layout);
@@ -515,6 +525,7 @@ public class SystemsTab {
 
         // Faction Standing
         chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        spnRegardMultiplier.setValue(options.getRegardMultiplier());
         chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
         chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
         chkUseFactionStandingCommandCircuit.setSelected(options.isUseFactionStandingCommandCircuit());
@@ -574,6 +585,7 @@ public class SystemsTab {
 
         // Faction Standing
         options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
         options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
         options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
         options.setUseFactionStandingCommandCircuit(chkUseFactionStandingCommandCircuit.isSelected());

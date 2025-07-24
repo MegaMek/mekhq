@@ -1930,7 +1930,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 List<Person> listOfPrisoners = Arrays.asList(prisoners);
                 List<String> reports =
                       factionStandings.executePrisonersOfWar(getCampaign().getFaction().getShortName(), listOfPrisoners,
-                      getCampaign().getGameYear());
+                            getCampaign().getGameYear(), getCampaign().getCampaignOptions().getRegardMultiplier());
 
                 for (String report : reports) {
                     getCampaign().addReport(report);
