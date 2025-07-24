@@ -97,7 +97,9 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
@@ -173,6 +175,8 @@ public class Person {
     public static final String BLOODMARK_LABEL = "BLOODMARK";
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
+
+    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
 
@@ -359,6 +363,7 @@ public class Person {
     private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
     private boolean darkSecretRevealed;
+    private LocalDate burnedConnectionsEndDate;
     // endregion SPAs
 
     // region Flags
@@ -569,6 +574,7 @@ public class Person {
         storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
         darkSecretRevealed = false;
+        burnedConnectionsEndDate = null;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -2673,6 +2679,14 @@ public class Person {
         this.darkSecretRevealed = darkSecretRevealed;
     }
 
+    public @Nullable LocalDate getBurnedConnectionsEndDate() {
+        return burnedConnectionsEndDate;
+    }
+
+    public void setBurnedConnectionsEndDate(final @Nullable LocalDate burnedConnectionsEndDate) {
+        this.burnedConnectionsEndDate = burnedConnectionsEndDate;
+    }
+
     // region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -3256,6 +3270,13 @@ public class Person {
                       darkSecretRevealed);
             }
 
+            if (burnedConnectionsEndDate != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "burnedConnectionsEndDate",
+                      burnedConnectionsEndDate);
+            }
+
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
@@ -3796,6 +3817,8 @@ public class Person {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
                     person.setDarkSecretRevealed(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("burnedConnectionsEndDate")) {
+                    person.setBurnedConnectionsEndDate(LocalDate.parse(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
@@ -5865,6 +5888,8 @@ public class Person {
     /**
      * Calculates and returns the character's adjusted Connections value.
      *
+     * <p>If the character has burned their Connections, their Connections value is fixed as 0.</p>
+     *
      * <p>If the character is suffering from an episode of Clinical Paranoia, their Connections value is fixed as
      * 0.</p>
      *
@@ -5885,6 +5910,10 @@ public class Person {
      * @since 0.50.07
      */
     public int getAdjustedConnections() {
+        if (burnedConnectionsEndDate != null) {
+            return 0;
+        }
+
         if (sufferingFromClinicalParanoia) {
             return 0;
         }
@@ -7606,5 +7635,109 @@ public class Person {
         }
 
         return 0;
+    }
+
+    /**
+     * Reestablishes connections if the cooldown has expired.
+     *
+     * <p>If burned connections exist and the specified date is after the cooldown period, this method clears the
+     * burned connections state and returns a formatted message  indicating that connections have been
+     * reestablished.</p>
+     *
+     * @param today the current date to check against the cooldown period
+     *
+     * @return a formatted message if connections are reestablished, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String checkForConnectionsReestablishContact(LocalDate today) {
+        if (burnedConnectionsEndDate != null && burnedConnectionsEndDate.isBefore(today)) {
+            burnedConnectionsEndDate = null;
+
+            return String.format(resources.getString("connections.reestablished"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
+        }
+        return "";
+    }
+
+    /**
+     * Attempts to generate wealth using connections for the given date and campaign finances.
+     *
+     * <p>Only commanders with active connections are eligible. If successful, a random roll is made to determine if
+     * wealth is generated, which is then added to the provided finances. Returns a formatted message if a wealth gain
+     * occurs, or an empty string if no wealth is generated.</p>
+     *
+     * @param today            the current date for the wealth check
+     * @param campaignFinances the finances object in which to credit any gained wealth
+     *
+     * @return a formatted message if wealth is gained, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String performConnectionsWealthCheck(LocalDate today, Finances campaignFinances) {
+        // Non-commanders can't use their connections to generate wealth
+        if (!commander) {
+            return "";
+        }
+
+        if (burnedConnectionsEndDate != null) {
+            LOGGER.info("Connections burned for {} unable to gain Connections wealth", getFullTitle());
+            return "";
+        }
+
+        int adjustedConnections = getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            Money donation = connectionsLevel.getWealth();
+            if (donation.isPositive()) {
+                int roll = d6(2);
+                LOGGER.info("Rolling to use connections to gain money {} {} vs. {}", getFullTitle(), roll,
+                      CONNECTIONS_TARGET_NUMBER);
+                if (roll >= CONNECTIONS_TARGET_NUMBER) {
+                    campaignFinances.credit(TransactionType.WEALTH, today, donation,
+                          resources.getString("connections.transaction"));
+                    return String.format(resources.getString("connections.wealth"), getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, donation.toAmountString());
+                }
+            } else {
+                LOGGER.info("Connections too low to generate Wealth");
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * Checks if there is a chance for the connections to be burned on the given date.
+     *
+     * <p>If the person has non-zero connections, a burn roll is performed. If the roll is equal to or below the burn
+     * chance, the connections are burned for a random number of months starting from the given date. Returns a
+     * formatted message if connections are burned, or an empty string otherwise.</p>
+     *
+     * @param today the current date to perform the burn check
+     *
+     * @return a formatted message if connections are burned, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String checkForBurnedContacts(LocalDate today) {
+        int adjustedConnections = getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            int roll = d6(2);
+            int burnChance = connectionsLevel.getBurnChance();
+            LOGGER.info("Rolling to burn connections for {} {} vs. {}", getFullTitle(), roll, burnChance);
+            if (roll <= connectionsLevel.getBurnChance()) {
+                burnedConnectionsEndDate = today.plusMonths(d6(1));
+                return String.format(resources.getString("connections.burned"), getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+            }
+        }
+        return "";
     }
 }

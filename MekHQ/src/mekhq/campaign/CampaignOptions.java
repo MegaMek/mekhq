@@ -487,6 +487,7 @@ public class CampaignOptions {
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
     private boolean allowMonthlyReinvestment;
+    private boolean allowMonthlyConnections;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -1112,6 +1113,7 @@ public class CampaignOptions {
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
         allowMonthlyReinvestment = false;
+        allowMonthlyConnections = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -3509,6 +3511,14 @@ public class CampaignOptions {
         this.allowMonthlyReinvestment = allowMonthlyReinvestment;
     }
 
+    public boolean isAllowMonthlyConnections() {
+        return allowMonthlyConnections;
+    }
+
+    public void setAllowMonthlyConnections(final boolean allowMonthlyConnections) {
+        this.allowMonthlyConnections = allowMonthlyConnections;
+    }
+
     // region Price Multipliers
     public double getCommonPartPriceMultiplier() {
         return commonPartPriceMultiplier;
@@ -5422,6 +5432,7 @@ public class CampaignOptions {
               newFinancialYearFinancesToCSVExport);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", simulateGrayMonday);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyReinvestment", allowMonthlyReinvestment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyConnections", allowMonthlyConnections);
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
@@ -6440,6 +6451,8 @@ public class CampaignOptions {
                     campaignOptions.simulateGrayMonday = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
                     campaignOptions.allowMonthlyReinvestment = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("allowMonthlyConnections")) {
+                    campaignOptions.allowMonthlyConnections = Boolean.parseBoolean(nodeContents);
 
                     // region Price Multipliers
                 } else if (nodeName.equalsIgnoreCase("commonPartPriceMultiplier")) {
