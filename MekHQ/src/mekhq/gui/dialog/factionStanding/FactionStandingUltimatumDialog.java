@@ -125,7 +125,9 @@ public class FactionStandingUltimatumDialog {
                         challenger.getGivenName()),
                   getFormattedTextAt(RESOURCE_BUNDLE,
                         "FactionStandingUltimatumDialog.support",
-                        incumbent.getGivenName())
+                        incumbent.getGivenName()),
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "FactionStandingUltimatumDialog.goRogue")
             );
             ultimatumDialog = new ImmersiveDialogSimple(
                   campaign, challenger, incumbent,
@@ -199,7 +201,7 @@ public class FactionStandingUltimatumDialog {
         // Process outcome
         processGoingRogue(campaign, chosenFaction, commander, supporter, isViolentTransition, true);
 
-        if (rival != null && !rival.getStatus().isDepartedUnit()) {
+        if (rival != null && !(rival.getStatus().isDepartedUnit() || rival.getStatus().isDead())) {
             rival.changeStatus(
                   campaign,
                   campaign.getLocalDate(),
@@ -260,7 +262,7 @@ public class FactionStandingUltimatumDialog {
     /**
      * Displays an immersive dialog with campaign and personnel data, using a resource key for text localization.
      *
-     * @param ultimatumName    the unique ultumatum name
+     * @param ultimatumName    the unique ultimatum name
      * @param key              the dialog key suffix for localization
      * @param commander        the commander character
      * @param second           the second-in-command character
