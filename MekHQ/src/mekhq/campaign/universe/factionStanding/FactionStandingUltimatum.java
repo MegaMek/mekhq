@@ -123,7 +123,8 @@ public class FactionStandingUltimatum {
         // Security checks out of the way, process the ultimatum
         Person challenger = createAgitator(ultimatum.challenger());
         Person incumbent = createAgitator(ultimatum.incumbent());
-        new FactionStandingUltimatumDialog(campaign, challenger, incumbent, ultimatum.isViolentTransition());
+        new FactionStandingUltimatumDialog(campaign, challenger, incumbent, ultimatum.isViolentTransition(),
+              ultimatum.name());
     }
 
     /**
