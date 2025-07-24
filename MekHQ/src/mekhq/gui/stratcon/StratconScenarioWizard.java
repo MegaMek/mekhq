@@ -41,6 +41,7 @@ import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibil
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INSTANT;
 import static mekhq.campaign.stratcon.StratconRulesManager.calculateReinforcementTargetNumber;
 import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
 import static mekhq.campaign.stratcon.StratconRulesManager.getReinforcementType;
@@ -79,6 +80,7 @@ import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
@@ -338,8 +340,8 @@ public class StratconScenarioWizard extends JDialog {
      *                       <ol>
      *                         <li>Retrieves a list of eligible force templates based on the value of {@code isPrimaryForce}.
      *                             <ul>
-     *                               <li>For primary forces, {@link StratconScenarioTemplate#getAllPrimaryPlayerForces()} is used.</li>
-     *                               <li>For reinforcement forces, {@link StratconScenarioTemplate#getAllPlayerReinforcementForces()} is used.</li>
+     *                               <li>For primary forces, {@link ScenarioTemplate#getAllPrimaryPlayerForces()} is used.</li>
+     *                               <li>For reinforcement forces, {@link ScenarioTemplate#getAllPlayerReinforcementForces()} is used.</li>
      *                             </ul>
      *                         </li>
      *                         <li>For each eligible force template:
@@ -685,7 +687,8 @@ public class StratconScenarioWizard extends JDialog {
      *                       <ul>
      *                         <li>When {@code isPrimaryForce} is {@code true}:
      *                             <ul>
-     *                               <li>The "Commit" button invokes the {@link #btnCommitClicked(ActionEvent, Integer, boolean)}
+     *                               <li>The "Commit" button invokes the
+     *                               {@link #btnCommitClicked(ActionEvent, Integer, boolean, boolean)}
      *                                   method to directly complete the action.</li>
      *                             </ul>
      *                         </li>
@@ -706,7 +709,7 @@ public class StratconScenarioWizard extends JDialog {
         btnCommit = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCommit.text"));
         btnCommit.setActionCommand("COMMIT_CLICK");
         if (isPrimaryForce) {
-            btnCommit.addActionListener(evt -> btnCommitClicked(evt, null, false));
+            btnCommit.addActionListener(evt -> btnCommitClicked(evt, null, false, true));
         } else {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
@@ -902,23 +905,50 @@ public class StratconScenarioWizard extends JDialog {
 
             currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
 
-            btnCommitClicked(evt, finalTargetNumber, false);
+            btnCommitClicked(evt, finalTargetNumber, false, false);
             dialog.dispose();
         });
         reinforceButton.setEnabled(availableSupportPoints > 0);
 
+        JButton reinforceButtonInstant = new JButton(resources.getString(
+              "reinforcementConfirmation.confirmButton.instant"));
+        reinforceButtonInstant.setToolTipText(resources.getString(
+              "reinforcementConfirmation.confirmButton.instant.tooltip"));
+        reinforceButtonInstant.addActionListener(evt -> {
+            int spentSupportPoints = (int) spnSupportPointCost.getValue() * 2;
+            int finalTargetNumber = targetNumber - ((spentSupportPoints - 1) * 2);
+
+            currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
+
+            btnCommitClicked(evt, finalTargetNumber, false, true);
+            dialog.dispose();
+        });
+        reinforceButtonInstant.setEnabled(availableSupportPoints > 0);
+
         JButton reinforceButtonGM = new JButton(resources.getString("reinforcementConfirmation.confirmButton.gm"));
         reinforceButtonGM.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.gm.tooltip"));
         reinforceButtonGM.addActionListener(evt -> {
-            btnCommitClicked(evt, 0, true);
+            btnCommitClicked(evt, 0, true, false);
             dialog.dispose();
         });
         reinforceButtonGM.setVisible(campaign.isGM());
 
+        JButton reinforceButtonGMInstant = new JButton(resources.getString(
+              "reinforcementConfirmation.confirmButton.gm.instant"));
+        reinforceButtonGMInstant.setToolTipText(resources.getString(
+              "reinforcementConfirmation.confirmButton.gm.instant.tooltip"));
+        reinforceButtonGMInstant.addActionListener(evt -> {
+            btnCommitClicked(evt, 0, true, true);
+            dialog.dispose();
+        });
+        reinforceButtonGMInstant.setVisible(campaign.isGM());
+
         JButton cancelButton = new JButton(resources.getString("reinforcementConfirmation.cancelButton"));
         cancelButton.addActionListener(evt -> dialog.dispose());
         buttonPanel.add(reinforceButton);
+        buttonPanel.add(reinforceButtonInstant);
         buttonPanel.add(reinforceButtonGM);
+        buttonPanel.add(reinforceButtonGMInstant);
         buttonPanel.add(cancelButton);
 
         // Info label panel
@@ -966,9 +996,10 @@ public class StratconScenarioWizard extends JDialog {
      *                                  reinforcement deployment
      * @param isGMReinforcement         {@code true} if the player is using GM powers to bypass the reinforcement check,
      *                                  {@code false} otherwise.
+     * @param isInstantlyDeployed       {@code true} if the player is deploying instantly
      */
     private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber,
-          boolean isGMReinforcement) {
+          boolean isGMReinforcement, boolean isInstantlyDeployed) {
         if (parent != null) {
             parent.setCommitForces(true);
         }
@@ -988,7 +1019,8 @@ public class StratconScenarioWizard extends JDialog {
                           currentScenario,
                           campaign,
                           reinforcementTargetNumber,
-                          isGMReinforcement);
+                          isGMReinforcement,
+                          isInstantlyDeployed);
 
                     if (reinforcementResults.ordinal() >= FAILED.ordinal()) {
                         currentScenario.addFailedReinforcements(force.getId());
@@ -1002,10 +1034,17 @@ public class StratconScenarioWizard extends JDialog {
                                                                  .getFriendlyDelayedReinforcements();
 
                         for (UUID unitId : force.getAllUnits(true)) {
-                            try {
+                            if (campaign.getUnit(unitId) != null) {
                                 delayedReinforcements.add(unitId);
-                            } catch (Exception ex) {
-                                logger.error(ex.getMessage(), ex);
+                            }
+                        }
+                    } else if (reinforcementResults == INSTANT) {
+                        List<UUID> instantReinforcements = currentScenario.getBackingScenario()
+                                                                 .getFriendlyInstantReinforcements();
+
+                        for (UUID unitId : force.getAllUnits(true)) {
+                            if (campaign.getUnit(unitId) != null) {
+                                instantReinforcements.add(unitId);
                             }
                         }
                     }

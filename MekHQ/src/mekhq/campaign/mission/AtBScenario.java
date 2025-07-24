@@ -584,10 +584,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     @Override
     public boolean canDeploy(Unit unit, Campaign campaign) {
-        if (isBigBattle() && (getForces(campaign).getAllUnits(true).size() > 7)) {
+        if (isBigBattle() && (getForces(campaign).getAllUnits(false).size() > 7)) {
             return false;
         } else {
-            return !isSpecialScenario() || (getForces(campaign).getAllUnits(true).size() <= 0);
+            return !isSpecialScenario() || (getForces(campaign).getAllUnits(false).size() <= 0);
         }
     }
 
@@ -600,10 +600,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return true if the force is eligible to deploy, otherwise false
      */
     public boolean canDeploy(Force force, Campaign campaign) {
-        Vector<UUID> units = force.getAllUnits(true);
-        if (isBigBattle() && getForces(campaign).getAllUnits(true).size() + units.size() > 8) {
+        Vector<UUID> units = force.getAllUnits(false);
+        if (isBigBattle() && getForces(campaign).getAllUnits(false).size() + units.size() > 8) {
             return false;
-        } else if (isSpecialScenario() && getForces(campaign).getAllUnits(true).size() + units.size() > 0) {
+        } else if (isSpecialScenario() && getForces(campaign).getAllUnits(false).size() + units.size() > 0) {
             return false;
         }
         for (UUID id : units) {
@@ -625,9 +625,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
         if (isBigBattle()) {
-            return getForces(campaign).getAllUnits(true).size() + units.size() <= 8;
+            return getForces(campaign).getAllUnits(false).size() + units.size() <= 8;
         } else if (isSpecialScenario()) {
-            return getForces(campaign).getAllUnits(true).size() + units.size() <= 1;
+            return getForces(campaign).getAllUnits(false).size() + units.size() <= 1;
         } else {
             return units.stream().allMatch(unit -> canDeploy(unit, campaign));
         }
@@ -645,12 +645,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {
         int total = 0;
         for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits(true);
+            Vector<UUID> units = force.getAllUnits(false);
             total += units.size();
             if (isBigBattle()) {
-                return getForces(c).getAllUnits(true).size() + units.size() <= 8;
+                return getForces(c).getAllUnits(false).size() + units.size() <= 8;
             } else if (isSpecialScenario()) {
-                return getForces(c).getAllUnits(true).size() + units.size() <= 0;
+                return getForces(c).getAllUnits(false).size() + units.size() <= 0;
             }
             for (UUID id : units) {
                 if (!canDeploy(c.getUnit(id), c)) {
@@ -659,9 +659,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
         if (isBigBattle()) {
-            return getForces(c).getAllUnits(true).size() + total <= 8;
+            return getForces(c).getAllUnits(false).size() + total <= 8;
         } else if (isSpecialScenario()) {
-            return getForces(c).getAllUnits(true).size() + total <= 0;
+            return getForces(c).getAllUnits(false).size() + total <= 0;
         }
         return true;
     }
@@ -677,7 +677,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             setObjectives(campaign, getContract(campaign));
             return;
         }
-        Vector<UUID> deployed = getForces(campaign).getAllUnits(true);
+        Vector<UUID> deployed = getForces(campaign).getAllUnits(false);
         if (isBigBattle()) {
             int numAllies = Math.min(4, 8 - deployed.size());
             alliesPlayer.clear();

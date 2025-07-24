@@ -480,7 +480,7 @@ public class Campaign implements ITechManager {
         gmMode = false;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputation = null;
+        reputation = new ReputationController();
         factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
@@ -2082,10 +2082,10 @@ public class Campaign implements ITechManager {
      *
      * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
      *
-     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
+     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person) {
-        return recruitPerson(person, person.getPrisonerStatus(), false, true, true);
+        return recruitPerson(person, person.getPrisonerStatus(), false, true, true, false);
     }
 
     /**
@@ -2110,10 +2110,10 @@ public class Campaign implements ITechManager {
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
-     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
+     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
-        return recruitPerson(person, person.getPrisonerStatus(), gmAdd, true, employ);
+        return recruitPerson(person, person.getPrisonerStatus(), gmAdd, true, employ, false);
     }
 
     /**
@@ -2137,18 +2137,41 @@ public class Campaign implements ITechManager {
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
-     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
+     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
-        return recruitPerson(person, prisonerStatus, false, true, employ);
+        return recruitPerson(person, prisonerStatus, false, true, employ, false);
     }
 
     /**
-     * @deprecated use {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)} instead.
+     * Attempts to recruit a given person into the campaign with the specified prisoner status.
+     *
+     * <p>This is a convenience method that calls
+     * {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)} with
+     * {@code bypassSimulateRelationships} set to {@code false}.</p>
+     *
+     * @param person         the {@link Person} to recruit
+     * @param prisonerStatus the {@link PrisonerStatus} applied to the recruited person
+     * @param gmAdd          if {@code true}, the person is added in GM Mode
+     * @param log            if {@code true}, the recruitment is logged
+     * @param employ         if {@code true}, the person is immediately employed
+     *
+     * @return {@code true} if the person was successfully recruited; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
+          boolean employ) {
+        return recruitPerson(person, prisonerStatus, gmAdd, log, employ, false);
+    }
+
+    /**
+     * @deprecated use {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log) {
-        return recruitPerson(person, prisonerStatus, gmAdd, log, true);
+        return recruitPerson(person, prisonerStatus, gmAdd, log, true, false);
     }
 
     /**
@@ -2170,12 +2193,13 @@ public class Campaign implements ITechManager {
      *                       funds check)
      * @param log            if {@code true}, a record of the recruitment will be added to campaign logs
      * @param employ         if {@code true}, the person is marked as employed in the campaign
+     * @param bypassSimulateRelationships         if {@code true}, relationship simulation does not occur
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} on failure
      *       or insufficient funds
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
-          boolean employ) {
+          boolean employ, boolean bypassSimulateRelationships) {
         if (person == null) {
             logger.warn("A null person was passed into recruitPerson.");
             return false;
@@ -2202,7 +2226,7 @@ public class Campaign implements ITechManager {
             person.setJoinedCampaign(currentDay);
             personnel.put(person.getId(), person);
 
-            if (getCampaignOptions().isUseSimulatedRelationships()) {
+            if (!bypassSimulateRelationships && getCampaignOptions().isUseSimulatedRelationships()) {
                 if ((prisonerStatus.isFree()) &&
                           (!person.getOriginFaction().isClan()) &&
                           // We don't simulate for civilians, otherwise MekHQ will try to simulate the entire
@@ -5008,7 +5032,7 @@ public class Campaign implements ITechManager {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
+                        for (UUID uid : forceIds.get(forceId).getAllUnits(false)) {
                             Unit u = getHangar().getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
@@ -5333,6 +5357,15 @@ public class Campaign implements ITechManager {
                     List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay, hasAlternativeID);
                     for (LocalDate assassinationAttempt : bloodmarkSchedule) {
                         person.addBloodhuntDate(assassinationAttempt);
+                    }
+                }
+
+                if (currentDay.getMonthValue() % 3 == 0) {
+                    if (person.hasDarkSecret()) {
+                        String report = person.isDarkSecretRevealed(true, false);
+                        if (report != null) {
+                            addReport(report);
+                        }
                     }
                 }
 

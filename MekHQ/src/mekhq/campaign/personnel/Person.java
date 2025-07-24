@@ -344,7 +344,7 @@ public class Person {
     private String personalityInterviewNotes;
     // endregion Personality
 
-    // region Compulsions
+    // region SPAs
     private String storedGivenName;
     private String storedSurname;
     private int storedLoyalty;
@@ -362,8 +362,9 @@ public class Person {
     private Reasoning storedReasoning;
     private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
+    private boolean darkSecretRevealed;
     private LocalDate burnedConnectionsEndDate;
-    // endregion Compulsions
+    // endregion SPAs
 
     // region Flags
     private boolean clanPersonnel;
@@ -572,6 +573,7 @@ public class Person {
         storedReasoning = Reasoning.AVERAGE;
         storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
+        darkSecretRevealed = false;
         burnedConnectionsEndDate = null;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
@@ -2669,6 +2671,14 @@ public class Person {
         this.sufferingFromClinicalParanoia = sufferingFromClinicalParanoia;
     }
 
+    public boolean isDarkSecretRevealed() {
+        return darkSecretRevealed;
+    }
+
+    public void setDarkSecretRevealed(final boolean darkSecretRevealed) {
+        this.darkSecretRevealed = darkSecretRevealed;
+    }
+
     public @Nullable LocalDate getBurnedConnectionsEndDate() {
         return burnedConnectionsEndDate;
     }
@@ -3253,6 +3263,13 @@ public class Person {
                       sufferingFromClinicalParanoia);
             }
 
+            if (darkSecretRevealed) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "darkSecretRevealed",
+                      darkSecretRevealed);
+            }
+
             if (burnedConnectionsEndDate != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw,
                       indent,
@@ -3798,6 +3815,8 @@ public class Person {
                     person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
+                    person.setDarkSecretRevealed(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("burnedConnectionsEndDate")) {
                     person.setBurnedConnectionsEndDate(LocalDate.parse(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
@@ -5908,6 +5927,8 @@ public class Person {
         boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
         modifiers += (hasMildParanoia ? -1 : 0);
 
+        modifiers += getDarkSecretModifier(false);
+
         return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
@@ -6010,6 +6031,8 @@ public class Person {
 
         boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
         modifiers -= hasXenophobia ? 1 : 0;
+
+        modifiers += getDarkSecretModifier(true);
 
         return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
@@ -7486,6 +7509,132 @@ public class Person {
             potentialVictims.remove(victim);
             victims.add(victim);
         }
+    }
+
+    /**
+     * Determines whether a character's dark secret is revealed based on a dice roll, configured modifiers, and campaign
+     * options.
+     *
+     * <p>If the character does not have a dark secret, an empty string is returned. Otherwise, a target number is
+     * assembled using base and optional modifiers, and a 2d6 roll is made.</p>
+     *
+     * <p>If the roll meets or exceeds the target, the dark secret is revealed, relevant state is updated, and a
+     * formatted report message is returned (with content and styling based on the severity of the secret).</p>
+     *
+     * <p>If the secret is not revealed, returns an empty string.</p>
+     *
+     * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
+     * {@link #hasDarkSecret()}
+     * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
+     *
+     * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String isDarkSecretRevealed(boolean hasDarkSecret, boolean forceReveal) {
+        // This boolean is here to ensure that we only ever pass in valid personnel
+        if (!hasDarkSecret || darkSecretRevealed) {
+            return "";
+        } else {
+            final int BASE_TARGET_NUMBER = 10;
+            final int ALTERNATE_ID_MODIFIER = 2;
+
+            TargetRoll targetRoll = new TargetRoll();
+            targetRoll.addModifier(BASE_TARGET_NUMBER, "BASE_TARGET_NUMBER");
+
+            if (options.booleanOption(ATOW_ALTERNATE_ID)) {
+                targetRoll.addModifier(ALTERNATE_ID_MODIFIER, "ALTERNATE_ID_MODIFIER");
+            }
+
+            int roll = d6(2);
+            int targetNumber = targetRoll.getValue();
+
+            LOGGER.info("Dark Secret reveal roll for {}: {} vs. target number: {}", getFullTitle(), roll, targetNumber);
+
+            boolean isDarkSecretRevealed = forceReveal || (roll >= targetNumber);
+
+            String report = "";
+            if (isDarkSecretRevealed) {
+                LOGGER.info("Dark Secret revealed for {}!", getFullTitle());
+                darkSecretRevealed = true;
+
+                String dialogKey = "darkSecret.revealed.";
+                String color = getWarningColor();
+                if (options.booleanOption(DARK_SECRET_TRIVIAL)) {
+                    dialogKey += "trivial";
+                } else if (options.booleanOption(DARK_SECRET_SIGNIFICANT)) {
+                    dialogKey += "significant";
+                } else if (options.booleanOption(DARK_SECRET_MAJOR)) {
+                    dialogKey += "major";
+                    color = getNegativeColor();
+                } else if (options.booleanOption(DARK_SECRET_SEVERE)) {
+                    dialogKey += "severe";
+                    color = getNegativeColor();
+                } else {
+                    dialogKey += "extreme";
+                    color = getNegativeColor();
+                }
+
+                report = String.format(resources.getString(dialogKey), spanOpeningWithCustomColor(color),
+                      CLOSING_SPAN_TAG, getHyperlinkedFullTitle());
+            }
+
+            return report;
+        }
+    }
+
+    /**
+     * Determines whether any dark secret options are enabled for this entity.
+     *
+     * @return {@code true} if the entity has any dark secret SPA enabled; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean hasDarkSecret() {
+        return options.booleanOption(DARK_SECRET_TRIVIAL)
+                     || options.booleanOption(DARK_SECRET_SIGNIFICANT)
+                     || options.booleanOption(DARK_SECRET_MAJOR)
+                     || options.booleanOption(DARK_SECRET_SEVERE)
+                     || options.booleanOption(DARK_SECRET_EXTREME);
+    }
+
+    /**
+     * Calculates the modifier associated with a character's Dark Secret.
+     *
+     * <p>If the dark secret is not revealed and the character does not have a dark secret, the modifier is 0.
+     * Otherwise, returns a value based on enabled options and the type of modifier requested (reputation or
+     * other).</p>
+     *
+     * @param isReputation {@code true} to retrieve the Reputation modifier; {@code false} to retrieve the Connections
+     *                     modifier.
+     *
+     * @return the appropriate Dark Secret modifier, or 0 if no relevant option is enabled or the secret is not
+     *       present/revealed.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getDarkSecretModifier(final boolean isReputation) {
+        // If the dark secret is not revealed and the character does not have a dark secret, return 0
+        if (!darkSecretRevealed && !hasDarkSecret()) {
+            return 0;
+        }
+
+        // If the character has a dark secret but it is not revealed, return a default modifier (e.g., -1)
+        if (!darkSecretRevealed && hasDarkSecret()) {
+            return -1; // Default modifier for unrevealed dark secrets
+        }
+
+        // If the dark secret is revealed, calculate the appropriate modifier
+        for (Map.Entry<String, int[]> entry : DARK_SECRET_MODIFIERS.entrySet()) {
+            if (options.booleanOption(entry.getKey())) {
+                return isReputation ? entry.getValue()[0] : entry.getValue()[1];
+            }
+        }
+
+        return 0;
     }
 
     /**
