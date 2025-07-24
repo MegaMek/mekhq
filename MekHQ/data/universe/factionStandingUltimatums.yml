@@ -46,3 +46,16 @@ ultimatums:
       role: NOBLE
       factionCode: CS
     isViolentTransition: true
+  - date: 2766-12-26
+    # Represents the date when Stefan Amaris shot Richard Cameron II and caused the downfall of the Star League
+    name: AMARIS_COUP
+    affectedFactionCode: SL
+    challenger:
+      name: First Citizen Stefan Amaris
+      role: NOBLE
+      factionCode: TH
+    incumbent:
+      name: General Aleksandr Kerensky
+      role: MEKWARRIOR
+      factionCode: SL
+    isViolentTransition: true
