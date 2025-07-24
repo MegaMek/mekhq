@@ -242,7 +242,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getRecruitmentRollsModifier()
      * @since 0.50.07
      */
-    public static int getRecruitmentRollsModifier(final double regard) {
+    public static double getRecruitmentRollsModifier(final double regard) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getRecruitmentRollsModifier();

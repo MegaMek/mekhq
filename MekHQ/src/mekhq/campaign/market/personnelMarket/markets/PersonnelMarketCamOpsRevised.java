@@ -33,6 +33,8 @@
 package mekhq.campaign.market.personnelMarket.markets;
 
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS_REVISED;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Implements the personnel market logic using the Campaign Operations Revised ruleset.
@@ -116,24 +120,43 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
             return interestedFactions;
         }
 
+        Factions factions = Factions.getInstance();
+        Faction mercenaryFaction = factions.getFaction(MERCENARY_FACTION_CODE);
+        Faction pirateFaction = factions.getFaction(PIRATE_FACTION_CODE);
+        FactionStandings factionStandings = getCampaign().getFactionStandings();
+
         for (Faction faction : systemFactions) {
             if (FactionHints.defaultFactionHints().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
-            // Allies have increased presence in the pool
-            if (FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
-                interestedFactions.add(faction);
+
+            int factionStandingMultiplier = 1;
+            if (getCampaign().getCampaignOptions().isUseFactionStandingRecruitmentSafe()) {
+                double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                factionStandingMultiplier = FactionStandingUtilities.getRecruitmentTickets(regard);
+            }
+
+            // Allies are three times as likely to join the campaign as non-allies
+            if (getCampaignFaction().equals(faction)
+                      || FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
+                factionStandingMultiplier *= 3;
+            }
+
+            for (int i = 0; i < factionStandingMultiplier; i++) {
                 interestedFactions.add(faction);
             }
-            interestedFactions.add(faction);
         }
 
-        // Add mercenaries, if not already present and eligible
-        Faction mercenaryFaction = Factions.getInstance().getFaction("MERC");
         if (mercenaryFaction != null &&
                   !interestedFactions.isEmpty() &&
                   !interestedFactions.contains(mercenaryFaction)) {
             interestedFactions.add(mercenaryFaction);
+        }
+
+        if (pirateFaction != null &&
+                  !interestedFactions.isEmpty() &&
+                  !interestedFactions.contains(pirateFaction)) {
+            interestedFactions.add(pirateFaction);
         }
 
         return interestedFactions;

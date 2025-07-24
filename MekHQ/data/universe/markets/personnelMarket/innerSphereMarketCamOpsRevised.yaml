@@ -47,6 +47,21 @@
   extinctionYear: -1
   fallbackProfession: CONVENTIONAL_AIRCRAFT_PILOT
 
+- weight: 404 # CamOps has it at 556 but we also need to include LAM Pilots, so we split the chance 10:1 and then
+  # split that 4:1 with Conventional Aircraft Pilot
+  profession: CONVENTIONAL_AIRCRAFT_PILOT
+  count: 1
+  introductionYear: 0
+  extinctionYear: -1
+  fallbackProfession: GROUND_VEHICLE_DRIVER
+
+- weight: 101
+  profession: AEROSPACE_PILOT
+  count: 1
+  introductionYear: 2314
+  extinctionYear: -1
+  fallbackProfession: CONVENTIONAL_AIRCRAFT_PILOT
+
 - weight: 51
   profession: LAM_PILOT
   count: 1
@@ -82,26 +97,41 @@
   extinctionYear: -1
   fallbackProfession: SOLDIER
 
-- weight: 1389
+- weight: 2222 # CamOps states that this result is 2778 so we divided it across conv. infantry and BA 4:1
   profession: SOLDIER
   count: 25
   introductionYear: 0
   extinctionYear: -1
   fallbackProfession: DEPENDENT
 
-- weight: 2778
-  profession: SOLDIER
-  count: 25
-  introductionYear: 0
+- weight: 557
+  profession: BATTLE_ARMOUR
+  count: 5
+  introductionYear: 2868
   extinctionYear: -1
   fallbackProfession: DEPENDENT
 
-- weight: 1667 # CamOps states that this result is 'no personnel available' we represent that by just generating Dependents
+- weight: 1000 # CamOps states that this result is 'no personnel available' we represent that by just generating
+  # Dependents, Astechs or Medics in a 3:1:1 ratio
   profession: DEPENDENT
   count: 6
   introductionYear: 0
   extinctionYear: -1
   fallbackProfession: NONE
+
+- weight: 333
+  profession: ASTECH
+  count: 6
+  introductionYear: 0
+  extinctionYear: -1
+  fallbackProfession: DEPENDENT
+
+- weight: 333
+  profession: MEDIC
+  count: 6
+  introductionYear: 0
+  extinctionYear: -1
+  fallbackProfession: DEPENDENT
 
 - weight: 139 # CamOps states that this result is 556 so we divided it across the professions but make each 'pull' generate multiple techs
   profession: MEK_TECH
