@@ -661,8 +661,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public String changeRegardForFaction(@Nullable String campaignFactionCode, final String factionCode,
-          final double delta, final int gameYear, final double regardMultiplier) {
+    public String changeRegardForFaction(@Nullable String campaignFactionCode, String factionCode, final double delta,
+          final int gameYear, final double regardMultiplier) {
         if (delta == 0) {
             LOGGER.debug("A change of 0 Regard requested for {}. Shortcutting the method.", factionCode);
             return "";
