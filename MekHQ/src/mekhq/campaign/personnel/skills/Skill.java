@@ -37,6 +37,7 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
 import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
@@ -45,6 +46,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -300,13 +302,12 @@ public class Skill {
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
     public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int spaModifiers = getSPAModifiers(characterOptions, reputation);
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
+        int modifiers = getModifiers(characterOptions, attributes, reputation);
 
         if (isCountUp()) {
-            return min(COUNT_UP_MAX_VALUE, getSkillValue() + spaModifiers + attributeModifiers);
+            return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
         } else {
-            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - spaModifiers - attributeModifiers);
+            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - modifiers);
         }
     }
 
@@ -588,10 +589,34 @@ public class Skill {
     public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
         int baseValue = level + bonus + agingModifier;
 
+        int modifiers = getModifiers(characterOptions, attributes, reputation);
+
+        return baseValue + modifiers;
+    }
+
+    /**
+     * Calculates the total modifiers for a character based on their SPA (Special Pilot Abilities), attributes, possible
+     * illiteracy penalty, and reputation.
+     *
+     * @param characterOptions the {@link PersonnelOptions} containing the character's options and SPAs
+     * @param attributes       the {@link Attributes} object representing the character's attributes
+     * @param reputation       the character's reputation value
+     *
+     * @return the sum of SPA modifiers, attribute-based modifiers, and any additional penalty (such as for illiteracy)
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int getModifiers(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
         int spaModifiers = getSPAModifiers(characterOptions, reputation);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
 
-        return baseValue + spaModifiers + attributeModifiers;
+        boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
+                                            || INTELLIGENCE.equals(type.getSecondAttribute());
+        int literacyModifier = isIntelligenceBased && attributes.isIlliterate()
+                                     ? UNTRAINED_SKILL_MODIFIER : 0;
+
+        return spaModifiers + attributeModifiers + literacyModifier;
     }
 
     /**
@@ -611,12 +636,7 @@ public class Skill {
      * @return the complete skill level after all relevant modifiers (excluding reputation) have been applied
      */
     public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
-        int baseValue = level + bonus + agingModifier;
-
-        int spaModifiers = getSPAModifiers(characterOptions, 0);
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
-
-        return baseValue + spaModifiers + attributeModifiers;
+        return getTotalSkillLevel(characterOptions, attributes, 0);
     }
 
     public void improve() {

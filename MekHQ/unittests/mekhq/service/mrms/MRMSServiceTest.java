@@ -65,6 +65,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -187,6 +188,7 @@ public class MRMSServiceTest {
         when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(SkillLevel.VETERAN);
         when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK, 7, 0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
+        when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
 
         configuredOptions = new MRMSConfiguredOptions(mockCampaign);
         unit.setTech(mockTech);
@@ -674,6 +676,7 @@ public class MRMSServiceTest {
               skillLevel.getExperienceLevel(),
               0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
+        when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
 
         return mockTech;
     }

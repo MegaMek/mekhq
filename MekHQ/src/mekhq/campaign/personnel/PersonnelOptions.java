@@ -89,6 +89,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_GREMLINS = "flaw_gremlins";
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
+    public static final String FLAW_ILLITERATE = "flaw_illiterate";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -118,6 +119,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ADMIN_TETRIS_MASTER = "admin_tetris_master";
     public static final String ADMIN_NETWORKER = "admin_networker";
     public static final String ADMIN_INTERSTELLAR_NEGOTIATOR = "admin_interstellar_negotiator";
+    public static final String ADMIN_SCROUNGE = "admin_scrounge";
 
     public static final String COMPULSION_UNPLEASANT_PERSONALITY = "compulsion_unpleasant_personality";
     public static final String COMPULSION_MILD_PARANOIA = "compulsion_mild_paranoia";
@@ -156,6 +158,7 @@ public class PersonnelOptions extends PilotOptions {
           DARK_SECRET_EXTREME, new int[] { -5, -3 }
     );
 
+    public static final int ILLITERACY_LANGUAGES_THRESHOLD = 4; // ATOW pg 120
 
     @Override
     public void initialize() {
@@ -225,6 +228,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_GREMLINS, false);
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
+        addOption(l3a, FLAW_ILLITERATE, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
@@ -254,6 +258,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ADMIN_TETRIS_MASTER, false);
         addOption(l3a, ADMIN_NETWORKER, false);
         addOption(l3a, ADMIN_INTERSTELLAR_NEGOTIATOR, false);
+        addOption(l3a, ADMIN_SCROUNGE, false);
 
         addOption(l3a, COMPULSION_UNPLEASANT_PERSONALITY, false);
         addOption(l3a, COMPULSION_MILD_PARANOIA, false);
