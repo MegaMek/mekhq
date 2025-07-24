@@ -495,16 +495,16 @@ public class SimulateMissionDialog extends JDialog {
     private JPanel populateButtonPanel() {
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
-        String label = getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(label);
+        String lblConfirm = getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.button.confirm");
+        RoundedJButton btnConfirm = new RoundedJButton(lblConfirm);
         btnConfirm.addActionListener(evt -> {
             int employerChoiceIndex = comboEmployerFaction.getSelectedIndex();
-            if (employerChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked leave the choice null
+            if (employerChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked, leave the choice null
                 employerChoice = allFactions.get(employerChoiceIndex);
             }
 
             int enemyChoiceIndex = comboEnemyFaction.getSelectedIndex();
-            if (enemyChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked leave the choice null
+            if (enemyChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked, leave the choice null
                 enemyChoice = allFactions.get(enemyChoiceIndex);
             }
 
@@ -536,6 +536,11 @@ public class SimulateMissionDialog extends JDialog {
         });
 
         pnlButton.add(btnConfirm);
+
+        String lblSkip = getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.button.skip");
+        RoundedJButton btnSkip = new RoundedJButton(lblSkip);
+        btnSkip.addActionListener(evt -> dispose());
+        pnlButton.add(btnSkip);
 
         return pnlButton;
     }
