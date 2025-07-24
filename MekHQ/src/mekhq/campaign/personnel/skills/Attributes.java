@@ -135,7 +135,6 @@ public class Attributes {
         intelligence = DEFAULT_ATTRIBUTE_SCORE;
         willpower = DEFAULT_ATTRIBUTE_SCORE;
         charisma = DEFAULT_ATTRIBUTE_SCORE;
-        isIlliterate = false;
     }
 
 
@@ -149,13 +148,12 @@ public class Attributes {
      * @param intelligence The initial value for the intelligence {@link SkillAttribute}.
      * @param willpower    The initial value for the willpower {@link SkillAttribute}.
      * @param charisma     The initial value for the charisma {@link SkillAttribute}.
-     * @param isIlliterate The initial value for the characters' illiteracy
      *
      * @author Illiani
      * @since 0.50.05
      */
     public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
-          int charisma, boolean isIlliterate) {
+          int charisma) {
         this.strength = strength;
         this.body = body;
         this.reflexes = reflexes;
@@ -163,7 +161,7 @@ public class Attributes {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
-        this.isIlliterate = isIlliterate;
+        isIlliterate = false;
     }
 
     /**
