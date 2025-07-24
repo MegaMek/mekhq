@@ -30,6 +30,7 @@ package mekhq.campaign.personnel;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import megamek.common.annotations.Nullable;
@@ -90,6 +91,12 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String FLAW_ILLITERATE = "flaw_illiterate";
 
+    public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
+    public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
+    public static final String DARK_SECRET_MAJOR = "dark_secret_major";
+    public static final String DARK_SECRET_SEVERE = "dark_secret_severe";
+    public static final String DARK_SECRET_EXTREME = "dark_secret_extreme";
+
     public static final String MUTATION_FREAKISH_STRENGTH = "mutation_freakish_strength";
     public static final String MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM = "mutation_exceptional_immune_system";
     public static final String MUTATION_EXOTIC_APPEARANCE = "mutation_exotic_appearance";
@@ -141,6 +148,15 @@ public class PersonnelOptions extends PilotOptions {
     public static final int COMPULSION_CHECK_MODIFIER_MAJOR = 4; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_SEVERE = 7; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_EXTREME = 10; // ATOW pg 110
+
+    // ATOW pg 112 (Reputation, Connections)
+    public static final Map<String, int[]> DARK_SECRET_MODIFIERS = Map.of(
+          DARK_SECRET_TRIVIAL, new int[] { -1, -1 },
+          DARK_SECRET_SIGNIFICANT, new int[] { -2, -1 },
+          DARK_SECRET_MAJOR, new int[] { -3, -2 },
+          DARK_SECRET_SEVERE, new int[] { -4, -2 },
+          DARK_SECRET_EXTREME, new int[] { -5, -3 }
+    );
 
     public static final int ILLITERACY_LANGUAGES_THRESHOLD = 4; // ATOW pg 120
 
@@ -213,6 +229,12 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, FLAW_ILLITERATE, false);
+
+        addOption(l3a, DARK_SECRET_TRIVIAL, false);
+        addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
+        addOption(l3a, DARK_SECRET_MAJOR, false);
+        addOption(l3a, DARK_SECRET_SEVERE, false);
+        addOption(l3a, DARK_SECRET_EXTREME, false);
 
         addOption(l3a, MUTATION_FREAKISH_STRENGTH, false);
         addOption(l3a, MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM, false);

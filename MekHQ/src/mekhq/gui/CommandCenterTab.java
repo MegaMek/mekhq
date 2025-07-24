@@ -63,7 +63,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -641,12 +640,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
             campaign.getUnitRating().reInitialize();
             lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
         } else if (unitRatingMethod.isCampaignOperations()) {
-            if (campaign.getReputation() == null) {
-                ReputationController reputationController = new ReputationController();
-                reputationController.initializeReputation(campaign);
-                campaign.setReputation(reputationController);
-            }
-
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
                   .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))

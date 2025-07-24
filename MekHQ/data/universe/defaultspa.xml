@@ -550,7 +550,7 @@ They can make one additional procurement attempt per day.]]></desc>
         <displayName>Alternate ID (ATOW)</displayName>
         <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streetwise, and Protocols skill checks. While ranks in the Bloodmark trait cause the character to be hunted by assassins.
 
-This SPA reduces the penalty from low Reputation by 2 and reduces the chance of an assassination attempt occurring by half.
+This SPA reduces the penalty from low Reputation by 2 and reduces the chance of an assassination attempt occurring by half. It also decreases the chance of a Dark Secret SPA being revealed.
 
 While this SPA does exist in ATOW (and that's where you'll find its description), these effects are unique to MekHQ.]]></desc>
         <xpCost>200</xpCost>
@@ -1457,6 +1457,81 @@ If Advanced Medical is disabled 1-2 Hits are inflicted, instead of Injuries.
 While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <xpCost>-500</xpCost>
     <weight>1</weight>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>dark_secret_trivial</lookupName>
+    <displayName>Dark Secret - Trivial (ATOW)</displayName>
+    <desc><![CDATA[Once every three months 2d6 is rolled, on a roll of 10+ the character's Dark Secret is revealed.
+
+If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+Once the characters' Dark Secret has been revealed, they permanently reduce their Reputation by 1 and Connections by 1.
+
+A trivial Dark Secret represents a personal lapse or dishonorable act that could harm the character's reputation if revealed.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <invalidAbilities>dark_secret_significant::dark_secret_major::dark_secret_severe::dark_secret_extreme</invalidAbilities>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>dark_secret_significant</lookupName>
+    <displayName>Dark Secret - Significant (ATOW)</displayName>
+    <desc><![CDATA[Once every three months 2d6 is rolled, on a roll of 10+ the character's Dark Secret is revealed.
+
+If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+Once the characters' Dark Secret has been revealed, they permanently reduce their Reputation by 2 and Connections by 1.
+
+A significant Dark Secret represents a concealed wrongdoing that would damage key relationships or the character's career.]]></desc>
+    <xpCost>-200</xpCost>
+    <weight>1</weight>
+    <invalidAbilities>dark_secret_trivial::dark_secret_major::dark_secret_severe::dark_secret_extreme</invalidAbilities>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>dark_secret_major</lookupName>
+    <displayName>Dark Secret - Major (ATOW)</displayName>
+    <desc><![CDATA[Once every three months 2d6 is rolled, on a roll of 10+ the character's Dark Secret is revealed.
+
+If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+Once the characters' Dark Secret has been revealed, they permanently reduce their Reputation by 3 and Connections by 2.
+
+A major Dark Secret represents a serious violation of law, duty, or trust that could lead to legal or social consequences.]]></desc>
+    <xpCost>-300</xpCost>
+    <weight>1</weight>
+    <invalidAbilities>dark_secret_trivial::dark_secret_significant::dark_secret_severe::dark_secret_extreme</invalidAbilities>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>dark_secret_severe</lookupName>
+    <displayName>Dark Secret - Severe (ATOW)</displayName>
+    <desc><![CDATA[Once every three months 2d6 is rolled, on a roll of 10+ the character's Dark Secret is revealed.
+
+If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+Once the characters' Dark Secret has been revealed, they permanently reduce their Reputation by 4 and Connections by 2.
+
+A severe Dark Secret represents a morally or ethically damning secret that would provoke outrage or condemnation.]]></desc>
+    <xpCost>-400</xpCost>
+    <weight>1</weight>
+    <invalidAbilities>dark_secret_trivial::dark_secret_significant::dark_secret_major::dark_secret_extreme</invalidAbilities>
+    <skillPrereq />
+    </ability>
+    <ability>
+    <lookupName>dark_secret_extreme</lookupName>
+    <displayName>Dark Secret - Extreme (ATOW)</displayName>
+    <desc><![CDATA[Once every three months 2d6 is rolled, on a roll of 10+ the character's Dark Secret is revealed.
+
+If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+Once the characters' Dark Secret has been revealed, they permanently reduce their Reputation by 5 and Connections by 3.
+
+An extreme Dark Secret represents a grave betrayal or atrocity that should lead to exile, imprisonment, or execution if exposed (not modeled in MekHQ).]]></desc>
+    <xpCost>-500</xpCost>
+    <weight>1</weight>
+    <invalidAbilities>dark_secret_trivial::dark_secret_significant::dark_secret_major::dark_secret_severe</invalidAbilities>
     <skillPrereq />
     </ability>
     <ability>
