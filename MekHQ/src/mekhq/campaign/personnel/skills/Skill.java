@@ -41,7 +41,6 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
 import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_LANGUAGES;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
@@ -303,18 +302,12 @@ public class Skill {
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
     public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int spaModifiers = getSPAModifiers(characterOptions, reputation);
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
-
-        boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
-                                            || INTELLIGENCE.equals(type.getSecondAttribute());
-        int literacyModifier = isIntelligenceBased && attributes.isIlliterate()
-                                     ? UNTRAINED_SKILL_MODIFIER : 0;
+        int modifiers = getModifiers(characterOptions, attributes, reputation);
 
         if (isCountUp()) {
-            return min(COUNT_UP_MAX_VALUE, getSkillValue() + spaModifiers + attributeModifiers + literacyModifier);
+            return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
         } else {
-            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - spaModifiers - attributeModifiers - literacyModifier);
+            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - modifiers);
         }
     }
 
@@ -596,12 +589,34 @@ public class Skill {
     public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
         int baseValue = level + bonus + agingModifier;
 
+        int modifiers = getModifiers(characterOptions, attributes, reputation);
+
+        return baseValue + modifiers;
+    }
+
+    /**
+     * Calculates the total modifiers for a character based on their SPA (Special Pilot Abilities), attributes, possible
+     * illiteracy penalty, and reputation.
+     *
+     * @param characterOptions the {@link PersonnelOptions} containing the character's options and SPAs
+     * @param attributes       the {@link Attributes} object representing the character's attributes
+     * @param reputation       the character's reputation value
+     *
+     * @return the sum of SPA modifiers, attribute-based modifiers, and any additional penalty (such as for illiteracy)
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int getModifiers(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
         int spaModifiers = getSPAModifiers(characterOptions, reputation);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
-        int literacyModifier = S_LANGUAGES.equals(type.getName()) && attributes.isIlliterate()
+
+        boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
+                                            || INTELLIGENCE.equals(type.getSecondAttribute());
+        int literacyModifier = isIntelligenceBased && attributes.isIlliterate()
                                      ? UNTRAINED_SKILL_MODIFIER : 0;
 
-        return baseValue + spaModifiers + attributeModifiers + literacyModifier;
+        return spaModifiers + attributeModifiers + literacyModifier;
     }
 
     /**
