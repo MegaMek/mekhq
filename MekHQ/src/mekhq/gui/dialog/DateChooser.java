@@ -743,7 +743,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                       LocalDate.of(2681, 1, 1),
                       LocalDate.of(2725, 1, 1),
                       LocalDate.of(2741, 1, 1),
-                      LocalDate.of(2766, 11, 26));
+                      LocalDate.of(2766, 12, 25));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
             }
             case 2 -> {

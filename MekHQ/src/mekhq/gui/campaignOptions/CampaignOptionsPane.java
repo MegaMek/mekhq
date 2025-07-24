@@ -447,10 +447,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Systems
         systemsTab = new SystemsTab(campaign);
 
-        JTabbedPane systemsContentTabs = createSubTabs(Map.of("reputationTab",
-              systemsTab.createReputationTab(),
-              "factionStanding",
-              systemsTab.createFactionStandingTab()));
+        JTabbedPane systemsContentTabs = createSubTabs(Map.of(
+              "reputationTab", systemsTab.createReputationTab(),
+              "factionStandingTab", systemsTab.createFactionStandingTab(),
+              "atowTab", systemsTab.createATOWTab()));
         systemsTab.loadValuesFromCampaignOptions();
 
         // Rulesets
@@ -529,7 +529,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         rulesetsTab.applyCampaignOptionsToCampaign(options);
 
         boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
-        systemsTab.applyCampaignOptionsToCampaign(options);
+        systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
 
         // Tidy up
         if (preset == null) {
@@ -618,6 +618,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        systemsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        systemsTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
     }
 }

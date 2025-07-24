@@ -60,8 +60,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.UnitEditorDialog;
+import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.common.Entity;
 import megamek.common.IStartingPositions;
 import megamek.common.annotations.Nullable;
@@ -463,7 +463,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 // either from the list of bot units or from the list of player units
                 if (scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
                     associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
-                } else if (scenario.getForces(campaign).getAllUnits(true).contains(uid)) {
+                } else if (scenario.getForces(campaign).getAllUnits(false).contains(uid)) {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 

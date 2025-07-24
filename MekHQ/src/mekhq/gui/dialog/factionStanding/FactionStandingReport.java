@@ -130,8 +130,10 @@ public class FactionStandingReport extends JDialog {
     private final CampaignOptions campaignOptions;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
+    private final List<String> innerSphereMinorFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
     private final List<String> peripheryFactions = new ArrayList<>();
+    private final List<String> deepPeripheryFactions = new ArrayList<>();
     private final List<String> specialFactions = new ArrayList<>();
     private final List<String> deadFactions = new ArrayList<>();
 
@@ -243,8 +245,12 @@ public class FactionStandingReport extends JDialog {
                 specialFactions.add(factionCode);
             } else if (faction.isClan()) {
                 clanFactions.add(factionCode);
+            } else if (faction.isDeepPeriphery()) {
+                deepPeripheryFactions.add(factionCode);
             } else if (faction.isPeriphery()) {
                 peripheryFactions.add(factionCode);
+            } else if (faction.isMinorPower()) {
+                innerSphereMinorFactions.add(factionCode);
             } else {
                 innerSphereFactions.add(factionCode);
             }
@@ -268,8 +274,10 @@ public class FactionStandingReport extends JDialog {
     private void createReportPanel() {
         // Create the tabbed pane
         String innerSphereTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere");
+        String innerSphereMinorTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere.minor");
         String clanTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.clan");
         String peripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.periphery");
+        String deepPeripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.deepPeriphery");
         String specialTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.special");
         String deadTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.dead");
         String disabledTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.disabled");
@@ -278,8 +286,10 @@ public class FactionStandingReport extends JDialog {
         tabbedPane.setName("tabbedPane");
         if (isFactionStandingEnabled) {
             tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
+            tabbedPane.addTab(innerSphereMinorTabTitle, createReportPanelForFactionGroup(innerSphereMinorFactions));
             tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
             tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
+            tabbedPane.addTab(deepPeripheryTabTitle, createReportPanelForFactionGroup(deepPeripheryFactions));
             tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
             tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
         } else {

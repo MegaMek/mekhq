@@ -229,6 +229,7 @@ public class CampaignOptions {
     private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
+    private boolean useCommanderAbilitiesOnly;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -245,8 +246,6 @@ public class CampaignOptions {
     private boolean displayMedicalRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
-    private boolean rewardComingOfAgeAbilities;
-    private boolean rewardComingOfAgeRPSkills;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -339,6 +338,10 @@ public class CampaignOptions {
     private boolean showLifeEventDialogBirths;
     private boolean showLifeEventDialogComingOfAge;
     private boolean showLifeEventDialogCelebrations;
+
+    // Coming of Age
+    private boolean rewardComingOfAgeAbilities;
+    private boolean rewardComingOfAgeRPSkills;
 
     // Marriage
     private boolean useManualMarriages;
@@ -789,6 +792,7 @@ public class CampaignOptions {
         setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
+        setUseCommanderAbilitiesOnly(false);
         setUseEdge(false);
         setUseSupportEdge(false);
         setUseImplants(false);
@@ -1583,6 +1587,14 @@ public class CampaignOptions {
 
     public void setUseAbilities(final boolean useAbilities) {
         this.useAbilities = useAbilities;
+    }
+
+    public boolean isUseCommanderAbilitiesOnly() {
+        return useCommanderAbilitiesOnly;
+    }
+
+    public void setUseCommanderAbilitiesOnly(final boolean useCommanderAbilitiesOnly) {
+        this.useCommanderAbilitiesOnly = useCommanderAbilitiesOnly;
     }
 
     public boolean isUseEdge() {
@@ -5065,6 +5077,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomToughness", isUseRandomToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", isUseArtillery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", isUseAbilities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderAbilitiesOnly", isUseCommanderAbilitiesOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", isUseEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", isUseImplants());
@@ -5887,6 +5900,8 @@ public class CampaignOptions {
                     campaignOptions.setUseArtillery(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useAbilities")) {
                     campaignOptions.setUseAbilities(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useCommanderAbilitiesOnly")) {
+                    campaignOptions.setUseCommanderAbilitiesOnly(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useEdge")) {
                     campaignOptions.setUseEdge(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSupportEdge")) {
