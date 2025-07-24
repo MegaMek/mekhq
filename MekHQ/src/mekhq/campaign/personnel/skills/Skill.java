@@ -37,14 +37,17 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
 import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_LANGUAGES;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -303,10 +306,15 @@ public class Skill {
         int spaModifiers = getSPAModifiers(characterOptions, reputation);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
 
+        boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
+                                            || INTELLIGENCE.equals(type.getSecondAttribute());
+        int literacyModifier = isIntelligenceBased && attributes.isIlliterate()
+                                     ? UNTRAINED_SKILL_MODIFIER : 0;
+
         if (isCountUp()) {
-            return min(COUNT_UP_MAX_VALUE, getSkillValue() + spaModifiers + attributeModifiers);
+            return min(COUNT_UP_MAX_VALUE, getSkillValue() + spaModifiers + attributeModifiers + literacyModifier);
         } else {
-            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - spaModifiers - attributeModifiers);
+            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - spaModifiers - attributeModifiers - literacyModifier);
         }
     }
 
@@ -590,8 +598,10 @@ public class Skill {
 
         int spaModifiers = getSPAModifiers(characterOptions, reputation);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
+        int literacyModifier = S_LANGUAGES.equals(type.getName()) && attributes.isIlliterate()
+                                     ? UNTRAINED_SKILL_MODIFIER : 0;
 
-        return baseValue + spaModifiers + attributeModifiers;
+        return baseValue + spaModifiers + attributeModifiers + literacyModifier;
     }
 
     /**
@@ -611,12 +621,7 @@ public class Skill {
      * @return the complete skill level after all relevant modifiers (excluding reputation) have been applied
      */
     public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
-        int baseValue = level + bonus + agingModifier;
-
-        int spaModifiers = getSPAModifiers(characterOptions, 0);
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
-
-        return baseValue + spaModifiers + attributeModifiers;
+        return getTotalSkillLevel(characterOptions, attributes, 0);
     }
 
     public void improve() {

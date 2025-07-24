@@ -87,6 +87,9 @@ public class Attributes {
     private int willpower;
     private int charisma;
 
+    // We store illiteracy here as it ensures that state is always accessible to skill checks
+    private boolean isIlliterate;
+
     /**
      * The default score assigned to all attributes during initialization.
      */
@@ -132,6 +135,7 @@ public class Attributes {
         intelligence = DEFAULT_ATTRIBUTE_SCORE;
         willpower = DEFAULT_ATTRIBUTE_SCORE;
         charisma = DEFAULT_ATTRIBUTE_SCORE;
+        isIlliterate = false;
     }
 
 
@@ -145,12 +149,13 @@ public class Attributes {
      * @param intelligence The initial value for the intelligence {@link SkillAttribute}.
      * @param willpower    The initial value for the willpower {@link SkillAttribute}.
      * @param charisma     The initial value for the charisma {@link SkillAttribute}.
+     * @param isIlliterate The initial value for the characters' illiteracy
      *
      * @author Illiani
      * @since 0.50.05
      */
     public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
-          int charisma) {
+          int charisma, boolean isIlliterate) {
         this.strength = strength;
         this.body = body;
         this.reflexes = reflexes;
@@ -158,6 +163,7 @@ public class Attributes {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
+        this.isIlliterate = isIlliterate;
     }
 
     /**
@@ -180,6 +186,7 @@ public class Attributes {
         this.intelligence = singleValue;
         this.willpower = singleValue;
         this.charisma = singleValue;
+        isIlliterate = false;
     }
 
     // Getters and Setters
@@ -366,6 +373,14 @@ public class Attributes {
             }
         };
         return cap;
+    }
+
+    public boolean isIlliterate() {
+        return isIlliterate;
+    }
+
+    public void setIlliterate(boolean isIlliterate) {
+        this.isIlliterate = isIlliterate;
     }
 
     /**

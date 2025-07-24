@@ -1459,6 +1459,16 @@ While this SPA does exist in ATOW, these effects are unique to MekHQ.]]></desc>
     <weight>1</weight>
     <skillPrereq />
     </ability>
+    <ability>
+    <lookupName>flaw_illiterate</lookupName>
+    <displayName>Illiterate (ATOW)</displayName>
+    <desc><![CDATA[The character suffers a -4 (untrained) penalty to all Intelligence-based skill checks.
+
+This penalty is removed once the character acquires level 4 in the Language/Any skill. Literacy status is updated daily, so may lag behind actual skill changes.]]></desc>
+    <xpCost>-100</xpCost>
+    <weight>1</weight>
+    <skillPrereq />
+    </ability>
 
     <!-- OTHER SPA -->
     <ability>

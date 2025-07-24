@@ -7458,4 +7458,26 @@ public class Person {
             victims.add(victim);
         }
     }
+
+    /**
+     * Determines whether the character is considered illiterate.
+     *
+     * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
+     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
+     * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
+     *
+     * @return {@code true} if the person is considered illiterate; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isIlliterate() {
+        if (!options.booleanOption(FLAW_ILLITERATE)) {
+            return false;
+        }
+
+        Skill languages = skills.getSkill(S_LANGUAGES);
+        int level = languages.getLevel();
+        return level < ILLITERACY_LANGUAGES_THRESHOLD;
+    }
 }
