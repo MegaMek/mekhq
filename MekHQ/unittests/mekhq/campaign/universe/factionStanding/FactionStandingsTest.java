@@ -93,7 +93,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
 
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.updateClimateRegard(campaignFaction, today);
+        factionStandings.updateClimateRegard(campaignFaction, today, 1.0);
 
         // Act
         double actualRegard = factionStandings.getRegardForFaction(targetFaction, true);
@@ -122,7 +122,7 @@ class FactionStandingsTest {
         factionStandings.setRegardForFaction(null, "FS", initialRegard, 3025, false);
 
         // Act
-        factionStandings.processRegardDegradation("FS", 3025);
+        factionStandings.processRegardDegradation("FS", 3025, 1.0);
 
         // Assert
         double actualRegard = factionStandings.getRegardForFaction("FS", false);
@@ -158,7 +158,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3050, 1, 1);
 
         // Act
-        factionStandings.processContractAccept("FS", enemyFaction, today);
+        factionStandings.processContractAccept("FS", enemyFaction, today, 1.0);
 
         // Assert
         assertEquals(primaryStart + expectedPrimaryDelta,
@@ -198,7 +198,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20);
 
         // Act
-        factionStandings.processContractCompletion(factions.getDefaultFaction(), employerFaction, today, status);
+        factionStandings.processContractCompletion(factions.getDefaultFaction(), employerFaction, today, status, 1.0);
 
         // Assert
         assertEquals(startingFsRegard + expectedFsDelta,
@@ -215,7 +215,7 @@ class FactionStandingsTest {
         factionStandings.setRegardForFaction(null, "CW", 10.0, gameYear, false); // Clan Wolf with regard 10.0
 
         // Act
-        List<String> reports = factionStandings.processRefusedBatchall("FS", "CW", gameYear);
+        List<String> reports = factionStandings.processRefusedBatchall("FS", "CW", gameYear, 1.0);
 
         // Assert
         assertEquals(1, reports.size(), "Reports size mismatch");
@@ -257,7 +257,7 @@ class FactionStandingsTest {
         List<Person> prisoners = List.of(federatedSunsPrisoner, capellanPrisoner, capellanPrisoner, comStarPrisoner);
 
         // Act
-        List<String> reports = factionStandings.executePrisonersOfWar("FS", prisoners, 3025);
+        List<String> reports = factionStandings.executePrisonersOfWar("FS", prisoners, 3025, 1.0);
 
         // Assert
         assertEquals(3, reports.size(), "Reports size mismatch");

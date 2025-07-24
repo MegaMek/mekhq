@@ -555,6 +555,18 @@ public class SimulateMissionDialog extends JDialog {
     }
 
     /**
+     * Use
+     * {@link #handleFactionRegardUpdates(Faction, Faction, Faction, MissionStatus, LocalDate, FactionStandings,
+     * double)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
+          @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
+          final LocalDate today, final FactionStandings factionStandings) {
+        return handleFactionRegardUpdates(campaignFaction, employer, enemy, status, today, factionStandings, 1.0);
+    }
+
+    /**
      * Calculates and describes updates to faction regard values in response to mission simulation parameters, for
      * both employer and enemy.
      *
@@ -564,6 +576,7 @@ public class SimulateMissionDialog extends JDialog {
      * @param status          the mission status applied to the simulation
      * @param today           the current date of the simulation
      * @param factionStandings the {@link FactionStandings} object holding all faction Regard data
+     * @param regardMultiplier the regard multiplier set in campaign options
      * @return a list of strings detailing each regard update performed as a result
      *
      * @author Illiani
@@ -571,17 +584,22 @@ public class SimulateMissionDialog extends JDialog {
      */
     public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
           @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
-          final LocalDate today, final FactionStandings factionStandings) {
+          final LocalDate today, final FactionStandings factionStandings, final double regardMultiplier) {
         List<String> reports = new ArrayList<>();
         if (enemy != null) { // Null means the faction isn't tracked
-            String report = factionStandings.processContractAccept(campaignFaction.getShortName(), enemy, today);
+            String report = factionStandings.processContractAccept(campaignFaction.getShortName(), enemy, today,
+                  regardMultiplier);
             if (report != null) {
                 reports.add(report);
             }
         }
 
         if (employer != null) {
-            reports.addAll(factionStandings.processContractCompletion(campaignFaction, employer, today, status));
+            reports.addAll(factionStandings.processContractCompletion(campaignFaction,
+                  employer,
+                  today,
+                  status,
+                  regardMultiplier));
         }
 
         return reports;

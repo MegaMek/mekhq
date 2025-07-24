@@ -617,7 +617,7 @@ public class ContractMarketDialog extends JDialog {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String standingsReport =
                           factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemy,
-                                campaign.getLocalDate());
+                                campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier());
 
                     if (standingsReport != null) {
                         campaign.addReport(standingsReport);

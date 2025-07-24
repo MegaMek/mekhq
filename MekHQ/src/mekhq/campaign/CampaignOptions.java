@@ -661,6 +661,7 @@ public class CampaignOptions {
     private boolean useFactionStandingUnitMarket;
     private boolean useFactionStandingContractPay;
     private boolean useFactionStandingSupportPoints;
+    private double regardMultiplier;
     //endregion Faction Standing
     // endregion Variable Declarations
 
@@ -1295,6 +1296,7 @@ public class CampaignOptions {
         useFactionStandingUnitMarket = true;
         useFactionStandingContractPay = true;
         useFactionStandingSupportPoints = true;
+        regardMultiplier = 1.0;
         // endregion Against the Bot Tab
     }
     // endregion Constructors
@@ -5581,6 +5583,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingUnitMarket", useFactionStandingUnitMarket);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingContractPay", useFactionStandingContractPay);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingSupportPoints", useFactionStandingSupportPoints);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionStandingGainMultiplier", regardMultiplier);
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
@@ -6677,6 +6680,8 @@ public class CampaignOptions {
                     campaignOptions.setUseFactionStandingContractPay(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFactionStandingSupportPoints")) {
                     campaignOptions.setUseFactionStandingSupportPoints(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("factionStandingGainMultiplier")) {
+                    campaignOptions.setRegardMultiplier(MathUtility.parseDouble(nodeContents, 1.0));
 
                     // region Legacy
                     // Removed in 0.49.*
@@ -7203,6 +7208,14 @@ public class CampaignOptions {
 
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
+    }
+
+    public double getRegardMultiplier() {
+        return regardMultiplier;
+    }
+
+    public void setRegardMultiplier(double regardMultiplier) {
+        this.regardMultiplier = regardMultiplier;
     }
     
     public boolean isAutoGenerateOpForCallsigns() {
