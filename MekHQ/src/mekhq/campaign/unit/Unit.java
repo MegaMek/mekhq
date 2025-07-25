@@ -5003,7 +5003,7 @@ public class Unit implements ITechnology {
                 int nCrew = 0;
                 int sumTechSkill = 0;
                 int sumTechBonus = 0;
-                int sumAdminSkill = 0;
+                int sumAdminSkill = -1; // Unskilled
                 int sumAdminBonus = 0;
                 int sumEdge = 0;
                 int sumEdgeUsed = 0;
@@ -5070,7 +5070,9 @@ public class Unit implements ITechnology {
                         engineer.setRank(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumTechSkill / nCrew, sumTechBonus / nCrew);
-                    engineer.addSkill(SkillType.S_ADMIN, sumAdminSkill / nCrew, sumAdminBonus / nCrew);
+                    if (sumAdminSkill > -1) {
+                        engineer.addSkill(SkillType.S_ADMIN, sumAdminSkill / nCrew, sumAdminBonus / nCrew);
+                    }
                     engineer.setEdgeUsed(sumEdgeUsed);
                     engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
                     engineer.setUnit(this);
