@@ -1173,7 +1173,7 @@ public class FactionStandings {
             regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
         }
 
-        int durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1);
+        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
         regardDelta *= durationMultiplier;
 
         return changeRegardForFaction(campaignFactionCode, enemyFaction.getShortName(), regardDelta, gameYear,
@@ -1225,7 +1225,7 @@ public class FactionStandings {
             default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
         };
 
-        int durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1);
+        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
         regardDeltaEmployer *= durationMultiplier;
 
         List<String> regardChangeReports = new ArrayList<>();
