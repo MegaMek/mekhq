@@ -1571,6 +1571,17 @@ public class Campaign implements ITechManager {
         return false;
     }
 
+    /**
+     * Retrieves a list of {@link AtBContract} objects that have a start date after the current day.
+     *
+     * @return a list of future AtBContract objects whose start date is after the current day
+     */
+    public List<AtBContract> getFutureAtBContracts() {
+        return getAtBContracts().stream()
+                     .filter(c -> c.getStartDate().isAfter(currentDay))
+                     .collect(Collectors.toList());
+    }
+
     public List<AtBContract> getActiveAtBContracts() {
         return getActiveAtBContracts(false);
     }
@@ -7682,7 +7693,9 @@ public class Campaign implements ITechManager {
 
             boolean isUseCommandCircuits =
                   FactionStandingUtilities.isUseCommandCircuit(isOverridingCommandCircuitRequirements, gmMode,
-                  campaignOptions.isUseFactionStandingCommandCircuitSafe(), factionStandings, getActiveAtBContracts());
+                        campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+                        factionStandings,
+                        getFutureAtBContracts());
 
             // Get current node's information
             double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate(), isUseCommandCircuits);

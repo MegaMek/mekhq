@@ -495,7 +495,7 @@ public class Contract extends Mission {
                   FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+                        campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
             JumpPath jumpPath = getJumpPath(campaign);
             double days = Math.round(jumpPath.getTotalTime(campaign.getLocalDate(),
@@ -730,7 +730,7 @@ public class Contract extends Mission {
                   FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+                        campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
             int days = (int) Math.ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
                   campaign.getLocation().getTransitTime(), isUseCommandCircuit));
