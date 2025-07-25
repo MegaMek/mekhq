@@ -51,21 +51,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -86,13 +77,11 @@ import mekhq.gui.dialog.glossary.NewGlossaryDialog;
  * @since 0.50.07
  */
 public class SimulateMissionDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(SimulateMissionDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(400);
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
     public final static int UNTRACKED_FACTION_INDEX = 0;
 
     private ImageIcon campaignIcon;
@@ -105,6 +94,8 @@ public class SimulateMissionDialog extends JDialog {
     private MMComboBox<String> comboEmployerFaction;
     private Faction enemyChoice = null;
     private MMComboBox<String> comboEnemyFaction;
+    private JSpinner spnDuration;
+    private int durationChoice = 1;
 
     private final List<MissionStatus> allStatuses = new ArrayList<>();
     private MMComboBox<String> comboMissionStatus = null;
@@ -188,6 +179,30 @@ public class SimulateMissionDialog extends JDialog {
      */
     public @Nullable MissionStatus getStatusChoice() {
         return statusChoice;
+    }
+
+    /**
+     * Retrieves the duration choice selected in the simulation dialog.
+     *
+     * @return the duration choice as an {@link Integer} value.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getDurationChoice() {
+        return durationChoice;
+    }
+
+    /**
+     * Sets the duration choice for the mission simulation dialog.
+     *
+     * @param durationChoice the duration choice to be set, represented as an {@link Integer}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setDurationChoice(int durationChoice) {
+        this.durationChoice = durationChoice;
     }
 
     /**
@@ -422,6 +437,17 @@ public class SimulateMissionDialog extends JDialog {
             pnlFactions.add(comboMissionStatus, gbc);
         }
 
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        JLabel lblDuration = new JLabel(getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.label.duration"));
+        pnlFactions.add(lblDuration, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        spnDuration = new JSpinner(new SpinnerNumberModel(durationChoice, 1, 120, 1));
+        pnlFactions.add(spnDuration, gbc);
+
         return pnlFactions;
     }
 
@@ -513,6 +539,8 @@ public class SimulateMissionDialog extends JDialog {
                 statusChoice = allStatuses.get(missionStatusChoiceIndex);
             }
 
+            durationChoice = (int) spnDuration.getValue();
+
             boolean wasUpdated = false;
             if (enemyChoice != null) {
                 wasUpdated = true;
@@ -562,13 +590,13 @@ public class SimulateMissionDialog extends JDialog {
     /**
      * Use
      * {@link #handleFactionRegardUpdates(Faction, Faction, Faction, MissionStatus, LocalDate, FactionStandings,
-     * double)} instead
+     * double, int)} instead
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
           @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
           final LocalDate today, final FactionStandings factionStandings) {
-        return handleFactionRegardUpdates(campaignFaction, employer, enemy, status, today, factionStandings, 1.0);
+        return handleFactionRegardUpdates(campaignFaction, employer, enemy, status, today, factionStandings, 1.0, 1);
     }
 
     /**
@@ -582,6 +610,7 @@ public class SimulateMissionDialog extends JDialog {
      * @param today           the current date of the simulation
      * @param factionStandings the {@link FactionStandings} object holding all faction Regard data
      * @param regardMultiplier the regard multiplier set in campaign options
+     * @param contractDuration how many months the contract or mission lasted
      * @return a list of strings detailing each regard update performed as a result
      *
      * @author Illiani
@@ -589,11 +618,12 @@ public class SimulateMissionDialog extends JDialog {
      */
     public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
           @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
-          final LocalDate today, final FactionStandings factionStandings, final double regardMultiplier) {
+          final LocalDate today, final FactionStandings factionStandings, final double regardMultiplier,
+          final int contractDuration) {
         List<String> reports = new ArrayList<>();
         if (enemy != null) { // Null means the faction isn't tracked
             String report = factionStandings.processContractAccept(campaignFaction.getShortName(), enemy, today,
-                  regardMultiplier);
+                  regardMultiplier, contractDuration);
             if (report != null) {
                 reports.add(report);
             }
@@ -604,7 +634,8 @@ public class SimulateMissionDialog extends JDialog {
                   employer,
                   today,
                   status,
-                  regardMultiplier));
+                  regardMultiplier,
+                  contractDuration));
         }
 
         return reports;
