@@ -64,7 +64,8 @@ public enum DocumentationEntry {
     UNIT_MARKETS("UNIT_MARKETS", "StratCon/Unit Markets"),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "MegaMek -MekHQ Chaos Campaign Guide"),
     COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide");
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide"),
+    RECRUITMENT("RECRUITMENT", "Personnel Modules/Recruitment");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 

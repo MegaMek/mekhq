@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.markets.personnelMarket;
 
+import static java.lang.Math.min;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
@@ -72,7 +73,9 @@ import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -215,6 +218,16 @@ public class PersonnelMarketDialog extends JDialog {
         dispose();
     }
 
+    private void documentationAction() {
+        DocumentationEntry documentationEntry = DocumentationEntry.RECRUITMENT;
+
+        try {
+            new NewDocumentationEntryDialog(this, documentationEntry);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to open PDF", ex);
+        }
+    }
+
 
     /**
      * Creates and returns the header panel for the personnel market dialog.
@@ -275,7 +288,7 @@ public class PersonnelMarketDialog extends JDialog {
         int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
-        int recruitmentSliderCurrent = market.getRecruitmentRolls();
+        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
         JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
         personnelAvailabilitySlider.setEnabled(false);
         rightPanel.add(personnelAvailabilitySlider, rightGbc);
@@ -347,6 +360,10 @@ public class PersonnelMarketDialog extends JDialog {
         boolean isGM = campaign.isGM();
 
         JPanel buttonPanel = new JPanel();
+        JButton documentationButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.documentation"));
+        documentationButton.addActionListener(e -> documentationAction());
+        buttonPanel.add(documentationButton);
+
         JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
         closeButton.addActionListener(e -> closeAction());
         buttonPanel.add(closeButton);

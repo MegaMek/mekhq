@@ -47,7 +47,6 @@ import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
@@ -6292,30 +6291,22 @@ public class Campaign implements ITechManager {
             personnelMarket.generatePersonnelForDay(this);
         } else {
             if (currentDay.getDayOfMonth() == 1) {
-                boolean blockRecruitment = false;
+                newPersonnelMarket.gatherApplications();
 
-                if (newPersonnelMarket.getAssociatedPersonnelMarketStyle() == MEKHQ) {
-                    blockRecruitment = !location.isOnPlanet();
-                }
+                if (newPersonnelMarket.getHasRarePersonnel()) {
+                    ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
+                          getSeniorAdminPerson(AdministratorSpecialization.HR),
+                          null,
+                          resources.getString("personnelMarket.rareProfession.inCharacter"),
+                          List.of(resources.getString("personnelMarket.rareProfession.button.later"),
+                                resources.getString("personnelMarket.rareProfession.button.decline"),
+                                resources.getString("personnelMarket.rareProfession.button.immediate")),
+                          resources.getString("personnelMarket.rareProfession.outOfCharacter"),
+                          null,
+                          true);
 
-                if (!blockRecruitment) {
-                    newPersonnelMarket.gatherApplications();
-
-                    if (newPersonnelMarket.getHasRarePersonnel()) {
-                        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
-                              getSeniorAdminPerson(AdministratorSpecialization.HR),
-                              null,
-                              resources.getString("personnelMarket.rareProfession.inCharacter"),
-                              List.of(resources.getString("personnelMarket.rareProfession.button.later"),
-                                    resources.getString("personnelMarket.rareProfession.button.decline"),
-                                    resources.getString("personnelMarket.rareProfession.button.immediate")),
-                              resources.getString("personnelMarket.rareProfession.outOfCharacter"),
-                              null,
-                              true);
-
-                        if (dialog.getDialogChoice() == 2) {
-                            newPersonnelMarket.showPersonnelMarketDialog();
-                        }
+                    if (dialog.getDialogChoice() == 2) {
+                        newPersonnelMarket.showPersonnelMarketDialog();
                     }
                 }
             }

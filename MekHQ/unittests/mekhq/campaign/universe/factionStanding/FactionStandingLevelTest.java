@@ -202,9 +202,9 @@ class FactionStandingLevelTest {
 
     @Test
     void test_recruitmentRollsAlwaysImprove() {
-        int lastRolls = STANDING_LEVEL_0.getRecruitmentRollsModifier();
+        double lastRolls = STANDING_LEVEL_0.getRecruitmentRollsModifier();
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
-            int currentRolls = standingLevel.getRecruitmentRollsModifier();
+            double currentRolls = standingLevel.getRecruitmentRollsModifier();
             assertTrue(currentRolls >= lastRolls,
                     "The recruitment roll modifier for " +
                             standingLevel.name() +

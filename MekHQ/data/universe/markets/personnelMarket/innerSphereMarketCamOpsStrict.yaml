@@ -47,13 +47,6 @@
   extinctionYear: -1
   fallbackProfession: SOLDIER
 
-- weight: 1389
-  profession: SOLDIER
-  count: 25
-  introductionYear: 0
-  extinctionYear: -1
-  fallbackProfession: DEPENDENT
-
 - weight: 2778
   profession: SOLDIER
   count: 25
