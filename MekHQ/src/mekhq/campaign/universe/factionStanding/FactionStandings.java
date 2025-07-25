@@ -233,6 +233,15 @@ public class FactionStandings {
     static final double REGARD_DELTA_REFUSE_BATCHALL = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 2;
 
     /**
+     * The multiplier applied to climate regard for pirate campaigns.
+     */
+    static final int PIRATE_CLIMATE_REGARD_ADJUSTMENT_NORMAL = 10;
+    /**
+     * The multiplier applied to the climate regard for pirate campaigns from Clan factions
+     */
+    static final int PIRATE_CLIMATE_REGARD_ADJUSTMENT_CLAN = 5;
+
+    /**
      * Regard penalty for refusing a batchall.
      */
     static final double REGARD_DELTA_EXECUTING_PRISONER = -0.1;
@@ -864,9 +873,14 @@ public class FactionStandings {
             if (isPirate) {
                 if (otherFaction.isClan()) {
                     climateRegard.put(otherFactionCode,
-                          (REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * regardMultiplier * 10));
+                          (REGARD_DELTA_CONTRACT_BREACH_EMPLOYER *
+                                 regardMultiplier *
+                                 PIRATE_CLIMATE_REGARD_ADJUSTMENT_CLAN));
                 } else {
-                    climateRegard.put(otherFactionCode, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * regardMultiplier * 10);
+                    climateRegard.put(otherFactionCode,
+                          REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER *
+                                regardMultiplier *
+                                PIRATE_CLIMATE_REGARD_ADJUSTMENT_NORMAL);
                 }
             }
         }
