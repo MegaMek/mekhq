@@ -87,7 +87,7 @@ public class NewPersonnelMarket {
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
     @SuppressWarnings(value = "FieldCanBeLocal")
-    private static int RARE_PROFESSION_WEIGHT = 20;
+    private static int RARE_PROFESSION_WEIGHT = 100000;
     private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
     private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")

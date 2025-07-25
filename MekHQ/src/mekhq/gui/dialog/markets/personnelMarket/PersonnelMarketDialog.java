@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.markets.personnelMarket;
 
+import static java.lang.Math.min;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
@@ -287,7 +288,7 @@ public class PersonnelMarketDialog extends JDialog {
         int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
-        int recruitmentSliderCurrent = market.getRecruitmentRolls();
+        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
         JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
         personnelAvailabilitySlider.setEnabled(false);
         rightPanel.add(personnelAvailabilitySlider, rightGbc);
