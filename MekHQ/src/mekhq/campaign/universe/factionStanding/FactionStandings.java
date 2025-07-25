@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -245,6 +246,11 @@ public class FactionStandings {
      * Regard penalty for refusing a batchall.
      */
     static final double REGARD_DELTA_EXECUTING_PRISONER = -0.1;
+
+    /**
+     * How much we should divide contract duration by when determining Duration Multiplier
+     */
+    static final int CONTRACT_DURATION_LENGTH_DIVISOR = 6;
 
     /**
      * A mapping of faction names to their respective standing levels.
@@ -1133,11 +1139,11 @@ public class FactionStandings {
         return regardChangeReports;
     }
 
-    /** Use {@link #processContractAccept(String, Faction, LocalDate, double)} instead */
+    /** Use {@link #processContractAccept(String, Faction, LocalDate, double, int)} instead */
     @Deprecated(since = "0.50.08", forRemoval = true)
     public @Nullable String processContractAccept(@Nullable final String campaignFactionCode,
           @Nullable final Faction enemyFaction, final LocalDate today) {
-        return processContractAccept(campaignFactionCode, enemyFaction, today, 1.0);
+        return processContractAccept(campaignFactionCode, enemyFaction, today, 1.0, 1);
     }
 
     /**
@@ -1153,6 +1159,7 @@ public class FactionStandings {
      * @param enemyFaction the {@link Faction} representing the targeted enemy against whom the contract is accepted
      * @param today the current in-game date of contract acceptance
      * @param regardMultiplier the regard multiplier assigned in campaign options
+     * @param contractDuration how many months the contract is estimated to last
      * @return a summary {@link String} describing the regard changes applied, or the result from
      * {@link #getMissingFactionReport()} if the enemy is missing, or {@code null} if the enemy faction is an aggregate
      *
@@ -1160,7 +1167,8 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public @Nullable String processContractAccept(@Nullable final String campaignFactionCode,
-          @Nullable final Faction enemyFaction, final LocalDate today, final double regardMultiplier) {
+          @Nullable final Faction enemyFaction, final LocalDate today, final double regardMultiplier,
+          final int contractDuration) {
         // If we're missing the relevant faction, alert the player and abort
         if (enemyFaction == null) {
             return getMissingFactionReport();
@@ -1179,15 +1187,18 @@ public class FactionStandings {
             regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
         }
 
+        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        regardDelta *= durationMultiplier;
+
         return changeRegardForFaction(campaignFactionCode, enemyFaction.getShortName(), regardDelta, gameYear,
               regardMultiplier);
     }
 
-    /** Use {@link #processContractCompletion(Faction, Faction, LocalDate, MissionStatus, double)} instead. */
+    /** Use {@link #processContractCompletion(Faction, Faction, LocalDate, MissionStatus, double, int)} instead. */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public List<String> processContractCompletion(@Nullable final Faction campaignFaction,
           @Nullable final Faction employerFaction, final LocalDate today, final MissionStatus missionStatus) {
-        return processContractCompletion(campaignFaction, employerFaction, today, missionStatus, 1.0);
+        return processContractCompletion(campaignFaction, employerFaction, today, missionStatus, 1.0, 1);
     }
 
     /**
@@ -1207,13 +1218,14 @@ public class FactionStandings {
      * @param today           The {@link LocalDate} representing the date of contract completion.
      * @param missionStatus   The {@link MissionStatus} of the contract upon completion.
      * @param regardMultiplier  The regard gain multiplier set in campaign options
+     * @param contractDuration how many months the contract is estimated to last
      * @return A {@link List} of strings summarizing any regard changes or messages relating to missing factions.
      * @author Illiani
      * @since 0.50.07
      */
     public List<String> processContractCompletion(@Nullable final Faction campaignFaction,
           @Nullable final Faction employerFaction, final LocalDate today, final MissionStatus missionStatus,
-          final double regardMultiplier) {
+          final double regardMultiplier, final int contractDuration) {
         // If the mission is still active, there is nothing to process, so abort
         if (missionStatus == MissionStatus.ACTIVE) {
             return new ArrayList<>();
@@ -1226,6 +1238,9 @@ public class FactionStandings {
             case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
             default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
         };
+
+        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        regardDeltaEmployer *= durationMultiplier;
 
         List<String> regardChangeReports = new ArrayList<>();
 
@@ -1638,17 +1653,19 @@ public class FactionStandings {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
+                    int contractLength = atbContract.getLength();
                     String report = processContractAccept(campaignFactionCode,
                           atbContract.getEnemy(),
                           today,
-                          regardMultiplier);
+                          regardMultiplier,
+                          contractLength);
                     if (report != null) {
                         reports.add(report);
                     }
 
                     if (missionStatus != MissionStatus.ACTIVE) {
                         reports.addAll(processContractCompletion(campaignFaction, atbContract.getEmployerFaction(),
-                              today, missionStatus, regardMultiplier));
+                              today, missionStatus, regardMultiplier, contractLength));
                     }
                 } else {
                     // Non-AtB missions have their Standings updated when the contract concludes
@@ -1658,14 +1675,16 @@ public class FactionStandings {
                               campaignFaction,
                               today,
                               missionStatus,
-                              mission.getName());
+                              mission.getName(),
+                              mission.getLength());
 
                         Faction employerChoice = dialog.getEmployerChoice();
                         Faction enemyChoice = dialog.getEnemyChoice();
                         MissionStatus statusChoice = dialog.getStatusChoice();
+                        int contractLength = dialog.getDurationChoice();
 
                         reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice,
-                              enemyChoice, statusChoice, today, this, regardMultiplier));
+                              enemyChoice, statusChoice, today, this, regardMultiplier, contractLength));
                     }
                 }
             }

@@ -655,7 +655,7 @@ public class AtBContract extends Contract {
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
                 String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
-                      regardMultiplier);
+                      regardMultiplier, getLength());
                 if (report != null) {
                     campaign.addReport(report);
                 }

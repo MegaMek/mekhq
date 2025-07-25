@@ -80,6 +80,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
+import megamek.utilities.FastJScrollPane;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
@@ -128,7 +129,6 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -251,7 +251,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
 
-        scrollMissionView = new JScrollPaneWithSpeed();
+        scrollMissionView = new FastJScrollPane();
         scrollMissionView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
@@ -343,7 +343,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnClearAssignedUnits.setEnabled(false);
         panScenarioButtons.add(btnClearAssignedUnits);
 
-        scrollScenarioView = new JScrollPaneWithSpeed();
+        scrollScenarioView = new FastJScrollPane();
         scrollScenarioView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollScenarioView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
@@ -357,7 +357,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         /* ATB */
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new JScrollPaneWithSpeed(panLanceAssignment);
+        JScrollPane paneLanceDeployment = new FastJScrollPane(panLanceAssignment);
         paneLanceDeployment.setBorder(null);
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
@@ -549,16 +549,17 @@ public final class BriefingTab extends CampaignGuiTab {
             if (mission instanceof AtBContract contract) {
                 Faction employer = contract.getEmployerFaction();
                 reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
-                      status, regardMultiplier);
+                      status, regardMultiplier, contract.getLength());
             } else {
                 SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
 
                 Faction employerChoice = dialog.getEmployerChoice();
                 Faction enemyChoice = dialog.getEnemyChoice();
                 MissionStatus statusChoice = dialog.getStatusChoice();
+                int durationChoice = dialog.getDurationChoice();
 
                 reports.addAll(handleFactionRegardUpdates(getCampaign().getFaction(), employerChoice, enemyChoice,
-                      statusChoice, today, factionStandings, regardMultiplier));
+                      statusChoice, today, factionStandings, regardMultiplier, durationChoice));
             }
 
             for (String report : reports) {
@@ -640,7 +641,8 @@ public final class BriefingTab extends CampaignGuiTab {
               getCampaign().getFaction(),
               startDate,
               status,
-              mission.getName());
+              mission.getName(),
+              mission.getLength());
     }
 
     /**

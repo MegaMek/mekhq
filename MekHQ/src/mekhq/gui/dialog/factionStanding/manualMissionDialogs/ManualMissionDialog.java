@@ -64,9 +64,11 @@ public class ManualMissionDialog extends SimulateMissionDialog {
      * @since 0.50.07
      */
     public ManualMissionDialog(JFrame parent, ImageIcon campaignIcon, Faction campaignFaction, LocalDate today,
-          MissionStatus missionStatus, String missionName) {
+          MissionStatus missionStatus, String missionName, int length) {
         super(campaignIcon, campaignFaction, today, missionStatus);
         this.missionName = missionName;
+
+        setDurationChoice(length);
 
         populateFactionsList();
         populateStatusList();

@@ -158,7 +158,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3050, 1, 1);
 
         // Act
-        factionStandings.processContractAccept("FS", enemyFaction, today, 1.0);
+        factionStandings.processContractAccept("FS", enemyFaction, today, 1.0, 1);
 
         // Assert
         assertEquals(primaryStart + expectedPrimaryDelta,
@@ -198,7 +198,8 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20);
 
         // Act
-        factionStandings.processContractCompletion(factions.getDefaultFaction(), employerFaction, today, status, 1.0);
+        factionStandings.processContractCompletion(factions.getDefaultFaction(), employerFaction, today, status, 1.0,
+              1);
 
         // Assert
         assertEquals(startingFsRegard + expectedFsDelta,
