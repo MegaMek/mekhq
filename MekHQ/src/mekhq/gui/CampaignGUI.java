@@ -1179,7 +1179,7 @@ public class CampaignGUI extends JPanel {
         boolean isUseCommandCircuit =
               FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
+                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
         lblLocation = new JLabel(getCampaign().getLocation()
                                        .getReport(getCampaign().getLocalDate(),
@@ -2745,7 +2745,7 @@ public class CampaignGUI extends JPanel {
         boolean isUseCommandCircuit =
               FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
+                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
         lblLocation.setText(getCampaign().getLocation()
                                   .getReport(getCampaign().getLocalDate(),

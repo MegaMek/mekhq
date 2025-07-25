@@ -256,7 +256,7 @@ public class CurrentLocation {
     public boolean isRecharging(Campaign campaign) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         return currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit) > 0;
     }
@@ -269,7 +269,7 @@ public class CurrentLocation {
     public void setRecharged(Campaign campaign) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit);
     }
@@ -282,7 +282,7 @@ public class CurrentLocation {
 
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         // recharge even if there is no jump path
         // because JumpShips don't go anywhere
