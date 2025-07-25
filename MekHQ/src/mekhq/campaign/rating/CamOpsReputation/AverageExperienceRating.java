@@ -133,6 +133,7 @@ public class AverageExperienceRating {
             }
             Force force = campaign.getForce(forceId);
             if (force == null) {
+                logger.warn("Force returned null for forceId {}", forceId);
                 continue;
             }
 
