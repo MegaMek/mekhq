@@ -33,6 +33,7 @@
 package mekhq.campaign.rating.CamOpsReputation;
 
 import static java.lang.Math.max;
+import static megamek.common.force.Force.NO_FORCE;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
@@ -43,6 +44,8 @@ import megamek.common.ProtoMek;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
@@ -120,6 +123,21 @@ public class AverageExperienceRating {
 
             // if the person does not belong to a unit, then skip this person
             if (unit == null) {
+                continue;
+            }
+
+            // If the unit does not belong to a force, skip it
+            int forceId = unit.getForceId();
+            if (forceId == NO_FORCE) {
+                continue;
+            }
+            Force force = campaign.getForce(forceId);
+            if (force == null) {
+                continue;
+            }
+
+            // If the unit does not belong to a standard force, skip it
+            if (!force.isForceType(ForceType.STANDARD)) {
                 continue;
             }
 
