@@ -234,7 +234,7 @@ public class Mission {
     /**
      * Returns the contract length in months.
      *
-     * @return the number and corresponding length of the contact in months as an integer
+     * @return the number and corresponding length of the contract in months as an integer
      */
     public int getLength() {
         // Missions don't have durations, so we treat it as always being 1 month long. This only really matters for

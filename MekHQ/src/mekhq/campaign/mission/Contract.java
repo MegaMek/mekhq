@@ -152,7 +152,7 @@ public class Contract extends Mission {
     /**
      * Returns the contract length in months.
      *
-     * @return the number and corresponding length of the contact in months as an integer
+     * @return the number and corresponding length of the contract in months as an integer
     */
     public int getLength() {
         return nMonths;
