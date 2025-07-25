@@ -864,7 +864,7 @@ public class FactionStandings {
             if (isPirate) {
                 if (otherFaction.isClan()) {
                     climateRegard.put(otherFactionCode,
-                          (REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * regardMultiplier * 10));
+                          (REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * regardMultiplier * 5));
                 } else {
                     climateRegard.put(otherFactionCode, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * regardMultiplier * 10);
                 }
