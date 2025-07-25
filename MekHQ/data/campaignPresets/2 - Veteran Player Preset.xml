@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaignPreset version="0.50.06">
+<campaignPreset version="0.50.07">
     <title>2 - Veteran Player Preset</title>
     <description><![CDATA[This preset offers the full MekHQ experience, with nearly all options enabled and balanced for a long-lasting campaign.
 <br>
@@ -9,6 +9,12 @@
     <date>3151-01-01</date>
     <contractCount>2</contractCount>
     <gm>false</gm>
+    <gameOptions>
+    <gameOption>
+    <name>allow_illegal_units</name>
+    <value>true</value>
+    </gameOption>
+    </gameOptions>
     <campaignOptions>
         <manualUnitRatingModifier>0</manualUnitRatingModifier>
         <clampReputationPayMultiplier>true</clampReputationPayMultiplier>
@@ -28,90 +34,126 @@
         <mrmsOptions>
             <mrmsOption>
                 <type>ARMOUR</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>AMMUNITION</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>WEAPON</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL_LOCATION</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ENGINE</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GYRO</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ACTUATOR</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ELECTRONICS</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
+                <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>HEAT_SINK</type>
+            <active>0</active>
+            <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
+            <targetNumberPreferred>4</targetNumberPreferred>
+            <targetNumberMax>6</targetNumberMax>
+            <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>MEK_LOCATION</type>
+            <active>0</active>
+            <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
+            <targetNumberPreferred>4</targetNumberPreferred>
+            <targetNumberMax>6</targetNumberMax>
+            <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>PHYSICAL_WEAPON</type>
+            <active>0</active>
+                <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>POD_SPACE</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
+                <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>UNKNOWN_LOCATION</type>
+            <active>0</active>
+                <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
@@ -169,7 +211,7 @@
         <warShipContractPercent>0.0</warShipContractPercent>
         <equipmentContractBase>true</equipmentContractBase>
         <equipmentContractSaleValue>true</equipmentContractSaleValue>
-        <blcSaleValue>false</blcSaleValue>
+        <blcSaleValue>true</blcSaleValue>
         <overageRepaymentInFinalPayment>true</overageRepaymentInFinalPayment>
         <clanAcquisitionPenalty>0</clanAcquisitionPenalty>
         <isAcquisitionPenalty>0</isAcquisitionPenalty>
@@ -195,6 +237,7 @@
         <autoLogisticsActuators>100</autoLogisticsActuators>
         <autoLogisticsJumpJets>50</autoLogisticsJumpJets>
         <autoLogisticsEngines>0</autoLogisticsEngines>
+        <autoLogisticsWeapons>50</autoLogisticsWeapons>
         <autoLogisticsOther>0</autoLogisticsOther>
         <useTactics>false</useTactics>
         <useInitiativeBonus>false</useInitiativeBonus>
@@ -202,6 +245,7 @@
         <useRandomToughness>true</useRandomToughness>
         <useArtillery>false</useArtillery>
         <useAbilities>true</useAbilities>
+        <useCommanderAbilitiesOnly>true</useCommanderAbilitiesOnly>
         <useEdge>true</useEdge>
         <useSupportEdge>true</useSupportEdge>
         <useImplants>true</useImplants>
@@ -219,6 +263,7 @@
         <displayAssignmentRecord>false</displayAssignmentRecord>
         <displayPerformanceRecord>false</displayPerformanceRecord>
         <rewardComingOfAgeAbilities>true</rewardComingOfAgeAbilities>
+        <rewardComingOfAgeRPSkills>true</rewardComingOfAgeRPSkills>
         <useTimeInService>true</useTimeInService>
         <timeInServiceDisplayFormat>YEARS</timeInServiceDisplayFormat>
         <useTimeInRank>true</useTimeInRank>
@@ -227,9 +272,7 @@
         <trackTotalXPEarnings>true</trackTotalXPEarnings>
         <showOriginFaction>true</showOriginFaction>
         <adminsHaveNegotiation>true</adminsHaveNegotiation>
-        <adminsHaveScrounge>false</adminsHaveScrounge>
         <adminExperienceLevelIncludeNegotiation>true</adminExperienceLevelIncludeNegotiation>
-        <adminExperienceLevelIncludeScrounge>false</adminExperienceLevelIncludeScrounge>
         <useAdvancedMedical>true</useAdvancedMedical>
         <healWaitingPeriod>1</healWaitingPeriod>
         <naturalHealingWaitingPeriod>15</naturalHealingWaitingPeriod>
@@ -241,6 +284,8 @@
         <prisonerCaptureStyle>MEKHQ</prisonerCaptureStyle>
         <useRandomDependentAddition>true</useRandomDependentAddition>
         <useRandomDependentRemoval>true</useRandomDependentRemoval>
+        <dependentProfessionDieSize>4</dependentProfessionDieSize>
+        <civilianProfessionDieSize>2</civilianProfessionDieSize>
         <usePersonnelRemoval>true</usePersonnelRemoval>
         <useRemovalExemptCemetery>true</useRemovalExemptCemetery>
         <useRemovalExemptRetirees>true</useRemovalExemptRetirees>
@@ -248,16 +293,17 @@
         <salaryAntiMekMultiplier>1.5</salaryAntiMekMultiplier>
         <salarySpecialistInfantryMultiplier>1.28</salarySpecialistInfantryMultiplier>
         <salaryXPMultipliers>
-            <ULTRA_GREEN>0.6</ULTRA_GREEN>
-            <NONE>0.5</NONE>
-            <GREEN>0.6</GREEN>
             <VETERAN>1.6</VETERAN>
             <REGULAR>1.0</REGULAR>
+            <GREEN>0.6</GREEN>
+            <HEROIC>6.4</HEROIC>
             <ELITE>3.2</ELITE>
             <LEGENDARY>12.8</LEGENDARY>
-            <HEROIC>6.4</HEROIC>
+            <ULTRA_GREEN>0.6</ULTRA_GREEN>
+            <NONE>0.5</NONE>
         </salaryXPMultipliers>
-        <salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+        <salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,50 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,2500 CSB,250 CSB
+        </salaryTypeBase>
         <awardBonusStyle>BOTH</awardBonusStyle>
         <enableAutoAwards>true</enableAutoAwards>
         <issuePosthumousAwards>true</issuePosthumousAwards>
@@ -321,9 +367,8 @@
         <payoutRetirementMultiplier>12</payoutRetirementMultiplier>
         <usePayoutServiceBonus>true</usePayoutServiceBonus>
         <payoutServiceBonusRate>10</payoutServiceBonusRate>
-        <useAdministrativeStrain>true</useAdministrativeStrain>
-        <administrativeStrain>10</administrativeStrain>
-        <multiCrewStrainDivider>5</multiCrewStrainDivider>
+        <UseHRStrain>true</UseHRStrain>
+        <hrStrain>10</hrStrain>
         <useManagementSkill>true</useManagementSkill>
         <useCommanderLeadershipOnly>false</useCommanderLeadershipOnly>
         <managementSkillPenalty>0</managementSkillPenalty>
@@ -348,19 +393,19 @@
         <noInterestInMarriageDiceSize>10</noInterestInMarriageDiceSize>
         <logMarriageNameChanges>true</logMarriageNameChanges>
         <marriageSurnameWeights>
-            <SPACE_SPOUSE>10</SPACE_SPOUSE>
+        <MALE>500</MALE>
+        <NO_CHANGE>100</NO_CHANGE>
+        <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
+        <SPOUSE>55</SPOUSE>
             <BOTH_HYPHEN_YOURS>20</BOTH_HYPHEN_YOURS>
-            <FEMALE>160</FEMALE>
+        <SPACE_SPOUSE>10</SPACE_SPOUSE>
+        <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
             <HYPHEN_YOURS>30</HYPHEN_YOURS>
-            <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
             <BOTH_SPACE_SPOUSE>5</BOTH_SPACE_SPOUSE>
-            <SPOUSE>55</SPOUSE>
+        <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
             <YOURS>55</YOURS>
             <SPACE_YOURS>10</SPACE_YOURS>
-            <NO_CHANGE>100</NO_CHANGE>
-            <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
-            <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
-            <MALE>500</MALE>
+        <FEMALE>160</FEMALE>
         </marriageSurnameWeights>
         <randomMarriageMethod>DICE_ROLL</randomMarriageMethod>
         <useRandomClanPersonnelMarriages>false</useRandomClanPersonnelMarriages>
@@ -374,8 +419,8 @@
         <usePrisonerDivorce>true</usePrisonerDivorce>
         <divorceSurnameWeights>
             <SPOUSE_CHANGES_SURNAME>10</SPOUSE_CHANGES_SURNAME>
-            <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
             <BOTH_KEEP_SURNAME>50</BOTH_KEEP_SURNAME>
+            <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
             <BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
         </divorceSurnameWeights>
         <randomDivorceMethod>DICE_ROLL</randomDivorceMethod>
@@ -419,13 +464,13 @@
         <allAges>false</allAges>
         <militaryAcademyAccidents>10000</militaryAcademyAccidents>
         <enabledRandomDeathAgeGroups>
-            <TEENAGER>false</TEENAGER>
+        <ADULT>true</ADULT>
+        <PRETEEN>false</PRETEEN>
             <ELDER>true</ELDER>
             <CHILD>false</CHILD>
-            <ADULT>true</ADULT>
-            <PRETEEN>false</PRETEEN>
+        <TEENAGER>false</TEENAGER>
+        <TODDLER>false</TODDLER>
             <BABY>false</BABY>
-            <TODDLER>false</TODDLER>
         </enabledRandomDeathAgeGroups>
         <useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
         <randomDeathMultiplier>1.0</randomDeathMultiplier>
@@ -439,6 +484,8 @@
         <sellUnits>true</sellUnits>
         <sellParts>true</sellParts>
         <payForRecruitment>true</payForRecruitment>
+        <payForFood>true</payForFood>
+        <payForHousing>true</payForHousing>
         <useLoanLimits>true</useLoanLimits>
         <usePercentageMaint>true</usePercentageMaint>
         <infantryDontCount>true</infantryDontCount>
@@ -449,6 +496,7 @@
         <newFinancialYearFinancesToCSVExport>false</newFinancialYearFinancesToCSVExport>
         <simulateGrayMonday>true</simulateGrayMonday>
         <allowMonthlyReinvestment>true</allowMonthlyReinvestment>
+        <allowMonthlyConnections>true</allowMonthlyConnections>
         <commonPartPriceMultiplier>1.0</commonPartPriceMultiplier>
         <innerSphereUnitPriceMultiplier>1.0</innerSphereUnitPriceMultiplier>
         <innerSpherePartPriceMultiplier>1.0</innerSpherePartPriceMultiplier>
@@ -463,17 +511,18 @@
         <sharesForAll>true</sharesForAll>
         <useTaxes>true</useTaxes>
         <taxesPercentage>30</taxesPercentage>
-        <personnelMarketName>Dylan&apos;s Method</personnelMarketName>
+        <personnelMarketStyle>MEKHQ</personnelMarketStyle>
+        <personnelMarketName>Disabled</personnelMarketName>
         <personnelMarketReportRefresh>true</personnelMarketReportRefresh>
         <personnelMarketRandomRemovalTargets>
-            <ULTRA_GREEN>4</ULTRA_GREEN>
-            <NONE>3</NONE>
-            <GREEN>4</GREEN>
             <VETERAN>8</VETERAN>
             <REGULAR>6</REGULAR>
+            <GREEN>4</GREEN>
+            <HEROIC>11</HEROIC>
             <ELITE>10</ELITE>
             <LEGENDARY>11</LEGENDARY>
-            <HEROIC>11</HEROIC>
+            <ULTRA_GREEN>4</ULTRA_GREEN>
+            <NONE>3</NONE>
         </personnelMarketRandomRemovalTargets>
         <personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
         <usePersonnelHireHiringHallOnly>false</usePersonnelHireHiringHallOnly>
@@ -503,8 +552,8 @@
         <phenotypeProbabilities>95,100,95,0,95,25</phenotypeProbabilities>
         <useAtB>false</useAtB>
         <useStratCon>true</useStratCon>
-        <useAero>true</useAero>
-        <useVehicles>true</useVehicles>
+        <useAero>false</useAero>
+        <useVehicles>false</useVehicles>
         <clanVehicles>true</clanVehicles>
         <useGenericBattleValue>true</useGenericBattleValue>
         <useVerboseBidding>false</useVerboseBidding>
@@ -520,16 +569,11 @@
         <attachedPlayerCamouflage>false</attachedPlayerCamouflage>
         <playerControlsAttachedUnits>true</playerControlsAttachedUnits>
         <atbBattleChance>40,20,60,10,0</atbBattleChance>
-        <generateChases>true</generateChases>
+        <generateChases>false</generateChases>
         <useWeatherConditions>true</useWeatherConditions>
         <useLightConditions>true</useLightConditions>
         <usePlanetaryConditions>true</usePlanetaryConditions>
-        <useStrategy>false</useStrategy>
-        <baseStrategyDeployment>3</baseStrategyDeployment>
-        <additionalStrategyDeployment>1</additionalStrategyDeployment>
         <restrictPartsByMission>true</restrictPartsByMission>
-        <limitLanceWeight>false</limitLanceWeight>
-        <limitLanceNumUnits>false</limitLanceNumUnits>
         <assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
         <allowDuplicatePortraits>true</allowDuplicatePortraits>
         <allowOpForAeros>false</allowOpForAeros>
@@ -542,46 +586,59 @@
         <scenarioModChance>25</scenarioModChance>
         <scenarioModBV>50</scenarioModBV>
         <autoConfigMunitions>true</autoConfigMunitions>
-        <planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
-        <planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
-        <planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-        <usePortraitForType>true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true</usePortraitForType>
+        <autoGenerateOpForCallsigns>true</autoGenerateOpForCallsigns>
+        <minimumCallsignSkillLevel>VETERAN</minimumCallsignSkillLevel>
+        <planetTechAcquisitionBonus>-2,-1,0,1,2,8,16</planetTechAcquisitionBonus>
+        <planetIndustryAcquisitionBonus>0,0,0,0,0</planetIndustryAcquisitionBonus>
+        <planetOutputAcquisitionBonus>-1,0,1,2,8</planetOutputAcquisitionBonus>
+        <usePortraitForType>true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true
+        </usePortraitForType>
+        <trackFactionStanding>true</trackFactionStanding>
+        <useFactionStandingNegotiation>true</useFactionStandingNegotiation>
+        <useFactionStandingResupply>true</useFactionStandingResupply>
+        <useFactionStandingCommandCircuit>true</useFactionStandingCommandCircuit>
+        <useFactionStandingOutlawed>true</useFactionStandingOutlawed>
+        <useFactionStandingBatchallRestrictions>true</useFactionStandingBatchallRestrictions>
+        <useFactionStandingRecruitment>true</useFactionStandingRecruitment>
+        <useFactionStandingBarracksCosts>true</useFactionStandingBarracksCosts>
+        <useFactionStandingUnitMarket>true</useFactionStandingUnitMarket>
+        <useFactionStandingContractPay>true</useFactionStandingContractPay>
+        <useFactionStandingSupportPoints>true</useFactionStandingSupportPoints>
+        <factionStandingGainMultiplier>1.0</factionStandingGainMultiplier>
     </campaignOptions>
     <randomSkillPreferences>
         <overallRecruitBonus>0</overallRecruitBonus>
         <recruitmentBonuses>
-            <BA_TECH>0</BA_TECH>
+        <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
+        <ASTECH>0</ASTECH>
+        <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
+        <MEKWARRIOR>0</MEKWARRIOR>
+        <VTOL_PILOT>0</VTOL_PILOT>
+        <MEDIC>0</MEDIC>
+        <VESSEL_PILOT>0</VESSEL_PILOT>
+        <VESSEL_GUNNER>0</VESSEL_GUNNER>
+        <MEK_TECH>0</MEK_TECH>
+        <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
+        <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
+        <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
             <SOLDIER>0</SOLDIER>
-            <AERO_TEK>0</AERO_TEK>
-            <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
             <DOCTOR>0</DOCTOR>
-            <VTOL_PILOT>0</VTOL_PILOT>
-            <MECHANIC>0</MECHANIC>
             <VEHICLE_CREW>0</VEHICLE_CREW>
-            <VESSEL_CREW>0</VESSEL_CREW>
             <ADMINISTRATOR_LOGISTICS>0</ADMINISTRATOR_LOGISTICS>
-            <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
-            <MEK_TECH>0</MEK_TECH>
-            <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
-            <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
-            <MEDIC>0</MEDIC>
+        <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
+        <LAM_PILOT>0</LAM_PILOT>
+        <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
+        <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
             <AEROSPACE_PILOT>0</AEROSPACE_PILOT>
-            <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
-            <ASTECH>0</ASTECH>
-            <DEPENDENT>0</DEPENDENT>
+        <VESSEL_CREW>0</VESSEL_CREW>
             <NAVAL_VEHICLE_DRIVER>0</NAVAL_VEHICLE_DRIVER>
-            <VESSEL_GUNNER>0</VESSEL_GUNNER>
-            <LAM_PILOT>0</LAM_PILOT>
-            <NONE>0</NONE>
-            <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
-            <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
-            <VESSEL_PILOT>0</VESSEL_PILOT>
-            <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
-            <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
-            <MEKWARRIOR>0</MEKWARRIOR>
+        <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
+        <AERO_TEK>0</AERO_TEK>
+        <MECHANIC>0</MECHANIC>
+        <BA_TECH>0</BA_TECH>
         </recruitmentBonuses>
-        <specialAbilityBonus>-10,-10,-2,0,1</specialAbilityBonus>
-        <commandSkillsModifier>-12,-11,-10,-9,-8</commandSkillsModifier>
+        <specialAbilityBonus>-10,-10,-2,0,1,1,1</specialAbilityBonus>
+        <commandSkillsModifier>-12,-11,-10,-9,-8,-7,-7</commandSkillsModifier>
         <roleplaySkillModifier>-8</roleplaySkillModifier>
         <randomizeSkill>true</randomizeSkill>
         <useAttributes>true</useAttributes>
@@ -605,9 +662,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -618,9 +677,11 @@
             <firstAttribute>CHARISMA</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -630,10 +691,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <greenLvl>1</greenLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -644,9 +707,11 @@
             <firstAttribute>WILLPOWER</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -660,7 +725,9 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
-            <costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
             <name>Appraisal (RP Only)</name>
@@ -670,9 +737,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -683,9 +752,11 @@
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -698,7 +769,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -711,7 +784,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -725,6 +800,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -737,7 +814,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -750,7 +829,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -763,7 +844,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -776,7 +859,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -789,7 +874,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -802,7 +889,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -815,7 +904,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -826,9 +917,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -838,10 +931,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <greenLvl>1</greenLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -852,22 +947,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Climbing (RP Only)</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>ROLEPLAY_GENERAL</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -878,9 +962,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -893,7 +979,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -906,7 +994,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -919,7 +1009,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -930,9 +1022,11 @@
             <firstAttribute>CHARISMA</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -945,7 +1039,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -956,9 +1052,11 @@
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -969,9 +1067,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -982,9 +1082,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -995,9 +1097,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1008,9 +1112,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1021,9 +1127,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1034,9 +1142,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1047,9 +1157,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1062,7 +1174,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1075,7 +1189,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1088,7 +1204,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1101,7 +1219,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1114,7 +1234,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1127,7 +1249,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1140,7 +1264,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1153,7 +1279,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1166,7 +1294,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1179,7 +1309,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1192,7 +1324,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1205,7 +1339,24 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+        <name>Interest/Law (RP Only)</name>
+        <target>9</target>
+        <isCountUp>false</isCountUp>
+        <subType>ROLEPLAY_INTEREST</subType>
+        <firstAttribute>INTELLIGENCE</firstAttribute>
+        <secondAttribute>WILLPOWER</secondAttribute>
+        <greenLvl>1</greenLvl>
+        <regLvl>3</regLvl>
+        <vetLvl>4</vetLvl>
+        <eliteLvl>6</eliteLvl>
+        <heroicLvl>8</heroicLvl>
+        <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1218,7 +1369,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1231,7 +1384,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1244,7 +1399,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1257,7 +1414,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1270,7 +1429,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1283,7 +1444,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1296,7 +1459,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1309,7 +1474,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1322,7 +1489,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1335,7 +1504,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1348,7 +1519,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1361,7 +1534,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1372,9 +1547,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>CHARISMA</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1384,10 +1561,12 @@
             <subType>SUPPORT_COMMAND</subType>
             <firstAttribute>WILLPOWER</firstAttribute>
             <secondAttribute>CHARISMA</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <greenLvl>1</greenLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1398,9 +1577,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1410,10 +1591,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <greenLvl>1</greenLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1424,9 +1607,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1436,10 +1621,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <greenLvl>1</greenLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1449,10 +1636,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>CHARISMA</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <greenLvl>1</greenLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1463,9 +1652,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1479,6 +1670,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1492,6 +1685,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1505,6 +1700,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1518,6 +1715,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1531,6 +1730,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1544,6 +1745,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1557,6 +1760,8 @@
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1567,9 +1772,11 @@
             <firstAttribute>WILLPOWER</firstAttribute>
             <secondAttribute>CHARISMA</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1580,9 +1787,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1595,7 +1804,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1608,7 +1819,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1621,7 +1834,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1634,7 +1849,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1647,7 +1864,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1660,7 +1879,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1673,7 +1894,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1686,7 +1909,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1699,7 +1924,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1712,7 +1939,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1725,20 +1954,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Scrounge</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>CHARISMA</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1751,7 +1969,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1764,7 +1984,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1775,9 +1997,11 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1788,9 +2012,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1801,9 +2027,11 @@
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>4</regLvl>
+            <vetLvl>5</vetLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1814,9 +2042,11 @@
             <firstAttribute>REFLEXES</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1826,10 +2056,12 @@
             <subType>SUPPORT_COMMAND</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1840,9 +2072,11 @@
             <firstAttribute>CHARISMA</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
             <eliteLvl>5</eliteLvl>
+            <heroicLvl>7</heroicLvl>
+            <legendaryLvl>8</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1853,9 +2087,11 @@
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1865,10 +2101,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1881,7 +2119,9 @@
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1892,9 +2132,11 @@
             <firstAttribute>STRENGTH</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
             <greenLvl>1</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <regLvl>2</regLvl>
+            <vetLvl>3</vetLvl>
+            <eliteLvl>4</eliteLvl>
+            <heroicLvl>6</heroicLvl>
+            <legendaryLvl>7</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1904,10 +2146,12 @@
             <subType>SUPPORT_COMMAND</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1917,10 +2161,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1930,10 +2176,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1943,10 +2191,12 @@
             <subType>SUPPORT</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
@@ -1956,24 +2206,26 @@
             <subType>SUPPORT</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
+            <eliteLvl>6</eliteLvl>
+            <heroicLvl>8</heroicLvl>
+            <legendaryLvl>9</legendaryLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
             <name>Tech/Vessel</name>
-            <target>9</target>
+            <target>10</target>
             <isCountUp>false</isCountUp>
             <subType>SUPPORT</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
+            <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+            <costs>12,6,6,6,6,6,-1,-1,-1,-1,-1</costs>
         </skillType>
         <skillType>
             <name>Thrown Weapons (RP Only)</name>
@@ -2033,7 +2285,7 @@
             <displayName>Terrain Master [Nightwalker] (CamOps)</displayName>
             <lookupName>tm_nightwalker</lookupName>
             <desc>Nightwalker ignores all darkness move penalties when using Walk / Cruise movement but does not affect gunnery modifiers for lighting conditions.</desc>
-            <xpCost>150</xpCost>
+            <xpCost>0</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2050,10 +2302,10 @@
             <displayName>Weapon Specialist (CamOps)</displayName>
             <lookupName>weapon_specialist</lookupName>
             <desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
-            <xpCost>150</xpCost>
+            <xpCost>0</xpCost>
             <weight>2</weight>
             <prereqAbilities></prereqAbilities>
-            <invalidAbilities>specialist</invalidAbilities>
+            <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
             <skillPrereq>
@@ -2070,7 +2322,7 @@
             <displayName>Foot Cavalry (CamOps)</displayName>
             <lookupName>foot_cav</lookupName>
             <desc>Foot Infantry gain 1 extra MP and allows for foot infantry to move and shoot when using two support weapons.</desc>
-            <xpCost>50</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2081,32 +2333,10 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Gregarious (ATOW)</displayName>
-            <lookupName>atow_gregarious</lookupName>
-            <desc>The Target Number of all Acting and Negotiation checks are decreased by 1.</desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_introvert</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Small Pilot (Unofficial)</displayName>
-            <lookupName>small_pilot</lookupName>
-            <desc>A small pilot can use small and cramped cockpits without problems.</desc>
-            <xpCost>-1</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Blood Stalker (CamOps)</displayName>
             <lookupName>blood_stalker</lookupName>
             <desc>Unit has -1 bonus against designated target, +2 penalty against all others; lasts until target retreats, can only be used once per battle.</desc>
-            <xpCost>120</xpCost>
+            <xpCost>0</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2123,23 +2353,10 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Clan Pilot Training (Unofficial)</displayName>
-            <lookupName>clan_pilot_training</lookupName>
-            <desc>Pilot has a +1 penalty for physical attacks,
-                because clans do not train for dishonourable combat.
-            </desc>
-            <xpCost>-1</xpCost>
-            <weight>0</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>RangeMaster (CamOps)</displayName>
             <lookupName>range_master</lookupName>
             <desc>Range modifiers are swapped with short range (Medium, Long, or Extreme).</desc>
-            <xpCost>100</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2156,53 +2373,12 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Slow Learner (ATOW)</displayName>
-            <lookupName>flaw_slow_learner</lookupName>
-            <desc>Increases the cost of purchasing and improving Skills by 20% (rounded normally).
-
-                If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So a 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.
-            </desc>
-            <xpCost>-300</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_fast_learner</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Impatient (ATOW)</displayName>
-            <lookupName>flaw_impatient</lookupName>
-            <desc>The Target Number of Art/Any, Cryptography, Demolitions, Investigation, Protocols, Security Systems/Any, Strategy, Tactics and Training checks is increased by 1.</desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_patient</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Transit Disorientation Syndrome (ATOW)</displayName>
-            <lookupName>flaw_transit_disorientation_syndrome</lookupName>
-            <desc>Is violently ill following a hyperspace jump.
-
-                They increase the Target Number of Piloting and Gunnery checks by 1 for 48 hours following the jump (Advanced Medical only).
-
-                They also gain Fatigue based on the campaign options fatigue rate (default 1).
-            </desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Terrain Master [Mountaineer] (CamOps)</displayName>
             <lookupName>tm_mountaineer</lookupName>
             <desc>Movement in rubble or rough cost 1 less MP and elevation changes also cost 1 MP less.
-                The mountaineer also receives a -1 to PSR checks for the given terrain.
+            The mountaineer also recieves a -1 to PSR checks for the given terrain.
             </desc>
-            <xpCost>150</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2216,136 +2392,33 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Introvert (ATOW)</displayName>
-            <lookupName>flaw_introvert</lookupName>
-            <desc>The Target Number of all Acting and Negotiation checks are increased by 1.</desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_gregarious</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Melee Master (CamOps)</displayName>
             <lookupName>melee_master</lookupName>
             <desc>Enables the unit to do one additional kick, punch, or club attack on the same opponent.</desc>
-            <xpCost>150</xpCost>
+            <xpCost>0</xpCost>
             <weight>6</weight>
-            <prereqAbilities>melee_specialist</prereqAbilities>
-            <invalidAbilities>zweihander</invalidAbilities>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Mek::Regular</skill>
             </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Toughness (ATOW)</displayName>
-            <lookupName>atow_toughness</lookupName>
-            <desc>All injuries suffered are reduced by 25% and Fatigue gain is halved. Fatigue gain from sustaining injuries is not halved.</desc>
-            <xpCost>300</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_glass_jaw</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Poison Resistance (ATOW)</displayName>
-            <lookupName>atow_poison_resistance</lookupName>
-            <desc>The character cannot be poisoned.
-
-                Mechanically, this offers few benefits; however, the character will be completely immune to the Fatigue gain from the &apos;Poisoning&apos; Prisoner Event.
-            </desc>
-            <xpCost>200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Fast Learner (ATOW)</displayName>
-            <lookupName>atow_fast_learner</lookupName>
-            <desc>Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
-
-                If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So a 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.
-            </desc>
-            <xpCost>300</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_slow_learner</removeAbilities>
-            <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Zweihander (CamOps)</displayName>
             <lookupName>zweihander</lookupName>
             <desc>You can do more damage with two-handed physical attacks at the risk of damaging yourself.</desc>
-            <xpCost>100</xpCost>
+            <xpCost>0</xpCost>
             <weight>6</weight>
-            <prereqAbilities>melee_specialist</prereqAbilities>
-            <invalidAbilities>melee_master</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Piloting/Mek::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Weathered (Unofficial)</displayName>
-            <lookupName>weathered</lookupName>
-            <desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
             <skillPrereq>
-                <skill>Gunnery/Mek::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Vehicle::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
             </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Extremely Excess Facial Hair (ATOW:Companion)</displayName>
-            <lookupName>mutation_facial_hair</lookupName>
-            <desc>Decreases Charisma Attribute by 1 (may not take it below 1).</desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Animal Antipathy (ATOW)</displayName>
-            <lookupName>flaw_animal_antipathy</lookupName>
-            <desc>Increases the Target Number for all Animal Handling checks by 2.</desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_animal_empathy</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Good Vision (ATOW)</displayName>
-            <lookupName>atow_good_vision</lookupName>
-            <desc>The Target Number of all Perception checks is decreased by 1.</desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_poor_vision</removeAbilities>
-            <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Urban Guerrilla (CamOps)</displayName>
@@ -2354,14 +2427,13 @@
                 It also keeps them from taking double damage in the open when in pavement or road terrain types.
                 Finally, urban guerrillas can call on local support once per scenario.
             </desc>
-            <xpCost>50</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
             <skillPrereq>
-                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Small Arms::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2371,7 +2443,7 @@
             <desc>Movement in mud or swamp costs 1 less MP.
                 Using run/flank MP while in mud/swamp gives +1 BTH when being attacked
             </desc>
-            <xpCost>150</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2385,35 +2457,10 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Exceptional Immune System (ATOW:Companion)</displayName>
-            <lookupName>mutation_exceptional_immune_system</lookupName>
-            <desc>Recover from injuries at twice the normal rate (Advanced Medical only).</desc>
-            <xpCost>200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Exceptional Attribute - Body (ATOW)</displayName>
-            <lookupName>exceptional_attribute_body</lookupName>
-            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
-
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
-            </desc>
-            <xpCost>200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Shaky Stick (CamOps)</displayName>
             <lookupName>shaky_stick</lookupName>
             <desc>Ground units have a harder time hitting this airborne target. Attacking units get a +1 tohit penalty</desc>
-            <xpCost>100</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2428,29 +2475,15 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Functional Tail and Mobile Ears (ATOW:Companion)</displayName>
-            <lookupName>mutation_cat_girl</lookupName>
-            <desc>Decreases Charisma Attribute by 3 (may not take it below 1).
-
-                The Target Number of all Perception checks decreased by 1 due to improved hearing.
-            </desc>
-            <xpCost>-300</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Sandblaster (CamOps)</displayName>
             <lookupName>sandblaster</lookupName>
             <desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
                 at short, medium, or long/extended range, respectively, but only with a specialized weapon.
             </desc>
-            <xpCost>100</xpCost>
+            <xpCost>0</xpCost>
             <weight>3</weight>
             <prereqAbilities></prereqAbilities>
-            <invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
+            <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
             <skillPrereq>
@@ -2464,57 +2497,11 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Poor Vision (ATOW)</displayName>
-            <lookupName>flaw_poor_vision</lookupName>
-            <desc>The Target Number of all Perception checks is increased by 1.</desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_good_vision</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Pain Resistance (MaxTech)</displayName>
-            <lookupName>pain_resistance</lookupName>
-            <desc>When making consciousness rolls,
-                1 is added to all rolls.
-                Also,
-                damage received from ammo explosions is reduced to 1.
-                Note: This ability is only used for BattleMeks.
-            </desc>
-            <xpCost>50</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Blind Fighter (Unofficial)</displayName>
-            <lookupName>blind_fighter</lookupName>
-            <desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Vehicle::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
             <displayName>Exceptional Attribute - Reflexes (ATOW)</displayName>
             <lookupName>exceptional_attribute_reflexes</lookupName>
             <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
 
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            This SPA increases that maximum by 1, but does not increase the Attribute itself.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
@@ -2536,8 +2523,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2554,8 +2541,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2572,17 +2559,31 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Veteran</skill>
                 <skill>Tech/Aero::Veteran</skill>
-                <skill>Tech/Mechanic::Veteran</skill>
                 <skill>Tech/Mek::Veteran</skill>
+                <skill>Tech/Mechanic::Veteran</skill>
                 <skill>Tech/BattleArmor::Veteran</skill>
             </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Illiterate (ATOW)</displayName>
+        <lookupName>flaw_illiterate</lookupName>
+        <desc>The character suffers a -4 (untrained) penalty to all Intelligence-based skill checks.
+
+        This penalty is removed once the character acquires level 4 in the Language/Any skill. Literacy status is updated daily, so may lag behind actual skill changes.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Tactical Genius (CamOps)</displayName>
             <lookupName>tactical_genius</lookupName>
             <desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
-                The second roll must be accepted.
-                Note: Only one Tactical Genius may be utilized per team.
+            The second roll must be accepted.
+            Note: Only one Tactical Genius may be utilized per team.
             </desc>
             <xpCost>150</xpCost>
             <weight>1</weight>
@@ -2598,11 +2599,10 @@
                 <skill>Piloting/Mek::Veteran</skill>
                 <skill>Piloting/VTOL::Veteran</skill>
                 <skill>Piloting/Naval::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Piloting/Aerospace::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
-                <skill>Anti-Mek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
@@ -2612,7 +2612,7 @@
             <displayName>Sensor Geek (Unofficial)</displayName>
             <lookupName>sensor_geek</lookupName>
             <desc>A pilot with this ability gets a -2 bonus on sensor checks.
-                Note that this is really only a bonus, if inclusive sensor ranges are in use.
+            Note that this is really only a bonus, if inclusive sensor ranges are in use.
             </desc>
             <xpCost>100</xpCost>
             <weight>2</weight>
@@ -2623,10 +2623,10 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Green</skill>
                 <skill>Piloting/Naval::Green</skill>
-                <skill>Piloting/Ground Vehicle::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Piloting/Ground Vehicle::Green</skill>
                 <skill>Piloting/VTOL::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
                 <skill>Piloting/Aircraft::Green</skill>
                 <skill>Piloting/Mek::Green</skill>
             </skillPrereq>
@@ -2636,7 +2636,7 @@
             <lookupName>exceptional_attribute_dexterity</lookupName>
             <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
 
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            This SPA increases that maximum by 1, but does not increase the Attribute itself.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
@@ -2696,6 +2696,59 @@
             </skillPrereq>
         </ability>
         <ability>
+        <displayName>Dark Secret - Extreme (ATOW)</displayName>
+        <lookupName>dark_secret_extreme</lookupName>
+        <desc>Once every three months 2d6 is rolled, on a roll of 10+ the character&apos;s Dark Secret is revealed.
+
+        If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+        Once the characters&apos; Dark Secret has been revealed, they permanently reduce their Reputation by 5 and Connections by 3.
+
+        An extreme Dark Secret represents a grave betrayal or atrocity that should lead to exile, imprisonment, or execution if exposed (not modeled in MekHQ).
+        </desc>
+        <xpCost>-500</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities>dark_secret_trivial::dark_secret_significant::dark_secret_major::dark_secret_severe</invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Dark Secret - Trivial (ATOW)</displayName>
+        <lookupName>dark_secret_trivial</lookupName>
+        <desc>Once every three months 2d6 is rolled, on a roll of 10+ the character&apos;s Dark Secret is revealed.
+
+        If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+        Once the characters&apos; Dark Secret has been revealed, they permanently reduce their Reputation by 1 and Connections by 1.
+
+        A trivial Dark Secret represents a personal lapse or dishonorable act that could harm the character&apos;s reputation if revealed.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities>dark_secret_significant::dark_secret_major::dark_secret_severe::dark_secret_extreme</invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Logistician (Unofficial)</displayName>
+        <lookupName>admin_logistician</lookupName>
+        <desc>This character is an expert at managing interstellar supply lines.
+
+        Parts procured by this character have their delivery time reduced by 10%
+        </desc>
+        <xpCost>50</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        <skillPrereq>
+        <skill>Administration::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
             <displayName>Jumping Jack (CamOps)</displayName>
             <lookupName>jumping_jack</lookupName>
             <desc>Unit only suffers a +1 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
@@ -2723,18 +2776,51 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Trivial Compulsion - Traumatic Past (ATOW)</displayName>
+        <lookupName>compulsion_traumatic_past</lookupName>
+        <desc>-1 Edge.
+
+        This SPA reflects the ATOW compulsion &apos;Trauma&apos;.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Networker (Unofficial)</displayName>
+        <lookupName>admin_networker</lookupName>
+        <desc>This character knows people in high places.
+
+        If this character is the senior-most Admin/Command character, the number of contracts offered each month is increased by 1 (may still be 0).
+        </desc>
+        <xpCost>400</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        <skillPrereq>
+        <skill>Administration::Elite</skill>
             </skillPrereq>
         </ability>
         <ability>
             <displayName>Dodge (MaxTech)</displayName>
             <lookupName>dodge_maneuver</lookupName>
             <desc>Enables the unit to make a dodge maneuver instead of a physical attack.
-                This maneuver adds +2 to the BTH to physical attacks against the unit.
-                NOTE: The dodge maneuver is declared during the weapons phase.
-                Note: This ability is only used for BattleMeks.
+            This maneuver adds +2 to the BTH to physical attacks against the unit.
+            NOTE: The dodge maneuver is declared during the weapons phase.
+            Note: This ability is only used for BattleMeks.
             </desc>
             <xpCost>100</xpCost>
             <weight>1</weight>
@@ -2746,6 +2832,24 @@
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Mek::Regular</skill>
             </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Dark Secret - Major (ATOW)</displayName>
+        <lookupName>dark_secret_major</lookupName>
+        <desc>Once every three months 2d6 is rolled, on a roll of 10+ the character&apos;s Dark Secret is revealed.
+
+        If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+        Once the characters&apos; Dark Secret has been revealed, they permanently reduce their Reputation by 3 and Connections by 2.
+
+        A major Dark Secret represents a serious violation of law, duty, or trust that could lead to legal or social consequences.
+        </desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities>dark_secret_trivial::dark_secret_significant::dark_secret_severe::dark_secret_extreme</invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Good Hearing (ATOW)</displayName>
@@ -2772,10 +2876,44 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Spacecraft::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Dark Secret - Significant (ATOW)</displayName>
+        <lookupName>dark_secret_significant</lookupName>
+        <desc>Once every three months 2d6 is rolled, on a roll of 10+ the character&apos;s Dark Secret is revealed.
+
+        If the character also possesses the Alternate ID SPA, their Dark Secret is only recovered on a roll of 12.
+
+        Once the characters&apos; Dark Secret has been revealed, they permanently reduce their Reputation by 2 and Connections by 1.
+
+        A significant Dark Secret represents a concealed wrongdoing that would damage key relationships or the character&apos;s career.
+        </desc>
+        <xpCost>-200</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities>dark_secret_trivial::dark_secret_major::dark_secret_severe::dark_secret_extreme</invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Scrounge (Unofficial)</displayName>
+        <lookupName>admin_scrounge</lookupName>
+        <desc>The character is adept at finding resources in places nobody else would think to look.
+
+        They can make one additional procurement attempt per day.
+        </desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        <skillPrereq>
+        <skill>Administration::Elite</skill>
             </skillPrereq>
         </ability>
         <ability>
@@ -2783,7 +2921,7 @@
             <lookupName>mutation_cat_girl_unofficial</lookupName>
             <desc>Increases Charisma Attribute by 1 (may not take it above 10).
 
-                The Target Number of all Perception checks decreased by 1 due to improved hearing.
+            The Target Number of all Perception checks decreased by 1 due to improved hearing.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
@@ -2793,11 +2931,27 @@
             <choiceValues></choiceValues>
         </ability>
         <ability>
+        <displayName>Major Psychosis - Regression (ATOW)</displayName>
+        <lookupName>madness_regression</lookupName>
+        <desc>Each week the character is required to pass a Willpower check (with a -7 penalty) or gain the Childlike Regression Injury (-4 Gunnery, -4 Piloting).
+
+        If Advanced Medical is disabled the character suffers 1 Hit, instead of the Injury.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-400</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
             <displayName>Exceptional Attribute - Strength (ATOW)</displayName>
             <lookupName>exceptional_attribute_strength</lookupName>
             <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
 
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            This SPA increases that maximum by 1, but does not increase the Attribute itself.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
@@ -2810,8 +2964,8 @@
             <displayName>Gunnery/Ballistic (Unofficial)</displayName>
             <lookupName>gunnery_ballistic</lookupName>
             <desc>Pilot gets a -1 to-hit bonus on all ballistic weapons (MGs,
-                all ACs,
-                Gauss rifles).
+            all ACs,
+            Gauss rifles).
             </desc>
             <xpCost>100</xpCost>
             <weight>1</weight>
@@ -2823,9 +2977,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2843,9 +2997,9 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2862,10 +3016,26 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Trivial Compulsion - Unpleasant Personality (ATOW)</displayName>
+        <lookupName>compulsion_unpleasant_personality</lookupName>
+        <desc>-1 to all Charisma-based Skill Checks.
+
+        This SPA represents ATOW compulsions such as arrogance and pride.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>All Weather (Unofficial)</displayName>
@@ -2880,8 +3050,8 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Aircraft::Regular</skill>
                 <skill>Piloting/Mek::Regular</skill>
@@ -2891,7 +3061,7 @@
             <displayName>Melee Specialist (CamOps)</displayName>
             <lookupName>melee_specialist</lookupName>
             <desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-                Note: This ability is only used for BattleMeks.
+            Note: This ability is only used for BattleMeks.
             </desc>
             <xpCost>100</xpCost>
             <weight>3</weight>
@@ -2918,9 +3088,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2928,7 +3098,7 @@
             <displayName>Gunnery Specialization (aToW)</displayName>
             <lookupName>specialist</lookupName>
             <desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
-                +1 to-hit modifier when using other types of weapons.
+            +1 to-hit modifier when using other types of weapons.
             </desc>
             <xpCost>50</xpCost>
             <weight>4</weight>
@@ -2940,9 +3110,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2950,9 +3120,9 @@
             <displayName>Gunnery/Missile (Unofficial)</displayName>
             <lookupName>gunnery_missile</lookupName>
             <desc>Pilot gets a -1 to-hit bonus on all missile weapons (LRM,
-                SRM,
-                MRM,
-                RL and ATM).
+            SRM,
+            MRM,
+            RL and ATM).
             </desc>
             <xpCost>100</xpCost>
             <weight>1</weight>
@@ -2964,9 +3134,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2975,7 +3145,7 @@
             <lookupName>flaw_gremlins</lookupName>
             <desc>The cost of purchasing and improving the Tech/Any, Computers, Communications, or Security Systems/Electronic skills is increased by 10% (rounded normally).
 
-                Furthermore, the Target Number of checks made with such skills is increased by 1.
+            Furthermore, the Target Number of checks made with such skills is increased by 1.
             </desc>
             <xpCost>-300</xpCost>
             <weight>1</weight>
@@ -2983,6 +3153,22 @@
             <invalidAbilities></invalidAbilities>
             <removeAbilities>atow_tech_empathy</removeAbilities>
             <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Minor Psychosis - Flashbacks (ATOW)</displayName>
+        <lookupName>madness_flashbacks</lookupName>
+        <desc>Each week the character is required to make a Willpower check (with a -4 penalty) or suffer the &apos;Crippling Flashbacks&apos; Injury (-1 Piloting, -1 Gunnery).
+
+        If Advanced Medical is disabled, the character suffers a single Hit, instead of the Injury.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Hopping Jack (Unofficial)</displayName>
@@ -3000,6 +3186,22 @@
             </skillPrereq>
         </ability>
         <ability>
+        <displayName>Minor Psychosis - Confusion (ATOW)</displayName>
+        <lookupName>madness_confusion</lookupName>
+        <desc>Each week the character must pass a Willpower check (with a -4 penalty) or suffer one random Injury.
+
+        If Advanced Medical is disabled, the character suffers a single Hit instead of the Injury.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
             <displayName>Poor Hearing (ATOW)</displayName>
             <lookupName>flaw_poor_hearing</lookupName>
             <desc>The Target Number of all Perception checks is increased by 1.</desc>
@@ -3014,9 +3216,9 @@
             <displayName>Animal Mimicry (CamOps)</displayName>
             <lookupName>animal_mimic</lookupName>
             <desc>Allows a Quad Mek or ProtoMek, or a bipedal Mek or ProtoMek with the animalistic quirk, the following benefits.
-                -1 MP per hex of Woods and Jungle terrain.
-                In addition quads gain a -1 to any quad related PSR check.
-                NOTE: The quirk should be used only on bipedal units that have an animal like appearance.
+            -1 MP per hex of Woods and Jungle terrain.
+            In addition quads gain a -1 to any quad related PSR check.
+            NOTE: The quirk should be used only on bipedal units that have an animal like appearance.
             </desc>
             <xpCost>50</xpCost>
             <weight>1</weight>
@@ -3067,9 +3269,9 @@
             <displayName>Gunnery/Energy (Unofficial)</displayName>
             <lookupName>gunnery_laser</lookupName>
             <desc>NOTE: This is a unofficial rule.
-                Pilot gets a -1 to-hit bonus on all energy-based weapons (Laser,
-                PPC,
-                Plasma and Flamer).
+            Pilot gets a -1 to-hit bonus on all energy-based weapons (Laser,
+            PPC,
+            Plasma and Flamer).
             </desc>
             <xpCost>100</xpCost>
             <weight>1</weight>
@@ -3081,9 +3283,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -3101,10 +3303,27 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Coordinator (Unofficial)</displayName>
+        <lookupName>admin_coordinator</lookupName>
+        <desc>This character is exceptionally skilled at liaising with allied forces, ensuring reinforcements arrive where they&apos;re needed.
+
+        If this character is the senior Admin/Command character, the reinforcement target number is reduced by 1.
+        </desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        <skillPrereq>
+        <skill>Administration::Veteran</skill>
             </skillPrereq>
         </ability>
         <ability>
@@ -3121,18 +3340,20 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
         <ability>
             <displayName>Alternate ID (ATOW)</displayName>
             <lookupName>atow_alternate_id</lookupName>
-            <desc>A low Reputation trait infers a penalty to Negotiation, Streetwise and Protocols skill checks. This SPA reduces that penalty by 2.
+            <desc>A low Reputation trait infers a penalty to Negotiation, Streetwise, and Protocols skill checks. While ranks in the Bloodmark trait cause the character to be hunted by assassins.
 
-                While this SPA does exist in ATOW (and that&apos;s where you&apos;ll find its description), these effects are unique to MekHQ.
+            This SPA reduces the penalty from low Reputation by 2 and reduces the chance of an assassination attempt occurring by half. It also decreases the chance of a Dark Secret SPA being revealed.
+
+            While this SPA does exist in ATOW (and that&apos;s where you&apos;ll find its description), these effects are unique to MekHQ.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
@@ -3160,7 +3381,7 @@
             <displayName>Environmental Specialist (CamOps)</displayName>
             <lookupName>env_specialist</lookupName>
             <desc>Environmental specialists are adept in certain planetary conditions.
-                This gives the unit bonuses to PSR and movement penalties (halves MP / PSR) as well to hit rolls (-1).
+            This gives the unit bonuses to PSR and movement penalties (halves MP / PSR) as well to hit rolls (-1).
             </desc>
             <xpCost>100</xpCost>
             <weight>1</weight>
@@ -3176,15 +3397,30 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Trivial Compulsion - Excessive Faction Pride (ATOW)</displayName>
+        <lookupName>compulsion_faction_pride</lookupName>
+        <desc>Improve Loyalty by 1 if the character&apos;s faction matches the campaign faction. Otherwise, reduce Loyalty by 2.
+
+        This SPA reflects the various &apos;faction x pride&apos; ATOW compulsions.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Serious Disfigurement (ATOW:Companion)</displayName>
@@ -3201,9 +3437,9 @@
             <displayName>Maneuvering Ace (CamOps)</displayName>
             <lookupName>maneuvering_ace</lookupName>
             <desc>Enables the unit to move laterally like a Quad.
-                Quads can move laterally for 1 less MP.
-                Aerospace units can perform maneuvers for 1 less thrust point.
-                Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.
+            Quads can move laterally for 1 less MP.
+            Aerospace units can perform maneuvers for 1 less thrust point.
+            Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.
             </desc>
             <xpCost>100</xpCost>
             <weight>3</weight>
@@ -3214,8 +3450,8 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Spacecraft::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Aircraft::Regular</skill>
@@ -3236,9 +3472,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
                 <skill>Artillery::Regular</skill>
             </skillPrereq>
@@ -3272,11 +3508,10 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -3286,8 +3521,8 @@
             <displayName>Terrain Master [Forest Ranger] (CamOps)</displayName>
             <lookupName>tm_forest_ranger</lookupName>
             <desc>Movement in woods or jungle costs 1 less MP.
-                Using walk/cruise MP while in woods/jungle gives +1 BTH when being attacked.
-                Additionally, you gain -1 to PSR checks in Jungle terrain.
+            Using walk/cruise MP while in woods/jungle gives +1 BTH when being attacked.
+            Additionally, you gain -1 to PSR checks in Jungle terrain.
             </desc>
             <xpCost>150</xpCost>
             <weight>3</weight>
@@ -3296,9 +3531,8 @@
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
             <skillPrereq>
-                <skill>Anti-Mek::Veteran</skill>
+            <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
-                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -3326,8 +3560,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -3347,12 +3581,28 @@
             <lookupName>mutation_freakish_strength</lookupName>
             <desc>Increases Strength Attribute by 2 and maximum Strength by 1. Neither increase may take this Attribute above 10.
 
-                Increases the target number of all Charisma-based skills by 2 due to inhumanly shaped bulk.
+            Increases the target number of all Charisma-based skills by 2 due to inhumanly shaped bulk.
             </desc>
             <xpCost>300</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities>flaw_unattractive</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Significant Compulsion - Addiction (ATOW)</displayName>
+        <lookupName>compulsion_addiction</lookupName>
+        <desc>Once per week a Willpower check is made (with a -2 penalty). If failed, the character suffers the Discontinuation Syndrome Injury and gains two Fatigue (if Fatigue is enabled).
+
+        If Advanced Medical is disabled, the character suffers a single Hit, instead of the Injury.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-200</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
         </ability>
@@ -3374,11 +3624,10 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -3402,11 +3651,10 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -3435,6 +3683,22 @@
             <choiceValues></choiceValues>
         </ability>
         <ability>
+        <displayName>Significant Compulsion - Pathologic Racism (ATOW)</displayName>
+        <lookupName>compulsion_pathologic_racism</lookupName>
+        <desc>-2 Reputation.
+
+        This SPA reflects the various &apos;hatred of x faction&apos; ATOW compulsions.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-200</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
             <displayName>Fit (ATOW)</displayName>
             <lookupName>atow_fit</lookupName>
             <desc>Half all Fatigue gained (rounding down).</desc>
@@ -3457,13 +3721,75 @@
             <choiceValues></choiceValues>
         </ability>
         <ability>
+        <displayName>Clinical Insanity- Catatonia (ATOW)</displayName>
+        <lookupName>madness_catatonia</lookupName>
+        <desc>Each week the character must pass a Willpower check (with a -10 penalty) or gain the Catatonia Injury (-20 Piloting, -20 Gunnery).
+
+        If Advanced Medical is disabled the character gains a single Hit, instead of the Injury.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-500</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Trivial Compulsion - Racism (ATOW)</displayName>
+        <lookupName>compulsion_racism</lookupName>
+        <desc>-1 Reputation.
+
+        This SPA represents the various &apos;Distrusts x Faction&apos; compulsions in ATOW.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Trivial Compulsion - Gambling (ATOW)</displayName>
+        <lookupName>compulsion_gambling</lookupName>
+        <desc>Each month the character&apos;s Wealth Trait will randomly improve or decrease.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        </ability>
+        <ability>
+        <displayName>Significant Compulsion - Excessive Faction Loyalty (ATOW)</displayName>
+        <lookupName>compulsion_faction_loyalty</lookupName>
+        <desc>Improve Loyalty by 1 if the character&apos;s faction matches the campaign faction. Otherwise, reduce Loyalty by 4.
+
+        This SPA reflects the various &apos;loyalty to x faction&apos; ATOW compulsions.
+
+        While this SPA does exist in ATOW, these effects are unique to MekHQ.
+        </desc>
+        <xpCost>-200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
             <displayName>Combat Sense (ATOW)</displayName>
             <lookupName>atow_combat_sense</lookupName>
             <desc>Unit Reputation is increased by 1 if this character is the campaign commander.
 
-                A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+            A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-                If individual initiative is enabled, this bonus applies only to the pilot&apos;s unit. Otherwise, the bonus is applied only if the pilot&apos;s unit is the force commander.
+            If individual initiative is enabled, this bonus applies only to the pilot&apos;s unit. Otherwise, the bonus is applied only if the pilot&apos;s unit is the force commander.
             </desc>
             <xpCost>400</xpCost>
             <weight>1</weight>
@@ -3479,15 +3805,31 @@
                 <skill>Piloting/Mek::Veteran</skill>
                 <skill>Piloting/VTOL::Veteran</skill>
                 <skill>Piloting/Naval::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Piloting/Aerospace::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
-                <skill>Anti-Mek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
+        </ability>
+        <ability>
+        <displayName>Interstellar Negotiator (Unofficial)</displayName>
+        <lookupName>admin_interstellar_negotiator</lookupName>
+        <desc>No matter who&apos;s in charge, this character always has a way of bringing down the price.
+
+        If this character is the senior-most Admin/Transport character, the cost of interstellar travel is reduced by 15%
+        </desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <prereqAbilities></prereqAbilities>
+        <invalidAbilities></invalidAbilities>
+        <removeAbilities></removeAbilities>
+        <choiceValues></choiceValues>
+        <skillPrereq>
+        <skill>Administration::Veteran</skill>
+        </skillPrereq>
         </ability>
         <ability>
             <displayName>Sixth Sense (ATOW)</displayName>
@@ -3514,9 +3856,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -3540,7 +3882,7 @@
             <lookupName>exceptional_attribute_willpower</lookupName>
             <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
 
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            This SPA increases that maximum by 1, but does not increase the Attribute itself.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
@@ -3553,7 +3895,7 @@
             <displayName>Terrain Master [Frogman] (CamOps)</displayName>
             <lookupName>tm_frogman</lookupName>
             <desc>Movement in depth 2 or greater water costs 1 MP less.
-                Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush Depth checks.
+            Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush Depth checks.
             </desc>
             <xpCost>150</xpCost>
             <weight>3</weight>
@@ -3571,9 +3913,9 @@
             <lookupName>atow_combat_paralysis</lookupName>
             <desc>Unit Reputation is decreased by 1 if this character is the campaign commander.
 
-                A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+            A pilot who has Combat Paralysis rolls three dice per initiative check, keeping the only the lowest two rolls.
 
-                If individual initiative is enabled, this penalty applies only to the pilot&apos;s unit. Otherwise, the penalty is applied only if the pilot&apos;s unit is the force commander.
+            If individual initiative is enabled, this penalty applies only to the pilot&apos;s unit. Otherwise, the penalty is applied only if the pilot&apos;s unit is the force commander.
             </desc>
             <xpCost>-400</xpCost>
             <weight>1</weight>
@@ -3587,7 +3929,7 @@
             <lookupName>atow_tech_empathy</lookupName>
             <desc>The cost of purchasing and improving the Tech/Any, Computers, Communications, or Security Systems/Electronic skills is decreased by 10% (rounded normally).
 
-                Furthermore, the Target Number of checks made with such skills is decreased by 1.
+            Furthermore, the Target Number of checks made with such skills is decreased by 1.
             </desc>
             <xpCost>300</xpCost>
             <weight>1</weight>
@@ -3601,7 +3943,7 @@
             <lookupName>exceptional_attribute_intelligence</lookupName>
             <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
 
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            This SPA increases that maximum by 1, but does not increase the Attribute itself.
             </desc>
             <xpCost>200</xpCost>
             <weight>1</weight>
