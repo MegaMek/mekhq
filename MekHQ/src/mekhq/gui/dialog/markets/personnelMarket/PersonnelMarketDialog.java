@@ -251,10 +251,8 @@ public class PersonnelMarketDialog extends JDialog {
         leftGbc.weightx = 1.0;
         leftGbc.fill = GridBagConstraints.NONE;
         leftGbc.anchor = GridBagConstraints.WEST;
-        int leftRow = 0;
 
         // Golden Hello Checkbox
-        leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, PADDING, 0);
         goldenHelloCheckbox.setText(getTextAt(RESOURCE_BUNDLE,
               "checkbox.personnelMarket.goldenHello"));
@@ -263,7 +261,6 @@ public class PersonnelMarketDialog extends JDialog {
         leftPanel.add(goldenHelloCheckbox, leftGbc);
 
         // Role ComboBox (Label + ComboBox)
-        leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, 0, 0);
 
         JPanel filterPanel = initializeFilter();
@@ -277,17 +274,14 @@ public class PersonnelMarketDialog extends JDialog {
         rightGbc.weightx = 1.0;
         rightGbc.fill = GridBagConstraints.HORIZONTAL;
         rightGbc.anchor = GridBagConstraints.CENTER;
-        int rightRow = 0;
 
         // Personnel Availability Label (Centered)
-        rightGbc.gridy = rightRow++;
         rightGbc.insets = new Insets(0, 0, PADDING, 0);
         JLabel availabilityLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.availability"));
         availabilityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         rightPanel.add(availabilityLabel, rightGbc);
 
         // Slider
-        rightGbc.gridy = rightRow++;
         int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
@@ -297,7 +291,6 @@ public class PersonnelMarketDialog extends JDialog {
         rightPanel.add(personnelAvailabilitySlider, rightGbc);
 
         // Experience Label
-        rightGbc.gridy = rightRow++;
         rightGbc.insets = new Insets(0, 0, 0, 0);
         rightPanel.add(new JLabel(getAvailabilityModifierMessage()), rightGbc);
 
