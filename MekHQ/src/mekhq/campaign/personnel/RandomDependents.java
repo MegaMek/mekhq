@@ -48,7 +48,7 @@ import java.util.List;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 
 /**
