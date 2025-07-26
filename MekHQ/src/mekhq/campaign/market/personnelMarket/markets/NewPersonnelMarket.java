@@ -861,7 +861,7 @@ public class NewPersonnelMarket {
      *         applicant could be generated.
      */
     @Nullable
-    public Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries,
+    Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries,
           List<PersonnelMarketEntry> orderedMarketEntries) {
         PersonnelMarketEntry entry = pickEntry(orderedMarketEntries);
         if (entry == null) {
