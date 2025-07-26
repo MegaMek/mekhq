@@ -1012,7 +1012,7 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node, int minimumSize) {
-        String[] values = node.getTextContent().split(",");
+        String[] values = node.getTextContent().trim().split(",");
         Money[] result = new Money[max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {

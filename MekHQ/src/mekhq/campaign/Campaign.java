@@ -151,6 +151,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.io.CampaignOptionsMarshaller;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
@@ -7325,7 +7326,7 @@ public class Campaign implements ITechManager {
 
         // region Options
         if (getCampaignOptions() != null) {
-            getCampaignOptions().writeToXml(writer, indent);
+            CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
         getGameOptions().writeToXML(writer, indent);
         // endregion Options

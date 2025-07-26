@@ -231,7 +231,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("custom")) {
                     reloadUnitData |= processCustom(campaign, wn);
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    campaign.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
+                    campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
+                          version));
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
