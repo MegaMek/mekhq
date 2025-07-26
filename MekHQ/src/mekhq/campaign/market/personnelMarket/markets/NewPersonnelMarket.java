@@ -1114,7 +1114,7 @@ public class NewPersonnelMarket {
                 continue;
             }
 
-            if (!currentChild.getNodeName().equalsIgnoreCase("rarePersonnel")) {
+            if (!currentChild.getNodeName().equalsIgnoreCase("rarePerson")) {
                 logger.error("Unknown node type not loaded in Rare Personnel nodes: {}", currentChild.getNodeName());
                 continue;
             }
