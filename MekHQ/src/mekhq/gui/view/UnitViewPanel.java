@@ -45,6 +45,7 @@ import javax.swing.JTextPane;
 
 import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.util.ViewFormatting;
 import megamek.common.Entity;
 import megamek.client.ui.unitreadout.EntityReadout;
 import megamek.common.TechConstants;
@@ -154,7 +155,7 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getBasicSection() + "<br>" + mview.getLoadoutSection() + "</div>");
+        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getBasicSection(ViewFormatting.HTML) + "<br>" + mview.getLoadoutSection(ViewFormatting.HTML) + "</div>");
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

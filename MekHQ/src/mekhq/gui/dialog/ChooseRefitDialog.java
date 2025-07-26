@@ -57,7 +57,6 @@ import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
 import megamek.client.ui.unitreadout.EntityReadout;
-import megamek.client.ui.util.ViewFormatting;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -166,7 +165,7 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setContentType("text/html");
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtOldUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), false, true, true, ViewFormatting.HTML);
+        EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), false, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getReadout() + "</div>");
         scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));

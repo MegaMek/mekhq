@@ -60,6 +60,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.unitreadout.EntityReadout;
+import megamek.client.ui.util.ViewFormatting;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
@@ -618,9 +619,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null != unit) {
                 EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" +
-                                                  mv.getBasicSection() +
+                                                  mv.getBasicSection(ViewFormatting.HTML) +
                                                   "<br>" +
-                                                  mv.getLoadoutSection() +
+                                                  mv.getLoadoutSection(ViewFormatting.HTML) +
                                                   "</div>");
                 SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
                 if (!unit.equals(selectedUnit)) {
