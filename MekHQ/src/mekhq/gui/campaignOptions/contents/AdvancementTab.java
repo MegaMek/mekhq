@@ -47,7 +47,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;

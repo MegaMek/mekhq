@@ -47,7 +47,7 @@ import javax.swing.JSpinner;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;

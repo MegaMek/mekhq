@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.service.mrms;
-
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.gui.dialog.MRMSDialog;
-import mekhq.gui.dialog.MRMSDialog.MRMSOptionControl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.gui.dialog.MRMSDialog;
+import mekhq.gui.dialog.MRMSDialog.MRMSOptionControl;
 
 public class MRMSConfiguredOptions {
     //region Variable Declarations
