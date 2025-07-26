@@ -411,10 +411,10 @@ public class FactionStandingReport extends JDialog {
         btnDocumentation.setName("btnDocumentation");
         btnDocumentation.addActionListener(e -> {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(
-                  "FACTION_STANDING");
+                  "FACTION_STANDINGS");
 
             if (documentationEntry == null) {
-                LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDING");
+                LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDINGS");
                 return;
             }
 

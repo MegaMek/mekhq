@@ -96,7 +96,7 @@ public class FactionStandings {
     /**
      * This value defines the upper limit of Regard a campaign can achieve with the campaign's faction.
      */
-    static final double MAXIMUM_SAME_FACTION_REGARD = STANDING_LEVEL_8.getMaximumRegard() + 10;
+    static final double MAXIMUM_SAME_FACTION_REGARD = STANDING_LEVEL_8.getMaximumRegard();
 
     /**
      * The maximum regard value a campaign can have with a faction other than the campaign's faction

@@ -53,10 +53,10 @@ import java.time.LocalDate;
  */
 public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
     /** The number of months after which a censure expires. */
-    static final int EXPIRY_PERIOD = 24;
+    static final int EXPIRY_PERIOD = 12;
 
     /** The minimum number of months that must pass before a censure is eligible for escalation. */
-    static final int COOLDOWN_PERIOD = 12;
+    static final int COOLDOWN_PERIOD = 6;
 
     /**
      * Determines whether this censure has expired according to the specified date.
