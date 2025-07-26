@@ -31,7 +31,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign;
+package mekhq.campaign.campaignOptions;
 
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
@@ -55,12 +55,11 @@ import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
-import mekhq.campaign.io.CampaignOptionsMarshaller;
-import mekhq.campaign.io.CampaignOptionsUnmarshaller;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;

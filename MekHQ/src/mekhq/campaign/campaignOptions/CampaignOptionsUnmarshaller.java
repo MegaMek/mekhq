@@ -31,7 +31,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.io;
+package mekhq.campaign.campaignOptions;
 
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.ALL;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
@@ -44,7 +44,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;

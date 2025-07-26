@@ -31,7 +31,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.io;
+package mekhq.campaign.campaignOptions;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 
 import megamek.common.enums.SkillLevel;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
