@@ -24,12 +24,40 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.death;
 
+import static mekhq.campaign.personnel.enums.AgeGroup.ADULT;
+import static mekhq.campaign.personnel.enums.AgeGroup.BABY;
+import static mekhq.campaign.personnel.enums.AgeGroup.CHILD;
+import static mekhq.campaign.personnel.enums.AgeGroup.ELDER;
+import static mekhq.campaign.personnel.enums.AgeGroup.PRETEEN;
+import static mekhq.campaign.personnel.enums.AgeGroup.TEENAGER;
+import static mekhq.campaign.personnel.enums.AgeGroup.TODDLER;
+import static mekhq.campaign.universe.enums.EraFlag.STAR_LEAGUE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.Set;
+
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -37,19 +65,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.eras.Era;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.Set;
-
-import static mekhq.campaign.personnel.enums.AgeGroup.*;
-import static mekhq.campaign.universe.enums.EraFlag.STAR_LEAGUE;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link RandomDeath} class.

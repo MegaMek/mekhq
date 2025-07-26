@@ -25,19 +25,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
-
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.finances.Accountant;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.PlanetarySystem;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -45,6 +39,17 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Accountant;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Miguel Azevedo
