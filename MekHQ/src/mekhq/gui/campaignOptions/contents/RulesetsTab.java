@@ -47,13 +47,13 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import megamek.client.ui.models.FileNameComboBoxModel;
-import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.models.FileNameComboBoxModel;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.skills.Skills;
