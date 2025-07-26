@@ -281,7 +281,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
                 int difference = applicantSkill - averageSkillLevel;
                 for (int i = 0; i < difference; i++) {
-                    int interestRoll = Compute.randomInt(10); // TODO make this a campaign option
+                    int interestRoll = Compute.randomInt(10);
 
                     if (interestRoll != 0) {
                         notInterested = true;
@@ -291,6 +291,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
                 if (notInterested) {
                     getLogger().debug("Applicant is too experienced for the campaign, skipping.");
+
+                    rarePersonnel.remove(applicant.getId());
+                    rareProfessions.remove(applicant.getPrimaryRole());
                     continue;
                 }
             }

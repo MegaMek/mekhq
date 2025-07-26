@@ -579,7 +579,7 @@ public class PersonnelMarketDialog extends JDialog {
      */
     private String getTipMessage() {
         if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
-            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(10));
+            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(11));
         }
 
         return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.0");
