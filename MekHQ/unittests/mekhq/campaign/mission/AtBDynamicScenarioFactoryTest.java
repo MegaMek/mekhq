@@ -30,8 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-
 package mekhq.campaign.mission;
+
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 
 import megamek.common.Entity;
 import megamek.common.Game;
@@ -40,19 +47,12 @@ import megamek.common.MekSummaryCache;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.w3c.dom.DOMException;
-
-import java.io.IOException;
-
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AtBDynamicScenarioFactoryTest {

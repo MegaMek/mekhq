@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 

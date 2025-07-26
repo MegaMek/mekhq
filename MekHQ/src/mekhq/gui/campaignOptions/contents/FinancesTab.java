@@ -50,7 +50,7 @@ import javax.swing.SpinnerNumberModel;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;

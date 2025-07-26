@@ -60,6 +60,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mek;
 import megamek.common.WeaponType;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.AmmoBin;
