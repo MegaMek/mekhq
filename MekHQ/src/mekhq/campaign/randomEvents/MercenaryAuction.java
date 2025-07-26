@@ -97,8 +97,8 @@ public class MercenaryAuction {
         }
 
         int maximumBid = campaignState.getSupportPoints();
-        int minimumBid = requiredCombatTeams;
-        boolean cannotAffordOpeningBid = (maximumBid < minimumBid) || (maximumBid == 0);
+        int minimumBid = max(requiredCombatTeams / 2, 1);
+        boolean cannotAffordOpeningBid = maximumBid < minimumBid;
 
         // If the player can't afford the minimum bid, we just tell them about the opportunity and
         // then close out the auction.
