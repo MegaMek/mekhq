@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.randomEvents;
 
+import static java.lang.Math.max;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
@@ -151,10 +152,12 @@ public class RoninOffer {
             return;
         }
 
+        int cost = max(requiredCombatTeams / 2, 1);
+
         response = displayRoninMessage(ronin,
               commanderAddress,
               campaignState == null,
-              requiredCombatTeams,
+              cost,
               campaignState == null ? null : campaignState.getSupportPoints());
         if (response != ACCEPT_DIALOG_CHOICE_INDEX) {
             return;
@@ -167,10 +170,10 @@ public class RoninOffer {
             campaign.getFinances()
                   .debit(RECRUITMENT,
                         campaign.getLocalDate(),
-                        FALLBACK_HIRING_FEE.multipliedBy(requiredCombatTeams),
+                        FALLBACK_HIRING_FEE.multipliedBy(cost),
                         getFormattedTextAt(RESOURCE_BUNDLE, "message.hiring", ronin.getFullName()));
         } else {
-            campaignState.changeSupportPoints(-requiredCombatTeams);
+            campaignState.changeSupportPoints(-cost);
         }
 
         campaign.recruitPerson(ronin, true, true);
