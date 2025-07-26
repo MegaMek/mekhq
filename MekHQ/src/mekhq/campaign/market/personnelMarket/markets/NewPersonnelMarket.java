@@ -48,8 +48,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -87,7 +90,7 @@ public class NewPersonnelMarket {
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
     @SuppressWarnings(value = "FieldCanBeLocal")
-    private static int RARE_PROFESSION_WEIGHT = 20;
+    private static final int RARE_PROFESSION_WEIGHT = 20;
     private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
     private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
@@ -102,7 +105,7 @@ public class NewPersonnelMarket {
     @SuppressWarnings(value = "unused")
     private List<Faction> applicantOriginFactions = new ArrayList<>();
     boolean offeringGoldenHello = true;
-    boolean hasRarePersonnel;
+    Set<UUID> rarePersonnel = new HashSet<>();
     List<PersonnelRole> rareProfessions = new ArrayList<>();
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
@@ -181,8 +184,8 @@ public class NewPersonnelMarket {
                     personnelMarket.setAssociatedPersonnelMarketStyle(PersonnelMarketStyle.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("offeringGoldenHello")) {
                     personnelMarket.setOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
-                    personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("rarePersonnel")) {
+                    processRarePersonnelNodes(personnelMarket, childNode);
                 } else if (nodeName.equalsIgnoreCase("rareProfessions")) {
                     processRareProfessionNodes(personnelMarket, childNode);
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
@@ -312,7 +315,11 @@ public class NewPersonnelMarket {
               "associatedPersonnelMarketStyle",
               associatedPersonnelMarketStyle.name()); // this node must always be first
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rarePersonnel");
+        for (UUID personId : rarePersonnel) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rarePerson", personId);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "rarePersonnel");
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rareProfessions");
         for (PersonnelRole profession : rareProfessions) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rareProfession", profession.name());
@@ -660,7 +667,7 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     public boolean getHasRarePersonnel() {
-        return hasRarePersonnel;
+        return !rarePersonnel.isEmpty();
     }
 
     /**
@@ -670,8 +677,35 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setHasRarePersonnel(boolean hasRarePersonnel) {
-        this.hasRarePersonnel = hasRarePersonnel;
+        //        this.hasRarePersonnel = hasRarePersonnel;
+    }
+
+    /**
+     * Returns the set of rare personnel.
+     *
+     * @return a {@link Set} containing {@link Person} objects considered rare personnel
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Set<UUID> getRarePersonnel() {
+        return rarePersonnel;
+    }
+
+    /**
+     * Adds a {@link UUID} to the set of rare personnel, if not {@code null}.
+     *
+     * @param personId the {@link UUID} to add to the rare personnel set; ignored if {@code null}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void addRarePerson(UUID personId) {
+        if (personId != null) {
+            rarePersonnel.add(personId);
+        }
     }
 
     /**
@@ -768,7 +802,7 @@ public class NewPersonnelMarket {
         gameYear = today.getYear();
         currentSystem = campaign.getCurrentSystem();
 
-        hasRarePersonnel = false;
+        rarePersonnel = new HashSet<>();
         rareProfessions = new ArrayList<>();
         recruitmentRolls = 0;
         applicantOriginFactions = new ArrayList<>();
@@ -881,13 +915,11 @@ public class NewPersonnelMarket {
             return null;
         }
 
-        if (!hasRarePersonnel && (entry.weight() <= RARE_PROFESSION_WEIGHT)) {
-            hasRarePersonnel = true;
+        if (entry.weight() <= RARE_PROFESSION_WEIGHT) {
+            rarePersonnel.add(applicant.getId());
 
             PersonnelRole profession = entry.profession();
-            if (!rareProfessions.contains(profession)) {
-                rareProfessions.add(profession);
-            }
+            rareProfessions.add(profession);
         }
 
         logger.debug("Generated applicant {} ({}) game year {} from faction {}",
@@ -1066,6 +1098,30 @@ public class NewPersonnelMarket {
             }
         }
 
-        logger.info("Load Kill Nodes Complete!");
+        logger.info("Load Rare Profession Nodes Complete!");
+    }
+
+    private static void processRarePersonnelNodes(NewPersonnelMarket personnelMarket, Node parentNode) {
+        logger.info("Loading Rare Personnel Nodes from XML...");
+
+        NodeList childNodes = parentNode.getChildNodes();
+
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node currentChild = childNodes.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (currentChild.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!currentChild.getNodeName().equalsIgnoreCase("rarePerson")) {
+                logger.error("Unknown node type not loaded in Rare Personnel nodes: {}", currentChild.getNodeName());
+                continue;
+            }
+
+            personnelMarket.addRarePerson(UUID.fromString(currentChild.getTextContent().trim()));
+        }
+
+        logger.info("Load Rare Personnel Nodes Complete!");
     }
 }
