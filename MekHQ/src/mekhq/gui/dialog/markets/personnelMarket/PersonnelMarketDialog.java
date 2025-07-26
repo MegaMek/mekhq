@@ -48,6 +48,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -74,6 +75,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
 import mekhq.gui.enums.PersonnelFilter;
@@ -359,28 +362,20 @@ public class PersonnelMarketDialog extends JDialog {
     private JPanel initializeButtonPanel() {
         boolean isGM = campaign.isGM();
 
-        JPanel buttonPanel = new JPanel();
-        JButton documentationButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.documentation"));
-        documentationButton.addActionListener(e -> documentationAction());
-        buttonPanel.add(documentationButton);
+        // Top row panel
+        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+        RoundedJButton btnClose = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
+        btnClose.addActionListener(e -> closeAction());
+        topRow.add(btnClose);
 
-        JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
-        closeButton.addActionListener(e -> closeAction());
-        buttonPanel.add(closeButton);
+        RoundedJButton btnHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
+        btnHire.addActionListener(e -> hireActionListener(isGM));
+        topRow.add(btnHire);
 
-        JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
-        hireButton.addActionListener(e -> hireActionListener(isGM));
-        buttonPanel.add(hireButton);
-
-        JButton addGMButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
-        addGMButton.addActionListener(e -> hireActionListener(isGM));
-        addGMButton.setEnabled(isGM);
-        buttonPanel.add(addGMButton);
-
-        JButton advanceMultipleDays = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.advanceDays"));
-        advanceMultipleDays.addActionListener(e -> {
+        RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "button.personnelMarket.advanceDays"));
+        btnAdvanceMultipleDays.addActionListener(e -> {
             closeAction(); // Close old instance
-
             AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(parent, campaign.getApp().getCampaigngui());
             advanceDaysDialog.setVisible(true);
             advanceDaysDialog.addWindowListener(new WindowAdapter() {
@@ -390,7 +385,31 @@ public class PersonnelMarketDialog extends JDialog {
                 }
             });
         });
-        buttonPanel.add(advanceMultipleDays);
+        topRow.add(btnAdvanceMultipleDays);
+
+        // Bottom row panel
+        JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+        RoundedJButton btnDocumentation = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "button.personnelMarket.documentation"));
+        btnDocumentation.addActionListener(e -> documentationAction());
+        bottomRow.add(btnDocumentation);
+
+        RoundedJButton bthGMHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
+        bthGMHire.addActionListener(e -> hireActionListener(isGM));
+        bthGMHire.setEnabled(isGM);
+        bottomRow.add(bthGMHire);
+
+        RoundedJButton btnGMAdd = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm"));
+        btnGMAdd.addActionListener(e -> addApplicantActionListener());
+        btnGMAdd.setEnabled(isGM);
+        bottomRow.add(btnGMAdd);
+
+        // Parent panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(topRow);
+        buttonPanel.add(bottomRow);
 
         return buttonPanel;
     }
@@ -489,6 +508,7 @@ public class PersonnelMarketDialog extends JDialog {
         personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
         viewScrollPane.setMinimumSize(PERSON_VIEW_MINIMUM_SIZE);
+        viewScrollPane.setBorder(null);
         SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
 
         JPanel buttonPanel = initializeButtonPanel();
@@ -543,6 +563,42 @@ public class PersonnelMarketDialog extends JDialog {
 
         // Clear selection in the table
         tablePanel.getTable().clearSelection();
+    }
+
+    /**
+     * Handles the process of adding a fresh applicant to the applicant pool.
+     *
+     * <p>This method attempts to create a single applicant for the personnel market. If no applicant is available,
+     * it reports an error message to the campaign log. Otherwise, the applicant is added to the list of current
+     * applicants, the table view in the user interface is refreshed to reflect the change, and any existing table
+     * selection is cleared.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void addApplicantActionListener() {
+        Person applicant = market.getSingleApplicant();
+        if (applicant == null) {
+            campaign.addReport(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm.error"));
+            return;
+        }
+
+        currentApplicants.add(applicant);
+
+        // Refresh the table view (notify the model of data changes)
+        AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
+        model.fireTableDataChanged();
+
+        // Clear selection in the table
+        tablePanel.getTable().clearSelection();
+
+        int rowCount = model.getRowCount();
+        if (rowCount > 0) {
+            if (rowCount == 1) { // Only 1 applicant in the table
+                tablePanel.getTable().setRowSelectionInterval(0, 0); // Select the first (and only) row
+            }
+            personViewPanel.setVisible(true);
+        }
     }
 
     /**
