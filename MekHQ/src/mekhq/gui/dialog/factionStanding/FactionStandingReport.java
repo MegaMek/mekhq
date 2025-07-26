@@ -68,7 +68,7 @@ import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
