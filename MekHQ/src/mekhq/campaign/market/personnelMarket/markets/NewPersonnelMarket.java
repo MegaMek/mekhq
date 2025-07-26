@@ -560,8 +560,8 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public ArrayList<Faction> getApplicantOriginFactions() {
-        return new ArrayList<>();
+    public List<Faction> getApplicantOriginFactions() {
+        return applicantOriginFactions;
     }
 
     /**
