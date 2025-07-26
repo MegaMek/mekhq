@@ -102,6 +102,7 @@ public class NewPersonnelMarket {
     @SuppressWarnings(value = "unused")
     private List<Faction> applicantOriginFactions = new ArrayList<>();
     boolean offeringGoldenHello = true;
+    boolean wasOfferingGoldenHello = true;
     boolean hasRarePersonnel;
     List<PersonnelRole> rareProfessions = new ArrayList<>();
     int recruitmentRolls;
@@ -179,6 +180,8 @@ public class NewPersonnelMarket {
                 String nodeContents = childNode.getTextContent().trim();
                 if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
                     personnelMarket.setAssociatedPersonnelMarketStyle(PersonnelMarketStyle.fromString(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("wasOfferingGoldenHello")) {
+                    personnelMarket.setWasOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("offeringGoldenHello")) {
                     personnelMarket.setOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
@@ -311,6 +314,7 @@ public class NewPersonnelMarket {
               indent,
               "associatedPersonnelMarketStyle",
               associatedPersonnelMarketStyle.name()); // this node must always be first
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "wasOfferingGoldenHello", wasOfferingGoldenHello);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rareProfessions");
@@ -653,6 +657,30 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Returns whether a golden hello (recruitment incentive) was being offered when applicants were generated.
+     *
+     * @return {@code true} if a golden hello was offered, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isWasOfferingGoldenHello() {
+        return wasOfferingGoldenHello;
+    }
+
+    /**
+     * Sets whether a golden hello (recruitment incentive) was being offered when applicants were generated.
+     *
+     * @param wasOfferingGoldenHello {@code true} if a golden hello was offered, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setWasOfferingGoldenHello(boolean wasOfferingGoldenHello) {
+        this.wasOfferingGoldenHello = wasOfferingGoldenHello;
+    }
+
+    /**
      * Returns whether rare personnel are available on the market.
      *
      * @return {@code true} if rare personnel are present, otherwise {@code false}
@@ -773,6 +801,7 @@ public class NewPersonnelMarket {
         recruitmentRolls = 0;
         applicantOriginFactions = new ArrayList<>();
         currentApplicants = new ArrayList<>();
+        wasOfferingGoldenHello = isOfferingGoldenHello();
     }
 
     /**

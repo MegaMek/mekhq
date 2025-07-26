@@ -369,11 +369,11 @@ public class PersonnelMarketDialog extends JDialog {
         buttonPanel.add(closeButton);
 
         JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
-        hireButton.addActionListener(e -> hireActionListener(isGM));
+        hireButton.addActionListener(e -> hireActionListener(false));
         buttonPanel.add(hireButton);
 
         JButton addGMButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
-        addGMButton.addActionListener(e -> hireActionListener(isGM));
+        addGMButton.addActionListener(e -> hireActionListener(true));
         addGMButton.setEnabled(isGM);
         buttonPanel.add(addGMButton);
 
@@ -509,17 +509,17 @@ public class PersonnelMarketDialog extends JDialog {
     /**
      * Performs the hiring action for the selected applicant.
      *
-     * @param isGM whether the hire action is performed by a game master
+     * @param isGMHire whether the hire action is performed as a GM Hire
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private void hireActionListener(boolean isGM) {
+    private void hireActionListener(boolean isGMHire) {
         List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
 
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
-            if (!isGM && market.isOfferingGoldenHello()) {
+            if (!isGMHire && market.isWasOfferingGoldenHello()) {
                 campaign.getFinances()
                       .debit(RECRUITMENT,
                             campaign.getLocalDate(),
@@ -528,7 +528,7 @@ public class PersonnelMarketDialog extends JDialog {
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
             }
-            campaign.recruitPerson(applicant, isGM, true);
+            campaign.recruitPerson(applicant, isGMHire, true);
         }
 
         // Remove all recruited persons from the applicant list
