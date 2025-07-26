@@ -48,6 +48,7 @@ import java.util.Objects;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.finances.Money;
