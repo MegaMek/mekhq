@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -38,7 +43,7 @@ import static org.mockito.Mockito.when;
 import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
 import org.junit.jupiter.api.Test;

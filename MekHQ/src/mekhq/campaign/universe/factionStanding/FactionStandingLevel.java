@@ -42,7 +42,7 @@ import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 
 /**

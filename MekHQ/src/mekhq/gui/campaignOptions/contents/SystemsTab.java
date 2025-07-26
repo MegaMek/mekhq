@@ -47,7 +47,7 @@ import javax.swing.JSpinner;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
