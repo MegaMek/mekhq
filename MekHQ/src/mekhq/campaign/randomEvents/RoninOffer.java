@@ -152,7 +152,7 @@ public class RoninOffer {
             return;
         }
 
-        int cost = max(requiredCombatTeams / 2, 1);
+        int cost = max((int) Math.round((double) requiredCombatTeams / 2), 1);
 
         response = displayRoninMessage(ronin,
               commanderAddress,
