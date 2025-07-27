@@ -387,10 +387,10 @@ public class PersonnelMarketDialog extends JDialog {
         btnDocumentation.addActionListener(e -> documentationAction());
         bottomRow.add(btnDocumentation);
 
-        RoundedJButton bthGMHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
-        bthGMHire.addActionListener(e -> hireActionListener(isGM));
-        bthGMHire.setEnabled(isGM);
-        bottomRow.add(bthGMHire);
+        RoundedJButton btnGMHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
+        btnGMHire.addActionListener(e -> hireActionListener(isGM));
+        btnGMHire.setEnabled(isGM);
+        bottomRow.add(btnGMHire);
 
         RoundedJButton btnGMAdd = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm"));
         btnGMAdd.addActionListener(e -> addApplicantActionListener());
