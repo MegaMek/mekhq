@@ -64,7 +64,9 @@ import megamek.common.preference.PreferenceManager;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
+import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -411,7 +413,7 @@ public class CampaignPreset {
         }
 
         if (getCampaignOptions() != null) {
-            getCampaignOptions().writeToXml(pw, indent);
+            CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), pw, indent);
         }
 
         if (getRandomSkillPreferences() != null) {
@@ -534,7 +536,8 @@ public class CampaignPreset {
                         preset.getGameOptions().fillFromXML(wn.getChildNodes());
                         break;
                     case "campaignOptions":
-                        preset.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
+                        preset.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
+                              version));
                         break;
                     case "randomSkillPreferences":
                         preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn,
