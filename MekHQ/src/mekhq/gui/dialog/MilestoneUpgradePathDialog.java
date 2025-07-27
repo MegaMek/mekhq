@@ -71,6 +71,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 public class MilestoneUpgradePathDialog {
     private static final MMLogger LOGGER = MMLogger.create(MilestoneUpgradePathDialog.class);
 
+    private final static String DISCORD_LINK = "https://discord.gg/megamek";
+
     /**
      * Displays the milestone upgrade path dialog if upgrades are needed for the supplied campaign.
      *
@@ -175,6 +177,13 @@ public class MilestoneUpgradePathDialog {
         pnlUpgrades.setAlignmentX(Component.CENTER_ALIGNMENT);
         pnlUpgrades.setMaximumSize(new Dimension(Integer.MAX_VALUE, pnlUpgrades.getPreferredSize().height));
 
+
+        JButton btnDiscord = new RoundedJButton("<html><b>" +
+                                                      getText("MilestoneUpgradePathDialog.discord") +
+                                                      "</b></html>");
+        btnDiscord.setName("btnDiscord");
+        buildUrlButton(pnlUpgrades, btnDiscord, DISCORD_LINK);
+
         // Create a batch of labels, one per upgrade, that both look and act like hyperlinks
         for (MilestoneData milestone : upgradePath) {
             String milestoneLabel = milestone.label();
@@ -182,24 +191,43 @@ public class MilestoneUpgradePathDialog {
 
             JButton btnUpgrade = new RoundedJButton("<html><b>" + milestoneLabel + "</b></html>");
             btnUpgrade.setName("upgrade" + milestoneLabel);
-            btnUpgrade.setToolTipText(milestoneUrl);
-            btnUpgrade.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnUpgrade.setAlignmentX(Component.CENTER_ALIGNMENT);
-            btnUpgrade.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent evt) {
-                    if (Desktop.isDesktopSupported()) {
-                        try {
-                            URI uri = new URI(milestoneUrl);
-                            Desktop.getDesktop().browse(uri);
-                        } catch (Exception ex) {
-                            LOGGER.error(ex, "Failed to open URL: {}", milestoneUrl);
-                        }
-                    }
-                }
-            });
-            pnlUpgrades.add(btnUpgrade);
+            buildUrlButton(pnlUpgrades, btnUpgrade, milestoneUrl);
         }
         return pnlUpgrades;
+    }
+
+    /**
+     * Adds a button to a specified panel that, when clicked, attempts to open the given URL in the user's default web
+     * browser.
+     *
+     * <p>This method sets the button's tooltip to the provided URL, changes its cursor to a hand when hovered,
+     * centers its alignment, and attaches a mouse click listener. On click, if the current platform supports desktop
+     * browsing, it will attempt to open the URL. If an error occurs during this process, the exception is logged.</p>
+     *
+     * @param pnlUpgrades the {@link JPanel} to which the button will be added
+     * @param btnDiscord  the {@link JButton} that will serve as the clickable link
+     * @param discordLink the URL to be opened when the button is clicked
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static void buildUrlButton(JPanel pnlUpgrades, JButton btnDiscord, String discordLink) {
+        btnDiscord.setToolTipText(discordLink);
+        btnDiscord.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnDiscord.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnDiscord.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        URI uri = new URI(discordLink);
+                        Desktop.getDesktop().browse(uri);
+                    } catch (Exception ex) {
+                        LOGGER.error(ex, "Failed to open URL: {}", discordLink);
+                    }
+                }
+            }
+        });
+        pnlUpgrades.add(btnDiscord);
     }
 }
