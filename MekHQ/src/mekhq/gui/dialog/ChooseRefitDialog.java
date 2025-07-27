@@ -166,7 +166,7 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtOldUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), false, true, true);
-        txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getReadout() + "</div>");
+        txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
         scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
@@ -285,7 +285,7 @@ public class ChooseRefitDialog extends JDialog {
         lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
         EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
-        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getReadout() + "</div>");
+        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }
 

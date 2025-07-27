@@ -1855,7 +1855,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         if ((unitStatus == null) || (unitStatus.getEntity() == null)) {
             return;
         }
-        EntityReadout.createReadoutDialog(frame, true, unitStatus.getEntity()).setVisible(true);
+        new EntityReadoutDialog(frame, true, unitStatus.getEntity()).setVisible(true);
     }
 
     /**
