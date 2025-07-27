@@ -50,12 +50,12 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;

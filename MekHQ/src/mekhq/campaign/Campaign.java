@@ -37,10 +37,10 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.CampaignOptions.S_AUTO;
-import static mekhq.campaign.CampaignOptions.S_TECH;
-import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
-import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
+import static mekhq.campaign.campaignOptions.CampaignOptions.S_AUTO;
+import static mekhq.campaign.campaignOptions.CampaignOptions.S_TECH;
+import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
+import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
@@ -138,6 +138,8 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Accountant;
@@ -7325,7 +7327,7 @@ public class Campaign implements ITechManager {
 
         // region Options
         if (getCampaignOptions() != null) {
-            getCampaignOptions().writeToXml(writer, indent);
+            CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
         getGameOptions().writeToXML(writer, indent);
         // endregion Options

@@ -42,7 +42,7 @@ import megamek.common.SmallCraft;
 import megamek.common.SupportTank;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;

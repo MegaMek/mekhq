@@ -24,14 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import static mekhq.campaign.campaignOptions.CampaignOptions.REPUTATION_PERFORMANCE_CUT_OFF_YEARS;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -39,7 +40,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.CampaignOptions.REPUTATION_PERFORMANCE_CUT_OFF_YEARS;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.MissionStatus;
 
 public class CombatRecordRating {
     private static final MMLogger logger = MMLogger.create(CombatRecordRating.class);

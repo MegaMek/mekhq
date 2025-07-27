@@ -74,7 +74,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.IPlayerSettings;
 import mekhq.campaign.personnel.Person;
@@ -1012,7 +1012,7 @@ public class Utilities {
     }
 
     public static Money[] readMoneyArray(Node node, int minimumSize) {
-        String[] values = node.getTextContent().split(",");
+        String[] values = node.getTextContent().trim().split(",");
         Money[] result = new Money[max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
