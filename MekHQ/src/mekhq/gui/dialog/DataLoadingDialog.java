@@ -446,6 +446,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
 
+                // Campaign upgrading
                 if (campaign.getVersion().isLowerThan(MHQConstants.VERSION)) {
                     handleCampaignUpgrading(campaign);
                 }
