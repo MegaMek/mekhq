@@ -122,6 +122,11 @@ public class MilestoneUpgradePathDialog {
 
         List<MilestoneData> upgradePath = new ArrayList<>();
         for (MilestoneData milestone : allMilestoneReleases) {
+            // If the milestone and the current version are identical, the campaign can always load in
+            if (milestone.version().equals(MHQConstants.VERSION)) {
+                continue;
+            }
+
             if (currentVersion.isLowerThan(milestone.version())) {
                 upgradePath.add(milestone);
             }
