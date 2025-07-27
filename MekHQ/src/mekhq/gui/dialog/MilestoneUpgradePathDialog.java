@@ -69,7 +69,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
  * @since 0.50.07
  */
 public class MilestoneUpgradePathDialog {
-    private final static MMLogger LOGGER = MMLogger.create(MilestoneUpgradePathDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MilestoneUpgradePathDialog.class);
 
     /**
      * Displays the milestone upgrade path dialog if upgrades are needed for the supplied campaign.
