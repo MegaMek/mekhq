@@ -55,6 +55,10 @@ public class CampaignFactory {
     public enum CampaignProblemType {
         NONE,
         CANT_LOAD_FROM_NEWER_VERSION,
+        /**
+         * No longer in use
+         */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         CANT_LOAD_FROM_OLDER_VERSION,
         /**
          * No longer in use
@@ -146,13 +150,6 @@ public class CampaignFactory {
         // Check if the campaign is from a newer version
         if (campaignVersion.isHigherThan(MHQConstants.VERSION)) {
             if (triggerProblemDialog(campaign, CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION)) {
-                return null;
-            }
-        }
-
-        // Check if the campaign is from an older, unsupported version
-        if (campaignVersion.isLowerThan(MHQConstants.LAST_MILESTONE)) {
-            if (triggerProblemDialog(campaign, CampaignProblemType.CANT_LOAD_FROM_OLDER_VERSION)) {
                 return null;
             }
         }
