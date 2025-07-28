@@ -291,6 +291,7 @@ public class Campaign implements ITechManager {
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
+    private final List<Version> pastVersions = new ArrayList<>();
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
@@ -577,6 +578,14 @@ public class Campaign implements ITechManager {
 
     public @Nullable Version getVersion() {
         return version;
+    }
+
+    public List<Version> getPastVersions() {
+        return pastVersions;
+    }
+
+    public void addPastVersion(Version pastVersion) {
+        this.pastVersions.add(pastVersion);
     }
 
     public String getName() {
@@ -6287,6 +6296,18 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Refreshes the personnel markets based on the current market style and the current date.
+     *
+     * <p>If the new personnel market is disabled, generates a daily set of available personnel using the old
+     * method. Otherwise, if it is the first day of the month, gathers new applications for the personnel market.
+     *
+     * <p>If rare professions are present, presents a dialog with options regarding these rare personnel. Optionally,
+     * allowing the user to view the new personnel market dialog immediately.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void refreshPersonnelMarkets() {
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
@@ -6296,6 +6317,12 @@ public class Campaign implements ITechManager {
                 newPersonnelMarket.gatherApplications();
 
                 if (newPersonnelMarket.getHasRarePersonnel()) {
+                    StringBuilder oocReport = new StringBuilder(resources.getString(
+                          "personnelMarket.rareProfession.outOfCharacter"));
+                    for (PersonnelRole profession : newPersonnelMarket.getRareProfessions()) {
+                        oocReport.append("<p>- ").append(profession.getLabel(isClanCampaign())).append("</p>");
+                    }
+
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
                           getSeniorAdminPerson(AdministratorSpecialization.HR),
                           null,
@@ -6303,7 +6330,7 @@ public class Campaign implements ITechManager {
                           List.of(resources.getString("personnelMarket.rareProfession.button.later"),
                                 resources.getString("personnelMarket.rareProfession.button.decline"),
                                 resources.getString("personnelMarket.rareProfession.button.immediate")),
-                          resources.getString("personnelMarket.rareProfession.outOfCharacter"),
+                          oocReport.toString(),
                           null,
                           true);
 
@@ -7256,6 +7283,11 @@ public class Campaign implements ITechManager {
 
         // Start the XML root.
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "campaign", "version", MHQConstants.VERSION);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "pastVersions");
+        for (final Version pastVersion : pastVersions) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "pastVersion", pastVersion.toString());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "pastVersions");
 
         // region Basic Campaign Info
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "info");
