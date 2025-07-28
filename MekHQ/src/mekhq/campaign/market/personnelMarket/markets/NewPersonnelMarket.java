@@ -37,6 +37,15 @@ import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -227,7 +236,7 @@ public class NewPersonnelMarket {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
             if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
-                campaign.addReport(generatePersonnelReport());
+                campaign.addReport(generatePersonnelReport(campaign));
             }
 
             MekHQ.triggerEvent(new MarketNewPersonnelEvent(currentApplicants));
@@ -943,14 +952,66 @@ public class NewPersonnelMarket {
         return entry;
     }
 
+    /** Use {@link #generatePersonnelReport(Campaign)} instead */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    private String generatePersonnelReport() {
+        return getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report");
+    }
+
     /**
-     * Generates a personnel recruitment report for the specified campaign.
+     * Generates an HTML-formatted personnel recruitment report for the specified campaign, summarizing the number of
+     * current applicants at each experience level.
+     *
+     * <p>The report includes a line for each experience level with at least one applicant, showing the count,
+     * color-coded rank, and name of the experience level. Pluralization is handled automatically.</p>
+     *
+     * @param campaign the campaign for which to generate the personnel report
+     * @return a formatted HTML report string summarizing applicant counts by experience level
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private String generatePersonnelReport() {
-        return getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report");
+    private String generatePersonnelReport(Campaign campaign) {
+        StringBuilder report = new StringBuilder(getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report"));
+
+        // Define the experience levels and tie them to their respective constants.
+        final int[] expLevels = {
+              EXP_ULTRA_GREEN, EXP_GREEN, EXP_REGULAR,
+              EXP_VETERAN, EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY
+        };
+
+        // Set up per-level tracking (index order must match expLevels)
+        final int[] applicantCounts = new int[expLevels.length];
+        final String[] colors = new String[expLevels.length];
+        final String[] names = new String[expLevels.length];
+
+        for (int i = 0; i < expLevels.length; i++) {
+            colors[i] = spanOpeningWithCustomColor(getExperienceLevelColor(expLevels[i]));
+            names[i] = getExperienceLevelName(expLevels[i]);
+        }
+
+        // Tally applicants per experience level
+        for (Person applicant : currentApplicants) {
+            int experienceLevel = applicant.getExperienceLevel(campaign, false);
+            for (int i = 0; i < expLevels.length; i++) {
+                if (experienceLevel == expLevels[i]) {
+                    applicantCounts[i]++;
+                    break;
+                }
+            }
+        }
+
+        // Append report lines for each non-zero level
+        for (int i = expLevels.length - 1; i >= 0; i--) { // highest to lowest
+            if (applicantCounts[i] > 0) {
+                int pluralizer = applicantCounts[i] > 1 ? 1 : 0;
+                report.append("<br>")
+                      .append(getFormattedTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.experienceLevel",
+                            applicantCounts[i], colors[i], names[i], CLOSING_SPAN_TAG, pluralizer));
+            }
+        }
+
+        return report.toString();
     }
 
     /**
