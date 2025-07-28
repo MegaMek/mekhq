@@ -134,6 +134,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
@@ -199,6 +200,12 @@ public class CampaignXmlParser {
             throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
                   campaignEle.getAttribute("version")));
         }
+        // Confirm the campaign version is compatible with the current MekHQ version. This function lives here so that
+        // we don't attempt to load incompatible campaigns and risk running into errors that might prevent the player
+        // from viewing this dialog
+        new MilestoneUpgradePathDialog(campaign, version);
+
+        // Assuming there is no upgrade path, we set version and continue parsing the campaign.
         campaign.setVersion(version);
 
         // Indicates whether or not new units were written to disk while
