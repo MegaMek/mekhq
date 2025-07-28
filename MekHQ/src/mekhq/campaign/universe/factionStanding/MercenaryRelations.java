@@ -41,6 +41,7 @@ import static mekhq.campaign.universe.factionStanding.MercenaryRelations.Standin
 import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.AVERAGE;
 import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.AWFUL;
 import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.BELOW_AVERAGE;
+import static mekhq.campaign.universe.factionStanding.MercenaryRelations.StandingModifier.DEATH_TO_MERCENARIES;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -101,9 +102,11 @@ public class MercenaryRelations {
                 // Distrustful due to bushido culture viewing mercenaries as dishonorable (default standing)
                 new MercenaryRelation(NO_STARTING_DATE, LocalDate.of(3029, 9, 3), BELOW_AVERAGE),
                 // Death to Mercenaries edict
-                new MercenaryRelation(LocalDate.of(3029, 9, 4), LocalDate.of(3039, 4, 15), AWFUL),
+                new MercenaryRelation(LocalDate.of(3029, 9, 4), LocalDate.of(3039, 4, 15), DEATH_TO_MERCENARIES),
                 // Death to Mercenaries starts to be relaxed, but not wholly removed
-                new MercenaryRelation(LocalDate.of(3039, 4, 16), LocalDate.of(3054, 9, 14), BELOW_AVERAGE),
+                new MercenaryRelation(LocalDate.of(3039, 4, 16), LocalDate.of(3049, 4, 16), AWFUL),
+                // Death to Mercenaries relaxed further
+                new MercenaryRelation(LocalDate.of(3049, 4, 17), LocalDate.of(3054, 9, 14), AWFUL),
                 // Theodore Kurita's reforms (new default)
                 new MercenaryRelation(LocalDate.of(3054, 9, 15), NO_ENDING_DATE, AVERAGE)
           )),
@@ -174,6 +177,7 @@ public class MercenaryRelations {
      * @since 0.50.07
      */
     enum StandingModifier {
+        DEATH_TO_MERCENARIES(REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 10),
         AWFUL(REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 5),
         BELOW_AVERAGE(REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER * 10),
         AVERAGE(DEFAULT_REGARD),
