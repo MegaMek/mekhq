@@ -50,9 +50,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import megamek.Version;
+import megamek.common.util.milestoneReleaseInformation.MilestoneData;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
-import megamek.utilities.MilestoneData;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
