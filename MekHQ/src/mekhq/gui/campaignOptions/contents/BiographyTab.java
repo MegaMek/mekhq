@@ -501,6 +501,8 @@ public class BiographyTab {
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
         panelParent.add(panelLeft, layoutParent);
+        layoutParent.gridx++;
+        panelParent.add(pnlAnniversariesPanel, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
