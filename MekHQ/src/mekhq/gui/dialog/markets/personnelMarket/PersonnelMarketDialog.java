@@ -362,7 +362,7 @@ public class PersonnelMarketDialog extends JDialog {
         topRow.add(btnClose);
 
         RoundedJButton btnHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
-        btnHire.addActionListener(e -> hireActionListener(isGM));
+        btnHire.addActionListener(e -> hireActionListener(false));
         topRow.add(btnHire);
 
         RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
@@ -388,7 +388,7 @@ public class PersonnelMarketDialog extends JDialog {
         bottomRow.add(btnDocumentation);
 
         RoundedJButton btnGMHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
-        btnGMHire.addActionListener(e -> hireActionListener(isGM));
+        btnGMHire.addActionListener(e -> hireActionListener(true));
         btnGMHire.setEnabled(isGM);
         bottomRow.add(btnGMHire);
 
@@ -522,17 +522,17 @@ public class PersonnelMarketDialog extends JDialog {
     /**
      * Performs the hiring action for the selected applicant.
      *
-     * @param isGM whether the hire action is performed by a game master
+     * @param isGMHire whether the hire action is performed as a GM Hire
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private void hireActionListener(boolean isGM) {
+    private void hireActionListener(boolean isGMHire) {
         List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
 
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
-            if (!isGM && market.isOfferingGoldenHello()) {
+            if (!isGMHire && market.isWasOfferingGoldenHello()) {
                 campaign.getFinances()
                       .debit(RECRUITMENT,
                             campaign.getLocalDate(),
@@ -541,7 +541,7 @@ public class PersonnelMarketDialog extends JDialog {
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
             }
-            campaign.recruitPerson(applicant, isGM, true);
+            campaign.recruitPerson(applicant, isGMHire, true);
         }
 
         // Remove all recruited persons from the applicant list
