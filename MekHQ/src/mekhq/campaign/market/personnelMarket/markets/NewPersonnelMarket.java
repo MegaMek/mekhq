@@ -247,6 +247,21 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Retrieves a single applicant if available.
+     *
+     * @return a {@link Person}, or {@code null} if no applicant exists
+     */
+    public @Nullable Person getSingleApplicant() {
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+                                                                                getClanMarketEntries() :
+                                                                                getInnerSphereMarketEntries();
+        unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
+        List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
+
+        return generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
+    }
+
+    /**
      * Performs the Connections recruits check for the given date and Connections level.
      *
      * <p>This method determines whether the commander gains additional recruits based on their Connections level. If
@@ -552,8 +567,8 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public ArrayList<Faction> getApplicantOriginFactions() {
-        return new ArrayList<>();
+    public List<Faction> getApplicantOriginFactions() {
+        return applicantOriginFactions;
     }
 
     /**
@@ -894,14 +909,14 @@ public class NewPersonnelMarket {
             logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
                                "fallback structure of the YAML file is incorrect.",
                   originalEntry.profession(),
-                  gameYear);
+                  getGameYear());
             return null;
         }
 
         // If we have a valid entry, we now need to generate the applicant
-        Faction applicantOriginFaction = getRandomItem(applicantOriginFactions);
+        Faction applicantOriginFaction = getRandomItem(getApplicantOriginFactions());
         if (applicantOriginFaction == null) {
-            logger.error("Could not find a valid applicant origin faction for game year {}.", gameYear);
+            logger.error("Could not find a valid applicant origin faction for game year {}.", getGameYear());
             return null;
         }
         String originFactionCode = applicantOriginFaction.getShortName();
@@ -910,7 +925,7 @@ public class NewPersonnelMarket {
         if (applicant == null) {
             logger.warn("Could not create person for {} game year {} from faction {}",
                   originalEntry.profession(),
-                  gameYear,
+                  getGameYear(),
                   applicantOriginFaction);
             return null;
         }
@@ -925,7 +940,7 @@ public class NewPersonnelMarket {
         logger.debug("Generated applicant {} ({}) game year {} from faction {}",
               applicant.getFullName(),
               applicant.getPrimaryRole(),
-              gameYear,
+              getGameYear(),
               applicantOriginFaction);
 
         return applicant;
