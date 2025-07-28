@@ -76,6 +76,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
@@ -308,7 +309,9 @@ public class CampaignXmlParser {
                 // Okay, so what element is it?
                 String nodeName = workingNode.getNodeName();
 
-                if (nodeName.equalsIgnoreCase("randomSkillPreferences")) {
+                if (nodeName.equalsIgnoreCase("pastVersions")) {
+                    processPastVersionNodes(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("randomSkillPreferences")) {
                     campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(
                           workingNode,
                           version));
@@ -924,6 +927,57 @@ public class CampaignXmlParser {
             if (combatTeam != null) {
                 campaign.addCombatTeam(combatTeam);
             }
+        }
+    }
+
+    /**
+     * Processes the child nodes of a given XML node to extract and register past version information in the specified
+     * campaign.
+     * <p>
+     * This method iterates through all child nodes of the supplied {@code workingNode}, identifies elements named
+     * "pastVersion", and creates {@link Version} objects from their text content. Each parsed version is added to the
+     * campaign's list of past versions if it is not already present. Unknown node types encountered in this context are
+     * logged as errors.
+     * <p>
+     * After processing, if the campaign's list of past versions is empty, a warning is logged. The method also ensures
+     * the current application version is included in the list if it was not already present.
+     *
+     * @param campaign    the {@link Campaign} instance to be updated with past version information
+     * @param workingNode the XML {@link Node} whose child nodes contain past version data to be processed
+     */
+    private static void processPastVersionNodes(Campaign campaign, Node workingNode) {
+        NodeList childNodes = workingNode.getChildNodes();
+
+        // Iterate through the children (past versions)
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node childNode = childNodes.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            // If the node name isn't correct, we ignore it.
+            if (!childNode.getNodeName().equalsIgnoreCase("pastVersion")) {
+                LOGGER.error("Incorrect node loaded in Past Version nodes: {}", childNode.getNodeName());
+                continue;
+            }
+
+            // Otherwise, we add it to the list of past versions
+            Version pastVersion = new Version(childNode.getTextContent());
+            if (!campaign.getPastVersions().contains(pastVersion)) {
+                campaign.addPastVersion(pastVersion);
+            }
+        }
+        List<Version> pastVersions = campaign.getPastVersions();
+        if (pastVersions.isEmpty()) {
+            LOGGER.info("No past versions found in campaign file.");
+        }
+
+        // Add the current version (if it's missing)
+        if (!pastVersions.contains(MHQConstants.VERSION)) {
+            LOGGER.info("Current version {} not found in past versions list. Adding it.", MHQConstants.VERSION);
+            campaign.addPastVersion(MHQConstants.VERSION);
         }
     }
 

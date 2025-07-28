@@ -291,6 +291,7 @@ public class Campaign implements ITechManager {
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
+    private final List<Version> pastVersions = new ArrayList<>();
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
@@ -577,6 +578,14 @@ public class Campaign implements ITechManager {
 
     public @Nullable Version getVersion() {
         return version;
+    }
+
+    public List<Version> getPastVersions() {
+        return pastVersions;
+    }
+
+    public void addPastVersion(Version pastVersion) {
+        this.pastVersions.add(pastVersion);
     }
 
     public String getName() {
@@ -7274,6 +7283,11 @@ public class Campaign implements ITechManager {
 
         // Start the XML root.
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "campaign", "version", MHQConstants.VERSION);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "pastVersions");
+        for (final Version pastVersion : pastVersions) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "pastVersion", pastVersion.toString());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "pastVersions");
 
         // region Basic Campaign Info
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "info");
