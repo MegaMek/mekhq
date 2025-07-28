@@ -6287,6 +6287,18 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Refreshes the personnel markets based on the current market style and the current date.
+     *
+     * <p>If the new personnel market is disabled, generates a daily set of available personnel using the old
+     * method. Otherwise, if it is the first day of the month, gathers new applications for the personnel market.
+     *
+     * <p>If rare professions are present, presents a dialog with options regarding these rare personnel. Optionally,
+     * allowing the user to view the new personnel market dialog immediately.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void refreshPersonnelMarkets() {
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
@@ -6296,6 +6308,12 @@ public class Campaign implements ITechManager {
                 newPersonnelMarket.gatherApplications();
 
                 if (newPersonnelMarket.getHasRarePersonnel()) {
+                    StringBuilder oocReport = new StringBuilder(resources.getString(
+                          "personnelMarket.rareProfession.outOfCharacter"));
+                    for (PersonnelRole profession : newPersonnelMarket.getRareProfessions()) {
+                        oocReport.append("<p>- ").append(profession.getLabel(isClanCampaign())).append("</p>");
+                    }
+
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
                           getSeniorAdminPerson(AdministratorSpecialization.HR),
                           null,
@@ -6303,7 +6321,7 @@ public class Campaign implements ITechManager {
                           List.of(resources.getString("personnelMarket.rareProfession.button.later"),
                                 resources.getString("personnelMarket.rareProfession.button.decline"),
                                 resources.getString("personnelMarket.rareProfession.button.immediate")),
-                          resources.getString("personnelMarket.rareProfession.outOfCharacter"),
+                          oocReport.toString(),
                           null,
                           true);
 

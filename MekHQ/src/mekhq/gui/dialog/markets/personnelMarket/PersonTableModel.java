@@ -37,6 +37,8 @@ import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLeve
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import javax.swing.table.AbstractTableModel;
 
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -115,10 +117,18 @@ public class PersonTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         Person person = people.get(rowIndex);
         NewPersonnelMarket market = campaign.getNewPersonnelMarket();
+        Set<UUID> rarePersonnel = market.getRarePersonnel();
 
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
-            case FULL_NAME -> person.getFullName();
+            case FULL_NAME -> {
+                String name = person.getFullName();
+                if (rarePersonnel.contains(person.getId())) {
+                    name += " ★";
+                }
+
+                yield name;
+            }
             case PROFESSION -> {
                 PersonnelRole profession = person.getPrimaryRole();
 
