@@ -48,6 +48,8 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RES
 import static mekhq.campaign.personnel.enums.PersonnelRole.GROUND_VEHICLE_DRIVER;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
+import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.CANCEL;
+import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.PLAYER;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -85,7 +87,7 @@ import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
+import mekhq.gui.dialog.ResupplyConvoyChoice;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
 import mekhq.gui.dialog.resupplyAndCaches.DialogSwindled;
 import mekhq.utilities.ReportingUtilities;
@@ -163,15 +165,19 @@ public class PerformResupply {
 
         // If appropriate, prompt the player to use their own convoys
         if (!resupplyType.equals(RESUPPLY_LOOT) && !resupplyType.equals(RESUPPLY_CONTRACT_END)) {
-            // If we're on a guerrilla contract, the player may be approached by smugglers, instead,
-            // which won't use player convoys.
+            // If we're on a pirate or guerrilla contract, the player may be approached by smugglers, instead, which
+            // won't use player convoys.
             if (!isGuerrilla) {
-                new DialogPlayerConvoyOption(resupply, isIndependent);
+                ResupplyConvoyChoice convoyChoice = new ResupplyConvoyChoice(resupply.getCampaign(), isIndependent,
+                      resupply.getPlayerConvoys().size(), resupply.getTargetCargoTonnagePlayerConvoy(),
+                      resupply.getTargetCargoTonnage(), (int) resupply.getTotalPlayerCargoCapacity(),
+                      contract.getMoraleLevel().toString());
 
-                // If the player is on an Independent contract and refuses to use their own transports,
-                // then no resupply occurs.
-                if (isIndependent && !resupply.getUsePlayerConvoy()) {
+                ResupplyConvoyChoice.ConvoyResponseType responseType = convoyChoice.getResponseType();
+                if (CANCEL.equals(responseType)) {
                     return;
+                } else {
+                    resupply.setUsePlayerConvoy(PLAYER.equals(responseType));
                 }
             }
 

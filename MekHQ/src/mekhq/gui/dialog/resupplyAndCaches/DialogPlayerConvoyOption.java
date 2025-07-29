@@ -66,6 +66,7 @@ import mekhq.campaign.personnel.Person;
  * choose whether to use their own convoy to transport cargo. The dialog dynamically generates content, localized
  * messages, and speaker visuals to guide the player's decision.
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class DialogPlayerConvoyOption extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
