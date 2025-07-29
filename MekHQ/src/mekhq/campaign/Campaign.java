@@ -5220,7 +5220,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Processes the resupply operation for a given contract.
-     * <p>This method checks if the contract type is not Guerrilla Warfare or if a d6 roll is greater than 4. If any of
+     * <p>This method checks if the contract type is not Guerrilla Warfare or if randomInt(4) == 0. If any of
      * these conditions is met, it calculates the maximum resupply size based on the contract's required lances, creates
      * an instance of the {@link Resupply} class, and initiates a resupply action.</p>
      *
