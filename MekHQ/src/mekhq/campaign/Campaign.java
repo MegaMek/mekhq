@@ -5228,7 +5228,7 @@ public class Campaign implements ITechManager {
      */
     private void processResupply(AtBContract contract) {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
-                                    || (PIRATE_FACTION_CODE).equals(contract.getEmployerCode());
+                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 
         if (!isGuerrilla || randomInt(4) == 0) {
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
