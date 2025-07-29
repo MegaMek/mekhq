@@ -56,7 +56,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
-import megamek.client.ui.unitreadout.EntityReadout;
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
