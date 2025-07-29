@@ -484,6 +484,13 @@ public class CampaignPreset {
             return null;
         }
 
+        if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
+            logger.error("Campaign Presets from {} are incompatible with version {}.",
+                  version,
+                  LAST_COMPATIBLE_VERSION);
+            return null;
+        }
+
         final CampaignPreset preset = new CampaignPreset();
         try {
             for (int x = 0; x < nl.getLength(); x++) {
