@@ -128,13 +128,23 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         initialize();
 
         if (preset != null) {
-            applyPreset(preset);
+            applyPreset(preset, true);
         }
 
         setLocationRelativeTo(frame);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
+    /**
+     * Constructs a {@code CampaignOptionsDialog} for the specified campaign and applies the given preset if provided.
+     *
+     * <p>This constructor initializes the dialog using the {@code NORMAL} mode, providing a user interface for
+     * viewing and modifying campaign options. If a {@link CampaignPreset} is supplied (i.e., {@code preset} is not
+     * {@code null}), the options from the preset are automatically applied to the dialog upon creation. </p>
+     *
+     * @param campaign the {@link Campaign} instance whose options will be displayed and edited
+     * @param preset   an optional {@link CampaignPreset} to apply initial settings (may be {@code null})
+     */
     public CampaignOptionsDialog(final Campaign campaign, @Nullable CampaignPreset preset) {
         super(null,
               false,
@@ -147,7 +157,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         initialize();
 
         if (preset != null) {
-            applyPreset(preset);
+            applyPreset(preset, false);
         }
 
         setLocationRelativeTo(null);
@@ -278,8 +288,24 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      *
      * @param preset the {@link CampaignPreset} instance to apply
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void applyPreset(CampaignPreset preset) {
         campaignOptionsPane.applyPreset(preset, true);
+    }
+
+    /**
+     * Applies the specified campaign preset to the options pane, optionally indicating if the dialog is being used
+     * during campaign startup.
+     *
+     * <p>This method updates the available campaign option settings in the dialog based on the values defined in the
+     * given {@link CampaignPreset}. The {@code isStartup} parameter allows for different preset application logic or
+     * behavior when initializing campaign options for a new campaign.</p>
+     *
+     * @param preset    the {@link CampaignPreset} whose settings will be applied to the options pane
+     * @param isStartup {@code true} if the dialog is being used during the startup of a new campaign
+     */
+    public void applyPreset(CampaignPreset preset, boolean isStartup) {
+        campaignOptionsPane.applyPreset(preset, isStartup);
     }
 
     /**
