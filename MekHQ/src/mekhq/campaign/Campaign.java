@@ -101,6 +101,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -5178,7 +5179,11 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)) {
+        int weekOfYear = currentDay.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+        boolean isOddWeek = (weekOfYear % 2 == 1);
+        if (campaignOptions.isUseStratCon()
+                  && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)
+                  && isOddWeek) {
             negotiateAdditionalSupportPoints(this);
         }
 
