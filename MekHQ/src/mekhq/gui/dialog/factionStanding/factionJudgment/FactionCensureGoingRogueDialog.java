@@ -259,6 +259,10 @@ public class FactionCensureGoingRogueDialog {
                     continue;
                 }
 
+                if (factionStandings.getRegardForFaction(factionShortName, false) < 0) {
+                    continue;
+                }
+
                 int recognition = currentAccoladeLevel.getRecognition();
                 if (recognition < ADOPTION_OR_MEKS.getRecognition()) {
                     activeFactions.remove(faction);
