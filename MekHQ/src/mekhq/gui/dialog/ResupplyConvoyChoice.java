@@ -89,8 +89,6 @@ public class ResupplyConvoyChoice {
      *
      * @param campaign             the campaign context in which this occurs
      * @param isForcedPlayerConvoy {@code true} if the convoy must be player-owned
-     * @param playerConvoyCount    number of available player convoys (return value of
-     *                             {@link Resupply#getPlayerConvoys()}{@code .size()})
      * @param enhancedTonnage      enhanced convoy tonnage value (return value of
      *                             {@link Resupply#getTargetCargoTonnagePlayerConvoy})
      * @param normalTonnage        normal convoy tonnage value (return value of {@link Resupply#getTargetCargoTonnage})
@@ -101,14 +99,14 @@ public class ResupplyConvoyChoice {
      * @author Illiani
      * @since 0.50.07
      */
-    public ResupplyConvoyChoice(Campaign campaign, boolean isForcedPlayerConvoy, int playerConvoyCount,
-          int enhancedTonnage, int normalTonnage, int availableCargoSpace, String moraleString) {
+    public ResupplyConvoyChoice(Campaign campaign, boolean isForcedPlayerConvoy, int enhancedTonnage,
+          int normalTonnage, int availableCargoSpace, String moraleString) {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT),
               null,
               getInCharacterMessage(isForcedPlayerConvoy, campaign.getCommanderAddress(), enhancedTonnage,
                     normalTonnage, availableCargoSpace),
-              getButtons(isForcedPlayerConvoy, playerConvoyCount),
+              getButtons(isForcedPlayerConvoy),
               getOutOfCharacterMessage(isForcedPlayerConvoy, moraleString),
               null,
               true);
@@ -153,23 +151,20 @@ public class ResupplyConvoyChoice {
      * Generates a list of button text strings for the convoy choice dialog, depending on campaign context.
      *
      * @param isForcedPlayerConvoy whether a player convoy is required
-     * @param playerConvoyCount    the number of available player convoys
      *
      * @return a list of button label strings for the dialog
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private List<String> getButtons(boolean isForcedPlayerConvoy, int playerConvoyCount) {
+    private List<String> getButtons(boolean isForcedPlayerConvoy) {
         List<String> buttons = new ArrayList<>();
 
         String cancel = getTextAt(RESOURCE_BUNDLE, "ResupplyConvoyChoice.button.cancel");
         buttons.add(cancel);
 
-        if (playerConvoyCount > 0) {
-            String player = getTextAt(RESOURCE_BUNDLE, "ResupplyConvoyChoice.button.player");
-            buttons.add(player);
-        }
+        String player = getTextAt(RESOURCE_BUNDLE, "ResupplyConvoyChoice.button.player");
+        buttons.add(player);
 
         if (!isForcedPlayerConvoy) {
             String npc = getTextAt(RESOURCE_BUNDLE, "ResupplyConvoyChoice.button.npc");
