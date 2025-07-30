@@ -32,7 +32,6 @@
  */
 package mekhq.gui.stratcon;
 
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -49,29 +48,29 @@ import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementD
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import megamek.client.ui.util.UIUtil;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
-import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -88,6 +87,7 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.StratconPanel;
+import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
@@ -688,7 +688,7 @@ public class StratconScenarioWizard extends JDialog {
      *                         <li>When {@code isPrimaryForce} is {@code true}:
      *                             <ul>
      *                               <li>The "Commit" button invokes the
-     *                               {@link #btnCommitClicked(ActionEvent, Integer, boolean, boolean)}
+     *                               {@link #btnCommitClicked(Integer, boolean, boolean)}
      *                                   method to directly complete the action.</li>
      *                             </ul>
      *                         </li>
@@ -709,7 +709,7 @@ public class StratconScenarioWizard extends JDialog {
         btnCommit = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCommit.text"));
         btnCommit.setActionCommand("COMMIT_CLICK");
         if (isPrimaryForce) {
-            btnCommit.addActionListener(evt -> btnCommitClicked(evt, null, false, true));
+            btnCommit.addActionListener(evt -> btnCommitClicked(null, false, true));
         } else {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
@@ -781,200 +781,40 @@ public class StratconScenarioWizard extends JDialog {
      * </ul>
      */
     private void reinforcementConfirmDialog() {
-        final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
-        final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
+        // Hide the old dialog until we're done.
+        // The dialog will be 'disposed' if the confirmation dialog is confirmed and re-shown if the dialog is canceled
+        setVisible(false);
+        final int SUPPORT_POINTS_MODIFIER = -2;
 
-        JDialog dialog = new JDialog();
-        dialog.setTitle(resources.getString("incomingTransmission.title"));
-        dialog.setLayout(new BorderLayout());
-
-        // Main Panel to hold left and right boxes
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1;
-
-        // Left box (commandLiaison details)
-        JPanel leftBox = new JPanel();
-        leftBox.setLayout(new BoxLayout(leftBox, BoxLayout.Y_AXIS));
-        leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Get commandLiaison details
         Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
-        String speakerName = (commandLiaison != null) ? commandLiaison.getFullTitle() : campaign.getName();
-
-        // Add commandLiaison image (icon)
-        ImageIcon speakerIcon = getSpeakerIcon(campaign, commandLiaison);
-        if (speakerIcon != null) {
-            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
-        }
-        JLabel imageLabel = new JLabel();
-        imageLabel.setIcon(speakerIcon);
-        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Speaker description (below the icon)
-        StringBuilder speakerDescription = getSpeakerDescription(campaign, commandLiaison, speakerName);
-        JLabel leftDescription = new JLabel(String.format(
-              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              LEFT_WIDTH,
-              speakerDescription));
-        leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Add components to leftBox
-        leftBox.add(imageLabel);
-        leftBox.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing
-        leftBox.add(leftDescription);
-
-        // Add leftBox to mainPanel
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0;
-        mainPanel.add(leftBox, gbc);
-
-        // Right box (message details)
-        JPanel rightBox = new JPanel(new BorderLayout());
-        rightBox.setBorder(BorderFactory.createEtchedBorder());
-
-        TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(commandLiaison,
+        TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
               currentCampaignState.getContract());
-        int targetNumber = reinforcementTargetNumber.getValue();
+        // The -1 is due to the default cost for reinforcing
+        int availableSupportPoints = currentCampaignState.getSupportPoints() - 1;
 
-        StringBuilder rightDescriptionMessage = new StringBuilder();
-        rightDescriptionMessage.append(String.format(resources.getString("reinforcementConfirmation.introduction"),
-              campaign.getCommanderAddress()));
-        rightDescriptionMessage.append(resources.getString("reinforcementConfirmation.breakdown"));
-
-        StringBuilder breakdownContents = new StringBuilder();
-        for (TargetRollModifier modifier : reinforcementTargetNumber.getModifiers()) {
-            breakdownContents.append(String.format("%s: %d<br>", modifier.getDesc(), modifier.getValue()));
+        StratConReinforcementsConfirmationDialog dialog = new StratConReinforcementsConfirmationDialog(campaign,
+              targetNumber, availableSupportPoints);
+        StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
+              dialog.getResponseType();
+        switch (responseType) {
+            case CANCEL -> setVisible(true);
+            case REINFORCE -> {
+                int supportPointsSpent = dialog.getSupportPoints();
+                int supportPointModifier = supportPointsSpent * SUPPORT_POINTS_MODIFIER;
+                int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
+                currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1));
+                btnCommitClicked(finalTargetNumber, false, false);
+            }
+            case REINFORCE_INSTANTLY -> {
+                int supportPointsSpent = dialog.getSupportPoints();
+                int supportPointModifier = supportPointsSpent * SUPPORT_POINTS_MODIFIER;
+                int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
+                currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1) * 2);
+                btnCommitClicked(finalTargetNumber, false, true);
+            }
+            case REINFORCE_GM -> btnCommitClicked(0, true, false);
+            case REINFORCE_GM_INSTANTLY -> btnCommitClicked(0, true, true);
         }
-        breakdownContents.append(String.format("<b>%s:</b> %s",
-              resources.getString("reinforcementConfirmation.breakdown.total"),
-              reinforcementTargetNumber.getValue())).append('+');
-        rightDescriptionMessage.append(breakdownContents);
-
-        JLabel rightDescription = new JLabel(String.format(
-              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              RIGHT_WIDTH,
-              rightDescriptionMessage));
-        rightBox.add(rightDescription);
-
-        // Add rightBox to mainPanel
-        gbc.gridx = 1;
-        gbc.weightx = 1; // Allow horizontal stretching
-        mainPanel.add(rightBox, gbc);
-
-        // Add mainPanel to dialog
-        dialog.add(mainPanel, BorderLayout.CENTER);
-
-        // Spinner Panel (Support Points)
-        JPanel spinnerPanel = new JPanel();
-        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));
-        JLabel lblSpinner = new JLabel(String.format("%s: ",
-              resources.getString("reinforcementConfirmation.spinnerLabel")));
-        lblSpinner.setToolTipText(resources.getString("reinforcementConfirmation.spinnerLabel.tooltip"));
-        lblSpinner.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        int availableSupportPoints = currentCampaignState.getSupportPoints();
-        JSpinner spnSupportPointCost = new JSpinner(new SpinnerNumberModel(availableSupportPoints > 0 ? 1 : 0,
-              availableSupportPoints > 0 ? 1 : 0,
-              availableSupportPoints,
-              1));
-        spnSupportPointCost.setToolTipText(resources.getString("reinforcementConfirmation.spinnerLabel.tooltip"));
-        spnSupportPointCost.setMaximumSize(spnSupportPointCost.getPreferredSize());
-        spnSupportPointCost.setAlignmentY(Component.CENTER_ALIGNMENT);
-        spinnerPanel.add(lblSpinner);
-        spinnerPanel.add(spnSupportPointCost);
-        spinnerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Combine spinnerPanel and checkboxPanel into a vertical layout panel
-        JPanel subPanel = new JPanel();
-        subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.Y_AXIS));
-        subPanel.add(spinnerPanel);
-        subPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing between sections
-
-        // Buttons panel
-        JPanel buttonPanel = new JPanel();
-
-        JButton reinforceButton = new JButton(resources.getString("reinforcementConfirmation.confirmButton"));
-        reinforceButton.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.tooltip"));
-        reinforceButton.addActionListener(evt -> {
-            int spentSupportPoints = (int) spnSupportPointCost.getValue();
-            int finalTargetNumber = targetNumber - ((spentSupportPoints - 1) * 2);
-
-            currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
-
-            btnCommitClicked(evt, finalTargetNumber, false, false);
-            dialog.dispose();
-        });
-        reinforceButton.setEnabled(availableSupportPoints > 0);
-
-        JButton reinforceButtonInstant = new JButton(resources.getString(
-              "reinforcementConfirmation.confirmButton.instant"));
-        reinforceButtonInstant.setToolTipText(resources.getString(
-              "reinforcementConfirmation.confirmButton.instant.tooltip"));
-        reinforceButtonInstant.addActionListener(evt -> {
-            int spentSupportPoints = (int) spnSupportPointCost.getValue() * 2;
-            int finalTargetNumber = targetNumber - ((spentSupportPoints - 1) * 2);
-
-            currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
-
-            btnCommitClicked(evt, finalTargetNumber, false, true);
-            dialog.dispose();
-        });
-        reinforceButtonInstant.setEnabled(availableSupportPoints > 0);
-
-        JButton reinforceButtonGM = new JButton(resources.getString("reinforcementConfirmation.confirmButton.gm"));
-        reinforceButtonGM.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.gm.tooltip"));
-        reinforceButtonGM.addActionListener(evt -> {
-            btnCommitClicked(evt, 0, true, false);
-            dialog.dispose();
-        });
-        reinforceButtonGM.setVisible(campaign.isGM());
-
-        JButton reinforceButtonGMInstant = new JButton(resources.getString(
-              "reinforcementConfirmation.confirmButton.gm.instant"));
-        reinforceButtonGMInstant.setToolTipText(resources.getString(
-              "reinforcementConfirmation.confirmButton.gm.instant.tooltip"));
-        reinforceButtonGMInstant.addActionListener(evt -> {
-            btnCommitClicked(evt, 0, true, true);
-            dialog.dispose();
-        });
-        reinforceButtonGMInstant.setVisible(campaign.isGM());
-
-        JButton cancelButton = new JButton(resources.getString("reinforcementConfirmation.cancelButton"));
-        cancelButton.addActionListener(evt -> dialog.dispose());
-        buttonPanel.add(reinforceButton);
-        buttonPanel.add(reinforceButtonInstant);
-        buttonPanel.add(reinforceButtonGM);
-        buttonPanel.add(reinforceButtonGMInstant);
-        buttonPanel.add(cancelButton);
-
-        // Info label panel
-        JPanel infoPanel = new JPanel(new BorderLayout());
-        JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              RIGHT_WIDTH + LEFT_WIDTH,
-              String.format(resources.getString("reinforcementConfirmation.addendum"))));
-        lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
-        infoPanel.add(lblInfo, BorderLayout.CENTER);
-        infoPanel.setBorder(BorderFactory.createEtchedBorder());
-
-        // South Panel
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(subPanel, BorderLayout.NORTH);
-        southPanel.add(buttonPanel, BorderLayout.CENTER);
-        southPanel.add(infoPanel, BorderLayout.SOUTH);
-
-        // Add southPanel to the dialog
-        dialog.add(southPanel, BorderLayout.SOUTH);
-
-        // Dialog settings
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(null);
-        dialog.pack();
-        dialog.setVisible(true);
     }
 
     /**
@@ -991,15 +831,14 @@ public class StratconScenarioWizard extends JDialog {
      *   <li>Publishes scenarios to the campaign and allows immediate play if forces have been committed.</li>
      * </ul>
      *
-     * @param evt                       the {@link ActionEvent} triggered by the button press
      * @param reinforcementTargetNumber the number representing the reinforcement target threshold used when processing
      *                                  reinforcement deployment
      * @param isGMReinforcement         {@code true} if the player is using GM powers to bypass the reinforcement check,
      *                                  {@code false} otherwise.
      * @param isInstantlyDeployed       {@code true} if the player is deploying instantly
      */
-    private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber,
-          boolean isGMReinforcement, boolean isInstantlyDeployed) {
+    private void btnCommitClicked(@Nullable Integer reinforcementTargetNumber, boolean isGMReinforcement,
+          boolean isInstantlyDeployed) {
         if (parent != null) {
             parent.setCommitForces(true);
         }
