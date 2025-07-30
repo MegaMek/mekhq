@@ -440,6 +440,14 @@ public class Campaign implements ITechManager {
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
 
     /**
+     * A constant that provides the ISO-8601 definition of week-based fields.
+     *
+     * <p>This includes the first day of the week set to Monday and the minimal number of days in the first week of
+     * the year set to 4.</p>
+     */
+    private static final WeekFields WEEK_FIELDS = WeekFields.ISO;
+
+    /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
      * administrative role within the organization.
      *
@@ -5179,7 +5187,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        int weekOfYear = currentDay.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+        int weekOfYear = currentDay.get(WEEK_FIELDS.weekOfYear());
         boolean isOddWeek = (weekOfYear % 2 == 1);
         if (campaignOptions.isUseStratCon()
                   && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)
