@@ -45,7 +45,7 @@ import javax.swing.WindowConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MekView;
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -59,13 +59,13 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class MekViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
 
-    private MekView mekView;
+    private EntityReadout mekView;
     private JButton btnOkay;
     private JScrollPane jScrollPane2;
     private JTextPane txtMek;
 
     /** Creates new form MekViewDialog */
-    public MekViewDialog(JFrame parent, boolean modal, MekView mv) {
+    public MekViewDialog(JFrame parent, boolean modal, EntityReadout mv) {
         super(parent, modal);
         this.mekView = mv;
         initComponents();
@@ -89,7 +89,7 @@ public class MekViewDialog extends JDialog {
         txtMek.setEditable(false);
         txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
         txtMek.setName("txtMek");
-        txtMek.setText(mekView.getMekReadout());
+        txtMek.setText(mekView.getFullReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text"));

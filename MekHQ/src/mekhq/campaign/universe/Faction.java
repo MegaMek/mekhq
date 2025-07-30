@@ -145,9 +145,14 @@ public class Faction {
             end = Objects.requireNonNullElse(active.get(active.size() - 1).end, 9999);
         }
         HonorRating preInvasion = faction2.getPreInvasionHonorRating();
-        preInvasionHonorRating = (preInvasion != null) ? preInvasion : HonorRating.STRICT;
         HonorRating postInvasion = faction2.getPostInvasionHonorRating();
-        postInvasionHonorRating = (postInvasion != null) ? postInvasion : HonorRating.OPPORTUNISTIC;
+        if (isClan()) {
+            preInvasionHonorRating = (preInvasion != HonorRating.NONE) ? preInvasion : HonorRating.STRICT;
+            postInvasionHonorRating = (postInvasion != HonorRating.NONE) ? postInvasion : HonorRating.OPPORTUNISTIC;
+        } else {
+            preInvasionHonorRating = HonorRating.NONE;
+            postInvasionHonorRating = HonorRating.NONE;
+        }
     }
     // endregion Constructors
 

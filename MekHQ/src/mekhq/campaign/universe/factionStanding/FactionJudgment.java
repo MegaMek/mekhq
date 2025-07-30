@@ -284,7 +284,7 @@ public class FactionJudgment {
      *
      * <p>This method looks up the saved {@code AccoladeEntry} for the specified faction code and returns the
      * associated {@link FactionAccoladeLevel}. If the faction has no accolades recorded, this method returns
-     * {@code null}.</p>
+     * {@code FactionAccoladeLevel#NO_ACCOLADE}.</p>
      *
      * @param factionCode the unique string code identifying the faction whose accolade is queried
      *

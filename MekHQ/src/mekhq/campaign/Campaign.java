@@ -101,6 +101,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -437,6 +438,14 @@ public class Campaign implements ITechManager {
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+
+    /**
+     * A constant that provides the ISO-8601 definition of week-based fields.
+     *
+     * <p>This includes the first day of the week set to Monday and the minimal number of days in the first week of
+     * the year set to 4.</p>
+     */
+    private static final WeekFields WEEK_FIELDS = WeekFields.ISO;
 
     /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
@@ -5140,7 +5149,6 @@ public class Campaign implements ITechManager {
                 rating.reInitialize();
             }
 
-            boolean hasHadResupply = false;
             for (AtBContract contract : getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
@@ -5148,7 +5156,7 @@ public class Campaign implements ITechManager {
                 AtBMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
-                if (contract.getContractType().isGarrisonDuty()) {
+                if (contract.isPeaceful()) {
                     report = resources.getString("garrisonDutyRouted.text");
                 } else if (oldMorale != newMorale) {
                     report = String.format(resources.getString("contractMoraleReport.text"),
@@ -5160,25 +5168,40 @@ public class Campaign implements ITechManager {
                 if (!report.isBlank()) {
                     addReport(report);
                 }
+            }
+        }
 
-                // Resupply
-                if (getCampaignOptions().isUseStratCon()) {
+        // Resupply
+        if (currentDay.getDayOfMonth() == 2) {
+            // This occurs at the end of the 1st day, each month to avoid an awkward mechanics interaction where
+            // personnel might quit or get taken out of fatigue without the player having any opportunity to
+            // intervene before their resupply attempt becomes active.
+            List<AtBContract> activeContracts = getActiveAtBContracts();
+            AtBContract firstNonSubcontract = null;
+            for (AtBContract contract : activeContracts) {
+                if (!contract.isSubcontract()) {
+                    firstNonSubcontract = contract;
+                    break;
+                }
+            }
+
+            if (firstNonSubcontract != null) {
+                if (campaignOptions.isUseStratCon()) {
                     boolean inLocation = location.isOnPlanet() &&
-                                               location.getCurrentSystem().equals(contract.getSystem());
-
-                    if (contract.isSubcontract() || hasHadResupply) {
-                        continue;
-                    }
+                                               location.getCurrentSystem().equals(firstNonSubcontract.getSystem());
 
                     if (inLocation) {
-                        processResupply(contract);
-                        hasHadResupply = true;
+                        processResupply(firstNonSubcontract);
                     }
                 }
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)) {
+        int weekOfYear = currentDay.get(WEEK_FIELDS.weekOfYear());
+        boolean isOddWeek = (weekOfYear % 2 == 1);
+        if (campaignOptions.isUseStratCon()
+                  && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)
+                  && isOddWeek) {
             negotiateAdditionalSupportPoints(this);
         }
 
@@ -5220,17 +5243,17 @@ public class Campaign implements ITechManager {
 
     /**
      * Processes the resupply operation for a given contract.
-     * <p>
-     * This method checks if the contract type is not Guerrilla Warfare or if a d6 roll is greater than 4. If any of
+     * <p>This method checks if the contract type is not Guerrilla Warfare or if randomInt(4) == 0. If any of
      * these conditions is met, it calculates the maximum resupply size based on the contract's required lances, creates
-     * an instance of the {@link Resupply} class, and initiates a resupply action.
+     * an instance of the {@link Resupply} class, and initiates a resupply action.</p>
      *
      * @param contract The relevant {@link AtBContract}
      */
     private void processResupply(AtBContract contract) {
-        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
+                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 
-        if (!isGuerrilla || d6(1) > 4) {
+        if (!isGuerrilla || randomInt(4) == 0) {
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
             performResupply(resupply, contract);

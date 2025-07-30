@@ -588,13 +588,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
         btnFactionStanding.addActionListener(evt -> {
             FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
-                  getCampaign().getFactionStandings(),
-                  getCampaign().getLocalDate(),
-                  getCampaign().isGM(),
-                  getCampaign().getFaction(),
-                  getCampaign().getCampaignFactionIcon(),
-                  getCampaign().getMissions(),
-                  getCampaignOptions());
+                  getCampaign());
 
             for (String report : factionStandingReport.getReports()) {
                 if (report != null && !report.isBlank()) {

@@ -568,7 +568,7 @@ public class AtBContract extends Contract {
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
         if (moraleLevel.isRouted()) {
-            if (contractType.isGarrisonType() || contractType.isReliefDuty()) {
+            if (contractType.isGarrisonType()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
@@ -1550,6 +1550,10 @@ public class AtBContract extends Contract {
 
     public void setMoraleLevel(final AtBMoraleLevel moraleLevel) {
         this.moraleLevel = moraleLevel;
+    }
+
+    public boolean isPeaceful() {
+        return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
     @Override

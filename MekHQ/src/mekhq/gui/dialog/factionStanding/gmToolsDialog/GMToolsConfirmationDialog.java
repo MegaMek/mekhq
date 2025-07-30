@@ -36,6 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -60,6 +61,7 @@ import javax.swing.event.HyperlinkEvent;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
@@ -85,7 +87,8 @@ public class GMToolsConfirmationDialog extends JDialog {
 
     private ImageIcon campaignIcon;
     private final FactionStandingsGMToolsActionType actionType;
-    private final String selectedFactionName;
+    private final Faction selectedFaction;
+    private final int currentGameYear;
     private boolean actionWasConfirmed = false;
 
     /**
@@ -94,17 +97,18 @@ public class GMToolsConfirmationDialog extends JDialog {
      * @param parent              parent dialog for positioning
      * @param campaignIcon        image icon for the campaign or faction
      * @param actionType          the action type being confirmed
-     * @param selectedFactionName an optional name for the faction involved in the action, or {@code null} for actions
-     *                            that do not involve a specific faction
+     * @param selectedFaction     an optional {@link Faction} object used to tailor the dialog
+     * @param currentGameYear     the current game year
      *
      * @author Illiani
      * @since 0.50.07
      */
     public GMToolsConfirmationDialog(JDialog parent, ImageIcon campaignIcon,
-          FactionStandingsGMToolsActionType actionType, @Nullable String selectedFactionName) {
+          FactionStandingsGMToolsActionType actionType, @Nullable Faction selectedFaction, int currentGameYear) {
         this.campaignIcon = campaignIcon;
         this.actionType = actionType;
-        this.selectedFactionName = selectedFactionName;
+        this.selectedFaction = selectedFaction;
+        this.currentGameYear = currentGameYear;
 
         populateDialog();
         initializeDialog(parent);
@@ -219,11 +223,9 @@ public class GMToolsConfirmationDialog extends JDialog {
         editorPane.setFocusable(false);
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
-        String description = getFormattedTextAt(RESOURCE_BUNDLE,
-                "gmTools." + actionType.name() + ".confirmation",
-                spanOpeningWithCustomColor(getWarningColor()),
-                CLOSING_SPAN_TAG,
-                selectedFactionName);
+        String description = getFormattedTextAt(RESOURCE_BUNDLE, "gmTools." + actionType.name() + ".confirmation",
+              spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, getFactionName(selectedFaction,
+                    currentGameYear));
         String fontStyle = "font-family: Noto Sans;";
         editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>", CENTER_WIDTH, fontStyle, description));
         setFontScaling(editorPane, false, 1.1);
