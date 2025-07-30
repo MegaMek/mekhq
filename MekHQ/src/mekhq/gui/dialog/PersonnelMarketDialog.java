@@ -60,7 +60,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Aero;
 import megamek.common.Compute;
@@ -561,10 +561,10 @@ public class PersonnelMarketDialog extends JDialog {
                 name = "Pilot";
             }
             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
-            MekViewPanel mvp = new MekViewPanel(200, 400, true);
+            EntityReadoutPanel mvp = new EntityReadoutPanel(200, 400);
             tabUnit.setMinimumSize(new Dimension(200, 400));
             tabUnit.setPreferredSize(new Dimension(200, 400));
-            mvp.setMek(en, true);
+            mvp.showEntity(en, true);
             tabUnit.add("Unit", mvp);
             scrollPersonnelView.setViewportView(tabUnit);
         } else {
