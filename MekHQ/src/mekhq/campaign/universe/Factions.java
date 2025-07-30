@@ -310,7 +310,7 @@ public class Factions {
             case "RWR" -> "logo_rim_worlds_republic";
             case "IND" -> "logo_security_forces";
             case "SIC" -> "logo_st_ives_compact";
-            case "SL" -> "logo_star_league";
+            case "SL", "SLIE" -> "logo_star_league";
             case "TC" -> "logo_taurian_concordat";
             case "TD" -> "logo_tortuga_dominions";
             case "UC" -> "logo_umayyad_caliphate";

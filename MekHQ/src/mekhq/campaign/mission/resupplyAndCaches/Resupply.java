@@ -42,6 +42,7 @@ import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.time.LocalDate;
@@ -497,12 +498,22 @@ public class Resupply {
         armorPool = new ArrayList<>();
         ammoBinPool = new ArrayList<>();
 
+        final int PROHIBITED_BAR_RATING = 0;
+
         for (PartDetails potentialPart : potentialParts.values()) {
             int weight = (int) Math.round(potentialPart.getWeight());
             for (int entry = 0; entry < weight; entry++) {
                 Part part = potentialPart.getPart();
 
-                if (part instanceof Armor) {
+                if (part instanceof Armor armor) {
+                    if (armor instanceof SVArmor svArmor) {
+                        int bar = svArmor.getBAR();
+
+                        if (bar == PROHIBITED_BAR_RATING) {
+                            continue;
+                        }
+                    }
+
                     armorPool.add(part);
                     continue;
                 }
@@ -772,7 +783,7 @@ public class Resupply {
         Person negotiator;
         negotiatorSkill = NONE.ordinal();
 
-        if (contract.getContractType().isGuerrillaWarfare()) {
+        if (contract.getContractType().isGuerrillaWarfare() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
             negotiator = campaign.getCommander();
         } else {
             negotiator = null;
@@ -794,7 +805,7 @@ public class Resupply {
                 int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
                       campaign.isClanCampaign(),
                       campaign.getLocalDate(),
-                      negotiator.getRankLevel());
+                      negotiator.getRankNumeric());
                 int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(),
                       negotiator.getATOWAttributes(),
                       reputation);

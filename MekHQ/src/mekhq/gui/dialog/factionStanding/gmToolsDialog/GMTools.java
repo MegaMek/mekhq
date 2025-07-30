@@ -36,6 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.dialog.factionStanding.gmToolsDialog.FactionStandingsGMToolsActionType.UPDATE_HISTORIC_CONTRACTS;
 import static mekhq.gui.dialog.factionStanding.gmToolsDialog.FactionStandingsGMToolsActionType.ZERO_ALL_REGARD;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -59,8 +60,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
+import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
+import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -86,12 +92,14 @@ public class GMTools extends JDialog {
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
 
+    private Campaign campaign;
     private ImageIcon campaignIcon;
     private final Faction campaignFaction;
     private final LocalDate today;
     private final int gameYear;
     private final FactionStandings factionStandings;
     private final List<Mission> missions;
+    private final double regardMultiplier;
 
     private final List<String> reports = new ArrayList<>();
 
@@ -99,23 +107,20 @@ public class GMTools extends JDialog {
      * Constructs a new {@link GMTools} dialog window.
      *
      * @param parent           the parent {@link JDialog} for modality
-     * @param campaignIcon     icon representing the campaign's faction
-     * @param campaignFaction  the main faction of the campaign
-     * @param today            the current in-game date
-     * @param factionStandings the {@link FactionStandings} object to be modified
-     * @param missions         list of missions to support historic contract updates
+     * @param campaign         the current campaign
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public GMTools(JDialog parent, ImageIcon campaignIcon, Faction campaignFaction, LocalDate today,
-          FactionStandings factionStandings, List<Mission> missions) {
-        this.campaignIcon = campaignIcon;
-        this.campaignFaction = campaignFaction;
-        this.today = today;
+    public GMTools(JDialog parent, Campaign campaign) {
+        this.campaign = campaign;
+        this.campaignIcon = campaign.getCampaignFactionIcon();
+        this.campaignFaction = campaign.getFaction();
+        this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
-        this.factionStandings = factionStandings;
-        this.missions = missions;
+        this.factionStandings = campaign.getFactionStandings();
+        this.missions = new ArrayList<>(campaign.getMissions());
+        this.regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
 
         populateDialog();
         initializeDialog(parent);
@@ -220,17 +225,30 @@ public class GMTools extends JDialog {
      * @since 0.50.07
      */
     private JPanel populateCenterPanel() {
-        JPanel pnlParent = new JPanel();
-        pnlParent.setLayout(new BoxLayout(pnlParent, BoxLayout.Y_AXIS));
+        JPanel pnlParent = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING); // Pad around components
+
+        int column = 0;
+        int row = 0;
 
         for (FactionStandingsGMToolsActionType actionType : FactionStandingsGMToolsActionType.values()) {
-            if (actionType == ZERO_ALL_REGARD) {
+            if (ZERO_ALL_REGARD.equals(actionType) || UPDATE_HISTORIC_CONTRACTS.equals(actionType)) {
                 continue;
             }
-            
+
             JPanel pnlTool = populateGMToolOption(actionType);
-            pnlParent.add(Box.createVerticalStrut(PADDING));
-            pnlParent.add(pnlTool);
+
+            gbc.gridx = column;
+            gbc.gridy = row;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            pnlParent.add(pnlTool, gbc);
+
+            row++;
+            if (row == 2) {
+                row = 0;
+                column++;
+            }
         }
 
         return pnlParent;
@@ -267,7 +285,7 @@ public class GMTools extends JDialog {
 
         RoundedJButton button = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, actionTypeKeyPrefix + "button"));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.addActionListener(evt -> updateStandingForChosenAction(actionType));
+        button.addActionListener(evt -> performGMAction(actionType));
 
         panel.add(editorPane);
         panel.add(Box.createVerticalStrut(PADDING));
@@ -288,11 +306,13 @@ public class GMTools extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    private void updateStandingForChosenAction(FactionStandingsGMToolsActionType actionType) {
+    private void performGMAction(FactionStandingsGMToolsActionType actionType) {
         setVisible(false);
 
         FactionSelectionDialog factionSelectionDialog = null;
-        String chosenFactionName = null;
+        AccoladeSelectionDialog accoladeSelectionDialog = null;
+        CensureSelectionDialog censureSelectionDialog = null;
+        Faction chosenFaction = null;
         if (actionType == FactionStandingsGMToolsActionType.SET_SPECIFIC_REGARD) {
             factionSelectionDialog = new FactionSelectionDialog(this, campaignIcon, factionStandings, today);
 
@@ -301,20 +321,56 @@ public class GMTools extends JDialog {
                 return;
             }
 
+            chosenFaction = factionSelectionDialog.getSelectedFaction();
+            if (chosenFaction == null) {
+                LOGGER.warn(new NullPointerException(), "Failed to find faction for dialog");
+                return;
+            }
+        } else if (actionType == FactionStandingsGMToolsActionType.TRIGGER_ACCOLADE) {
+            accoladeSelectionDialog = new AccoladeSelectionDialog(this, campaignIcon, factionStandings, today);
 
-            Faction chosenFaction = factionSelectionDialog.getSelectedFaction();
+            if (!accoladeSelectionDialog.wasActionConfirmed()) {
+                setVisible(true);
+                return;
+            }
+
+            chosenFaction = accoladeSelectionDialog.getSelectedFaction();
             if (chosenFaction == null) {
                 LOGGER.warn(new NullPointerException(), "Failed to find faction for dialog");
                 return;
             }
 
-            chosenFactionName = chosenFaction.getFullName(gameYear);
+            FactionAccoladeLevel chosenAccolade = accoladeSelectionDialog.getSelectedAccolade();
+            if (chosenAccolade == null) {
+                LOGGER.warn(new NullPointerException(), "Failed to find accolade for dialog");
+                return;
+            }
+        } else if (actionType == FactionStandingsGMToolsActionType.TRIGGER_CENSURE) {
+            censureSelectionDialog = new CensureSelectionDialog(this, campaignIcon, factionStandings, today);
+
+            if (!censureSelectionDialog.wasActionConfirmed()) {
+                setVisible(true);
+                return;
+            }
+
+            chosenFaction = censureSelectionDialog.getSelectedFaction();
+            if (chosenFaction == null) {
+                LOGGER.warn(new NullPointerException(), "Failed to find faction for dialog");
+                return;
+            }
+
+            FactionCensureLevel chosenAccolade = censureSelectionDialog.getSelectedCensure();
+            if (chosenAccolade == null) {
+                LOGGER.warn(new NullPointerException(), "Failed to find censure for dialog");
+                return;
+            }
         }
 
         GMToolsConfirmationDialog GMToolsConfirmationDialog = new GMToolsConfirmationDialog(this,
               campaignIcon,
               actionType,
-              chosenFactionName);
+              chosenFaction,
+              today.getYear());
 
         if (GMToolsConfirmationDialog.wasActionConfirmed()) {
             new StandingUpdateConfirmationDialog(this, campaignIcon, true);
@@ -323,7 +379,7 @@ public class GMTools extends JDialog {
                 case RESET_ALL_REGARD, ZERO_ALL_REGARD -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today);
+                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
                 }
                 case SET_SPECIFIC_REGARD -> {
                     Faction selectedFaction = factionSelectionDialog.getSelectedFaction();
@@ -339,11 +395,39 @@ public class GMTools extends JDialog {
                 case UPDATE_HISTORIC_CONTRACTS -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today);
+                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
                     reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
                           campaignIcon,
                           campaignFaction,
-                          today));
+                          today,
+                          regardMultiplier));
+                }
+                case TRIGGER_ACCOLADE -> {
+                    FactionAccoladeLevel chosenAccolade = accoladeSelectionDialog.getSelectedAccolade();
+                    chosenFaction = accoladeSelectionDialog.getSelectedFaction();
+                    boolean isPermanent = accoladeSelectionDialog.getIsPermanent();
+                    if (isPermanent) {
+                        factionStandings.getFactionJudgments().setAccoladeForFaction(chosenFaction.getShortName(),
+                              chosenAccolade, today);
+                    }
+
+                    if (chosenAccolade.getRecognition() > FactionAccoladeLevel.TAKING_NOTICE_1.getRecognition()) {
+                        new FactionAccoladeEvent(campaign, chosenFaction, chosenAccolade,
+                              campaignFaction.equals(chosenFaction));
+                    }
+                }
+                case TRIGGER_CENSURE -> {
+                    FactionCensureLevel chosenCensure = censureSelectionDialog.getSelectedCensure();
+                    chosenFaction = censureSelectionDialog.getSelectedFaction();
+                    boolean isPermanent = censureSelectionDialog.getIsPermanent();
+                    if (isPermanent) {
+                        factionStandings.getFactionJudgments().setCensureForFaction(chosenFaction.getShortName(),
+                              chosenCensure, today);
+                    }
+
+                    if (!FactionCensureLevel.CENSURE_LEVEL_0.equals(chosenCensure)) {
+                        new FactionCensureEvent(campaign, chosenCensure, chosenFaction);
+                    }
                 }
             }
 

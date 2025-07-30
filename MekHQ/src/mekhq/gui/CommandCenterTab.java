@@ -55,15 +55,14 @@ import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -589,13 +588,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
         btnFactionStanding.addActionListener(evt -> {
             FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
-                  getCampaign().getFactionStandings(),
-                  getCampaign().getLocalDate(),
-                  getCampaign().isGM(),
-                  getCampaign().getFaction(),
-                  getCampaign().getCampaignFactionIcon(),
-                  getCampaign().getMissions(),
-                  getCampaignOptions());
+                  getCampaign());
 
             for (String report : factionStandingReport.getReports()) {
                 if (report != null && !report.isBlank()) {
@@ -641,12 +634,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
             campaign.getUnitRating().reInitialize();
             lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
         } else if (unitRatingMethod.isCampaignOperations()) {
-            if (campaign.getReputation() == null) {
-                ReputationController reputationController = new ReputationController();
-                reputationController.initializeReputation(campaign);
-                campaign.setReputation(reputationController);
-            }
-
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
                   .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))

@@ -743,7 +743,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                       LocalDate.of(2681, 1, 1),
                       LocalDate.of(2725, 1, 1),
                       LocalDate.of(2741, 1, 1),
-                      LocalDate.of(2766, 11, 26));
+                      LocalDate.of(2766, 12, 25));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
             }
             case 2 -> {
@@ -751,7 +751,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                       "OperationKlondike",
                       "SecondSuccessionWar",
                       "ThirdSuccessionWar");
-                turningPointDates = List.of(LocalDate.of(2784, 2, 14),
+                turningPointDates = List.of(LocalDate.of(2784, 11, 4),
                       LocalDate.of(2821, 7, 2),
                       LocalDate.of(2830, 1, 1),
                       LocalDate.of(2866, 1, 1));

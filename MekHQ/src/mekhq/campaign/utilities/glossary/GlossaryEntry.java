@@ -32,11 +32,11 @@
  */
 package mekhq.campaign.utilities.glossary;
 
-import megamek.common.annotations.Nullable;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import megamek.common.annotations.Nullable;
 
 /**
  * The {@code GlossaryEntry} enum represents individual glossary entries used within MekHQ.
@@ -131,7 +131,9 @@ public enum GlossaryEntry {
     TURNOVER("TURNOVER"),
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO"),
     VOCATIONAL_XP("VOCATIONAL_XP"),
-    WINTER_HOLIDAY("WINTER_HOLIDAY");
+    WINTER_HOLIDAY("WINTER_HOLIDAY"),
+    BLOODMARK("BLOODMARK"),
+    CONNECTIONS("CONNECTIONS");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";
 

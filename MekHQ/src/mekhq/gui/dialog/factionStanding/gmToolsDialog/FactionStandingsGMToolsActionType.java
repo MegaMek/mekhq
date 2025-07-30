@@ -44,18 +44,29 @@ public enum FactionStandingsGMToolsActionType {
      */
     RESET_ALL_REGARD,
     /**
-     * Sets all faction regard values to zero.
+     * Triggers an accolade event for a specific faction. This can be used to kickstart a faction's accolade chain or
+     * to provide a fun narrative moment.
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    ZERO_ALL_REGARD,
+    TRIGGER_ACCOLADE,
     /**
      * Updates the regard value for a specific faction. This action is typically performed to adjust the standings of a
      * particular faction to a desired value.
      */
     SET_SPECIFIC_REGARD,
     /**
+     * Triggers a censure action for a specific faction. This can be used to kickstart a faction's censure chain or to
+     * provide a fun narrative moment.
+     */
+    TRIGGER_CENSURE,
+    /**
+     * Sets all faction regard values to zero.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    ZERO_ALL_REGARD,
+    /**
      * Updates faction standings based on historical contract data (i.e., completed
      * {@link mekhq.campaign.mission.Mission} objects).
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     UPDATE_HISTORIC_CONTRACTS
 }

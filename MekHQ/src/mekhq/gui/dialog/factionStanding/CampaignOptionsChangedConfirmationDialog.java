@@ -96,6 +96,7 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
     private final FactionStandings factionStandings;
     private final List<Mission> missions;
     private final boolean isFactionStandingEnabled;
+    private final double regardMultiplier;
 
     private final List<String> reports = new ArrayList<>();
 
@@ -113,19 +114,21 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
      * @param missions                 the set of missions relevant for recalculating standings on confirmation
      * @param isFactionStandingEnabled {@code true} if faction standings are being enabled; {@code false} if being
      *                                 disabled
+     * @param regardMultiplier         the regard multiplier set in campaign options
      *
      * @author Illiani
      * @since 0.50.07
      */
     public CampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon, Faction campaignFaction,
           LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
-          boolean isFactionStandingEnabled) {
+          boolean isFactionStandingEnabled, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;
         this.today = today;
         this.factionStandings = factionStandings;
         this.missions = new ArrayList<>(missions);
         this.isFactionStandingEnabled = isFactionStandingEnabled;
+        this.regardMultiplier = regardMultiplier;
 
         populateDialog();
         initializeDialog(parent);
@@ -286,11 +289,12 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
             if (isFactionStandingEnabled) {
                 reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                 factionStandings.resetAllFactionStandings();
-                factionStandings.updateClimateRegard(campaignFaction, today);
+                factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
                 reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
                       campaignIcon,
                       campaignFaction,
-                      today));
+                      today,
+                      regardMultiplier));
             } else {
                 reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                 factionStandings.resetAllFactionStandings();

@@ -52,7 +52,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -146,6 +146,7 @@ public enum PersonnelTableModelColumn {
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
     REPUTATION("PersonnelTableModelColumn.REPUTATION.text"),
     UNLUCKY("PersonnelTableModelColumn.UNLUCKY.text"),
+    BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
     FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
@@ -450,6 +451,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isUnlucky() {
         return this == UNLUCKY;
+    }
+
+    public boolean isBloodmark() {
+        return this == BLOODMARK;
     }
 
     public boolean isFatigue() {
@@ -873,7 +878,7 @@ public enum PersonnelTableModelColumn {
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,
-                                                                person.getRankLevel()))) :
+                                                                person.getRankNumeric()))) :
                              "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
@@ -929,16 +934,18 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:
-                return Integer.toString(person.getConnections());
+                return Integer.toString(person.getAdjustedConnections());
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case REPUTATION:
                 return Integer.toString(person.getAdjustedReputation(isUseAgeEffects,
                       isClanCampaign,
                       today,
-                      person.getRankLevel()));
+                      person.getRankNumeric()));
             case UNLUCKY:
                 return Integer.toString(person.getUnlucky());
+            case BLOODMARK:
+                return Integer.toString(person.getBloodmark());
             case FATIGUE:
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),
@@ -951,7 +958,7 @@ public enum PersonnelTableModelColumn {
             case IMPLANT_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case LOYALTY:
-                return String.valueOf(person.getLoyalty());
+                return String.valueOf(person.getAdjustedLoyalty(campaign.getFaction()));
             case EDUCATION:
                 return person.getEduHighestEducation().toString();
             case AGGRESSION:
@@ -1197,7 +1204,7 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case TRAITS -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY -> true;
+                case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY, BLOODMARK -> true;
                 case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
@@ -1263,6 +1270,7 @@ public enum PersonnelTableModelColumn {
                  WEALTH,
                  REPUTATION,
                  UNLUCKY,
+                 BLOODMARK,
                  EDGE,
                  SPA_COUNT,
                  IMPLANT_COUNT,

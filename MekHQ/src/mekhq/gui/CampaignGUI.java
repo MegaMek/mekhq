@@ -87,7 +87,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -1179,7 +1179,7 @@ public class CampaignGUI extends JPanel {
         boolean isUseCommandCircuit =
               FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
+                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
         lblLocation = new JLabel(getCampaign().getLocation()
                                        .getReport(getCampaign().getLocalDate(),
@@ -1346,6 +1346,7 @@ public class CampaignGUI extends JPanel {
         pnlButton.add(btnCompanyGenerator, gridBagConstraints);
 
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
+        btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -1358,6 +1359,7 @@ public class CampaignGUI extends JPanel {
         pnlButton.add(btnGMMode, gridBagConstraints);
 
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -2391,7 +2393,8 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (person != null) {
-                    getCampaign().recruitPerson(person, true, person.isEmployed());
+                    getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, person.isEmployed(),
+                          true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
@@ -2742,7 +2745,7 @@ public class CampaignGUI extends JPanel {
         boolean isUseCommandCircuit =
               FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
+                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
         lblLocation.setText(getCampaign().getLocation()
                                   .getReport(getCampaign().getLocalDate(),

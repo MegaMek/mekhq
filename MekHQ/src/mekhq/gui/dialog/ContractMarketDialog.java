@@ -136,9 +136,7 @@ public class ContractMarketDialog extends JDialog {
      */
     private void countSuccessfulContracts() {
         List<String> retainers = getPossibleRetainerContracts(campaign);
-        for (String key : retainers) {
-            possibleRetainerContracts.add(key);
-        }
+        possibleRetainerContracts.addAll(retainers);
     }
 
     /**
@@ -617,7 +615,7 @@ public class ContractMarketDialog extends JDialog {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String standingsReport =
                           factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemy,
-                                campaign.getLocalDate());
+                                campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier(), 1);
 
                     if (standingsReport != null) {
                         campaign.addReport(standingsReport);

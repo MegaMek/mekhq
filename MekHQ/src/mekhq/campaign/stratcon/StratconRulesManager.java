@@ -53,6 +53,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
@@ -60,6 +61,7 @@ import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedC
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.AUXILIARY;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INSTANT;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.SUCCESS;
 import static mekhq.campaign.stratcon.StratconScenarioFactory.convertSpecificUnitTypeToGeneral;
@@ -168,6 +170,11 @@ public class StratconRulesManager {
          * The reinforcements arrive later than normal.
          */
         DELAYED,
+
+        /**
+         * The reinforcements arrive instantly.
+         */
+        INSTANT,
 
         /**
          * The attempt failed, nothing else happens.
@@ -1510,6 +1517,19 @@ public class StratconRulesManager {
     }
 
     /**
+     * Use
+     * {@link #processReinforcementDeployment(Force, ReinforcementEligibilityType, StratconCampaignState,
+     * StratconScenario, Campaign, int, boolean, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static ReinforcementResultsType processReinforcementDeployment(Force force,
+          ReinforcementEligibilityType reinforcementType, StratconCampaignState campaignState,
+          StratconScenario scenario, Campaign campaign, int reinforcementTargetNumber, boolean isGMReinforcement) {
+        return processReinforcementDeployment(force, reinforcementType, campaignState, scenario, campaign,
+              reinforcementTargetNumber, isGMReinforcement, false);
+    }
+
+    /**
      * Processes the effects of deploying a reinforcement force to a scenario. Based on the reinforcement type, the
      * campaign state, and the results dice rolls, skills, and intercept odds), this method determines whether the
      * reinforcement deployment succeeds, fails, is delayed, or is intercepted.
@@ -1532,6 +1552,7 @@ public class StratconRulesManager {
      * @param reinforcementTargetNumber the target number that the reinforcement roll must meet or exceed
      * @param isGMReinforcement         {@code true} if the player is using GM powers to bypass the reinforcement check,
      *                                  {@code false} otherwise.
+     * @param isInstantlyDeployed       {@code true} if the player is deploying instantly
      *
      * @return a {@link ReinforcementResultsType} indicating the result of the reinforcement deployment:
      *       <ul>
@@ -1544,12 +1565,13 @@ public class StratconRulesManager {
      */
     public static ReinforcementResultsType processReinforcementDeployment(Force force,
           ReinforcementEligibilityType reinforcementType, StratconCampaignState campaignState,
-          StratconScenario scenario, Campaign campaign, int reinforcementTargetNumber, boolean isGMReinforcement) {
+          StratconScenario scenario, Campaign campaign, int reinforcementTargetNumber, boolean isGMReinforcement,
+          boolean isInstantlyDeployed) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
               MekHQ.getMHQOptions().getLocale());
 
         if (reinforcementType.equals(ReinforcementEligibilityType.CHAINED_SCENARIO)) {
-            return SUCCESS;
+            return INSTANT;
         }
 
         AtBContract contract = campaignState.getContract();
@@ -1584,7 +1606,8 @@ public class StratconRulesManager {
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
-            return SUCCESS;
+
+            return isInstantlyDeployed ? INSTANT : SUCCESS;
         } else {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
                   scenario.getHyperlinkedName(),
@@ -1610,7 +1633,8 @@ public class StratconRulesManager {
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
-            return SUCCESS;
+
+            return isInstantlyDeployed ? INSTANT : SUCCESS;
         }
 
         // Reinforcement roll failed, make interception check
@@ -1666,7 +1690,8 @@ public class StratconRulesManager {
         int targetNumber = 9;
         Skill tactics = commander.getSkill(S_TACTICS);
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false);
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false,
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate());
         campaign.addReport(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
@@ -1786,7 +1811,7 @@ public class StratconRulesManager {
         Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;
         int skillModifier;
         if (skill == null) {
-            skillModifier = REGULAR.getExperienceLevel();
+            skillModifier = 0;
         } else {
             skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel(commandLiaison.getOptions(),
              commandLiaison.getATOWAttributes());
@@ -1796,7 +1821,8 @@ public class StratconRulesManager {
         reinforcementTargetNumber.addModifier(skillModifier, "Administration Skill");
 
         // Enemy Morale Modifier
-        reinforcementTargetNumber.addModifier(contract.getMoraleLevel().ordinal(), "Enemy Morale");
+        reinforcementTargetNumber.addModifier(contract.getMoraleLevel().getLevel() - STALEMATE.getLevel(),
+              "Enemy Morale");
 
         // Skill Modifier
         int enemySkillModifier = contract.getEnemySkill().getAdjustedValue() - REGULAR.getAdjustedValue();

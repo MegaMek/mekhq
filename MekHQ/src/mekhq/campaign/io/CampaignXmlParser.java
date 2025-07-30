@@ -76,15 +76,17 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
@@ -104,6 +106,7 @@ import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.SVArmor;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -131,6 +134,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
@@ -196,6 +200,12 @@ public class CampaignXmlParser {
             throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
                   campaignEle.getAttribute("version")));
         }
+        // Confirm the campaign version is compatible with the current MekHQ version. This function lives here so that
+        // we don't attempt to load incompatible campaigns and risk running into errors that might prevent the player
+        // from viewing this dialog
+        new MilestoneUpgradePathDialog(campaign, version);
+
+        // Assuming there is no upgrade path, we set version and continue parsing the campaign.
         campaign.setVersion(version);
 
         // Indicates whether or not new units were written to disk while
@@ -230,7 +240,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("custom")) {
                     reloadUnitData |= processCustom(campaign, wn);
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
-                    campaign.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
+                    campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
+                          version));
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
@@ -298,7 +309,9 @@ public class CampaignXmlParser {
                 // Okay, so what element is it?
                 String nodeName = workingNode.getNodeName();
 
-                if (nodeName.equalsIgnoreCase("randomSkillPreferences")) {
+                if (nodeName.equalsIgnoreCase("pastVersions")) {
+                    processPastVersionNodes(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("randomSkillPreferences")) {
                     campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(
                           workingNode,
                           version));
@@ -649,6 +662,17 @@ public class CampaignXmlParser {
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
         for (Part part : campaign.getWarehouse().getParts()) {
+            // < 50.08 compatibility handler
+            if (part instanceof SVArmor svArmor) {
+                final int PROHIBITED_BAR_RATING = 0;
+
+                int bar = svArmor.getBAR();
+                if (bar == PROHIBITED_BAR_RATING) {
+                    LOGGER.info("Discarding untracked BAR 0 armor");
+                    continue;
+                }
+            }
+
             warehouse.addPart(part, true);
         }
 
@@ -903,6 +927,57 @@ public class CampaignXmlParser {
             if (combatTeam != null) {
                 campaign.addCombatTeam(combatTeam);
             }
+        }
+    }
+
+    /**
+     * Processes the child nodes of a given XML node to extract and register past version information in the specified
+     * campaign.
+     * <p>
+     * This method iterates through all child nodes of the supplied {@code workingNode}, identifies elements named
+     * "pastVersion", and creates {@link Version} objects from their text content. Each parsed version is added to the
+     * campaign's list of past versions if it is not already present. Unknown node types encountered in this context are
+     * logged as errors.
+     * <p>
+     * After processing, if the campaign's list of past versions is empty, a warning is logged. The method also ensures
+     * the current application version is included in the list if it was not already present.
+     *
+     * @param campaign    the {@link Campaign} instance to be updated with past version information
+     * @param workingNode the XML {@link Node} whose child nodes contain past version data to be processed
+     */
+    private static void processPastVersionNodes(Campaign campaign, Node workingNode) {
+        NodeList childNodes = workingNode.getChildNodes();
+
+        // Iterate through the children (past versions)
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node childNode = childNodes.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            // If the node name isn't correct, we ignore it.
+            if (!childNode.getNodeName().equalsIgnoreCase("pastVersion")) {
+                LOGGER.error("Incorrect node loaded in Past Version nodes: {}", childNode.getNodeName());
+                continue;
+            }
+
+            // Otherwise, we add it to the list of past versions
+            Version pastVersion = new Version(childNode.getTextContent());
+            if (!campaign.getPastVersions().contains(pastVersion)) {
+                campaign.addPastVersion(pastVersion);
+            }
+        }
+        List<Version> pastVersions = campaign.getPastVersions();
+        if (pastVersions.isEmpty()) {
+            LOGGER.info("No past versions found in campaign file.");
+        }
+
+        // Add the current version (if it's missing)
+        if (!pastVersions.contains(MHQConstants.VERSION)) {
+            LOGGER.info("Current version {} not found in past versions list. Adding it.", MHQConstants.VERSION);
+            campaign.addPastVersion(MHQConstants.VERSION);
         }
     }
 

@@ -47,7 +47,8 @@ import javax.swing.JSpinner;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -70,6 +71,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class SystemsTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
+    private final RandomSkillPreferences randomSkillPreferences;
 
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
@@ -89,6 +91,8 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
+    private JLabel lblRegardMultiplier;
+    private JSpinner spnRegardMultiplier;
 
     private JPanel pnlFactionStandingModifiersPanel;
     private JCheckBox chkUseFactionStandingNegotiation;
@@ -102,6 +106,16 @@ public class SystemsTab {
     private JCheckBox chkUseFactionStandingContractPay;
     private JCheckBox chkUseFactionStandingSupportPoints;
 
+    // A Time of War Tab
+    private CampaignOptionsHeaderPanel atowHeader;
+
+    private JPanel pnlATOWAttributes;
+    private JCheckBox chkUseAttributes;
+    private JCheckBox chkRandomizeAttributes;
+    private JCheckBox chkRandomizeTraits;
+    private JCheckBox chkAllowMonthlyReinvestment;
+    private JCheckBox chkAllowMonthlyConnections;
+
     /**
      * Constructs a new {@code SystemsTab} for the specified campaign.
      *
@@ -113,6 +127,7 @@ public class SystemsTab {
     public SystemsTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
+        this.randomSkillPreferences = campaign.getRandomSkillPreferences();
     }
 
     /**
@@ -258,11 +273,16 @@ public class SystemsTab {
         // Header
         factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              3);
+              4);
 
         // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
+
+        lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
+        lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
+        spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
+        spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
         pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
 
@@ -279,6 +299,12 @@ public class SystemsTab {
         layoutParent.gridwidth = 1;
         panel.add(chkTrackFactionStanding, layoutParent);
 
+        layoutParent.gridy++;
+        panel.add(lblRegardMultiplier, layoutParent);
+        layoutParent.gridx++;
+        panel.add(spnRegardMultiplier, layoutParent);
+
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         layoutParent.gridwidth = 2;
         panel.add(pnlFactionStandingModifiersPanel, layoutParent);
@@ -345,9 +371,6 @@ public class SystemsTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(chkTrackFactionStanding, layout);
-
-        layout.gridy++;
         panel.add(chkUseFactionStandingNegotiation, layout);
         layout.gridx++;
         panel.add(chkUseFactionStandingResupply, layout);
@@ -380,6 +403,84 @@ public class SystemsTab {
     }
 
     /**
+     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its
+     * header.
+     *
+     * @return a {@link JPanel} component representing the entire ATOW tab UI
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public JPanel createATOWTab() {
+        // Header
+        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab",
+              getImageDirectory() + "logo_elysian_fields.png",
+              9);
+
+        // Contents
+        pnlATOWAttributes = createATOWAttributesPanel();
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("ATimeOfWarTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(atowHeader, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(pnlATOWAttributes, layoutParent);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "ATimeOfWarTab");
+    }
+
+    /**
+     * Creates and returns the ATOW panel, which allows users to configure settings for attribute and traits
+     * probabilities.
+     *
+     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
+     */
+    private JPanel createATOWAttributesPanel() {
+        // Contents
+        chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes");
+        chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
+        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
+        chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
+        chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
+        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
+        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(atowHeader,
+              "AllowMonthlyReinvestment"));
+        chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections");
+        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
+              "AllowMonthlyConnections"));
+
+        final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+
+        layout.gridy++;
+        panel.add(chkUseAttributes, layout);
+        layout.gridx++;
+        panel.add(chkRandomizeAttributes, layout);
+        layout.gridx++;
+        panel.add(chkRandomizeTraits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkAllowMonthlyReinvestment, layout);
+        layout.gridx++;
+        panel.add(chkAllowMonthlyConnections, layout);
+
+        return panel;
+    }
+
+    /**
      * Loads values from the current campaign or an optional preset campaign options into the UI components, updating
      * their states to match the data.
      *
@@ -387,7 +488,7 @@ public class SystemsTab {
      * @since 0.50.07
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null);
+        loadValuesFromCampaignOptions(null, null);
     }
 
     /**
@@ -396,14 +497,22 @@ public class SystemsTab {
      *
      * @param presetCampaignOptions an alternative {@link CampaignOptions}, or {@code null} to use the current
      *                              campaign's options
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
+     *                                     {@code null}, values are loaded from the current skill preferences.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
+        }
+
+        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences;
+        if (skillPreferences == null) {
+            skillPreferences = this.randomSkillPreferences;
         }
 
         // Reputation
@@ -416,6 +525,7 @@ public class SystemsTab {
 
         // Faction Standing
         chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        spnRegardMultiplier.setValue(options.getRegardMultiplier());
         chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
         chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
         chkUseFactionStandingCommandCircuit.setSelected(options.isUseFactionStandingCommandCircuit());
@@ -426,6 +536,13 @@ public class SystemsTab {
         chkUseFactionStandingUnitMarket.setSelected(options.isUseFactionStandingUnitMarket());
         chkUseFactionStandingContractPay.setSelected(options.isUseFactionStandingContractPay());
         chkUseFactionStandingSupportPoints.setSelected(options.isUseFactionStandingSupportPoints());
+
+        // A Time of War
+        chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
+        chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
+        chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
+        chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
+        chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
     }
 
     /**
@@ -434,14 +551,22 @@ public class SystemsTab {
      *
      * @param presetCampaignOptions an alternative {@link CampaignOptions} object to update, or {@code null} to update
      *                              the campaign's own options
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
+     *                                     {@code null}, values are applied to the current skill preferences.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
+        }
+
+        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences;
+        if (skillPreferences == null) {
+            skillPreferences = this.randomSkillPreferences;
         }
 
         // Reputation
@@ -460,6 +585,7 @@ public class SystemsTab {
 
         // Faction Standing
         options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
         options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
         options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
         options.setUseFactionStandingCommandCircuit(chkUseFactionStandingCommandCircuit.isSelected());
@@ -470,5 +596,12 @@ public class SystemsTab {
         options.setUseFactionStandingUnitMarket(chkUseFactionStandingUnitMarket.isSelected());
         options.setUseFactionStandingContractPay(chkUseFactionStandingContractPay.isSelected());
         options.setUseFactionStandingSupportPoints(chkUseFactionStandingSupportPoints.isSelected());
+
+        // A Time of War
+        skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
+        skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
+        skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
+        options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
+        options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
     }
 }

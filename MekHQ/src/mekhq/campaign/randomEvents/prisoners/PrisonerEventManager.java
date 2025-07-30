@@ -56,7 +56,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -564,10 +564,11 @@ public class PrisonerEventManager {
      * @param prisoners  The list of prisoners involved in the execution.
      */
     private void processExecutions(int executions, List<Person> prisoners) {
-        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isTrackFactionStanding()) {
             FactionStandings factionStandings = campaign.getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getFaction().getShortName(),
-                  prisoners, campaign.getGameYear());
+                  prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
 
             for (String report : reports) {
                 campaign.addReport(report);

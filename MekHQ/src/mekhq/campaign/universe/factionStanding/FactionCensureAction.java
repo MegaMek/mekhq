@@ -115,4 +115,9 @@ public enum FactionCensureAction {
     public boolean isValidInTransit() {
         return validInTransit;
     }
+
+    @Override
+    public String toString() {
+        return this.getLookupName().replace("_", " ");
+    }
 }

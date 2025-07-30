@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaignPreset version="0.50.06">
+<campaignPreset version="0.50.07">
     <title>3 - Campaign Operations Preset</title>
     <description><![CDATA[This preset follows the rules from the official Campaign Operations manual, designed for human GMs managing CamOps campaigns in MekHQ.
 <br>
@@ -9,6 +9,12 @@
     <date>3151-01-01</date>
     <contractCount>2</contractCount>
     <gm>true</gm>
+    <gameOptions>
+    <gameOption>
+    <name>allow_illegal_units</name>
+    <value>true</value>
+    </gameOption>
+    </gameOptions>
     <campaignOptions>
         <manualUnitRatingModifier>0</manualUnitRatingModifier>
         <clampReputationPayMultiplier>false</clampReputationPayMultiplier>
@@ -28,90 +34,126 @@
         <mrmsOptions>
             <mrmsOption>
                 <type>ARMOUR</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>AMMUNITION</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>WEAPON</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL_LOCATION</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ENGINE</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GYRO</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ACTUATOR</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ELECTRONICS</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
+                <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>HEAT_SINK</type>
+            <active>0</active>
+            <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
+            <targetNumberPreferred>4</targetNumberPreferred>
+            <targetNumberMax>6</targetNumberMax>
+            <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>MEK_LOCATION</type>
+            <active>0</active>
+                <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
+            <targetNumberPreferred>4</targetNumberPreferred>
+            <targetNumberMax>6</targetNumberMax>
+            <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>PHYSICAL_WEAPON</type>
+            <active>0</active>
+            <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>POD_SPACE</type>
-                <active>1</active>
+                <active>0</active>
                 <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
+                <skillMax>6</skillMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
+                <dailyTimeMin>0</dailyTimeMin>
+            </mrmsOption>
+            <mrmsOption>
+            <type>UNKNOWN_LOCATION</type>
+            <active>0</active>
+            <skillMin>0</skillMin>
+            <skillMax>6</skillMax>
                 <targetNumberPreferred>4</targetNumberPreferred>
                 <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
@@ -133,8 +175,8 @@
         <mistakeXP>0</mistakeXP>
         <successXP>0</successXP>
         <vocationalXP>0</vocationalXP>
-        <vocationalXPTargetNumber>10</vocationalXPTargetNumber>
-        <vocationalXPCheckFrequency>2</vocationalXPCheckFrequency>
+        <vocationalXPTargetNumber>7</vocationalXPTargetNumber>
+        <vocationalXPCheckFrequency>1</vocationalXPCheckFrequency>
         <contractNegotiationXP>0</contractNegotiationXP>
         <adminWeeklyXP>0</adminWeeklyXP>
         <adminXPPeriod>1</adminXPPeriod>
@@ -159,10 +201,10 @@
         <usePlanetaryAcquisition>false</usePlanetaryAcquisition>
         <planetAcquisitionFactionLimit>NEUTRAL</planetAcquisitionFactionLimit>
         <planetAcquisitionNoClanCrossover>true</planetAcquisitionNoClanCrossover>
-        <noClanPartsFromIS>false</noClanPartsFromIS>
+        <noClanPartsFromIS>true</noClanPartsFromIS>
         <penaltyClanPartsFromIS>4</penaltyClanPartsFromIS>
         <planetAcquisitionVerbose>false</planetAcquisitionVerbose>
-        <maxJumpsPlanetaryAcquisition>2</maxJumpsPlanetaryAcquisition>
+        <maxJumpsPlanetaryAcquisition>1</maxJumpsPlanetaryAcquisition>
         <equipmentContractPercent>5.0</equipmentContractPercent>
         <dropShipContractPercent>0.0</dropShipContractPercent>
         <jumpShipContractPercent>0.0</jumpShipContractPercent>
@@ -195,6 +237,7 @@
         <autoLogisticsActuators>100</autoLogisticsActuators>
         <autoLogisticsJumpJets>50</autoLogisticsJumpJets>
         <autoLogisticsEngines>0</autoLogisticsEngines>
+        <autoLogisticsWeapons>50</autoLogisticsWeapons>
         <autoLogisticsOther>0</autoLogisticsOther>
         <useTactics>false</useTactics>
         <useInitiativeBonus>false</useInitiativeBonus>
@@ -202,6 +245,7 @@
         <useRandomToughness>false</useRandomToughness>
         <useArtillery>false</useArtillery>
         <useAbilities>true</useAbilities>
+        <useCommanderAbilitiesOnly>true</useCommanderAbilitiesOnly>
         <useEdge>false</useEdge>
         <useSupportEdge>false</useSupportEdge>
         <useImplants>true</useImplants>
@@ -209,9 +253,9 @@
         <useAgeEffects>false</useAgeEffects>
         <useTransfers>true</useTransfers>
         <useExtendedTOEForceName>false</useExtendedTOEForceName>
-        <personnelLogSkillGain>false</personnelLogSkillGain>
-        <personnelLogAbilityGain>false</personnelLogAbilityGain>
-        <personnelLogEdgeGain>false</personnelLogEdgeGain>
+        <personnelLogSkillGain>true</personnelLogSkillGain>
+        <personnelLogAbilityGain>true</personnelLogAbilityGain>
+        <personnelLogEdgeGain>true</personnelLogEdgeGain>
         <displayPersonnelLog>false</displayPersonnelLog>
         <displayScenarioLog>false</displayScenarioLog>
         <displayKillRecord>false</displayKillRecord>
@@ -219,17 +263,16 @@
         <displayAssignmentRecord>false</displayAssignmentRecord>
         <displayPerformanceRecord>false</displayPerformanceRecord>
         <rewardComingOfAgeAbilities>false</rewardComingOfAgeAbilities>
+        <rewardComingOfAgeRPSkills>false</rewardComingOfAgeRPSkills>
         <useTimeInService>true</useTimeInService>
         <timeInServiceDisplayFormat>YEARS</timeInServiceDisplayFormat>
         <useTimeInRank>true</useTimeInRank>
-        <timeInRankDisplayFormat>YEARS</timeInRankDisplayFormat>
-        <trackTotalEarnings>false</trackTotalEarnings>
-        <trackTotalXPEarnings>false</trackTotalXPEarnings>
+        <timeInRankDisplayFormat>MONTHS_YEARS</timeInRankDisplayFormat>
+        <trackTotalEarnings>true</trackTotalEarnings>
+        <trackTotalXPEarnings>true</trackTotalXPEarnings>
         <showOriginFaction>true</showOriginFaction>
-        <adminsHaveNegotiation>false</adminsHaveNegotiation>
-        <adminsHaveScrounge>false</adminsHaveScrounge>
+        <adminsHaveNegotiation>true</adminsHaveNegotiation>
         <adminExperienceLevelIncludeNegotiation>false</adminExperienceLevelIncludeNegotiation>
-        <adminExperienceLevelIncludeScrounge>false</adminExperienceLevelIncludeScrounge>
         <useAdvancedMedical>false</useAdvancedMedical>
         <healWaitingPeriod>1</healWaitingPeriod>
         <naturalHealingWaitingPeriod>15</naturalHealingWaitingPeriod>
@@ -241,6 +284,8 @@
         <prisonerCaptureStyle>CAMPAIGN_OPERATIONS</prisonerCaptureStyle>
         <useRandomDependentAddition>false</useRandomDependentAddition>
         <useRandomDependentRemoval>false</useRandomDependentRemoval>
+        <dependentProfessionDieSize>4</dependentProfessionDieSize>
+        <civilianProfessionDieSize>2</civilianProfessionDieSize>
         <usePersonnelRemoval>true</usePersonnelRemoval>
         <useRemovalExemptCemetery>true</useRemovalExemptCemetery>
         <useRemovalExemptRetirees>true</useRemovalExemptRetirees>
@@ -248,16 +293,17 @@
         <salaryAntiMekMultiplier>1.5</salaryAntiMekMultiplier>
         <salarySpecialistInfantryMultiplier>1.28</salarySpecialistInfantryMultiplier>
         <salaryXPMultipliers>
-            <ULTRA_GREEN>0.6</ULTRA_GREEN>
-            <NONE>0.5</NONE>
-            <GREEN>0.6</GREEN>
             <VETERAN>1.6</VETERAN>
             <REGULAR>1.0</REGULAR>
+            <GREEN>0.6</GREEN>
+            <HEROIC>6.4</HEROIC>
             <ELITE>3.2</ELITE>
             <LEGENDARY>12.8</LEGENDARY>
-            <HEROIC>6.4</HEROIC>
+            <ULTRA_GREEN>0.6</ULTRA_GREEN>
+            <NONE>0.5</NONE>
         </salaryXPMultipliers>
-        <salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+        <salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,50 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,250 CSB,2500 CSB,250 CSB
+        </salaryTypeBase>
         <awardBonusStyle>BOTH</awardBonusStyle>
         <enableAutoAwards>false</enableAutoAwards>
         <issuePosthumousAwards>true</issuePosthumousAwards>
@@ -293,9 +339,9 @@
         <useReasoningXpMultiplier>true</useReasoningXpMultiplier>
         <useSimulatedRelationships>false</useSimulatedRelationships>
         <useRandomRetirement>false</useRandomRetirement>
-        <turnoverBaseTn>3</turnoverBaseTn>
+        <turnoverBaseTn>4</turnoverBaseTn>
         <turnoverFrequency>MONTHLY</turnoverFrequency>
-        <aeroRecruitsHaveUnits>false</aeroRecruitsHaveUnits>
+        <aeroRecruitsHaveUnits>true</aeroRecruitsHaveUnits>
         <trackOriginalUnit>true</trackOriginalUnit>
         <useContractCompletionRandomRetirement>true</useContractCompletionRandomRetirement>
         <useRandomFounderTurnover>true</useRandomFounderTurnover>
@@ -303,7 +349,7 @@
         <useSubContractSoldiers>false</useSubContractSoldiers>
         <serviceContractDuration>36</serviceContractDuration>
         <serviceContractModifier>3</serviceContractModifier>
-        <payBonusDefault>false</payBonusDefault>
+        <payBonusDefault>true</payBonusDefault>
         <payBonusDefaultThreshold>3</payBonusDefaultThreshold>
         <useCustomRetirementModifiers>true</useCustomRetirementModifiers>
         <useFatigueModifiers>true</useFatigueModifiers>
@@ -321,10 +367,9 @@
         <payoutRetirementMultiplier>12</payoutRetirementMultiplier>
         <usePayoutServiceBonus>true</usePayoutServiceBonus>
         <payoutServiceBonusRate>10</payoutServiceBonusRate>
-        <useAdministrativeStrain>false</useAdministrativeStrain>
-        <administrativeStrain>10</administrativeStrain>
-        <multiCrewStrainDivider>5</multiCrewStrainDivider>
-        <useManagementSkill>false</useManagementSkill>
+        <UseHRStrain>true</UseHRStrain>
+        <hrStrain>10</hrStrain>
+        <useManagementSkill>true</useManagementSkill>
         <useCommanderLeadershipOnly>false</useCommanderLeadershipOnly>
         <managementSkillPenalty>0</managementSkillPenalty>
         <useFatigue>true</useFatigue>
@@ -333,7 +378,7 @@
         <fieldKitchenCapacity>150</fieldKitchenCapacity>
         <fieldKitchenIgnoreNonCombatants>true</fieldKitchenIgnoreNonCombatants>
         <fatigueLeaveThreshold>13</fatigueLeaveThreshold>
-        <familyDisplayLevel>SPOUSE</familyDisplayLevel>
+        <familyDisplayLevel>PARENTS_CHILDREN_SIBLINGS</familyDisplayLevel>
         <announceBirthdays>true</announceBirthdays>
         <announceRecruitmentAnniversaries>true</announceRecruitmentAnniversaries>
         <announceOfficersOnly>true</announceOfficersOnly>
@@ -346,25 +391,25 @@
         <usePrisonerMarriages>true</usePrisonerMarriages>
         <checkMutualAncestorsDepth>4</checkMutualAncestorsDepth>
         <noInterestInMarriageDiceSize>10</noInterestInMarriageDiceSize>
-        <logMarriageNameChanges>false</logMarriageNameChanges>
+        <logMarriageNameChanges>true</logMarriageNameChanges>
         <marriageSurnameWeights>
-            <SPACE_SPOUSE>10</SPACE_SPOUSE>
+        <MALE>500</MALE>
+        <NO_CHANGE>100</NO_CHANGE>
+        <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
+        <SPOUSE>55</SPOUSE>
             <BOTH_HYPHEN_YOURS>20</BOTH_HYPHEN_YOURS>
-            <FEMALE>160</FEMALE>
+        <SPACE_SPOUSE>10</SPACE_SPOUSE>
+        <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
             <HYPHEN_YOURS>30</HYPHEN_YOURS>
-            <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
             <BOTH_SPACE_SPOUSE>5</BOTH_SPACE_SPOUSE>
-            <SPOUSE>55</SPOUSE>
+        <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
             <YOURS>55</YOURS>
             <SPACE_YOURS>10</SPACE_YOURS>
-            <NO_CHANGE>100</NO_CHANGE>
-            <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
-            <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
-            <MALE>500</MALE>
+        <FEMALE>160</FEMALE>
         </marriageSurnameWeights>
         <randomMarriageMethod>NONE</randomMarriageMethod>
         <useRandomClanPersonnelMarriages>false</useRandomClanPersonnelMarriages>
-        <useRandomPrisonerMarriages>true</useRandomPrisonerMarriages>
+        <useRandomPrisonerMarriages>false</useRandomPrisonerMarriages>
         <randomMarriageAgeRange>10</randomMarriageAgeRange>
         <randomMarriageDiceSize>5000</randomMarriageDiceSize>
         <randomSameSexMarriageDiceSize>14</randomSameSexMarriageDiceSize>
@@ -374,8 +419,8 @@
         <usePrisonerDivorce>true</usePrisonerDivorce>
         <divorceSurnameWeights>
             <SPOUSE_CHANGES_SURNAME>10</SPOUSE_CHANGES_SURNAME>
-            <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
             <BOTH_KEEP_SURNAME>50</BOTH_KEEP_SURNAME>
+            <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
             <BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
         </divorceSurnameWeights>
         <randomDivorceMethod>NONE</randomDivorceMethod>
@@ -395,11 +440,11 @@
         <determineFatherAtBirth>false</determineFatherAtBirth>
         <displayTrueDueDate>false</displayTrueDueDate>
         <noInterestInChildrenDiceSize>3</noInterestInChildrenDiceSize>
-        <logProcreation>false</logProcreation>
+        <logProcreation>true</logProcreation>
         <randomProcreationMethod>NONE</randomProcreationMethod>
         <useRelationshiplessRandomProcreation>true</useRelationshiplessRandomProcreation>
         <useRandomClanPersonnelProcreation>false</useRandomClanPersonnelProcreation>
-        <useRandomPrisonerProcreation>true</useRandomPrisonerProcreation>
+        <useRandomPrisonerProcreation>false</useRandomPrisonerProcreation>
         <randomProcreationRelationshipDiceSize>500</randomProcreationRelationshipDiceSize>
         <randomProcreationRelationshiplessDiceSize>2000</randomProcreationRelationshiplessDiceSize>
         <useEducationModule>false</useEducationModule>
@@ -419,13 +464,13 @@
         <allAges>false</allAges>
         <militaryAcademyAccidents>10000</militaryAcademyAccidents>
         <enabledRandomDeathAgeGroups>
-            <TEENAGER>false</TEENAGER>
+        <ADULT>true</ADULT>
+        <PRETEEN>false</PRETEEN>
             <ELDER>true</ELDER>
             <CHILD>false</CHILD>
-            <ADULT>true</ADULT>
-            <PRETEEN>false</PRETEEN>
+        <TEENAGER>false</TEENAGER>
+        <TODDLER>false</TODDLER>
             <BABY>false</BABY>
-            <TODDLER>false</TODDLER>
         </enabledRandomDeathAgeGroups>
         <useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
         <randomDeathMultiplier>0.0</randomDeathMultiplier>
@@ -439,6 +484,8 @@
         <sellUnits>true</sellUnits>
         <sellParts>true</sellParts>
         <payForRecruitment>false</payForRecruitment>
+        <payForFood>false</payForFood>
+        <payForHousing>false</payForHousing>
         <useLoanLimits>false</useLoanLimits>
         <usePercentageMaint>false</usePercentageMaint>
         <infantryDontCount>false</infantryDontCount>
@@ -449,6 +496,7 @@
         <newFinancialYearFinancesToCSVExport>false</newFinancialYearFinancesToCSVExport>
         <simulateGrayMonday>false</simulateGrayMonday>
         <allowMonthlyReinvestment>false</allowMonthlyReinvestment>
+        <allowMonthlyConnections>false</allowMonthlyConnections>
         <commonPartPriceMultiplier>1.0</commonPartPriceMultiplier>
         <innerSphereUnitPriceMultiplier>1.0</innerSphereUnitPriceMultiplier>
         <innerSpherePartPriceMultiplier>1.0</innerSpherePartPriceMultiplier>
@@ -463,22 +511,23 @@
         <sharesForAll>false</sharesForAll>
         <useTaxes>false</useTaxes>
         <taxesPercentage>30</taxesPercentage>
-        <personnelMarketName>Campaign Ops</personnelMarketName>
+        <personnelMarketStyle>CAMPAIGN_OPERATIONS_STRICT</personnelMarketStyle>
+        <personnelMarketName>Disabled</personnelMarketName>
         <personnelMarketReportRefresh>true</personnelMarketReportRefresh>
         <personnelMarketRandomRemovalTargets>
-            <ULTRA_GREEN>4</ULTRA_GREEN>
-            <NONE>3</NONE>
-            <GREEN>4</GREEN>
             <VETERAN>8</VETERAN>
             <REGULAR>6</REGULAR>
+            <GREEN>4</GREEN>
+            <HEROIC>11</HEROIC>
             <ELITE>10</ELITE>
             <LEGENDARY>11</LEGENDARY>
-            <HEROIC>11</HEROIC>
+            <ULTRA_GREEN>4</ULTRA_GREEN>
+            <NONE>3</NONE>
         </personnelMarketRandomRemovalTargets>
         <personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
         <usePersonnelHireHiringHallOnly>false</usePersonnelHireHiringHallOnly>
         <unitMarketMethod>NONE</unitMarketMethod>
-        <unitMarketRegionalMekVariations>false</unitMarketRegionalMekVariations>
+        <unitMarketRegionalMekVariations>true</unitMarketRegionalMekVariations>
         <unitMarketSpecialUnitChance>30</unitMarketSpecialUnitChance>
         <unitMarketRarityModifier>0</unitMarketRarityModifier>
         <instantUnitMarketDelivery>false</instantUnitMarketDelivery>
@@ -486,8 +535,8 @@
         <unitMarketReportRefresh>true</unitMarketReportRefresh>
         <contractMarketMethod>NONE</contractMarketMethod>
         <contractSearchRadius>400</contractSearchRadius>
-        <variableContractLength>false</variableContractLength>
-        <useDynamicDifficulty>false</useDynamicDifficulty>
+        <variableContractLength>true</variableContractLength>
+        <useDynamicDifficulty>true</useDynamicDifficulty>
         <contractMarketReportRefresh>true</contractMarketReportRefresh>
         <contractMaxSalvagePercentage>100</contractMaxSalvagePercentage>
         <dropShipBonusPercentage>0</dropShipBonusPercentage>
@@ -498,13 +547,13 @@
         <autoResolveMethod>PRINCESS</autoResolveMethod>
         <autoResolveVictoryChanceEnabled>false</autoResolveVictoryChanceEnabled>
         <autoResolveNumberOfScenarios>100</autoResolveNumberOfScenarios>
-        <autoResolveUseExperimentalPacarGui>false</autoResolveUseExperimentalPacarGui>
+        <autoResolveUseExperimentalPacarGui>true</autoResolveUseExperimentalPacarGui>
         <strategicViewTheme>gbc green.theme</strategicViewTheme>
         <phenotypeProbabilities>95,100,95,0,95,25</phenotypeProbabilities>
         <useAtB>false</useAtB>
         <useStratCon>false</useStratCon>
         <useAero>false</useAero>
-        <useVehicles>true</useVehicles>
+        <useVehicles>false</useVehicles>
         <clanVehicles>true</clanVehicles>
         <useGenericBattleValue>true</useGenericBattleValue>
         <useVerboseBidding>false</useVerboseBidding>
@@ -513,23 +562,18 @@
         <opForLanceTypeMeks>5</opForLanceTypeMeks>
         <opForLanceTypeMixed>2</opForLanceTypeMixed>
         <opForLanceTypeVehicles>1</opForLanceTypeVehicles>
-        <opForUsesVTOLs>false</opForUsesVTOLs>
-        <useDropShips>false</useDropShips>
+        <opForUsesVTOLs>true</opForUsesVTOLs>
+        <useDropShips>true</useDropShips>
         <mercSizeLimited>false</mercSizeLimited>
-        <regionalMekVariations>false</regionalMekVariations>
-        <attachedPlayerCamouflage>true</attachedPlayerCamouflage>
+        <regionalMekVariations>true</regionalMekVariations>
+        <attachedPlayerCamouflage>false</attachedPlayerCamouflage>
         <playerControlsAttachedUnits>true</playerControlsAttachedUnits>
-        <atbBattleChance>0,0,0,0,0</atbBattleChance>
+        <atbBattleChance>40,20,60,10,0</atbBattleChance>
         <generateChases>false</generateChases>
         <useWeatherConditions>true</useWeatherConditions>
         <useLightConditions>true</useLightConditions>
         <usePlanetaryConditions>true</usePlanetaryConditions>
-        <useStrategy>true</useStrategy>
-        <baseStrategyDeployment>3</baseStrategyDeployment>
-        <additionalStrategyDeployment>1</additionalStrategyDeployment>
         <restrictPartsByMission>true</restrictPartsByMission>
-        <limitLanceWeight>false</limitLanceWeight>
-        <limitLanceNumUnits>false</limitLanceNumUnits>
         <assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
         <allowDuplicatePortraits>true</allowDuplicatePortraits>
         <allowOpForAeros>false</allowOpForAeros>
@@ -540,53 +584,66 @@
         <spaUpgradeIntensity>1</spaUpgradeIntensity>
         <scenarioModMax>3</scenarioModMax>
         <scenarioModChance>25</scenarioModChance>
-        <scenarioModBV>25</scenarioModBV>
+        <scenarioModBV>50</scenarioModBV>
         <autoConfigMunitions>true</autoConfigMunitions>
-        <planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
-        <planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
-        <planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-        <usePortraitForType>true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true</usePortraitForType>
+        <autoGenerateOpForCallsigns>true</autoGenerateOpForCallsigns>
+        <minimumCallsignSkillLevel>VETERAN</minimumCallsignSkillLevel>
+        <planetTechAcquisitionBonus>-2,-1,0,1,2,8,16</planetTechAcquisitionBonus>
+        <planetIndustryAcquisitionBonus>0,0,0,0,0</planetIndustryAcquisitionBonus>
+        <planetOutputAcquisitionBonus>-1,0,1,2,8</planetOutputAcquisitionBonus>
+        <usePortraitForType>true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true
+        </usePortraitForType>
+        <trackFactionStanding>false</trackFactionStanding>
+        <useFactionStandingNegotiation>true</useFactionStandingNegotiation>
+        <useFactionStandingResupply>true</useFactionStandingResupply>
+        <useFactionStandingCommandCircuit>true</useFactionStandingCommandCircuit>
+        <useFactionStandingOutlawed>true</useFactionStandingOutlawed>
+        <useFactionStandingBatchallRestrictions>true</useFactionStandingBatchallRestrictions>
+        <useFactionStandingRecruitment>true</useFactionStandingRecruitment>
+        <useFactionStandingBarracksCosts>true</useFactionStandingBarracksCosts>
+        <useFactionStandingUnitMarket>true</useFactionStandingUnitMarket>
+        <useFactionStandingContractPay>true</useFactionStandingContractPay>
+        <useFactionStandingSupportPoints>true</useFactionStandingSupportPoints>
+        <factionStandingGainMultiplier>1.0</factionStandingGainMultiplier>
     </campaignOptions>
     <randomSkillPreferences>
         <overallRecruitBonus>0</overallRecruitBonus>
         <recruitmentBonuses>
-            <BA_TECH>0</BA_TECH>
+        <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
+        <ASTECH>0</ASTECH>
+        <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
+        <MEKWARRIOR>0</MEKWARRIOR>
+        <VTOL_PILOT>0</VTOL_PILOT>
+        <MEDIC>0</MEDIC>
+        <VESSEL_PILOT>0</VESSEL_PILOT>
+        <VESSEL_GUNNER>0</VESSEL_GUNNER>
+        <MEK_TECH>0</MEK_TECH>
+        <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
+        <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
+        <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
             <SOLDIER>0</SOLDIER>
-            <AERO_TEK>0</AERO_TEK>
-            <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
             <DOCTOR>0</DOCTOR>
-            <VTOL_PILOT>0</VTOL_PILOT>
-            <MECHANIC>0</MECHANIC>
             <VEHICLE_CREW>0</VEHICLE_CREW>
-            <VESSEL_CREW>0</VESSEL_CREW>
             <ADMINISTRATOR_LOGISTICS>0</ADMINISTRATOR_LOGISTICS>
-            <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
-            <MEK_TECH>0</MEK_TECH>
-            <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
-            <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
-            <MEDIC>0</MEDIC>
-            <AEROSPACE_PILOT>0</AEROSPACE_PILOT>
-            <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
-            <ASTECH>0</ASTECH>
-            <DEPENDENT>0</DEPENDENT>
-            <NAVAL_VEHICLE_DRIVER>0</NAVAL_VEHICLE_DRIVER>
-            <VESSEL_GUNNER>0</VESSEL_GUNNER>
+        <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
             <LAM_PILOT>0</LAM_PILOT>
-            <NONE>0</NONE>
-            <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
+        <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
             <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
-            <VESSEL_PILOT>0</VESSEL_PILOT>
-            <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
-            <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
-            <MEKWARRIOR>0</MEKWARRIOR>
+        <AEROSPACE_PILOT>0</AEROSPACE_PILOT>
+        <VESSEL_CREW>0</VESSEL_CREW>
+        <NAVAL_VEHICLE_DRIVER>0</NAVAL_VEHICLE_DRIVER>
+        <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
+        <AERO_TEK>0</AERO_TEK>
+        <MECHANIC>0</MECHANIC>
+        <BA_TECH>0</BA_TECH>
         </recruitmentBonuses>
-        <specialAbilityBonus>-10,-10,-2,0,1</specialAbilityBonus>
-        <commandSkillsModifier>-10,-10,-7,-4,-1</commandSkillsModifier>
-        <roleplaySkillModifier>-12</roleplaySkillModifier>
-        <randomizeSkill>false</randomizeSkill>
-        <useAttributes>false</useAttributes>
-        <randomizeAttributes>false</randomizeAttributes>
-        <randomizeTraits>false</randomizeTraits>
+        <specialAbilityBonus>-10,-10,-2,0,1,1,1</specialAbilityBonus>
+        <commandSkillsModifier>-12,-11,-10,-9,-8,-7,-7</commandSkillsModifier>
+        <roleplaySkillModifier>-8</roleplaySkillModifier>
+        <randomizeSkill>true</randomizeSkill>
+        <useAttributes>true</useAttributes>
+        <randomizeAttributes>true</randomizeAttributes>
+        <randomizeTraits>true</randomizeTraits>
         <useClanBonuses>true</useClanBonuses>
         <antiMekProb>10</antiMekProb>
         <combatSmallArmsBonus>-3</combatSmallArmsBonus>

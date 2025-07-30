@@ -46,3 +46,61 @@ ultimatums:
       role: NOBLE
       factionCode: CS
     isViolentTransition: true
+  - date: 2766-12-26
+    # Represents the date when Stefan Amaris shot Richard Cameron II and caused the downfall of the Star League
+    name: AMARIS_COUP
+    affectedFactionCode: SL
+    challenger:
+      name: First Citizen Stefan Amaris
+      role: NOBLE
+      factionCode: TH
+    incumbent:
+      name: General Aleksandr Kerensky
+      role: MEKWARRIOR
+      factionCode: SL
+    isViolentTransition: true
+  - date: 2784-11-05
+    # Represents the date when the SLDF left the inner sphere. I opted to go with this date rather than Kerensky's
+    # address as it results in the least amount of downtime between when the exodus begins and when the player will
+    # start getting contracts again.
+    name: EXODUS
+    affectedFactionCode: TH # The Star League doesn't exist at this point.
+    challenger:
+      name: General Aleksandr Kerensky
+      role: MEKWARRIOR
+      factionCode: SLIE
+    incumbent:
+      name: Jerome Blake
+      role: TECH_COMMUNICATIONS
+      factionCode: CS
+    isViolentTransition: false
+  - date: 2784-11-05
+    # Represents the date when the SLDF left the inner sphere. I opted to go with this date rather than Kerensky's
+    # address as it results in the least amount of downtime between when the exodus begins and when the player will
+    # start getting contracts again.
+    name: EXODUS
+    affectedFactionCode: SLIE # The Star League doesn't exist at this point.
+    challenger:
+      name: General Aleksandr Kerensky
+      role: MEKWARRIOR
+      factionCode: SLIE
+    incumbent:
+      name: Jerome Blake
+      role: TECH_COMMUNICATIONS
+      factionCode: CS
+    isViolentTransition: false
+  - date: 2784-11-05
+    # Represents the date when the SLDF left the inner sphere. I opted to go with this date rather than Kerensky's
+    # address as it results in the least amount of downtime between when the exodus begins and when the player will
+    # start getting contracts again.
+    name: EXODUS
+    affectedFactionCode: CS # The Star League doesn't exist at this point.
+    challenger:
+      name: General Aleksandr Kerensky
+      role: MEKWARRIOR
+      factionCode: SLIE
+    incumbent:
+      name: Jerome Blake
+      role: TECH_COMMUNICATIONS
+      factionCode: CS
+    isViolentTransition: false

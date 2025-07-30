@@ -60,7 +60,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class FactionStandingLevelTest {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
+    private final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingLevel";
     private static final List<String> SUPPORTED_FACTIONS = List.of("CC", "DC", "LA", "FS", "FWL", "TH",
             "ROS", "SL", "FC", "RWR", "TC", "MOC", "OA", "MH", "TD", "CS", "WOB", "innerSphere", "periphery", "clan");
 
@@ -202,9 +202,9 @@ class FactionStandingLevelTest {
 
     @Test
     void test_recruitmentRollsAlwaysImprove() {
-        int lastRolls = STANDING_LEVEL_0.getRecruitmentRollsModifier();
+        double lastRolls = STANDING_LEVEL_0.getRecruitmentRollsModifier();
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
-            int currentRolls = standingLevel.getRecruitmentRollsModifier();
+            double currentRolls = standingLevel.getRecruitmentRollsModifier();
             assertTrue(currentRolls >= lastRolls,
                     "The recruitment roll modifier for " +
                             standingLevel.name() +

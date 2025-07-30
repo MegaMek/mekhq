@@ -33,17 +33,35 @@
 package mekhq.campaign.market.personnelMarket.markets;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
+import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -56,6 +74,7 @@ import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -80,7 +99,7 @@ public class NewPersonnelMarket {
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
     @SuppressWarnings(value = "FieldCanBeLocal")
-    private static int RARE_PROFESSION_WEIGHT = 20;
+    private static final int RARE_PROFESSION_WEIGHT = 20;
     private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
     private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
@@ -95,7 +114,8 @@ public class NewPersonnelMarket {
     @SuppressWarnings(value = "unused")
     private List<Faction> applicantOriginFactions = new ArrayList<>();
     boolean offeringGoldenHello = true;
-    boolean hasRarePersonnel;
+    boolean wasOfferingGoldenHello = true;
+    Set<UUID> rarePersonnel = new HashSet<>();
     List<PersonnelRole> rareProfessions = new ArrayList<>();
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
@@ -172,10 +192,12 @@ public class NewPersonnelMarket {
                 String nodeContents = childNode.getTextContent().trim();
                 if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
                     personnelMarket.setAssociatedPersonnelMarketStyle(PersonnelMarketStyle.fromString(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("wasOfferingGoldenHello")) {
+                    personnelMarket.setWasOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("offeringGoldenHello")) {
                     personnelMarket.setOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
-                    personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("rarePersonnel")) {
+                    processRarePersonnelNodes(personnelMarket, childNode);
                 } else if (nodeName.equalsIgnoreCase("rareProfessions")) {
                     processRareProfessionNodes(personnelMarket, childNode);
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
@@ -220,7 +242,7 @@ public class NewPersonnelMarket {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
             if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
-                campaign.addReport(generatePersonnelReport());
+                campaign.addReport(generatePersonnelReport(campaign));
             }
 
             MekHQ.triggerEvent(new MarketNewPersonnelEvent(currentApplicants));
@@ -234,6 +256,66 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     public void generateApplicants() {
+    }
+
+    /**
+     * Retrieves a single applicant if available.
+     *
+     * @return a {@link Person}, or {@code null} if no applicant exists
+     */
+    public @Nullable Person getSingleApplicant() {
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+                                                                                getClanMarketEntries() :
+                                                                                getInnerSphereMarketEntries();
+        unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
+        List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
+
+        return generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
+    }
+
+    /**
+     * Performs the Connections recruits check for the given date and Connections level.
+     *
+     * <p>This method determines whether the commander gains additional recruits based on their Connections level. If
+     * the Connections level allows for additional recruit rolls and the roll is successful, the recruit bonus is
+     * awarded and a report is added to the campaign.</p>
+     *
+     * @return the number of additional recruits gained from the check, or {@code 0} if none are gained or if no
+     *       commander is present.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    int performConnectionsRecruitsCheck() {
+        Person commander = campaign.getCommander();
+        if (commander == null) {
+            return 0;
+        }
+
+        if (commander.getBurnedConnectionsEndDate() != null) {
+            return 0;
+        }
+
+        int adjustedConnections = commander.getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            int additionalRecruitRolls = connectionsLevel.getRecruits();
+            if (additionalRecruitRolls > 0) {
+                int roll = d6(2);
+                logger.info("Rolling to use connections to get extra recruits {} {} vs. {}",
+                      commander.getFullTitle(), roll, CONNECTIONS_TARGET_NUMBER);
+                if (roll >= CONNECTIONS_TARGET_NUMBER) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "connections.recruits",
+                            commander.getHyperlinkedFullTitle(), additionalRecruitRolls,
+                            spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
+
+                    return additionalRecruitRolls;
+                }
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -259,8 +341,13 @@ public class NewPersonnelMarket {
               indent,
               "associatedPersonnelMarketStyle",
               associatedPersonnelMarketStyle.name()); // this node must always be first
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "wasOfferingGoldenHello", wasOfferingGoldenHello);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rarePersonnel");
+        for (UUID personId : rarePersonnel) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rarePerson", personId);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "rarePersonnel");
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rareProfessions");
         for (PersonnelRole profession : rareProfessions) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rareProfession", profession.name());
@@ -493,8 +580,8 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public ArrayList<Faction> getApplicantOriginFactions() {
-        return new ArrayList<>();
+    public List<Faction> getApplicantOriginFactions() {
+        return applicantOriginFactions;
     }
 
     /**
@@ -601,6 +688,30 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Returns whether a golden hello (recruitment incentive) was being offered when applicants were generated.
+     *
+     * @return {@code true} if a golden hello was offered, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isWasOfferingGoldenHello() {
+        return wasOfferingGoldenHello;
+    }
+
+    /**
+     * Sets whether a golden hello (recruitment incentive) was being offered when applicants were generated.
+     *
+     * @param wasOfferingGoldenHello {@code true} if a golden hello was offered, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setWasOfferingGoldenHello(boolean wasOfferingGoldenHello) {
+        this.wasOfferingGoldenHello = wasOfferingGoldenHello;
+    }
+
+    /**
      * Returns whether rare personnel are available on the market.
      *
      * @return {@code true} if rare personnel are present, otherwise {@code false}
@@ -608,7 +719,7 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     public boolean getHasRarePersonnel() {
-        return hasRarePersonnel;
+        return !rarePersonnel.isEmpty();
     }
 
     /**
@@ -618,8 +729,35 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setHasRarePersonnel(boolean hasRarePersonnel) {
-        this.hasRarePersonnel = hasRarePersonnel;
+        //        this.hasRarePersonnel = hasRarePersonnel;
+    }
+
+    /**
+     * Returns the set of rare personnel.
+     *
+     * @return a {@link Set} containing {@link Person} objects considered rare personnel
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Set<UUID> getRarePersonnel() {
+        return rarePersonnel;
+    }
+
+    /**
+     * Adds a {@link UUID} to the set of rare personnel, if not {@code null}.
+     *
+     * @param personId the {@link UUID} to add to the rare personnel set; ignored if {@code null}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void addRarePerson(UUID personId) {
+        if (personId != null) {
+            rarePersonnel.add(personId);
+        }
     }
 
     /**
@@ -716,11 +854,12 @@ public class NewPersonnelMarket {
         gameYear = today.getYear();
         currentSystem = campaign.getCurrentSystem();
 
-        hasRarePersonnel = false;
+        rarePersonnel = new HashSet<>();
         rareProfessions = new ArrayList<>();
         recruitmentRolls = 0;
         applicantOriginFactions = new ArrayList<>();
         currentApplicants = new ArrayList<>();
+        wasOfferingGoldenHello = isOfferingGoldenHello();
     }
 
     /**
@@ -808,14 +947,14 @@ public class NewPersonnelMarket {
             logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
                                "fallback structure of the YAML file is incorrect.",
                   originalEntry.profession(),
-                  gameYear);
+                  getGameYear());
             return null;
         }
 
         // If we have a valid entry, we now need to generate the applicant
-        Faction applicantOriginFaction = getRandomItem(applicantOriginFactions);
+        Faction applicantOriginFaction = getRandomItem(getApplicantOriginFactions());
         if (applicantOriginFaction == null) {
-            logger.error("Could not find a valid applicant origin faction for game year {}.", gameYear);
+            logger.error("Could not find a valid applicant origin faction for game year {}.", getGameYear());
             return null;
         }
         String originFactionCode = applicantOriginFaction.getShortName();
@@ -824,24 +963,22 @@ public class NewPersonnelMarket {
         if (applicant == null) {
             logger.warn("Could not create person for {} game year {} from faction {}",
                   originalEntry.profession(),
-                  gameYear,
+                  getGameYear(),
                   applicantOriginFaction);
             return null;
         }
 
-        if (!hasRarePersonnel && (entry.weight() <= RARE_PROFESSION_WEIGHT)) {
-            hasRarePersonnel = true;
+        if (entry.weight() <= RARE_PROFESSION_WEIGHT) {
+            rarePersonnel.add(applicant.getId());
 
             PersonnelRole profession = entry.profession();
-            if (!rareProfessions.contains(profession)) {
-                rareProfessions.add(profession);
-            }
+            rareProfessions.add(profession);
         }
 
         logger.debug("Generated applicant {} ({}) game year {} from faction {}",
               applicant.getFullName(),
               applicant.getPrimaryRole(),
-              gameYear,
+              getGameYear(),
               applicantOriginFaction);
 
         return applicant;
@@ -891,14 +1028,66 @@ public class NewPersonnelMarket {
         return entry;
     }
 
+    /** Use {@link #generatePersonnelReport(Campaign)} instead */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    private String generatePersonnelReport() {
+        return getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report");
+    }
+
     /**
-     * Generates a personnel recruitment report for the specified campaign.
+     * Generates an HTML-formatted personnel recruitment report for the specified campaign, summarizing the number of
+     * current applicants at each experience level.
+     *
+     * <p>The report includes a line for each experience level with at least one applicant, showing the count,
+     * color-coded rank, and name of the experience level. Pluralization is handled automatically.</p>
+     *
+     * @param campaign the campaign for which to generate the personnel report
+     * @return a formatted HTML report string summarizing applicant counts by experience level
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private String generatePersonnelReport() {
-        return getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report");
+    private String generatePersonnelReport(Campaign campaign) {
+        StringBuilder report = new StringBuilder(getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report"));
+
+        // Define the experience levels and tie them to their respective constants.
+        final int[] expLevels = {
+              EXP_ULTRA_GREEN, EXP_GREEN, EXP_REGULAR,
+              EXP_VETERAN, EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY
+        };
+
+        // Set up per-level tracking (index order must match expLevels)
+        final int[] applicantCounts = new int[expLevels.length];
+        final String[] colors = new String[expLevels.length];
+        final String[] names = new String[expLevels.length];
+
+        for (int i = 0; i < expLevels.length; i++) {
+            colors[i] = spanOpeningWithCustomColor(getExperienceLevelColor(expLevels[i]));
+            names[i] = getExperienceLevelName(expLevels[i]);
+        }
+
+        // Tally applicants per experience level
+        for (Person applicant : currentApplicants) {
+            int experienceLevel = applicant.getExperienceLevel(campaign, false);
+            for (int i = 0; i < expLevels.length; i++) {
+                if (experienceLevel == expLevels[i]) {
+                    applicantCounts[i]++;
+                    break;
+                }
+            }
+        }
+
+        // Append report lines for each non-zero level
+        for (int i = expLevels.length - 1; i >= 0; i--) { // highest to lowest
+            if (applicantCounts[i] > 0) {
+                int pluralizer = applicantCounts[i] > 1 ? 1 : 0;
+                report.append("<br>")
+                      .append(getFormattedTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.experienceLevel",
+                            applicantCounts[i], colors[i], names[i], CLOSING_SPAN_TAG, pluralizer));
+            }
+        }
+
+        return report.toString();
     }
 
     /**
@@ -1014,6 +1203,30 @@ public class NewPersonnelMarket {
             }
         }
 
-        logger.info("Load Kill Nodes Complete!");
+        logger.info("Load Rare Profession Nodes Complete!");
+    }
+
+    private static void processRarePersonnelNodes(NewPersonnelMarket personnelMarket, Node parentNode) {
+        logger.info("Loading Rare Personnel Nodes from XML...");
+
+        NodeList childNodes = parentNode.getChildNodes();
+
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node currentChild = childNodes.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (currentChild.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!currentChild.getNodeName().equalsIgnoreCase("rarePerson")) {
+                logger.error("Unknown node type not loaded in Rare Personnel nodes: {}", currentChild.getNodeName());
+                continue;
+            }
+
+            personnelMarket.addRarePerson(UUID.fromString(currentChild.getTextContent().trim()));
+        }
+
+        logger.info("Load Rare Personnel Nodes Complete!");
     }
 }

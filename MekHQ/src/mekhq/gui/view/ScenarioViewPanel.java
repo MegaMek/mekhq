@@ -24,8 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.Vector;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.Atmosphere;
@@ -40,14 +71,6 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
-
-import javax.swing.*;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.List;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -325,7 +348,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 // either from the list of bot units or from the list of player units
                 if (scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
                     associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
-                } else if (scenario.getForces(campaign).getAllUnits(true).contains(uid)) {
+                } else if (scenario.getForces(campaign).getAllUnits(false).contains(uid)) {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 

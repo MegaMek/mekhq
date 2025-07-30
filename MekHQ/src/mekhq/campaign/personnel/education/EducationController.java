@@ -58,7 +58,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -1536,9 +1536,9 @@ public class EducationController {
         int roll = d6(1);
 
         if (roll == 1) {
-            person.setLoyalty(person.getLoyalty() - 1);
+            person.setLoyalty(person.getBaseLoyalty() - 1);
         } else if (roll >= 4) {
-            person.setLoyalty(person.getLoyalty() + 1);
+            person.setLoyalty(person.getBaseLoyalty() + 1);
         }
     }
 

@@ -68,7 +68,7 @@ As you will be pushing into enemy territory, we will be unable to secure the bat
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.5</forceMultiplier>
+                <forceMultiplier>1.0</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>

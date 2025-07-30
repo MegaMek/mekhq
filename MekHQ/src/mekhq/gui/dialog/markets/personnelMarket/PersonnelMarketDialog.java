@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.markets.personnelMarket;
 
+import static java.lang.Math.min;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
@@ -47,6 +48,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -67,12 +69,16 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -215,6 +221,16 @@ public class PersonnelMarketDialog extends JDialog {
         dispose();
     }
 
+    private void documentationAction() {
+        DocumentationEntry documentationEntry = DocumentationEntry.RECRUITMENT;
+
+        try {
+            new NewDocumentationEntryDialog(this, documentationEntry);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to open PDF", ex);
+        }
+    }
+
 
     /**
      * Creates and returns the header panel for the personnel market dialog.
@@ -235,10 +251,8 @@ public class PersonnelMarketDialog extends JDialog {
         leftGbc.weightx = 1.0;
         leftGbc.fill = GridBagConstraints.NONE;
         leftGbc.anchor = GridBagConstraints.WEST;
-        int leftRow = 0;
 
         // Golden Hello Checkbox
-        leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, PADDING, 0);
         goldenHelloCheckbox.setText(getTextAt(RESOURCE_BUNDLE,
               "checkbox.personnelMarket.goldenHello"));
@@ -247,7 +261,6 @@ public class PersonnelMarketDialog extends JDialog {
         leftPanel.add(goldenHelloCheckbox, leftGbc);
 
         // Role ComboBox (Label + ComboBox)
-        leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, 0, 0);
 
         JPanel filterPanel = initializeFilter();
@@ -261,27 +274,23 @@ public class PersonnelMarketDialog extends JDialog {
         rightGbc.weightx = 1.0;
         rightGbc.fill = GridBagConstraints.HORIZONTAL;
         rightGbc.anchor = GridBagConstraints.CENTER;
-        int rightRow = 0;
 
         // Personnel Availability Label (Centered)
-        rightGbc.gridy = rightRow++;
         rightGbc.insets = new Insets(0, 0, PADDING, 0);
         JLabel availabilityLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.availability"));
         availabilityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         rightPanel.add(availabilityLabel, rightGbc);
 
         // Slider
-        rightGbc.gridy = rightRow++;
         int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
-        int recruitmentSliderCurrent = market.getRecruitmentRolls();
+        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
         JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
         personnelAvailabilitySlider.setEnabled(false);
         rightPanel.add(personnelAvailabilitySlider, rightGbc);
 
         // Experience Label
-        rightGbc.gridy = rightRow++;
         rightGbc.insets = new Insets(0, 0, 0, 0);
         rightPanel.add(new JLabel(getAvailabilityModifierMessage()), rightGbc);
 
@@ -346,24 +355,20 @@ public class PersonnelMarketDialog extends JDialog {
     private JPanel initializeButtonPanel() {
         boolean isGM = campaign.isGM();
 
-        JPanel buttonPanel = new JPanel();
-        JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
-        closeButton.addActionListener(e -> closeAction());
-        buttonPanel.add(closeButton);
+        // Top row panel
+        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+        RoundedJButton btnClose = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
+        btnClose.addActionListener(e -> closeAction());
+        topRow.add(btnClose);
 
-        JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
-        hireButton.addActionListener(e -> hireActionListener(isGM));
-        buttonPanel.add(hireButton);
+        RoundedJButton btnHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
+        btnHire.addActionListener(e -> hireActionListener(false));
+        topRow.add(btnHire);
 
-        JButton addGMButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
-        addGMButton.addActionListener(e -> hireActionListener(isGM));
-        addGMButton.setEnabled(isGM);
-        buttonPanel.add(addGMButton);
-
-        JButton advanceMultipleDays = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.advanceDays"));
-        advanceMultipleDays.addActionListener(e -> {
+        RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "button.personnelMarket.advanceDays"));
+        btnAdvanceMultipleDays.addActionListener(e -> {
             closeAction(); // Close old instance
-
             AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(parent, campaign.getApp().getCampaigngui());
             advanceDaysDialog.setVisible(true);
             advanceDaysDialog.addWindowListener(new WindowAdapter() {
@@ -373,7 +378,31 @@ public class PersonnelMarketDialog extends JDialog {
                 }
             });
         });
-        buttonPanel.add(advanceMultipleDays);
+        topRow.add(btnAdvanceMultipleDays);
+
+        // Bottom row panel
+        JPanel bottomRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+        RoundedJButton btnDocumentation = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "button.personnelMarket.documentation"));
+        btnDocumentation.addActionListener(e -> documentationAction());
+        bottomRow.add(btnDocumentation);
+
+        RoundedJButton btnGMHire = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
+        btnGMHire.addActionListener(e -> hireActionListener(true));
+        btnGMHire.setEnabled(isGM);
+        bottomRow.add(btnGMHire);
+
+        RoundedJButton btnGMAdd = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm"));
+        btnGMAdd.addActionListener(e -> addApplicantActionListener());
+        btnGMAdd.setEnabled(isGM);
+        bottomRow.add(btnGMAdd);
+
+        // Parent panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(topRow);
+        buttonPanel.add(bottomRow);
 
         return buttonPanel;
     }
@@ -472,6 +501,7 @@ public class PersonnelMarketDialog extends JDialog {
         personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
         viewScrollPane.setMinimumSize(PERSON_VIEW_MINIMUM_SIZE);
+        viewScrollPane.setBorder(null);
         SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
 
         JPanel buttonPanel = initializeButtonPanel();
@@ -492,17 +522,17 @@ public class PersonnelMarketDialog extends JDialog {
     /**
      * Performs the hiring action for the selected applicant.
      *
-     * @param isGM whether the hire action is performed by a game master
+     * @param isGMHire whether the hire action is performed as a GM Hire
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private void hireActionListener(boolean isGM) {
+    private void hireActionListener(boolean isGMHire) {
         List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
 
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
-            if (!isGM && market.isOfferingGoldenHello()) {
+            if (!isGMHire && market.isWasOfferingGoldenHello()) {
                 campaign.getFinances()
                       .debit(RECRUITMENT,
                             campaign.getLocalDate(),
@@ -511,7 +541,7 @@ public class PersonnelMarketDialog extends JDialog {
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
             }
-            campaign.recruitPerson(applicant, isGM, true);
+            campaign.recruitPerson(applicant, isGMHire, true);
         }
 
         // Remove all recruited persons from the applicant list
@@ -526,6 +556,42 @@ public class PersonnelMarketDialog extends JDialog {
 
         // Clear selection in the table
         tablePanel.getTable().clearSelection();
+    }
+
+    /**
+     * Handles the process of adding a fresh applicant to the applicant pool.
+     *
+     * <p>This method attempts to create a single applicant for the personnel market. If no applicant is available,
+     * it reports an error message to the campaign log. Otherwise, the applicant is added to the list of current
+     * applicants, the table view in the user interface is refreshed to reflect the change, and any existing table
+     * selection is cleared.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void addApplicantActionListener() {
+        Person applicant = market.getSingleApplicant();
+        if (applicant == null) {
+            campaign.addReport(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm.error"));
+            return;
+        }
+
+        currentApplicants.add(applicant);
+
+        // Refresh the table view (notify the model of data changes)
+        AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
+        model.fireTableDataChanged();
+
+        // Clear selection in the table
+        tablePanel.getTable().clearSelection();
+
+        int rowCount = model.getRowCount();
+        if (rowCount > 0) {
+            if (rowCount == 1) { // Only 1 applicant in the table
+                tablePanel.getTable().setRowSelectionInterval(0, 0); // Select the first (and only) row
+            }
+            personViewPanel.setVisible(true);
+        }
     }
 
     /**
@@ -562,7 +628,7 @@ public class PersonnelMarketDialog extends JDialog {
      */
     private String getTipMessage() {
         if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
-            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(10));
+            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(11));
         }
 
         return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.0");

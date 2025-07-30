@@ -46,6 +46,7 @@ import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -63,6 +64,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
+import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -94,7 +96,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode
 import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
-    private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(DataLoadingDialog.class);
 
     // region Variable Declarations
     private final MekHQ application;
@@ -319,7 +321,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             final Campaign campaign;
             if (getCampaignFile() == null) {
                 // region Progress 6
-                logger.info("Starting a new campaign");
+                LOGGER.info("Starting a new campaign");
                 campaign = new Campaign();
 
                 // Campaign Preset
@@ -375,7 +377,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 if (campaign.getCampaignOptions().isTrackFactionStanding()) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                          campaign.getLocalDate());
+                          campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier());
                     campaign.addReport(report);
                 }
                 // endregion Progress 6
@@ -426,7 +428,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // endregion Progress 7
             } else {
                 // region Progress 6
-                logger.info(String.format("Loading campaign file from XML file %s", getCampaignFile()));
+                LOGGER.info("Loading campaign file from XML file {}", getCampaignFile());
 
                 // And then load the campaign object from it.
                 try (FileInputStream fis = new FileInputStream(getCampaignFile())) {
@@ -435,18 +437,63 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.restore();
                     campaign.cleanUp();
                 }
+                // Make sure campaign options event handlers get their data
+                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
                 // endregion Progress 6
 
                 // region Progress 7
                 setProgress(7);
-                // Make sure campaign options event handlers get their data
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
 
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
+
+                // Campaign upgrading
+                if (campaign.getVersion().isLowerThan(MHQConstants.VERSION)) {
+                    handleCampaignUpgrading(campaign);
+                }
                 // endregion Progress 7
             }
             campaign.setApp(getApplication());
             return campaign;
+        }
+
+        /**
+         * Handles the upgrade process for a campaign in a thread-safe and blocking manner.
+         *
+         * <p>This method initiates the campaign upgrade dialog for the specified {@link Campaign}. While the upgrade
+         * is in progress, the method blocks further execution by using a {@link CountDownLatch}. This ensures that
+         * campaign loading or other interactions do not proceed while the campaign data may be in an inconsistent,
+         * mid-upgrade state, which can prevent a variety of random and challenging-to-debug errors.</p>
+         *
+         * <p>Once the upgrade dialog completes, the provided callback triggers an {@link OptionsChangedEvent}
+         * and signals the latch, allowing the method to return.</p>
+         *
+         * <p><b>Note:</b> This method should not be called from the Event Dispatch Thread (EDT), as it will block
+         * the thread until the upgrade is finished.</p>
+         *
+         * @param campaign the {@link Campaign} instance to be upgraded
+         *
+         * @author Illiani
+         * @since 0.50.07
+         */
+        private static void handleCampaignUpgrading(Campaign campaign) {
+            // As we're upgrading the campaign, we purposefully block load progress until after the upgrade
+            // has completed. This removes any risk of gui interaction with a mid-upgrade campaign object.
+            // During testing this was found to result in a bundle of inconsistent and seemingly random
+            // errors.
+
+            CountDownLatch latch = new CountDownLatch(1);
+
+            CampaignUpgradeDialog.campaignUpgradeDialog(campaign, () -> {
+                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                latch.countDown();
+            });
+
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOGGER.warn("Thread was interrupted during campaign upgrade", e);
+            }
         }
 
         /**
@@ -485,7 +532,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             } catch (InterruptedException | CancellationException ignored) {
                 campaign = null;
             } catch (ExecutionException ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
                     JOptionPane.showMessageDialog(null,
                           String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),

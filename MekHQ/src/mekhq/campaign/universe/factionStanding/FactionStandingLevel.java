@@ -42,7 +42,7 @@ import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -65,17 +65,17 @@ import mekhq.campaign.universe.Faction;
  * @since 0.50.07
  */
 public enum FactionStandingLevel {
-    STANDING_LEVEL_0(0, -60, -51, -4, 0.0, false, true, false, 0, -2, 3.0, -3, 0.6, -2, -4),
-    STANDING_LEVEL_1(1, -50, -41, -3, 0.25, false, true, false, 0, -1, 2.0, -2, 0.7, -1, -3),
-    STANDING_LEVEL_2(2, -40, -26, -2, 0.5, false, false, true, 1, 0, 1.75, -1, 0.8, -1, -2),
-    STANDING_LEVEL_3(3, -25, -11, -1, 0.75, false, false, true, 2, 0, 1.5, 0, 0.9, 0, -1),
-    STANDING_LEVEL_4(4, -10, 10, 0, 1.0, false, false, true, 3, 0, 1.0, 0, 1.0, 0, 0),
-    STANDING_LEVEL_5(5, 11, 25, 1, 1.25, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
-    STANDING_LEVEL_6(6, 26, 40, 2, 1.5, false, false, true, 5, 0, 0.85, 1, 1.1, 1, 1),
-    STANDING_LEVEL_7(7, 41, 50, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
+    STANDING_LEVEL_0(0, -60, -51, -4, 0.0, false, true, false, 0, 0, 3.0, -3, 0.6, -2, -4),
+    STANDING_LEVEL_1(1, -50, -41, -3, 0.25, false, true, false, 0, 0.25, 2.0, -2, 0.7, -1, -3),
+    STANDING_LEVEL_2(2, -40, -26, -2, 0.5, false, false, true, 1, 0.5, 1.75, -1, 0.8, -1, -2),
+    STANDING_LEVEL_3(3, -25, -11, -1, 0.75, false, false, true, 2, 0.75, 1.5, 0, 0.9, 0, -1),
+    STANDING_LEVEL_4(4, -10, 10, 0, 1.0, false, false, true, 3, 1, 1.0, 0, 1.0, 0, 0),
+    STANDING_LEVEL_5(5, 11, 25, 1, 1.25, false, false, true, 4, 1.25, 1.0, 0, 1.05, 0, 1),
+    STANDING_LEVEL_6(6, 26, 40, 2, 1.5, false, false, true, 5, 1.5, 0.85, 1, 1.1, 1, 1),
+    STANDING_LEVEL_7(7, 41, 50, 3, 1.75, true, false, true, 10, 1.75, 0.80, 2, 1.15, 1, 2),
     STANDING_LEVEL_8(8, 51, 60, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingLevel";
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingLevel.class);
 
     final static String FALLBACK_LABEL_SUFFIX_INNER_SPHERE = "innerSphere";
@@ -94,7 +94,7 @@ public enum FactionStandingLevel {
     private final boolean isOutlawed;
     private final boolean isBatchallAllowed;
     private final int recruitmentTickets;
-    private final int recruitmentRollsModifier;
+    private final double recruitmentRollsModifier;
     private final double barrackCostsMultiplier;
     private final int unitMarketRarityModifier;
     private final double contractPayMultiplier;
@@ -123,10 +123,10 @@ public enum FactionStandingLevel {
      * @since 0.50.07
      */
     FactionStandingLevel(int standingLevel, int minimumRegard, int maximumRegard, int negotiationModifier,
-          double resupplyWeightModifier, boolean hasCommandCircuitAccess, boolean isOutlawed, boolean isBatchallAllowed,
-          int recruitmentTickets, int recruitmentRollsModifier, double barrackCostsMultiplier,
-          int unitMarketRarityModifier, double contractPayMultiplier, int supportPointModifierContractStart,
-          int supportPointModifierPeriodic) {
+          double resupplyWeightModifier, boolean hasCommandCircuitAccess, boolean isOutlawed,
+          boolean isBatchallAllowed, int recruitmentTickets, double recruitmentRollsModifier,
+          double barrackCostsMultiplier, int unitMarketRarityModifier, double contractPayMultiplier,
+          int supportPointModifierContractStart, int supportPointModifierPeriodic) {
         this.standingLevel = standingLevel;
         this.minimumRegard = minimumRegard;
         this.maximumRegard = maximumRegard;
@@ -281,7 +281,7 @@ public enum FactionStandingLevel {
      * @author Illiani
      * @since 0.50.07
      */
-    public int getRecruitmentRollsModifier() {
+    public double getRecruitmentRollsModifier() {
         return recruitmentRollsModifier;
     }
 
@@ -492,7 +492,7 @@ public enum FactionStandingLevel {
 
             if (recruitmentRollsModifier != 0) {
                 effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.rolls",
-                      getPolarityOfModifier(recruitmentRollsModifier)));
+                      recruitmentRollsModifier));
             }
         }
 

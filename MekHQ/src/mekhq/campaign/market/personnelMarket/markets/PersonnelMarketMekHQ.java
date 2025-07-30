@@ -40,6 +40,8 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -55,6 +57,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
@@ -145,7 +148,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             return interestedFactions;
         }
 
+        Factions factions = Factions.getInstance();
+        Faction mercenaryFaction = factions.getFaction(MERCENARY_FACTION_CODE);
+        Faction pirateFaction = factions.getFaction(PIRATE_FACTION_CODE);
         FactionStandings factionStandings = getCampaign().getFactionStandings();
+
         for (Faction faction : systemFactions) {
             if (filterOutLegalFactions) {
                 if (!faction.isPirate() && !faction.isMercenary()) {
@@ -174,11 +181,16 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             }
         }
 
-        Faction mercenaryFaction = Factions.getInstance().getFaction("MERC");
         if (mercenaryFaction != null &&
                   !interestedFactions.isEmpty() &&
                   !interestedFactions.contains(mercenaryFaction)) {
             interestedFactions.add(mercenaryFaction);
+        }
+
+        if (pirateFaction != null &&
+                  !interestedFactions.isEmpty() &&
+                  !interestedFactions.contains(pirateFaction)) {
+            interestedFactions.add(pirateFaction);
         }
 
         return interestedFactions;
@@ -269,7 +281,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
                 int difference = applicantSkill - averageSkillLevel;
                 for (int i = 0; i < difference; i++) {
-                    int interestRoll = Compute.randomInt(10); // TODO make this a campaign option
+                    int interestRoll = Compute.randomInt(10);
 
                     if (interestRoll != 0) {
                         notInterested = true;
@@ -279,6 +291,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
                 if (notInterested) {
                     getLogger().debug("Applicant is too experienced for the campaign, skipping.");
+
+                    rarePersonnel.remove(applicant.getId());
+                    rareProfessions.remove(applicant.getPrimaryRole());
                     continue;
                 }
             }
@@ -330,11 +345,17 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
         getLogger().debug("Rolls modified for population: {}", rolls);
 
-        if (getCampaign().getCampaignOptions().isUseFactionStandingRecruitmentSafe()) {
-            rolls += getFactionStandingsRecruitmentModifier();
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        if (campaignOptions.isUseFactionStandingRecruitmentSafe()) {
+            rolls = (int) round(rolls * getFactionStandingsRecruitmentModifier());
         }
 
-        setRecruitmentRolls(rolls);
+        if (campaignOptions.isAllowMonthlyConnections()) {
+            int additionalRecruits = performConnectionsRecruitsCheck();
+            rolls += additionalRecruits;
+        }
+
+        setRecruitmentRolls(max(rolls, 0));
     }
 
     /**
@@ -349,23 +370,23 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.07
      */
-    private int getFactionStandingsRecruitmentModifier() {
+    private double getFactionStandingsRecruitmentModifier() {
         FactionStandings factionStandings = getCampaign().getFactionStandings();
 
         CurrentLocation location = getCampaign().getLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
-        int modifier = 0;
+        double multiplier = 0;
 
         for (Faction faction : currentSystem.getFactionSet(getToday())) {
             double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
-            int currentModifier = FactionStandingUtilities.getRecruitmentRollsModifier(regard);
+            double currentModifier = FactionStandingUtilities.getRecruitmentRollsModifier(regard);
 
-            if (currentModifier > modifier) {
-                modifier = currentModifier;
+            if (currentModifier > multiplier) {
+                multiplier = currentModifier;
             }
         }
 
-        return modifier;
+        return multiplier;
     }
 
 
@@ -392,13 +413,25 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
         getLogger().debug("Rolls based on hiring hall status: {}", rolls);
 
+        boolean isCapital = false;
+        boolean isMajorCapital = false;
         for (Faction faction : currentSystem.getFactionSet(today)) {
             if (currentSystem.equals(faction.getStartingPlanet(getCampaign(), today))) {
+                isCapital = true;
+
                 if (faction.isMajorOrSuperPower()) {
-                    rolls++;
+                    isMajorCapital = true;
                     break;
                 }
             }
+        }
+
+        if (isCapital) {
+            rolls++;
+        }
+
+        if (isMajorCapital) {
+            rolls++;
         }
 
         getLogger().debug("Rolls including capital status: {}", rolls);

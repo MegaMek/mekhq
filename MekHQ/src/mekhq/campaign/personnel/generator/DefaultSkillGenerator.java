@@ -43,7 +43,7 @@ import java.util.List;
 
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -248,6 +248,15 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             person.setUnlucky(1);
         } else {
             person.setUnlucky(0);
+        }
+
+        // Bloodmark
+        // We want the chance of a Bloodmark to be low as it can be quite disruptive
+        roll = randomInt(person.getOriginFaction().isPirate() ? 50 : 100);
+        if (roll == 0) {
+            person.setBloodmark(1);
+        } else {
+            person.setBloodmark(0);
         }
     }
 }

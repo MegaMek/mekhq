@@ -55,7 +55,7 @@ public enum DocumentationEntry {
     RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", "Personnel Modules/Random Personalities"),
     STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES", "Personnel Modules/Starting Attribute Scores"),
     TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION", "Personnel Modules/Turnover & Retention Module (feat. Fatigue)"),
-    PRISONERS_OF_WAR("PRISONERS_OF_WAR", "Random Events/Prisoners of War & Abstracted Search and Rescue"),
+    PRISONERS_OF_WAR("PRISONERS_OF_WAR", "MekHQ Systems/Prisoners of War & Abstracted Search and Rescue"),
     ACAR("ACAR", "StratCon/ACAR-Abstract Combat Auto-Resolve documentation"),
     ADMIN_SKILLS("ADMIN_SKILLS", "StratCon/Admin Skills"),
     COMBAT_TEAMS("COMBAT_TEAMS", "StratCon/Combat Teams, Roles, Training & Reinforcements"),
@@ -64,7 +64,9 @@ public enum DocumentationEntry {
     UNIT_MARKETS("UNIT_MARKETS", "StratCon/Unit Markets"),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "MegaMek -MekHQ Chaos Campaign Guide"),
     COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide");
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide"),
+    RECRUITMENT("RECRUITMENT", "Personnel Modules/Recruitment"),
+    FACTION_STANDINGS("FACTION_STANDINGS", "MekHQ Systems/Faction Standings");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 

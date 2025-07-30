@@ -4531,16 +4531,17 @@ public class Unit implements ITechnology {
                 }
             }
 
-            // For crew-served units, let's look at the abilities of the group. If more than
-            // half the crew
-            // (gunners and pilots only, for spacecraft) have an ability, grant the benefit
-            // to the unit
+            boolean commanderOnly = campaign.getCampaignOptions().isUseCommanderAbilitiesOnly();
+
+            // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
+            // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
             // TODO : Mobile structures, large naval support vehicles
-            if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
+            if (!commanderOnly &&
+                      (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
                       entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
                       entity.hasETypeFlag(Entity.ETYPE_TANK) ||
                       entity.hasETypeFlag(Entity.ETYPE_INFANTRY) ||
-                      entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK)) {
+                             entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK))) {
                 // If there is no crew, there's nothing left to do here.
                 if (null == commander) {
                     return;
@@ -4652,7 +4653,6 @@ public class Unit implements ITechnology {
                 // question
                 // of what to do with extra crew quarters and crewmember assignments beyond the
                 // minimum.
-
             } else {
                 // For other unit types, just use the unit commander's abilities.
                 PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
@@ -4966,13 +4966,13 @@ public class Unit implements ITechnology {
             // then get the number based on the least amount available to crew members
             // in the case of Edge, everyone must have the same triggers set for Edge to
             // work
-            for (Person p : getActiveCrew()) {
-                if (p.getMinutesLeft() < minutesLeft) {
-                    minutesLeft = p.getMinutesLeft();
+            for (Person person : getActiveCrew()) {
+                if (person.getMinutesLeft() < minutesLeft) {
+                    minutesLeft = person.getMinutesLeft();
                 }
 
-                if (p.getOvertimeLeft() < overtimeLeft) {
-                    overtimeLeft = p.getOvertimeLeft();
+                if (person.getOvertimeLeft() < overtimeLeft) {
+                    overtimeLeft = person.getOvertimeLeft();
                 }
             }
         }
@@ -4992,58 +4992,68 @@ public class Unit implements ITechnology {
                 engineer.addSkill(SkillType.S_TECH_MECHANIC,
                       SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(),
                       0);
+                engineer.addSkill(SkillType.S_ADMIN,
+                      SkillType.getType(SkillType.S_ADMIN).getRegularLevel(),
+                      0);
             } else {
                 engineer = null;
             }
         } else {
             if (!vesselCrew.isEmpty()) {
                 int nCrew = 0;
-                int sumSkill = 0;
-                int sumBonus = 0;
+                int sumTechSkill = 0;
+                int sumTechBonus = 0;
+                int sumAdminSkill = -1; // Unskilled
+                int sumAdminBonus = 0;
                 int sumEdge = 0;
                 int sumEdgeUsed = 0;
                 String engineerGivenName = "Nobody";
                 String engineerSurname = "Nobody";
                 int bestRank = Integer.MIN_VALUE;
-                for (Person p : vesselCrew) {
+                for (Person person : vesselCrew) {
                     if (engineer != null) {
                         // If the engineer used edge points, remove some from vessel crewmembers until
                         // all is paid for
                         if (engineer.getEdgeUsed() > 0) {
                             // Don't subtract an Edge if the individual has none left
-                            if (p.getCurrentEdge() > 0) {
-                                p.changeCurrentEdge(-1);
+                            if (person.getCurrentEdge() > 0) {
+                                person.changeCurrentEdge(-1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
                         // If the engineer gained XP, add it for each crewman
-                        p.awardXP(getCampaign(), engineer.getXP());
+                        person.awardXP(getCampaign(), engineer.getXP());
 
                         // Update each crewman's successful task count too
-                        p.setNTasks(p.getNTasks() + engineer.getNTasks());
-                        if (p.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
-                            p.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
-                            p.setNTasks(0);
+                        person.setNTasks(person.getNTasks() + engineer.getNTasks());
+                        if (person.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
+                            person.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
+                            person.setNTasks(0);
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
                     }
-                    sumEdge += p.getAdjustedEdge();
+                    sumEdge += person.getAdjustedEdge();
 
-                    if (p.hasSkill(SkillType.S_TECH_VESSEL)) {
-                        sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                        sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
+                    if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
+                        sumTechSkill += person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
+                        sumTechBonus += person.getSkill(SkillType.S_TECH_VESSEL).getBonus();
                         nCrew++;
                     }
-                    if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
+
+                    if (person.hasSkill(SkillType.S_ADMIN)) {
+                        sumAdminSkill += person.getSkill(SkillType.S_ADMIN).getLevel();
+                        sumAdminBonus += person.getSkill(SkillType.S_ADMIN).getBonus();
+                    }
+                    if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
                         breakpartreroll = false;
                     }
-                    if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
+                    if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
                         failrefitreroll = false;
                     }
-                    if (p.getRankNumeric() > bestRank) {
-                        engineerGivenName = p.getGivenName();
-                        engineerSurname = p.getSurname();
-                        bestRank = p.getRankNumeric();
+                    if (person.getRankNumeric() > bestRank) {
+                        engineerGivenName = person.getGivenName();
+                        engineerSurname = person.getSurname();
+                        bestRank = person.getRankNumeric();
                     }
                 }
                 if (nCrew > 0) {
@@ -5059,7 +5069,10 @@ public class Unit implements ITechnology {
                     if (bestRank > -1) {
                         engineer.setRank(bestRank);
                     }
-                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
+                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumTechSkill / nCrew, sumTechBonus / nCrew);
+                    if (sumAdminSkill > -1) {
+                        engineer.addSkill(SkillType.S_ADMIN, sumAdminSkill / nCrew, sumAdminBonus / nCrew);
+                    }
                     engineer.setEdgeUsed(sumEdgeUsed);
                     engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
                     engineer.setUnit(this);

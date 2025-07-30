@@ -54,7 +54,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -68,8 +67,8 @@ import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -118,20 +117,20 @@ public class FactionStandingReport extends JDialog {
     private static final int REPORT_IMAGE_WIDTH = 100; // Scaled by scaleImageIcon call
 
     private final JFrame frame;
+    private final Campaign campaign;
     private final LocalDate today;
     private final int gameYear;
     private final FactionStandings factionStandings;
     private final Factions factions;
-    private final boolean isGM;
     private final Faction campaignFaction;
-    private final ImageIcon campaignIcon;
-    private final List<Mission> missions;
     private final boolean isFactionStandingEnabled;
     private final CampaignOptions campaignOptions;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
+    private final List<String> innerSphereMinorFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
     private final List<String> peripheryFactions = new ArrayList<>();
+    private final List<String> deepPeripheryFactions = new ArrayList<>();
     private final List<String> specialFactions = new ArrayList<>();
     private final List<String> deadFactions = new ArrayList<>();
 
@@ -142,30 +141,21 @@ public class FactionStandingReport extends JDialog {
      * specified campaign and related data.
      *
      * @param frame The parent {@link JFrame} that acts as the owner of this report dialog.
-     * @param factionStandings The object containing the standings of factions in the campaign.
-     * @param today The current date for reference in the report.
-     * @param isGM A boolean indicating whether the user is a Game Master (GM).
-     * @param campaignFaction The primary faction for the campaign associated with the report.
-     * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
-     * @param campaignOptions the {@link CampaignOptions} object associated with the current campaign.
+     * @param campaign The current campaign
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-          final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
-          final Collection<Mission> missions, final CampaignOptions campaignOptions) {
+    public FactionStandingReport(final JFrame frame, final Campaign campaign) {
         this.frame = frame;
-        this.today = today;
+        this.campaign = campaign;
+        this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
-        this.isGM = isGM;
-        this.campaignFaction = campaignFaction;
-        this.campaignIcon = campaignIcon;
-        this.factionStandings = factionStandings;
+        this.campaignFaction = campaign.getFaction();
+        this.factionStandings = campaign.getFactionStandings();
         factions = Factions.getInstance();
-        this.missions = new ArrayList<>(missions);
+        this.campaignOptions = campaign.getCampaignOptions();
         this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
-        this.campaignOptions = campaignOptions;
 
         sortFactions();
         createReportPanel();
@@ -243,8 +233,12 @@ public class FactionStandingReport extends JDialog {
                 specialFactions.add(factionCode);
             } else if (faction.isClan()) {
                 clanFactions.add(factionCode);
+            } else if (faction.isDeepPeriphery()) {
+                deepPeripheryFactions.add(factionCode);
             } else if (faction.isPeriphery()) {
                 peripheryFactions.add(factionCode);
+            } else if (faction.isMinorPower()) {
+                innerSphereMinorFactions.add(factionCode);
             } else {
                 innerSphereFactions.add(factionCode);
             }
@@ -268,18 +262,27 @@ public class FactionStandingReport extends JDialog {
     private void createReportPanel() {
         // Create the tabbed pane
         String innerSphereTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere");
+        String innerSphereMinorTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere.minor");
         String clanTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.clan");
         String peripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.periphery");
+        String deepPeripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.deepPeriphery");
         String specialTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.special");
         String deadTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.dead");
+        String disabledTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.disabled");
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
-        tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
-        tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
-        tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
-        tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
-        tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+        if (isFactionStandingEnabled) {
+            tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
+            tabbedPane.addTab(innerSphereMinorTabTitle, createReportPanelForFactionGroup(innerSphereMinorFactions));
+            tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
+            tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
+            tabbedPane.addTab(deepPeripheryTabTitle, createReportPanelForFactionGroup(deepPeripheryFactions));
+            tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
+            tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+        } else {
+            tabbedPane.addTab(disabledTitle, createFactionStandingDisabledTab());
+        }
         setFontScaling(tabbedPane, true, 1.5);
 
         // If a tab only contains an empty Container, disable it. This will occur if the relevant faction list is empty.
@@ -339,6 +342,18 @@ public class FactionStandingReport extends JDialog {
         return pnlFactionReport;
     }
 
+    private JPanel createFactionStandingDisabledTab() {
+        JTextPane textPane = new JTextPane();
+        textPane.setText(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.disabled.blurb"));
+        textPane.setEditable(false);
+        textPane.setOpaque(false);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(textPane, BorderLayout.CENTER);
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        return panel;
+    }
+
     /**
      * Constructs the panel that shows standing effects or explanatory text.
      *
@@ -384,10 +399,10 @@ public class FactionStandingReport extends JDialog {
         btnDocumentation.setName("btnDocumentation");
         btnDocumentation.addActionListener(e -> {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(
-                  "FACTION_STANDING");
+                  "FACTION_STANDINGS");
 
             if (documentationEntry == null) {
-                LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDING");
+                LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDINGS");
                 return;
             }
 
@@ -402,10 +417,10 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.gmTools"));
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
-        btnGmTools.setEnabled(isFactionStandingEnabled && isGM);
+        btnGmTools.setEnabled(isFactionStandingEnabled && campaign.isGM());
         btnGmTools.addActionListener(e -> {
             setVisible(false);
-            GMTools gmTools = new GMTools(this, campaignIcon, campaignFaction, today, factionStandings, missions);
+            GMTools gmTools = new GMTools(this, campaign);
             reports.addAll(gmTools.getReports());
             setVisible(true);
         });
@@ -439,14 +454,16 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     private void triggerMissionSimulationDialog() {
-        SimulateMissionDialog dialog = new SimulateMissionDialog(frame, campaignIcon, campaignFaction, today);
+        SimulateMissionDialog dialog = new SimulateMissionDialog(frame, campaign.getCampaignFactionIcon(),
+              campaignFaction, today);
 
         Faction employerChoice = dialog.getEmployerChoice();
         Faction enemyChoice = dialog.getEnemyChoice();
         MissionStatus statusChoice = dialog.getStatusChoice();
+        int durationChoice = dialog.getDurationChoice();
 
         reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice, enemyChoice, statusChoice, today,
-              factionStandings));
+              factionStandings, campaignOptions.getRegardMultiplier(), durationChoice));
     }
 
     /**

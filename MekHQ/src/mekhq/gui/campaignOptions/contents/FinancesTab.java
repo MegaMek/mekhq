@@ -50,7 +50,7 @@ import javax.swing.SpinnerNumberModel;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -83,7 +83,6 @@ public class FinancesTab {
     private MMComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
     private JCheckBox chkSimulateGrayMonday;
-    private JCheckBox chkAllowMonthlyReinvestment;
 
     private JPanel pnlPayments;
     private JCheckBox payForPartsBox;
@@ -192,7 +191,6 @@ public class FinancesTab {
         newFinancialYearFinancesToCSVExportBox = new JCheckBox();
 
         chkSimulateGrayMonday = new JCheckBox();
-        chkAllowMonthlyReinvestment = new JCheckBox();
 
         // Payments
         pnlPayments = new JPanel();
@@ -408,9 +406,6 @@ public class FinancesTab {
 
         chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
         chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SimulateGrayMonday"));
-        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
-        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-              "AllowMonthlyReinvestment"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
@@ -446,9 +441,6 @@ public class FinancesTab {
 
         layout.gridy++;
         panel.add(chkSimulateGrayMonday, layout);
-
-        layout.gridy++;
-        panel.add(chkAllowMonthlyReinvestment, layout);
 
         return panel;
     }
@@ -864,7 +856,6 @@ public class FinancesTab {
         options.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
         options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
         options.setSimulateGrayMonday(chkSimulateGrayMonday.isSelected());
-        options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setPayForParts(payForPartsBox.isSelected());
         options.setPayForRepairs(payForRepairsBox.isSelected());
         options.setPayForUnits(payForUnitsBox.isSelected());
@@ -932,7 +923,6 @@ public class FinancesTab {
         comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
         chkSimulateGrayMonday.setSelected(options.isSimulateGrayMonday());
-        chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         payForPartsBox.setSelected(options.isPayForParts());
         payForRepairsBox.setSelected(options.isPayForRepairs());
         payForUnitsBox.setSelected(options.isPayForUnits());

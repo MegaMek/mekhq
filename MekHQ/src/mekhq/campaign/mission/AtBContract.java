@@ -112,7 +112,7 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -568,7 +568,7 @@ public class AtBContract extends Contract {
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
         if (moraleLevel.isRouted()) {
-            if (contractType.isGarrisonType() || contractType.isReliefDuty()) {
+            if (contractType.isGarrisonType()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
@@ -635,6 +635,7 @@ public class AtBContract extends Contract {
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
+            double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
             String campaignFactionCode = campaign.getFaction().getShortName();
             if (faction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
@@ -643,7 +644,7 @@ public class AtBContract extends Contract {
 
                 if (!batchallAccepted && tracksStanding) {
                     List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
-                          today.getYear());
+                          today.getYear(), regardMultiplier);
 
                     for (String report : reports) {
                         campaign.addReport(report);
@@ -653,7 +654,8 @@ public class AtBContract extends Contract {
 
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
-                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today);
+                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
+                      regardMultiplier, getLength());
                 if (report != null) {
                     campaign.addReport(report);
                 }
@@ -1548,6 +1550,10 @@ public class AtBContract extends Contract {
 
     public void setMoraleLevel(final AtBMoraleLevel moraleLevel) {
         this.moraleLevel = moraleLevel;
+    }
+
+    public boolean isPeaceful() {
+        return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
     @Override

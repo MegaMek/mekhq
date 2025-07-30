@@ -35,14 +35,7 @@ package mekhq.gui.dialog;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.Person.MAXIMUM_CONNECTIONS;
-import static mekhq.campaign.personnel.Person.MAXIMUM_REPUTATION;
-import static mekhq.campaign.personnel.Person.MAXIMUM_UNLUCKY;
-import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
-import static mekhq.campaign.personnel.Person.MINIMUM_CONNECTIONS;
-import static mekhq.campaign.personnel.Person.MINIMUM_REPUTATION;
-import static mekhq.campaign.personnel.Person.MINIMUM_UNLUCKY;
-import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
+import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
@@ -71,11 +64,11 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.clientGUI.DialogOptionListener;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.panels.DialogOptionComponentYPanel;
-import megamek.client.ui.clientGUI.DialogOptionListener;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
@@ -156,6 +149,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textWealth;
     private JTextField textReputation;
     private JTextField textUnlucky;
+    private JTextField textBloodmark;
     private JTextField textFatigue;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
@@ -188,6 +182,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private MMComboBox<Social> comboSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
     private MMComboBox<Reasoning> comboReasoning;
+
+    // Other
+    private JCheckBox chkDarkSecretRevealed;
 
     private final Campaign campaign;
 
@@ -255,6 +252,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblReputation = new JLabel();
         textUnlucky = new JTextField();
         JLabel lblUnlucky = new JLabel();
+        textBloodmark = new JTextField();
+        JLabel lblBloodmark = new JLabel();
         textFatigue = new JTextField();
         JLabel lblLoyalty = new JLabel();
         textLoyalty = new JTextField();
@@ -787,7 +786,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         y++;
 
         lblUnlucky.setText(resourceMap.getString("lblUnlucky.text"));
-        lblReputation.setName("lblUnlucky");
+        lblUnlucky.setName("lblUnlucky");
 
         textUnlucky.setText(Integer.toString(person.getUnlucky()));
         textUnlucky.setName("textUnlucky");
@@ -804,6 +803,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panDemog.add(textUnlucky, gridBagConstraints);
+
+        y++;
+
+        lblBloodmark.setText(resourceMap.getString("lblBloodmark.text"));
+        lblBloodmark.setName("lblBloodmark");
+
+        textBloodmark.setText(Integer.toString(person.getBloodmark()));
+        textBloodmark.setName("textBloodmark");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        panDemog.add(lblBloodmark, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        panDemog.add(textBloodmark, gridBagConstraints);
 
         y++;
 
@@ -861,7 +881,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
             lblLoyalty.setName("lblLoyalty");
 
-            textLoyalty.setText(Integer.toString(person.getLoyalty()));
+            textLoyalty.setText(Integer.toString(person.getBaseLoyalty()));
             textLoyalty.setName("textLoyalty");
 
             gridBagConstraints = new GridBagConstraints();
@@ -1112,7 +1132,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        y++;
+        if (person.hasDarkSecret()) {
+            chkDarkSecretRevealed = new JCheckBox("Dark Secret Revealed");
+            chkDarkSecretRevealed.setSelected(person.isDarkSecretRevealed());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+            panDemog.add(chkDarkSecretRevealed, gridBagConstraints);
+
+            y++;
+        }
 
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setMinimumSize(UIUtil.scaleForGUI(400, 200));
@@ -1420,12 +1453,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);
         person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
+        currentValue = person.getBloodmark();
+        newValue = MathUtility.parseInt(textBloodmark.getText(), currentValue);
+        person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            currentValue = person.getLoyalty();
+            currentValue = person.getBaseLoyalty();
             person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), currentValue));
         }
 
@@ -1451,6 +1488,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setReasoning(comboReasoning.getSelectedItem());
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
+        }
+
+        if (person.hasDarkSecret()) {
+            boolean darkSecretRevealed = chkDarkSecretRevealed.isSelected();
+            if (darkSecretRevealed != person.isDarkSecretRevealed()) {
+                if (!darkSecretRevealed) {
+                    person.setDarkSecretRevealed(false);
+                } else {
+                    String report = person.isDarkSecretRevealed(true, true);
+                    if (!report.isBlank()) {
+                        campaign.addReport(report);
+                    }
+                }
+            }
         }
 
         setSkills();

@@ -34,7 +34,6 @@ package mekhq.gui.dialog;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
-import static mekhq.campaign.CampaignFactory.CampaignProblemType.NEW_VERSION_WITH_OLD_DATA;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
@@ -88,8 +87,7 @@ public class CampaignHasProblemOnLoad {
               null,
               true);
 
-        // There is deliberately no cancel option for NEW_VERSION_WITH_OLD_DATA
-        wasCanceled = (problemType != NEW_VERSION_WITH_OLD_DATA) && (dialog.getDialogChoice() == DIALOG_CANCEL_OPTION);
+        wasCanceled = (dialog.getDialogChoice() == DIALOG_CANCEL_OPTION);
     }
 
     /**
@@ -129,16 +127,11 @@ public class CampaignHasProblemOnLoad {
     private List<String> createButtons(CampaignProblemType problemType) {
         String btnCancel = getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button");
         String btnContinue = getFormattedTextAt(RESOURCE_BUNDLE, "continue.button");
-        String btnContinueNewVersion = getFormattedTextAt(RESOURCE_BUNDLE, "continue.newVersion.button");
 
         if (problemType == CANT_LOAD_FROM_NEWER_VERSION) {
             return List.of(btnCancel);
         } else {
-            if (problemType == NEW_VERSION_WITH_OLD_DATA) {
-                return List.of(btnContinueNewVersion);
-            } else {
-                return List.of(btnCancel, btnContinue);
-            }
+            return List.of(btnCancel, btnContinue);
         }
     }
 

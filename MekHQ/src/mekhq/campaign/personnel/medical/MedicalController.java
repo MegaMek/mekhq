@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.resolv
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ import megamek.common.TargetRollModifier;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
@@ -88,18 +89,35 @@ public class MedicalController {
         isUseMedicalController = campaignOptions.isUseAdvancedMedical();
     }
 
+    /**
+     * Use {@link #processMedicalEvents(Person, boolean, boolean, LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void processMedicalEvents(Person patient) {
+        processMedicalEvents(patient, false, false, LocalDate.of(3151, 1, 1));
+    }
 
     /**
-     * Processes the medical events for the given patient. This includes doctor-assisted healing,
-     * natural healing, and advanced medical rules (if enabled).
+     * Processes daily medical events for a given patient, handling both standard and advanced medical healing.
      *
-     * <p>For non-advanced medical rules, the method validates and assigns doctors and handles
-     * natural healing if the doctor cannot assist. For advanced medical rules, it delegates
-     * the processing to the advanced medical subsystem.</p>
+     * <p>The method orchestrates healing for a {@link Person} by applying doctor-assisted healing, natural healing
+     * rolls, and advanced medical rules, depending on campaign settings and the patient's needs.</p>
+     * <ul>
+     *   <li>If the patient requires healing and advanced medical rules are <b>not</b> enabled,
+     *       it attempts to validate and assign a doctor for assisted healing. If a doctor is not available or able
+     *       to help, it attempts natural healing instead. Successful natural healing is logged, and related
+     *       unit states are reset.</li>
+     *   <li>If advanced medical rules are enabled, the method defers the healing process to the advanced
+     *       medical subsystem and resets unit-related state as needed.</li>
+     * </ul>
      *
-     * @param patient the {@link Person} being healed
+     * @param patient           the {@link Person} undergoing healing
+     * @param isUseAgingEffects {@code true} if aging effects should be included when applying healing
+     * @param isClanCampaign    {@code true} if the campaign uses clan-based rules
+     * @param today             the current {@link LocalDate} for time-dependent calculations
      */
-    public void processMedicalEvents(Person patient) {
+    public void processMedicalEvents(Person patient, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
         Person doctor = campaign.getPerson(patient.getDoctorId());
 
         if (doctor != null) {
@@ -111,7 +129,7 @@ public class MedicalController {
             patient.decrementDaysToWaitForHealing();
 
             if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
-                healPerson(patient, doctor);
+                healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
             } else if (checkNaturalHealing(patient)) {
                 // TODO change logging level from info to debug in 50.08
                 logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
@@ -133,7 +151,6 @@ public class MedicalController {
         }
     }
 
-
     /**
      * Checks if the patient can heal naturally (without a doctor) and processes the healing if possible.
      *
@@ -149,29 +166,39 @@ public class MedicalController {
         return false;
     }
 
+    /**
+     * Use {@link #healPerson(Person, Person, boolean, boolean, LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    private void healPerson(Person patient, Person doctor) {
+        healPerson(patient, doctor, false, false, LocalDate.of(3151, 1, 1));
+    }
 
     /**
-     * Heals the given patient with assistance from the specified doctor if they meet all necessary conditions.
+     * Applies medical treatment to the specified patient, using the given doctor as the medical provider.
      *
-     * <p>The method calculates modifiers using campaign rules, performs a skill check for the doctor, and updates
-     * the patient's healing status based on the result.</p>
+     * <p>This method performs a skill check for the doctor using current campaign rules and relevant situational
+     * modifiers. If the skill check succeeds, the patient is healed and any associated unit state is reset. Regardless
+     * of the outcome, the patient's healing waiting period is reset.</p>
      *
-     * @param patient the {@link Person} receiving medical treatment
-     * @param doctor  the {@link Person} performing the treatment
+     * @param patient           the {@link Person} receiving treatment
+     * @param doctor            the {@link Person} performing the medical treatment
+     * @param isUseAgingEffects {@code true} if aging effects should influence the healing process
+     * @param isClanCampaign    {@code true} if campaign-specific (clan) rules apply to healing
+     * @param today             the current date, used for time-dependent effects
      */
-    private void healPerson(Person patient, Person doctor) {
-        // TODO change logging level from info to debug in 50.08
-        logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
+    private void healPerson(Person patient, Person doctor, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
+        logger.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
         SkillCheckUtility skillCheckUtility = new SkillCheckUtility(doctor, S_SURGERY,
               getAdditionalHealingModifiers(patient),
               0,
               isUseSupportEdge,
-              false);
+              false, isUseAgingEffects, isClanCampaign, today);
 
-        // TODO change logging level from info to debug in 50.08
-        logger.info(skillCheckUtility.getResultsText());
+        logger.debug(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
             patient.heal();
@@ -183,7 +210,6 @@ public class MedicalController {
 
         patient.setDaysToWaitForHealing(healingWaitingPeriod);
     }
-
 
     /**
      * Retrieves additional healing modifiers for the given patient. These modifiers are based on campaign-specific

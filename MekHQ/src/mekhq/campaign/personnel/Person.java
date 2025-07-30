@@ -42,18 +42,29 @@ import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.log.LogEntryType.SERVICE;
+import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
@@ -68,6 +79,7 @@ import java.util.stream.Stream;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -81,11 +93,13 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
@@ -98,6 +112,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -109,10 +124,12 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
@@ -154,6 +171,13 @@ public class Person {
     public static final String UNLUCKY_LABEL = "UNLUCKY";
     public static final int MINIMUM_UNLUCKY = 0;
     public static final int MAXIMUM_UNLUCKY = 5;
+
+    public static final String BLOODMARK_LABEL = "BLOODMARK";
+    public static final int MINIMUM_BLOODMARK = 0;
+    public static final int MAXIMUM_BLOODMARK = 5;
+
+    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
+
     private static final String DELIMITER = "::";
 
 
@@ -220,6 +244,8 @@ public class Person {
     private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
+    private int bloodmark;
+    private List<LocalDate> bloodhuntSchedule;
     private Attributes atowAttributes;
 
     private PersonnelStatus status;
@@ -318,6 +344,28 @@ public class Person {
     private String personalityInterviewNotes;
     // endregion Personality
 
+    // region SPAs
+    private String storedGivenName;
+    private String storedSurname;
+    private int storedLoyalty;
+    private Faction storedOriginFaction;
+    private Aggression storedAggression;
+    private int storedAggressionDescriptionIndex;
+    private Ambition storedAmbition;
+    private int storedAmbitionDescriptionIndex;
+    private Greed storedGreed;
+    private int storedGreedDescriptionIndex;
+    private Social storedSocial;
+    private int storedSocialDescriptionIndex;
+    private PersonalityQuirk storedPersonalityQuirk;
+    private int storedPersonalityQuirkDescriptionIndex;
+    private Reasoning storedReasoning;
+    private int storedReasoningDescriptionIndex;
+    private boolean sufferingFromClinicalParanoia;
+    private boolean darkSecretRevealed;
+    private LocalDate burnedConnectionsEndDate;
+    // endregion SPAs
+
     // region Flags
     private boolean clanPersonnel;
     private boolean commander;
@@ -340,7 +388,7 @@ public class Person {
 
     private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
           MekHQ.getMHQOptions().getLocale());
-    private static final MMLogger logger = MMLogger.create(Person.class);
+    private static final MMLogger LOGGER = MMLogger.create(Person.class);
 
     // initializes the AtB ransom values
     static {
@@ -352,22 +400,22 @@ public class Person {
         // no official AtB rules for really inexperienced scrubs, but...
         MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(5000));
 
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(10000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(25000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(50000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(100000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_HEROIC, Money.of(150000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_LEGENDARY, Money.of(200000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_GREEN, Money.of(10000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_REGULAR, Money.of(25000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_VETERAN, Money.of(50000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ELITE, Money.of(100000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_HEROIC, Money.of(150000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(200000));
 
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(1250));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(2500));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(5000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(10000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_HEROIC, Money.of(100000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_LEGENDARY, Money.of(150000));
+        OTHER_RANSOM_VALUES.put(EXP_NONE, Money.of(1250));
+        OTHER_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(2500));
+        OTHER_RANSOM_VALUES.put(EXP_GREEN, Money.of(5000));
+        OTHER_RANSOM_VALUES.put(EXP_REGULAR, Money.of(10000));
+        OTHER_RANSOM_VALUES.put(EXP_VETERAN, Money.of(25000));
+        OTHER_RANSOM_VALUES.put(EXP_ELITE, Money.of(50000));
+        OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
+        OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
     }
     // endregion Variable Declarations
 
@@ -457,6 +505,8 @@ public class Person {
         hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
+        bloodmark = 0;
+        bloodhuntSchedule = new ArrayList<>();
         atowAttributes = new Attributes();
         dateOfDeath = null;
         recruitment = null;
@@ -509,6 +559,22 @@ public class Person {
         reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
         personalityInterviewNotes = "";
+        storedLoyalty = 0;
+        storedAggression = Aggression.NONE;
+        storedAggressionDescriptionIndex = 0;
+        storedAmbition = Ambition.NONE;
+        storedAmbitionDescriptionIndex = 0;
+        storedGreed = Greed.NONE;
+        storedGreedDescriptionIndex = 0;
+        storedSocial = Social.NONE;
+        storedSocialDescriptionIndex = 0;
+        storedPersonalityQuirk = PersonalityQuirk.NONE;
+        storedPersonalityQuirkDescriptionIndex = 0;
+        storedReasoning = Reasoning.AVERAGE;
+        storedReasoningDescriptionIndex = 0;
+        sufferingFromClinicalParanoia = false;
+        darkSecretRevealed = false;
+        burnedConnectionsEndDate = null;
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -563,6 +629,14 @@ public class Person {
 
     public void setOriginFaction(final Faction originFaction) {
         this.originFaction = originFaction;
+    }
+
+    Faction getStoredOriginFaction() {
+        return storedOriginFaction;
+    }
+
+    void setStoredOriginFaction(final Faction originFaction) {
+        this.storedOriginFaction = originFaction;
     }
 
     public Planet getOriginPlanet() {
@@ -757,6 +831,14 @@ public class Person {
         this.givenName = givenName;
     }
 
+    String getStoredGivenName() {
+        return storedGivenName;
+    }
+
+    void setStoredGivenName(String storedGivenName) {
+        this.storedGivenName = storedGivenName;
+    }
+
     /**
      * @return the person's surname
      */
@@ -774,6 +856,14 @@ public class Person {
 
     protected void setSurnameDirect(final String surname) {
         this.surname = surname;
+    }
+
+    String getStoredSurname() {
+        return storedSurname;
+    }
+
+    void setStoredSurname(String storedSurname) {
+        this.storedSurname = storedSurname;
     }
 
     /**
@@ -1176,30 +1266,30 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
-                  SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS,
-                  SkillType.S_SENSOR_OPERATIONS,
-                  SkillType.S_ART_COOKING).anyMatch(this::hasSkill);
-            case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
-            case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
-            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
-            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
-            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
-            case DOCTOR -> hasSkill(SkillType.S_SURGERY);
+            case VEHICLE_CREW -> Stream.of(S_TECH_MEK,
+                  S_TECH_AERO,
+                  S_TECH_MECHANIC,
+                  S_TECH_BA,
+                  S_SURGERY,
+                  S_MEDTECH,
+                  S_ASTECH,
+                  S_COMMUNICATIONS,
+                  S_SENSOR_OPERATIONS,
+                  S_ART_COOKING).anyMatch(this::hasSkill);
+            case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
+            case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
+            case MEK_TECH -> hasSkill(S_TECH_MEK);
+            case AERO_TEK -> hasSkill(S_TECH_AERO);
+            case BA_TECH -> hasSkill(S_TECH_BA);
+            case DOCTOR -> hasSkill(S_SURGERY);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(SkillType.S_ADMIN);
+                  hasSkill(S_ADMIN);
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (isChild(today, true)) {
                     yield false;
                 } else {
-                    yield hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
+                    yield hasSkill(S_ART_OTHER) && hasSkill(S_ACTING);
                 }
             }
             case LUXURY_COMPANION -> {
@@ -1207,7 +1297,7 @@ public class Person {
                 if (isChild(today, true)) {
                     yield false;
                 } else {
-                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
+                    yield hasSkill(S_ACTING) && hasSkill(S_PROTOCOLS);
                 }
             }
             default -> {
@@ -1467,8 +1557,8 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
-                  ReportingUtilities.CLOSING_SPAN_TAG));
+                  spanOpeningWithCustomColor(getWarningColor()),
+                  CLOSING_SPAN_TAG));
         }
     }
 
@@ -1549,6 +1639,39 @@ public class Person {
     }
 
     /**
+     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     *
+     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
+     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
+     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
+     * group loyalty change is added to the campaign reports.</p>
+     *
+     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
+     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
+     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     */
+    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
+          boolean isMajor) {
+        for (Person person : campaign.getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
+                  ReportingUtilities.CLOSING_SPAN_TAG));
+        }
+    }
+
+    /**
      * Reports the change in loyalty.
      *
      * @param campaign        The campaign for which the loyalty change is being reported.
@@ -1564,7 +1687,7 @@ public class Person {
 
         // choose the color and string based on the loyalty comparison.
         if (originalLoyalty > loyalty) {
-            color = ReportingUtilities.getNegativeColor();
+            color = getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
             color = ReportingUtilities.getPositiveColor();
@@ -1842,8 +1965,57 @@ public class Person {
         this.retirement = retirement;
     }
 
+    /**
+     * Use {@link #getBaseLoyalty()} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getLoyalty() {
+        return getBaseLoyalty();
+    }
+
+    /**
+     * This method returns the character's base loyalty score.
+     *
+     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction)} instead.</p>
+     *
+     * @return the loyalty value as an {@link Integer}
+     */
+    public int getBaseLoyalty() {
         return loyalty;
+    }
+
+    /**
+     * Calculates and returns the adjusted loyalty value for the given campaign faction.
+     *
+     * @param campaignFaction the campaign {@link Faction} being compared with the origin {@link Faction}
+     *
+     * @return the loyalty value adjusted based on the provided campaign {@link Faction}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedLoyalty(Faction campaignFaction) {
+        final int LOYALTY_PENALTY_FOR_ANARCHIST = -2;
+
+        boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
+
+        int modifier = 0;
+        boolean hasHatredForAuthority = options.booleanOption(COMPULSION_ANARCHIST);
+        if (hasHatredForAuthority) {
+            modifier += commander ? 0 : LOYALTY_PENALTY_FOR_ANARCHIST;
+        }
+
+        boolean hasFactionPride = options.booleanOption(COMPULSION_FACTION_PRIDE);
+        if (hasFactionPride) {
+            modifier += campaignFactionMatchesOriginFaction ? 1 : -2;
+        }
+
+        boolean hasFactionLoyalty = options.booleanOption(COMPULSION_FACTION_LOYALTY);
+        if (hasFactionLoyalty) {
+            modifier += campaignFactionMatchesOriginFaction ? 1 : -4;
+        }
+
+        return loyalty + modifier;
     }
 
     public void setLoyalty(int loyalty) {
@@ -1879,6 +2051,14 @@ public class Person {
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyaltyModifier);
         };
+    }
+
+    int getStoredLoyalty() {
+        return storedLoyalty;
+    }
+
+    void setStoredLoyalty(int storedLoyalty) {
+        this.storedLoyalty = storedLoyalty;
     }
 
     public int getFatigue() {
@@ -2259,6 +2439,22 @@ public class Person {
         this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
+    Aggression getStoredAggression() {
+        return storedAggression;
+    }
+
+    void setStoredAggression(Aggression storedAggression) {
+        this.storedAggression = storedAggression;
+    }
+
+    int getStoredAggressionDescriptionIndex() {
+        return storedAggressionDescriptionIndex;
+    }
+
+    void setStoredAggressionDescriptionIndex(int storedAggressionDescriptionIndex) {
+        this.storedAggressionDescriptionIndex = storedAggressionDescriptionIndex;
+    }
+
     public Ambition getAmbition() {
         return ambition;
     }
@@ -2279,6 +2475,22 @@ public class Person {
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
         this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
+    }
+
+    Ambition getStoredAmbition() {
+        return storedAmbition;
+    }
+
+    void setStoredAmbition(Ambition storedAmbition) {
+        this.storedAmbition = storedAmbition;
+    }
+
+    int getStoredAmbitionDescriptionIndex() {
+        return storedAmbitionDescriptionIndex;
+    }
+
+    void setStoredAmbitionDescriptionIndex(int storedAmbitionDescriptionIndex) {
+        this.storedAmbitionDescriptionIndex = storedAmbitionDescriptionIndex;
     }
 
     public Greed getGreed() {
@@ -2303,6 +2515,22 @@ public class Person {
         this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
+    Greed getStoredGreed() {
+        return storedGreed;
+    }
+
+    void setStoredGreed(Greed storedGreed) {
+        this.storedGreed = storedGreed;
+    }
+
+    int getStoredGreedDescriptionIndex() {
+        return storedGreedDescriptionIndex;
+    }
+
+    void setStoredGreedDescriptionIndex(int storedGreedDescriptionIndex) {
+        this.storedGreedDescriptionIndex = storedGreedDescriptionIndex;
+    }
+
     public Social getSocial() {
         return social;
     }
@@ -2323,6 +2551,22 @@ public class Person {
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
         this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
+    }
+
+    Social getStoredSocial() {
+        return storedSocial;
+    }
+
+    void setStoredSocial(Social storedSocial) {
+        this.storedSocial = storedSocial;
+    }
+
+    int getStoredSocialDescriptionIndex() {
+        return storedSocialDescriptionIndex;
+    }
+
+    void setStoredSocialDescriptionIndex(int storedSocialDescriptionIndex) {
+        this.storedSocialDescriptionIndex = storedSocialDescriptionIndex;
     }
 
     public PersonalityQuirk getPersonalityQuirk() {
@@ -2349,6 +2593,22 @@ public class Person {
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
 
+    PersonalityQuirk getStoredPersonalityQuirk() {
+        return storedPersonalityQuirk;
+    }
+
+    void setStoredPersonalityQuirk(PersonalityQuirk storedPersonalityQuirk) {
+        this.storedPersonalityQuirk = storedPersonalityQuirk;
+    }
+
+    int getStoredPersonalityQuirkDescriptionIndex() {
+        return storedPersonalityQuirkDescriptionIndex;
+    }
+
+    void setStoredPersonalityQuirkDescriptionIndex(int storedPersonalityQuirkDescriptionIndex) {
+        this.storedPersonalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
+    }
+
     public Reasoning getReasoning() {
         return reasoning;
     }
@@ -2371,6 +2631,22 @@ public class Person {
         this.reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, Reasoning.MAXIMUM_VARIATIONS - 1);
     }
 
+    Reasoning getStoredReasoning() {
+        return storedReasoning;
+    }
+
+    void setStoredReasoning(Reasoning storedReasoning) {
+        this.storedReasoning = storedReasoning;
+    }
+
+    int getStoredReasoningDescriptionIndex() {
+        return storedReasoningDescriptionIndex;
+    }
+
+    void setStoredReasoningDescriptionIndex(int storedReasoningDescriptionIndex) {
+        this.storedReasoningDescriptionIndex = storedReasoningDescriptionIndex;
+    }
+
     public String getPersonalityDescription() {
         return personalityDescription;
     }
@@ -2385,6 +2661,30 @@ public class Person {
 
     public void setPersonalityInterviewNotes(final String personalityInterviewNotes) {
         this.personalityInterviewNotes = personalityInterviewNotes;
+    }
+
+    public boolean isSufferingFromClinicalParanoia() {
+        return sufferingFromClinicalParanoia;
+    }
+
+    public void setSufferingFromClinicalParanoia(final boolean sufferingFromClinicalParanoia) {
+        this.sufferingFromClinicalParanoia = sufferingFromClinicalParanoia;
+    }
+
+    public boolean isDarkSecretRevealed() {
+        return darkSecretRevealed;
+    }
+
+    public void setDarkSecretRevealed(final boolean darkSecretRevealed) {
+        this.darkSecretRevealed = darkSecretRevealed;
+    }
+
+    public @Nullable LocalDate getBurnedConnectionsEndDate() {
+        return burnedConnectionsEndDate;
+    }
+
+    public void setBurnedConnectionsEndDate(final @Nullable LocalDate burnedConnectionsEndDate) {
+        this.burnedConnectionsEndDate = burnedConnectionsEndDate;
     }
 
     // region Flags
@@ -2636,6 +2936,18 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
             }
 
+            if (bloodmark != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodmark", bloodmark);
+            }
+
+            if (!bloodhuntSchedule.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "bloodhuntSchedule");
+                for (LocalDate attemptDate : bloodhuntSchedule) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attemptDate", attemptDate);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "bloodhuntSchedule");
+            }
+
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "atowAttributes");
             atowAttributes.writeAttributesToXML(pw, indent);
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "atowAttributes");
@@ -2653,7 +2965,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
@@ -2865,6 +3177,106 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
             }
 
+            if (!isNullOrBlank(storedGivenName)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGivenName", storedGivenName);
+            }
+
+            if (!isNullOrBlank(storedSurname)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedSurname", storedSurname);
+            }
+
+            if (storedLoyalty != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedLoyalty", storedLoyalty);
+            }
+
+            if (storedOriginFaction != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedOriginFaction", storedOriginFaction.getShortName());
+            }
+
+            if (storedAggression != Aggression.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedAggression", storedAggression.name());
+            }
+
+            if (storedAggressionDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedAggressionDescriptionIndex",
+                      storedAggressionDescriptionIndex);
+            }
+
+            if (storedAmbition != Ambition.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedAmbition", storedAmbition.name());
+            }
+
+            if (storedAmbitionDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedAmbitionDescriptionIndex",
+                      storedAmbitionDescriptionIndex);
+            }
+
+            if (storedGreed != Greed.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGreed", storedGreed.name());
+            }
+
+            if (storedGreedDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGreedDescriptionIndex", storedGreedDescriptionIndex);
+            }
+
+            if (storedSocial != Social.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedSocial", storedSocial.name());
+            }
+
+            if (storedSocialDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedSocialDescriptionIndex",
+                      storedSocialDescriptionIndex);
+            }
+
+            if (storedPersonalityQuirk != PersonalityQuirk.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedPersonalityQuirk", storedPersonalityQuirk.name());
+            }
+
+            if (storedPersonalityQuirkDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedPersonalityQuirkDescriptionIndex",
+                      storedPersonalityQuirkDescriptionIndex);
+            }
+
+            if (storedReasoning != Reasoning.AVERAGE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedReasoning", storedReasoning.name());
+            }
+
+            if (storedReasoningDescriptionIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "storedReasoningDescriptionIndex",
+                      storedReasoningDescriptionIndex);
+            }
+
+            if (sufferingFromClinicalParanoia) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "sufferingFromClinicalParanoia",
+                      sufferingFromClinicalParanoia);
+            }
+
+            if (darkSecretRevealed) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "darkSecretRevealed",
+                      darkSecretRevealed);
+            }
+
+            if (burnedConnectionsEndDate != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "burnedConnectionsEndDate",
+                      burnedConnectionsEndDate);
+            }
+
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
@@ -2881,7 +3293,7 @@ public class Person {
                 extraData.writeToXml(pw);
             }
         } catch (Exception ex) {
-            logger.error(ex, "Failed to write {} to the XML File", getFullName());
+            LOGGER.error(ex, "Failed to write {} to the XML File", getFullName());
             throw ex; // we want to rethrow to ensure that the save fails
         }
         return indent;
@@ -2931,7 +3343,7 @@ public class Person {
                         }
                         person.originPlanet = p;
                     } catch (NullPointerException e) {
-                        logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
+                        LOGGER.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (nodeName.equalsIgnoreCase("becomingBondsmanEndDate")) {
                     person.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
@@ -2947,17 +3359,17 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("secondaryRole")) {
                     person.setSecondaryRoleDirect(PersonnelRole.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("acquisitions")) {
-                    person.acquisitions = MathUtility.parseInt(wn2.getTextContent());
+                    person.acquisitions = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("primaryDesignator")) {
                     person.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("secondaryDesignator")) {
                     person.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("daysToWaitForHealing")) {
-                    person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent());
+                    person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("vocationalXPTimer")) {
-                    person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent());
+                    person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("id")) {
-                    person.id = UUID.fromString(wn2.getTextContent());
+                    person.id = UUID.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("genealogy")) {
                     person.getGenealogy().fillFromXML(wn2.getChildNodes());
                 } else if (nodeName.equalsIgnoreCase("dueDate")) {
@@ -2971,11 +3383,11 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("totalXPEarnings")) {
                     person.setTotalXPEarnings(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("nTasks")) {
-                    person.nTasks = MathUtility.parseInt(wn2.getTextContent());
+                    person.nTasks = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hits")) {
-                    person.hits = MathUtility.parseInt(wn2.getTextContent());
+                    person.hits = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hitsPrior")) {
-                    person.hitsPrior = MathUtility.parseInt(wn2.getTextContent());
+                    person.hitsPrior = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("gender")) {
                     person.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("bloodGroup")) {
@@ -2996,11 +3408,11 @@ public class Person {
                     person.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("doctorId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        person.doctorId = UUID.fromString(wn2.getTextContent());
+                        person.doctorId = UUID.fromString(wn2.getTextContent().trim());
                     }
                 } else if (nodeName.equalsIgnoreCase("unitId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
+                        person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("status")) {
                     person.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
@@ -3011,9 +3423,9 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("totalEarnings")) {
                     person.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("minutesLeft")) {
-                    person.minutesLeft = MathUtility.parseInt(wn2.getTextContent());
+                    person.minutesLeft = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("overtimeLeft")) {
-                    person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent());
+                    person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("birthday")) {
                     person.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("deathday")) {
@@ -3031,7 +3443,7 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("loyalty")) {
                     person.loyalty = MathUtility.parseInt(wn2.getTextContent(), 9);
                 } else if (nodeName.equalsIgnoreCase("fatigue")) {
-                    person.fatigue = MathUtility.parseInt(wn2.getTextContent());
+                    person.fatigue = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("isRecoveringFromFatigue")) {
                     person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("advantages")) {
@@ -3043,21 +3455,39 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
-                    person.toughness = MathUtility.parseInt(wn2.getTextContent());
+                    person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("connections")) {
-                    person.connections = MathUtility.parseInt(wn2.getTextContent());
+                    person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
-                    person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                    person.wealth = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
-                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent());
+                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
-                    person.reputation = MathUtility.parseInt(wn2.getTextContent());
+                    person.reputation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
-                    person.unlucky = MathUtility.parseInt(wn2.getTextContent());
+                    person.unlucky = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("bloodmark")) {
+                    person.bloodmark = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("bloodhuntSchedule")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("attemptDate")) {
+                            LOGGER.error("(techUnitIds) Unknown node type not loaded in bloodhuntSchedule nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+                        person.addBloodhuntDate(LocalDate.parse(wn3.getTextContent().trim()));
+                    }
                 } else if (nodeName.equalsIgnoreCase("atowAttributes")) {
                     person.atowAttributes = new Attributes().generateAttributesFromXML(wn2);
                 } else if (nodeName.equalsIgnoreCase("pilotHits")) {
-                    person.hits = MathUtility.parseInt(wn2.getTextContent());
+                    person.hits = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
@@ -3073,11 +3503,11 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            logger.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
+                            LOGGER.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
-                        person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
+                        person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent().trim())));
                     }
                 } else if (nodeName.equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -3089,7 +3519,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                            LOGGER.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3156,7 +3586,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                            LOGGER.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3176,7 +3606,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in scenario logEntry nodes: {}",
+                            LOGGER.error("Unknown node type not loaded in scenario logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3196,7 +3626,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                            LOGGER.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3216,7 +3646,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                            LOGGER.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3235,7 +3665,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            logger.error("Unknown node type not loaded in personnel award log nodes: {}",
+                            LOGGER.error("Unknown node type not loaded in personnel award log nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -3253,7 +3683,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            logger.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
+                            LOGGER.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         person.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -3263,17 +3693,17 @@ public class Person {
                           .filter(inj -> (null == inj.getStart()))
                           .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
-                    person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent());
+                    person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
-                    person.originalUnitTech = MathUtility.parseInt(wn2.getTextContent());
+                    person.originalUnitTech = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitId")) {
-                    person.originalUnitId = UUID.fromString(wn2.getTextContent());
+                    person.originalUnitId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduHighestEducation")) {
-                    person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent());
+                    person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduJourneyTime")) {
-                    person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduDaysOfTravel")) {
-                    person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                     if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -3298,59 +3728,97 @@ public class Person {
                             Node node = nodes.item(j);
 
                             if (node.getNodeName().equalsIgnoreCase("eduFailedApplication")) {
-                                person.eduFailedApplications.add(node.getTextContent());
+                                person.eduFailedApplications.add(node.getTextContent().trim());
                             }
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
-                    person.eduAcademySystem = String.valueOf(wn2.getTextContent());
+                    person.eduAcademySystem = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyName")) {
-                    person.eduAcademyName = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyName = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
-                    person.eduAcademySet = String.valueOf(wn2.getTextContent());
+                    person.eduAcademySet = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyNameInSet")) {
-                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyFaction")) {
-                    person.eduAcademyFaction = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyFaction = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduCourseIndex")) {
-                    person.eduCourseIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduCourseIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduEducationStage")) {
-                    person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
+                    person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduEducationTime")) {
-                    person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent());
+                    person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggression")) {
-                    person.aggression = Aggression.fromString(wn2.getTextContent());
+                    person.aggression = Aggression.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggressionDescriptionIndex")) {
-                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("ambition")) {
-                    person.ambition = Ambition.fromString(wn2.getTextContent());
+                    person.ambition = Ambition.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("ambitionDescriptionIndex")) {
-                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("greed")) {
-                    person.greed = Greed.fromString(wn2.getTextContent());
+                    person.greed = Greed.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("greedDescriptionIndex")) {
-                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("social")) {
-                    person.social = Social.fromString(wn2.getTextContent());
+                    person.social = Social.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("socialDescriptionIndex")) {
-                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityQuirk")) {
-                    person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+                    person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
 
                     // < 50.07 compatibility handler
                     if (person.personalityQuirk == PersonalityQuirk.BROKEN) {
                         person.personalityQuirk = PersonalityQuirk.HAUNTED;
                     }
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
-                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
-                    person.reasoning = Reasoning.fromString(wn2.getTextContent());
+                    person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
-                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
                     person.personalityInterviewNotes = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("storedGivenName")) {
+                    person.storedGivenName = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("storedSurname")) {
+                    person.storedSurname = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("storedLoyalty")) {
+                    person.storedLoyalty = MathUtility.parseInt(wn2.getTextContent().trim(), 9);
+                } else if (nodeName.equalsIgnoreCase("storedOriginFaction")) {
+                    person.storedOriginFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAggression")) {
+                    person.storedAggression = Aggression.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAggressionDescriptionIndex")) {
+                    person.storedAggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAmbition")) {
+                    person.storedAmbition = Ambition.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedAmbitionDescriptionIndex")) {
+                    person.storedAmbitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedGreed")) {
+                    person.storedGreed = Greed.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedGreedDescriptionIndex")) {
+                    person.storedGreedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedSocial")) {
+                    person.storedSocial = Social.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedSocialDescriptionIndex")) {
+                    person.storedSocialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirk")) {
+                    person.storedPersonalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirkDescriptionIndex")) {
+                    person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
+                    person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedReasoningDescriptionIndex")) {
+                    person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
+                    person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
+                    person.setDarkSecretRevealed(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("burnedConnectionsEndDate")) {
+                    person.setBurnedConnectionsEndDate(LocalDate.parse(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
@@ -3391,7 +3859,7 @@ public class Person {
                     try {
                         person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        logger.warn("Error restoring advantage: {}", adv);
+                        LOGGER.warn("Error restoring advantage: {}", adv);
                     }
                 }
             }
@@ -3416,7 +3884,7 @@ public class Person {
                     try {
                         person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        logger.error("Error restoring implants: {}", adv);
+                        LOGGER.error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -3436,7 +3904,7 @@ public class Person {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -3445,12 +3913,12 @@ public class Person {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      spanOpeningWithCustomColor(getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
         } catch (Exception e) {
-            logger.error(e, "Failed to read person {} from file", person.getFullName());
+            LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
 
@@ -3606,7 +4074,7 @@ public class Person {
                 retVal.getOptions().getOption(triggerName).setValue(value);
                 edgeOptionList.remove(triggerName);
             } catch (Exception e) {
-                logger.error("Error restoring edge trigger: {}", trigger);
+                LOGGER.error("Error restoring edge trigger: {}", trigger);
             }
         }
     }
@@ -3624,7 +4092,7 @@ public class Person {
             try {
                 retVal.getOptions().getOption(advName).setValue(false);
             } catch (Exception e) {
-                logger.error("Error disabling edge trigger: {}", edgeTrigger);
+                LOGGER.error("Error disabling edge trigger: {}", edgeTrigger);
             }
         }
     }
@@ -3681,6 +4149,11 @@ public class Person {
         return getRankSystem().getRank(getRankNumeric());
     }
 
+    /**
+     * Retrieves the index of the character's rank
+     *
+     * @return the numeric value of the rank as an {@link Integer}
+     */
     public int getRankNumeric() {
         return rank;
     }
@@ -3689,6 +4162,13 @@ public class Person {
         this.rank = rank;
     }
 
+    /**
+     * Retrieves the character's rank <b>sub-level</b>. Predominantly used in ComStar rank styles.
+     *
+     * <p><b>Important:</b> You almost always want to use {@link #getRankNumeric()} instead.</p>
+     *
+     * @return the rank level as an integer
+     */
     public int getRankLevel() {
         return rankLevel;
     }
@@ -3902,7 +4382,7 @@ public class Person {
         final int adjustedReputation = getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
-              rankLevel);
+              rank);
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -3915,32 +4395,32 @@ public class Person {
                           isAlternativeQualityAveraging,
                           adjustedReputation);
                 } else {
-                    if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
-                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
-                              (getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
-                    } else if (hasSkill(SkillType.S_GUN_VEE)) {
-                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes);
-                    } else if (hasSkill(SkillType.S_ARTILLERY)) {
-                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes);
+                    if ((hasSkill(S_GUN_VEE)) && (hasSkill(S_ARTILLERY))) {
+                        yield Math.max((getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
+                              (getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
+                    } else if (hasSkill(S_GUN_VEE)) {
+                        yield getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes);
+                    } else if (hasSkill(S_ARTILLERY)) {
+                        yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes);
                     } else {
-                        yield SkillType.EXP_NONE;
+                        yield EXP_NONE;
                     }
                 }
             }
             case VEHICLE_CREW -> {
                 // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
-                List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
-                      SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
-                      SkillType.S_TECH_BA,
-                      SkillType.S_SURGERY,
-                      SkillType.S_MEDTECH,
-                      SkillType.S_ASTECH,
-                      SkillType.S_COMMUNICATIONS,
-                      SkillType.S_ART_COOKING,
-                      SkillType.S_SENSOR_OPERATIONS);
-                int highestExperienceLevel = SkillType.EXP_NONE;
+                List<String> relevantSkills = List.of(S_TECH_MEK,
+                      S_TECH_AERO,
+                      S_TECH_MECHANIC,
+                      S_TECH_BA,
+                      S_SURGERY,
+                      S_MEDTECH,
+                      S_ASTECH,
+                      S_COMMUNICATIONS,
+                      S_ART_COOKING,
+                      S_SENSOR_OPERATIONS);
+                int highestExperienceLevel = EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
 
@@ -3957,10 +4437,10 @@ public class Person {
                 yield highestExperienceLevel;
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
 
-                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
+                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION);
                 negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
@@ -3975,7 +4455,7 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    yield SkillType.EXP_NONE;
+                    yield EXP_NONE;
                 } else {
                     yield Math.max(0, levelSum / divisor);
                 }
@@ -4020,7 +4500,7 @@ public class Person {
           int adjustedReputation) {
         if (skillNames.isEmpty()) {
             // If we're not tracking skills for this profession, it always counts as REGULAR
-            return SkillType.EXP_REGULAR;
+            return EXP_REGULAR;
         }
 
         int totalSkillLevel = 0;
@@ -4033,13 +4513,13 @@ public class Person {
                 // If a character is missing a skill, it means they're unqualified for a profession. They will lose
                 // that profession the next time the campaign is loaded. We don't remove it here as that would
                 // require passing in a bunch of extra information that is largely irrelevant.
-                return SkillType.EXP_NONE;
+                return EXP_NONE;
             }
 
-            SkillType skillType = SkillType.getType(skillName);
+            SkillType skillType = getType(skillName);
             if (skillType == null) {
-                logger.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
-                return SkillType.EXP_NONE;
+                LOGGER.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
+                return EXP_NONE;
             }
 
             int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
@@ -4059,11 +4539,11 @@ public class Person {
             return expectedExperienceLevel;
         }
 
-        int averageSkillLevel = (int) Math.floor((double) totalSkillLevel / skillNames.size());
+        int averageSkillLevel = (int) floor((double) totalSkillLevel / skillNames.size());
 
         Skill skill = getSkill(skillNames.get(0));
         if (skill == null) {
-            return SkillType.EXP_NONE;
+            return EXP_NONE;
         }
 
         return skill.getType().getExperienceLevel(averageSkillLevel);
@@ -4221,7 +4701,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b>Failed to heal.</b></font>";
+        return " <font color='" + getNegativeColor() + "'><b>Failed to heal.</b></font>";
     }
 
     // region skill
@@ -4264,7 +4744,7 @@ public class Person {
           LocalDate today) {
         final Skill skill = getSkill(skillName);
 
-        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankLevel);
+        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
         return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
     }
@@ -4580,7 +5060,9 @@ public class Person {
      * @return The adjusted edge value after accounting for the person's level of bad luck.
      */
     public int getAdjustedEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
+        boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
+        int modifier = hasTraumaticPast ? -1 : 0;
+        return options.intOption(OptionsConstants.EDGE) - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
@@ -5145,7 +5627,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        Skill administration = skills.getSkill(S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -5162,7 +5644,7 @@ public class Person {
     }
 
     public boolean isDoctor() {
-        return hasSkill(SkillType.S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+        return hasSkill(S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
     }
 
     /**
@@ -5193,7 +5675,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        Skill administration = skills.getSkill(S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -5403,6 +5885,53 @@ public class Person {
         return connections;
     }
 
+    /**
+     * Calculates and returns the character's adjusted Connections value.
+     *
+     * <p>If the character has burned their Connections, their Connections value is fixed as 0.</p>
+     *
+     * <p>If the character is suffering from an episode of Clinical Paranoia, their Connections value is fixed as
+     * 0.</p>
+     *
+     * <p>If the character has the {@link PersonnelOptions#COMPULSION_XENOPHOBIA} SPA their Connections value is
+     * decreased by 1.</p>
+     *
+     * <p>If the character has the {@link PersonnelOptions#ATOW_CITIZENSHIP} SPA their Connections value is
+     * increased by 1.</p>
+     *
+     * <p>If the character has the {@link PersonnelOptions#COMPULSION_MILD_PARANOIA} SPA their Connections value is
+     * reduced by 1.</p>
+     *
+     * <p>The Connections value is clamped within the allowed minimum and maximum range before being returned.</p>
+     *
+     * @return the character's Connections value, clamped within the minimum and maximum limits
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getAdjustedConnections() {
+        if (burnedConnectionsEndDate != null) {
+            return 0;
+        }
+
+        if (sufferingFromClinicalParanoia) {
+            return 0;
+        }
+
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        int modifiers = (hasXenophobia ? -1 : 0);
+
+        boolean hasCitizenship = options.booleanOption(ATOW_CITIZENSHIP);
+        modifiers += (hasCitizenship ? 1 : 0);
+
+        boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
+        modifiers += (hasMildParanoia ? -1 : 0);
+
+        modifiers += getDarkSecretModifier(false);
+
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
     public void setConnections(final int connections) {
         this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
@@ -5477,21 +6006,35 @@ public class Person {
      * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankLevel         The rank index of the character, which can adjust the reputation modifier in clan-based
+     * @param rankNumeric       The rank index of the character, which can adjust the reputation modifier in clan-based
      *                          campaigns.
      *
      * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
      *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankLevel) {
-        int modifier = isUseAgingEffects ?
+          int rankNumeric) {
+        final int PATHOLOGIC_RACISM_REPUTATION_PENALTY = -2;
+
+        int modifiers = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
                                    !isNullOrBlank(bloodname),
-                                   rankLevel) :
+                                   rankNumeric) :
                              0;
-        return reputation + modifier;
+
+        boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
+        modifiers -= hasRacism ? 1 : 0;
+
+        boolean hasPathologicRacism = options.booleanOption(COMPULSION_PATHOLOGIC_RACISM);
+        modifiers += hasPathologicRacism ? PATHOLOGIC_RACISM_REPUTATION_PENALTY : 0;
+
+        boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
+        modifiers -= hasXenophobia ? 1 : 0;
+
+        modifiers += getDarkSecretModifier(true);
+
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
@@ -5524,6 +6067,35 @@ public class Person {
         unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
+    public int getBloodmark() {
+        return bloodmark;
+    }
+
+    public Money getBloodmarkValue() {
+        return Money.of(bloodmark);
+    }
+
+    public void setBloodmark(final int unlucky) {
+        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+    }
+
+    public void changeBloodmark(final int delta) {
+        int newValue = bloodmark + delta;
+        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+    }
+
+    public List<LocalDate> getBloodhuntSchedule() {
+        return bloodhuntSchedule;
+    }
+
+    public void addBloodhuntDate(final LocalDate date) {
+        bloodhuntSchedule.add(date);
+    }
+
+    public void removeBloodhuntDate(final LocalDate date) {
+        bloodhuntSchedule.remove(date);
+    }
+
     /**
      * Retrieves the character's {@link Attributes} object containing the character's attribute scores.
      *
@@ -5554,7 +6126,7 @@ public class Person {
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
         if (attribute == null || attribute == SkillAttribute.NONE) {
-            logger.warn("(setAttributeScore) SkillAttribute is null or NONE.");
+            LOGGER.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
@@ -5573,7 +6145,7 @@ public class Person {
      */
     public int getAttributeScore(final SkillAttribute attribute) {
         if (attribute == null || attribute.isNone()) {
-            logger.error("(getAttributeScore) SkillAttribute is null or NONE.");
+            LOGGER.error("(getAttributeScore) SkillAttribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
         }
 
@@ -5636,7 +6208,7 @@ public class Person {
      */
     public int getAttributeCap(final SkillAttribute attribute) {
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(getAttributeCap) SkillAttribute is null or NONE.");
+            LOGGER.warn("(getAttributeCap) SkillAttribute is null or NONE.");
             return MAXIMUM_ATTRIBUTE_SCORE;
         }
 
@@ -5677,7 +6249,7 @@ public class Person {
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
+            LOGGER.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
@@ -6056,7 +6628,7 @@ public class Person {
             final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error("Person {} ('{}') references missing unit {}", getId(), getFullName(), id);
+                LOGGER.error("Person {} ('{}') references missing unit {}", getId(), getFullName(), id);
             }
         }
 
@@ -6067,7 +6639,7 @@ public class Person {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    logger.error("Person {} ('{}') techs missing unit {}", getId(), getFullName(), techUnit.getId());
+                    LOGGER.error("Person {} ('{}') techs missing unit {}", getId(), getFullName(), techUnit.getId());
                     techUnits.remove(ii);
                 }
             }
@@ -6199,5 +6771,995 @@ public class Person {
 
             recruitment = today;
         }
+    }
+
+    /**
+     * Resolves a gambling compulsion for the current person and adjusts their wealth accordingly.
+     *
+     * <p>If the person has the gambling compulsion option enabled, this method performs a d6 roll to determine
+     * whether wealth is gained, lost, or unchanged, and formats the result as a localized string with appropriate
+     * styling. If the gambling compulsion option is not present, the method returns an empty string.</p>
+     *
+     * <p>On a roll of 6, the person's wealth increases; on a roll of 4 or 5, it remains unchanged; and on a roll of
+     * 1, 2, or 3, the person's wealth decreases.</p>
+     *
+     * @return a formatted localized result {@link String} reflecting the outcome, or an empty {@link String} if not
+     *       applicable
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String gambleWealth() {
+        boolean hasGamblingCompulsion = options.booleanOption(COMPULSION_GAMBLING);
+        if (!hasGamblingCompulsion) {
+            return "";
+        }
+
+        String key;
+        String color;
+
+        int roll = d6();
+        switch (roll) {
+            case 4, 5 -> {
+                key = "neutral";
+                color = getWarningColor();
+            }
+            case 6 -> {
+                changeWealth(1);
+                key = "success";
+                color = getPositiveColor();
+            }
+            default -> { // 1, 2, 3
+                changeWealth(-1);
+                key = "failure";
+                color = getNegativeColor();
+            }
+        }
+
+        return String.format(resources.getString("gambling." + key), getHyperlinkedFullTitle(),
+              spanOpeningWithCustomColor(color), CLOSING_SPAN_TAG, wealth);
+    }
+
+    /**
+     * Processes the effects of discontinuation syndrome.
+     *
+     * <p>This method applies the symptoms and risks associated with compulsive addiction discontinuation, adjusted
+     * by campaign options and current conditions:</p>
+     *
+     * <ul>
+     *   <li>If Advanced Medical is available, {@link InjuryTypes#DISCONTINUATION_SYNDROME} is added; otherwise, Hits
+     *   are incremented.</li>
+     *   <li>If Fatigue is enabled, the character's Fatigue level increases.</li>
+     *   <li>If the number of injuries or cumulative hits exceeds a defined threshold, the entity's status is changed
+     *   to {@link PersonnelStatus#MEDICAL_COMPLICATIONS} (killed).</li>
+     * </ul>
+     *
+     * @param campaign               the active {@link Campaign} in which the discontinuation syndrome is processed
+     * @param useAdvancedMedical     {@code true} if Advanced Medical is enabled
+     * @param useFatigue             {@code true} if Fatigue should be increased
+     * @param hasCompulsionAddiction specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
+     *                               Flaw.
+     * @param failedWillpowerCheck   {@code true} if the character failed the check to resist their compulsion
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical, boolean useFatigue,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
+        final int FATIGUE_INCREASE = 2;
+        final int DEATH_THRESHOLD = 5;
+
+
+        if (hasCompulsionAddiction && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits++;
+            }
+
+            if (useFatigue) {
+                changeFatigue(FATIGUE_INCREASE);
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+        }
+    }
+
+    /**
+     * Processes the effects of crippling flashbacks.
+     *
+     * <p>If the personnel has flashbacks and fails a willpower check, this method determines the outcome:</p>
+     * <ul>
+     *     <li>If advanced medical care is available, a new injury related to crippling flashbacks is added.</li>
+     *     <li>Otherwise, the personnel takes additional damage (hits).</li>
+     * </ul>
+     *
+     * <p>If the number of injuries or hits exceeds a predefined threshold, the character's status is updated to
+     * {@link PersonnelStatus#MEDICAL_COMPLICATIONS} (killed).</p>
+     *
+     * @param campaign             The current campaign context.
+     * @param useAdvancedMedical   {@code true} if advanced medical care is available; {@code false} otherwise.
+     * @param hasFlashbacks        {@code true} if the personnel is suffering from flashbacks.
+     * @param failedWillpowerCheck {@code true} if the personnel failed their willpower check due to flashbacks.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processCripplingFlashbacks(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasFlashbacks, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasFlashbacks && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CRIPPLING_FLASHBACKS.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+        }
+    }
+
+    /**
+     * Processes the occurrence of a split personality event.
+     *
+     * <p>If the subject has split personality and fails a willpower check, an alternative personality is generated
+     * (if needed), the personality is switched, and a description of the resulting personality is written using the
+     * {@link PersonalityController}.</p>
+     *
+     * @param hasSplitPersonality  {@code true} if the subject is susceptible to having a split personality
+     * @param failedWillpowerCheck {@code true} if the subject failed the willpower check prompting the split
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processSplitPersonality(boolean hasSplitPersonality, boolean failedWillpowerCheck) {
+        if (hasSplitPersonality && failedWillpowerCheck) {
+            String originalName = getHyperlinkedFullTitle();
+
+            if (isNullOrBlank(storedGivenName)) {
+                generateAlternativePersonality();
+            }
+
+            switchPersonality();
+            PersonalityController.writePersonalityDescription(this);
+
+            return String.format(resources.getString("compulsion.personalityChange"), originalName,
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, getFullTitle());
+        }
+
+        return "";
+    }
+
+    /**
+     * Generates an alternative set of personality attributes (name, faction, traits) for the character.
+     *
+     * <p>This involves selecting a new faction of origin, generating a new name based on the faction, and creating a
+     * set of alternative personality characteristics.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void generateAlternativePersonality() {
+        Faction chosenFaction = generateSplitPersonalityOriginFaction();
+        generateSplitPersonalityName(chosenFaction);
+        generateSplitPersonalityPersonalityCharacteristics();
+        storedLoyalty = d6(3);
+    }
+
+    /**
+     * Generates alternative personality traits and applies them to the stored split personality profile.
+     *
+     * <p>Traits are randomly selected from
+     * {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social}, with potential for up to four traits
+     * total. Additional characteristics such as a {@link PersonalityQuirk} trait and {@link Reasoning} characteristics
+     * are randomly determined and stored.</p>
+     *
+     * @author Illiani
+     * @see PersonalityController#generatePersonality(Person, boolean)
+     * @since 0.50.07
+     */
+    private void generateSplitPersonalityPersonalityCharacteristics() {
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(PersonalityTraitType.AGGRESSION,
+              PersonalityTraitType.AMBITION,
+              PersonalityTraitType.GREED,
+              PersonalityTraitType.SOCIAL));
+
+        Collections.shuffle(possibleTraits);
+
+        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
+
+        PersonalityTraitType firstTrait = possibleTraits.get(0);
+        possibleTraits.remove(firstTrait);
+        chosenTraits.add(firstTrait);
+
+        PersonalityTraitType secondTrait = possibleTraits.get(0);
+        possibleTraits.remove(secondTrait);
+        chosenTraits.add(secondTrait);
+
+        if (randomInt(4) == 0) {
+            PersonalityTraitType thirdTrait = possibleTraits.get(0);
+            possibleTraits.remove(thirdTrait);
+            chosenTraits.add(thirdTrait);
+        }
+
+        if (randomInt(4) == 0) {
+            PersonalityTraitType forthTrait = possibleTraits.get(0);
+            chosenTraits.add(forthTrait);
+        }
+
+        for (PersonalityTraitType traitType : chosenTraits) {
+            storeSplitPersonality(traitType);
+        }
+
+        int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+        String traitIndex = String.valueOf(traitRoll);
+        storedPersonalityQuirk = PersonalityQuirk.fromString(traitIndex);
+        storedPersonalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
+
+        int reasoningRoll = randomInt(8346);
+        storedReasoning = generateReasoning(reasoningRoll);
+        storedReasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
+    }
+
+    /**
+     * Stores the specified personality trait type in the split personality profile.
+     *
+     * <p>Based on the provided {@link PersonalityTraitType}, this method assigns a randomly chosen trait value and
+     * description index to the corresponding stored split personality fields (such as {@link Aggression},
+     * {@link Ambition}, {@link Greed}, or {@link Social}). If the trait type does not match any known category, no
+     * action is taken.</p>
+     *
+     * @param traitType the {@link PersonalityTraitType} to store for the split personality profile
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void storeSplitPersonality(PersonalityTraitType traitType) {
+        switch (traitType) {
+            case AGGRESSION -> {
+                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                storedAggression = Aggression.fromString(traitIndex);
+                storedAggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
+            }
+            case AMBITION -> {
+                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                storedAmbition = Ambition.fromString(traitIndex);
+                storedAmbitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
+            }
+            case GREED -> {
+                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                storedGreed = Greed.fromString(traitIndex);
+                storedGreedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
+            }
+            case SOCIAL -> {
+                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                storedSocial = Social.fromString(traitIndex);
+                storedSocialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
+            }
+            default -> {}
+        }
+    }
+
+    /**
+     * Generates a new split personality name based on the provided faction.
+     *
+     * <p>Uses the random name generator to assign a given name and surname appropriate to the gender, personnel
+     * type, and the supplied faction's short name; stores the results.</p>
+     *
+     * @param chosenFaction the {@link Faction} selected as the origin of the split personality
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void generateSplitPersonalityName(Faction chosenFaction) {
+        RandomNameGenerator.getInstance().generate(gender, clanPersonnel, chosenFaction.getShortName());
+
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(gender,
+              clanPersonnel,
+              chosenFaction.getShortName());
+        storedGivenName = name[0];
+        storedSurname = name[1];
+    }
+
+    /**
+     * Randomly selects and returns a new faction to be used as the origin for a split personality.
+     *
+     * <p>Considers all active factions at the time of the subject's birthday, applying faction- and
+     * personnel-specific constraints, then randomly chooses one and stores it.</p>
+     *
+     * @return the chosen {@link Faction} for the split personality's origin
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Faction generateSplitPersonalityOriginFaction() {
+        Set<Faction> possibleNewFaction = new HashSet<>();
+        Collection<Faction> allActiveFactions = Factions.getInstance().getActiveFactions(birthday);
+        for (Faction faction : allActiveFactions) {
+            if (faction.isClan() &&
+                      birthday.isBefore(BATTLE_OF_TUKAYYID) &&
+                      !clanPersonnel) {
+                continue;
+            }
+            possibleNewFaction.add(faction);
+        }
+
+        Faction chosenFaction = ObjectUtility.getRandomItem(possibleNewFaction);
+        storedOriginFaction = chosenFaction;
+        return chosenFaction;
+    }
+
+    /**
+     * Switches the primary and stored personality attributes of the subject.
+     *
+     * <p>This method exchanges all major personal attributes, such as name, loyalty, origin faction, personality
+     * traits, and their associated descriptions, between the primary and split personality profiles.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void switchPersonality() {
+        String transitionaryGivenName = givenName;
+        setGivenName(storedGivenName);
+        storedGivenName = transitionaryGivenName;
+
+        String transitionarySurname = surname;
+        setSurname(storedSurname);
+        storedSurname = transitionarySurname;
+
+        int transitionaryLoyalty = loyalty;
+        loyalty = storedLoyalty;
+        storedLoyalty = transitionaryLoyalty;
+
+        Faction transitionaryOriginFaction = originFaction;
+        originFaction = storedOriginFaction;
+        storedOriginFaction = transitionaryOriginFaction;
+
+        Aggression transitionaryAggression = aggression;
+        aggression = storedAggression;
+        storedAggression = transitionaryAggression;
+
+        int transitionaryAggressionDescriptionIndex = aggressionDescriptionIndex;
+        aggressionDescriptionIndex = storedAggressionDescriptionIndex;
+        storedAggressionDescriptionIndex = transitionaryAggressionDescriptionIndex;
+
+        Ambition transitionaryAmbition = ambition;
+        ambition = storedAmbition;
+        storedAmbition = transitionaryAmbition;
+
+        int transitionaryAmbitionDescriptionIndex = ambitionDescriptionIndex;
+        ambitionDescriptionIndex = storedAmbitionDescriptionIndex;
+        storedAmbitionDescriptionIndex = transitionaryAmbitionDescriptionIndex;
+
+        Greed transitionaryGreed = greed;
+        greed = storedGreed;
+        storedGreed = transitionaryGreed;
+
+        int transitionaryGreedDescriptionIndex = greedDescriptionIndex;
+        greedDescriptionIndex = storedGreedDescriptionIndex;
+        storedGreedDescriptionIndex = transitionaryGreedDescriptionIndex;
+
+        Social transitionarySocial = social;
+        social = storedSocial;
+        storedSocial = transitionarySocial;
+
+        int transitionarySocialDescriptionIndex = socialDescriptionIndex;
+        socialDescriptionIndex = storedSocialDescriptionIndex;
+        storedSocialDescriptionIndex = transitionarySocialDescriptionIndex;
+
+        PersonalityQuirk transitionaryPersonalityQuirk = personalityQuirk;
+        personalityQuirk = storedPersonalityQuirk;
+        storedPersonalityQuirk = transitionaryPersonalityQuirk;
+
+        int transitionaryPersonalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
+        personalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
+        storedPersonalityQuirkDescriptionIndex = transitionaryPersonalityQuirkDescriptionIndex;
+
+        Reasoning transitionaryReasoning = reasoning;
+        reasoning = storedReasoning;
+        storedReasoning = transitionaryReasoning;
+
+        int transitionaryReasoningDescriptionIndex = reasoningDescriptionIndex;
+        reasoningDescriptionIndex = storedReasoningDescriptionIndex;
+        storedReasoningDescriptionIndex = transitionaryReasoningDescriptionIndex;
+    }
+
+    /**
+     * Processes the effects of childlike regression on the character, applying injuries or health complications based
+     * on specified conditions.
+     *
+     * <p>If the character has childlike regression and fails a willpower check, the method will apply either an
+     * injury (using advanced medical rules) or increment the number of "hits" (using basic rules). If the total number
+     * of injuries or hits exceeds a defined threshold, the personnel status is changed to indicate medical
+     * complications (killed).</p>
+     *
+     * @param campaign             the {@link Campaign} context in which the effects are processed
+     * @param useAdvancedMedical   {@code true} to use advanced medical injury processing
+     * @param hasRegression        {@code true} if the character is affected by childlike regression
+     * @param failedWillpowerCheck {@code true} if the character failed their willpower check
+     */
+    public String processChildlikeRegression(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasRegression, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasRegression && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.regression"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Processes a potential catatonia episode fthe character, applying relevant effects and status changes.
+     *
+     * <p>If both {@code hasCatatonia} and {@code failedWillpowerCheck} are {@code true}, this method applies an
+     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of
+     * injuries or trauma exceeds a predefined death threshold, the person's status is changed to indicate medical
+     * complications. In either case, the method returns a formatted string describing the catatonia episode. If the
+     * conditions are not met, it returns an empty string.</p>
+     *
+     * @param campaign             the current campaign context
+     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param hasCatatonia         {@code true} if the person is suffering from catatonia
+     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     * @return description of the resulting catatonia episode, or an empty string if no episode occurred
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasCatatonia, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasCatatonia && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                Injury injury = CATATONIA.newInjury(campaign, this, INTERNAL, 1);
+                addInjury(injury);
+            } else {
+                hits += 1;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.catatonia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Processes the effects of "confusion" for a personnel based on their mental state.
+     *
+     * <p>If the personnel has both "madness confusion", and has failed a willpower check, applies random damage
+     * (injury or hit points depending on the medical system in use), and changes their status to medical complications
+     * if the number of injuries or hits exceeds a set threshold.</p>
+     *
+     * <p>Returns a formatted warning message describing the confusion compulsion, or an empty string if no action
+     * was taken.</p>
+     *
+     * @param campaign             The current campaign instance, used for logging and state updates.
+     * @param useAdvancedMedical   Whether the advanced medical system should be used.
+     * @param hasMadnessConfusion  Indicates if the personnel is afflicted with madness-induced confusion.
+     * @param failedWillpowerCheck Indicates if the required willpower check was failed.
+     *
+     * @return A formatted string with the confusion compulsion warning, or an empty string if not applicable.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processConfusion(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasMadnessConfusion, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasMadnessConfusion && failedWillpowerCheck) {
+            if (useAdvancedMedical) {
+                InjuryUtil.resolveCombatDamage(campaign, this, 1);
+            } else {
+                hits++;
+            }
+
+            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+                changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+
+            return String.format(resources.getString("compulsion.confusion"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+
+    /**
+     * Processes the effects of a berserker frenzy event for a character, potentially injuring themselves and other
+     * victims.
+     *
+     * <p>If the character has the berserker trait and fails a willpower check, this method determines who is
+     * affected by the frenzy (including the character and other victims depending on deployment). Each affected person
+     * may receive one or two wounds, applied either as advanced medical injuries or as simple hit increments.</p>
+     *
+     * <p>If the number of injuries or hits for any victim exceeds a defined threshold, the status for that person
+     * is updated to reflect medical complications (for the berserker) or homicide (for other victims). A formatted
+     * message describing the frenzy is returned.</p>
+     *
+     * @param campaign             the campaign context used for looking up personnel, applying wounds, and updating
+     *                             statuses
+     * @param useAdvancedMedical   if {@code true}, applies wounds using the advanced medical system; otherwise,
+     *                             increments hits directly
+     * @param hasBerserker         if {@code true}, indicates the character is capable of berserker frenzy
+     * @param failedWillpowerCheck if {@code true}, indicates the character failed their willpower check to resist
+     *                             frenzy
+     *
+     * @return a formatted message describing the frenzy if one occurs, or an empty string if there is no effect
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processBerserkerFrenzy(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasBerserker, boolean failedWillpowerCheck) {
+        final int DEATH_THRESHOLD = 5;
+
+        if (hasBerserker && failedWillpowerCheck) {
+            Set<Person> victims = new HashSet<>();
+            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
+            if (isDeployed() && unit != null) {
+                getLocalVictims(allActivePersonnel, victims);
+            } else {
+                getNonDeployedVictims(allActivePersonnel, victims);
+            }
+
+            // The berserker hurts themselves
+            victims.add(this);
+
+            for (Person victim : victims) {
+                int wounds = randomInt(2) + 1; // (1-2)
+                if (useAdvancedMedical) {
+                    InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
+                } else {
+                    int currentHits = victim.getHits();
+                    victim.setHits(currentHits + wounds);
+                }
+
+                if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
+                    victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
+                                                                          PersonnelStatus.MEDICAL_COMPLICATIONS :
+                                                                          PersonnelStatus.HOMICIDE);
+                }
+            }
+
+            return String.format(resources.getString("compulsion.berserker"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
+    }
+
+    /**
+     * Determines whether a personnel member is suffering from clinical paranoia based on their condition and willpower
+     * check, and returns a formatted warning message if applicable.
+     *
+     * <p>If both {@code hasClinicalParanoia} and {@code failedWillpowerCheck} are {@code true}, this method sets the
+     * internal state indicating the member is suffering from clinical paranoia and returns a warning message.
+     * Otherwise, it resets the state and returns an empty string.</p>
+     *
+     * @param hasClinicalParanoia  {@code true} if the personnel member has the clinical paranoia condition
+     * @param failedWillpowerCheck {@code true} if the personnel member failed their willpower check
+     *
+     * @return A formatted warning message if clinical paranoia applies, or an empty string otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processClinicalParanoia(
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasClinicalParanoia, boolean failedWillpowerCheck) {
+        if (hasClinicalParanoia && failedWillpowerCheck) {
+            sufferingFromClinicalParanoia = true;
+            return String.format(resources.getString("compulsion.clinicalParanoia"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+        }
+
+        sufferingFromClinicalParanoia = false;
+        return "";
+    }
+
+    /**
+     * Processes a hysteria episode for the character.
+     *
+     * <p>If both {@code hasHysteria} and {@code failedWillpowerCheck} are {@code true}, this method randomly
+     * determines (via die roll) which type of episode occurs: berserker frenzy, confusion, or clinical paranoia. The
+     * appropriate episode handler is called, and its result returned as a description string. When the episode is not
+     * paranoia, any paranoia flag is cleared. Otherwise, if the conditions are not met, returns an empty string.</p>
+     *
+     * @param campaign             the current campaign context
+     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param hasHysteria          {@code true} if the person is suffering from hysteria
+     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     *
+     * @return description of the resulting episode, or an empty string if no episode occurred
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String processHysteria(Campaign campaign, boolean useAdvancedMedical,
+          // These boolean are here to ensure that we only ever pass in valid personnel
+          boolean hasHysteria, boolean failedWillpowerCheck) {
+
+        if (hasHysteria && failedWillpowerCheck) {
+            int roll = d6(1);
+            String report = switch (roll) {
+                case 1, 2 -> processBerserkerFrenzy(campaign, useAdvancedMedical, true, true);
+                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, true, true);
+                case 5, 6 -> processClinicalParanoia(true, true);
+                default -> throw new IllegalStateException("Unexpected value: " + roll);
+            };
+
+            // Reset paranoia
+            if (roll < 5) {
+                sufferingFromClinicalParanoia = false;
+            }
+
+            return report;
+        }
+
+        return "";
+    }
+
+    /**
+     * Selects random victims from the list of all active, non-deployed personnel and adds them to the provided set of
+     * victims.
+     *
+     * <p>The number of victims selected is determined by a single six-sided die roll. For each count, a random
+     * non-deployed person is chosen from the available pool and added to the victims set. Once chosen, a victim will
+     * not be selected again.</p>
+     *
+     * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
+     * @param victims            the set to which randomly selected non-deployed victims will be added
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void getNonDeployedVictims(List<Person> allActivePersonnel, Set<Person> victims) {
+        Set<Person> potentialVictims = new HashSet<>();
+
+        for (Person bystander : allActivePersonnel) {
+            if (!bystander.isDeployed()) {
+                potentialVictims.add(bystander);
+            }
+        }
+
+        potentialVictims.remove(this);
+
+        int roll = d6(1);
+        for (int i = 0; i < roll; ++i) {
+            if (potentialVictims.isEmpty()) {
+                break;
+            }
+
+            Person victim = ObjectUtility.getRandomItem(potentialVictims);
+            potentialVictims.remove(victim);
+            victims.add(victim);
+        }
+    }
+
+    /**
+     * Selects random victims from deployed personnel who are in the same scenario as the caller and adds them to the
+     * provided set of victims.
+     *
+     * <p>Only personnel currently deployed in the same scenario (as determined by matching scenario IDs) are
+     * eligible to be selected. The number of victims chosen is based on a single six-sided die roll. For each count, a
+     * random eligible person is added to the victims set; once chosen, a victim will not be selected again.</p>
+     *
+     * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
+     * @param victims            the set to which randomly selected victims from the same scenario will be added
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void getLocalVictims(List<Person> allActivePersonnel, Set<Person> victims) {
+        Set<Person> potentialVictims = new HashSet<>();
+
+        int scenarioId = unit.getScenarioId();
+        for (Person bystander : allActivePersonnel) {
+            Unit bystanderUnit = bystander.getUnit();
+            if (bystanderUnit != null) {
+                if (scenarioId == bystanderUnit.getScenarioId()) {
+                    potentialVictims.add(bystander);
+                }
+            }
+        }
+
+        potentialVictims.remove(this);
+
+        int roll = d6(1);
+        for (int i = 0; i < roll; ++i) {
+            if (potentialVictims.isEmpty()) {
+                break;
+            }
+
+            Person victim = ObjectUtility.getRandomItem(potentialVictims);
+            potentialVictims.remove(victim);
+            victims.add(victim);
+        }
+    }
+
+    /**
+     * Determines whether a character's dark secret is revealed based on a dice roll, configured modifiers, and campaign
+     * options.
+     *
+     * <p>If the character does not have a dark secret, an empty string is returned. Otherwise, a target number is
+     * assembled using base and optional modifiers, and a 2d6 roll is made.</p>
+     *
+     * <p>If the roll meets or exceeds the target, the dark secret is revealed, relevant state is updated, and a
+     * formatted report message is returned (with content and styling based on the severity of the secret).</p>
+     *
+     * <p>If the secret is not revealed, returns an empty string.</p>
+     *
+     * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
+     * {@link #hasDarkSecret()}
+     * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
+     *
+     * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String isDarkSecretRevealed(boolean hasDarkSecret, boolean forceReveal) {
+        // This boolean is here to ensure that we only ever pass in valid personnel
+        if (!hasDarkSecret || darkSecretRevealed) {
+            return "";
+        } else {
+            final int BASE_TARGET_NUMBER = 10;
+            final int ALTERNATE_ID_MODIFIER = 2;
+
+            TargetRoll targetRoll = new TargetRoll();
+            targetRoll.addModifier(BASE_TARGET_NUMBER, "BASE_TARGET_NUMBER");
+
+            if (options.booleanOption(ATOW_ALTERNATE_ID)) {
+                targetRoll.addModifier(ALTERNATE_ID_MODIFIER, "ALTERNATE_ID_MODIFIER");
+            }
+
+            int roll = d6(2);
+            int targetNumber = targetRoll.getValue();
+
+            LOGGER.info("Dark Secret reveal roll for {}: {} vs. target number: {}", getFullTitle(), roll, targetNumber);
+
+            boolean isDarkSecretRevealed = forceReveal || (roll >= targetNumber);
+
+            String report = "";
+            if (isDarkSecretRevealed) {
+                LOGGER.info("Dark Secret revealed for {}!", getFullTitle());
+                darkSecretRevealed = true;
+
+                String dialogKey = "darkSecret.revealed.";
+                String color = getWarningColor();
+                if (options.booleanOption(DARK_SECRET_TRIVIAL)) {
+                    dialogKey += "trivial";
+                } else if (options.booleanOption(DARK_SECRET_SIGNIFICANT)) {
+                    dialogKey += "significant";
+                } else if (options.booleanOption(DARK_SECRET_MAJOR)) {
+                    dialogKey += "major";
+                    color = getNegativeColor();
+                } else if (options.booleanOption(DARK_SECRET_SEVERE)) {
+                    dialogKey += "severe";
+                    color = getNegativeColor();
+                } else {
+                    dialogKey += "extreme";
+                    color = getNegativeColor();
+                }
+
+                report = String.format(resources.getString(dialogKey), spanOpeningWithCustomColor(color),
+                      CLOSING_SPAN_TAG, getHyperlinkedFullTitle());
+            }
+
+            return report;
+        }
+    }
+
+    /**
+     * Determines whether any dark secret options are enabled for this entity.
+     *
+     * @return {@code true} if the entity has any dark secret SPA enabled; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean hasDarkSecret() {
+        return options.booleanOption(DARK_SECRET_TRIVIAL)
+                     || options.booleanOption(DARK_SECRET_SIGNIFICANT)
+                     || options.booleanOption(DARK_SECRET_MAJOR)
+                     || options.booleanOption(DARK_SECRET_SEVERE)
+                     || options.booleanOption(DARK_SECRET_EXTREME);
+    }
+
+    /**
+     * Calculates the modifier associated with a character's Dark Secret.
+     *
+     * <p>If the dark secret is not revealed and the character does not have a dark secret, the modifier is 0.
+     * Otherwise, returns a value based on enabled options and the type of modifier requested (reputation or
+     * other).</p>
+     *
+     * @param isReputation {@code true} to retrieve the Reputation modifier; {@code false} to retrieve the Connections
+     *                     modifier.
+     *
+     * @return the appropriate Dark Secret modifier, or 0 if no relevant option is enabled or the secret is not
+     *       present/revealed.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getDarkSecretModifier(final boolean isReputation) {
+        // If the dark secret is not revealed and the character does not have a dark secret, return 0
+        if (!darkSecretRevealed && !hasDarkSecret()) {
+            return 0;
+        }
+
+        // If the character has a dark secret but it is not revealed, return a default modifier (e.g., -1)
+        if (!darkSecretRevealed && hasDarkSecret()) {
+            return -1; // Default modifier for unrevealed dark secrets
+        }
+
+        // If the dark secret is revealed, calculate the appropriate modifier
+        for (Map.Entry<String, int[]> entry : DARK_SECRET_MODIFIERS.entrySet()) {
+            if (options.booleanOption(entry.getKey())) {
+                return isReputation ? entry.getValue()[0] : entry.getValue()[1];
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Reestablishes connections if the cooldown has expired.
+     *
+     * <p>If burned connections exist and the specified date is after the cooldown period, this method clears the
+     * burned connections state and returns a formatted message  indicating that connections have been
+     * reestablished.</p>
+     *
+     * @param today the current date to check against the cooldown period
+     *
+     * @return a formatted message if connections are reestablished, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String checkForConnectionsReestablishContact(LocalDate today) {
+        if (burnedConnectionsEndDate != null && burnedConnectionsEndDate.isBefore(today)) {
+            burnedConnectionsEndDate = null;
+
+            return String.format(resources.getString("connections.reestablished"), getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
+        }
+        return "";
+    }
+
+    /**
+     * Attempts to generate wealth using connections for the given date and campaign finances.
+     *
+     * <p>Only commanders with active connections are eligible. If successful, a random roll is made to determine if
+     * wealth is generated, which is then added to the provided finances. Returns a formatted message if a wealth gain
+     * occurs, or an empty string if no wealth is generated.</p>
+     *
+     * @param today            the current date for the wealth check
+     * @param campaignFinances the finances object in which to credit any gained wealth
+     *
+     * @return a formatted message if wealth is gained, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String performConnectionsWealthCheck(LocalDate today, Finances campaignFinances) {
+        // Non-commanders can't use their connections to generate wealth
+        if (!commander) {
+            return "";
+        }
+
+        if (burnedConnectionsEndDate != null) {
+            LOGGER.info("Connections burned for {} unable to gain Connections wealth", getFullTitle());
+            return "";
+        }
+
+        int adjustedConnections = getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            Money donation = connectionsLevel.getWealth();
+            if (donation.isPositive()) {
+                int roll = d6(2);
+                LOGGER.info("Rolling to use connections to gain money {} {} vs. {}", getFullTitle(), roll,
+                      CONNECTIONS_TARGET_NUMBER);
+                if (roll >= CONNECTIONS_TARGET_NUMBER) {
+                    campaignFinances.credit(TransactionType.WEALTH, today, donation,
+                          resources.getString("connections.transaction"));
+                    return String.format(resources.getString("connections.wealth"), getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG, donation.toAmountString());
+                }
+            } else {
+                LOGGER.info("Connections too low to generate Wealth");
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * Checks if there is a chance for the connections to be burned on the given date.
+     *
+     * <p>If the person has non-zero connections, a burn roll is performed. If the roll is equal to or below the burn
+     * chance, the connections are burned for a random number of months starting from the given date. Returns a
+     * formatted message if connections are burned, or an empty string otherwise.</p>
+     *
+     * @param today the current date to perform the burn check
+     *
+     * @return a formatted message if connections are burned, or an empty string if not
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String checkForBurnedContacts(LocalDate today) {
+        int adjustedConnections = getAdjustedConnections();
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+
+        if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
+            int roll = d6(2);
+            int burnChance = connectionsLevel.getBurnChance();
+            LOGGER.info("Rolling to burn connections for {} {} vs. {}", getFullTitle(), roll, burnChance);
+            if (roll <= connectionsLevel.getBurnChance()) {
+                burnedConnectionsEndDate = today.plusMonths(d6(1));
+                return String.format(resources.getString("connections.burned"), getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Determines whether the character is considered illiterate.
+     *
+     * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
+     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
+     * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
+     *
+     * @return {@code true} if the person is considered illiterate; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isIlliterate() {
+        if (!options.booleanOption(FLAW_ILLITERATE)) {
+            return false;
+        }
+
+        Skill languages = skills.getSkill(S_LANGUAGES);
+        int level = languages.getLevel();
+        return level < ILLITERACY_LANGUAGES_THRESHOLD;
     }
 }

@@ -54,7 +54,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -393,7 +393,7 @@ public final class BatchXPDialog extends JDialog {
                 int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                       campaign.isClanCampaign(),
                       campaign.getLocalDate(),
-                      person.getRankLevel());
+                      person.getRankNumeric());
 
                 PerformanceLogger.improvedSkill(campaign,
                       person,
