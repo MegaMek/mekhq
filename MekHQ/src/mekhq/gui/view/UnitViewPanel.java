@@ -45,8 +45,9 @@ import javax.swing.JTextPane;
 
 import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.util.ViewFormatting;
 import megamek.common.Entity;
-import megamek.common.MekView;
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.common.TechConstants;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -149,12 +150,12 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        MekView mview = new MekView(entity, false, true);
+        EntityReadout mview = EntityReadout.createReadout(entity, false, true);
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMekReadoutBasic() + "<br>" + mview.getMekReadoutLoadout() + "</div>");
+        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getBasicSection(ViewFormatting.HTML) + "<br>" + mview.getLoadoutSection(ViewFormatting.HTML) + "</div>");
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

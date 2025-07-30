@@ -45,10 +45,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
-import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
-import megamek.common.ViewFormatting;
+import megamek.client.ui.util.ViewFormatting;
 import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
 import mekhq.campaign.Campaign;
@@ -206,8 +206,8 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
         TROView troView = TROView.createView(entity, ViewFormatting.HTML);
 
         // Create the MekViewPanel and associate the entity and TROView
-        MekViewPanel panelTROView = new MekViewPanel();
-        panelTROView.setMek(entity, troView);
+        EntityReadoutPanel panelTROView = new EntityReadoutPanel();
+        panelTROView.showEntity(entity, troView);
 
         // Set the MekViewPanel as the dialog's content
         dialog.setContentPane(panelTROView);
