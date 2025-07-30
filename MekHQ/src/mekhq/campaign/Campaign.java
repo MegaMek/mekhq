@@ -5220,17 +5220,17 @@ public class Campaign implements ITechManager {
 
     /**
      * Processes the resupply operation for a given contract.
-     * <p>
-     * This method checks if the contract type is not Guerrilla Warfare or if a d6 roll is greater than 4. If any of
+     * <p>This method checks if the contract type is not Guerrilla Warfare or if randomInt(4) == 0. If any of
      * these conditions is met, it calculates the maximum resupply size based on the contract's required lances, creates
-     * an instance of the {@link Resupply} class, and initiates a resupply action.
+     * an instance of the {@link Resupply} class, and initiates a resupply action.</p>
      *
      * @param contract The relevant {@link AtBContract}
      */
     private void processResupply(AtBContract contract) {
-        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
+                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 
-        if (!isGuerrilla || d6(1) > 4) {
+        if (!isGuerrilla || randomInt(4) == 0) {
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
             performResupply(resupply, contract);
