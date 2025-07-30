@@ -54,7 +54,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -68,8 +67,8 @@ import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -118,14 +117,12 @@ public class FactionStandingReport extends JDialog {
     private static final int REPORT_IMAGE_WIDTH = 100; // Scaled by scaleImageIcon call
 
     private final JFrame frame;
+    private final Campaign campaign;
     private final LocalDate today;
     private final int gameYear;
     private final FactionStandings factionStandings;
     private final Factions factions;
-    private final boolean isGM;
     private final Faction campaignFaction;
-    private final ImageIcon campaignIcon;
-    private final List<Mission> missions;
     private final boolean isFactionStandingEnabled;
     private final CampaignOptions campaignOptions;
 
@@ -144,30 +141,21 @@ public class FactionStandingReport extends JDialog {
      * specified campaign and related data.
      *
      * @param frame The parent {@link JFrame} that acts as the owner of this report dialog.
-     * @param factionStandings The object containing the standings of factions in the campaign.
-     * @param today The current date for reference in the report.
-     * @param isGM A boolean indicating whether the user is a Game Master (GM).
-     * @param campaignFaction The primary faction for the campaign associated with the report.
-     * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
-     * @param campaignOptions the {@link CampaignOptions} object associated with the current campaign.
+     * @param campaign The current campaign
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-          final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
-          final Collection<Mission> missions, final CampaignOptions campaignOptions) {
+    public FactionStandingReport(final JFrame frame, final Campaign campaign) {
         this.frame = frame;
-        this.today = today;
+        this.campaign = campaign;
+        this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
-        this.isGM = isGM;
-        this.campaignFaction = campaignFaction;
-        this.campaignIcon = campaignIcon;
-        this.factionStandings = factionStandings;
+        this.campaignFaction = campaign.getFaction();
+        this.factionStandings = campaign.getFactionStandings();
         factions = Factions.getInstance();
-        this.missions = new ArrayList<>(missions);
+        this.campaignOptions = campaign.getCampaignOptions();
         this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
-        this.campaignOptions = campaignOptions;
 
         sortFactions();
         createReportPanel();
@@ -429,11 +417,10 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.gmTools"));
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
-        btnGmTools.setEnabled(isFactionStandingEnabled && isGM);
+        btnGmTools.setEnabled(isFactionStandingEnabled && campaign.isGM());
         btnGmTools.addActionListener(e -> {
             setVisible(false);
-            GMTools gmTools = new GMTools(this, campaignIcon, campaignFaction, today, factionStandings, missions,
-                  campaignOptions.getRegardMultiplier());
+            GMTools gmTools = new GMTools(this, campaign);
             reports.addAll(gmTools.getReports());
             setVisible(true);
         });
@@ -467,7 +454,8 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     private void triggerMissionSimulationDialog() {
-        SimulateMissionDialog dialog = new SimulateMissionDialog(frame, campaignIcon, campaignFaction, today);
+        SimulateMissionDialog dialog = new SimulateMissionDialog(frame, campaign.getCampaignFactionIcon(),
+              campaignFaction, today);
 
         Faction employerChoice = dialog.getEmployerChoice();
         Faction enemyChoice = dialog.getEnemyChoice();

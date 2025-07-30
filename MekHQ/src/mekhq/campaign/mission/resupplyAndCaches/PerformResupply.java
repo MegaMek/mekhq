@@ -48,6 +48,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RES
 import static mekhq.campaign.personnel.enums.PersonnelRole.GROUND_VEHICLE_DRIVER;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.CANCEL;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.PLAYER;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
@@ -161,13 +162,14 @@ public class PerformResupply {
 
         final boolean isIndependent = contract.getCommandRights().isIndependent();
         final boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+        final boolean isPirate = PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
         final ResupplyType resupplyType = resupply.getResupplyType();
 
         // If appropriate, prompt the player to use their own convoys
         if (!resupplyType.equals(RESUPPLY_LOOT) && !resupplyType.equals(RESUPPLY_CONTRACT_END)) {
             // If we're on a pirate or guerrilla contract, the player may be approached by smugglers, instead, which
             // won't use player convoys.
-            if (!isGuerrilla) {
+            if (!isGuerrilla && !isPirate) {
                 ResupplyConvoyChoice convoyChoice = new ResupplyConvoyChoice(resupply.getCampaign(), isIndependent,
                       resupply.getPlayerConvoys().size(), resupply.getTargetCargoTonnagePlayerConvoy(),
                       resupply.getTargetCargoTonnage(), contract.getMoraleLevel().toString());

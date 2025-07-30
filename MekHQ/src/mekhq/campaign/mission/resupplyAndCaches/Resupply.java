@@ -42,6 +42,7 @@ import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.time.LocalDate;
@@ -782,7 +783,7 @@ public class Resupply {
         Person negotiator;
         negotiatorSkill = NONE.ordinal();
 
-        if (contract.getContractType().isGuerrillaWarfare()) {
+        if (contract.getContractType().isGuerrillaWarfare() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
             negotiator = campaign.getCommander();
         } else {
             negotiator = null;

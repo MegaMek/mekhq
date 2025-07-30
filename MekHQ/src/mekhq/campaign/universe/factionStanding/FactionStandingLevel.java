@@ -75,7 +75,7 @@ public enum FactionStandingLevel {
     STANDING_LEVEL_7(7, 41, 50, 3, 1.75, true, false, true, 10, 1.75, 0.80, 2, 1.15, 1, 2),
     STANDING_LEVEL_8(8, 51, 60, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingLevel";
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingLevel.class);
 
     final static String FALLBACK_LABEL_SUFFIX_INNER_SPHERE = "innerSphere";

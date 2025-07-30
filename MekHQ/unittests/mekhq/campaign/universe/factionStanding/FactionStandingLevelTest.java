@@ -60,7 +60,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class FactionStandingLevelTest {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
+    private final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingLevel";
     private static final List<String> SUPPORTED_FACTIONS = List.of("CC", "DC", "LA", "FS", "FWL", "TH",
             "ROS", "SL", "FC", "RWR", "TC", "MOC", "OA", "MH", "TD", "CS", "WOB", "innerSphere", "periphery", "clan");
 
