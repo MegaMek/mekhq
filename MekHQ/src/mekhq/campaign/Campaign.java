@@ -101,6 +101,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -437,6 +438,14 @@ public class Campaign implements ITechManager {
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
     FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+
+    /**
+     * A constant that provides the ISO-8601 definition of week-based fields.
+     *
+     * <p>This includes the first day of the week set to Monday and the minimal number of days in the first week of
+     * the year set to 4.</p>
+     */
+    private static final WeekFields WEEK_FIELDS = WeekFields.ISO;
 
     /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
@@ -5188,7 +5197,11 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)) {
+        int weekOfYear = currentDay.get(WEEK_FIELDS.weekOfYear());
+        boolean isOddWeek = (weekOfYear % 2 == 1);
+        if (campaignOptions.isUseStratCon()
+                  && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)
+                  && isOddWeek) {
             negotiateAdditionalSupportPoints(this);
         }
 
