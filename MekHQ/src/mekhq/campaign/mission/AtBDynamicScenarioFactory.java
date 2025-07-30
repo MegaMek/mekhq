@@ -3377,7 +3377,7 @@ public class AtBDynamicScenarioFactory {
                     bvBudget += botForce.getTotalBV(campaign);
                 }
 
-                LOGGER.info("{} {}: {}}",
+                LOGGER.info("{} {}: {}",
                       botForce.getName(),
                       generationMethod,
                       botForce.getTotalBV(campaign));
