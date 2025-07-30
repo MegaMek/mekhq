@@ -5148,7 +5148,7 @@ public class Campaign implements ITechManager {
                 AtBMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
-                if (contract.getContractType().isGarrisonDuty()) {
+                if (contract.isPeaceful()) {
                     report = resources.getString("garrisonDutyRouted.text");
                 } else if (oldMorale != newMorale) {
                     report = String.format(resources.getString("contractMoraleReport.text"),
