@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.NO_ACCOLADE;
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_0;
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
@@ -295,7 +296,7 @@ public class FactionJudgment {
     public FactionAccoladeLevel getAccoladeForFaction(final String factionCode) {
         AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
         if (accoladeEntry == null) {
-            return FactionAccoladeLevel.NO_ACCOLADE;
+            return NO_ACCOLADE;
         }
         return accoladeEntry.level();
     }
@@ -522,7 +523,7 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     private static AccoladeEntry readAccoladeEntryFromFactionNode(Node codeNode) {
-        FactionAccoladeLevel level = FactionAccoladeLevel.NO_ACCOLADE;
+        FactionAccoladeLevel level = NO_ACCOLADE;
         LocalDate issueDate = LocalDate.MIN;
 
         NodeList props = codeNode.getChildNodes();

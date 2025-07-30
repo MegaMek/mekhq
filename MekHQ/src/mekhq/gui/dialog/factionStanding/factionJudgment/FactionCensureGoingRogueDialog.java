@@ -260,6 +260,7 @@ public class FactionCensureGoingRogueDialog {
                 }
 
                 if (factionStandings.getRegardForFaction(factionShortName, false) < 0) {
+                    activeFactions.remove(faction);
                     continue;
                 }
 
