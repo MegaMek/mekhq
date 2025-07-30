@@ -274,4 +274,9 @@ public enum FactionAccoladeLevel {
                     text);
         return NO_ACCOLADE;
     }
+
+    @Override
+    public String toString() {
+        return this.getLookupName().replace("_", " ") + " (" + this.getRecognition() + ")";
+    }
 }
