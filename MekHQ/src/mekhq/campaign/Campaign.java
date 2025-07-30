@@ -5140,7 +5140,6 @@ public class Campaign implements ITechManager {
                 rating.reInitialize();
             }
 
-            boolean hasHadResupply = false;
             for (AtBContract contract : getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
@@ -5160,19 +5159,30 @@ public class Campaign implements ITechManager {
                 if (!report.isBlank()) {
                     addReport(report);
                 }
+            }
+        }
 
-                // Resupply
-                if (getCampaignOptions().isUseStratCon()) {
+        // Resupply
+        if (currentDay.getDayOfMonth() == 2) {
+            // This occurs at the end of the 1st day, each month to avoid an awkward mechanics interaction where
+            // personnel might quit or get taken out of fatigue without the player having any opportunity to
+            // intervene before their resupply attempt becomes active.
+            List<AtBContract> activeContracts = getActiveAtBContracts();
+            AtBContract firstNonSubcontract = null;
+            for (AtBContract contract : activeContracts) {
+                if (!contract.isSubcontract()) {
+                    firstNonSubcontract = contract;
+                    break;
+                }
+            }
+
+            if (firstNonSubcontract != null) {
+                if (campaignOptions.isUseStratCon()) {
                     boolean inLocation = location.isOnPlanet() &&
-                                               location.getCurrentSystem().equals(contract.getSystem());
-
-                    if (contract.isSubcontract() || hasHadResupply) {
-                        continue;
-                    }
+                                               location.getCurrentSystem().equals(firstNonSubcontract.getSystem());
 
                     if (inLocation) {
-                        processResupply(contract);
-                        hasHadResupply = true;
+                        processResupply(firstNonSubcontract);
                     }
                 }
             }
