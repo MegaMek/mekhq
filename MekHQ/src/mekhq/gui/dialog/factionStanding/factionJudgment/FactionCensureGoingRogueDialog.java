@@ -32,9 +32,12 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.NO_ACCOLADE;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_0;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -51,6 +54,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
+import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
+import mekhq.campaign.universe.factionStanding.FactionJudgment;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
@@ -220,16 +227,6 @@ public class FactionCensureGoingRogueDialog {
         boolean isMerc = campaignFaction.equals(mercenaries);
         boolean isPirate = campaignFaction.equals(pirates);
 
-        // Handle special campaign factions
-        if (isMerc && isUsingFactionStandings) {
-            possibleFactions.add(pirates);
-            return;
-        }
-        if (isPirate && isUsingFactionStandings) {
-            possibleFactions.add(mercenaries);
-            return;
-        }
-
         List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
         activeFactions.remove(campaignFaction);
 
@@ -243,6 +240,36 @@ public class FactionCensureGoingRogueDialog {
                                                  faction.equals(mercenaries) ||
                                                  faction.equals(pirates)
         );
+
+        if (isMerc || isPirate) {
+            FactionStandings factionStandings = campaign.getFactionStandings();
+            FactionJudgment factionJudgments = factionStandings.getFactionJudgments();
+            for (Faction faction : new ArrayList<>(activeFactions)) {
+                String factionShortName = faction.getShortName();
+
+                FactionAccoladeLevel currentAccoladeLevel = factionJudgments.getAccoladeForFaction(factionShortName);
+                if (NO_ACCOLADE.equals(currentAccoladeLevel)) {
+                    activeFactions.remove(faction);
+                    continue;
+                }
+
+                FactionCensureLevel currentCensureLevel = factionJudgments.getCensureLevelForFaction(factionShortName);
+                if (!CENSURE_LEVEL_0.equals(currentCensureLevel)) {
+                    activeFactions.remove(faction);
+                    continue;
+                }
+
+                if (factionStandings.getRegardForFaction(factionShortName, false) < 0) {
+                    activeFactions.remove(faction);
+                    continue;
+                }
+
+                int recognition = currentAccoladeLevel.getRecognition();
+                if (recognition < ADOPTION_OR_MEKS.getRecognition()) {
+                    activeFactions.remove(faction);
+                }
+            }
+        }
 
         // Add in order: mercenaries, pirates, then other valid factions
         if (!isMerc) {

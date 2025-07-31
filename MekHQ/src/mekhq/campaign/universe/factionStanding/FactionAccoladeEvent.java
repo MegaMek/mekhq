@@ -35,7 +35,13 @@ package mekhq.campaign.universe.factionStanding;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.*;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
+import static mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog.getFactionJudgmentDialogResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +67,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
@@ -151,7 +158,7 @@ public class FactionAccoladeEvent {
                 String oocTextKey = isSameFaction
                                           ? "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.meks.ooc"
                                           : "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.adoption.ooc";
-                oocText = getTextAt(FactionJudgmentDialog.getFactionJudgmentDialogResourceBundle(), oocTextKey);
+                oocText = getTextAt(getFactionJudgmentDialogResourceBundle(), oocTextKey);
             }
 
             ImmersiveDialogWidth dialogWidth;
@@ -186,7 +193,13 @@ public class FactionAccoladeEvent {
                 return;
             }
 
-            if (accoladeWasRefused) {
+            if (!isSameFaction && accoladeWasRefused) {
+                String message = getFormattedTextAt(getFactionJudgmentDialogResourceBundle(),
+                      "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.meks.campaign",
+                      getFactionName(accoladingFaction, campaign.getGameYear()),
+                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+
+                new ImmersiveDialogNotification(campaign, message, false);
                 return;
             }
 
