@@ -6043,24 +6043,6 @@ public class Person {
     }
 
     /**
-     * Changes the extra income trait level by a specified delta.
-     *
-     * <p>The new trait level is clamped to the allowed range, and the corresponding {@link ExtraIncome} is set.</p>
-     *
-     * @param delta the amount by which to adjust the current trait level.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public void changeExtraIncome(final int delta) {
-        int currentExtraIncomeTraitLevel = extraIncome.getTraitLevel();
-        int newExtraIncomeTraitLevel = clamp(currentExtraIncomeTraitLevel + delta,
-              MINIMUM_EXTRA_INCOME,
-              MAXIMUM_EXTRA_INCOME);
-        extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
-    }
-
-    /**
      * Retrieves the raw reputation value of the character.
      *
      * <p>This method returns the unadjusted reputation value associated with the character.</p>
