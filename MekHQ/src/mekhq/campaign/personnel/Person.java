@@ -176,6 +176,10 @@ public class Person {
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
 
+    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
+    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
+    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
+
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
@@ -241,6 +245,7 @@ public class Person {
     private int toughness;
     private int connections;
     private int wealth;
+    private ExtraIncome extraIncome;
     private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
@@ -502,6 +507,7 @@ public class Person {
         toughness = 0;
         connections = 0;
         wealth = 0;
+        extraIncome = ExtraIncome.ZERO;
         hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
@@ -2924,6 +2930,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
             }
 
+            if (!ExtraIncome.ZERO.equals(extraIncome)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extraIncome", extraIncome.name());
+            }
+
             if (hasPerformedExtremeExpenditure) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
             }
@@ -3460,6 +3470,8 @@ public class Person {
                     person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
                     person.wealth = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("extraIncome")) {
+                    person.extraIncome = ExtraIncome.extraIncomeParseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
                     person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
@@ -5976,6 +5988,76 @@ public class Person {
 
     public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
         this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
+    }
+
+    /**
+     * Returns the current {@link ExtraIncome} value.
+     *
+     * @return the {@link ExtraIncome} object representing the current extra income setting.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public ExtraIncome getExtraIncome() {
+        return extraIncome;
+    }
+
+    /**
+     * Returns the trait level associated with the current {@link ExtraIncome}.
+     *
+     * @return the integer trait level for the current extra income value.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getExtraIncomeTraitLevel() {
+        return extraIncome.getTraitLevel();
+    }
+
+    /**
+     * Sets the {@link ExtraIncome} value based on a specified trait level.
+     *
+     * <p>The trait level is clamped to the allowed range before being converted into an {@link ExtraIncome}
+     * object.</p>
+     *
+     * @param traitLevel the integer value representing the trait level to set for extra income.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setExtraIncomeFromTraitLevel(final int traitLevel) {
+        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
+    }
+
+    /**
+     * Directly assigns an {@link ExtraIncome} object.
+     *
+     * @param extraIncome the {@link ExtraIncome} instance to assign.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setExtraIncomeDirect(final ExtraIncome extraIncome) {
+        this.extraIncome = extraIncome;
+    }
+
+    /**
+     * Changes the extra income trait level by a specified delta.
+     *
+     * <p>The new trait level is clamped to the allowed range, and the corresponding {@link ExtraIncome} is set.</p>
+     *
+     * @param delta the amount by which to adjust the current trait level.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void changeExtraIncome(final int delta) {
+        int currentExtraIncomeTraitLevel = extraIncome.getTraitLevel();
+        int newExtraIncomeTraitLevel = clamp(currentExtraIncomeTraitLevel + delta,
+              MINIMUM_EXTRA_INCOME,
+              MAXIMUM_EXTRA_INCOME);
+        extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
     }
 
     /**
