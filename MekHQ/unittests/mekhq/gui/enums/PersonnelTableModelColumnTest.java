@@ -881,6 +881,7 @@ public class PersonnelTableModelColumnTest {
                      TOUGHNESS,
                      CONNECTIONS,
                      WEALTH,
+                     EXTRA_INCOME,
                      REPUTATION,
                      UNLUCKY,
                      BLOODMARK,
