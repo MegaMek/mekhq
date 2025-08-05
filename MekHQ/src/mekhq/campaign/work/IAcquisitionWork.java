@@ -78,6 +78,14 @@ public interface IAcquisitionWork extends IWork {
 
     String getQuantityName(int quantity);
 
+    /**
+     * Gets the true number of parts represented by this AcquisitionWork. An ammo part that
+     * contains six shots should return six, not one.
+     */
+    default int getTotalQuantity() {
+        return getQuantity();
+    }
+
     void incrementQuantity();
 
     void decrementQuantity();
