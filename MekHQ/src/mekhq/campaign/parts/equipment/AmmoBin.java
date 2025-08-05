@@ -128,6 +128,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return getFullShots() / (double) getType().getShots();
     }
 
+    @Override
+    public int getTotalQuantity() {
+        return getQuantity() * getType().getShots();
+    }
+
     public int getFullShots() {
         if (oneShot) {
             return 1;

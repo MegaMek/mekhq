@@ -139,6 +139,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                 && Objects.equals(getType(), ((AmmoStorage) part).getType());
     }
 
+    @Override
+    public int getTotalQuantity() {
+        return getQuantity() * getShots();
+    }
+
     /**
      * Gets a value indicating whether or an {@code AmmoType} is
      * the same as this instance's ammo.

@@ -67,7 +67,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public static final int COL_REQUSTED_STOCK = 4;
     public static final int COL_IN_TRANSFER = 5;
     public static final int COL_COST = 6;
-    public static final int COL_BUTTON_BUY  = 7;
+    public static final int COL_BUTTON_BUY = 7;
     public static final int COL_BUTTON_BUY_BULK  = 8;
     public static final int COL_BUTTON_SELL = 9;
     public static final int COL_BUTTON_SELL_BULK = 10;
@@ -436,5 +436,4 @@ public class PartsInUseTableModel extends DataTableModel {
             super.setValueAt(value, rowIndex, columnIndex);
         }
     }
-
 }

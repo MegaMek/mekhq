@@ -714,6 +714,11 @@ public class Armor extends Part implements IAcquisitionWork {
         return true;
     }
 
+    @Override
+    public int getTotalQuantity() {
+        return getQuantity() * getAmount();
+    }
+
     public void changeType(int ty, boolean cl) {
         this.type = ty;
         this.clan = cl;
