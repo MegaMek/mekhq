@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import megamek.logging.MMLogger;
-
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import megamek.logging.MMLogger;
 
 public enum PrisonerStatus {
     // region Enum Declarations
@@ -87,10 +92,11 @@ public enum PrisonerStatus {
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
-     * @param text The saved value to parse, either the older magic number save
-     *             format or the
-     *             PrisonerStatus.name() value
+     * @param text The saved value to parse, either the older magic number save format or the PrisonerStatus.name()
+     *             value
+     *
      * @return the Prisoner Status in question
      */
     public static PrisonerStatus parseFromString(final String text) {
@@ -98,7 +104,7 @@ public enum PrisonerStatus {
             return valueOf(text);
         } catch (Exception ignored) {
             MMLogger.create(PrisonerStatus.class)
-                .error("Unable to parse {} into a PrisonerStatus. Returning {}.", text, FREE);
+                  .error("Unable to parse {} into a PrisonerStatus. Returning {}.", text, FREE);
             return FREE;
         }
     }

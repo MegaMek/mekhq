@@ -24,12 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.campaign.Campaign;
+import javax.swing.JFrame;
+import javax.swing.JTextPane;
 
-import javax.swing.*;
+import mekhq.campaign.Campaign;
 
 public class ReputationReportDialog extends AbstractReportDialog {
     //region Variable Declarations

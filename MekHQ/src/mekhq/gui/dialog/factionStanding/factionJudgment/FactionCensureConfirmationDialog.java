@@ -75,7 +75,7 @@ public class FactionCensureConfirmationDialog {
      *
      * <p>The dialog content is dynamically generated based on the specified campaign and its commander.</p>
      *
-     * @param campaign     the campaign context in which censure is being performed
+     * @param campaign the campaign context in which censure is being performed
      *
      * @author Illiani
      * @since 0.50.07

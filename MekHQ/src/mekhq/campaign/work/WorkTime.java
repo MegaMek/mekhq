@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.work;
 
@@ -50,6 +55,7 @@ public enum WorkTime {
 
     // Initialize by-id array lookup table
     private static WorkTime[] idMap;
+
     static {
         int maxId = 0;
         for (WorkTime workTime : values()) {
@@ -66,12 +72,12 @@ public enum WorkTime {
 
     /** Default (Strategic Operations) work time modifiers */
     public static final WorkTime[] DEFAULT_TIMES = {
-            NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
+          NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
     };
 
     /** StratOps times in increasing order **/
     public static final WorkTime[] STRAT_OPTS_INCREASING_TIMES = {
-            RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
+          RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
     };
 
     /**

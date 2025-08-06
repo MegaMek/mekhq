@@ -135,7 +135,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
                 getLogger().debug(
                       "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
-                                   "rating is below the cutoff.");
+                            "rating is below the cutoff.");
                 filterOutLegalFactions = true;
             }
         }
@@ -263,8 +263,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
 
         Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
-                                                                       getClanMarketEntries() :
-                                                                       getInnerSphereMarketEntries();
+                                                                                getClanMarketEntries() :
+                                                                                getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
         List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
 

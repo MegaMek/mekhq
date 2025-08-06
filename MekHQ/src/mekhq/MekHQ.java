@@ -64,14 +64,14 @@ import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.abstractDialogs.AutoResolveChanceDialog;
 import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
+import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
+import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
-import megamek.client.ui.clientGUI.GUIPreferences;
-import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
-import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Board;
 import megamek.common.annotations.Nullable;
@@ -861,7 +861,7 @@ public class MekHQ implements GameListener {
                         "AtbScenario {}, AutoResolveConcludedEvent {}", scenario, autoResolveConcludedEvent);
             LOGGER.errorDialog(
                   I18n.getTextAt("AbortingResolveScenarioWizard",
-                        Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
+                        Sentry.isEnabled() ? "errorMessage.withSentry" : "errorMessage.withoutSentry"),
                   I18n.getTextAt("AbortingResolveScenarioWizard",
                         "errorMessage.title"));
         }
@@ -886,6 +886,7 @@ public class MekHQ implements GameListener {
             throw new NullPointerException(errorMessage);
         }
     }
+
     /*
      * Access methods for event bus.
      */

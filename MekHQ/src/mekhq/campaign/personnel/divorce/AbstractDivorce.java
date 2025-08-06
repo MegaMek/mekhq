@@ -52,10 +52,9 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 
 /**
- * AbstractDivorce is the baseline class for divorce in MekHQ. It holds all the common logic for
- * divorces, and is implemented by classes defining how to determine if a person will randomly
- * divorce on a given day.
- *
+ * AbstractDivorce is the baseline class for divorce in MekHQ. It holds all the common logic for divorces, and is
+ * implemented by classes defining how to determine if a person will randomly divorce on a given day.
+ * <p>
  * TODO : Decouple widowing, which should be part of the death module instead.
  */
 public abstract class AbstractDivorce {
@@ -69,7 +68,7 @@ public abstract class AbstractDivorce {
     private boolean useRandomPrisonerDivorce;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -140,8 +139,10 @@ public abstract class AbstractDivorce {
 
     /**
      * This is used to determine if a person can divorce.
-     * @param person the person to determine for
+     *
+     * @param person        the person to determine for
      * @param randomDivorce if this is for random divorce or manual divorce
+     *
      * @return null if they can, otherwise the reason they cannot
      */
     public @Nullable String canDivorce(final Person person, final boolean randomDivorce) {
@@ -157,7 +158,8 @@ public abstract class AbstractDivorce {
             return resources.getString("cannotDivorce.ClanPersonnelSpouse.text");
         } else if (!isUsePrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotDivorce.Prisoner.text");
-        } else if (!isUsePrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
+        } else if (!isUsePrisonerDivorce() &&
+                         person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotDivorce.PrisonerSpouse.text");
         } else if (randomDivorce) {
             if (!isUseRandomClanPersonnelDivorce() && person.isClanPersonnel()) {
@@ -166,7 +168,8 @@ public abstract class AbstractDivorce {
                 return resources.getString("cannotDivorce.RandomClanPersonnelSpouse.text");
             } else if (!isUseRandomPrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisoner.text");
-            } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
+            } else if (!isUseRandomPrisonerDivorce() &&
+                             person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisonerSpouse.text");
             } else if (!person.equals(person.getGenealogy().getOriginSpouse())) {
                 return resources.getString("cannotDivorce.RandomNotOriginSpouse.text");
@@ -185,14 +188,13 @@ public abstract class AbstractDivorce {
     }
 
     /**
-     * This is a standardization method for the divorce surname style to use when a person's spouse
-     * dies.
+     * This is a standardization method for the divorce surname style to use when a person's spouse dies.
      * <p>
      * TODO : I should be part of AbstractDeath
      *
      * @param campaign the campaign the person is in
-     * @param today the current day
-     * @param person the person whose spouse has died
+     * @param today    the current day
+     * @param person   the person whose spouse has died
      */
     public void widowed(final Campaign campaign, final LocalDate today, final Person person) {
         divorce(campaign, today, person, SplittingSurnameStyle.BOTH_KEEP_SURNAME);
@@ -200,14 +202,14 @@ public abstract class AbstractDivorce {
 
     /**
      * This divorces two married people
+     *
      * @param campaign the campaign the two people are a part of
-     * @param today the current date
-     * @param origin the origin person being divorced
-     * @param style the style for how the person and their spouse's surnames will change as part of
-     *              the divorce
+     * @param today    the current date
+     * @param origin   the origin person being divorced
+     * @param style    the style for how the person and their spouse's surnames will change as part of the divorce
      */
     public void divorce(final Campaign campaign, final LocalDate today, final Person origin,
-                        final SplittingSurnameStyle style) {
+          final SplittingSurnameStyle style) {
         final Person spouse = origin.getGenealogy().getSpouse();
 
         style.apply(campaign, origin, spouse);
@@ -223,7 +225,7 @@ public abstract class AbstractDivorce {
             PersonalLogger.divorcedFrom(spouse, origin, today);
 
             campaign.addReport(String.format(resources.getString("divorce.report"),
-                origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
+                  origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         } else {
             reasonOrigin = FormerSpouseReason.DIVORCE;
             reasonSpouse = FormerSpouseReason.WIDOWED;
@@ -238,7 +240,7 @@ public abstract class AbstractDivorce {
 
 
             campaign.addReport(String.format(resources.getString("widowed.report"),
-                origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
+                  origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         }
 
         // Add to the former spouse list
@@ -311,12 +313,12 @@ public abstract class AbstractDivorce {
      * Processes divorce events that occur as part of a character's background.
      *
      * @param campaign the campaign associated with the divorce
-     * @param today the current date of the divorce
-     * @param origin the person whose background is being divorced
-     * @param style the splitting surname style to be applied
+     * @param today    the current date of the divorce
+     * @param origin   the person whose background is being divorced
+     * @param style    the splitting surname style to be applied
      */
     public void backgroundDivorce(final Campaign campaign, final LocalDate today, final Person origin,
-                        final SplittingSurnameStyle style) {
+          final SplittingSurnameStyle style) {
         final Person spouse = origin.getGenealogy().getSpouse();
 
         style.apply(campaign, origin, spouse);
@@ -347,14 +349,17 @@ public abstract class AbstractDivorce {
     }
 
     //region New Day
+
     /**
      * Processes new day random divorce for an individual.
-     * @param campaign the campaign to process
-     * @param today the current day
-     * @param person the person to process
+     *
+     * @param campaign     the campaign to process
+     * @param today        the current day
+     * @param person       the person to process
      * @param isBackground whether the divorce occurred during a character's backstory
      */
-    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person, boolean isBackground) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person,
+          boolean isBackground) {
         if (canDivorce(person, true) != null) {
             return;
         }
@@ -369,8 +374,10 @@ public abstract class AbstractDivorce {
     }
 
     //region Random Divorce
+
     /**
      * This determines if a person will randomly divorce their spouse
+     *
      * @return true if the person is to randomly divorce
      */
     protected abstract boolean randomDivorce();

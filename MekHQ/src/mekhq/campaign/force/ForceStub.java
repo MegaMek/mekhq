@@ -25,15 +25,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.util.UUID;
 import java.util.Vector;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -43,11 +45,12 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * this is a hierarchical object that represents forces from the TO&amp;E using
- * strings rather than unit objects. This makes it static and thus usable to
- * keep track of forces involved in completed scenarios
+ * this is a hierarchical object that represents forces from the TO&amp;E using strings rather than unit objects. This
+ * makes it static and thus usable to keep track of forces involved in completed scenarios
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -154,7 +157,7 @@ public class ForceStub {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
                             logger
-                                    .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                                  .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -168,7 +171,7 @@ public class ForceStub {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
                             logger
-                                    .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                                  .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 

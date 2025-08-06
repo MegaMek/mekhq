@@ -24,21 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
 /**
- * Injury levels are simple categorization values used in the display and prioritization of injuries.
- * The order is important: For display purposes, "later" injury levels are considered more important
- * and have preference over "earlier" ones.
+ * Injury levels are simple categorization values used in the display and prioritization of injuries. The order is
+ * important: For display purposes, "later" injury levels are considered more important and have preference over
+ * "earlier" ones.
  */
 public enum InjuryLevel {
     //region Enum Declarations
     /** Not actually a real injury */
     NONE,
     /**
-     * Low-level chronic injuries and diseases, not threatening under normal circumstances.
-     * Examples: Scars, tinnitus, diabetes, lost limbs
+     * Low-level chronic injuries and diseases, not threatening under normal circumstances. Examples: Scars, tinnitus,
+     * diabetes, lost limbs
      */
     CHRONIC,
     /**
@@ -46,8 +51,7 @@ public enum InjuryLevel {
      */
     MINOR,
     /**
-     * Important injuries, professional medical attention required about weekly to ensure
-     * proper healing.
+     * Important injuries, professional medical attention required about weekly to ensure proper healing.
      */
     MAJOR,
     /**

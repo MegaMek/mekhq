@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

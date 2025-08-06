@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.personnel.autoAwards;
 
 import java.util.ArrayList;
@@ -42,17 +46,16 @@ import mekhq.campaign.universe.Faction;
 
 public class FactionHunterAwards {
     /**
-     * This function loops through Faction Hunter Awards, checking whether the
-     * person is eligible to receive each type of award
+     * This function loops through Faction Hunter Awards, checking whether the person is eligible to receive each type
+     * of award
      *
      * @param campaign the campaign to be processed
      * @param mission  the mission just completed
      * @param person   the person to check award eligibility for
-     * @param awards   the awards to be processed (should only include awards where
-     *                 item == TheatreOfWar)
+     * @param awards   the awards to be processed (should only include awards where item == TheatreOfWar)
      */
     public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, Mission mission,
-            UUID person, List<Award> awards) {
+          UUID person, List<Award> awards) {
         boolean isEligible = false;
         List<Award> eligibleAwards = new ArrayList<>();
 

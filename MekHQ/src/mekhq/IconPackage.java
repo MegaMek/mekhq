@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -39,6 +44,7 @@ import java.util.TreeMap;
 public class IconPackage {
     /** A map of keys to various gui elements, for future skinning purposes */
     private final Map<String, String> guiElements = new HashMap<>();
+
     {
         // Skin defaults
         guiElements.put("default_male_paperdoll", "data/images/misc/paperdoll/default_male.xml");
@@ -47,6 +53,7 @@ public class IconPackage {
 
     /** A map of resolution widths to file names for the startup screen */
     private final TreeMap<Integer, String> startupScreenImages = new TreeMap<>();
+
     {
         startupScreenImages.put(370, "data/images/misc/MekHQ Start_hd.png");
         startupScreenImages.put(556, "data/images/misc/MekHQ Start_fhd.png");
@@ -55,6 +62,7 @@ public class IconPackage {
 
     /** A map of resolution widths to file names for the loading screen */
     private final TreeMap<Integer, String> loadingScreenImages = new TreeMap<>();
+
     {
         loadingScreenImages.put(370, "data/images/misc/MekHQ Load_hd.png");
         loadingScreenImages.put(556, "data/images/misc/MekHQ Load_fhd.png");
@@ -62,7 +70,7 @@ public class IconPackage {
     }
 
     private final TreeMap<Integer, String> autoResolveScreenImages = new TreeMap<>(Map.of(
-        0, "data/images/misc/MekHQ AutoResolve.png"));
+          0, "data/images/misc/MekHQ AutoResolve.png"));
 
     public TreeMap<Integer, String> getLoadingScreenImages() {
         return loadingScreenImages;

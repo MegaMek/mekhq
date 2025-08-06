@@ -44,8 +44,8 @@ public enum FactionStandingsGMToolsActionType {
      */
     RESET_ALL_REGARD,
     /**
-     * Triggers an accolade event for a specific faction. This can be used to kickstart a faction's accolade chain or
-     * to provide a fun narrative moment.
+     * Triggers an accolade event for a specific faction. This can be used to kickstart a faction's accolade chain or to
+     * provide a fun narrative moment.
      */
     TRIGGER_ACCOLADE,
     /**

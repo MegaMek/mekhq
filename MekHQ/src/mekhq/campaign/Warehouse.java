@@ -64,7 +64,9 @@ public class Warehouse {
 
     /**
      * Adds a part to the warehouse.
+     *
      * @param part The part to add to the warehouse.
+     *
      * @return The part added to the warehouse.
      */
     public Part addPart(Part part) {
@@ -72,11 +74,11 @@ public class Warehouse {
     }
 
     /**
-     * Adds a part to the warehouse, optionally merging it with
-     * any existing spare part.
-     * @param part The part to add to the warehouse.
-     * @param mergeWithExisting If true and the part is spare, it may
-     *                          be merged with an existing spare part.
+     * Adds a part to the warehouse, optionally merging it with any existing spare part.
+     *
+     * @param part              The part to add to the warehouse.
+     * @param mergeWithExisting If true and the part is spare, it may be merged with an existing spare part.
+     *
      * @return The part itself or the spare part it was merged with.
      */
     public Part addPart(Part part, boolean mergeWithExisting) {
@@ -133,7 +135,9 @@ public class Warehouse {
 
     /**
      * Gets a part from the warehouse by its ID.
+     *
      * @param id The unique ID of the part.
+     *
      * @return The part with the given ID, or null if no matching part exists.
      */
     public @Nullable Part getPart(int id) {
@@ -142,6 +146,7 @@ public class Warehouse {
 
     /**
      * Executes a function for each part in the warehouse.
+     *
      * @param consumer A function to apply to each part.
      */
     public void forEachPart(Consumer<Part> consumer) {
@@ -152,7 +157,9 @@ public class Warehouse {
 
     /**
      * Removes a part from the warehouse.
+     *
      * @param part The part to remove.
+     *
      * @return A value indicating whether or not the part was removed.
      */
     public boolean removePart(Part part) {
@@ -182,8 +189,10 @@ public class Warehouse {
 
     /**
      * Removes one or more parts from the warehouse.
-     * @param part The part to remove.
+     *
+     * @param part     The part to remove.
      * @param quantity The amount of the part to remove.
+     *
      * @return A value indicating whether or not the part was removed.
      */
     public boolean removePart(Part part, int quantity) {
@@ -215,9 +224,8 @@ public class Warehouse {
     }
 
     /**
-     * Attempts to merge a given part with an existing spare part in stock. The merge
-     * is only possible if a compatible spare part is found, and both parts have the
-     * same "brand new" state.
+     * Attempts to merge a given part with an existing spare part in stock. The merge is only possible if a compatible
+     * spare part is found, and both parts have the same "brand new" state.
      *
      * <p>The merge process follows these steps:</p>
      * <ul>
@@ -235,7 +243,9 @@ public class Warehouse {
      * </ul>
      *
      * @param part The part to attempt to merge with an existing spare part. Cannot be {@code null}.
+     *
      * @return The original part if no merge occurs, or the existing spare part if the parts are merged.
+     *
      * @throws NullPointerException If the {@code part} parameter is {@code null}.
      */
     private Part mergePartWithExisting(Part part) {
@@ -267,7 +277,9 @@ public class Warehouse {
 
     /**
      * Checks for an existing spare part.
+     *
      * @param part The part to search for in the warehouse.
+     *
      * @return The matching spare part or null if none were found.
      */
     public @Nullable Part checkForExistingSparePart(Part part) {
@@ -277,8 +289,8 @@ public class Warehouse {
         }
 
         return findSparePart(spare ->
-                (spare.getId() != part.getId())
-                && part.isSamePartTypeAndStatus(spare));
+                                   (spare.getId() != part.getId())
+                                         && part.isSamePartTypeAndStatus(spare));
     }
 
     /**
@@ -320,12 +332,13 @@ public class Warehouse {
 
     /**
      * Gets a list of spare parts in the warehouse.
+     *
      * @return A list of spare parts in the warehouse.
      */
     public List<Part> getSpareParts() {
         return getParts().stream()
-                .filter(Part::isSpare)
-                .collect(Collectors.toList());
+                     .filter(Part::isSpare)
+                     .collect(Collectors.toList());
     }
 
     public int getSparePartsCount(Part targetPart) {
@@ -353,8 +366,7 @@ public class Warehouse {
     /**
      * Executes a method for each spare part in the warehouse.
      *
-     * @param consumer The method to apply to each spare part
-     *                 in the warehouse.
+     * @param consumer The method to apply to each spare part in the warehouse.
      */
     public void forEachSparePart(Consumer<Part> consumer) {
         for (Part part : getParts()) {
@@ -367,10 +379,9 @@ public class Warehouse {
     /**
      * Finds the first spare part matching a predicate.
      *
-     * @param predicate The predicate to use when searching
-     *                  for a suitable spare part.
-     * @return A matching spare {@link Part} or {@code null}
-     *         if no suitable match was found.
+     * @param predicate The predicate to use when searching for a suitable spare part.
+     *
+     * @return A matching spare {@link Part} or {@code null} if no suitable match was found.
      */
     public @Nullable Part findSparePart(Predicate<Part> predicate) {
         for (Part part : getParts()) {
@@ -392,7 +403,8 @@ public class Warehouse {
 
     /**
      * Adds ammo to the warehouse.
-     * @param ammo Ammo in the warehouse.
+     *
+     * @param ammo  Ammo in the warehouse.
      * @param shots The amount of ammo to add to the warehouse.
      */
     public void addAmmo(AmmoStorage ammo, int shots) {
@@ -404,7 +416,8 @@ public class Warehouse {
 
     /**
      * Removes ammo from the warehouse.
-     * @param ammo Ammo in the warehouse.
+     *
+     * @param ammo  Ammo in the warehouse.
      * @param shots The amount of ammo to remove from the warehouse.
      */
     public boolean removeAmmo(AmmoStorage ammo, int shots) {

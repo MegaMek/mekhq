@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -45,12 +50,10 @@ public class OtherModifiers {
      * Calculates the 'other modifiers' used by CamOps Reputation
      *
      * @param campaign The campaign for which to calculate the modifiers.
-     * @return A map representing the calculated modifiers. The map contains two
-     *         entries:
-     *         - "inactiveYears": The number of inactive years calculated from the
-     *         campaign options.
-     *         - "total": The total value calculated based on the number of inactive
-     *         years.
+     *
+     * @return A map representing the calculated modifiers. The map contains two entries: - "inactiveYears": The number
+     *       of inactive years calculated from the campaign options. - "total": The total value calculated based on the
+     *       number of inactive years.
      */
     protected static Map<String, Integer> calculateOtherModifiers(Campaign campaign) {
         // Calculate inactive years if campaign options allow
@@ -62,25 +65,24 @@ public class OtherModifiers {
         // Create a map for modifiers with "inactive years" and "total" calculated from
         // inactive years
         Map<String, Integer> modifierMap = Map.of(
-                "inactiveYears", inactiveYears,
-                "customModifier", manualModifier,
-                "total", manualModifier - (inactiveYears * 5));
+              "inactiveYears", inactiveYears,
+              "customModifier", manualModifier,
+              "total", manualModifier - (inactiveYears * 5));
 
         // Log the calculated modifiers
         logger.debug("Other Modifiers = {}",
-                modifierMap.entrySet().stream()
-                        .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
-                        .collect(Collectors.joining()));
+              modifierMap.entrySet().stream()
+                    .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
+                    .collect(Collectors.joining()));
 
         // Return the calculated modifier map
         return modifierMap;
     }
 
     /**
-     * @return the number of years between the oldest mission date and the current
-     *         date.
-     *
      * @param campaign the current campaign
+     *
+     * @return the number of years between the oldest mission date and the current date.
      */
     private static int getInactiveYears(Campaign campaign) {
         LocalDate today = campaign.getLocalDate();
@@ -92,10 +94,10 @@ public class OtherModifiers {
         // contracts
         // or the campaign start date if there are no completed contracts
         LocalDate oldestMissionDate = contracts.isEmpty() ? campaign.getCampaignStartDate()
-                : contracts.stream()
-                        .map(AtBContract::getEndingDate)
-                        .min(LocalDate::compareTo)
-                        .orElse(today);
+                                            : contracts.stream()
+                                                    .map(AtBContract::getEndingDate)
+                                                    .min(LocalDate::compareTo)
+                                                    .orElse(today);
 
         if (oldestMissionDate == null) {
             oldestMissionDate = today;
@@ -110,23 +112,25 @@ public class OtherModifiers {
      * Retrieves a list of suitable AtBContracts for the given Campaign.
      *
      * @param campaign The Campaign to retrieve contracts from.
+     *
      * @return A List of suitable AtBContracts.
      */
     private static List<AtBContract> getSuitableContracts(Campaign campaign) {
         // Filter mission of type AtBContract and with completed status, check if it's
         // suitable
         return campaign.getMissions().stream()
-                .filter(c -> (c instanceof AtBContract) && (c.getStatus().isCompleted()))
-                .filter(c -> isSuitableContract((AtBContract) c))
-                .map(c -> (AtBContract) c)
-                .toList();
+                     .filter(c -> (c instanceof AtBContract) && (c.getStatus().isCompleted()))
+                     .filter(c -> isSuitableContract((AtBContract) c))
+                     .map(c -> (AtBContract) c)
+                     .toList();
     }
 
     /**
-     * Determines whether a given AtBContract is suitable.
-     * CamOps excludes Garrison and Cadre contracts when calculating inactivity.
+     * Determines whether a given AtBContract is suitable. CamOps excludes Garrison and Cadre contracts when calculating
+     * inactivity.
      *
      * @param contract The AtBContract to check.
+     *
      * @return true if the contract is suitable, false otherwise.
      */
     private static boolean isSuitableContract(AtBContract contract) {

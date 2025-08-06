@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
+
+import java.util.List;
 
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
-import java.util.List;
-
 public class PregnantCombatantNagLogic {
     /**
-     * Determines if the current campaign contains any personnel who are pregnant and actively assigned
-     * to a combat force.
+     * Determines if the current campaign contains any personnel who are pregnant and actively assigned to a combat
+     * force.
      *
      * <p>This method evaluates the following conditions to return {@code true}:</p>
      * <ul>
@@ -50,7 +55,7 @@ public class PregnantCombatantNagLogic {
      * This prevents unnecessary processing of the personnel list.</p>
      *
      * @param hasActiveContract A flag indicating whether the campaign currently has an active contract.
-     * @param activePersonnel A list of {@link Person} objects representing the active personnel in the campaign.
+     * @param activePersonnel   A list of {@link Person} objects representing the active personnel in the campaign.
      *
      * @return {@code true} if there are pregnant personnel assigned to a combat force; {@code false} otherwise.
      */

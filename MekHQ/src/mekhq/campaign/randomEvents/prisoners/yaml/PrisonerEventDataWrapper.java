@@ -24,24 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.yaml;
 
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-
 import java.util.List;
 
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+
 /**
- * A wrapper class for managing a list of {@link PrisonerEventData}.
- * This class provides getter and setter methods to access and modify the list
- * of prisoner events.
+ * A wrapper class for managing a list of {@link PrisonerEventData}. This class provides getter and setter methods to
+ * access and modify the list of prisoner events.
  */
 public class PrisonerEventDataWrapper {
     private List<PrisonerEventData> events;
 
     /**
-     * @return a {@link List} of {@link PrisonerEventData} objects representing
-     * the prisoner events.
+     * @return a {@link List} of {@link PrisonerEventData} objects representing the prisoner events.
      */
     public List<PrisonerEventData> getEvents() {
         return events;
@@ -50,8 +53,7 @@ public class PrisonerEventDataWrapper {
     /**
      * Sets the list of {@link PrisonerEventData} for this wrapper.
      *
-     * @param events a {@link List} of {@link PrisonerEventData} objects to be
-     *               associated with this wrapper.
+     * @param events a {@link List} of {@link PrisonerEventData} objects to be associated with this wrapper.
      */
     public void setEvents(List<PrisonerEventData> events) {
         this.events = events;

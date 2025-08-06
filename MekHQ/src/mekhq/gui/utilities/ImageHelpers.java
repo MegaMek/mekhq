@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
@@ -37,14 +42,13 @@ import java.awt.Image;
  */
 public class ImageHelpers {
     /**
-     * Resizes an image, keeping its aspect ratio, in order to fit in the given
-     * boundaries. It will not resize in case
+     * Resizes an image, keeping its aspect ratio, in order to fit in the given boundaries. It will not resize in case
      * the image already fits the boundaries.
      *
      * @param image               Image to resize
      * @param boundary            Maximum size the image can have
-     * @param resamplingAlgorithm flags to indicate the type of algorithm to use for
-     *                            image resampling.
+     * @param resamplingAlgorithm flags to indicate the type of algorithm to use for image resampling.
+     *
      * @return Imputed image, resized if necessary.
      */
     public static Image getScaledForBoundaries(Image image, Dimension boundary, int resamplingAlgorithm) {

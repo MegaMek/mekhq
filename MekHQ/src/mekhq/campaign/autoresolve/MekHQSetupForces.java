@@ -42,6 +42,7 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * This class is responsible for setting up the forces for a scenario
+ *
  * @author Luana Coppio
  */
 public class MekHQSetupForces extends ScenarioSetupForces<Scenario> {
@@ -49,12 +50,12 @@ public class MekHQSetupForces extends ScenarioSetupForces<Scenario> {
 
 
     public MekHQSetupForces(Campaign campaign, List<Unit> units, Scenario scenario,
-                            ForceConsolidation forceConsolidationMethod) {
+          ForceConsolidation forceConsolidationMethod) {
         super(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
     }
 
     public MekHQSetupForces(Campaign campaign, List<Unit> units, Scenario scenario,
-                            ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
+          ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         super(campaign, units, scenario, forceConsolidationMethod, orderFactory);
     }
 }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -53,9 +58,8 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      * Determines the most suitable speaker for a campaign dialog based on personnel specialization and rank.
      *
      * <p>This method evaluates all active forces within the campaign to identify an appropriate speaker. It
-     * prioritizes
-     * selecting force commanders belonging to "SECURITY" forces, using rank and skills to break ties between
-     * candidates. If no qualified force commander is found, it falls back to a default speaker mechanism.</p>
+     * prioritizes selecting force commanders belonging to "SECURITY" forces, using rank and skills to break ties
+     * between candidates. If no qualified force commander is found, it falls back to a default speaker mechanism.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to force and personnel data.
      * @param specialization The {@link AdministratorSpecialization} used as an optional criterion for selecting the

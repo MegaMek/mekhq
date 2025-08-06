@@ -50,7 +50,8 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
- * @author  Jay Lawson (jaylawson39 at yahoo.com)
+ *
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPathViewPanel extends JScrollablePanel {
     private JumpPath path;
@@ -150,7 +151,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         lblJumps = new JLabel();
         txtJumps = new JLabel();
@@ -202,7 +203,13 @@ public class JumpPathViewPanel extends JScrollablePanel {
         pnlStats.add(lblTimeStart, gridBagConstraints);
 
         txtTimeStart.setName("lblTimeStart2");
-        txtTimeStart.setText("<html>" + Math.round(path.getStartTime(campaign.getLocation().getTransitTime())*100.0)/100.0 + " days from "+ startName + " to jump point" + "</html>");
+        txtTimeStart.setText("<html>" +
+                                   Math.round(path.getStartTime(campaign.getLocation().getTransitTime()) * 100.0) /
+                                         100.0 +
+                                   " days from " +
+                                   startName +
+                                   " to jump point" +
+                                   "</html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -222,7 +229,11 @@ public class JumpPathViewPanel extends JScrollablePanel {
         pnlStats.add(lblTimeEnd, gridBagConstraints);
 
         txtTimeEnd.setName("lblTimeEnd2");
-        txtTimeEnd.setText("<html>" + Math.round(path.getEndTime()*100.0)/100.0 + " days from final jump point to " + endName + "</html>");
+        txtTimeEnd.setText("<html>" +
+                                 Math.round(path.getEndTime() * 100.0) / 100.0 +
+                                 " days from final jump point to " +
+                                 endName +
+                                 "</html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -293,11 +304,11 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
             txtCost.setName("lblCost2");
             txtCost.setText("<html>" +
-                    campaign.calculateCostPerJump(
-                                true,
-                                campaign.getCampaignOptions().isEquipmentContractBase())
-                            .multipliedBy(path.getJumps())
-                                .toAmountAndSymbolString() + "</html>");
+                                  campaign.calculateCostPerJump(
+                                              true,
+                                              campaign.getCampaignOptions().isEquipmentContractBase())
+                                        .multipliedBy(path.getJumps())
+                                        .toAmountAndSymbolString() + "</html>");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 6;

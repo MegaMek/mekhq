@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -37,8 +42,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Finds all planets controlled by a given faction at a particular date and can find all planets
- * controlled by another faction within a set distance.
+ * Finds all planets controlled by a given faction at a particular date and can find all planets controlled by another
+ * faction within a set distance.
  *
  * @author Neoancient
  */
@@ -71,8 +76,7 @@ public class FactionBorders {
     }
 
     /**
-     * Finds all planets currently owned (completely or partially) by the faction and finds
-     * its border.
+     * Finds all planets currently owned (completely or partially) by the faction and finds its border.
      *
      * @param when The date for testing faction ownership.
      */
@@ -81,17 +85,16 @@ public class FactionBorders {
     }
 
     /**
-     * Finds all planets within the supplied collection currently owned (completely or partially)
-     * by the faction and finds its border. This can be used to narrow the area to one section of
-     * the galaxy.
+     * Finds all planets within the supplied collection currently owned (completely or partially) by the faction and
+     * finds its border. This can be used to narrow the area to one section of the galaxy.
      *
      * @param when    The date for testing faction ownership.
      * @param systems The set of <code>planetarySystem</code>'s to include in the region.
      */
     public void calculateRegion(LocalDate when, Collection<PlanetarySystem> systems) {
         this.systems = systems.stream()
-                .filter(p -> p.getFactionSet(when).contains(faction))
-                .collect(Collectors.toSet());
+                             .filter(p -> p.getFactionSet(when).contains(faction))
+                             .collect(Collectors.toSet());
         border = new RegionPerimeter(systems);
     }
 
@@ -119,10 +122,11 @@ public class FactionBorders {
     /**
      * Finds planets of another faction that are on a border with this faction.
      *
-     * @param other       The other faction's region.
-     * @param borderSize  The size of the border.
-     * @return            All planets from the other faction that are within borderSize light years
-     *                    of one of this faction's planets.
+     * @param other      The other faction's region.
+     * @param borderSize The size of the border.
+     *
+     * @return All planets from the other faction that are within borderSize light years of one of this faction's
+     *       planets.
      */
     List<PlanetarySystem> getBorderSystems(FactionBorders other, double borderSize) {
         List<RegionPerimeter.Point> intersection = border.intersection(other.getBorder(), borderSize);
@@ -130,13 +134,17 @@ public class FactionBorders {
             return Collections.emptyList();
         }
         List<PlanetarySystem> theirSystems = other.getSystems().stream()
-                .filter(p -> RegionPerimeter.isInsideRegion(p.getX(), p.getY(), intersection))
-                .sorted(Comparator.comparingDouble(PlanetarySystem::getX))
-                .collect(Collectors.toList());
+                                                   .filter(p -> RegionPerimeter.isInsideRegion(p.getX(),
+                                                         p.getY(),
+                                                         intersection))
+                                                   .sorted(Comparator.comparingDouble(PlanetarySystem::getX))
+                                                   .collect(Collectors.toList());
         List<PlanetarySystem> ourSystems = getSystems().stream()
-                .filter(p -> RegionPerimeter.isInsideRegion(p.getX(), p.getY(), intersection))
-                .sorted(Comparator.comparingDouble(PlanetarySystem::getX))
-                .collect(Collectors.toList());
+                                                 .filter(p -> RegionPerimeter.isInsideRegion(p.getX(),
+                                                       p.getY(),
+                                                       intersection))
+                                                 .sorted(Comparator.comparingDouble(PlanetarySystem::getX))
+                                                 .collect(Collectors.toList());
 
         List<PlanetarySystem> retVal = new ArrayList<>();
         int start = 0;
@@ -157,8 +165,8 @@ public class FactionBorders {
                 // We're going to do a cheap bounding rectangle check first to determine whether
                 // the more computationally expensive distance calculation is even necessary
                 if ((p2.getY() > p.getY() - borderSize)
-                        && (p2.getY() < p.getY() + borderSize)
-                        && (p.getDistanceTo(p2) <= borderSize)) {
+                          && (p2.getY() < p.getY() + borderSize)
+                          && (p.getDistanceTo(p2) <= borderSize)) {
                     retVal.add(p);
                 }
             }

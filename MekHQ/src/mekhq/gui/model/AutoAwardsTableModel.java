@@ -24,8 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -34,15 +49,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class AutoAwardsTableModel extends AbstractTableModel {
     private static final MMLogger logger = MMLogger.create(AutoAwardsTableModel.class);
@@ -55,7 +61,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     public static final int N_COL = 5;
 
     private static final String[] colNames = {
-            "Person", "Name", "Set", "Award", "Description"
+          "Person", "Name", "Set", "Award", "Description"
     };
 
     private final Campaign campaign;
@@ -123,7 +129,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
             }
         } catch (NullPointerException e) {
             logger.error("autoAwards 'getColumnClass()' failed to parse {}",
-                    getValueAt(0, col));
+                  getValueAt(0, col));
         }
         return retVal;
     }
@@ -159,6 +165,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
      * Retrieves a description for the given award based on the campaign's award bonus style.
      *
      * @param award The {@link Award} object for which the description string is generated.
+     *
      * @return A {@link String} containing the awards based on the style, including XP and Edge rewards if applicable.
      */
     private String getDescriptionString(Award award) {
@@ -212,9 +219,9 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int rowIndex, int columnIndex) {
+              boolean hasFocus, int rowIndex, int columnIndex) {
             super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, rowIndex, columnIndex);
+                  hasFocus, rowIndex, columnIndex);
             int actualColumn = table.convertColumnIndexToModel(columnIndex);
 
             setHorizontalAlignment(getAlignment(actualColumn));
@@ -230,7 +237,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int rowIndex, int columnIndex) {
+              boolean hasFocus, int rowIndex, int columnIndex) {
             int actualColumn = table.convertColumnIndexToModel(columnIndex);
             int actualRow = table.convertRowIndexToModel(rowIndex);
 

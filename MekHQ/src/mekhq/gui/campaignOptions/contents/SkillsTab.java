@@ -151,7 +151,7 @@ public class SkillsTab {
         lblEdgeCost = new JLabel();
         spnEdgeCost = new JSpinner();
     }
-    
+
     /**
      * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
      *
@@ -622,13 +622,13 @@ public class SkillsTab {
      * assignments for milestone thresholds.
      * </p>
      *
-     * @param currentIndex        the position in the milestone sequence.
-     * @param greenIndex   the index where Green begins.
-     * @param regularIndex the index where Regular begins.
-     * @param veteranIndex the index where Veteran begins.
-     * @param eliteIndex   the index where Elite begins.
-     * @param heroicIndex   the index where Heroic begins.
-     * @param legendaryIndex   the index where Legendary begins.
+     * @param currentIndex   the position in the milestone sequence.
+     * @param greenIndex     the index where Green begins.
+     * @param regularIndex   the index where Regular begins.
+     * @param veteranIndex   the index where Veteran begins.
+     * @param eliteIndex     the index where Elite begins.
+     * @param heroicIndex    the index where Heroic begins.
+     * @param legendaryIndex the index where Legendary begins.
      *
      * @return the corresponding {@link SkillLevel} for the given milestone.
      */

@@ -24,21 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
+import java.time.DayOfWeek;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-
-import java.time.DayOfWeek;
 
 public class DeploymentShortfallNagLogic {
     /**
      * Checks if the campaign's active contracts have deployment deficits that need to be addressed.
      *
      * <p>
-     * The following conditions are evaluated to determine whether the requirements for short
-     * deployments are met:
+     * The following conditions are evaluated to determine whether the requirements for short deployments are met:
      * <ul>
      *     <li>The campaign must currently be located on a planet. If it is not, the dialog is skipped.</li>
      *     <li>The check is performed weekly, only on Sundays, to avoid spamming the user daily.</li>

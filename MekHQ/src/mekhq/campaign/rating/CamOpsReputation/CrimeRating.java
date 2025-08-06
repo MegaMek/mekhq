@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -41,6 +46,7 @@ public class CrimeRating {
      * Calculates the crime rating for a given campaign.
      *
      * @param campaign the campaign for which to calculate the crime rating
+     *
      * @return the calculated crime rating
      */
     protected static Map<String, Integer> calculateCrimeRating(Campaign campaign) {
@@ -53,9 +59,9 @@ public class CrimeRating {
         crimeRating.put("total", adjustedCrimeRating);
 
         logger.debug("Crime Rating = {}",
-                crimeRating.entrySet().stream()
-                        .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
-                        .collect(Collectors.joining()));
+              crimeRating.entrySet().stream()
+                    .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
+                    .collect(Collectors.joining()));
 
         return crimeRating;
     }

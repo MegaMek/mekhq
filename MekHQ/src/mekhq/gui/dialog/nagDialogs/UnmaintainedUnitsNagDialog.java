@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -55,9 +60,9 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      * Constructs a new {@code UnmaintainedUnitsNagDialog} to display a warning about unmaintained units.
      *
      * <p>This constructor initializes the dialog with preconfigured values, including the
-     * {@code NAG_UNMAINTAINED_UNITS}
-     * constant for managing dialog suppression and the {@code "UnmaintainedUnitsNagDialog"} localization key for
-     * retrieving dialog content. This dialog does not associate a specific speaker.</p>
+     * {@code NAG_UNMAINTAINED_UNITS} constant for managing dialog suppression and the
+     * {@code "UnmaintainedUnitsNagDialog"} localization key for retrieving dialog content. This dialog does not
+     * associate a specific speaker.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
      *                 required for constructing the nag dialog.
@@ -85,7 +90,8 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable Campaign.AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
+          @Nullable Campaign.AdministratorSpecialization specialization) {
         if (campaign == null) {
             return null;
         }

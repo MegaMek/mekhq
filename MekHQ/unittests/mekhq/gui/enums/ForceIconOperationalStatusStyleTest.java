@@ -24,42 +24,47 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
-
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ResourceBundle;
+
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 public class ForceIconOperationalStatusStyleTest {
     //region Variable Declarations
     private static final ForceIconOperationalStatusStyle[] styles = ForceIconOperationalStatusStyle.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("ForceIconOperationalStatusStyle.BORDER.toolTipText"),
-                ForceIconOperationalStatusStyle.BORDER.getToolTipText());
+              ForceIconOperationalStatusStyle.BORDER.getToolTipText());
         assertEquals(resources.getString("ForceIconOperationalStatusStyle.TAB.toolTipText"),
-                ForceIconOperationalStatusStyle.TAB.getToolTipText());
+              ForceIconOperationalStatusStyle.TAB.getToolTipText());
     }
 
     @Test
     public void testGetPath() {
         assertEquals(MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH,
-                ForceIconOperationalStatusStyle.BORDER.getPath());
+              ForceIconOperationalStatusStyle.BORDER.getPath());
         assertEquals(MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH,
-                ForceIconOperationalStatusStyle.TAB.getPath());
+              ForceIconOperationalStatusStyle.TAB.getPath());
     }
     //endregion Getters
 
@@ -89,7 +94,9 @@ public class ForceIconOperationalStatusStyleTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("ForceIconOperationalStatusStyle.BORDER.text"), ForceIconOperationalStatusStyle.BORDER.toString());
-        assertEquals(resources.getString("ForceIconOperationalStatusStyle.TAB.text"), ForceIconOperationalStatusStyle.TAB.toString());
+        assertEquals(resources.getString("ForceIconOperationalStatusStyle.BORDER.text"),
+              ForceIconOperationalStatusStyle.BORDER.toString());
+        assertEquals(resources.getString("ForceIconOperationalStatusStyle.TAB.text"),
+              ForceIconOperationalStatusStyle.TAB.toString());
     }
 }

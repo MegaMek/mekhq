@@ -25,23 +25,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
-import static java.lang.Math.*;
-
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.logging.MMLogger;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
-
-import java.util.Arrays;
+import megamek.logging.MMLogger;
 
 /**
- * Helper functions for determining part availability and tech base
- * and the associated modifiers. A lot of this code is borrowed from
- * the deprecated SSWLibHelper.java
+ * Helper functions for determining part availability and tech base and the associated modifiers. A lot of this code is
+ * borrowed from the deprecated SSWLibHelper.java
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -53,7 +51,7 @@ public class Availability {
             // We don't know why we got a null availability, but it shouldn't raise.
             return 999;
         }
-        
+
         return switch (availability) {
             case A -> -4;
             case B -> -3;

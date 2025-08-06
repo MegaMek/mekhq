@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.iconDialogs;
 
@@ -38,8 +43,9 @@ import mekhq.gui.panels.AbstractMHQIconChooser;
 import mekhq.gui.panels.StandardForceIconChooser;
 
 /**
- * StandardForceIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to
- * select a StandardForceIcon from the Force Icon Directory.
+ * StandardForceIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to select a
+ * StandardForceIcon from the Force Icon Directory.
+ *
  * @see AbstractMHQIconChooserDialog
  * @see AbstractIconChooserDialog
  */
@@ -47,11 +53,11 @@ public class StandardForceIconDialog extends AbstractMHQIconChooserDialog {
     //region Constructors
     public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
         this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",
-                new StandardForceIconChooser(frame, icon));
+              new StandardForceIconChooser(frame, icon));
     }
 
     protected StandardForceIconDialog(final JFrame frame, final String name, final String title,
-                                      final AbstractMHQIconChooser chooser) {
+          final AbstractMHQIconChooser chooser) {
         super(frame, name, title, chooser);
     }
     //endregion Constructors

@@ -24,32 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
 
-import megamek.client.ui.util.MenuScroller;
-import mekhq.MekHQ;
-import mekhq.MHQConstants;
-
 import java.util.ResourceBundle;
-
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
+import megamek.client.ui.util.MenuScroller;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+
 /**
- * JScrollablePopupMenu is an extension of JPopupMenu that expands the add functionality so that it
- * adds child menus only if they are not empty, and then adds a scroller to them if they are of the
- * specified size or larger.
- *
- * WARNING: When using this menu always have it be strictly declared to the max abstraction of this
- * WARNING: class, or the menu addition will be assumed to be using the base JMenu add
- * WARNING: e.g. use JScrollablePopupMenu menu = new JScrollablePopupMenu("menu"),
- * WARNING: never JPopupMenu menu = new JScrollablePopupMenu("menu")
+ * JScrollablePopupMenu is an extension of JPopupMenu that expands the add functionality so that it adds child menus
+ * only if they are not empty, and then adds a scroller to them if they are of the specified size or larger.
+ * <p>
+ * WARNING: When using this menu always have it be strictly declared to the max abstraction of this WARNING: class, or
+ * the menu addition will be assumed to be using the base JMenu add WARNING: e.g. use JScrollablePopupMenu menu = new
+ * JScrollablePopupMenu("menu"), WARNING: never JPopupMenu menu = new JScrollablePopupMenu("menu")
  */
 public class JScrollablePopupMenu extends JPopupMenu {
     //region Variable Declarations
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -65,8 +67,9 @@ public class JScrollablePopupMenu extends JPopupMenu {
     //endregion Constructors
 
     /**
-     * This is used to add a JMenu to this, provided the former isn't empty, and then add a scroller
-     * to the child if it is above the default minimum threshold
+     * This is used to add a JMenu to this, provided the former isn't empty, and then add a scroller to the child if it
+     * is above the default minimum threshold
+     *
      * @param child the JMenu to add
      */
     public void add(final JMenu child) {
@@ -74,9 +77,10 @@ public class JScrollablePopupMenu extends JPopupMenu {
     }
 
     /**
-     * This is used to add a JMenu this, provided the former isn't empty, and then add a scroller
-     * to the child if it is above the provided threshold
-     * @param child the JMenu to add
+     * This is used to add a JMenu this, provided the former isn't empty, and then add a scroller to the child if it is
+     * above the provided threshold
+     *
+     * @param child             the JMenu to add
      * @param scrollerThreshold the threshold for adding a scroller
      */
     public void add(final JMenu child, final int scrollerThreshold) {

@@ -24,14 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -42,10 +44,11 @@ import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This StoryPoint begins transit to some destination on the map. It completes
- * when the campaign arrives at this
+ * This StoryPoint begins transit to some destination on the map. It completes when the campaign arrives at this
  * destination.
  */
 public class TravelStoryPoint extends StoryPoint {
@@ -56,11 +59,9 @@ public class TravelStoryPoint extends StoryPoint {
     private String destinationId;
 
     /**
-     * Should travel automatically begin to this system when the story point starts?
-     * For the time being, this will be yes. Once we implement a graphical display
-     * of story objectives
-     * then we can give creators the option of letting players arrange travel
-     * themselves
+     * Should travel automatically begin to this system when the story point starts? For the time being, this will be
+     * yes. Once we implement a graphical display of story objectives then we can give creators the option of letting
+     * players arrange travel themselves
      */
     private boolean autoStart;
     // endregion Variable Declarations
@@ -111,7 +112,7 @@ public class TravelStoryPoint extends StoryPoint {
         } else if (autoStart) {
             CurrentLocation location = getStoryArc().getCampaign().getLocation();
             JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(),
-                    getDestination());
+                  getDestination());
             getStoryArc().getCampaign().getLocation().setJumpPath(path);
         }
     }

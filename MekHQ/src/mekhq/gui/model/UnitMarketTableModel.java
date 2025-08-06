@@ -25,15 +25,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
-import java.awt.*;
+import java.awt.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -44,7 +49,7 @@ import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 
 /**
  * Model for displaying offers on the UnitMarket
- *
+ * <p>
  * Code borrowed heavily from PersonnelTableModel
  *
  * @author Neoancient
@@ -61,7 +66,7 @@ public class UnitMarketTableModel extends DataTableModel {
     public static final int COL_NUM = 7;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -105,7 +110,7 @@ public class UnitMarketTableModel extends DataTableModel {
 
     public Optional<UnitMarketOffer> getOffer(final int row) {
         return ((row >= 0) && (row < getData().size())) ? Optional.of((UnitMarketOffer) getData().get(row))
-                : Optional.empty();
+                     : Optional.empty();
     }
 
     @Override
@@ -121,7 +126,7 @@ public class UnitMarketTableModel extends DataTableModel {
                 return UnitType.getTypeName(offer.getUnitType());
             case COL_WEIGHTCLASS:
                 return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
-                        offer.getUnit().getUnitType(), offer.getUnit().isSupport());
+                      offer.getUnit().getUnitType(), offer.getUnit().isSupport());
             case COL_UNIT:
                 return offer.getUnit().getName();
             case COL_PRICE:
@@ -142,8 +147,8 @@ public class UnitMarketTableModel extends DataTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                       final boolean isSelected, final boolean hasFocus,
-                                                       final int row, final int column) {
+              final boolean isSelected, final boolean hasFocus,
+              final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(getAlignment(table.convertColumnIndexToModel(column)));
             return this;

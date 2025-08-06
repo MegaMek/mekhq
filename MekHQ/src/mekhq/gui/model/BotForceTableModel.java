@@ -25,12 +25,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.List;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -106,7 +110,7 @@ public class BotForceTableModel extends AbstractTableModel {
                 return botForce.getFixedEntityList().size() + " Units, BV: " + botForce.getFixedBV();
             case COL_RANDOM:
                 return ((null == botForce.getBotForceRandomizer()) ? ""
-                        : botForce.getBotForceRandomizer().getShortDescription());
+                              : botForce.getBotForceRandomizer().getShortDescription());
             case COL_DEPLOYMENT:
                 return Utilities.getDeploymentString(botForce);
             default:
@@ -166,7 +170,7 @@ public class BotForceTableModel extends AbstractTableModel {
         switch (col) {
             case COL_RANDOM:
                 return ((null == botForce.getBotForceRandomizer()) ? ""
-                        : botForce.getBotForceRandomizer().getDescription(campaign));
+                              : botForce.getBotForceRandomizer().getDescription(campaign));
             default:
                 return null;
         }
@@ -185,8 +189,8 @@ public class BotForceTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
@@ -33,19 +38,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.gui.dialog.StoryChoiceDialog;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which
- * offers the player
- * potentially more than one possible choice or response.
+ * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which offers the player potentially more than
+ * one possible choice or response.
  */
 public class ChoiceStoryPoint extends DialogStoryPoint {
     private static final MMLogger logger = MMLogger.create(ChoiceStoryPoint.class);
@@ -98,11 +101,11 @@ public class ChoiceStoryPoint extends DialogStoryPoint {
         for (Entry<String, String> entry : choices.entrySet()) {
             // FIXME: not sue how to do this with attribute using new XML writing methods
             pw1.println(MHQXMLUtility.indentStr(indent)
-                    + "<choice id=\""
-                    + entry.getKey()
-                    + "\">"
-                    + entry.getValue()
-                    + "</choice>");
+                              + "<choice id=\""
+                              + entry.getKey()
+                              + "\">"
+                              + entry.getValue()
+                              + "</choice>");
         }
         writeToXmlEnd(pw1, --indent);
     }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -37,10 +42,11 @@ public class NoCommanderNagLogic {
      * <p>This method checks if the provided flagged commander is {@code null}, which indicates
      * that no commander has been assigned to the campaign.</p>
      *
-     * @param flaggedCommander The {@link Person} designated as the flagged commander, or {@code null}
-     *                         if no commander is assigned.
+     * @param flaggedCommander The {@link Person} designated as the flagged commander, or {@code null} if no commander
+     *                         is assigned.
+     *
      * @return {@code true} if no flagged commander is assigned ({@code flaggedCommander} is {@code null}),
-     *         {@code false} otherwise.
+     *       {@code false} otherwise.
      */
     public static boolean hasNoCommander(@Nullable Person flaggedCommander) {
         return flaggedCommander == null;

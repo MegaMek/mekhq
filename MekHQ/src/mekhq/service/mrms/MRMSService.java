@@ -176,10 +176,10 @@ public class MRMSService {
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
         String msg = String.format(
-                "<font color='" + ReportingUtilities.getPositiveColor()
-                        + "'>Mass %s complete on %s.</font>",
-                actionDescriptor,
-                unit.getName());
+              "<font color='" + ReportingUtilities.getPositiveColor()
+                    + "'>Mass %s complete on %s.</font>",
+              actionDescriptor,
+              unit.getName());
 
         switch (unitAction.getStatus()) {
             case ACTIONS_PERFORMED:
@@ -214,12 +214,12 @@ public class MRMSService {
             if (!parts.isEmpty()) {
                 if (parts.size() == 1) {
                     campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                            + "'>There in still 1 part that is not being worked on.</font>");
+                                             + "'>There in still 1 part that is not being worked on.</font>");
                 } else {
                     campaign.addReport(String.format(
-                            "<font color='" + ReportingUtilities.getNegativeColor()
-                                    + "'>There are still %s parts that are not being worked on.</font>",
-                            parts.size()));
+                          "<font color='" + ReportingUtilities.getNegativeColor()
+                                + "'>There are still %s parts that are not being worked on.</font>",
+                          parts.size()));
                 }
             }
         }
@@ -309,8 +309,8 @@ public class MRMSService {
             }
 
             StringBuilder sb = new StringBuilder(
-                    String.format("<font color='" + ReportingUtilities.getPositiveColor()
-                            + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
+                  String.format("<font color='" + ReportingUtilities.getPositiveColor()
+                                      + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
 
             if (actionsPerformed > 0) {
                 sb.append(String.format(" %s repair/salvage action%s performed.",
@@ -372,12 +372,12 @@ public class MRMSService {
                 if (count > 0) {
                     if (count == 1) {
                         campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                                + "'>There in still 1 part that is not being worked on.</font>");
+                                                 + "'>There in still 1 part that is not being worked on.</font>");
                     } else {
                         campaign.addReport(String.format(
-                                "<font color='" + ReportingUtilities.getNegativeColor()
-                                        + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
-                                count, unitCount, (unitCount == 1) ? "" : "s"));
+                              "<font color='" + ReportingUtilities.getNegativeColor()
+                                    + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
+                              count, unitCount, (unitCount == 1) ? "" : "s"));
                     }
                 }
             }
@@ -646,15 +646,19 @@ public class MRMSService {
 
                         if (unfixable) {
                             campaign.addReport(String.format(
-                                    "<font color='" + ReportingUtilities.getWarningColor()
-                                            + "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
-                                    loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
+                                  "<font color='" +
+                                        ReportingUtilities.getWarningColor()
+                                        +
+                                        "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
+                                  loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
                         } else {
                             campaign.addReport(String.format(
-                                    "<font color='" + ReportingUtilities.getWarningColor()
-                                            + "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
-                                    loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
-                                    countOfPartsPerLocation.get(locId)));
+                                  "<font color='" +
+                                        ReportingUtilities.getWarningColor()
+                                        +
+                                        "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
+                                  loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
+                                  countOfPartsPerLocation.get(locId)));
                         }
                     }
 
@@ -791,46 +795,40 @@ public class MRMSService {
                 if (!canChangeWorkTime) {
                     debugLog("... can't increase the time because this part can't have its workMode changed",
                           "repairPart");
-                }
-
-                else if (targetRoll.getValue() > mrmsOptions.getTargetNumberPreferred() && !configuredOptions.isUseExtraTime()) {
+                } else if (targetRoll.getValue() > mrmsOptions.getTargetNumberPreferred() &&
+                                 !configuredOptions.isUseExtraTime()) {
                     debugLog("... is above preferred TN but can't increase time due to configuration", "repairPart");
-                }
-
-                else if (targetRoll.getValue() > mrmsOptions.getTargetNumberPreferred() && configuredOptions.isUseExtraTime()) {
+                } else if (targetRoll.getValue() > mrmsOptions.getTargetNumberPreferred() &&
+                                 configuredOptions.isUseExtraTime()) {
                     debugLog("... is above preferred TN and trying to increase time", "repairPart");
                     WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
-                            mrmsOptions, campaign, true, highestAvailableTechSkill);
+                          mrmsOptions, campaign, true, highestAvailableTechSkill);
 
                     if (workTimeCalc.getWorkTime() != null) {
                         selectedWorktime = workTimeCalc.getWorkTime();
-                    }
-                    else if (workTimeCalc.isReachedMaxSkill()) {
+                    } else if (workTimeCalc.isReachedMaxSkill()) {
                         debugLog("... is above preferred TN but has no suitable time settings with max available tech",
-                                "repairPart");
+                              "repairPart");
 
                         return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
-                                mrmsOptions.getTargetNumberPreferred());
+                              mrmsOptions.getTargetNumberPreferred());
                     } else {
                         debugLog("... is above preferred TN but has no suitable time settings", "repairPart");
 
                         continue;
                     }
-                }
-
-                else if (targetRoll.getValue() < mrmsOptions.getTargetNumberPreferred() && !configuredOptions.isUseRushJob()) {
+                } else if (targetRoll.getValue() < mrmsOptions.getTargetNumberPreferred() &&
+                                 !configuredOptions.isUseRushJob()) {
                     debugLog("... is below preferred TN but can't decrease time due to configuration", "repairPart");
-                }
-
-                else if (targetRoll.getValue() < mrmsOptions.getTargetNumberPreferred() && configuredOptions.isUseRushJob()) {
+                } else if (targetRoll.getValue() < mrmsOptions.getTargetNumberPreferred() &&
+                                 configuredOptions.isUseRushJob()) {
                     debugLog("... is below preferred TN and trying to decrease time", "repairPart");
                     WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
                           mrmsOptions, campaign, false, highestAvailableTechSkill);
 
                     if (workTimeCalc.getWorkTime() != null) {
                         selectedWorktime = workTimeCalc.getWorkTime();
-                    }
-                    else if (workTimeCalc.isReachedMaxSkill()) {
+                    } else if (workTimeCalc.isReachedMaxSkill()) {
                         debugLog("... is below preferred TN but has no suitable time settings with max available tech",
                               "repairPart");
 
@@ -1223,18 +1221,18 @@ public class MRMSService {
                 // around again
                 if (targetRoll.getValue() <= mrmsOption.getTargetNumberPreferred()) {
                     debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
-                            "calculateNewMRMSWorktime",
-                            System.nanoTime() - time);
+                          "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
+                          "calculateNewMRMSWorktime",
+                          System.nanoTime() - time);
 
                     return new WorkTimeCalculation(newWorkTime);
                 }
             } else {
                 if (targetRoll.getValue() > mrmsOption.getTargetNumberMax()) {
                     debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
-                            "calculateNewMRMSWorktime",
-                            System.nanoTime() - time);
+                          "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
+                          "calculateNewMRMSWorktime",
+                          System.nanoTime() - time);
 
                     return new WorkTimeCalculation(previousNewWorkTime);
                 }
@@ -1309,8 +1307,8 @@ public class MRMSService {
             }
 
             int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1.getOptions(),
-                            tech1.getATOWAttributes()),
-                    skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes()));
+                        tech1.getATOWAttributes()),
+                  skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes()));
             if (experienceCompare != 0) {
                 return experienceCompare;
             }
@@ -1408,7 +1406,7 @@ public class MRMSService {
         }
 
         public static MRMSPartAction createMaxSkillReached(final IPartWork partWork,
-                final int maxSkill, final int targetNumberPreferred) {
+              final int maxSkill, final int targetNumberPreferred) {
             final MRMSPartAction mrmsPartAction = new MRMSPartAction(partWork, STATUS.MAX_SKILL_REACHED);
             mrmsPartAction.setMaxTechSkill(maxSkill);
             mrmsPartAction.setConfiguredTargetNumberPreferred(targetNumberPreferred);

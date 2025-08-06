@@ -161,8 +161,8 @@ public class GlossaryDialog extends JDialog {
      * to the user.
      * </p>
      *
-     * @param parent   The parent {@link JDialog} that is temporarily hidden while this dialog is displayed.
-     * @param key      The unique identifier for the glossary term to be displayed.
+     * @param parent The parent {@link JDialog} that is temporarily hidden while this dialog is displayed.
+     * @param key    The unique identifier for the glossary term to be displayed.
      */
     public GlossaryDialog(@Nullable JDialog parent, String key) {
         this.parent = parent;

@@ -24,14 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
-import javax.swing.event.MouseInputAdapter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,17 +38,23 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.event.MouseInputAdapter;
 
 /**
- * Provides a popup menu adapter for a component which also ensures that
- * the accessibility chord SHIFT+F10 opens the popup as well.
+ * Provides a popup menu adapter for a component which also ensures that the accessibility chord SHIFT+F10 opens the
+ * popup as well.
  */
 public abstract class JPopupMenuAdapter extends MouseInputAdapter implements ActionListener {
     public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
 
     /**
-     * Connect the popup menu adapter to the component. Implementations should call this
-     * to connect the popup menu to both right click and the SHIFT+F10 accessibility chord.
+     * Connect the popup menu adapter to the component. Implementations should call this to connect the popup menu to
+     * both right click and the SHIFT+F10 accessibility chord.
+     *
      * @param component The component to trap context menu actions.
      */
     protected void connect(JComponent component) {
@@ -62,7 +67,7 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
             @Override
             public void actionPerformed(ActionEvent e) {
                 createPopupMenu().ifPresent(popup ->
-                        popup.show(component, component.getX(), component.getY()));
+                                                  popup.show(component, component.getX(), component.getY()));
             }
         });
     }
@@ -94,6 +99,7 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
 
     /**
      * A {@link JPopupMenu} to show, if applicable.
+     *
      * @return An optional {@link JPopupMenu} to show.
      */
     protected abstract Optional<JPopupMenu> createPopupMenu();

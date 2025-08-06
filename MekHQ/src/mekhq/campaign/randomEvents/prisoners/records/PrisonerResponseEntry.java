@@ -24,25 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.records;
 
-import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
-
 import java.util.List;
 
+import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
+
 /**
- * Represents an individual response entry for a prisoner event.
- * Each response entry defines a response quality and its associated effects.
+ * Represents an individual response entry for a prisoner event. Each response entry defines a response quality and its
+ * associated effects.
  *
- * @param quality the quality of the response, as defined by the {@link ResponseQuality} enum
- * @param effectsSuccess a list of effects resulting from successful resolution of the event, as
- *                      defined by the {@link EventResult} record
- * @param effectsFailure a list of effects resulting from failing to resolve the event, as defined
- *                      by the {@link EventResult} record
+ * @param quality        the quality of the response, as defined by the {@link ResponseQuality} enum
+ * @param effectsSuccess a list of effects resulting from successful resolution of the event, as defined by the
+ *                       {@link EventResult} record
+ * @param effectsFailure a list of effects resulting from failing to resolve the event, as defined by the
+ *                       {@link EventResult} record
  */
 public record PrisonerResponseEntry(
-    ResponseQuality quality,
-    List<EventResult> effectsSuccess,
-    List<EventResult> effectsFailure
-) { }
+      ResponseQuality quality,
+      List<EventResult> effectsSuccess,
+      List<EventResult> effectsFailure
+) {}

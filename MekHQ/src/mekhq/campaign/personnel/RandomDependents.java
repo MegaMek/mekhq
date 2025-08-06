@@ -52,8 +52,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 
 /**
- * The {@link RandomDependents} class manages the random addition and removal of dependent personnel
- * based on the current campaign state and options.
+ * The {@link RandomDependents} class manages the random addition and removal of dependent personnel based on the
+ * current campaign state and options.
  *
  * <p>This class processes dependents, determining if some should be removed or new dependents added,
  * based on predefined campaign rules.</p>
@@ -96,8 +96,8 @@ public class RandomDependents {
     }
 
     /**
-     * Calculates the dependent capacity based on the number of active non-dependents and a
-     * predefined capacity multiplier. The capacity is always at least 1.
+     * Calculates the dependent capacity based on the number of active non-dependents and a predefined capacity
+     * multiplier. The capacity is always at least 1.
      *
      * @return The calculated dependent capacity as an integer, ensuring a value of at least 1.
      */
@@ -135,8 +135,7 @@ public class RandomDependents {
      * Calculates the number of active personnel in the campaign who are not dependents.
      *
      * <p>This method iterates through the active personnel in the associated {@link Campaign}
-     * and applies the following filters to determine if a person qualifies as a
-     * non-dependent active personnel:</p>
+     * and applies the following filters to determine if a person qualifies as a non-dependent active personnel:</p>
      * <ul>
      *     <li>The person must not be categorized as a dependent.</li>
      *     <li>The person must not be a prisoner (unless they are a bondsman).</li>
@@ -171,9 +170,8 @@ public class RandomDependents {
      * Randomly removes dependents from the provided list based on campaign rules and options.
      *
      * <p>If random removal is enabled in the campaign options, dependents are evaluated for
-     * eligibility for removal using {@link #isRemovalEligible(Person, LocalDate)}. Eligible
-     * dependents are removed based on a rolling mechanism, and their status is updated within the
-     * campaign.</p>
+     * eligibility for removal using {@link #isRemovalEligible(Person, LocalDate)}. Eligible dependents are removed
+     * based on a rolling mechanism, and their status is updated within the campaign.</p>
      */
     void dependentsRollForRemoval() {
         List<Person> dependentsToRemove = new ArrayList<>();
@@ -212,7 +210,7 @@ public class RandomDependents {
                 int pluralizer = dependentsToRemove.size();
 
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentLeavesForce.report",
-                    dependentsToRemove.size(), pluralizer));
+                      dependentsToRemove.size(), pluralizer));
 
                 for (Person dependent : dependentsToRemove) {
                     dependent.changeStatus(campaign, currentDay, LEFT);
@@ -228,8 +226,9 @@ public class RandomDependents {
      * <p>A dependent is eligible for removal if they have no non-adult children, no spouse, and
      * are not classified as a child themselves.</p>
      *
-     * @param dependent  The {@link Person} object being evaluated.
+     * @param dependent   The {@link Person} object being evaluated.
      * @param currentDate The current date used for determining eligibility.
+     *
      * @return {@code true} if the dependent is eligible for removal; {@code false} otherwise.
      */
     boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
@@ -241,14 +240,13 @@ public class RandomDependents {
     }
 
     /**
-     * Randomly adds new dependents to the campaign based on the available dependent capacity and
-     * campaign options.
+     * Randomly adds new dependents to the campaign based on the available dependent capacity and campaign options.
      *
      * <p>If the campaign options enable random dependent addition and the current dependent count
-     * is below the allowed capacity, this method attempts to add new dependents. New dependents
-     * are created, recruited into the campaign, and reported to the campaign logs.</p>
+     * is below the allowed capacity, this method attempts to add new dependents. New dependents are created, recruited
+     * into the campaign, and reported to the campaign logs.</p>
      *
-     * @param dependentCount   The current number of dependents.
+     * @param dependentCount The current number of dependents.
      */
     void dependentsAddNew(int dependentCount) {
         if (isUseRandomDependentAddition && (dependentCount < dependentCapacity)) {

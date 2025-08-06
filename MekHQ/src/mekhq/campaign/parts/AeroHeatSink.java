@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -90,7 +95,8 @@ public class AeroHeatSink extends Part {
             for (Part part : unit.getParts()) {
                 if (hsDamage == 0) {
                     break;
-                } else if ((part instanceof AeroHeatSink && part.getHits() > 0) || part instanceof MissingAeroHeatSink) {
+                } else if ((part instanceof AeroHeatSink && part.getHits() > 0) ||
+                                 part instanceof MissingAeroHeatSink) {
                     hsDamage--;
                 }
             }
@@ -102,8 +108,8 @@ public class AeroHeatSink extends Part {
             }
 
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -131,7 +137,7 @@ public class AeroHeatSink extends Part {
         if (null != unit && unit.getEntity() instanceof Aero) {
             if (hits == 0) {
                 Aero a = (Aero) unit.getEntity();
-                a.setHeatSinks(Math.min(a.getHeatSinks()+1, a.getOHeatSinks()));
+                a.setHeatSinks(Math.min(a.getHeatSinks() + 1, a.getOHeatSinks()));
             }
         }
     }
@@ -141,7 +147,7 @@ public class AeroHeatSink extends Part {
         boolean fixed = needsFixing();
         super.fix();
         if (fixed && (null != unit)
-                && unit.getEntity() instanceof Aero) {
+                  && unit.getEntity() instanceof Aero) {
             ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + 1);
         }
     }
@@ -186,9 +192,9 @@ public class AeroHeatSink extends Part {
     @Override
     public Money getStickerPrice() {
         if (type == Aero.HEAT_DOUBLE) {
-            return Money.of(isOmniPodded()? 7500 : 6000);
+            return Money.of(isOmniPodded() ? 7500 : 6000);
         } else {
-            return Money.of(isOmniPodded()? 2500 : 2000);
+            return Money.of(isOmniPodded() ? 2500 : 2000);
         }
     }
 
@@ -219,7 +225,7 @@ public class AeroHeatSink extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof AeroHeatSink && type == ((AeroHeatSink) part).getType()
-                && isOmniPodded() == part.isOmniPodded();
+                     && isOmniPodded() == part.isOmniPodded();
     }
 
     public int getType() {

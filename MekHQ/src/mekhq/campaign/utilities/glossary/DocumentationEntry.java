@@ -79,7 +79,7 @@ public enum DocumentationEntry {
     /**
      * Constructs a {@code DocumentationEntry} with the specified lookup name.
      *
-     * @param lookUpName the resource key used to look up this entry's localized strings
+     * @param lookUpName  the resource key used to look up this entry's localized strings
      * @param fileAddress the document address
      *
      * @author Illiani

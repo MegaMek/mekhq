@@ -24,16 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Component;
+import java.awt.Container;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
 
 public class CompleteMissionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
@@ -76,8 +87,8 @@ public class CompleteMissionDialog extends AbstractMHQButtonDialog {
         getComboOutcomeStatus().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof MissionStatus) {
                     list.setToolTipText(((MissionStatus) value).getToolTipText());
@@ -96,15 +107,15 @@ public class CompleteMissionDialog extends AbstractMHQButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(lblOutcomeStatus)
-                        .addComponent(getComboOutcomeStatus())
+              layout.createSequentialGroup()
+                    .addComponent(lblOutcomeStatus)
+                    .addComponent(getComboOutcomeStatus())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(lblOutcomeStatus)
-                        .addComponent(getComboOutcomeStatus())
+              layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(lblOutcomeStatus)
+                    .addComponent(getComboOutcomeStatus())
         );
 
         return panel;

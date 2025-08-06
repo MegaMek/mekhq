@@ -24,15 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
+
+import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.codeUtilities.MathUtility;
-
-import java.util.Locale;
 
 /** A class to carry information about a star. Used in planetary system **/
 public class StarType {
@@ -130,14 +135,14 @@ public class StarType {
             subtypeFormat = "%.1f";
         }
 
-        if(null == luminosity) {
+        if (null == luminosity) {
             // assume mid-range luminosity
             return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
-                getSpectralClassName(spectralClass),
-                subtypeValue / 100.0, StarType.LUM_V);
+                  getSpectralClassName(spectralClass),
+                  subtypeValue / 100.0, StarType.LUM_V);
         }
 
-        switch(luminosity) {
+        switch (luminosity) {
             case StarType.LUM_VI:
                 // subdwarfs
                 return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
@@ -149,8 +154,8 @@ public class StarType {
                 return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0);
             default:
                 return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
-                    getSpectralClassName(spectralClass),
-                    subtypeValue / 100.0,  luminosity);
+                      getSpectralClassName(spectralClass),
+                      subtypeValue / 100.0, luminosity);
 
         }
     }
@@ -235,8 +240,8 @@ public class StarType {
         int spectralTypeNumber = spectralClass * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
         return MathUtility.lerp(StarUtil.getDistanceToJumpPoint(spectralTypeNumber),
-            StarUtil.getDistanceToJumpPoint(spectralTypeNumber),
-            remainder);
+              StarUtil.getDistanceToJumpPoint(spectralTypeNumber),
+              remainder);
     }
 
     public double getSolarRechargeTime() {
@@ -247,12 +252,14 @@ public class StarType {
         int intSubtype = (int) subtype;
         if (spectralClass == SPECTRAL_T) {
             // months!
-            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype], StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype + 1],
-                subtype - intSubtype);
+            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype],
+                  StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype + 1],
+                  subtype - intSubtype);
         } else if (spectralClass == SPECTRAL_L) {
             // weeks!
-            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype], StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype + 1],
-                subtype - intSubtype);
+            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype],
+                  StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype + 1],
+                  subtype - intSubtype);
         } else {
             return 141 + 10 * spectralClass + subtype;
         }
@@ -327,8 +334,9 @@ public class StarType {
 
     /**
      * @param lc string which starts with some luminosity description
+     *
      * @return the canonical luminosity string based on how this string starts, or
-     *         <i>null</i> if it doesn't look like luminosity
+     *       <i>null</i> if it doesn't look like luminosity
      */
     private static String validateLuminosity(String lc) {
         // The order of entries here is important

@@ -24,18 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module.api;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.Campaign;
 import org.w3c.dom.Node;
 
-import mekhq.campaign.Campaign;
-
 /**
- * Interface that needs to be implemented by all MekHQ plugins. Contains methods that MekHQ uses to
- * identify the plugin, perform initialization, and save state in a campaign file.
+ * Interface that needs to be implemented by all MekHQ plugins. Contains methods that MekHQ uses to identify the plugin,
+ * perform initialization, and save state in a campaign file.
  *
  * @author Neoancient
  */
@@ -46,5 +50,6 @@ public interface MekHQModule {
     void initPlugin(Campaign c);
 
     void loadFieldsFromXml(Node node);
+
     void writeToXML(PrintWriter pw, int indent);
 }

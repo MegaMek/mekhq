@@ -92,16 +92,16 @@ public class DocTableModel extends DataTableModel {
             int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
 
             toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
-                    .append("</b> " + SkillType.S_SURGERY);
+                  .append("</b> " + SkillType.S_SURGERY);
         }
 
         toReturn.append(String.format(" (%d XP)", doctor.getXP()));
 
         if (campaign.requiresAdditionalMedics()) {
             toReturn.append("</font><font color='")
-                    .append(ReportingUtilities.getNegativeColor()).append("'>, ")
-                    .append(campaign.getMedicsPerDoctor())
-                    .append(" medics</font><font><br/>");
+                  .append(ReportingUtilities.getNegativeColor()).append("'>, ")
+                  .append(campaign.getMedicsPerDoctor())
+                  .append(" medics</font><font><br/>");
         } else {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
@@ -130,7 +130,7 @@ public class DocTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             setImage(getDoctorAt(row).getPortrait().getImage(54));
             setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {

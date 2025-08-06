@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.event;
 
 import mekhq.campaign.Campaign;
 
 /**
- * An event triggered just after all new day calculations were finished, but before the UI is updated
- * with the new data.
+ * An event triggered just after all new day calculations were finished, but before the UI is updated with the new
+ * data.
  * <p>
  * The new day can be queried via <code>event.getCampaign().getDate()</code>
  */

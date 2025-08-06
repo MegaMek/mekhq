@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -32,12 +37,13 @@ public class InsufficientAstechsNagLogic {
      * Determines whether additional astechs are needed in the campaign.
      *
      * <p>This method checks if the number of astechs required is greater than zero. If so, this
-     * indicates a need for additional astechs to meet the campaign's requirements. Otherwise, no
-     * additional astechs are required.</p>
+     * indicates a need for additional astechs to meet the campaign's requirements. Otherwise, no additional astechs are
+     * required.</p>
      *
      * @param asTechsNeeded The number of astechs currently required to meet the campaign's needs.
-     * @return {@code true} if the number of required astechs ({@code asTechsNeeded}) is greater
-     *         than zero; {@code false} otherwise.
+     *
+     * @return {@code true} if the number of required astechs ({@code asTechsNeeded}) is greater than zero;
+     *       {@code false} otherwise.
      */
     public static boolean hasAsTechsNeeded(int asTechsNeeded) {
         return asTechsNeeded > 0;

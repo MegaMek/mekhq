@@ -24,8 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -37,19 +54,9 @@ import mekhq.MHQConstants;
 import mekhq.campaign.universe.enums.HPGRating;
 import org.w3c.dom.DOMException;
 
-import java.io.*;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 /**
- * This will eventually replace the Planets object as our source of
- * system/planetary information using the new XML format that places planets
- * within systems
+ * This will eventually replace the Planets object as our source of system/planetary information using the new XML
+ * format that places planets within systems
  *
  * @author Taharqa
  */
@@ -76,8 +83,8 @@ public class Systems {
 
     private ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
     /**
-     * Organizes systems into a grid of 30lyx30ly squares so we can find nearby
-     * systems without iterating through the entire planet list.
+     * Organizes systems into a grid of 30lyx30ly squares so we can find nearby systems without iterating through the
+     * entire planet list.
      */
     private HashMap<Integer, Map<Integer, Set<PlanetarySystem>>> systemGrid = new HashMap<>();
 
@@ -138,12 +145,12 @@ public class Systems {
     }
 
     /**
-     * Get a list of planetary systems within a certain jump radius (30ly per jump)
-     * that
-     * you can shop on, sorted by number of jumps and in system transit time
+     * Get a list of planetary systems within a certain jump radius (30ly per jump) that you can shop on, sorted by
+     * number of jumps and in system transit time
      *
      * @param system - current <code>PlanetarySystem</code>
      * @param jumps  - number of jumps out to look as an integer
+     *
      * @return a list of planets where you can go shopping
      */
     public List<PlanetarySystem> getShoppingSystems(final PlanetarySystem system, int jumps, LocalDate when) {
@@ -234,9 +241,8 @@ public class Systems {
     // Data loading methods
 
     /**
-     * Loads the default planetary system data. This includes all *.yml files in
-     * data/universe/planetary_systems and subfolders. It also loads a player's
-     * custom planets in their custom user directory, if it exists.
+     * Loads the default planetary system data. This includes all *.yml files in data/universe/planetary_systems and
+     * subfolders. It also loads a player's custom planets in their custom user directory, if it exists.
      *
      * @throws DOMException
      * @throws IOException
@@ -259,7 +265,7 @@ public class Systems {
 
         // logging
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
-                systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
+              systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
         systems.logVeryCloseSystems();
 
         return systems;
@@ -268,7 +274,7 @@ public class Systems {
     /**
      * Loads Systems data from files.
      *
-     * @param planetsPath     The path to the folder containing planetary XML files.
+     * @param planetsPath The path to the folder containing planetary XML files.
      *
      * @throws DOMException
      */
@@ -289,10 +295,10 @@ public class Systems {
     }
 
     /**
-     * loop through all files in the directory and subdirectories and load any
-     * *.yml files found.
+     * loop through all files in the directory and subdirectories and load any *.yml files found.
+     *
      * @param dirName the name of the directory from which to load files
-     * @param mapper the Jackson mapper used to load the data from yaml
+     * @param mapper  the Jackson mapper used to load the data from yaml
      */
     private void parsePlanetarySystemFiles(String dirName, ObjectMapper mapper) {
         if ((null == dirName)) {
@@ -313,8 +319,8 @@ public class Systems {
                         } catch (Exception ex) {
                             // Ignore this file then
                             logger.error(
-                                String.format("Exception trying to parse %s - ignoring.", file.getPath()),
-                                ex);
+                                  String.format("Exception trying to parse %s - ignoring.", file.getPath()),
+                                  ex);
                         }
                     }
                 }
@@ -333,15 +339,16 @@ public class Systems {
                             } catch (Exception ex) {
                                 // Ignore this file then
                                 logger.error(
-                                    String.format("Exception trying to parse zip  entry %s - ignoring.", entry.getName()),
-                                    ex);
+                                      String.format("Exception trying to parse zip  entry %s - ignoring.",
+                                            entry.getName()),
+                                      ex);
                             }
                         }
                     }
                 } catch (Exception ex) {
                     logger.error(
-                        String.format("Exception trying to read the zip file %s -ignoring.", zipFile.getName()),
-                        ex);
+                          String.format("Exception trying to read the zip file %s -ignoring.", zipFile.getName()),
+                          ex);
                 }
             }
 
@@ -374,7 +381,7 @@ public class Systems {
                 continue;
             }
 
-            if(null == system.getStar()) {
+            if (null == system.getStar()) {
                 logger.error(String.format("System \"%s\" is missing a star", system.getId()));
                 toRemove.add(system);
                 continue;
@@ -383,7 +390,8 @@ public class Systems {
             // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
                 logger.error(String
-                        .format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
+                                   .format("System \"%s\" has a primary slot greater than the number of planets",
+                                         system.getId()));
                 toRemove.add(system);
                 continue;
             }
@@ -406,8 +414,8 @@ public class Systems {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
                         logger.warn(String.format(Locale.ROOT,
-                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
-                                system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
+                              "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
+                              system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
                 }
             }
@@ -417,8 +425,8 @@ public class Systems {
     /** A data class representing a HPG link between two planets */
     public static final class HPGLink {
         /**
-         * In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A
-         * node. Else the order doesn't matter.
+         * In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't
+         * matter.
          */
         public final PlanetarySystem primary;
         public final PlanetarySystem secondary;
@@ -445,12 +453,12 @@ public class Systems {
             }
             final HPGLink other = (HPGLink) obj;
             return Objects.equals(primary, other.primary) && Objects.equals(secondary, other.secondary)
-                    && (rating == other.rating);
+                         && (rating == other.rating);
         }
     }
 
     public void visitNearbySystems(final double centerX, final double centerY, final int distance,
-            Consumer<PlanetarySystem> visitor) {
+          Consumer<PlanetarySystem> visitor) {
         int gridRadius = (int) Math.ceil(distance / 30.0);
         int gridX = (int) (centerX / 30.0);
         int gridY = (int) (centerY / 30.0);
@@ -471,7 +479,7 @@ public class Systems {
     }
 
     public void visitNearbySystems(final PlanetarySystem system, final int distance,
-            Consumer<PlanetarySystem> visitor) {
+          Consumer<PlanetarySystem> visitor) {
         visitNearbySystems(system.getX(), system.getY(), distance, visitor);
     }
 }

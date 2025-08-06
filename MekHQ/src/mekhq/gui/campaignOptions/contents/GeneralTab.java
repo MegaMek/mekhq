@@ -469,8 +469,7 @@ public class GeneralTab {
      * <p>
      * This is a convenience method that uses the default campaign options, default date, and default faction to
      * populate the relevant data fields in the user interface. It essentially delegates the work to the overloaded
-     * method {@link #loadValuesFromCampaignOptions(LocalDate, Faction)} with all parameters set to
-     * {@code null}.
+     * method {@link #loadValuesFromCampaignOptions(LocalDate, Faction)} with all parameters set to {@code null}.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null);
@@ -492,11 +491,12 @@ public class GeneralTab {
      *     custom configuration.</li>
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
      * </ul>
-     *
+     * <p>
      *  @param presetDate            Optional {@link LocalDate} to be used as the active date. If {@code null}, the
      *                              campaign's current date is used.
-     * @param presetFaction         Optional {@link Faction} to be used in the faction selection field. If {@code null},
-     *                              the campaign's default faction is used.
+     *
+     * @param presetFaction Optional {@link Faction} to be used in the faction selection field. If {@code null}, the
+     *                      campaign's default faction is used.
      */
     public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         txtName.setText(campaign.getName());
@@ -516,8 +516,8 @@ public class GeneralTab {
      * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}. This method
      * ensures that any changes made in the UI are reflected in the campaign's settings.
      *
-     * @param isStartUp             A boolean indicating if the campaign is in a startup state.
-     * @param isSaveAction          A boolean indicating if this is a save action.
+     * @param isStartUp    A boolean indicating if the campaign is in a startup state.
+     * @param isSaveAction A boolean indicating if this is a save action.
      */
     public void applyCampaignOptionsToCampaign(boolean isStartUp, boolean isSaveAction) {
         // First, we apply any updates to the campaign

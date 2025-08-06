@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -31,22 +36,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.common.options.IOption;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.options.IOption;
-import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
-
 /**
- * Parses custom SPA file and passes data to the PersonnelOption constructor so
- * the custom
- * abilities are included.
+ * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom abilities are included.
  *
  * @author Neoancient
  */

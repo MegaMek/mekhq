@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -50,10 +55,15 @@ public class KFHeliumTank extends Part {
     private static final MMLogger logger = MMLogger.create(KFHeliumTank.class);
 
     public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(Faction.TA)
-            .setProductionFactions(Faction.TA).setTechRating(TechRating.D)
-            .setAvailability(AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                               .setAdvancement(2107, 2120, 2300)
+                                                               .setPrototypeFactions(Faction.TA)
+                                                               .setProductionFactions(Faction.TA)
+                                                               .setTechRating(TechRating.D)
+                                                               .setAvailability(AvailabilityValue.D,
+                                                                     AvailabilityValue.E,
+                                                                     AvailabilityValue.D,
+                                                                     AvailabilityValue.D)
+                                                               .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...
     private int coreType;
@@ -100,8 +110,8 @@ public class KFHeliumTank extends Part {
                 }
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -147,7 +157,7 @@ public class KFHeliumTank extends Part {
             // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(
-                        Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
+                      Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
             } else {
                 js.setKFIntegrity(js.getOKFIntegrity());
             }
@@ -204,7 +214,7 @@ public class KFHeliumTank extends Part {
         if (unit != null && unit.getEntity() instanceof Jumpship) {
             int cost = (50000 * ((Jumpship) unit.getEntity()).getOKFIntegrity());
             if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
-                    && ((Jumpship) unit.getEntity()).hasLF()) {
+                      && ((Jumpship) unit.getEntity()).hasLF()) {
                 cost *= 15;
             } else if (((Jumpship) unit.getEntity()).hasLF()) {
                 cost *= 3;
@@ -224,8 +234,8 @@ public class KFHeliumTank extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFHeliumTank
-                && coreType == ((KFHeliumTank) part).getCoreType()
-                && docks == ((KFHeliumTank) part).getDocks();
+                     && coreType == ((KFHeliumTank) part).getCoreType()
+                     && docks == ((KFHeliumTank) part).getDocks();
     }
 
     @Override

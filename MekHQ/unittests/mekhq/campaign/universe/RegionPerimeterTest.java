@@ -24,22 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
-
-import mekhq.campaign.universe.RegionPerimeter.GrahamScanPointSorter;
-import mekhq.campaign.universe.RegionPerimeter.Point;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import mekhq.campaign.universe.RegionPerimeter.GrahamScanPointSorter;
+import mekhq.campaign.universe.RegionPerimeter.Point;
+import org.junit.jupiter.api.Test;
 
 public class RegionPerimeterTest {
 
@@ -99,10 +104,10 @@ public class RegionPerimeterTest {
         Comparator<Point> sorter = new GrahamScanPointSorter(new Point(0, 0));
         List<Point> list = new ArrayList<>();
         Point[] points = new Point[] {
-            new Point(1, 0),
-            new Point(1, 1),
-            new Point(0, 1),
-            new Point(-1, 1)
+              new Point(1, 0),
+              new Point(1, 1),
+              new Point(0, 1),
+              new Point(-1, 1)
         };
         list.add(points[1]);
         list.add(points[3]);
@@ -156,9 +161,9 @@ public class RegionPerimeterTest {
     @Test
     public void testIntersectionTriangleClippedByRectangle() {
         List<Point> triangle = new ArrayList<>();
-        triangle.add(new Point(0,  2));
-        triangle.add(new Point(-2,  -2));
-        triangle.add(new Point(2,  -2));
+        triangle.add(new Point(0, 2));
+        triangle.add(new Point(-2, -2));
+        triangle.add(new Point(2, -2));
         List<Point> rectangle = new ArrayList<>();
         rectangle.add(new Point(-3, 0));
         rectangle.add(new Point(3, 0));
@@ -177,9 +182,9 @@ public class RegionPerimeterTest {
     @Test
     public void testIntersectionNonOverlappingRegions() {
         List<Point> region1 = new ArrayList<>();
-        region1.add(new Point(3,  2));
-        region1.add(new Point(1,  -2));
-        region1.add(new Point(5,  -2));
+        region1.add(new Point(3, 2));
+        region1.add(new Point(1, -2));
+        region1.add(new Point(5, -2));
         List<Point> region2 = new ArrayList<>();
         region2.add(new Point(-3, 2));
         region2.add(new Point(-1, -2));

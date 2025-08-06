@@ -24,34 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
+
+import java.util.ResourceBundle;
+import javax.swing.JFrame;
 
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractTabbedPane;
 import mekhq.MekHQ;
 
-import javax.swing.*;
-import java.util.ResourceBundle;
-
 /**
  * This is the default TabbedPane. It handles preferences, resources, and the frame.
- *
+ * <p>
  * Inheriting classes must call initialize() in their constructors and override initialize()
  */
 public abstract class AbstractMHQTabbedPane extends AbstractTabbedPane {
     //region Constructors
+
     /**
-     * This creates an AbstractMHQTabbedPane using the default MHQ resource bundle. This is the
-     * normal constructor to use for an AbstractMHQTabbedPane.
+     * This creates an AbstractMHQTabbedPane using the default MHQ resource bundle. This is the normal constructor to
+     * use for an AbstractMHQTabbedPane.
      */
     protected AbstractMHQTabbedPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale()), name);
+              MekHQ.getMHQOptions().getLocale()), name);
     }
 
     /**
-     * This creates an AbstractMHQTabbedPane using the specified resource bundle. This is not recommended
-     * by default.
+     * This creates an AbstractMHQTabbedPane using the specified resource bundle. This is not recommended by default.
      */
     protected AbstractMHQTabbedPane(final JFrame frame, final ResourceBundle resources, final String name) {
         super(frame, resources, name);

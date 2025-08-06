@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -74,7 +79,7 @@ public enum Alphabet {
     //region Constructors
     Alphabet(final String ccb1943, final String icao1956, final String english, final String greek) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.ccb1943 = resources.getString(ccb1943);
         this.icao1956 = resources.getString(icao1956);
         this.english = resources.getString(english);

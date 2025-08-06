@@ -45,13 +45,14 @@ import mekhq.campaign.Campaign;
 public class BatchallFactions {
 
     public static final List<String> BATCHALL_FACTIONS = List.of("CBS", "CB", "CCC", "CCO",
-        "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
-        "CSL", "CWI", "CW", "CWE", "CWIE", "CEI", "RD", "RA", "CP", "AML", "CLAN");
+          "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
+          "CSL", "CWI", "CW", "CWE", "CWIE", "CEI", "RD", "RA", "CP", "AML", "CLAN");
 
     /**
      * Determines whether a given faction engages in batchalling.
      *
      * @param factionCode The faction code to check eligibility for. Must be a non-null {@link String}.
+     *
      * @return {@code true} if the faction code engages in batchalling, {@code false} otherwise.
      */
     public static boolean usesBatchalls(String factionCode) {
@@ -69,11 +70,12 @@ public class BatchallFactions {
      *
      * @param campaign    The campaign for which to retrieve the greeting.
      * @param factionCode The faction code for which to retrieve the greeting.
+     *
      * @return The greeting message as a {@link String}.
      */
     public static String getGreeting(Campaign campaign, String factionCode) {
         final int infamy = MathUtility.clamp(campaign.getFameAndInfamy().getFameLevelForFaction(factionCode),
-            0, 5);
+              0, 5);
 
         // Faction special handlers
         String version = "";

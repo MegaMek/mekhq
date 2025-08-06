@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
@@ -54,7 +59,7 @@ public class RandomPortraitGenerator {
      * This generates a unique Portrait based on the supplied {@link Person}
      *
      * @param personnel a list of all personnel, from which existing portraits are determined
-     * @param person         the {@link Person} to generate a unique portrait for
+     * @param person    the {@link Person} to generate a unique portrait for
      *
      * @return the generated portrait
      */

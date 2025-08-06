@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -32,8 +37,7 @@ import java.util.Comparator;
 import megamek.logging.MMLogger;
 
 /**
- * A comparator for bonuses written as strings with "-" sorted to the bottom
- * always
+ * A comparator for bonuses written as strings with "-" sorted to the bottom always
  *
  * @author Jay Lawson
  */

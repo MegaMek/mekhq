@@ -287,8 +287,8 @@ public class FactionStandingUltimatumDialog {
     /**
      * Constructs a localization key for dialogs based on the affix and faction.
      *
-     * @param ultimatumName       the unique ultimatum name
-     * @param affix               the key affix indicating dialog type
+     * @param ultimatumName the unique ultimatum name
+     * @param affix         the key affix indicating dialog type
      *
      * @return the constructed resource localization key
      *

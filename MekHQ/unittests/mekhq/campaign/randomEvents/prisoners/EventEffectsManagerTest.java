@@ -431,9 +431,9 @@ class EventEffectsManagerTest {
         Person prisoner3 = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
         List<Integer> oldLoyalties = List.of(prisoner0.getBaseLoyalty(),
-                prisoner1.getBaseLoyalty(),
-                prisoner2.getBaseLoyalty(),
-                prisoner3.getBaseLoyalty());
+              prisoner1.getBaseLoyalty(),
+              prisoner2.getBaseLoyalty(),
+              prisoner3.getBaseLoyalty());
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);

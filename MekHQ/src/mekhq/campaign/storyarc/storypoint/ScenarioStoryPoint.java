@@ -24,15 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -42,13 +44,13 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyarc.StoryPoint;
-import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Adds a scenario to the identified mission. The listener in StoryArc will
- * listen for the completion of the
- * added scenario and then complete the StoryPoint.
+ * Adds a scenario to the identified mission. The listener in StoryArc will listen for the completion of the added
+ * scenario and then complete the StoryPoint.
  */
 public class ScenarioStoryPoint extends StoryPoint {
     private static final MMLogger logger = MMLogger.create(ScenarioStoryPoint.class);
@@ -62,16 +64,13 @@ public class ScenarioStoryPoint extends StoryPoint {
     private UUID missionStoryPointId;
 
     /**
-     * A force ID to deploy in this scenario. This should be used carefully as
-     * forces may shift depending
-     * on player changes. Primarily to be used for first mission where force ids
-     * should be known
+     * A force ID to deploy in this scenario. This should be used carefully as forces may shift depending on player
+     * changes. Primarily to be used for first mission where force ids should be known
      */
     private int deployedForceId;
 
     /**
-     * Days ahead to set the date of the scenario. Will default to current date if
-     * nothing is entered.
+     * Days ahead to set the date of the scenario. Will default to current date if nothing is entered.
      */
     private int days;
 

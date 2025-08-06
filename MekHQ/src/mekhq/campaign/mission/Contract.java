@@ -54,8 +54,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Contracts - we need to track static amounts here because changes in the
- * underlying campaign don't change the figures once the ink is dry
+ * Contracts - we need to track static amounts here because changes in the underlying campaign don't change the figures
+ * once the ink is dry
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -153,7 +153,7 @@ public class Contract extends Mission {
      * Returns the contract length in months.
      *
      * @return the number and corresponding length of the contract in months as an integer
-    */
+     */
     public int getLength() {
         return nMonths;
     }
@@ -179,9 +179,8 @@ public class Contract extends Mission {
     }
 
     /**
-     * This sets the Start Date and End Date of the Contract based on the length of
-     * the contract and
-     * the starting date provided
+     * This sets the Start Date and End Date of the Contract based on the length of the contract and the starting date
+     * provided
      *
      * @param startDate the date the contract starts at
      */
@@ -340,10 +339,10 @@ public class Contract extends Mission {
 
     public Money getTotalAmount() {
         return baseAmount
-                .plus(supportAmount)
-                .plus(overheadAmount)
-                .plus(transportAmount)
-                .plus(transitAmount);
+                     .plus(supportAmount)
+                     .plus(overheadAmount)
+                     .plus(transportAmount)
+                     .plus(transitAmount);
     }
 
     public Money getAdvanceAmount() {
@@ -426,21 +425,20 @@ public class Contract extends Mission {
     @Override
     public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
         return super.isActiveOn(date, excludeEndDateCheck) && !date.isBefore(getStartDate())
-                && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
+                     && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
     }
 
     /**
-     * Gets the currently calculated jump path for this contract,
-     * only recalculating if it's not valid any longer or hasn't been calculated
-     * yet.
+     * Gets the currently calculated jump path for this contract, only recalculating if it's not valid any longer or
+     * hasn't been calculated yet.
      */
     public @Nullable JumpPath getJumpPath(Campaign c) {
         // if we don't have a cached jump path, or if the jump path's starting/ending
         // point
         // no longer match the campaign's current location or contract's destination
         if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
-                || !getCachedJumpPath().getFirstSystem().equals(c.getCurrentSystem())
-                || !getCachedJumpPath().getLastSystem().equals(getSystem())) {
+                  || !getCachedJumpPath().getFirstSystem().equals(c.getCurrentSystem())
+                  || !getCachedJumpPath().getLastSystem().equals(getSystem())) {
             setCachedJumpPath(c.calculateJumpPath(c.getCurrentSystem(), getSystem()));
         }
 
@@ -461,20 +459,21 @@ public class Contract extends Mission {
         }
 
         return getTotalAmountPlusFeesAndBonuses()
-                .minus(getTotalAdvanceAmount())
-                .dividedBy(getLength());
+                     .minus(getTotalAdvanceAmount())
+                     .dividedBy(getLength());
     }
 
     /**
      * @param c campaign loaded
+     *
      * @return the cumulative sum the estimated monthly incomes - expenses
      */
     public Money getTotalMonthlyPayOut(Campaign c) {
         return getMonthlyPayOut()
-                .multipliedBy(getLength())
-                .minus(getTotalEstimatedOverheadExpenses(c))
-                .minus(getTotalEstimatedMaintenanceExpenses(c))
-                .minus(getTotalEstimatedPayrollExpenses(c));
+                     .multipliedBy(getLength())
+                     .minus(getTotalEstimatedOverheadExpenses(c))
+                     .minus(getTotalEstimatedMaintenanceExpenses(c))
+                     .minus(getTotalEstimatedPayrollExpenses(c));
     }
 
     /**
@@ -508,8 +507,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the approximate number of months for a 2-way trip + deployment,
-     *         rounded up
+     *
+     * @return the approximate number of months for a 2-way trip + deployment, rounded up
      */
     public int getLengthPlusTravel(Campaign c) {
         int travelMonths = (int) Math.ceil(2 * getTravelDays(c) / 30.0);
@@ -518,8 +517,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the cumulative sum of estimated overhead expenses for the duration of
-     *         travel + deployment
+     *
+     * @return the cumulative sum of estimated overhead expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedOverheadExpenses(Campaign c) {
         return c.getAccountant().getOverheadExpenses().multipliedBy(getLengthPlusTravel(c));
@@ -527,8 +526,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the cumulative sum of estimated maintenance expenses for the duration
-     *         of travel + deployment
+     *
+     * @return the cumulative sum of estimated maintenance expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedMaintenanceExpenses(Campaign c) {
         return c.getAccountant().getMaintenanceCosts().multipliedBy(getLengthPlusTravel(c));
@@ -536,6 +535,7 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
+     *
      * @return the estimated payroll expenses for one month
      */
     public Money getEstimatedPayrollExpenses(Campaign c) {
@@ -549,8 +549,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the cumulative sum of estimated payroll expenses for the duration of
-     *         travel + deployment
+     *
+     * @return the cumulative sum of estimated payroll expenses for the duration of travel + deployment
      */
     public Money getTotalEstimatedPayrollExpenses(Campaign c) {
         return getEstimatedPayrollExpenses(c).multipliedBy(getLengthPlusTravel(c));
@@ -558,8 +558,9 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the total (2-way) estimated transportation fee from the player's
-     *         current location to this contract's planet
+     *
+     * @return the total (2-way) estimated transportation fee from the player's current location to this contract's
+     *       planet
      */
     public Money getTotalTransportationFees(Campaign c) {
         if ((null != getSystem()) && c.getCampaignOptions().isPayForTransport()) {
@@ -573,30 +574,26 @@ public class Contract extends Mission {
     }
 
     /**
-     * Get the estimated total profit for this contract. The total profit is the
-     * total contract
-     * payment including fees and bonuses, minus overhead, maintenance, payroll,
-     * spare parts,
-     * and other monthly expenses. The duration used for monthly expenses is the
-     * contract duration
-     * plus the travel time from the unit's current world to the contract world and
-     * back.
+     * Get the estimated total profit for this contract. The total profit is the total contract payment including fees
+     * and bonuses, minus overhead, maintenance, payroll, spare parts, and other monthly expenses. The duration used for
+     * monthly expenses is the contract duration plus the travel time from the unit's current world to the contract
+     * world and back.
      *
      * @param c The campaign with which this contract is associated.
+     *
      * @return The estimated profit in the current default currency.
      */
     public Money getEstimatedTotalProfit(Campaign c) {
         return getTotalAdvanceAmount()
-                .plus(getTotalMonthlyPayOut(c))
-                .minus(getTotalTransportationFees(c));
+                     .plus(getTotalMonthlyPayOut(c))
+                     .minus(getTotalTransportationFees(c));
     }
 
     /**
-     * Get the number of months left in this contract after the given date. Partial
-     * months are counted as
-     * full months.
+     * Get the number of months left in this contract after the given date. Partial months are counted as full months.
      *
      * @param date the date to use in the calculation
+     *
      * @return the number of months left
      */
     public int getMonthsLeft(LocalDate date) {
@@ -618,9 +615,8 @@ public class Contract extends Mission {
     }
 
     /**
-     * Only do this at the time the contract is set up, otherwise amounts may change
-     * after
-     * the ink is signed, which is a no-no.
+     * Only do this at the time the contract is set up, otherwise amounts may change after the ink is signed, which is a
+     * no-no.
      *
      * @param campaign current campaign
      */
@@ -629,15 +625,15 @@ public class Contract extends Mission {
 
         // calculate base amount
         baseAmount = accountant.getContractBase()
-                .multipliedBy(getLength())
-                .multipliedBy(paymentMultiplier);
+                           .multipliedBy(getLength())
+                           .multipliedBy(paymentMultiplier);
 
         // calculate overhead
         switch (overheadComp) {
             case OH_HALF:
                 overheadAmount = accountant.getOverheadExpenses()
-                        .multipliedBy(getLength())
-                        .multipliedBy(0.5);
+                                       .multipliedBy(getLength())
+                                       .multipliedBy(0.5);
                 break;
             case OH_FULL:
                 overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLength());
@@ -650,17 +646,17 @@ public class Contract extends Mission {
         if (campaign.getCampaignOptions().isUsePeacetimeCost()
                   && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             supportAmount = accountant.getPeacetimeCost()
-                    .multipliedBy(getLength())
-                    .multipliedBy(straightSupport)
-                    .dividedBy(100);
+                                  .multipliedBy(getLength())
+                                  .multipliedBy(straightSupport)
+                                  .dividedBy(100);
         } else {
             Money maintCosts = campaign.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
-                    Unit::getWeeklyMaintenanceCost);
+                  Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
-                    .multipliedBy(getLength())
-                    .multipliedBy(straightSupport)
-                    .dividedBy(100);
+                                  .multipliedBy(getLength())
+                                  .multipliedBy(straightSupport)
+                                  .dividedBy(100);
         }
 
         // calculate transportation costs
@@ -673,10 +669,10 @@ public class Contract extends Mission {
             // costs.
             boolean campaignOps = campaign.getCampaignOptions().isEquipmentContractBase();
             transportAmount = campaign.calculateCostPerJump(campaignOps, campaignOps)
-                    .multipliedBy(jumpPath.getJumps())
-                    .multipliedBy(2)
-                    .multipliedBy(transportComp)
-                    .dividedBy(100);
+                                    .multipliedBy(jumpPath.getJumps())
+                                    .multipliedBy(2)
+                                    .multipliedBy(transportComp)
+                                    .dividedBy(100);
         } else {
             transportAmount = Money.zero();
         }
@@ -688,34 +684,34 @@ public class Contract extends Mission {
             transitAmount = accountant.getContractBase()
                                   .multipliedBy(((getJumpPath(campaign).getJumps()) * 2.0) / 4.0)
                                   .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
-                    .multipliedBy(1.2);
+                                  .multipliedBy(1.2);
         } else {
             transitAmount = Money.zero();
         }
 
         signingAmount = baseAmount
-                .plus(overheadAmount)
-                .plus(transportAmount)
-                .plus(transitAmount)
-                .plus(supportAmount)
-                .multipliedBy(signBonus)
-                .dividedBy(100);
+                              .plus(overheadAmount)
+                              .plus(transportAmount)
+                              .plus(transitAmount)
+                              .plus(supportAmount)
+                              .multipliedBy(signBonus)
+                              .dividedBy(100);
 
         if (mrbcFee) {
             feeAmount = baseAmount
-                    .plus(overheadAmount)
-                    .plus(transportAmount)
-                    .plus(transitAmount)
-                    .plus(supportAmount)
-                    .multipliedBy(getMrbcFeePercentage())
-                    .dividedBy(100);
+                              .plus(overheadAmount)
+                              .plus(transportAmount)
+                              .plus(transitAmount)
+                              .plus(supportAmount)
+                              .multipliedBy(getMrbcFeePercentage())
+                              .dividedBy(100);
         } else {
             feeAmount = Money.zero();
         }
 
         advanceAmount = getTotalAmountPlusFees()
-                .multipliedBy(advancePct)
-                .dividedBy(100);
+                              .multipliedBy(advancePct)
+                              .dividedBy(100);
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
@@ -741,8 +737,7 @@ public class Contract extends Mission {
     }
 
     /**
-     * Retrieves the percentage of shares for this contract.
-     * This currently returns a default value of 30.
+     * Retrieves the percentage of shares for this contract. This currently returns a default value of 30.
      *
      * @return the percentage of shares
      */

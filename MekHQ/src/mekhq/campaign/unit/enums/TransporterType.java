@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+/*
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit.enums;
@@ -32,12 +37,9 @@ import megamek.common.*;
 import mekhq.campaign.enums.CampaignTransportType;
 
 /**
- * Entities are equipped with different Transporters.
- * TransporterTypes are the different kinds of
- * transporters from MegaMek that are implemented
- * to be used with CampaignTransportTypes, like
- * Mek Bays, Docking Collars, Battle Armor Handles,
- * or Infantry Compartments.
+ * Entities are equipped with different Transporters. TransporterTypes are the different kinds of transporters from
+ * MegaMek that are implemented to be used with CampaignTransportTypes, like Mek Bays, Docking Collars, Battle Armor
+ * Handles, or Infantry Compartments.
  *
  * @see Transporter
  * @see CampaignTransportType
@@ -81,15 +83,15 @@ public enum TransporterType {
     // endregion Constructor
 
     /**
-     * An Entity's Transporters need to be mapped to their
-     * TransporterTypes. For the provided Transporter,
-     * this returns its corresponding TransporterType,
-     * or null if it's not found.
+     * An Entity's Transporters need to be mapped to their TransporterTypes. For the provided Transporter, this returns
+     * its corresponding TransporterType, or null if it's not found.
+     *
+     * @param transporter specific transporter to return the type of
+     * @param <T>         extends Transporter
+     *
+     * @return TransporterType (enum) of the provided transporter, or null
      *
      * @see Transporter
-     * @param transporter specific transporter to return the type of
-     * @return TransporterType (enum) of the provided transporter, or null
-     * @param <T> extends Transporter
      */
     public static <T extends Transporter> TransporterType getTransporterType(T transporter) {
         for (TransporterType transporterType : TransporterType.values()) {
@@ -102,7 +104,8 @@ public enum TransporterType {
 
     /**
      * The specific Class of Transporter that corresponds to this TransporterType
+     *
      * @return Class that extends Transporter
      */
-    public Class<? extends Transporter> getTransporterClass() { return transporterClass; }
+    public Class<? extends Transporter> getTransporterClass() {return transporterClass;}
 }

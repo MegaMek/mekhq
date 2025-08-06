@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.utilities;
 
+import java.io.IOException;
+
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -40,8 +42,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Systems;
-
-import java.io.IOException;
 
 /**
  * The {@code TestableCampaign} class provides a static utility method for preparing the minimal required subsystems to

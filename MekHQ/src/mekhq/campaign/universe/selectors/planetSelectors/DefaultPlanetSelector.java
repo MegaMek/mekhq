@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.selectors.planetSelectors;
 
@@ -42,6 +47,7 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
      * Creates a new DefaultPlanetSelector that uses the central planet to produce the planet.
      */
@@ -51,6 +57,7 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
 
     /**
      * Creates a new DefaultPlanetSelector that always selects a specific planet.
+     *
      * @param planet The {@link Planet} to use.
      */
     public DefaultPlanetSelector(final RandomOriginOptions options, final @Nullable Planet planet) {

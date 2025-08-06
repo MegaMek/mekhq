@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -42,7 +47,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
 
 import megamek.client.bot.princess.BehaviorSettings;
@@ -146,7 +150,7 @@ public class CustomizeBotForceDialog extends JDialog {
     private void initComponents() {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeBotForceDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("title"));
 
@@ -270,8 +274,8 @@ public class CustomizeBotForceDialog extends JDialog {
         scrollFixedUnits.setMinimumSize(new Dimension(400, 200));
         scrollFixedUnits.setPreferredSize(new Dimension(400, 200));
         scrollFixedUnits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("scrollFixedUnits.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("scrollFixedUnits.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 1.0;
@@ -285,8 +289,8 @@ public class CustomizeBotForceDialog extends JDialog {
     private void intBehaviorPanel(ResourceBundle resourceMap) {
         panBehavior = new JPanel(new GridBagLayout());
         panBehavior.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
@@ -351,8 +355,8 @@ public class CustomizeBotForceDialog extends JDialog {
     private void initRandomForcesPanel(ResourceBundle resourceMap) {
         panRandomUnits = new JPanel(new GridBagLayout());
         panRandomUnits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panRandomUnits.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("panRandomUnits.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -396,10 +400,10 @@ public class CustomizeBotForceDialog extends JDialog {
 
         DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
-                campaign.getLocalDate()));
+              campaign.getLocalDate()));
         choiceFaction = new MMComboBox<>("choiceFaction", factionModel);
         choiceFaction.setSelectedItem(new FactionDisplay(Factions.getInstance().getFaction(randomizer.getFactionCode()),
-                campaign.getLocalDate()));
+              campaign.getLocalDate()));
         choiceFaction.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
@@ -430,7 +434,7 @@ public class CustomizeBotForceDialog extends JDialog {
 
         // leave out none as a skill option
         ArrayList<SkillLevel> skills = Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone())
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+                                             .collect(Collectors.toCollection(() -> new ArrayList<>()));
         choiceSkillLevel = new MMComboBox("choiceSkillLevel", skills.toArray());
         choiceSkillLevel.setSelectedItem(randomizer.getSkill());
         choiceSkillLevel.setEnabled(useRandomUnits);
@@ -470,11 +474,11 @@ public class CustomizeBotForceDialog extends JDialog {
         }
         choiceFocalWeightClass = new MMComboBox("choiceFocalWeightClass", weightClassModel);
         if (randomizer.getFocalWeightClass() < EntityWeightClass.WEIGHT_LIGHT
-                || randomizer.getFocalWeightClass() > EntityWeightClass.WEIGHT_ASSAULT) {
+                  || randomizer.getFocalWeightClass() > EntityWeightClass.WEIGHT_ASSAULT) {
             choiceFocalWeightClass.setSelectedIndex(0);
         } else {
             choiceFocalWeightClass.setSelectedItem(EntityWeightClass
-                    .getClassName((int) Math.round(randomizer.getFocalWeightClass())));
+                                                         .getClassName((int) Math.round(randomizer.getFocalWeightClass())));
         }
         choiceFocalWeightClass.setEnabled(useRandomUnits);
         gbc.gridx = 0;
@@ -488,7 +492,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(choiceFocalWeightClass, gbc);
 
         spnForceMultiplier = new JSpinner(new SpinnerNumberModel(randomizer.getForceMultiplier(),
-                0.05, 5, 0.05));
+              0.05, 5, 0.05));
         spnForceMultiplier.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -501,7 +505,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(spnForceMultiplier, gbc);
 
         spnPercentConventional = new JSpinner(new SpinnerNumberModel(randomizer.getPercentConventional(),
-                0, 75, 5));
+              0, 75, 5));
         spnPercentConventional.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
@@ -512,7 +516,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(spnPercentConventional, gbc);
 
         spnBaChance = new JSpinner(new SpinnerNumberModel(randomizer.getBaChance(),
-                0, 100, 5));
+              0, 100, 5));
         spnBaChance.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
@@ -523,7 +527,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(spnBaChance, gbc);
 
         spnLanceSize = new JSpinner(new SpinnerNumberModel(randomizer.getLanceSize(),
-                0, 6, 1));
+              0, 6, 1));
         spnLanceSize.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
@@ -602,7 +606,7 @@ public class CustomizeBotForceDialog extends JDialog {
 
     private void saveUnits(ActionEvent evt) {
         Optional<File> saveUnits = FileDialogs.saveUnits(frame,
-                (!botForce.getName().isEmpty()) ? botForce.getName() : "BotForce");
+              (!botForce.getName().isEmpty()) ? botForce.getName() : "BotForce");
 
         if (saveUnits.isPresent()) {
             try {

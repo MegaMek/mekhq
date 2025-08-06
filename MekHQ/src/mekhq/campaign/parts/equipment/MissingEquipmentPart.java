@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -82,7 +87,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage, double size,
-                                boolean omniPodded) {
+          boolean omniPodded) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
@@ -44,14 +49,17 @@ import mekhq.campaign.utilities.CampaignTransportUtilities;
 
 /**
  * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
+ *
  * @see AbstractTransportedUnitsSummary
  * @see CampaignTransportType#SHIP_TRANSPORT
  *
  */
 public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
     private static final MMLogger logger = MMLogger.create(ShipTransportedUnitsSummary.class);
+
     /**
      * Initialize the transport details for a transport ship
+     *
      * @param transport unit this summary is about
      */
     public ShipTransportedUnitsSummary(Unit transport) {
@@ -64,7 +72,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      * @param transportedUnits Units we wish to unload
      */
     @Override
-    public void unloadTransport(Set<Unit>  transportedUnits) {
+    public void unloadTransport(Set<Unit> transportedUnits) {
         super.unloadTransport(transportedUnits);
 
     }
@@ -77,7 +85,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         // then update its transport ship assignment (provided the
         // assignment is actually to us!).
         if (transportedUnit.hasTransportShipAssignment()
-            && transportedUnit.getTransportShipAssignment().getTransportShip().equals(transport)) {
+                  && transportedUnit.getTransportShipAssignment().getTransportShip().equals(transport)) {
             transportedUnit.setTransportShipAssignment(null);
 
         }
@@ -85,15 +93,13 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
 
     /**
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the transport ship. Once in the MM lobby,
-     * this data
-     * will be used to actually load the unit into a bay on the transport.
+     * Bay loading utility used when assigning units to bay-equipped transport units For each passed-in unit, this will
+     * find the first available, transport bay and set both the target bay and the transport ship. Once in the MM lobby,
+     * this data will be used to actually load the unit into a bay on the transport.
      *
      * @param transportedUnits units being loaded
-     * @param transporterType type (Enum) of bay or Transporter
+     * @param transporterType  type (Enum) of bay or Transporter
+     *
      * @return old transports; what were  the units' previous transport, if they had one?
      */
     public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, TransporterType transporterType) {
@@ -107,7 +113,8 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
         //Let's get matching transporters and then recalculate our transport capacity for this transporter type
         Vector<Transporter> transporters = new Vector<>(transport.getEntity().getTransports().stream()
-            .filter(transporter -> TransporterType.getTransporterType(transporter) == transporterType).toList());
+                                                              .filter(transporter -> TransporterType.getTransporterType(
+                                                                    transporter) == transporterType).toList());
         recalculateTransportCapacity(transporters);
 
         return oldTransports;
@@ -118,7 +125,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         int bayNumber = Utilities.selectBestBayFor(transportedUnit.getEntity(), transport.getEntity());
 
         TransporterType oldTransporterType = null;
-        if(transportedUnit.hasTransportShipAssignment()) {
+        if (transportedUnit.hasTransportShipAssignment()) {
             oldTransport = transportedUnit.getTransportShipAssignment().getTransportShip();
             oldTransporterType = transportedUnit.getTransportShipAssignment().getTransporterType();
             if (oldTransport.getEntity() != null) {
@@ -130,26 +137,33 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
         if ((transportedUnit.getEntity() != null)) {
             // This shouldn't happen, but it'd be really annoying to debug if it did
-            if ((transportedUnit.getEntity().getBayById(bayNumber) != null && TransporterType.getTransporterType(transportedUnit.getEntity().getBayById(bayNumber)) != transporterType)) {
-                logger.warn(String.format("Unit was assigned a bay number for a different transport type than the unit is assigned! " +
-                    "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
-                    transport.getName(), transportedUnit.getName(), transporterType, bayNumber));
+            if ((transportedUnit.getEntity().getBayById(bayNumber) != null &&
+                       TransporterType.getTransporterType(transportedUnit.getEntity().getBayById(bayNumber)) !=
+                             transporterType)) {
+                logger.warn(String.format(
+                      "Unit was assigned a bay number for a different transport type than the unit is assigned! " +
+                            "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
+                      transport.getName(),
+                      transportedUnit.getName(),
+                      transporterType,
+                      bayNumber));
             }
         }
 
         addTransportedUnit(transportedUnit);
         if (!Objects.equals(oldTransport, transport)
-            && (transportedUnit.getTransportShipAssignment().getTransporterType() != oldTransporterType)) {
+                  && (transportedUnit.getTransportShipAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - CampaignTransportUtilities.transportCapacityUsage(transporterType, transportedUnit.getEntity()));
+                  getCurrentTransportCapacity(transporterType) -
+                        CampaignTransportUtilities.transportCapacityUsage(transporterType,
+                              transportedUnit.getEntity()));
         }
         return oldTransport;
     }
 
     /**
-     * Bay unloading utility used when removing units from bay-equipped transport
-     * units
-     * and/or moving them to a new transport
+     * Bay unloading utility used when removing units from bay-equipped transport units and/or moving them to a new
+     * transport
      *
      * @param transportedUnit The unit that we wish to unload from this transport
      */
@@ -158,8 +172,8 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
     }
 
     /**
-     * Bay unloading utility used when removing a bay-equipped Transport unit
-     * This removes all units assigned to the transport from it
+     * Bay unloading utility used when removing a bay-equipped Transport unit This removes all units assigned to the
+     * transport from it
      */
     @Override
     public void clearTransportedUnits(Campaign campaign) {
@@ -168,7 +182,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         // And now reset the Transported values for all the units we just booted
         campaign.getHangar().forEachUnit(u -> {
             if (u.hasTransportShipAssignment()
-                && Objects.equals(transport, u.getTransportShipAssignment().getTransportShip())) {
+                      && Objects.equals(transport, u.getTransportShipAssignment().getTransportShip())) {
                 u.setTransportShipAssignment(null);
             }
         });
@@ -192,8 +206,8 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
                     newTransportedUnits.add(realUnit);
                 } else {
                     logger.error(
-                        String.format("Unit %s ('%s') references missing transported unit %s",
-                            unit.getId(), unit.getName(), transportedUnit.getId()));
+                          String.format("Unit %s ('%s') references missing transported unit %s",
+                                unit.getId(), unit.getName(), transportedUnit.getId()));
                 }
             } else {
                 newTransportedUnits.add(transportedUnit);

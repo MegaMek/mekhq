@@ -35,7 +35,15 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.Compute;
+import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.IAero;
+import megamek.common.Jumpship;
+import megamek.common.LandAirMek;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

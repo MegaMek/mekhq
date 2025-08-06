@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -51,7 +56,7 @@ public enum ManeiDominiClass {
     // region Constructors
     ManeiDominiClass(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -97,7 +102,7 @@ public enum ManeiDominiClass {
             return valueOf(text);
         } catch (Exception ignored) {
             MMLogger.create(ManeiDominiClass.class)
-                    .error(ignored, "Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
+                  .error(ignored, "Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
             return NONE;
 
         }

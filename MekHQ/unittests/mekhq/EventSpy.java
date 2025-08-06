@@ -24,8 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.event.MMEvent;
@@ -35,15 +45,9 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-
 /**
- * Provides a list of events captured during its lifetime.
- * Use this as part of a try-with-resources block.
- *
+ * Provides a list of events captured during its lifetime. Use this as part of a try-with-resources block.
+ * <p>
  * If you need to listen to a new event, add a handler to this class.
  */
 public class EventSpy implements AutoCloseable {
@@ -66,6 +70,7 @@ public class EventSpy implements AutoCloseable {
 
     /**
      * Gets the list of events which occurred.
+     *
      * @return The list of events which occurred, in the order received.
      */
     public List<MMEvent> getEvents() {
@@ -74,8 +79,10 @@ public class EventSpy implements AutoCloseable {
 
     /**
      * Finds an event of a certain type matching a given predicate.
-     * @param clazz The event class in question.
+     *
+     * @param clazz     The event class in question.
      * @param predicate The predicate to apply when searching for an event.
+     *
      * @return The first matching event, otherwise null.
      */
     public @Nullable <TEvent extends MMEvent> TEvent findEvent(Class<TEvent> clazz, Predicate<TEvent> predicate) {
@@ -93,6 +100,7 @@ public class EventSpy implements AutoCloseable {
 
     /**
      * Records an event.
+     *
      * @param e The event received.
      */
     private void record(MMEvent e) {

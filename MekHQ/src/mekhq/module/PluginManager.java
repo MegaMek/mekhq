@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module;
 
@@ -38,8 +43,7 @@ import java.util.List;
 import megamek.logging.MMLogger;
 
 /**
- * Tracks which plugins are installed and which are active. Provides class
- * loader for use by ServiceLoader.
+ * Tracks which plugins are installed and which are active. Provides class loader for use by ServiceLoader.
  *
  * @author Neoancient
  */
@@ -79,10 +83,10 @@ public class PluginManager {
     }
 
     /**
-     * Recursively checks the plugin directory for jar files and adds them to the
-     * list.
+     * Recursively checks the plugin directory for jar files and adds them to the list.
      *
      * @param origin The origin file to check
+     *
      * @return A list of all jar files in the directory and subdirectories
      */
     private List<URL> getPluginsFromDir(final File origin) {

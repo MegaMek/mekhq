@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.autoresolve;
@@ -133,18 +138,23 @@ public class ResolverTest {
     static double lowerBoundTeam1() {
         return 0.35;
     }
+
     static double upperBoundTeam1() {
         return 0.50;
     }
+
     static double lowerBoundTeam2() {
         return 0.35;
     }
+
     static double upperBoundTeam2() {
         return 0.50;
     }
+
     static double lowerBoundDraw() {
         return 0.10;
     }
+
     static double upperBoundDraw() {
         return 0.20;
     }
@@ -163,7 +173,6 @@ public class ResolverTest {
 
     @Mock
     private BotForce botForce;
-
 
 
     @BeforeEach
@@ -250,43 +259,43 @@ public class ResolverTest {
     }
 
     private static final String[][] unitNames = {
-        {   // Team 1/2: Team 1 and Team 2
-            "Enforcer III ENF-6M",
-            "Shadow Hawk SHD-5D",
-            "Hatchetman HCT-6D",
-            "Osiris OSR-5D"
-        },
-        {   // Team 1: Unbalanced Team 1
-            "Enforcer III ENF-6M",
-            "Shadow Hawk SHD-5D",
-            "Hatchetman HCT-6D",
-            "Osiris OSR-5D",
-            "Wasp WSP-1"
-        },
-        {   // Team 1: Same BV Team 1 and Team 2 with different meks and crews
-            "Shadow Hawk SHD-7CS",
-            "Vulcan VT-7T",
-            "Crusader CRD-7M",
-            "Rifleman RFL-9T",
-        },
-        {   // Team 2: Same BV Team 1 and Team 2 with different meks and crews
-            "Hammerhands HMH-5D",
-            "Spartan SPT-N1",
-            "Rifleman RFL-9T",
-            "Champion CHP-3P"
-        },
-        {   // Team 1: Same BV and Skills
-            "Griffin GRF-1E 'Sparky'",
-            "Flashman FLS-7K",
-            "Stalker STK-4N",
-            "Victor VTR-9S",
-        },
-        {    // Team 2: Same BV and Skills
-            "Victor VTR-9S",
-            "Victor VTR-9B",
-            "Zeus ZEU-6A",
-            "Crockett CRK-5003-0",
-        }
+          {   // Team 1/2: Team 1 and Team 2
+              "Enforcer III ENF-6M",
+              "Shadow Hawk SHD-5D",
+              "Hatchetman HCT-6D",
+              "Osiris OSR-5D"
+          },
+          {   // Team 1: Unbalanced Team 1
+              "Enforcer III ENF-6M",
+              "Shadow Hawk SHD-5D",
+              "Hatchetman HCT-6D",
+              "Osiris OSR-5D",
+              "Wasp WSP-1"
+          },
+          {   // Team 1: Same BV Team 1 and Team 2 with different meks and crews
+              "Shadow Hawk SHD-7CS",
+              "Vulcan VT-7T",
+              "Crusader CRD-7M",
+              "Rifleman RFL-9T",
+              },
+          {   // Team 2: Same BV Team 1 and Team 2 with different meks and crews
+              "Hammerhands HMH-5D",
+              "Spartan SPT-N1",
+              "Rifleman RFL-9T",
+              "Champion CHP-3P"
+          },
+          {   // Team 1: Same BV and Skills
+              "Griffin GRF-1E 'Sparky'",
+              "Flashman FLS-7K",
+              "Stalker STK-4N",
+              "Victor VTR-9S",
+              },
+          {    // Team 2: Same BV and Skills
+               "Victor VTR-9S",
+               "Victor VTR-9B",
+               "Zeus ZEU-6A",
+               "Crockett CRK-5003-0",
+               }
     };
 
     private static Crew createCrew(int gunnery, int piloting) {
@@ -294,18 +303,18 @@ public class ResolverTest {
     }
 
     private final Crew[][] crews = {
-        {   // Team 1 for same BV
-            createCrew(4, 5),
-            createCrew(4, 6),
-            createCrew(3, 5),
-            createCrew(3, 4),
-        },
-        {   // Team 2 for same BV
-            createCrew(3, 4),
-            createCrew(4, 4),
-            createCrew(4, 6),
-            createCrew(5, 6),
-        }
+          {   // Team 1 for same BV
+              createCrew(4, 5),
+              createCrew(4, 6),
+              createCrew(3, 5),
+              createCrew(3, 4),
+              },
+          {   // Team 2 for same BV
+              createCrew(3, 4),
+              createCrew(4, 4),
+              createCrew(4, 6),
+              createCrew(5, 6),
+              }
     };
 
 
@@ -358,7 +367,7 @@ public class ResolverTest {
             unit.setId(UUID.randomUUID());
 
             var crew = switch (teamArrangement) {
-                case BALANCED, UNBALANCED, SAME_BV_SAME_SKILL-> createCrew(4, 5);
+                case BALANCED, UNBALANCED, SAME_BV_SAME_SKILL -> createCrew(4, 5);
                 case SAME_BV -> crews[0][i % crews[0].length];
             };
 
@@ -416,24 +425,68 @@ public class ResolverTest {
         double team2Rate = (double) team2 / totalRuns;
         double drawRate = (double) draws / totalRuns;
 
-        System.out.println("Ran " + totalRuns + " times. \n\tTeam 1: " + team1 + " (" + team1Rate*100 + "%) " +
-            "\n\tTeam 2: " + team2 + " (" + team2Rate*100 + "%) \n\tDraws: " + draws + " (" + drawRate*100 + "%)");
+        System.out.println("Ran " +
+                                 totalRuns +
+                                 " times. \n\tTeam 1: " +
+                                 team1 +
+                                 " (" +
+                                 team1Rate * 100 +
+                                 "%) " +
+                                 "\n\tTeam 2: " +
+                                 team2 +
+                                 " (" +
+                                 team2Rate * 100 +
+                                 "%) \n\tDraws: " +
+                                 draws +
+                                 " (" +
+                                 drawRate * 100 +
+                                 "%)");
 
         assertAll("Distribution check",
-            () -> assertTrue(team1Rate >= lowerBoundTeam1(),
-                "Team 1 rate (" + team1Rate + ") is below lower bound " + lowerBoundTeam1() + ". Deviation: " + (lowerBoundTeam1() - team1Rate)),
-            () -> assertTrue(team1Rate <= upperBoundTeam1(),
-                "Team 1 rate (" + team1Rate + ") is above upper bound " + upperBoundTeam1() + ". Deviation: " + (team1Rate - upperBoundTeam1())),
+              () -> assertTrue(team1Rate >= lowerBoundTeam1(),
+                    "Team 1 rate (" +
+                          team1Rate +
+                          ") is below lower bound " +
+                          lowerBoundTeam1() +
+                          ". Deviation: " +
+                          (lowerBoundTeam1() - team1Rate)),
+              () -> assertTrue(team1Rate <= upperBoundTeam1(),
+                    "Team 1 rate (" +
+                          team1Rate +
+                          ") is above upper bound " +
+                          upperBoundTeam1() +
+                          ". Deviation: " +
+                          (team1Rate - upperBoundTeam1())),
 
-            () -> assertTrue(team2Rate >= lowerBoundTeam2(),
-                "Team 2 rate (" + team2Rate + ") is below lower bound " + lowerBoundTeam2() + ". Deviation: " + (lowerBoundTeam2() - team2Rate)),
-            () -> assertTrue(team2Rate <= upperBoundTeam2(),
-                "Team 2 rate (" + team2Rate + ") is above upper bound " + upperBoundTeam2() + ". Deviation: " + (team2Rate - upperBoundTeam2())),
+              () -> assertTrue(team2Rate >= lowerBoundTeam2(),
+                    "Team 2 rate (" +
+                          team2Rate +
+                          ") is below lower bound " +
+                          lowerBoundTeam2() +
+                          ". Deviation: " +
+                          (lowerBoundTeam2() - team2Rate)),
+              () -> assertTrue(team2Rate <= upperBoundTeam2(),
+                    "Team 2 rate (" +
+                          team2Rate +
+                          ") is above upper bound " +
+                          upperBoundTeam2() +
+                          ". Deviation: " +
+                          (team2Rate - upperBoundTeam2())),
 
-            () -> assertTrue(drawRate >= lowerBoundDraw(),
-                "Draw rate (" + drawRate + ") is below lower bound " + lowerBoundDraw() + ". Deviation: " + (lowerBoundDraw() - drawRate)),
-            () -> assertTrue(drawRate <= upperBoundDraw(),
-                "Draw rate (" + drawRate + ") is above upper bound " + upperBoundDraw() + ". Deviation: " + (drawRate - upperBoundDraw()))
+              () -> assertTrue(drawRate >= lowerBoundDraw(),
+                    "Draw rate (" +
+                          drawRate +
+                          ") is below lower bound " +
+                          lowerBoundDraw() +
+                          ". Deviation: " +
+                          (lowerBoundDraw() - drawRate)),
+              () -> assertTrue(drawRate <= upperBoundDraw(),
+                    "Draw rate (" +
+                          drawRate +
+                          ") is above upper bound " +
+                          upperBoundDraw() +
+                          ". Deviation: " +
+                          (drawRate - upperBoundDraw()))
         );
         resetTrackers();
     }

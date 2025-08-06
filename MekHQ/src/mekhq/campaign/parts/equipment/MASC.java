@@ -25,13 +25,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
@@ -41,6 +43,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -109,9 +113,9 @@ public class MASC extends EquipmentPart {
             return false;
         }
         return part instanceof MASC
-                && getType().equals(((EquipmentPart) part).getType())
-                && getTonnage() == part.getTonnage()
-                && getEngineRating() == ((MASC) part).getEngineRating();
+                     && getType().equals(((EquipmentPart) part).getType())
+                     && getTonnage() == part.getTonnage()
+                     && getEngineRating() == ((MASC) part).getEngineRating();
     }
 
     @Override
@@ -150,7 +154,7 @@ public class MASC extends EquipmentPart {
     @Override
     public MissingMASC getMissingPart() {
         return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating,
-                omniPodded);
+              omniPodded);
     }
 
     @Override
@@ -173,10 +177,10 @@ public class MASC extends EquipmentPart {
         if (isSupercharger()) {
             // Causes extra information but needed so omnipods show all data
             details.append(equipTonnage)
-                .append(" tons, ");
+                  .append(" tons, ");
         }
         details.append(getEngineRating())
-            .append(" rating");
+              .append(" rating");
         return details.toString();
     }
 

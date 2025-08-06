@@ -54,13 +54,13 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Aero;
 import megamek.common.Compute;

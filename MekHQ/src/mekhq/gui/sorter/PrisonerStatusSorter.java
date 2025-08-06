@@ -24,24 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-
 import java.util.Comparator;
+
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 
 public class PrisonerStatusSorter implements Comparator<PrisonerStatus> {
 
     /**
-     * Order:
-     * 1) Free
-     * 2) Prisoners willing to Defect
-     * 3) Prisoners not willing to Defect
-     * 4) Bondsmen
+     * Order: 1) Free 2) Prisoners willing to Defect 3) Prisoners not willing to Defect 4) Bondsmen
      *
-     * @param o1    the first PrisonerStatus
-     * @param o2    the second PrisonerStatus
+     * @param o1 the first PrisonerStatus
+     * @param o2 the second PrisonerStatus
+     *
      * @return the sort order
      */
     @Override

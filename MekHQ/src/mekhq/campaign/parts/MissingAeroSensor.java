@@ -25,23 +25,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -86,7 +90,7 @@ public class MissingAeroSensor extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof AeroSensor && dropship == ((AeroSensor) part).isForSpaceCraft()
-                && (dropship || getUnitTonnage() == part.getUnitTonnage());
+                     && (dropship || getUnitTonnage() == part.getUnitTonnage());
     }
 
     @Override
@@ -146,10 +150,12 @@ public class MissingAeroSensor extends MissingPart {
         return PartRepairType.ELECTRONICS;
     }
 
-    /**  This function is over-ridden from it's parent because Aero Sensors depend on tonnage for small craft, but not for dropships/warships
-    * So we have to use regexes to change the acquistion name if the sensors are for spacecraft
-    * @return description string for the missing part
-    */
+    /**
+     * This function is over-ridden from it's parent because Aero Sensors depend on tonnage for small craft, but not for
+     * dropships/warships So we have to use regexes to change the acquistion name if the sensors are for spacecraft
+     *
+     * @return description string for the missing part
+     */
     @Override
     public String getAcquisitionName() {
         if (dropship) {

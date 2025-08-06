@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -41,8 +46,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.rating.IUnitRating;
 
 /**
- * Base class for unit generators containing common functionality.
- * Currently, only turret-related code.
+ * Base class for unit generators containing common functionality. Currently, only turret-related code.
  *
  * @author NickAragua
  */
@@ -54,9 +58,8 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
     private Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
 
     /**
-     * Worker function to initialize the mapping between a numeric quality rating
-     * level
-     * and an alphabetic one (such as one used in the RATs)
+     * Worker function to initialize the mapping between a numeric quality rating level and an alphabetic one (such as
+     * one used in the RATs)
      */
     private void initializeRatRatingMappings() {
         // TODO : Switch this with a call to a new IUnitRating array
@@ -78,6 +81,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
      * @param skill       The skill level of the turret operator
      * @param quality     The quality level of the turret
      * @param currentYear The current year
+     *
      * @return List of turrets
      */
     @Override
@@ -94,7 +98,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // we can handle any number of them.
         initializeRatRatingMappings();
 
-        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext();) {
+        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext(); ) {
             String currentName = rats.next();
             if (currentName.contains("Turrets")) {
                 String turretQuality = currentName.substring(currentName.length() - 1);

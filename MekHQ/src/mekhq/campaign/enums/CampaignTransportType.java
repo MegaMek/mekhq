@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,20 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.enums;
 
-import megamek.common.*;
-import mekhq.campaign.unit.*;
+import megamek.common.BattleArmorHandles;
+import megamek.common.Bay;
+import megamek.common.DockingCollar;
+import megamek.common.InfantryCompartment;
+import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
+import mekhq.campaign.unit.ITransportAssignment;
+import mekhq.campaign.unit.ShipTransportedUnitsSummary;
+import mekhq.campaign.unit.TacticalTransportedUnitsSummary;
+import mekhq.campaign.unit.TowTransportedUnitsSummary;
+import mekhq.campaign.unit.TransportAssignment;
+import mekhq.campaign.unit.TransportShipAssignment;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 
 /**
- * Enum for the different transport types used in MekHQ.
- * Campaign Transports allow a unit to be
- * assigned a transport (another unit).
- * The different transport types primarily differ
- * in the Transporters they allow.
+ * Enum for the different transport types used in MekHQ. Campaign Transports allow a unit to be assigned a transport
+ * (another unit). The different transport types primarily differ in the Transporters they allow.
  *
  * @see Unit
  * @see TransporterType
@@ -48,24 +60,19 @@ public enum CampaignTransportType {
     // which transport assignment should be used when loading
     // units in the MegaMek lobby.
     /**
-     * Units assigned a ship transport, if both units are in the battle
-     * the unit will attempt to load onto the transport when deployed into battle.
-     * Ship transports are intended to be used for long-term travel or space combat
-     * and only allow units to be transported in long-term Transporters like Bays or
-     * Docking Collars.
+     * Units assigned a ship transport, if both units are in the battle the unit will attempt to load onto the transport
+     * when deployed into battle. Ship transports are intended to be used for long-term travel or space combat and only
+     * allow units to be transported in long-term Transporters like Bays or Docking Collars.
      *
      * @see Bay
      * @see DockingCollar
      */
     SHIP_TRANSPORT(TransportShipAssignment.class, ShipTransportedUnitsSummary.class),
     /**
-     * Units assigned a tactical transport, if both units are in the battle
-     * the unit will attempt to load onto the transport when deployed into battle.
-     * Tactical Transporters are meant to represent short-term transport - Infantry
-     * in
-     * an Infantry compartment, or Battle Armor on Battle Armor Handles. It still
-     * allows
-     * units to be loaded into bays though for tactical Dropship assaults.
+     * Units assigned a tactical transport, if both units are in the battle the unit will attempt to load onto the
+     * transport when deployed into battle. Tactical Transporters are meant to represent short-term transport - Infantry
+     * in an Infantry compartment, or Battle Armor on Battle Armor Handles. It still allows units to be loaded into bays
+     * though for tactical Dropship assaults.
      *
      * @see InfantryCompartment
      * @see BattleArmorHandles
@@ -73,9 +80,7 @@ public enum CampaignTransportType {
     TACTICAL_TRANSPORT(TransportAssignment.class, TacticalTransportedUnitsSummary.class),
 
     /**
-     * Units assigned a tow transports will, if both deployed to battle,
-     * automatically
-     * set the unit as being towed.
+     * Units assigned a tow transports will, if both deployed to battle, automatically set the unit as being towed.
      */
     TOW_TRANSPORT(TransportAssignment.class, TowTransportedUnitsSummary.class);
     // endregion Enum declarations
@@ -87,7 +92,7 @@ public enum CampaignTransportType {
 
     // region Constructors
     CampaignTransportType(Class<? extends ITransportAssignment> transportAssignmentType,
-            Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
+          Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
         this.transportAssignmentType = transportAssignmentType;
         this.transportedUnitsSummaryType = transportedUnitsSummaryType;
     }

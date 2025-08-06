@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
@@ -43,7 +48,7 @@ public class ApproximateMatchStep extends UnscrambleStep {
     public void visit(final EquipmentProposal proposal, final AmmoBin ammoBin) {
         final Mounted<?> mount = proposal.getEquipment(ammoBin.getEquipmentNum());
         if ((mount != null) && (mount.getType() instanceof AmmoType)
-                && ammoBin.canChangeMunitions((AmmoType) mount.getType())) {
+                  && ammoBin.canChangeMunitions((AmmoType) mount.getType())) {
             proposal.proposeMapping(ammoBin, ammoBin.getEquipmentNum());
         }
     }

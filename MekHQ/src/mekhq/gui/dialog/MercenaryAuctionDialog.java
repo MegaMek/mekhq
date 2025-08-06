@@ -47,8 +47,8 @@ import javax.swing.event.HyperlinkEvent.EventType;
 
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Entity;
 import megamek.client.ui.util.ViewFormatting;
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
 import mekhq.campaign.Campaign;
@@ -82,7 +82,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
      * @param stepSize       The step size for each spinner adjustment.
      */
     public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid, int percentPerStep,
-                                  int stepSize) {
+          int stepSize) {
         super(campaign,
               campaign.getSeniorAdminPerson(TRANSPORT),
               null,
@@ -177,7 +177,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
      * @return The JPanel containing the spinner, or {@code null} if the default value is invalid.
      */
     private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue, int maximumValue,
-                                                        int stepSize) {
+          int stepSize) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue, maximumValue, stepSize));
         JLabel label = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "spinner.label.auction"));
 

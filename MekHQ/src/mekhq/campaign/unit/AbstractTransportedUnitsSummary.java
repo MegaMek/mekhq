@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
@@ -85,9 +90,11 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     /**
-     * Recalculates transport capacity - make sure you pass in all the transporters
-     * of a given type (class), or just all the transporters an entity has.
+     * Recalculates transport capacity - make sure you pass in all the transporters of a given type (class), or just all
+     * the transporters an entity has.
+     *
      * @param transporters What transporters are we recalculating?
+     *
      * @see Entity#getTransports()
      */
     @Override
@@ -113,7 +120,8 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         for (Transporter transporter : transporters) {
             TransporterType transporterType = TransporterType.getTransporterType(transporter);
             if (transportCapacity.containsKey(transporterType)) {
-                transportCapacity.replace(transporterType, transportCapacity.get(transporterType) + transporter.getUnused());
+                transportCapacity.replace(transporterType,
+                      transportCapacity.get(transporterType) + transporter.getUnused());
             } else {
                 transportCapacity.put(transporterType, transporter.getUnused());
             }
@@ -147,6 +155,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * Returns true if the unit has capacity left for a transporter type
      *
      * @param transporterType Does the unit have free capacity in this type?
+     *
      * @return True if the unit has capacity, false if not
      */
     @Override
@@ -158,6 +167,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * Returns the current capacity of a transporter type
      *
      * @param transporterType What kind of transporter types are we checking?
+     *
      * @return The current capacity of the transporter, or 0
      */
     @Override
@@ -177,8 +187,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     /**
-     * Gets a value indicating whether or not this unit is
-     * transporting units.
+     * Gets a value indicating whether or not this unit is transporting units.
      *
      * @return true if the unit has any transported units
      */
@@ -209,6 +218,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * Removes a unit from our set of transported units.
      *
      * @param unit The unit to remove from our set of transported units.
+     *
      * @return True if the unit was removed, otherwise false.
      */
     @Override
@@ -229,8 +239,8 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     /**
-     * Completely clears the capacity map. Helpful if the transportCapacity has a TransporterType for a Transporter
-     * the unit no longer has - such as after a refit.
+     * Completely clears the capacity map. Helpful if the transportCapacity has a TransporterType for a Transporter the
+     * unit no longer has - such as after a refit.
      */
     public void clearTransportCapacityMap() {
         transportCapacity = new HashMap<>();
@@ -250,7 +260,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
                 transportedEntities.add(transportedEntity);
             }
 
-                transport.getEntity().resetTransporter();
+            transport.getEntity().resetTransporter();
         }
         return transportedEntities;
     }
@@ -293,15 +303,17 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         if (transport.getEntity() != null && transportedEntity != null) {
             if (transport.getEntity().canLoad(transportedEntity, false)) {
                 transport.getEntity().load(transportedEntity, false);
-            }
-            else {
-                logger.error(String.format("Could not load entity %s onto unit %s", transportedEntity.getDisplayName(), transport.getName()));
+            } else {
+                logger.error(String.format("Could not load entity %s onto unit %s",
+                      transportedEntity.getDisplayName(),
+                      transport.getName()));
             }
         }
     }
 
     /**
      * When fixing references we need to replace the transported units
+     *
      * @param newTransportedUnits The units that should be transported
      */
     @Override

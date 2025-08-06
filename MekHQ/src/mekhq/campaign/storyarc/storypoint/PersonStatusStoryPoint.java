@@ -24,8 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -36,22 +47,12 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 /**
- * This StoryPoint is started and completed whenever the status of a Person with
- * a certain UUID is in a certain state.
- * Most typically this would be used to end the game if the main character is
- * killed.
+ * This StoryPoint is started and completed whenever the status of a Person with a certain UUID is in a certain state.
+ * Most typically this would be used to end the game if the main character is killed.
  * <p>
- * This class differs from {@link CheckPersonStatusStoryPoint
- * CheckPersonStatusStoryPoint} in that it is activated by
- * the listener in StoryArc rather than being called explicitly in a chain of
- * StoryPoints.
+ * This class differs from {@link CheckPersonStatusStoryPoint CheckPersonStatusStoryPoint} in that it is activated by
+ * the listener in StoryArc rather than being called explicitly in a chain of StoryPoints.
  * </p>
  */
 public class PersonStatusStoryPoint extends StoryPoint {

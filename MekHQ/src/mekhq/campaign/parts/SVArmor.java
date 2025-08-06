@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -34,8 +39,6 @@ import java.util.Objects;
 
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.TechRating;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -102,7 +105,7 @@ public class SVArmor extends Armor {
     @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(
-                Money.of(amount * ArmorType.svArmor(bar).getCost()));
+              Money.of(amount * ArmorType.svArmor(bar).getCost()));
     }
 
     @Override
@@ -113,7 +116,7 @@ public class SVArmor extends Armor {
     @Override
     public Money getValueNeeded() {
         return adjustCostsForCampaignOptions(
-                Money.of(amountNeeded * ArmorType.svArmor(bar).getCost()));
+              Money.of(amountNeeded * ArmorType.svArmor(bar).getCost()));
     }
 
     @Override
@@ -133,8 +136,8 @@ public class SVArmor extends Armor {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && (bar == ((SVArmor) part).bar)
-                && (techRating == ((SVArmor) part).techRating);
+                     && (bar == ((SVArmor) part).bar)
+                     && (techRating == ((SVArmor) part).techRating);
     }
 
     @Override
@@ -219,7 +222,9 @@ public class SVArmor extends Armor {
 
     /**
      * Not sure how true this title is, it was used in {@link SVArmor#getAmountAvailable}
+     *
      * @param part is this part the same
+     *
      * @return true if the two parts are the same, at least as far as {@link SVArmor#getAmountAvailable} is concerned
      */
     private boolean isSameSVArmorPart(Part part) {

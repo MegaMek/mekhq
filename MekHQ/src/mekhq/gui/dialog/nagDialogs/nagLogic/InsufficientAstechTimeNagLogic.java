@@ -24,37 +24,45 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
+import java.util.Collection;
+
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-
-import java.util.Collection;
 
 public class InsufficientAstechTimeNagLogic {
     /**
      * Determines whether there is an astech time deficit in the campaign.
      *
      * <p>This method calculates the astech time deficit by evaluating the total maintenance time
-     * required by valid campaign units in comparison to the available astech work time. It returns
-     * {@code true} if the deficit is positive, indicating that the campaign's available astech time
-     * is insufficient. Otherwise, it returns {@code false}.</p>
+     * required by valid campaign units in comparison to the available astech work time. It returns {@code true} if the
+     * deficit is positive, indicating that the campaign's available astech time is insufficient. Otherwise, it returns
+     * {@code false}.</p>
      *
      * <p>An astech time deficit occurs when the required maintenance time exceeds the available
      * astech work time, even after accounting for any overtime that may be allowed.</p>
      *
-     * @param units A collection of {@link Unit} objects to evaluate for maintenance needs.
-     * @param possibleAstechPoolMinutes The total available astech work minutes without considering overtime.
-     * @param isOvertimeAllowed A flag indicating whether overtime is allowed, which adds to the available work time.
+     * @param units                      A collection of {@link Unit} objects to evaluate for maintenance needs.
+     * @param possibleAstechPoolMinutes  The total available astech work minutes without considering overtime.
+     * @param isOvertimeAllowed          A flag indicating whether overtime is allowed, which adds to the available work
+     *                                   time.
      * @param possibleAstechPoolOvertime The additional astech work minutes available if overtime is allowed.
      *
-     * @return {@code true} if there is a positive astech time deficit (deficit > 0),
-     *         {@code false} otherwise.
+     * @return {@code true} if there is a positive astech time deficit (deficit > 0), {@code false} otherwise.
      */
     public static boolean hasAsTechTimeDeficit(Collection<Unit> units, int possibleAstechPoolMinutes,
-                                               boolean isOvertimeAllowed, int possibleAstechPoolOvertime) {
-        int asTechsTimeDeficit = getAsTechTimeDeficit(units, possibleAstechPoolMinutes, isOvertimeAllowed, possibleAstechPoolOvertime);
+          boolean isOvertimeAllowed, int possibleAstechPoolOvertime) {
+        int asTechsTimeDeficit = getAsTechTimeDeficit(units,
+              possibleAstechPoolMinutes,
+              isOvertimeAllowed,
+              possibleAstechPoolOvertime);
         return asTechsTimeDeficit > 0;
     }
 
@@ -62,8 +70,8 @@ public class InsufficientAstechTimeNagLogic {
      * Calculates the astech time deficit for the campaign.
      *
      * <p>This method determines the total maintenance time required by valid hangar units
-     * and compares it to the available astech work time in the campaign. The deficit, if any,
-     * is calculated, rounded up, and returned as an integer value.</p>
+     * and compares it to the available astech work time in the campaign. The deficit, if any, is calculated, rounded
+     * up, and returned as an integer value.</p>
      *
      * <p>A unit is considered valid for maintenance if it satisfies all the following conditions:</p>
      * <ul>
@@ -77,15 +85,16 @@ public class InsufficientAstechTimeNagLogic {
      * work pool. The deficit is then calculated as the difference between total maintenance time
      * and available astech time, ensuring the result is never negative.</p>
      *
-     * @param units A collection of {@link Unit} objects to evaluate for maintenance needs.
-     * @param possibleAstechPoolMinutes The total available astech work minutes without considering overtime.
-     * @param isOvertimeAllowed A flag indicating whether overtime is allowed, which adds to the available work time.
+     * @param units                      A collection of {@link Unit} objects to evaluate for maintenance needs.
+     * @param possibleAstechPoolMinutes  The total available astech work minutes without considering overtime.
+     * @param isOvertimeAllowed          A flag indicating whether overtime is allowed, which adds to the available work
+     *                                   time.
      * @param possibleAstechPoolOvertime The additional astech work minutes available if overtime is allowed.
      *
      * @return The rounded-up astech time deficit, or {@code 0} if there is no deficit.
      */
     public static int getAsTechTimeDeficit(Collection<Unit> units, int possibleAstechPoolMinutes,
-                                           boolean isOvertimeAllowed, int possibleAstechPoolOvertime) {
+          boolean isOvertimeAllowed, int possibleAstechPoolOvertime) {
         // Calculate the total maintenance time needed using a traditional loop
         int need = 0;
         for (Unit unit : units) {
@@ -99,6 +108,7 @@ public class InsufficientAstechTimeNagLogic {
         }
 
         // Ensure deficit is non-negative
-        return Math.max(0, (int) Math.ceil((need - possibleAstechPoolMinutes) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME));
+        return Math.max(0,
+              (int) Math.ceil((need - possibleAstechPoolMinutes) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME));
     }
 }

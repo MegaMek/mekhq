@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -32,12 +37,13 @@ public class InsufficientMedicsNagLogic {
      * Determines whether additional medics are needed in the campaign.
      *
      * <p>This method checks if the number of required medics is greater than zero. If it is, this
-     * indicates a need for additional medics to meet the campaign's requirements; otherwise, no
-     * additional medics are required.</p>
+     * indicates a need for additional medics to meet the campaign's requirements; otherwise, no additional medics are
+     * required.</p>
      *
      * @param medicsRequired The number of medics currently required to meet the campaign's needs.
+     *
      * @return {@code true} if the number of required medics ({@code medicsRequired}) is greater than zero,
-     *         {@code false} otherwise.
+     *       {@code false} otherwise.
      */
     public static boolean hasMedicsNeeded(int medicsRequired) {
         return medicsRequired > 0;

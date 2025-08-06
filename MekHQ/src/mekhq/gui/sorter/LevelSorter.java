@@ -35,8 +35,7 @@ package mekhq.gui.sorter;
 import java.util.Comparator;
 
 /**
- * A comparator for skills levels (e.g. Regular, Veteran, etc)
- *   * @author Jay Lawson
+ * A comparator for skills levels (e.g. Regular, Veteran, etc) * @author Jay Lawson
  *
  */
 public class LevelSorter implements Comparator<String> {

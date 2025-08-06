@@ -1049,7 +1049,8 @@ public class EquipmentPartTest {
         when(mounted.isSplit()).thenReturn(true);
         int secondLocation = Mek.LOC_LT;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
-        doReturn(0).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+        doReturn(0).when(entity)
+              .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
         // Break the part again
         equipmentPart.setHits(hits);
@@ -1093,7 +1094,8 @@ public class EquipmentPartTest {
         when(mounted.isSplit()).thenReturn(true);
         int secondLocation = Mek.LOC_LT;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
-        doReturn(2).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+        doReturn(2).when(entity)
+              .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
         // Fix the part from our side
         equipmentPart.setHits(0);
@@ -1165,13 +1167,15 @@ public class EquipmentPartTest {
             assertTrue(warehouse.getParts().contains(equipmentPart));
 
             // Restore thte first location
-            doReturn(0).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+            doReturn(0).when(entity)
+                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
 
             // Split the mount and bust the second location ...
             when(mounted.isSplit()).thenReturn(true);
             int secondLocation = Mek.LOC_LT;
             when(mounted.getSecondLocation()).thenReturn(secondLocation);
-            doReturn(1).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+            doReturn(1).when(entity)
+                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
             // The underlying equipment has a hit so this should hit the part
             equipmentPart.updateConditionFromEntity(true);
@@ -1181,8 +1185,10 @@ public class EquipmentPartTest {
             assertTrue(warehouse.getParts().contains(equipmentPart));
 
             // Now, hit both locations hard, triggering a roll we'll fail
-            doReturn(2).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
-            doReturn(3).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+            doReturn(2).when(entity)
+                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+            doReturn(3).when(entity)
+                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
             // The underlying equipment has a hit so this should hit the part
             equipmentPart.updateConditionFromEntity(true);

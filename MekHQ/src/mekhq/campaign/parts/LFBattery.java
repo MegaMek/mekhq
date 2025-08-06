@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -51,10 +56,15 @@ public class LFBattery extends Part {
 
     // Not specified in IO - use SO p158
     public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2519, 2529, 2600).setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH).setTechRating(TechRating.D)
-            .setAvailability(AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.E)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                              .setAdvancement(2519, 2529, 2600)
+                                                              .setPrototypeFactions(Faction.TH)
+                                                              .setProductionFactions(Faction.TH)
+                                                              .setTechRating(TechRating.D)
+                                                              .setAvailability(AvailabilityValue.E,
+                                                                    AvailabilityValue.F,
+                                                                    AvailabilityValue.E,
+                                                                    AvailabilityValue.E)
+                                                              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...
     private int coreType;
@@ -100,8 +110,8 @@ public class LFBattery extends Part {
                 }
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -208,8 +218,8 @@ public class LFBattery extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof LFBattery
-                && coreType == ((LFBattery) part).getCoreType()
-                && docks == ((LFBattery) part).getDocks();
+                     && coreType == ((LFBattery) part).getCoreType()
+                     && docks == ((LFBattery) part).getDocks();
     }
 
     @Override
@@ -251,7 +261,7 @@ public class LFBattery extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-                .add(getDocks() + " collars");
+              .add(getDocks() + " collars");
         return joiner.toString();
     }
 

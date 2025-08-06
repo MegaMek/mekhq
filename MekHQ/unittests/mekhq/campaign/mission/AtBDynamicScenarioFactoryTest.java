@@ -59,11 +59,11 @@ class AtBDynamicScenarioFactoryTest {
     Campaign campaign;
     Player player = new Player(1, "Test");
     Game game = new Game();
-    
+
     @BeforeAll
     public static void setUpBeforeClass() throws IOException, DOMException {
     }
-    
+
     @BeforeEach
     public void setUp() {
         // Initialize the mock objects
@@ -74,7 +74,7 @@ class AtBDynamicScenarioFactoryTest {
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.VETERAN);
         when(options.isUseTactics()).thenReturn(false);
         when(options.isUseInitiativeBonus()).thenReturn(false);
-        
+
         when(campaign.getPlayer()).thenReturn(player);
         when(campaign.getGame()).thenReturn(game);
 
@@ -100,12 +100,12 @@ class AtBDynamicScenarioFactoryTest {
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.ULTRA_GREEN);
-        
+
         String factionCode = "LC";
         String unitName = "Shadow Hawk SHD-2H";
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        
+
         Entity entity = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
         assertFalse(entity.getCrew().getNickname(0).isEmpty());
     }
@@ -117,7 +117,7 @@ class AtBDynamicScenarioFactoryTest {
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.REGULAR);
-        
+
         // Two mekwarriors, both alike in dignity (but not in exp or pay grade)
         String factionCode = "LC";
         String unitName = "Shadow Hawk SHD-2H";
@@ -130,7 +130,7 @@ class AtBDynamicScenarioFactoryTest {
 
         // 2nd crew, vet, gets a callsign
         skill = SkillLevel.VETERAN;
-        
+
         Entity entity2 = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
         assertFalse(entity2.getCrew().getNickname(0).isEmpty());
     }
@@ -157,7 +157,7 @@ class AtBDynamicScenarioFactoryTest {
 
         Entity entity2 = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
         assertTrue(entity2.getCrew().getNickname(0).isEmpty());
-        
+
         // 3rd crew, vet, gets no callsign
         skill = SkillLevel.VETERAN;
 

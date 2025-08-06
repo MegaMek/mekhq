@@ -313,7 +313,7 @@ public class ArmorTest {
         int partCount = warehouse.getSpareParts().size();
 
         // Assert
-        assertEquals(ARMOR_AMOUNT -1, amountAvailable);
+        assertEquals(ARMOR_AMOUNT - 1, amountAvailable);
         assertEquals(2, partCount);
     }
 
@@ -329,7 +329,7 @@ public class ArmorTest {
         warehouse.addPart(armorDifferentType, false);
 
         // Act
-        armor.changeAmountAvailable( -(ARMOR_AMOUNT+12));
+        armor.changeAmountAvailable(-(ARMOR_AMOUNT + 12));
         int amountAvailable = armor.getAmountAvailable();
         int partCount = warehouse.getSpareParts().size();
 

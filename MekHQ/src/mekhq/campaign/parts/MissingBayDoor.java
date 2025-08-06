@@ -24,16 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
-
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
 
 import megamek.common.Entity;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.Node;
 
 /**
  * @author Neoancient
@@ -129,8 +133,11 @@ public class MissingBayDoor extends MissingPart {
     @Override
     public TechAdvancement getTechAdvancement() {
         return new TechAdvancement(TechBase.ALL).setAdvancement(DATE_PS, DATE_PS, DATE_PS)
-                .setTechRating(TechRating.A)
-                .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
-                .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                     .setTechRating(TechRating.A)
+                     .setAvailability(AvailabilityValue.A,
+                           AvailabilityValue.A,
+                           AvailabilityValue.A,
+                           AvailabilityValue.A)
+                     .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 }

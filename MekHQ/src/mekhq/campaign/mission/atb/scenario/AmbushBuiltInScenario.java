@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
@@ -70,7 +75,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
@@ -79,16 +84,16 @@ public class AmbushBuiltInScenario extends AtBScenario {
             if (weight <= EntityWeightClass.WEIGHT_LIGHT) {
                 // Generate Two Meks of the same Weight Class
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                        getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+                      getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
 
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                        getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+                      getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
             } else {
                 // Generate 3 Meks of a lower Weight Class
                 for (int i = 0; i < 3; i++) {
                     enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(),
-                            getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                            UnitType.MEK, weight - 1, campaign));
+                          getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
+                          UnitType.MEK, weight - 1, campaign));
                 }
             }
 
@@ -103,7 +108,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 66);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 100, false);
+              1, 100, false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

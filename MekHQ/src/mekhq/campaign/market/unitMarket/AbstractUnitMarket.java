@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.unitMarket;
 
@@ -244,7 +249,7 @@ public abstract class AbstractUnitMarket {
     protected int generateTransitDuration(final Campaign campaign) {
         if (campaign.getCampaignOptions().isInstantUnitMarketDelivery()) {
             return 0;
-        } 
+        }
         return campaign.calculatePartTransitTime(Compute.d6(2) - 2);
     }
 

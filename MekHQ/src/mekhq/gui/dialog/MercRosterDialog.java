@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -34,7 +39,6 @@ import java.awt.Insets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
-
 import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
@@ -45,8 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.MercRosterAccess;
 
 /**
- * A dialog that sets up a connection with a mysql MercRoster database to upload
- * campaign data
+ * A dialog that sets up a connection with a mysql MercRoster database to upload campaign data
  *
  * @author Jay Lawson
  * @since Jan 6, 2010, 10:46:02 PM
@@ -79,7 +82,7 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         txtAddress = new JTextField("localhost");
         txtPort = new JTextField("3306");
@@ -193,14 +196,15 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
         String passwd = new String(txtPasswd.getPassword());
         access = new MercRosterAccess(address, port, table, username, passwd, campaign);
         progressMonitor = new ProgressMonitor(frame,
-                "Uploading data to MercRoster",
-                access.getProgressNote(), 0, 100);
+              "Uploading data to MercRoster",
+              access.getProgressNote(), 0, 100);
         try {
             access.connect();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(frame,
-                    "Could not connect to the mysql database. Check your entries and confirm\n that you can connect to the database remotely.",
-                    "Could not connect", JOptionPane.ERROR_MESSAGE);
+                  "Could not connect to the mysql database. Check your entries and confirm\n that you can connect to the database remotely.",
+                  "Could not connect",
+                  JOptionPane.ERROR_MESSAGE);
             logger.error("", ex);
             return;
         }

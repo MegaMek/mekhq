@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
@@ -36,14 +44,16 @@ import megamek.common.EntityWeightClass;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
@@ -68,7 +78,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int otherStart;
         int otherHome;
@@ -147,7 +157,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
         ScenarioObjective keepFriendliesAlive = null;
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
         ScenarioObjective destroyHostiles = null;
         ScenarioObjective civilianObjective;
 
@@ -170,7 +180,8 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             bonusEffect.howMuch = 1;
             civilianObjective.addSuccessEffect(bonusEffect);
             civilianObjective.addDetail(String
-                    .format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
+                                              .format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
+                                                    bonusEffect.howMuch));
         } else {
             civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 1, 100);
             civilianObjective.setTimeLimit(10);

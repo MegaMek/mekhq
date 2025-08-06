@@ -24,16 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import javax.swing.AbstractListModel;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 public class FilterableListModel<E> extends AbstractListModel<E> implements ListDataListener {
     private ListModel<E> peerModel;
@@ -98,12 +104,12 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
 
         if ((null != filter) && (null != peerModel)) {
             IntStream.range(0, peerModel.getSize()).filter(i -> filter.test(peerModel.getElementAt(i)))
-                .forEach(i -> {
-                    indices.add(i);
-                    if (fireEvent) {
-                        fireIntervalAdded(this, getSize() - 1, getSize() - 1);
-                    }
-                });
+                  .forEach(i -> {
+                      indices.add(i);
+                      if (fireEvent) {
+                          fireIntervalAdded(this, getSize() - 1, getSize() - 1);
+                      }
+                  });
         }
     }
 

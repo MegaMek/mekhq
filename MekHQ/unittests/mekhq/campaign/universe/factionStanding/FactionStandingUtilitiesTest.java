@@ -46,28 +46,28 @@ import org.junit.jupiter.params.provider.MethodSource;
 class FactionStandingUtilitiesTest {
     static Stream<Arguments> standingLevelProvider() {
         return Stream.of(
-                // In-range for all standing levels
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_1),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMaximumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_1),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_2),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_2),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_3),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMaximumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_3),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMinimumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMaximumRegard(),
-                        FactionStandingLevel.STANDING_LEVEL_4),
-                // Typical mid-range values
-                Arguments.of((FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard() +
-                                      FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard()) / 2,
-                        FactionStandingLevel.STANDING_LEVEL_2),
-                // Out-of-range (below min, above max)
+              // In-range for all standing levels
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_1),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMaximumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_1),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_2),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_2),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_3),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMaximumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_3),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMinimumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_4),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMaximumRegard(),
+                    FactionStandingLevel.STANDING_LEVEL_4),
+              // Typical mid-range values
+              Arguments.of((FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard() +
+                                  FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard()) / 2,
+                    FactionStandingLevel.STANDING_LEVEL_2),
+              // Out-of-range (below min, above max)
               Arguments.of(Double.NEGATIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_0),
               Arguments.of(Double.POSITIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_8),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard() - 100.0,

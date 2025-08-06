@@ -24,37 +24,42 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class PersonnelFilterStyleTest {
     //region Variable Declarations
     private static final PersonnelFilterStyle[] styles = PersonnelFilterStyle.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("PersonnelFilterStyle.STANDARD.toolTipText"),
-                PersonnelFilterStyle.STANDARD.getToolTipText());
+              PersonnelFilterStyle.STANDARD.getToolTipText());
         assertEquals(resources.getString("PersonnelFilterStyle.ALL.toolTipText"),
-                PersonnelFilterStyle.ALL.getToolTipText());
+              PersonnelFilterStyle.ALL.getToolTipText());
     }
     //endregion Getters
 
@@ -98,13 +103,17 @@ public class PersonnelFilterStyleTest {
         try (MockedStatic<PersonnelFilter> personnelFilter = Mockito.mockStatic(PersonnelFilter.class)) {
             final List<PersonnelFilter> individualRolesStandardPersonnelFilters = new ArrayList<>();
             individualRolesStandardPersonnelFilters.add(PersonnelFilter.MEKWARRIOR);
-            personnelFilter.when(PersonnelFilter::getIndividualRolesStandardPersonnelFilters).thenReturn(individualRolesStandardPersonnelFilters);
-            assertEquals(individualRolesStandardPersonnelFilters, PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(true));
+            personnelFilter.when(PersonnelFilter::getIndividualRolesStandardPersonnelFilters)
+                  .thenReturn(individualRolesStandardPersonnelFilters);
+            assertEquals(individualRolesStandardPersonnelFilters,
+                  PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(true));
 
             final List<PersonnelFilter> individualRolesExpandedPersonnelFilters = new ArrayList<>();
             individualRolesExpandedPersonnelFilters.add(PersonnelFilter.FOUNDER);
-            personnelFilter.when(PersonnelFilter::getIndividualRolesExpandedPersonnelFilters).thenReturn(individualRolesExpandedPersonnelFilters);
-            assertEquals(individualRolesExpandedPersonnelFilters, PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(false));
+            personnelFilter.when(PersonnelFilter::getIndividualRolesExpandedPersonnelFilters)
+                  .thenReturn(individualRolesExpandedPersonnelFilters);
+            assertEquals(individualRolesExpandedPersonnelFilters,
+                  PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(false));
 
             final List<PersonnelFilter> allStandardFilters = new ArrayList<>();
             allStandardFilters.add(PersonnelFilter.ACTIVE);
@@ -130,8 +139,10 @@ public class PersonnelFilterStyleTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelFilterStyle.STANDARD.text"), PersonnelFilterStyle.STANDARD.toString());
-        assertEquals(resources.getString("PersonnelFilterStyle.INDIVIDUAL_ROLE.text"), PersonnelFilterStyle.INDIVIDUAL_ROLE.toString());
+        assertEquals(resources.getString("PersonnelFilterStyle.STANDARD.text"),
+              PersonnelFilterStyle.STANDARD.toString());
+        assertEquals(resources.getString("PersonnelFilterStyle.INDIVIDUAL_ROLE.text"),
+              PersonnelFilterStyle.INDIVIDUAL_ROLE.toString());
         assertEquals(resources.getString("PersonnelFilterStyle.ALL.text"), PersonnelFilterStyle.ALL.toString());
     }
 }

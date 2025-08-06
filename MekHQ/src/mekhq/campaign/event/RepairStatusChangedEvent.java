@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.event;
@@ -32,10 +37,8 @@ import megamek.common.event.MMEvent;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a damaged unit has the repair location changed or is toggled between
- * salvage and repair. The repair site can be found with getUnit().getSite() and the
- * repair/salvage flag with getUnit().isSalvage().
- *
+ * Triggered when a damaged unit has the repair location changed or is toggled between salvage and repair. The repair
+ * site can be found with getUnit().getSite() and the repair/salvage flag with getUnit().isSalvage().
  */
 public class RepairStatusChangedEvent extends MMEvent {
 

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -50,11 +55,10 @@ import java.util.ResourceBundle;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.*;
 
-import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.client.ui.dialogs.minimap.MinimapPanel;
+import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.common.Board;
 import megamek.common.BoardDimensions;
 import megamek.common.Configuration;
@@ -96,7 +100,7 @@ public class EditMapSettingsDialog extends JDialog {
     private ImageLoader loader;
 
     public EditMapSettingsDialog(JFrame parent, boolean modal, int boardType, boolean usingFixedMap, String map,
-            int mapSizeX, int mapSizeY) {
+          int mapSizeX, int mapSizeY) {
 
         super(parent, modal);
         this.boardType = boardType;
@@ -134,7 +138,7 @@ public class EditMapSettingsDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMapSettingsDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setTitle(resourceMap.getString("dialog.title"));
 
         getContentPane().setLayout(new BorderLayout());
@@ -342,7 +346,7 @@ public class EditMapSettingsDialog extends JDialog {
 
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value,
-                int index, boolean isSelected, boolean cellHasFocus) {
+              int index, boolean isSelected, boolean cellHasFocus) {
 
             String board = (String) value;
             // For generated boards, add the size to have different images for different
@@ -367,7 +371,7 @@ public class EditMapSettingsDialog extends JDialog {
                     loader.add(board);
                     setToolTipText(null);
                     return super.getListCellRendererComponent(list, new File(board).getName(), index, isSelected,
-                            cellHasFocus);
+                          cellHasFocus);
                 } else {
                     icon = new ImageIcon(image);
 
@@ -487,7 +491,7 @@ public class EditMapSettingsDialog extends JDialog {
         private void redrawMapTable(Image image) {
             if (image != null) {
                 if (listFixedMaps.getFixedCellHeight() != image.getHeight(null)
-                        || listFixedMaps.getFixedCellWidth() != image.getWidth(null)) {
+                          || listFixedMaps.getFixedCellWidth() != image.getWidth(null)) {
                     listFixedMaps.setFixedCellHeight(image.getHeight(null));
                     listFixedMaps.setFixedCellWidth(image.getWidth(null));
                 }

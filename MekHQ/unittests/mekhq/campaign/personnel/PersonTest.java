@@ -86,26 +86,26 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertTrue(mockPerson.getAwardController().hasAwards());
         assertEquals(2, mockPerson.getAwardController().getAwards().size());
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertTrue(mockPerson.getAwardController().hasAwards());
         assertEquals(1, mockPerson.getAwardController().getAwards().size());
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertFalse(mockPerson.getAwardController().hasAwards());
         assertEquals(0, mockPerson.getAwardController().getAwards().size());
@@ -124,21 +124,21 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
 
         assertEquals(2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertEquals(1, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertEquals(0, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
     }
@@ -165,12 +165,12 @@ public class PersonTest {
         assertEquals(is1Id, mockPerson.getOriginalUnitId());
 
         int[] is2Techs = new int[] {
-                TechConstants.T_IS_TW_NON_BOX,
-                TechConstants.T_IS_TW_ALL,
-                TechConstants.T_IS_ADVANCED,
-                TechConstants.T_IS_EXPERIMENTAL,
-                TechConstants.T_IS_UNOFFICIAL,
-        };
+              TechConstants.T_IS_TW_NON_BOX,
+              TechConstants.T_IS_TW_ALL,
+              TechConstants.T_IS_ADVANCED,
+              TechConstants.T_IS_EXPERIMENTAL,
+              TechConstants.T_IS_UNOFFICIAL,
+              };
         for (int is2TechLevel : is2Techs) {
             UUID is2Id = UUID.randomUUID();
             int is2WeightClass = EntityWeightClass.WEIGHT_HEAVY;
@@ -191,11 +191,11 @@ public class PersonTest {
         }
 
         int[] clanTechs = new int[] {
-                TechConstants.T_CLAN_TW,
-                TechConstants.T_CLAN_ADVANCED,
-                TechConstants.T_CLAN_EXPERIMENTAL,
-                TechConstants.T_CLAN_UNOFFICIAL,
-        };
+              TechConstants.T_CLAN_TW,
+              TechConstants.T_CLAN_ADVANCED,
+              TechConstants.T_CLAN_EXPERIMENTAL,
+              TechConstants.T_CLAN_UNOFFICIAL,
+              };
         for (int clanTech : clanTechs) {
             UUID clanId = UUID.randomUUID();
             int clanWeightClass = EntityWeightClass.WEIGHT_MEDIUM;

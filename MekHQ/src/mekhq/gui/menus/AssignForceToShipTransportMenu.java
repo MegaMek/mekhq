@@ -24,26 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui.menus;
 
-import mekhq.campaign.unit.enums.TransporterType;
-import mekhq.campaign.utilities.CampaignTransportUtilities;
-import mekhq.utilities.MHQInternationalization;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.unit.Unit;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.JOptionPane;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * Menu for assigning a unit to a specific Ship Transport
+ *
  * @see CampaignTransportType#SHIP_TRANSPORT
  * @see mekhq.campaign.unit.ShipTransportedUnitsSummary
  * @see mekhq.campaign.unit.TransportShipAssignment
@@ -52,8 +58,10 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
     /**
      * Constructor for a new ship transport Menu
+     *
      * @param campaign current campaign
-     * @param units selected units to try and assign
+     * @param units    selected units to try and assign
+     *
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     public AssignForceToShipTransportMenu(Campaign campaign, Set<Unit> units) {
@@ -61,9 +69,10 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
     }
 
     /**
-     * Returns a Set of Transporters that the provided units could all be loaded into
-     * for Ship Transport.
+     * Returns a Set of Transporters that the provided units could all be loaded into for Ship Transport.
+     *
      * @param units filter the transporter list based on what these units could use
+     *
      * @return Transporters suitable for long-term or space travel.
      */
     @Override
@@ -71,7 +80,9 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(campaignTransportType).keySet());
 
         for (Unit unit : units) {
-            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(SHIP_TRANSPORT, unit.getEntity());
+            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(
+                  SHIP_TRANSPORT,
+                  unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {
@@ -87,18 +98,22 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
     /**
      * Assigns the units to the Ship Transport.
+     *
      * @param evt             ActionEvent from the selection happening
      * @param transporterType transporter type selected in an earlier menu
      * @param transport       transport (Unit) that will load these units
      * @param units           units being assigned to the transport
      */
     @Override
-    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Set<Unit> units) {
+    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport,
+          Set<Unit> units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
-                JOptionPane.showMessageDialog(null,MHQInternationalization.getFormattedTextAt(
-                    "mekhq.resources.AssignForceToTransport", "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
-                    unit.getName(), transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
+                      "mekhq.resources.AssignForceToTransport",
+                      "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
+                      unit.getName(),
+                      transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 

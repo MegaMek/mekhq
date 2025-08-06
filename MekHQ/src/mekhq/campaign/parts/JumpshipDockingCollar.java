@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -51,19 +56,25 @@ public class JumpshipDockingCollar extends Part {
     private static final MMLogger logger = MMLogger.create(JumpshipDockingCollar.class);
 
     static final TechAdvancement TA_BOOM = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2458, 2470, 2500)
-            .setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C)
-            .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                 .setAdvancement(2458, 2470, 2500)
+                                                 .setPrototypeFactions(Faction.TH)
+                                                 .setProductionFactions(Faction.TH)
+                                                 .setTechRating(TechRating.C)
+                                                 .setAvailability(AvailabilityValue.C,
+                                                       AvailabilityValue.C,
+                                                       AvailabilityValue.C,
+                                                       AvailabilityValue.C)
+                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2304, 2350, 2364, 2520)
-            .setPrototypeFactions(Faction.TA)
-            .setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.B)
-            .setAvailability(AvailabilityValue.C, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                    .setAdvancement(2304, 2350, 2364, 2520)
+                                                    .setPrototypeFactions(Faction.TA)
+                                                    .setProductionFactions(Faction.TH)
+                                                    .setTechRating(TechRating.B)
+                                                    .setAvailability(AvailabilityValue.C,
+                                                          AvailabilityValue.X,
+                                                          AvailabilityValue.X,
+                                                          AvailabilityValue.X)
+                                                    .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int collarType;
     private int collarNumber;
@@ -108,8 +119,8 @@ public class JumpshipDockingCollar extends Part {
                 hits = 0;
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -207,7 +218,7 @@ public class JumpshipDockingCollar extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof JumpshipDockingCollar)
-                && (collarType == ((JumpshipDockingCollar) part).collarType);
+                     && (collarType == ((JumpshipDockingCollar) part).collarType);
     }
 
     @Override

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package asserts;
 
@@ -46,6 +51,6 @@ public class BigDecimalAssert {
         BigDecimal scaledExpected = expected.setScale(scale, RoundingMode.FLOOR);
         BigDecimal scaledActual = ((BigDecimal) actual).setScale(scale, RoundingMode.FLOOR);
         Assertions.assertEquals(0, scaledExpected.compareTo(scaledActual),
-                "\n\texpected: " + scaledExpected + "\n\tactual: " + scaledActual);
+              "\n\texpected: " + scaledExpected + "\n\tactual: " + scaledActual);
     }
 }

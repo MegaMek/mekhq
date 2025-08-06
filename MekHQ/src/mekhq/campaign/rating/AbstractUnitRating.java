@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating;
 
@@ -171,7 +176,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     protected BigDecimal calcAverageExperience() {
         return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN)
-                : BigDecimal.ZERO;
+                     : BigDecimal.ZERO;
     }
 
     /**
@@ -303,16 +308,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
         // Compute the score.
         BigDecimal scoredPercent = getTransportPercent().subtract(
-                new BigDecimal(50));
+              new BigDecimal(50));
         if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
             return value;
         }
         BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10),
-                0,
-                RoundingMode.DOWN);
+              0,
+              RoundingMode.DOWN);
         value += percentageScore.multiply(new BigDecimal(5))
-                .setScale(0, RoundingMode.DOWN)
-                .intValue();
+                       .setScale(0, RoundingMode.DOWN)
+                       .intValue();
         value = Math.min(value, 25);
 
         // Only the highest of these values should be used, regardless of how
@@ -387,8 +392,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculates the weighted value of the unit based on if it is Infantry,
-     * Battle Armor or something else.
+     * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.
      *
      * @param u The {@code Unit} to be evaluated.
      */
@@ -439,8 +443,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected abstract int calculateUnitRatingScore();
 
     /**
-     * Recalculates the dragoons rating. If this has already been done, the
-     * initialized flag should already be set true
+     * Recalculates the dragoons rating. If this has already been done, the initialized flag should already be set true
      * and this method will immediately exit.
      */
     protected void initValues() {
@@ -490,11 +493,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Updates the count of storage bays that may be used in Interstellar transport
-     * (part of transport capacity calculations)
+     * Updates the count of storage bays that may be used in Interstellar transport (part of transport capacity
+     * calculations)
      *
-     * @param e is the unit that may or may not contain bays that need to be
-     *          included in the count
+     * @param e is the unit that may or may not contain bays that need to be included in the count
      */
     void updateBayCount(Entity e) {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
@@ -517,7 +519,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
                     setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof InfantryBay) {
                     setInfantryBayCount(getInfantryBayCount()
-                            + (int) Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                                              +
+                                              (int) Math.floor(bay.getCapacity() /
+                                                                     ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }
@@ -693,11 +697,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculate the number of infantry "platoons" present in the company, based on
-     * the numbers
-     * of various infantry present. Per CamOps, the simplification is that an
-     * infantry cube can
-     * house 28 infantry.
+     * Calculate the number of infantry "platoons" present in the company, based on the numbers of various infantry
+     * present. Per CamOps, the simplification is that an infantry cube can house 28 infantry.
      *
      * @return Number of infantry "platoons" in the company.
      */

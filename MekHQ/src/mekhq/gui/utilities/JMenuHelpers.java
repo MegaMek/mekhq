@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
@@ -35,15 +40,13 @@ import mekhq.MHQConstants;
 
 public class JMenuHelpers {
     /**
-     * This is used to add a JMenu to another JMenu, provided it isn't empty, and
-     * then add a scroller
-     * to it if it is above the default minimum threshold
+     * This is used to add a JMenu to another JMenu, provided it isn't empty, and then add a scroller to it if it is
+     * above the default minimum threshold
      *
      * @param menu  the JMenu to add the child to
      * @param child the JMenu to add
      *
-     * @deprecated since 0.50.04, replaced by
-     *             {@link mekhq.gui.baseComponents.JScrollableMenu}
+     * @deprecated since 0.50.04, replaced by {@link mekhq.gui.baseComponents.JScrollableMenu}
      */
     @Deprecated(since = "0.50.04")
     public static void addMenuIfNonEmpty(JMenu menu, JMenu child) {
@@ -51,15 +54,14 @@ public class JMenuHelpers {
     }
 
     /**
-     * This is used to add a JMenu to another JMenu, provided it isn't empty, and
-     * then add a scroller to it if it is above the minimum threshold
+     * This is used to add a JMenu to another JMenu, provided it isn't empty, and then add a scroller to it if it is
+     * above the minimum threshold
      *
      * @param menu              the JMenu to add the child to
      * @param child             the JMenu to add
      * @param scrollerThreshold the threshold for adding a scroller
      *
-     * @deprecated since 0.50.04, replaced by
-     *             {@link mekhq.gui.baseComponents.JScrollableMenu}
+     * @deprecated since 0.50.04, replaced by {@link mekhq.gui.baseComponents.JScrollableMenu}
      */
     @Deprecated(since = "0.50.04")
     public static void addMenuIfNonEmpty(JMenu menu, JMenu child, int scrollerThreshold) {
@@ -72,15 +74,13 @@ public class JMenuHelpers {
     }
 
     /**
-     * This is used to add a JMenu to a JPopupMenu, provided it isn't empty, and
-     * then add a scroller
-     * to it if it is above the default minimum threshold
+     * This is used to add a JMenu to a JPopupMenu, provided it isn't empty, and then add a scroller to it if it is
+     * above the default minimum threshold
      *
      * @param menu  the JPopupMenu to add the child to
      * @param child the JMenu to add
      *
-     * @deprecated since 0.50.04, replaced by
-     *             {@link mekhq.gui.baseComponents.JScrollablePopupMenu}
+     * @deprecated since 0.50.04, replaced by {@link mekhq.gui.baseComponents.JScrollablePopupMenu}
      */
     @Deprecated(since = "0.50.04")
     public static void addMenuIfNonEmpty(JPopupMenu menu, JMenu child) {
@@ -88,16 +88,14 @@ public class JMenuHelpers {
     }
 
     /**
-     * This is used to add a JMenu to a JPopupMenu, provided it isn't empty, and
-     * then add a scroller
-     * to it if it is above the minimum threshold
+     * This is used to add a JMenu to a JPopupMenu, provided it isn't empty, and then add a scroller to it if it is
+     * above the minimum threshold
      *
      * @param menu              the JPopupMenu to add the child to
      * @param child             the JMenu to add
      * @param scrollerThreshold the threshold for adding a scroller
      *
-     * @deprecated since 0.50.04, replaced by
-     *             {@link mekhq.gui.baseComponents.JScrollablePopupMenu}
+     * @deprecated since 0.50.04, replaced by {@link mekhq.gui.baseComponents.JScrollablePopupMenu}
      */
     @Deprecated(since = "0.50.04")
     public static void addMenuIfNonEmpty(JPopupMenu menu, JMenu child, int scrollerThreshold) {

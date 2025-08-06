@@ -116,7 +116,7 @@ public class FactionCensureGoingRogueDialog {
      * Constructs and displays the dialog for selecting a new affiliation when going rogue. The dialog is modal and
      * completes upon construction.
      *
-     * @param campaign the campaign context to use for available factions and dialog content.
+     * @param campaign                the campaign context to use for available factions and dialog content.
      * @param isUsingFactionStandings {@code true} if the campaign has faction standings enabled.
      *
      * @author Illiani

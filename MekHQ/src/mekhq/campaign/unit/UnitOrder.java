@@ -35,21 +35,19 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
-import mekhq.utilities.ReportingUtilities;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -120,6 +118,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     /**
      * @param quantity - the number of parts of this type
+     *
      * @return a string that gives a grammatical correct name based on the quantity
      */
     @Override
@@ -200,17 +199,17 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+                         + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='" + ReportingUtilities.getNegativeColor()
-                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+                         + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
         return "<font color='" + ReportingUtilities.getNegativeColor()
-                + "'><b> unit not found</b>.</font>";
+                     + "'><b> unit not found</b>.</font>";
     }
 
     @Override
@@ -322,7 +321,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     @Override
     public AvailabilityValue getAvailability() {
         return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
-                getCampaign().getTechFaction());
+              getCampaign().getTechFaction());
     }
 
     @Override

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
@@ -45,6 +50,7 @@ public final class EquipmentProposalReport {
      * Creates a message detailing the results of the unscrambling.
      *
      * @param proposal The unscrambling proposal.
+     *
      * @return A String describing the result of the unscrambling operation.
      */
     public static String createReport(final EquipmentProposal proposal) {
@@ -53,18 +59,18 @@ public final class EquipmentProposalReport {
         final Unit unit = proposal.getUnit();
         if (!proposal.isReduced()) {
             builder.append(String.format("Could not unscramble equipment for %s (%s)\n\n",
-                    unit.getName(), unit.getId()));
+                  unit.getName(), unit.getId()));
             for (final Part part : proposal.getParts()) {
                 if (proposal.hasProposal(part)) {
                     continue;
                 }
 
                 builder.append(" - ").append(part.getPartName()).append(" equipmentNum: ")
-                        .append(proposal.getOriginalMapping(part)).append("\n");
+                      .append(proposal.getOriginalMapping(part)).append("\n");
             }
         } else {
             builder.append(String.format("Unscrambled equipment for %s (%s)\n\n",
-                    unit.getName(), unit.getId()));
+                  unit.getName(), unit.getId()));
         }
 
         builder.append("\nEquipment Parts:\n");
@@ -79,12 +85,14 @@ public final class EquipmentProposalReport {
             }
 
             final boolean isMissing = !proposal.hasProposal(part);
-            final String eName = isMissing ? "<Incorrect>"
-                    : ((equipNum >= 0) ? unit.getEntity().getEquipment(equipNum).getName() : "<None>");
+            final String eName = isMissing ?
+                                       "<Incorrect>"
+                                       :
+                                       ((equipNum >= 0) ? unit.getEntity().getEquipment(equipNum).getName() : "<None>");
 
             builder.append(
-                    String.format(" %d: %s %s %s %s\n", (!isMissing ? equipNum : proposal.getOriginalMapping(part)),
-                            part.getName(), part.getLocationName(), eName, isMissing ? " (Missing)" : ""));
+                  String.format(" %d: %s %s %s %s\n", (!isMissing ? equipNum : proposal.getOriginalMapping(part)),
+                        part.getName(), part.getLocationName(), eName, isMissing ? " (Missing)" : ""));
         }
 
         builder.append("\nEquipment:\n");
@@ -93,7 +101,7 @@ public final class EquipmentProposalReport {
             final EquipmentType mType = m.getType();
             final boolean isAvailable = proposal.getEquipment(equipNum) != null;
             builder.append(String.format(" %d: %s %s%s\n", equipNum, m.getName(), mType.getName(),
-                    isAvailable ? " (Available)" : ""));
+                  isAvailable ? " (Available)" : ""));
         }
 
         return builder.toString();

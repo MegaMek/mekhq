@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -38,8 +43,8 @@ public class CampaignController {
     private UUID host;
 
     /**
-     * Creates a new {@code CampaignController} for
-     * the given {@link Campaign}
+     * Creates a new {@code CampaignController} for the given {@link Campaign}
+     *
      * @param c The {@link Campaign} being used locally.
      */
     public CampaignController(Campaign c) {
@@ -48,6 +53,7 @@ public class CampaignController {
 
     /**
      * Gets the local {@link Campaign}.
+     *
      * @return The local {@link Campaign}.
      */
     public Campaign getLocalCampaign() {
@@ -55,8 +61,8 @@ public class CampaignController {
     }
 
     /**
-     * Gets the unique identifier of the campaign hosting
-     * this session.
+     * Gets the unique identifier of the campaign hosting this session.
+     *
      * @return The unique identifier of the host campaign.
      */
     public UUID getHost() {
@@ -64,8 +70,8 @@ public class CampaignController {
     }
 
     /**
-     * Sets the unique identifier of the campaign hosting
-     * this session.
+     * Sets the unique identifier of the campaign hosting this session.
+     *
      * @param id The unique identifier of the host campaign.
      */
     public void setHost(UUID id) {
@@ -74,10 +80,9 @@ public class CampaignController {
     }
 
     /**
-     * Gets a value indicating whether or not the local Campaign
-     * is hosting this session.
-     * @return {@code true} if the local campaign is hosting
-     *         this session, otherwise {@code false}.
+     * Gets a value indicating whether or not the local Campaign is hosting this session.
+     *
+     * @return {@code true} if the local campaign is hosting this session, otherwise {@code false}.
      */
     public boolean isHost() {
         return isHost;

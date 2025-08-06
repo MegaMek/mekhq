@@ -24,8 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.IsoFields;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
@@ -37,17 +60,6 @@ import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.IsoFields;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     private static final MMLogger logger = MMLogger.create(AdvanceDaysDialog.class);
@@ -180,14 +192,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(advanceDaysDurationPanel)
-                        .addComponent(getDailyLogPanel()));
+              layout.createSequentialGroup()
+                    .addComponent(advanceDaysDurationPanel)
+                    .addComponent(getDailyLogPanel()));
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(advanceDaysDurationPanel)
-                        .addComponent(getDailyLogPanel()));
+              layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(advanceDaysDurationPanel)
+                    .addComponent(getDailyLogPanel()));
 
         return panel;
     }
@@ -210,31 +222,31 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         panel.add(lblDays);
 
         setBtnStartAdvancement(new MMButton("btnStartAdvancement", resources.getString("btnStartAdvancement.text"),
-                resources.getString("btnStartAdvancement.toolTipText"), this::startAdvancement));
+              resources.getString("btnStartAdvancement.toolTipText"), this::startAdvancement));
         panel.add(getBtnStartAdvancement());
 
         setBtnNewDay(new MMButton("btnNewDay", resources.getString("btnNewDay.text"),
-                resources.getString("btnNewDay.toolTipText"), this::startAdvancement));
+              resources.getString("btnNewDay.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewDay());
 
         setBtnNewWeek(new MMButton("btnNewWeek", resources.getString("btnNewWeek.text"),
-                resources.getString("btnNewWeek.toolTipText"), this::startAdvancement));
+              resources.getString("btnNewWeek.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewWeek());
 
         setBtnNewMonth(new MMButton("btnNewMonth", resources.getString("btnNewMonth.text"),
-                resources.getString("btnNewMonth.toolTipText"), this::startAdvancement));
+              resources.getString("btnNewMonth.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewMonth());
 
         setBtnNewQuarter(new MMButton("btnNewQuarter", resources.getString("btnNewQuarter.text"),
-                resources.getString("btnNewQuarter.toolTipText"), this::startAdvancement));
+              resources.getString("btnNewQuarter.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewQuarter());
 
         setBtnNewYear(new MMButton("btnNewYear", resources.getString("btnNewYear.text"),
-                resources.getString("btnNewYear.toolTipText"), this::startAdvancement));
+              resources.getString("btnNewYear.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewYear());
 
         setBtnNewQuinquennial(new MMButton("btnNewQuinquennial", resources.getString("btnNewQuinquennial.text"),
-                resources.getString("btnNewQuinquennial.toolTipText"), this::startAdvancement));
+              resources.getString("btnNewQuinquennial.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewQuinquennial());
 
         return panel;
@@ -287,7 +299,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
         } else if (getBtnNewQuarter().equals(evt.getSource())) {
             days = Math.toIntExact(ChronoUnit.DAYS.between(today,
-                    today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(3)));
+                  today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(3)));
         } else if (getBtnNewYear().equals(evt.getSource())) {
             // The number of days until the next year is the length of the year plus one
             // minus
@@ -297,7 +309,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             days = today.lengthOfYear() + 1 - today.getDayOfYear();
         } else if (getBtnNewQuinquennial().equals(evt.getSource())) {
             days = Math.toIntExact(ChronoUnit.DAYS.between(today,
-                    LocalDate.ofYearDay(today.getYear() + 5 - (today.getYear() % 5), 1)));
+                  LocalDate.ofYearDay(today.getYear() + 5 - (today.getYear() % 5), 1)));
         } else {
             logger.error("Unknown source to start advancing days. Advancing to tomorrow.");
             days = 1;

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.io;
 
@@ -34,7 +39,7 @@ import java.util.function.Predicate;
 /**
  * Enumeration holding information about the file types that are most relevant for MekHQ
  */
- public enum FileType {
+public enum FileType {
 
     /**
      * Value for personnel files.
@@ -123,14 +128,14 @@ import java.util.function.Predicate;
                 for (String extension : extensions) {
                     // if the extension would be longer than the file
                     // or the entire file name, skip it...
-                    if (extension.length()+1 >= fileName.length()) {
+                    if (extension.length() + 1 >= fileName.length()) {
                         continue;
                     }
                     // ...otherwise, check that the file name ends with the
                     // extension preceded by a period.
-                    if ((fileName.charAt(len - (extension.length()+1)) == '.')
-                        && fileName.regionMatches(true, len - extension.length(),
-                            extension, 0, extension.length())) {
+                    if ((fileName.charAt(len - (extension.length() + 1)) == '.')
+                              && fileName.regionMatches(true, len - extension.length(),
+                          extension, 0, extension.length())) {
                         return true;
                     }
                 }

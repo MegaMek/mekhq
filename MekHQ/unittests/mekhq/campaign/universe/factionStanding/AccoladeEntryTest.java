@@ -50,14 +50,14 @@ class AccoladeEntryTest {
 
     @ParameterizedTest(name = "canImprove: monthsToAdd={0}, accoladeLevel={1}, expectedCanImprove={2}")
     @CsvSource({
-            // Normal improvement cases for PROPAGANDA_REEL (allowed to improve)
-            "0,PROPAGANDA_REEL,false",
-            "1,PROPAGANDA_REEL,false",
-            COOLDOWN_PERIOD + ",PROPAGANDA_REEL,false",
-            (COOLDOWN_PERIOD - 1) + ",PROPAGANDA_REEL,false",
-            (COOLDOWN_PERIOD + 1) + ",PROPAGANDA_REEL,true",
-            // Improvement should be false for LETTER_FROM_HEAD_OF_STATE even after cooldown
-            (COOLDOWN_PERIOD + 1) + ",LETTER_FROM_HEAD_OF_STATE,false"
+          // Normal improvement cases for PROPAGANDA_REEL (allowed to improve)
+          "0,PROPAGANDA_REEL,false",
+          "1,PROPAGANDA_REEL,false",
+          COOLDOWN_PERIOD + ",PROPAGANDA_REEL,false",
+          (COOLDOWN_PERIOD - 1) + ",PROPAGANDA_REEL,false",
+          (COOLDOWN_PERIOD + 1) + ",PROPAGANDA_REEL,true",
+          // Improvement should be false for LETTER_FROM_HEAD_OF_STATE even after cooldown
+          (COOLDOWN_PERIOD + 1) + ",LETTER_FROM_HEAD_OF_STATE,false"
     })
     void testCanImprove(int monthsToAdd, FactionAccoladeLevel accoladeLevel,
           boolean expectedCanImprove) {
@@ -75,55 +75,55 @@ class AccoladeEntryTest {
 
     private static Stream<Arguments> provideDifferentStandingLevels() {
         return Stream.of(
-                arguments(7, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_8, true),
-                arguments(5, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_7, false),
-                arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_5, false),
-                arguments(7,
-                        FactionAccoladeLevel.LETTER_FROM_HEAD_OF_STATE,
-                        FactionStandingLevel.STANDING_LEVEL_8,
-                        false)
+              arguments(7, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_8, true),
+              arguments(5, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_7, false),
+              arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_5, false),
+              arguments(7,
+                    FactionAccoladeLevel.LETTER_FROM_HEAD_OF_STATE,
+                    FactionStandingLevel.STANDING_LEVEL_8,
+                    false)
         );
     }
 
     @ParameterizedTest(name = "canImproveWithDifferentStandingLevels: {0}, {1}, {2}, {3}")
     @MethodSource("provideDifferentStandingLevels")
     void testCanImproveWithDifferentStandingLevels(int monthsToAdd, FactionAccoladeLevel accoladeLevel,
-            FactionStandingLevel standingLevel, boolean expectedCanImprove) {
+          FactionStandingLevel standingLevel, boolean expectedCanImprove) {
         LocalDate currentDate = issueDate.plusMonths(monthsToAdd);
         AccoladeEntry entry = new AccoladeEntry(accoladeLevel, issueDate);
 
         if (expectedCanImprove) {
             assertTrue(entry.canImprove(currentDate, standingLevel),
-                    "Expected true when months between: " + monthsToAdd + ", level=" + accoladeLevel
-                            + ", standing=" + standingLevel);
+                  "Expected true when months between: " + monthsToAdd + ", level=" + accoladeLevel
+                        + ", standing=" + standingLevel);
         } else {
             assertFalse(entry.canImprove(currentDate, standingLevel),
-                    "Expected false when months between: " + monthsToAdd + ", level=" + accoladeLevel
-                            + ", standing=" + standingLevel);
+                  "Expected false when months between: " + monthsToAdd + ", level=" + accoladeLevel
+                        + ", standing=" + standingLevel);
         }
     }
 
     private static Stream<Arguments> provideCooldownDateCases() {
         return Stream.of(
-                arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, false),
-                arguments(7, FactionAccoladeLevel.PROPAGANDA_REEL, true),
-                arguments(6, FactionAccoladeLevel.STATUE_OR_SIBKO, false)
+              arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, false),
+              arguments(7, FactionAccoladeLevel.PROPAGANDA_REEL, true),
+              arguments(6, FactionAccoladeLevel.STATUE_OR_SIBKO, false)
         );
     }
 
     @ParameterizedTest(name = "canImproveAtCooldownDate: {0}, {1}, {2}")
     @MethodSource("provideCooldownDateCases")
     void testCanImproveWithReachingCooldownDate(int monthsToAdd, FactionAccoladeLevel accoladeLevel,
-            boolean expectedCanImprove) {
+          boolean expectedCanImprove) {
         LocalDate currentDate = issueDate.plusMonths(monthsToAdd);
         AccoladeEntry entry = new AccoladeEntry(accoladeLevel, issueDate);
 
         if (expectedCanImprove) {
             assertTrue(entry.canImprove(currentDate, FactionStandingLevel.STANDING_LEVEL_8),
-                    "Expected true at cooldown date for months: " + monthsToAdd + ", level=" + accoladeLevel);
+                  "Expected true at cooldown date for months: " + monthsToAdd + ", level=" + accoladeLevel);
         } else {
             assertFalse(entry.canImprove(currentDate, FactionStandingLevel.STANDING_LEVEL_8),
-                    "Expected false at cooldown date for months: " + monthsToAdd + ", level=" + accoladeLevel);
+                  "Expected false at cooldown date for months: " + monthsToAdd + ", level=" + accoladeLevel);
         }
     }
 }

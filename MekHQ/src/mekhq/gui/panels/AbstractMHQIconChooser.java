@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
@@ -36,21 +41,21 @@ import megamek.common.icons.AbstractIcon;
 import mekhq.MekHQ;
 
 /**
- * AbstractMHQIconChooser is an extension of abstractIconChooserPanel that moves the preferences to
- * MekHQ.
+ * AbstractMHQIconChooser is an extension of abstractIconChooserPanel that moves the preferences to MekHQ.
+ *
  * @see abstractIconChooserPanel
  */
 public abstract class AbstractMHQIconChooser extends abstractIconChooserPanel {
     //region Constructors
     protected AbstractMHQIconChooser(final JFrame frame, final String name,
-                                     final AbstractIconChooserTree tree,
-                                     final @Nullable AbstractIcon icon) {
+          final AbstractIconChooserTree tree,
+          final @Nullable AbstractIcon icon) {
         super(frame, name, tree, icon);
     }
 
     protected AbstractMHQIconChooser(final JFrame frame, final String name,
-                                     final AbstractIconChooserTree tree,
-                                     final @Nullable AbstractIcon icon, final boolean initialize) {
+          final AbstractIconChooserTree tree,
+          final @Nullable AbstractIcon icon, final boolean initialize) {
         super(frame, name, tree, icon, initialize);
     }
     //endregion Constructors

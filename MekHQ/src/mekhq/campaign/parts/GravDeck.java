@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -50,10 +55,13 @@ public class GravDeck extends Part {
     private static final MMLogger logger = MMLogger.create(GravDeck.class);
 
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
-            .setTechRating(TechRating.B)
-            .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                      .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                      .setTechRating(TechRating.B)
+                                                      .setAvailability(AvailabilityValue.C,
+                                                            AvailabilityValue.C,
+                                                            AvailabilityValue.C,
+                                                            AvailabilityValue.C)
+                                                      .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private int deckType;
     private int deckNumber;
@@ -102,8 +110,8 @@ public class GravDeck extends Part {
             hits = ((Jumpship) unit.getEntity()).getGravDeckDamageFlag(deckNumber);
 
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -202,7 +210,7 @@ public class GravDeck extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof GravDeck)
-                && (deckType == ((GravDeck) part).deckType);
+                     && (deckType == ((GravDeck) part).deckType);
     }
 
     @Override

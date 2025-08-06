@@ -33,13 +33,13 @@
 
 package mekhq.campaign.mission.utilities;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
-
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static mekhq.campaign.force.ForceType.STANDARD;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
 
 public class ContractUtilities {
     /**
@@ -90,10 +90,8 @@ public class ContractUtilities {
      * The unit contribution to the total is determined based on its type. See {@link CombatTeam#getSize(Campaign)}
      *
      * <p>
-     * Units that aren’t associated with a valid combat team or can’t be fetched due
-     * to missing
-     * data are ignored. The final result is returned as an integer by flooring the
-     * calculated total.
+     * Units that aren’t associated with a valid combat team or can’t be fetched due to missing data are ignored. The
+     * final result is returned as an integer by flooring the calculated total.
      * </p>
      *
      * @param campaign the campaign containing the combat teams and units to evaluate
@@ -112,7 +110,7 @@ public class ContractUtilities {
             if (!force.isForceType(STANDARD)) {
                 continue;
             }
-            
+
             numUnits += combatTeam.getSize(campaign);
         }
 

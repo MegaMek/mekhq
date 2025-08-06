@@ -24,9 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.personnel.backgrounds;
+
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedEndWordCorporate;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedEndWordMercenary;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedMiddleWordCorporate;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedMiddleWordMercenary;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.getWeightedPreFab;
+
+import java.util.ResourceBundle;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Compute;
@@ -35,13 +47,9 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.*;
-
 public class BackgroundsController {
     static final ResourceBundle resources = ResourceBundle
-            .getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
+                                                  .getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
 
     public static void generateBackground(Campaign campaign, Person person) {
         if (campaign.getCampaignOptions().isUseToughness()) {
@@ -53,8 +61,8 @@ public class BackgroundsController {
      * Generates a random mercenary company name.
      *
      * @return A string containing the generated name.
-     * @throws IllegalStateException if an unexpected value is encountered during
-     *                               the generation process.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
      */
     public static String randomMercenaryCompanyNameGenerator(@Nullable Person commander) {
         try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
@@ -69,8 +77,8 @@ public class BackgroundsController {
      * Returns the body of the generated name.
      *
      * @return the name body as a String.
-     * @throws IllegalStateException if an unexpected value is encountered in the
-     *                               switch statement.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
      */
     private static String getNameBody(String name) {
         int roll = Compute.randomInt(4);
@@ -94,8 +102,8 @@ public class BackgroundsController {
             // Pre-Fab
             case 3 -> name + getWeightedPreFab().randomItem();
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getNameBody: "
-                    + roll
+                  "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getNameBody: "
+                        + roll
             );
         };
     }
@@ -104,9 +112,10 @@ public class BackgroundsController {
      * Retrieves the prefix for generating a random mercenary company name.
      *
      * @param commander The person object representing the commander. Can be null.
+     *
      * @return The prefix for generating a random mercenary company name.
-     * @throws IllegalStateException if an unexpected value is encountered during
-     *                               the generation process.
+     *
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
      */
     private static String getPrefix(Person commander) {
         int roll = Compute.randomInt(4);
@@ -119,8 +128,8 @@ public class BackgroundsController {
             // 'The'
             case 2, 3 -> resources.getString("definiteArticle.text");
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getPrefix: "
-                            + roll);
+                  "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getPrefix: "
+                        + roll);
         };
     }
 
@@ -128,8 +137,9 @@ public class BackgroundsController {
      * Retrieves the name of the commander.
      *
      * @param commander The person object representing the commander. Can be null.
-     * @return The name of the commander. If the commander is null, a random
-     *         callsign from a weighted list will be returned.
+     *
+     * @return The name of the commander. If the commander is null, a random callsign from a weighted list will be
+     *       returned.
      */
     private static String getCommanderName(@Nullable Person commander) {
         if (commander == null) {
@@ -143,8 +153,9 @@ public class BackgroundsController {
     /**
      * Returns a random word from the given `wordMap` that is unique to the currently generated name.
      *
-     * @param name the name string to check against the generated word
+     * @param name    the name string to check against the generated word
      * @param wordMap the weighted map containing available words to choose from
+     *
      * @return a new word that is unique within 'name'
      */
     private static String getNewWord(String name, WeightedIntMap<String> wordMap) {
@@ -162,8 +173,8 @@ public class BackgroundsController {
      *
      * @param currentName       the current name to check against
      * @param suggestedAddition the suggested addition to the name
-     * @return true if the start of the suggested addition is not present in the
-     *         current name, otherwise false
+     *
+     * @return true if the start of the suggested addition is not present in the current name, otherwise false
      */
     private static boolean checkIfNameContains(String currentName, String suggestedAddition) {
         int checkLength = suggestedAddition.length() - 2;
@@ -174,8 +185,7 @@ public class BackgroundsController {
     }
 
     /**
-     * Generates a numerical name using a random number and a suffix based on the
-     * number's modulo.
+     * Generates a numerical name using a random number and a suffix based on the number's modulo.
      */
     private static String getNumericalNameStart() {
         int number = Compute.randomInt(30) + 1;

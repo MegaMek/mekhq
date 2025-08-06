@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -38,16 +43,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class is a test class for the {@link PrisonersNagDialog} class.
- * It contains tests for various scenarios related to the {@code hasPrisoners} method
+ * This class is a test class for the {@link PrisonersNagDialog} class. It contains tests for various scenarios related
+ * to the {@code hasPrisoners} method
  */
 class PrisonersNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {

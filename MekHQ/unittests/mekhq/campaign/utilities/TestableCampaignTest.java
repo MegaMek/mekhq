@@ -32,13 +32,13 @@
  */
 package mekhq.campaign.utilities;
 
+import static mekhq.campaign.utilities.TestableCampaign.initializeCampaignForTesting;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static mekhq.campaign.utilities.TestableCampaign.initializeCampaignForTesting;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * A test class for testing the functionality and initialization of {@link Campaign} objects.

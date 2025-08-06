@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
-
-import mekhq.MekHQ;
 
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
+
+import mekhq.MekHQ;
 
 public class DateStringComparator implements Comparator<String> {
 

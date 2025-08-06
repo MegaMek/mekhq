@@ -103,7 +103,7 @@ public class StarLeagueCache {
     // We use year -1 as otherwise MHQ considers the SL to no longer exist.
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
     private final LocalDate FALL_OF_STAR_LEAGUE = LocalDate.of(
-        Factions.getInstance().getFaction("SL").getEndYear() - 1, 1, 1);
+          Factions.getInstance().getFaction("SL").getEndYear() - 1, 1, 1);
 
     public enum CacheType {
         TRASH_CACHE, // The cache contains only trash or roleplay items.
@@ -202,8 +202,8 @@ public class StarLeagueCache {
                     }
 
                     Pair<Unit, Part> pair = new Pair<>(unit, part);
-//                    int weight = getDropWeight(pair.getValue());
-//                    partsPool.merge(part, weight, Integer::sum);
+                    //                    int weight = getDropWeight(pair.getValue());
+                    //                    partsPool.merge(part, weight, Integer::sum);
                 }
             }
         } catch (Exception exception) {
@@ -260,8 +260,8 @@ public class StarLeagueCache {
             return new MekFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
         } catch (Exception ex) {
             logger.error("Unable to load entity: {}: {}",
-                unitData.getSourceFile(),
-                unitData.getEntryName(), ex);
+                  unitData.getSourceFile(),
+                  unitData.getEntryName(), ex);
             return null;
         }
     }
@@ -281,8 +281,9 @@ public class StarLeagueCache {
         List<MekSummary> unitSummaries = new ArrayList<>();
         for (int unitType : potentialUnitTypes) {
             for (int unitWeight : unitsPresent.get(unitType)) {
-                unitSummaries.add(campaign.getUnitGenerator().generate(originFaction.getShortName(), unitType, unitWeight,
-                    FALL_OF_STAR_LEAGUE.getYear(), getRandomUnitQuality(0).toNumeric()));
+                unitSummaries.add(campaign.getUnitGenerator()
+                                        .generate(originFaction.getShortName(), unitType, unitWeight,
+                                              FALL_OF_STAR_LEAGUE.getYear(), getRandomUnitQuality(0).toNumeric()));
             }
         }
 
@@ -298,7 +299,7 @@ public class StarLeagueCache {
 
             if (unitType == INFANTRY) {
                 unitsPresent.put(INFANTRY, List.of(UNIT_WEIGHT_UNSPECIFIED, UNIT_WEIGHT_UNSPECIFIED,
-                    UNIT_WEIGHT_UNSPECIFIED));
+                      UNIT_WEIGHT_UNSPECIFIED));
             } else {
                 for (int lance : getCompanyLances()) {
                     if (unitsPresent.containsKey(unitType)) {
@@ -323,7 +324,7 @@ public class StarLeagueCache {
             case 4, 5 -> MEK;
             case 6 -> AEROSPACEFIGHTER;
             default -> throw new IllegalStateException("Unexpected value in getCompanyUnitType: "
-                + roll);
+                                                             + roll);
         };
 
     }
@@ -365,7 +366,7 @@ public class StarLeagueCache {
                 companyLances.add(WEIGHT_ASSAULT);
             }
             default -> throw new IllegalStateException("Unexpected value in getCompanyLances(): "
-                + roll);
+                                                             + roll);
         }
 
         return companyLances;
@@ -379,30 +380,30 @@ public class StarLeagueCache {
         // This table is based on the one found on p265 of Total Warfare
         switch (roll) {
             case 1 -> rollOutcome = switch (weight) {
-                case WEIGHT_LIGHT -> new int[]{WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_LIGHT};
-                case WEIGHT_MEDIUM -> new int[]{WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_HEAVY};
-                case WEIGHT_HEAVY -> new int[]{WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_HEAVY};
-                case WEIGHT_ASSAULT -> new int[]{WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_ASSAULT, WEIGHT_ASSAULT};
+                case WEIGHT_LIGHT -> new int[] { WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_LIGHT };
+                case WEIGHT_MEDIUM -> new int[] { WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_HEAVY };
+                case WEIGHT_HEAVY -> new int[] { WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_HEAVY };
+                case WEIGHT_ASSAULT -> new int[] { WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_ASSAULT, WEIGHT_ASSAULT };
                 default -> throw new IllegalStateException("Unexpected weight: " + weight);
             };
             case 2, 3 -> rollOutcome = switch (weight) {
-                case WEIGHT_LIGHT -> new int[]{WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_MEDIUM};
-                case WEIGHT_MEDIUM, WEIGHT_HEAVY -> new int[]{weight, weight, weight, weight};
-                case WEIGHT_ASSAULT -> new int[]{WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_ASSAULT, WEIGHT_ASSAULT};
+                case WEIGHT_LIGHT -> new int[] { WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_MEDIUM };
+                case WEIGHT_MEDIUM, WEIGHT_HEAVY -> new int[] { weight, weight, weight, weight };
+                case WEIGHT_ASSAULT -> new int[] { WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_ASSAULT, WEIGHT_ASSAULT };
                 default -> throw new IllegalStateException("Unexpected weight: " + weight);
             };
             case 4, 5 -> rollOutcome = switch (weight) {
-                case WEIGHT_LIGHT -> new int[]{WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_MEDIUM};
-                case WEIGHT_MEDIUM -> new int[]{WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_HEAVY};
-                case WEIGHT_HEAVY -> new int[]{WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_ASSAULT};
-                case WEIGHT_ASSAULT -> new int[]{WEIGHT_HEAVY, WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT};
+                case WEIGHT_LIGHT -> new int[] { WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_MEDIUM };
+                case WEIGHT_MEDIUM -> new int[] { WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_HEAVY };
+                case WEIGHT_HEAVY -> new int[] { WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_ASSAULT };
+                case WEIGHT_ASSAULT -> new int[] { WEIGHT_HEAVY, WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT };
                 default -> throw new IllegalStateException("Unexpected weight: " + weight);
             };
             case 6 -> rollOutcome = switch (weight) {
-                case WEIGHT_LIGHT -> new int[]{WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_HEAVY};
-                case WEIGHT_MEDIUM -> new int[]{WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_HEAVY};
-                case WEIGHT_HEAVY -> new int[]{WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_ASSAULT};
-                case WEIGHT_ASSAULT -> new int[]{WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT};
+                case WEIGHT_LIGHT -> new int[] { WEIGHT_LIGHT, WEIGHT_LIGHT, WEIGHT_MEDIUM, WEIGHT_HEAVY };
+                case WEIGHT_MEDIUM -> new int[] { WEIGHT_MEDIUM, WEIGHT_MEDIUM, WEIGHT_HEAVY, WEIGHT_HEAVY };
+                case WEIGHT_HEAVY -> new int[] { WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_HEAVY, WEIGHT_ASSAULT };
+                case WEIGHT_ASSAULT -> new int[] { WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT };
                 default -> throw new IllegalStateException("Unexpected weight: " + weight);
             };
             default -> throw new IllegalStateException("Unexpected value in getlanceWeights(): " + roll);
@@ -445,26 +446,26 @@ public class StarLeagueCache {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         ImageIcon speakerIcon = getSpeakerIcon(false);
-//        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+        //        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
-//        JLabel description = new JLabel(
-//            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-//                UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
-//        description.setHorizontalAlignment(JLabel.CENTER);
+        //        JLabel description = new JLabel(
+        //            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+        //                UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
+        //        description.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            String.format(resources.getString("dialogBorderTitle.text"), "PLACEHOLDER")));
-//        descriptionPanel.add(description);
+              String.format(resources.getString("dialogBorderTitle.text"), "PLACEHOLDER")));
+        //        descriptionPanel.add(description);
         dialog.add(descriptionPanel, BorderLayout.CENTER);
 
         // Prepares and adds the confirm button
         JButton confirmButton = new JButton(resources.getString("confirmDud.text"));
         confirmButton.addActionListener(dialogDismissActionListener);
-        dialog.add(confirmButton,  BorderLayout.SOUTH);
+        dialog.add(confirmButton, BorderLayout.SOUTH);
 
         // Pack, position and display the dialog
         dialog.pack();
@@ -491,7 +492,7 @@ public class StarLeagueCache {
         ActionListener dialogDismissActionListener = e -> {
             dialog.dispose();
             campaign.getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
-                resources.getString("transaction.text"));
+                  resources.getString("transaction.text"));
         };
 
         // Associates the dismiss action to the dialog window close event
@@ -507,21 +508,21 @@ public class StarLeagueCache {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         ImageIcon speakerIcon = getSpeakerIcon(true);
-//        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+        //        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
-//        JLabel description = new JLabel(
-//            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-//                UIUtil.scaleForGUI(DIALOG_WIDTH), getProposalText(proposal)));
-//        description.setHorizontalAlignment(JLabel.CENTER);
+        //        JLabel description = new JLabel(
+        //            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+        //                UIUtil.scaleForGUI(DIALOG_WIDTH), getProposalText(proposal)));
+        //        description.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            String.format(resources.getString("dialogBorderTitle.text"),
-                resources.getString("senderUnknown.text"))));
-//        descriptionPanel.add(description);
+              String.format(resources.getString("dialogBorderTitle.text"),
+                    resources.getString("senderUnknown.text"))));
+        //        descriptionPanel.add(description);
         dialog.add(descriptionPanel, BorderLayout.CENTER);
 
         // Prepares and adds the accept button
@@ -564,7 +565,7 @@ public class StarLeagueCache {
         ActionListener dialogDismissActionListener = e -> {
             dialog.dispose();
             campaign.getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
-                resources.getString("transaction.text"));
+                  resources.getString("transaction.text"));
         };
 
         // Associates the dismiss action to the dialog window close event
@@ -580,20 +581,20 @@ public class StarLeagueCache {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         ImageIcon speakerIcon = getSpeakerIcon(true);
-//        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+        //        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
         JLabel description = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), resources.getString("warning.text")));
+              String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                    UIUtil.scaleForGUI(DIALOG_WIDTH), resources.getString("warning.text")));
         description.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            String.format(resources.getString("dialogBorderTitle.text"),
-                resources.getString("senderUnknown.text"))));
+              String.format(resources.getString("dialogBorderTitle.text"),
+                    resources.getString("senderUnknown.text"))));
         descriptionPanel.add(description);
         dialog.add(descriptionPanel, BorderLayout.CENTER);
 
@@ -628,31 +629,31 @@ public class StarLeagueCache {
         return Money.of(roundedValue);
     }
 
-//    private String getProposalText(Money proposal) {
-//        String commanderTitle = getCommanderTitle(campaign, true);
-//
-//        return String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"),
-//            commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"),
-//            proposal.toAmountAndSymbolString());
-//    }
+    //    private String getProposalText(Money proposal) {
+    //        String commanderTitle = getCommanderTitle(campaign, true);
+    //
+    //        return String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"),
+    //            commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"),
+    //            proposal.toAmountAndSymbolString());
+    //    }
 
-//    private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
-//        final String DUD_FORWARD = "dud";
-//        final String DUD_AFTERWARD = ".text";
-//
-//        String commanderTitle = getCommanderTitle(campaign, false);
-//        String gridReference = track.toString() + '-' + stratconCoords.toBTString();
-//
-//        int roll = Compute.d6(1);
-//        if ((roll <= 2) || !(Objects.equals(originFaction.getShortName(), "SL"))) {
-//            return String.format(resources.getString(DUD_FORWARD + "Generic" +
-//                Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference,
-//                originFaction.getFullName(campaign.getGameYear()));
-//        } else {
-//            return String.format(resources.getString(DUD_FORWARD + "StarLeague"
-//                + Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference);
-//        }
-//    }
+    //    private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
+    //        final String DUD_FORWARD = "dud";
+    //        final String DUD_AFTERWARD = ".text";
+    //
+    //        String commanderTitle = getCommanderTitle(campaign, false);
+    //        String gridReference = track.toString() + '-' + stratconCoords.toBTString();
+    //
+    //        int roll = Compute.d6(1);
+    //        if ((roll <= 2) || !(Objects.equals(originFaction.getShortName(), "SL"))) {
+    //            return String.format(resources.getString(DUD_FORWARD + "Generic" +
+    //                Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference,
+    //                originFaction.getFullName(campaign.getGameYear()));
+    //        } else {
+    //            return String.format(resources.getString(DUD_FORWARD + "StarLeague"
+    //                + Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference);
+    //        }
+    //    }
 
     @Nullable
     private ImageIcon getSpeakerIcon(boolean isAnon) {

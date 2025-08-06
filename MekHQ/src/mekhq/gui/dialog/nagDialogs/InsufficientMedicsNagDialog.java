@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -85,7 +90,8 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
+          @Nullable AdministratorSpecialization specialization) {
         if (campaign == null) {
             return null;
         }

@@ -75,6 +75,7 @@ import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class contains code relevant to rendering the StratCon ("AtB Campaign State") tab.
+ *
  * @author NickAragua
  */
 public class StratconTab extends CampaignGuiTab {
@@ -95,6 +96,7 @@ public class StratconTab extends CampaignGuiTab {
     CampaignManagementDialog cmd;
 
     //region Constructors
+
     /**
      * Creates an instance of the StratconTab.
      */
@@ -157,7 +159,8 @@ public class StratconTab extends CampaignGuiTab {
 
         JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
         infoScrollPane.setBorder(null);
-        infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600), infoScrollPane.getHeight())));
+        infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600),
+              infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
 
         MekHQ.registerHandler(this);
@@ -270,8 +273,8 @@ public class StratconTab extends CampaignGuiTab {
     }
 
     /**
-     * Worker function that updates the campaign state section of the info panel
-     * with such info as current objective status, VP/SP totals, etc.
+     * Worker function that updates the campaign state section of the info panel with such info as current objective
+     * status, VP/SP totals, etc.
      */
     public void updateCampaignState() {
         if ((listCurrentTrack == null) || (campaignStatusText == null)) {
@@ -304,18 +307,18 @@ public class StratconTab extends CampaignGuiTab {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<html><b>").append(currentContract.getContractType()).append(":</b> ")
-            .append(currentContract.getName()).append("<br/>")
-            .append("<i>").append(campaignState.getBriefingText()).append("</i>");
+              .append(currentContract.getName()).append("<br/>")
+              .append("<i>").append(campaignState.getBriefingText()).append("</i>");
 
         if (currentContract.getEndingDate().isBefore(currentDate)) {
             sb.append("<br/>Contract term has expired!");
         }
 
         sb.append("<br/><b>Campaign Victory Points:</b> ").append(campaignState.getVictoryPoints())
-            .append("<br/><b>Support Points:</b> ").append(campaignState.getSupportPoints())
-            .append("<br/><b>Deployment Period:</b> ").append(currentTDI.track.getDeploymentTime())
-            .append(" days")
-            .append("</html>");
+              .append("<br/><b>Support Points:</b> ").append(campaignState.getSupportPoints())
+              .append("<br/><b>Deployment Period:</b> ").append(currentTDI.track.getDeploymentTime())
+              .append(" days")
+              .append("</html>");
 
         campaignStatusText.setText(sb.toString());
 
@@ -323,19 +326,18 @@ public class StratconTab extends CampaignGuiTab {
     }
 
     /**
-     * Builds strategic objective text, appropriately appending details
-     * if the objectives are not "collapsed".
+     * Builds strategic objective text, appropriately appending details if the objectives are not "collapsed".
      */
     private String getStrategicObjectiveText(StratconCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>")
-            .append(buildShortStrategicObjectiveText(campaignState));
+              .append(buildShortStrategicObjectiveText(campaignState));
 
         if (objectivesCollapsed) {
             sb.append(" [+] ");
         } else {
             sb.append(" [-]<br/>")
-                .append(buildStrategicObjectiveText(campaignState));
+                  .append(buildStrategicObjectiveText(campaignState));
         }
 
         sb.append("</html>");
@@ -375,7 +377,11 @@ public class StratconTab extends CampaignGuiTab {
             }
         }
 
-        sb.append("Strategic objectives: ").append(completedObjectives).append('/').append(desiredObjectives).append(" completed</span>");
+        sb.append("Strategic objectives: ")
+              .append(completedObjectives)
+              .append('/')
+              .append(desiredObjectives)
+              .append(" completed</span>");
         return sb.toString();
     }
 
@@ -402,14 +408,26 @@ public class StratconTab extends CampaignGuiTab {
 
                 // special case: allied facilities can get lost at any point in time
                 if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) &&
-                        !campaignState.allowEarlyVictory()) {
-                    sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                          !campaignState.allowEarlyVictory()) {
+                    sb.append("<span color='")
+                          .append(ReportingUtilities.getWarningColor())
+                          .append("'>")
+                          .append(OBJECTIVE_IN_PROGRESS);
                 } else if (objectiveCompleted) {
-                    sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>").append(OBJECTIVE_COMPLETED);
+                    sb.append("<span color='")
+                          .append(ReportingUtilities.getPositiveColor())
+                          .append("'>")
+                          .append(OBJECTIVE_COMPLETED);
                 } else if (objectiveFailed) {
-                    sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>").append(OBJECTIVE_FAILED);
+                    sb.append("<span color='")
+                          .append(ReportingUtilities.getNegativeColor())
+                          .append("'>")
+                          .append(OBJECTIVE_FAILED);
                 } else {
-                    sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                    sb.append("<span color='")
+                          .append(ReportingUtilities.getWarningColor())
+                          .append("'>")
+                          .append(OBJECTIVE_IN_PROGRESS);
                 }
 
                 sb.append(' ');
@@ -421,15 +439,15 @@ public class StratconTab extends CampaignGuiTab {
                 switch (objective.getObjectiveType()) {
                     case SpecificScenarioVictory:
                         sb.append(coordsRevealed ? "E" : "e")
-                            .append("ngage and defeat hostile forces");
+                              .append("ngage and defeat hostile forces");
                         break;
                     case HostileFacilityControl:
                         sb.append(coordsRevealed ? "C" : "c")
-                            .append("apture or destroy designated facility");
+                              .append("apture or destroy designated facility");
                         break;
                     case AlliedFacilityControl:
                         sb.append(coordsRevealed ? "M" : "m")
-                            .append("aintain control of designated facility");
+                              .append("aintain control of designated facility");
 
                         if (!campaignState.allowEarlyVictory()) {
                             sb.append(" until " + campaignState.getContract().getEndingDate());
@@ -437,16 +455,16 @@ public class StratconTab extends CampaignGuiTab {
                         break;
                     case AnyScenarioVictory:
                         sb.append("Engage and defeat hostile forces in ")
-                            .append(objective.getCurrentObjectiveCount()).append('/')
-                            .append(objective.getDesiredObjectiveCount())
-                            .append(" scenarios in ").append(track.getDisplayableName());
+                              .append(objective.getCurrentObjectiveCount()).append('/')
+                              .append(objective.getDesiredObjectiveCount())
+                              .append(" scenarios in ").append(track.getDisplayableName());
                         break;
                     default:
                         break;
                 }
                 if (coordsRevealed && displayCoordinateData) {
                     sb.append(" at ").append(objective.getObjectiveCoords().toBTString())
-                        .append(" on ").append(track.getDisplayableName());
+                          .append(" on ").append(track.getDisplayableName());
                 }
 
                 sb.append("</span><br/>");
@@ -455,18 +473,28 @@ public class StratconTab extends CampaignGuiTab {
 
         // special case text reminding player to complete Turning Point scenarios
         if (!campaignState.getContract().getCommandRights().isIndependent()) {
-            boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
+            boolean contractIsActive = campaignState.getContract()
+                                             .isActiveOn(getCampaignGui().getCampaign().getLocalDate());
 
             if (contractIsActive) {
-                sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                sb.append("<span color='")
+                      .append(ReportingUtilities.getWarningColor())
+                      .append("'>")
+                      .append(OBJECTIVE_IN_PROGRESS);
             } else if (campaignState.getVictoryPoints() > 0) {
-                sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>").append(OBJECTIVE_COMPLETED);
+                sb.append("<span color='")
+                      .append(ReportingUtilities.getPositiveColor())
+                      .append("'>")
+                      .append(OBJECTIVE_COMPLETED);
             } else {
-                sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>").append(OBJECTIVE_FAILED);
+                sb.append("<span color='")
+                      .append(ReportingUtilities.getNegativeColor())
+                      .append("'>")
+                      .append(OBJECTIVE_FAILED);
             }
 
             sb.append(" Maintain Campaign Victory Point count above 0 by completing Turning Point scenarios")
-                .append("</span><br/>");
+                  .append("</span><br/>");
         }
 
         return sb.toString();
@@ -519,7 +547,7 @@ public class StratconTab extends CampaignGuiTab {
             return;
         }
         cmd.display(getCampaign(), selectedTrack.contract.getStratconCampaignState(),
-            selectedTrack.track, getCampaign().isGM());
+              selectedTrack.track, getCampaign().isGM());
         cmd.setModalityType(ModalityType.APPLICATION_MODAL);
         cmd.setVisible(true);
     }
@@ -549,6 +577,7 @@ public class StratconTab extends CampaignGuiTab {
 
     /**
      * Data structure to hold necessary information about a track drop down item.
+     *
      * @author NickAragua
      */
     private static class TrackDropdownItem {

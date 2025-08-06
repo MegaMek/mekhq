@@ -39,10 +39,10 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import javax.swing.*;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Entity;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;

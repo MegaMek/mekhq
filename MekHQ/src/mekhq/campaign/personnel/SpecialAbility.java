@@ -352,7 +352,7 @@ public class SpecialAbility {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash,
-                                                       PersonnelOptions options) {
+          PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -487,7 +487,7 @@ public class SpecialAbility {
      * @return the name of the selected weapon, or null if there are no weapons that can be selected
      */
     public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel, final int year,
-                                                              final boolean clusterOnly) {
+          final boolean clusterOnly) {
         final WeightedIntMap<EquipmentType> weapons = new WeightedIntMap<>();
         // First try to generate based on the person's unit
         if ((person.getUnit() != null) && (person.getUnit().getEntity() != null)) {
@@ -518,8 +518,8 @@ public class SpecialAbility {
      * @param weapons       the weighted map of weaponry to add the equipmentType to if valid
      */
     private static void addValidWeaponryToMap(final EquipmentType equipmentType, final Person person,
-                                              final int techLevel, final int year, final boolean clusterOnly,
-                                              final WeightedIntMap<EquipmentType> weapons) {
+          final int techLevel, final int year, final boolean clusterOnly,
+          final WeightedIntMap<EquipmentType> weapons) {
         // Ensure it is a weapon eligible for the SPA in question, and the tech level is
         // IS for
         // IS personnel and Clan for Clan personnel

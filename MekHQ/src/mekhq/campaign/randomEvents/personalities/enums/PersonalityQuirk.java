@@ -52,16 +52,16 @@ import mekhq.campaign.universe.Faction;
  * Represents various personality quirks that can define an individual's behavior or habits.
  *
  * <p>
- * This enumeration describes a wide array of personality quirks that may manifest in characters,
- * ranging from minor habits like "FIDGETS" or "CLEANER" to more distinct and situational traits
- * like "DRAMATIC" or "BATTLEFIELD_NOSTALGIA." These quirks provide depth and individuality to
- * characters in campaigns, aiding storytelling and immersion in the MekHQ ecosystem.
+ * This enumeration describes a wide array of personality quirks that may manifest in characters, ranging from minor
+ * habits like "FIDGETS" or "CLEANER" to more distinct and situational traits like "DRAMATIC" or
+ * "BATTLEFIELD_NOSTALGIA." These quirks provide depth and individuality to characters in campaigns, aiding storytelling
+ * and immersion in the MekHQ ecosystem.
  * </p>
  *
  * <p>
- * Each personality quirk is paired with localized labels and descriptions using resource bundles,
- * enabling custom, gender-specific, and role-based descriptions such as combat or support roles.
- * Additionally, quirks can integrate with broader faction-based labels for more tailored storytelling.
+ * Each personality quirk is paired with localized labels and descriptions using resource bundles, enabling custom,
+ * gender-specific, and role-based descriptions such as combat or support roles. Additionally, quirks can integrate with
+ * broader faction-based labels for more tailored storytelling.
  * </p>
  */
 public enum PersonalityQuirk {
@@ -319,8 +319,8 @@ public enum PersonalityQuirk {
      * Defines the number of individual description variants available for each trait.
      *
      * <p>Note that this should be equal to the number of description variants for each type of
-     * role (combat or support) and not both combined. i.e., if there are three variants for Combat
-     * and three for Support, this should equal 3 and not 6.</p>
+     * role (combat or support) and not both combined. i.e., if there are three variants for Combat and three for
+     * Support, this should equal 3 and not 6.</p>
      */
     public final static int MAXIMUM_VARIATIONS = 3;
 
@@ -348,8 +348,7 @@ public enum PersonalityQuirk {
      * Retrieves the label associated with the current enumeration value.
      *
      * <p>The label is determined based on the resource bundle for the application,
-     * utilizing the enum name combined with a specific key suffix to fetch the
-     * relevant localized string.</p>
+     * utilizing the enum name combined with a specific key suffix to fetch the relevant localized string.</p>
      *
      * @return the localized label string corresponding to the enumeration value.
      */
@@ -361,29 +360,28 @@ public enum PersonalityQuirk {
     }
 
     /**
-     * Generates a localized and detailed description for a person based on their role, personality,
-     * gender, faction origin, and given name.
+     * Generates a localized and detailed description for a person based on their role, personality, gender, faction
+     * origin, and given name.
      * <p>
-     * This method uses the provided role and personality quirk index, along with character attributes
-     * like gender and faction, to generate a formatted description string. The description incorporates
-     * pronouns and other character-specific details, tailoring the result for the user.
+     * This method uses the provided role and personality quirk index, along with character attributes like gender and
+     * faction, to generate a formatted description string. The description incorporates pronouns and other
+     * character-specific details, tailoring the result for the user.
      * </p>
      *
-     * @param primaryRole       the primary {@link PersonnelRole} of the person. If the role is
-     *                         marked as "dependent" or "None", no description is generated.
-     * @param personalityQuirkIndex an index representing the person's personality quirk description
-     *                             variant. This is clamped to a valid range from 0 to
-     *                             {@code MAXIMUM_VARIATIONS - 1}.
-     * @param gender            the {@link Gender} of the person, used to determine pronouns for
-     *                         the description.
-     * @param originFaction     the {@link Faction} representing the person's origin.
-     * @param givenName         the given name of the person. This <b>MUST</b> use 'person.getGivenName()'
-     *                         and <b>NOT</b> 'person.getFirstName()'
-     * @return                  a formatted description string tailored to the specified person. Returns
-     *                          an empty string if the {@code primaryRole} is "dependent" or "none.
+     * @param primaryRole           the primary {@link PersonnelRole} of the person. If the role is marked as
+     *                              "dependent" or "None", no description is generated.
+     * @param personalityQuirkIndex an index representing the person's personality quirk description variant. This is
+     *                              clamped to a valid range from 0 to {@code MAXIMUM_VARIATIONS - 1}.
+     * @param gender                the {@link Gender} of the person, used to determine pronouns for the description.
+     * @param originFaction         the {@link Faction} representing the person's origin.
+     * @param givenName             the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
+     *                              <b>NOT</b> 'person.getFirstName()'
+     *
+     * @return a formatted description string tailored to the specified person. Returns an empty string if the
+     *       {@code primaryRole} is "dependent" or "none.
      */
     public String getDescription(final PersonnelRole primaryRole, int personalityQuirkIndex,
-                                 final Gender gender, final Faction originFaction, final String givenName) {
+          final Gender gender, final Faction originFaction, final String givenName) {
         if (primaryRole.isDependent() || primaryRole.isNone()) {
             return "";
         }
@@ -416,8 +414,8 @@ public enum PersonalityQuirk {
             factionKey = "innerSphere";
         }
 
-        String lanceLabelUppercase  = getFormattedTextAt(RESOURCE_BUNDLE,
-            formationKey + '.' + factionKey);
+        String lanceLabelUppercase = getFormattedTextAt(RESOURCE_BUNDLE,
+              formationKey + '.' + factionKey);
         String lanceLabelLowercase = lanceLabelUppercase.toLowerCase();
 
         // {0} = givenName
@@ -432,9 +430,9 @@ public enum PersonalityQuirk {
         // {9} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
-            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
-            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), lanceLabelUppercase,
-            lanceLabelLowercase, pronounData.pluralizer());
+              pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+              pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), lanceLabelUppercase,
+              lanceLabelLowercase, pronounData.pluralizer());
     }
 
     /**
@@ -456,16 +454,17 @@ public enum PersonalityQuirk {
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
-     * Converts the given string into an instance of the {@code PersonalityQuirk} enum.
-     * The method tries to interpret the string as both a name of an enumeration constant
-     * and as an ordinal index. If neither interpretation succeeds, it logs an error
-     * and returns {@code NONE}.
+     * Converts the given string into an instance of the {@code PersonalityQuirk} enum. The method tries to interpret
+     * the string as both a name of an enumeration constant and as an ordinal index. If neither interpretation succeeds,
+     * it logs an error and returns {@code NONE}.
      *
-     * @param text the string representation of the quirk; can be either
-     *             the name of an enumeration constant or the ordinal string.
-     * @return the corresponding {@code PersonalityQuirk} enum instance if the string is a valid
-     *         name or ordinal; otherwise, returns {@code NONE}.
+     * @param text the string representation of the quirk; can be either the name of an enumeration constant or the
+     *             ordinal string.
+     *
+     * @return the corresponding {@code PersonalityQuirk} enum instance if the string is a valid name or ordinal;
+     *       otherwise, returns {@code NONE}.
      */
     public static PersonalityQuirk fromString(String text) {
         try {

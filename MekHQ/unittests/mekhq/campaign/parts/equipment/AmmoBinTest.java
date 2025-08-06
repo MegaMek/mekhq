@@ -451,7 +451,7 @@ public class AmmoBinTest {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         AmmoBin ammoBin = new AmmoBin(0, isSRM2InfernoAmmo, 42,
-                isSRM2InfernoAmmo.getShots() - 1, false, false, mockCampaign);
+              isSRM2InfernoAmmo.getShots() - 1, false, false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -572,7 +572,13 @@ public class AmmoBinTest {
     public void emptyAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
-        AmmoBin ammoBin = new AmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots(), false, false, mockCampaign);
+        AmmoBin ammoBin = new AmmoBin(0,
+              isSRM2InfernoAmmo,
+              42,
+              isSRM2InfernoAmmo.getShots(),
+              false,
+              false,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -1496,7 +1502,8 @@ public class AmmoBinTest {
             when(mockAmmoRack2.getType()).thenReturn(ammo2);
         }
 
-        @Test void matchingACAmmo () {
+        @Test
+        void matchingACAmmo() {
             ammo1 = (AmmoType) AmmoType.get("ISAC5 Ammo");
             ammo2 = (AmmoType) AmmoType.get("ISAC5 Ammo");
 
@@ -1507,7 +1514,8 @@ public class AmmoBinTest {
             assertTrue(ammoBin1.isSamePartType(ammoBin2));
         }
 
-        @Test void mismatchedACAmmo () {
+        @Test
+        void mismatchedACAmmo() {
             ammo1 = (AmmoType) AmmoType.get("ISAC5 Ammo");
             ammo2 = (AmmoType) AmmoType.get("ISAC10 Ammo");
 

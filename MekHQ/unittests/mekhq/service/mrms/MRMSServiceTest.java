@@ -334,7 +334,7 @@ public class MRMSServiceTest {
         }
 
         /**
-         * When "Use Extra Time" and "Use Rush Job" options are deactivated, MRMS will succeed unless the part's TN is 
+         * When "Use Extra Time" and "Use Rush Job" options are deactivated, MRMS will succeed unless the part's TN is
          * higher than the "Max TN" setting ("Preferred TN" not considered).
          */
         @Nested
@@ -411,9 +411,9 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired even if the TN is above the "max TN" setting when it is able to reduce the TN to
-             * equal or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as
-             * close as possible to the "Preferred TN" setting.
+             * Unit is repaired even if the TN is above the "max TN" setting when it is able to reduce the TN to equal
+             * or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as close as
+             * possible to the "Preferred TN" setting.
              */
             @Test
             public void testMRMSUnitsTargetNumbersifTNAbovePreferredAboveMax() {
@@ -428,9 +428,9 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired even if the TN is above the "Max TN" setting when it is able to reduce the TN to
-             * equal or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as
-             * close as possible to the "Preferred TN" setting, using extra time if it currently above it.
+             * Unit is repaired even if the TN is above the "Max TN" setting when it is able to reduce the TN to equal
+             * or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as close as
+             * possible to the "Preferred TN" setting, using extra time if it currently above it.
              */
             @Test
             public void testMRMSUnitsTargetNumbersifTNAbovePreferredBelowMax() {

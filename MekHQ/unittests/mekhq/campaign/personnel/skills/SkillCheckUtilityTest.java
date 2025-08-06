@@ -84,7 +84,7 @@ import org.mockito.Mockito;
  */
 class SkillCheckUtilityTest {
     private static final LocalDate CURRENT_DATE = LocalDate.of(3151, 1, 1);
-    
+
     @Test
     void testIsPersonNull_EdgeDisallowed() {
         SkillCheckUtility checkUtility = new SkillCheckUtility(null,

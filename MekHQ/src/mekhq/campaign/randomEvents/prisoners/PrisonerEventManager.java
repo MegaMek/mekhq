@@ -445,7 +445,7 @@ public class PrisonerEventManager {
                   null,
                   inCharacterMessage,
                   null,
-                  outOfCharacterMessage,  null, false);
+                  outOfCharacterMessage, null, false);
             return;
         }
 

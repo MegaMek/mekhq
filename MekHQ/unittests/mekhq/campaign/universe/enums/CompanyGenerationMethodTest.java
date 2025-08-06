@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
@@ -51,16 +56,16 @@ class CompanyGenerationMethodTest {
     private static final CompanyGenerationMethod[] methods = CompanyGenerationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-                CompanyGenerationMethod.AGAINST_THE_BOT.getToolTipText());
+              CompanyGenerationMethod.AGAINST_THE_BOT.getToolTipText());
         assertEquals(resources.getString("CompanyGenerationMethod.WINDCHILD.toolTipText"),
-                CompanyGenerationMethod.WINDCHILD.getToolTipText());
+              CompanyGenerationMethod.WINDCHILD.getToolTipText());
     }
     // endregion Getters
 
@@ -97,20 +102,20 @@ class CompanyGenerationMethodTest {
         final CompanyGenerationOptions mockOptions = mock(CompanyGenerationOptions.class);
         when(mockOptions.getRandomOriginOptions()).thenReturn(new RandomOriginOptions(false));
         when(mockOptions.getBattleMekWeightClassGenerationMethod())
-                .thenReturn(BattleMekWeightClassGenerationMethod.WINDCHILD);
+              .thenReturn(BattleMekWeightClassGenerationMethod.WINDCHILD);
         when(mockOptions.getBattleMekQualityGenerationMethod()).thenReturn(BattleMekQualityGenerationMethod.WINDCHILD);
 
         assertInstanceOf(AtBCompanyGenerator.class,
-                CompanyGenerationMethod.AGAINST_THE_BOT.getGenerator(mockCampaign, mockOptions));
+              CompanyGenerationMethod.AGAINST_THE_BOT.getGenerator(mockCampaign, mockOptions));
         assertInstanceOf(WindchildCompanyGenerator.class,
-                CompanyGenerationMethod.WINDCHILD.getGenerator(mockCampaign, mockOptions));
+              CompanyGenerationMethod.WINDCHILD.getGenerator(mockCampaign, mockOptions));
     }
 
     @Test
     void testToStringOverride() {
         assertEquals(resources.getString("CompanyGenerationMethod.AGAINST_THE_BOT.text"),
-                CompanyGenerationMethod.AGAINST_THE_BOT.toString());
+              CompanyGenerationMethod.AGAINST_THE_BOT.toString());
         assertEquals(resources.getString("CompanyGenerationMethod.WINDCHILD.text"),
-                CompanyGenerationMethod.WINDCHILD.toString());
+              CompanyGenerationMethod.WINDCHILD.toString());
     }
 }

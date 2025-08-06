@@ -24,14 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.Objects;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
@@ -42,11 +44,12 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Storage for infantry weapon ammo. The AmmoType is a placeholder and
- * distinguishes between
- * standard and inferno munitions, but does not distinguish the type of weapon.
+ * Storage for infantry weapon ammo. The AmmoType is a placeholder and distinguishes between standard and inferno
+ * munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
     private static final MMLogger logger = MMLogger.create(InfantryAmmoStorage.class);
@@ -58,7 +61,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     public InfantryAmmoStorage(int tonnage, @Nullable AmmoType et, int shots,
-            @Nullable InfantryWeapon weaponType, @Nullable Campaign c) {
+          @Nullable InfantryWeapon weaponType, @Nullable Campaign c) {
         super(tonnage, et, shots, c);
         this.weaponType = weaponType;
     }
@@ -109,20 +112,21 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && isSameAmmoType(((InfantryAmmoStorage) part).getType(), ((InfantryAmmoStorage) part).getWeaponType());
+                     &&
+                     isSameAmmoType(((InfantryAmmoStorage) part).getType(),
+                           ((InfantryAmmoStorage) part).getWeaponType());
     }
 
     /**
-     * Gets a value indicating whether or not the {@code AmmoType} for the
-     * {@code InfantryWeapon}
-     * is the same as this instance.
+     * Gets a value indicating whether or not the {@code AmmoType} for the {@code InfantryWeapon} is the same as this
+     * instance.
      *
      * @param ammoType   The {@code AmmoType}.
      * @param weaponType The {@code InfantryWeapon} carrying the ammo.
      */
     public boolean isSameAmmoType(AmmoType ammoType, InfantryWeapon weaponType) {
         return isSameAmmoType(ammoType)
-                && Objects.equals(getWeaponType(), weaponType);
+                     && Objects.equals(getWeaponType(), weaponType);
     }
 
     @Override
@@ -162,6 +166,6 @@ public class InfantryAmmoStorage extends AmmoStorage {
     @Override
     public InfantryAmmoStorage getNewPart() {
         return new InfantryAmmoStorage(1, getType(), getWeaponType().getShots(),
-                getWeaponType(), campaign);
+              getWeaponType(), campaign);
     }
 }

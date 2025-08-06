@@ -54,9 +54,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This will be a special type of part that will only exist as spares
- * It will determine the amount of ammo of a particular type that
- * is available
+ * This will be a special type of part that will only exist as spares It will determine the amount of ammo of a
+ * particular type that is available
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -121,7 +120,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
 
         return adjustCostsForCampaignOptions(
-                getStickerPrice().multipliedBy(shots).dividedBy(getType().getShots()));
+              getStickerPrice().multipliedBy(shots).dividedBy(getType().getShots()));
     }
 
     public int getShots() {
@@ -136,28 +135,27 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isSamePartType(@Nullable Part part) {
         return (getClass() == part.getClass())
-                && Objects.equals(getType(), ((AmmoStorage) part).getType());
+                     && Objects.equals(getType(), ((AmmoStorage) part).getType());
     }
 
     /**
-     * Gets a value indicating whether or an {@code AmmoType} is
-     * the same as this instance's ammo.
+     * Gets a value indicating whether or an {@code AmmoType} is the same as this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
      */
     public boolean isSameAmmoType(AmmoType otherAmmoType) {
         return getType().equalsAmmoTypeOnly(otherAmmoType)
-                && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
-                && (getType().getRackSize() == otherAmmoType.getRackSize());
+                     && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
+                     && (getType().getRackSize() == otherAmmoType.getRackSize());
     }
 
     /**
-     * Gets a value indicating whether or not an {@code AmmoType}
-     * is compatible with this instance's ammo.
+     * Gets a value indicating whether or not an {@code AmmoType} is compatible with this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
-     * @return False if the ammo does not support "compatibility" or is not compatible, true if the ammo type
-     * supports compatibility and is compatible
+     *
+     * @return False if the ammo does not support "compatibility" or is not compatible, true if the ammo type supports
+     *       compatibility and is compatible
      */
     public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
         return getType().isCompatibleWith(otherAmmoType);
@@ -278,10 +276,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+                         + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='" + ReportingUtilities.getNegativeColor()
-                    + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+                         + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -293,7 +291,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='" + ReportingUtilities.getNegativeColor()
-                + "'><b> part not found</b>.</font>";
+                     + "'><b> part not found</b>.</font>";
     }
 
     @Override

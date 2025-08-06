@@ -24,18 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.partGenerators;
+
+import java.util.List;
 
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
-import java.util.List;
-
 /**
- * 1 Part for every 3, rounded normally.
- * This means you get 1 part for 2-4 in the input array, plus another for every interval above that.
+ * 1 Part for every 3, rounded normally. This means you get 1 part for 2-4 in the input array, plus another for every
+ * interval above that.
  *
  * @author Justin "Windchild" Bowen
  */

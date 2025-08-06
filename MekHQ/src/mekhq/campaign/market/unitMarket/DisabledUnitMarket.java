@@ -24,20 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.unitMarket;
 
-import megamek.common.annotations.Nullable;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.Version;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
 import org.w3c.dom.Node;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a completely empty unit market, which is used when the market is disabled.
@@ -71,15 +76,15 @@ public class DisabledUnitMarket extends AbstractUnitMarket {
 
     @Override
     public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-                                          final int unitType, final Faction faction,
-                                          final int quality, final int percent) {
+          final int unitType, final Faction faction,
+          final int quality, final int percent) {
         return null;
     }
 
     @Override
     public void addOffers(final Campaign campaign, final int number, final UnitMarketType market,
-                             final int unitType, final Faction faction, final int quality,
-                             final int priceTarget) {
+          final int unitType, final Faction faction, final int quality,
+          final int priceTarget) {
 
     }
 

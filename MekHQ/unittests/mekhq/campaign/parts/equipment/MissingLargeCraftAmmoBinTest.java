@@ -24,8 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
+
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
 import megamek.common.AmmoType;
@@ -46,21 +71,6 @@ import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MissingLargeCraftAmmoBinTest {
     @Test
@@ -102,7 +112,7 @@ public class MissingLargeCraftAmmoBinTest {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, isSRM2InfernoAmmo, 42, 25.0,
-                mockCampaign);
+              mockCampaign);
         missingAmmoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -212,7 +222,7 @@ public class MissingLargeCraftAmmoBinTest {
         int equipmentNum = 18;
         int bayNum = 31;
         MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, ammoType, equipmentNum, 25.0,
-                mockCampaign);
+              mockCampaign);
         Unit unit = mock(Unit.class);
         ArgumentCaptor<Part> replacementCaptor = ArgumentCaptor.forClass(Part.class);
         doAnswer(ans -> {

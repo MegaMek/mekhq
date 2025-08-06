@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
@@ -32,7 +37,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,10 +51,10 @@ import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.campaignOptions.CreateCampaignPreset;
 
 /**
- * This class displays a Campaign Preset. It is used in a List Renderer for preset selection, and as
- * the panel for preset customization and addition. We only want to be able to edit the preset if
- * the campaign and preset are both not null, and the preset is in the userdata folder. This
- * prevents it from being shown on the renderer, where the button cannot be used.
+ * This class displays a Campaign Preset. It is used in a List Renderer for preset selection, and as the panel for
+ * preset customization and addition. We only want to be able to edit the preset if the campaign and preset are both not
+ * null, and the preset is in the userdata folder. This prevents it from being shown on the renderer, where the button
+ * cannot be used.
  */
 public class CampaignPresetPanel extends AbstractMHQPanel {
     //region Variable Declarations
@@ -62,7 +66,7 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
 
     //region Constructors
     public CampaignPresetPanel(final JFrame frame, final @Nullable Campaign campaign,
-                               final @Nullable CampaignPreset preset) {
+          final @Nullable CampaignPreset preset) {
         super(frame, "CampaignPresetPanel");
         this.campaign = campaign;
         setPreset(preset);
@@ -107,8 +111,8 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
 
         // Setup the Panel
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createLineBorder(Color.BLACK, 2)));
+              BorderFactory.createEmptyBorder(5, 5, 5, 5),
+              BorderFactory.createLineBorder(Color.BLACK, 2)));
         setName("campaignPresetPanel");
         setLayout(new GridBagLayout());
 
@@ -126,9 +130,9 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
 
         if (editPreset) { // TODO : Add a way to access this
             final JButton btnEditPreset = new MMButton("btnEditPreset", resources.getString("Edit.text"),
-                    resources.getString("btnEditPreset.toolTipText"), evt -> {
+                  resources.getString("btnEditPreset.toolTipText"), evt -> {
                 final CreateCampaignPreset dialog = new CreateCampaignPreset(
-                        getFrame(), getCampaign(), getPreset());
+                      getFrame(), getCampaign(), getPreset());
                 if (dialog.showDialog().isConfirmed()) {
                     updateFromPreset(getPreset());
                 }

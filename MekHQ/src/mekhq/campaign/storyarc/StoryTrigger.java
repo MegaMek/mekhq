@@ -24,26 +24,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
- * A Story Trigger can be added to a StoryPoint or a StoryOutcome and when the
- * StoryPoint is completed the StoryTrigger
- * will be executed and will do some things. This is a way to have StoryPoints
- * affect things other than just the
- * next story point
+ * A Story Trigger can be added to a StoryPoint or a StoryOutcome and when the StoryPoint is completed the StoryTrigger
+ * will be executed and will do some things. This is a way to have StoryPoints affect things other than just the next
+ * story point
  */
 public abstract class StoryTrigger {
     private static final MMLogger logger = MMLogger.create(StoryTrigger.class);

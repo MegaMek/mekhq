@@ -105,7 +105,7 @@ public enum ProcurementPersonnelPick {
      *       category, {@code false} otherwise.
      */
     public static boolean isIneligibleToPerformProcurement(Person person,
-                                                           ProcurementPersonnelPick acquisitionCategory) {
+          ProcurementPersonnelPick acquisitionCategory) {
         switch (acquisitionCategory) {
             case NONE -> {
                 return true;

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
@@ -35,11 +40,12 @@ import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.UnitIcon;
 
 /**
- * UnitIconChooser is an implementation of StandardForceIconChooser that is used to select a
- * UnitIcon from the Force Icon Directory.
+ * UnitIconChooser is an implementation of StandardForceIconChooser that is used to select a UnitIcon from the Force
+ * Icon Directory.
+ * <p>
+ * The only differences from its originator are that it specifies the icon creation and selection methods to be for a
+ * UnitIcon instead of a StandardForceIcon.
  *
- * The only differences from its originator are that it specifies the icon creation and selection
- * methods to be for a UnitIcon instead of a StandardForceIcon.
  * @see StandardForceIconChooser
  * @see AbstractMHQIconChooser
  * @see abstractIconChooserPanel

@@ -24,16 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
-
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * Creates a simple narrative {@link StoryDialog StoryDialog} with an optional image and text.
@@ -67,7 +77,8 @@ public class StoryNarrativeDialog extends StoryDialog {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        String text = StoryArc.replaceTokens(((NarrativeStoryPoint) getStoryPoint()).getNarrative(), getStoryPoint().getCampaign());
+        String text = StoryArc.replaceTokens(((NarrativeStoryPoint) getStoryPoint()).getNarrative(),
+              getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         txtDesc.setCaretPosition(0);
         JScrollPane scrollPane = new JScrollPaneWithSpeed(txtDesc);

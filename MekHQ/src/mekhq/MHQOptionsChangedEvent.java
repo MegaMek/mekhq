@@ -24,14 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
 import megamek.common.event.MMEvent;
 
 /**
- * An event triggered after the MHQOptions are changed.
- * The event handlers cannot modify these options.
+ * An event triggered after the MHQOptions are changed. The event handlers cannot modify these options.
  */
 public class MHQOptionsChangedEvent extends MMEvent {
     // region Constructors
