@@ -136,7 +136,7 @@ public class PersonnelStatusTest {
     @Test
     public void testIsDead() {
         List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
-            NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
+              NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
               SUICIDE,
               BONDSREF,
               SEPPUKU);
@@ -151,7 +151,7 @@ public class PersonnelStatusTest {
     @Test
     public void testIsDeadOrMIA() {
         List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
-            NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
+              NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
               SUICIDE,
               BONDSREF,
               MIA,

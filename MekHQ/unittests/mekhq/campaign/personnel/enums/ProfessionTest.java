@@ -54,16 +54,16 @@ public class ProfessionTest {
     private static final Profession[] professions = Profession.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("Profession.MEKWARRIOR.toolTipText"),
-                Profession.MEKWARRIOR.getToolTipText());
+              Profession.MEKWARRIOR.getToolTipText());
         assertEquals(resources.getString("Profession.ADMINISTRATOR.toolTipText"),
-                Profession.ADMINISTRATOR.getToolTipText());
+              Profession.ADMINISTRATOR.getToolTipText());
     }
     // endregion Getters
 

@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.universe;
 
 import java.util.ArrayList;
@@ -38,8 +42,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Given a list of planets, uses a convex hull algorithm to select the planets that form a polygon that
- * completely enclose the space.
+ * Given a list of planets, uses a convex hull algorithm to select the planets that form a polygon that completely
+ * enclose the space.
  *
  * @author Neoancient
  *
@@ -89,7 +93,8 @@ public class RegionPerimeter {
      * Tests whether a given point is inside the border region using a ray casting algorithm.
      *
      * @param p The Point to test
-     * @return  Whether the point is contained within the convex polygon describing the border.
+     *
+     * @return Whether the point is contained within the convex polygon describing the border.
      */
     public boolean isInsideRegion(Point p) {
         return isInsideRegion(p.getX(), p.getY(), border);
@@ -101,7 +106,8 @@ public class RegionPerimeter {
      * @param x      The x coordinate of the point to test
      * @param y      The y coordinate of the point to test
      * @param region An ordered list of vertices of a convex polygon
-     * @return       Whether the point is contained within the polygon.
+     *
+     * @return Whether the point is contained within the polygon.
      */
     public static boolean isInsideRegion(double x, double y, List<Point> region) {
         // Track how many sides are intersected by a ray along the X axis originating at the point
@@ -134,7 +140,7 @@ public class RegionPerimeter {
             if ((x < p1.getX()) && (x < p2.getX())) {
                 intersections++;
             } else if ((y - p1.getY()) / (x - p1.getX())
-                    > (p2.getY() - p1.getY()) / (p2.getX() - p1.getX())) {
+                             > (p2.getY() - p1.getY()) / (p2.getX() - p1.getX())) {
                 intersections++;
             }
             // Since we are only dealing with convex polygons, two intersections means that the point
@@ -148,19 +154,23 @@ public class RegionPerimeter {
 
     /**
      * Test whether the coordinates are in the region's bounding rectangle. Used for filtering likely values.
+     *
      * @param x
      * @param y
-     * @return  True if the point is contained within the bounding rectangle.
+     *
+     * @return True if the point is contained within the bounding rectangle.
      */
     public boolean isInsideBoundingBox(double x, double y) {
         return (x > boundsX1) && (x < boundsX2)
-                && (y > boundsY1) && (y < boundsY2);
+                     && (y > boundsY1) && (y < boundsY2);
     }
 
     /**
      * Test whether the point in the region's bounding rectangle. Used for filtering likely values.
+     *
      * @param p
-     * @return  True if the point is contained within the bounding rectangle.
+     *
+     * @return True if the point is contained within the bounding rectangle.
      */
     public boolean isInsideBoundingBox(Point p) {
         return isInsideBoundingBox(p.getX(), p.getY());
@@ -168,8 +178,10 @@ public class RegionPerimeter {
 
     /**
      * Test whether the planet in the region's bounding rectangle. Used for filtering likely values.
+     *
      * @param p
-     * @return  True if the point is contained within the bounding rectangle.
+     *
+     * @return True if the point is contained within the bounding rectangle.
      */
     public boolean isInsideBoundingBox(Planet p) {
         return isInsideBoundingBox(p.getX(), p.getY());
@@ -180,7 +192,8 @@ public class RegionPerimeter {
      *
      * @param region  The region to surround
      * @param padding The size of the border to add around the inner region
-     * @return        A list of vertices of a convex polygon
+     *
+     * @return A list of vertices of a convex polygon
      */
     public static List<Point> getPaddedRegion(List<Point> region, double padding) {
         if (padding > 0) {
@@ -198,17 +211,18 @@ public class RegionPerimeter {
     }
 
     /**
-     * Calculates the intersection between this region and another with the possibility of setting the
-     * width of a border around each.
+     * Calculates the intersection between this region and another with the possibility of setting the width of a border
+     * around each.
      *
-     * @param other    The other intersecting region
-     * @param padding  If &gt; 0, adds extra space of the given width around each region before
-     *                 calculating the intersection.
-     * @return         A list of the vertices of the polygon around the intersection.
+     * @param other   The other intersecting region
+     * @param padding If &gt; 0, adds extra space of the given width around each region before calculating the
+     *                intersection.
+     *
+     * @return A list of the vertices of the polygon around the intersection.
      */
     public List<Point> intersection(RegionPerimeter other, double padding) {
         return intersection(getPaddedRegion(border, padding),
-                getPaddedRegion(other.border, padding));
+              getPaddedRegion(other.border, padding));
     }
 
     /**
@@ -216,6 +230,7 @@ public class RegionPerimeter {
      *
      * @param subject A collection of points defining the first polygon.
      * @param clipper A collection of points defining the second polygon. This one must be convex.
+     *
      * @return The set of vertices defining the intersection between the two polygons.
      */
     public static List<Point> intersection(List<Point> subject, List<Point> clipper) {
@@ -236,17 +251,17 @@ public class RegionPerimeter {
             Point b = clipper.get(i);
 
             for (int j = 0; j < outputSize; j++) {
-                 Point p = input.get((j + outputSize - 1) % outputSize);
-                 Point q = input.get(j);
+                Point p = input.get((j + outputSize - 1) % outputSize);
+                Point q = input.get(j);
 
-                 if (vectorCrossProduct(a, b, q) > 0) {
-                     if (vectorCrossProduct(a, b, p) <= 0) {
-                         output.add(lineIntersection(a, b, p, q));
-                     }
-                     output.add(q);
-                 } else if (vectorCrossProduct(a, b, p) > 0) {
-                     output.add(lineIntersection(a, b, p, q));
-                 }
+                if (vectorCrossProduct(a, b, q) > 0) {
+                    if (vectorCrossProduct(a, b, p) <= 0) {
+                        output.add(lineIntersection(a, b, p, q));
+                    }
+                    output.add(q);
+                } else if (vectorCrossProduct(a, b, p) > 0) {
+                    output.add(lineIntersection(a, b, p, q));
+                }
             }
 
         }
@@ -255,14 +270,15 @@ public class RegionPerimeter {
     }
 
     /**
-     * Find the point where two lines intersect in a plane. Does not test for parallel or for distinct
-     * points defining a line.
+     * Find the point where two lines intersect in a plane. Does not test for parallel or for distinct points defining a
+     * line.
      *
      * @param a A point on the first line
      * @param b Another point on the first line
      * @param p A point on the second line
      * @param q Another point on the second line
-     * @return  The intersection
+     *
+     * @return The intersection
      */
     private static Point lineIntersection(Point a, Point b, Point p, Point q) {
         double a1 = b.getY() - a.getY();
@@ -281,16 +297,15 @@ public class RegionPerimeter {
     }
 
     /**
-     * Method to compute the convex hull of a list of points. Starts by determining the point
-     * with the lowest y coordinate, selecting the lowest x coordinate if there is more than one that
-     * shares the lowest y. The remaining points are sorted according to the angle made by the X axis
-     * and a line from the reference point. Points are then added to a stack in the sorted order. If
-     * adding a point would make a concavity in the polygon, previous points are popped off the
-     * stack until adding the current point makes a convex angle.
+     * Method to compute the convex hull of a list of points. Starts by determining the point with the lowest y
+     * coordinate, selecting the lowest x coordinate if there is more than one that shares the lowest y. The remaining
+     * points are sorted according to the angle made by the X axis and a line from the reference point. Points are then
+     * added to a stack in the sorted order. If adding a point would make a concavity in the polygon, previous points
+     * are popped off the stack until adding the current point makes a convex angle.
      *
-     * @param points  A list of points in the region
-     * @return        A list of points whose coordinates define a convex polygon surrounding
-     *                all the points in the list.
+     * @param points A list of points in the region
+     *
+     * @return A list of points whose coordinates define a convex polygon surrounding all the points in the list.
      */
     static List<Point> performGrahamScan(List<Point> points) {
         Optional<Point> start = points.stream().min(leastYSorter);
@@ -300,9 +315,9 @@ public class RegionPerimeter {
         final Point origin = start.get();
         Comparator<Point> pointSorter = new GrahamScanPointSorter(origin);
         List<Point> sortedPoints = points.stream()
-                .filter(p -> !p.equals(origin))
-                .sorted(pointSorter)
-                .collect(Collectors.toList());
+                                         .filter(p -> !p.equals(origin))
+                                         .sorted(pointSorter)
+                                         .collect(Collectors.toList());
         // Check for a special case: if there are more than two points that have the same least Y,
         // remove all but the right-most to prevent popping too many values off the stack in the next
         // step.
@@ -334,23 +349,22 @@ public class RegionPerimeter {
     }
 
     /**
-     * Computes the cross product of two vectors from p1 -> p2 and p1 -> p3. This can
-     * be used to determine if a path from the origin to p1 to p2 is clockwise ( < 0 ), anticlockwise
-     * ( > 0 ) or a straight line ( 0 ).
+     * Computes the cross product of two vectors from p1 -> p2 and p1 -> p3. This can be used to determine if a path
+     * from the origin to p1 to p2 is clockwise ( < 0 ), anticlockwise ( > 0 ) or a straight line ( 0 ).
      *
      * @param p1 First point in sequence
      * @param p2 Second point in sequence
      * @param p3 Third point in sequence
-     * @return   The cross product of the vectors p1->p2 and p1->p3
+     *
+     * @return The cross product of the vectors p1->p2 and p1->p3
      */
     static double vectorCrossProduct(Point p1, Point p2, Point p3) {
         return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
-                - (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
+                     - (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
     }
 
     /**
-     * Sorts points from lowest Y coordinate to highest. If Y coordinates are equal, sorts
-     * from lowest to highest X.
+     * Sorts points from lowest Y coordinate to highest. If Y coordinates are equal, sorts from lowest to highest X.
      */
     final static Comparator<Point> leastYSorter = (p1, p2) -> {
         int retVal = Double.compare(p1.getY(), p2.getY());

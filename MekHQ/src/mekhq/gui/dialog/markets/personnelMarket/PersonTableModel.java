@@ -170,6 +170,7 @@ public class PersonTableModel extends AbstractTableModel {
      * Gets the {@link Person} instance for the specified row, or null if out of bounds.
      *
      * @param row the table row
+     *
      * @return the associated {@link Person} object, or {@code null}
      *
      * @author Illiani

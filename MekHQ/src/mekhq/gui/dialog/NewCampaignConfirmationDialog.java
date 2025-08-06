@@ -24,16 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 public class NewCampaignConfirmationDialog {
-  public int YesNoOption() {
-    return JOptionPane.showConfirmDialog(null,
-        "Are you sure you want to start a new campaign?",
-        "Start New Campaign?",
-        JOptionPane.YES_NO_OPTION);
-  }
+    public int YesNoOption() {
+        return JOptionPane.showConfirmDialog(null,
+              "Are you sure you want to start a new campaign?",
+              "Start New Campaign?",
+              JOptionPane.YES_NO_OPTION);
+    }
 }

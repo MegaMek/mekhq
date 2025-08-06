@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui;
@@ -31,11 +36,10 @@ package mekhq.gui;
 import javax.swing.Timer;
 
 /**
- * Schedules a future execution of a method after a specified delay. Additional scheduling reset
- * the timer. This is designed for cases when an action produces multiple events that would cause
- * part of the gui to refresh. As long as the events are received within the delay period, only the
- * final one will cause a refresh. This also causes the refresh to occur on the Swing event dispatching
- * thread regardless of which thread it is scheduled from.
+ * Schedules a future execution of a method after a specified delay. Additional scheduling reset the timer. This is
+ * designed for cases when an action produces multiple events that would cause part of the gui to refresh. As long as
+ * the events are received within the delay period, only the final one will cause a refresh. This also causes the
+ * refresh to occur on the Swing event dispatching thread regardless of which thread it is scheduled from.
  *
  * @author Neoancient
  *

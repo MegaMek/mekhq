@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -87,9 +92,8 @@ public class StratconFacility implements Cloneable {
     private transient TreeMap<Integer, StratconBiome> biomeTempMap = new TreeMap<>();
 
     /**
-     * A temporary variable used to track situations where changing the ownership of
-     * this facility
-     * hinges upon multiple objectives
+     * A temporary variable used to track situations where changing the ownership of this facility hinges upon multiple
+     * objectives
      */
     private transient int ownershipChangeScore;
 
@@ -115,8 +119,7 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * Copies data from the source facility to here. Does cosmetic data.
-     * Reconstructs file-driven transient data.
+     * Copies data from the source facility to here. Does cosmetic data. Reconstructs file-driven transient data.
      */
     public void copyRulesDataFrom(StratconFacility facility) {
         setCapturedDefinition(facility.getCapturedDefinition());
@@ -143,7 +146,7 @@ public class StratconFacility implements Cloneable {
 
     /**
      * @return {@code true} if the facility owner is either allied to the player or is the player themselves,
-     *         {@code false} otherwise.
+     *       {@code false} otherwise.
      */
     public boolean isOwnerAlliedToPlayer() {
         return owner == ForceAlignment.Allied || owner == ForceAlignment.Player;
@@ -182,8 +185,7 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios in the same
-     * track as this facility.
+     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
      */
     public List<String> getSharedModifiers() {
         return sharedModifiers;
@@ -194,8 +196,7 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios involving this
-     * facility directly.
+     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly.
      */
     public List<String> getLocalModifiers() {
         return localModifiers;
@@ -246,8 +247,7 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * If present, this is the name of the definition file to draw from
-     * when switching facility ownership.
+     * If present, this is the name of the definition file to draw from when switching facility ownership.
      */
     public String getCapturedDefinition() {
         return capturedDefinition;
@@ -298,16 +298,14 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * Returns the biome temperature map (note: temperature mapping is in kelvins
-     * but stored in celsius)
+     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in celsius)
      */
     public TreeMap<Integer, StratconBiome> getBiomeTempMap() {
         return biomeTempMap;
     }
 
     /**
-     * Attempt to deserialize an instance of a StratconFacility from the passed-in
-     * file name
+     * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
      *
      * @return Possibly an instance of a StratconFacility
      */

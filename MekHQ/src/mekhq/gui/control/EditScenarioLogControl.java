@@ -24,8 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.control;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableColumn;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -34,12 +52,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AddOrEditScenarioEntryDialog;
 import mekhq.gui.model.LogTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.util.ResourceBundle;
 
 public class EditScenarioLogControl extends JPanel {
     private JFrame parent;
@@ -65,7 +77,7 @@ public class EditScenarioLogControl extends JPanel {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioLogControl",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setName(resourceMap.getString("control.name"));
         this.setLayout(new BorderLayout());

@@ -24,38 +24,52 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.icons.enums;
 
-import mekhq.MekHQ;
-import mekhq.MHQConstants;
-
-import javax.swing.*;
 import java.util.List;
 import java.util.ResourceBundle;
+import javax.swing.ListSelectionModel;
+
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
 
 /**
- * This contains the individual layers of a LayeredForceIcon, which are also the potential header
- * folders within the Pieces category of the Force Icon Directory.
+ * This contains the individual layers of a LayeredForceIcon, which are also the potential header folders within the
+ * Pieces category of the Force Icon Directory.
  */
 public enum LayeredForceIconLayer {
     //region Enum Declarations
     TYPE("LayeredForceIconLayer.TYPE.text", "LayeredForceIconLayer.TYPE.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_TYPE_PATH, "tableTypes", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+          MHQConstants.LAYERED_FORCE_ICON_TYPE_PATH, "tableTypes", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
     FORMATION("LayeredForceIconLayer.FORMATION.text", "LayeredForceIconLayer.FORMATION.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_FORMATION_PATH, "tableFormations", ListSelectionModel.SINGLE_SELECTION),
-    ADJUSTMENT("LayeredForceIconLayer.ADJUSTMENT.text", "LayeredForceIconLayer.ADJUSTMENT.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_ADJUSTMENT_PATH, "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    ALPHANUMERIC("LayeredForceIconLayer.ALPHANUMERIC.text", "LayeredForceIconLayer.ALPHANUMERIC.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_PATH, "tableAlphanumerics", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    SPECIAL_MODIFIER("LayeredForceIconLayer.SPECIAL_MODIFIER.text", "LayeredForceIconLayer.SPECIAL_MODIFIER.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH, "tableSpecialModifiers", ListSelectionModel.SINGLE_SELECTION),
+          MHQConstants.LAYERED_FORCE_ICON_FORMATION_PATH, "tableFormations", ListSelectionModel.SINGLE_SELECTION),
+    ADJUSTMENT("LayeredForceIconLayer.ADJUSTMENT.text",
+          "LayeredForceIconLayer.ADJUSTMENT.toolTipText",
+          MHQConstants.LAYERED_FORCE_ICON_ADJUSTMENT_PATH,
+          "tableAdjustments",
+          ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    ALPHANUMERIC("LayeredForceIconLayer.ALPHANUMERIC.text",
+          "LayeredForceIconLayer.ALPHANUMERIC.toolTipText",
+          MHQConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_PATH,
+          "tableAlphanumerics",
+          ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+    SPECIAL_MODIFIER("LayeredForceIconLayer.SPECIAL_MODIFIER.text",
+          "LayeredForceIconLayer.SPECIAL_MODIFIER.toolTipText",
+          MHQConstants.LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH,
+          "tableSpecialModifiers",
+          ListSelectionModel.SINGLE_SELECTION),
     BACKGROUND("LayeredForceIconLayer.BACKGROUND.text", "LayeredForceIconLayer.BACKGROUND.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_BACKGROUND_PATH, "tableBackgrounds", ListSelectionModel.SINGLE_SELECTION),
+          MHQConstants.LAYERED_FORCE_ICON_BACKGROUND_PATH, "tableBackgrounds", ListSelectionModel.SINGLE_SELECTION),
     FRAME("LayeredForceIconLayer.FRAME.text", "LayeredForceIconLayer.FRAME.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_FRAME_PATH, "tableFrames", ListSelectionModel.SINGLE_SELECTION),
+          MHQConstants.LAYERED_FORCE_ICON_FRAME_PATH, "tableFrames", ListSelectionModel.SINGLE_SELECTION),
     LOGO("LayeredForceIconLayer.LOGO.text", "LayeredForceIconLayer.LOGO.toolTipText",
-            MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH, "tableLogos", ListSelectionModel.SINGLE_SELECTION);
+          MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH, "tableLogos", ListSelectionModel.SINGLE_SELECTION);
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -68,9 +82,9 @@ public enum LayeredForceIconLayer {
 
     //region Constructors
     LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
-                          final String tableName, final int listSelectionMode) {
+          final String tableName, final int listSelectionMode) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;

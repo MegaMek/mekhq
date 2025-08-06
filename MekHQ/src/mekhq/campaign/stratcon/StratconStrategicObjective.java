@@ -24,16 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.stratcon;
 
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
 /**
- * This class is a data structure storing data relating to StratCon strategic objectives
- * and also handles some small amount of "business logic"
+ * This class is a data structure storing data relating to StratCon strategic objectives and also handles some small
+ * amount of "business logic"
  */
 public class StratconStrategicObjective {
     public static final int OBJECTIVE_FAILED = -1;

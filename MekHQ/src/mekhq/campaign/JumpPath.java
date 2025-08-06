@@ -45,13 +45,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is an array list of planets for a jump path, from which we can derive
- * various statistics. We can also add in details about the jump path here, like
- * if
- * the user would like to use recharge stations when available. For XML
- * serialization,
- * this object will need to spit out a list of planet names and then reconstruct
- * the planets from that.
+ * This is an array list of planets for a jump path, from which we can derive various statistics. We can also add in
+ * details about the jump path here, like if the user would like to use recharge stations when available. For XML
+ * serialization, this object will need to spit out a list of planet names and then reconstruct the planets from that.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */

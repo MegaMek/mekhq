@@ -24,11 +24,14 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.utilities;
-
-import megamek.MegaMek;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,9 +43,11 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
+import megamek.MegaMek;
+
 /**
- * Class to handle MHQInternationalization (you will find online material on that looking for i18n)
- * It makes use of some short names to make it easier to use since it is used in many places
+ * Class to handle MHQInternationalization (you will find online material on that looking for i18n) It makes use of some
+ * short names to make it easier to use since it is used in many places
  */
 public class MHQInternationalization {
     private static final String MISSING_RESOURCE_TAG = "!";
@@ -65,12 +70,13 @@ public class MHQInternationalization {
 
     private static class UTF8Control extends ResourceBundle.Control {
         @Override
-        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
-            throws IOException {
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
+              boolean reload)
+              throws IOException {
             // The below is one approach; there are multiple ways to do this
             String resourceName = toResourceName(toBundleName(baseName, locale), "properties");
             try (InputStream is = loader.getResourceAsStream(resourceName);
-                 InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                  InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                 return new PropertyResourceBundle(isr);
             }
         }
@@ -78,13 +84,17 @@ public class MHQInternationalization {
 
     ResourceBundle getResourceBundle(String bundleName) {
         return resourceBundles.computeIfAbsent(bundleName, k ->
-            ResourceBundle.getBundle(bundleName, MegaMek.getMMOptions().getLocale(), new UTF8Control()));
+                                                                 ResourceBundle.getBundle(bundleName,
+                                                                       MegaMek.getMMOptions().getLocale(),
+                                                                       new UTF8Control()));
     }
 
     /**
      * Get a localized string from a specific bundle
+     *
      * @param bundleName the name of the bundle
-     * @param key the key of the string
+     * @param key        the key of the string
+     *
      * @return the localized string
      */
     public static String getTextAt(String bundleName, String key) {
@@ -96,7 +106,9 @@ public class MHQInternationalization {
 
     /**
      * Get a localized string from the default bundle
+     *
      * @param key the key of the string
+     *
      * @return the localized string
      */
     public static String getText(String key) {
@@ -105,8 +117,10 @@ public class MHQInternationalization {
 
     /**
      * Get a formatted localized string from the default bundle
-     * @param key the key of the string
+     *
+     * @param key  the key of the string
      * @param args the arguments to format the string
+     *
      * @return the localized string
      */
     public static String getFormattedText(String key, Object... args) {
@@ -115,9 +129,11 @@ public class MHQInternationalization {
 
     /**
      * Get a formatted localized string from the default bundle
+     *
      * @param bundleName the name of the bundle
-     * @param key the key of the string
-     * @param args the arguments to format the string
+     * @param key        the key of the string
+     * @param args       the arguments to format the string
+     *
      * @return the localized string
      */
     public static String getFormattedTextAt(String bundleName, String key, Object... args) {
@@ -125,19 +141,16 @@ public class MHQInternationalization {
     }
 
 
-
     /**
-     * Checks if the given text is valid. A valid string does not start or end with an exclamation
-     * mark ('!').
+     * Checks if the given text is valid. A valid string does not start or end with an exclamation mark ('!').
      *
      * <p>If {@link MHQInternationalization} fails to fetch a valid return it returns the key
-     * between two {@code !}. So by checking the returned string doesn't begin and end with that
-     * punctuation, we can easily verify that all statuses have been provided results for the key
-     * s we're using.</p>
+     * between two {@code !}. So by checking the returned string doesn't begin and end with that punctuation, we can
+     * easily verify that all statuses have been provided results for the key s we're using.</p>
      *
      * @param text The text to validate.
-     * @return {@code true} if the text is valid (does not start and end with an '!'); {@code false}
-     * otherwise.
+     *
+     * @return {@code true} if the text is valid (does not start and end with an '!'); {@code false} otherwise.
      */
     public static boolean isResourceKeyValid(String text) {
         return !(text.startsWith(MISSING_RESOURCE_TAG) && text.endsWith(MISSING_RESOURCE_TAG));

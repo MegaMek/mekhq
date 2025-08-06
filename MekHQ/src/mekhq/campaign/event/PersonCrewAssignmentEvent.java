@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.event;
+
+import static mekhq.campaign.force.Force.FORCE_NONE;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
-
 /**
- * Represents an event triggered when a {@link Person} is assigned to or removed from a {@link Unit},
- * either as a pilot or part of the crew.
+ * Represents an event triggered when a {@link Person} is assigned to or removed from a {@link Unit}, either as a pilot
+ * or part of the crew.
  *
  * <p>This event is a subclass of {@link PersonChangedEvent} and adds the context of the
  * {@link Unit} involved in the assignment or removal.</p>
@@ -55,8 +60,8 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
      * @param crew     The {@link Person} assigned or removed from the {@link Unit}.
      * @param unit     The {@link Unit} involved in the assignment or removal.
      *
-     * <p>If the {@code unit} is associated with a force, the force's commander information is updated
-     * during the construction of this event by calling {@link Force#updateCommander(Campaign)}.</p>
+     *                 <p>If the {@code unit} is associated with a force, the force's commander information is updated
+     *                 during the construction of this event by calling {@link Force#updateCommander(Campaign)}.</p>
      */
     public PersonCrewAssignmentEvent(Campaign campaign, Person crew, Unit unit) {
         super(crew);

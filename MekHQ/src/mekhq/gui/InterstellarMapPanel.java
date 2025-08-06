@@ -85,8 +85,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
- * This is not functional yet. Just testing things out.
- * A lot of this code is borrowed from InterstellarMap.java in MekWars
+ * This is not functional yet. Just testing things out. A lot of this code is borrowed from InterstellarMap.java in
+ * MekWars
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -94,12 +94,12 @@ public class InterstellarMapPanel extends JPanel {
     private static final MMLogger logger = MMLogger.create(InterstellarMapPanel.class);
 
     private static final Vector2d[] BASE_HEXCOORDS = {
-            new Vector2d(1.0, 0.0),
-            new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
-            new Vector2d(Math.cos(2.0 * Math.PI / 3.0), Math.sin(2.0 * Math.PI / 3.0)),
-            new Vector2d(-1.0, 0.0),
-            new Vector2d(Math.cos(4.0 * Math.PI / 3.0), Math.sin(4.0 * Math.PI / 3.0)),
-            new Vector2d(Math.cos(5.0 * Math.PI / 3.0), Math.sin(5.0 * Math.PI / 3.0))
+          new Vector2d(1.0, 0.0),
+          new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
+          new Vector2d(Math.cos(2.0 * Math.PI / 3.0), Math.sin(2.0 * Math.PI / 3.0)),
+          new Vector2d(-1.0, 0.0),
+          new Vector2d(Math.cos(4.0 * Math.PI / 3.0), Math.sin(4.0 * Math.PI / 3.0)),
+          new Vector2d(Math.cos(5.0 * Math.PI / 3.0), Math.sin(5.0 * Math.PI / 3.0))
     };
 
     private JLayeredPane pane;
@@ -171,7 +171,7 @@ public class InterstellarMapPanel extends JPanel {
                     return;
                 }
                 optionView.setBounds(pane.getParent().getWidth() - 10 - width,
-                        pane.getParent().getHeight() - 10 - height, width, height);
+                      pane.getParent().getHeight() - 10 - height, width, height);
                 viewPoint.move(0, maxHeight - minHeight);
                 optionView.setViewPosition(viewPoint);
                 optionView.revalidate();
@@ -446,11 +446,11 @@ public class InterstellarMapPanel extends JPanel {
                 final Stroke thick = new BasicStroke(2.0f);
                 final Stroke thin = new BasicStroke(1.2f);
                 final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
-                        new float[] { 3 }, 0);
+                      new float[] { 3 }, 0);
                 final Stroke dashedThick = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
-                        new float[] { 3 }, 0);
+                      new float[] { 3 }, 0);
                 final Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
-                        new float[] { 2, 5 }, 0);
+                      new float[] { 2, 5 }, 0);
                 final Color darkCyan = new Color(0, 100, 50);
 
                 minX = scr2mapX(-size * 2.0);
@@ -467,7 +467,7 @@ public class InterstellarMapPanel extends JPanel {
                     final double y = map2scrY(selectedSystem.getY());
                     // Contract Search Radius Aura
                     if (!InterstellarMapPanel.this.campaign.getCampaignOptions().getContractMarketMethod().isNone()
-                            && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
+                              && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
                         final double z = map2scrX(selectedSystem.getX()
                                                         +
                                                         InterstellarMapPanel.this.campaign.getCampaignOptions()
@@ -481,14 +481,14 @@ public class InterstellarMapPanel extends JPanel {
 
                     // Acquisition Search Radius Aura
                     if (InterstellarMapPanel.this.campaign.getCampaignOptions().isUsePlanetaryAcquisition()
-                            && MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()
-                            && (conf.scale > MekHQ.getMHQOptions()
-                                    .getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom())) {
+                              && MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()
+                              && (conf.scale > MekHQ.getMHQOptions()
+                                                     .getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom())) {
                         final double z = map2scrX(selectedSystem.getX()
-                                + (MHQConstants.MAX_JUMP_RADIUS
-                                         *
-                                         InterstellarMapPanel.this.campaign.getCampaignOptions()
-                                               .getMaxJumpsPlanetaryAcquisition()));
+                                                        + (MHQConstants.MAX_JUMP_RADIUS
+                                                                 *
+                                                                 InterstellarMapPanel.this.campaign.getCampaignOptions()
+                                                                       .getMaxJumpsPlanetaryAcquisition()));
                         final double acquisitionRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
                         g2.setStroke(dashedThick);
@@ -498,7 +498,7 @@ public class InterstellarMapPanel extends JPanel {
 
                     // Jump Radius Aura
                     if (MekHQ.getMHQOptions().getInterstellarMapShowJumpRadius()
-                            && (conf.scale > MekHQ.getMHQOptions().getInterstellarMapShowJumpRadiusMinimumZoom())) {
+                              && (conf.scale > MekHQ.getMHQOptions().getInterstellarMapShowJumpRadiusMinimumZoom())) {
                         final double z = map2scrX(selectedSystem.getX() + MHQConstants.MAX_JUMP_RADIUS);
                         final double jumpRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapJumpRadiusColour());
@@ -542,7 +542,10 @@ public class InterstellarMapPanel extends JPanel {
                             Paint factionPaint = defaultFactionPaint;
                             Set<Faction> hexFactions = new HashSet<>();
 
-                            List<PlanetarySystem> nearbySystems = Systems.getInstance().getNearbySystems(coordX, coordY, (int) Math.round(HEX_SIZE * 1.3));
+                            List<PlanetarySystem> nearbySystems = Systems.getInstance()
+                                                                        .getNearbySystems(coordX,
+                                                                              coordY,
+                                                                              (int) Math.round(HEX_SIZE * 1.3));
 
                             for (PlanetarySystem system : nearbySystems) {
                                 if (!isSystemEmpty(system) && path.contains(system.getX(), system.getY())) {
@@ -573,7 +576,7 @@ public class InterstellarMapPanel extends JPanel {
                                 float[] colorComponents = new float[4];
                                 factionColor.getComponents(colorComponents);
                                 factionPaint = new Color(colorComponents[0], colorComponents[1], colorComponents[2],
-                                    0.25f);
+                                      0.25f);
                             } else if (hexFactions.size() > 1) {
                                 // Create the painted stripes data
                                 int factionSize = hexFactions.size();
@@ -587,7 +590,7 @@ public class InterstellarMapPanel extends JPanel {
                                     Color factionColor = factionIterator.next().getColor();
                                     factionColor.getComponents(colorComponents);
                                     factionColor = new Color(colorComponents[0], colorComponents[1], colorComponents[2],
-                                        0.25f);
+                                          0.25f);
                                     paintColors[i * 2] = factionColor;
                                     paintColors[i * 2 + 1] = factionColor;
                                 }
@@ -596,11 +599,11 @@ public class InterstellarMapPanel extends JPanel {
                                 // Determine where to anchor the stripes
                                 Point2D firstPoint = new Point2D.Double(map2scrX(coordX), map2scrY(coordY));
                                 Point2D secondPoint = new Point2D.Double(
-                                    firstPoint.getX() + 6 * conf.scale,
-                                    firstPoint.getY() + 6 * conf.scale);
+                                      firstPoint.getX() + 6 * conf.scale,
+                                      firstPoint.getY() + 6 * conf.scale);
                                 factionPaint = new LinearGradientPaint(
-                                    firstPoint, secondPoint, paintFractions, paintColors,
-                                    CycleMethod.REPEAT);
+                                      firstPoint, secondPoint, paintFractions, paintColors,
+                                      CycleMethod.REPEAT);
                             }
 
                             g2.setPaint(factionPaint);
@@ -632,7 +635,7 @@ public class InterstellarMapPanel extends JPanel {
                         PlanetarySystem systemA = jumpPath.get(i - 1);
                         g2.setPaint(Color.WHITE);
                         g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()),
-                                map2scrX(systemB.getX()), map2scrY(systemB.getY())));
+                              map2scrX(systemB.getX()), map2scrY(systemB.getY())));
                     }
                 }
 
@@ -680,13 +683,13 @@ public class InterstellarMapPanel extends JPanel {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(thick);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
-                                        map2scrY(p2.getY())));
+                                      map2scrY(p2.getY())));
                             }
                             if (link.rating == HPGRating.B) {
                                 g2.setPaint(Color.BLUE);
                                 g2.setStroke(dashed);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
-                                        map2scrY(p2.getY())));
+                                      map2scrY(p2.getY())));
                             }
                         }
                     }
@@ -719,7 +722,7 @@ public class InterstellarMapPanel extends JPanel {
                                                             .get(i - 1);
                             g2.setPaint(Color.YELLOW);
                             g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()),
-                                    map2scrX(systemB.getX()), map2scrY(systemB.getY())));
+                                  map2scrX(systemB.getX()), map2scrY(systemB.getY())));
                         }
                     }
                 }
@@ -783,29 +786,29 @@ public class InterstellarMapPanel extends JPanel {
                                     if (capitals.get(faction).equals(system.getId())) {
                                         g2.setPaint(faction.getColor());
                                         arc.setArcByCenter(x, y, size + 5, 0,
-                                            360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                              360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                         g2.fill(arc);
                                         g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
                                         arc.setArcByCenter(x, y, size + 3, 0,
-                                            360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                              360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                         g2.fill(arc);
                                     } else {
                                         if (system.getHiringHallLevel(InterstellarMapPanel.this.campaign.getLocalDate()) ==
                                                   HiringHallLevel.GREAT) {
                                             g2.setPaint(new Color(176, 196, 222));
                                             arc.setArcByCenter(x, y, size + 5, 0,
-                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                                  360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                             g2.fill(arc);
                                             g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
                                             arc.setArcByCenter(x, y, size + 3, 0,
-                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                                  360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                             g2.fill(arc);
                                         }
                                     }
 
                                     g2.setPaint(faction.getColor());
                                     arc.setArcByCenter(x, y, size, 0, 360.0 * (1 - ((double) i) / factions.size()),
-                                            Arc2D.PIE);
+                                          Arc2D.PIE);
                                     g2.fill(arc);
                                     ++i;
                                 }
@@ -847,7 +850,7 @@ public class InterstellarMapPanel extends JPanel {
                         double x = map2scrX(system.getX());
                         double y = map2scrY(system.getY());
                         if ((conf.showPlanetNamesThreshold == 0) || (conf.scale > conf.showPlanetNamesThreshold)
-                                || jumpPath.contains(system)
+                                  || jumpPath.contains(system)
                                   || ((InterstellarMapPanel.this.campaign.getLocation().getJumpPath() != null)
                                             &&
                                             InterstellarMapPanel.this.campaign.getLocation()
@@ -975,7 +978,7 @@ public class InterstellarMapPanel extends JPanel {
         pane.setBounds(0, 0, width, height);
         mapPanel.setBounds(0, 0, width, height);
         optionView.setBounds(width - 10 - optionView.getWidth(), height - 10 - optionView.getHeight(),
-                optionView.getWidth(), optionView.getHeight());
+              optionView.getWidth(), optionView.getHeight());
 
         super.paintComponent(g);
     }
@@ -1066,11 +1069,9 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     /**
-     * Calculate the nearest neighbor for the given point
-     * If anyone has a better algorithm than this, please, feel free to
-     * exchange my brute force thing...
-     * A good idea would be a voronoi diagram and the sweep
-     * algorithm from Steven Fortune.
+     * Calculate the nearest neighbor for the given point If anyone has a better algorithm than this, please, feel free
+     * to exchange my brute force thing... A good idea would be a voronoi diagram and the sweep algorithm from Steven
+     * Fortune.
      */
     private PlanetarySystem nearestNeighbour(double x, double y) {
         double minDiff = Double.MAX_VALUE;
@@ -1093,7 +1094,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         return factions.stream()
-                .allMatch(faction -> faction.is(FactionTag.ABANDONED));
+                     .allMatch(faction -> faction.is(FactionTag.ABANDONED));
     }
 
     private boolean isSystemVisible(PlanetarySystem system, boolean hideEmpty) {
@@ -1152,10 +1153,10 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     /**
-     * Return a planet color based on what the user has selected from the radio
-     * button options
+     * Return a planet color based on what the user has selected from the radio button options
      *
      * @param p PlanetarySystem object
+     *
      * @return a Color
      */
     public Color getSystemColor(PlanetarySystem p) {

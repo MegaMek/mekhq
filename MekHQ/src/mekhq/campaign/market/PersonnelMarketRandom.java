@@ -43,8 +43,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
- * Generation method for personnel market that adds a random number of recruits of a random type
- * each day and removes them based on skill (with more experienced leaving more quickly).
+ * Generation method for personnel market that adds a random number of recruits of a random type each day and removes
+ * them based on skill (with more experienced leaving more quickly).
  *
  * @author Neoancient
  */
@@ -73,9 +73,9 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
     @Override
     public List<Person> removePersonnelForDay(final Campaign campaign, final List<Person> current) {
         return current.stream()
-                .filter(person -> campaign.getCampaignOptions().getPersonnelMarketRandomRemovalTargets()
-                        .get(person.getSkillLevel(campaign, false)) > Compute.d6(2))
-                .collect(Collectors.toList());
+                     .filter(person -> campaign.getCampaignOptions().getPersonnelMarketRandomRemovalTargets()
+                                             .get(person.getSkillLevel(campaign, false)) > Compute.d6(2))
+                     .collect(Collectors.toList());
     }
 
     int generateRandomQuantity() {

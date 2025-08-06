@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.personnel.autoAwards;
 
 import java.util.ArrayList;
@@ -41,16 +45,15 @@ public class ScenarioAwards {
     private static final MMLogger logger = MMLogger.create(ScenarioAwards.class);
 
     /**
-     * This function loops through Scenario Awards, checking whether the person is
-     * eligible to receive each type of award.
+     * This function loops through Scenario Awards, checking whether the person is eligible to receive each type of
+     * award.
      *
      * @param campaign the campaign to be processed
      * @param person   the person to check award eligibility for
-     * @param awards   the awards to be processed (should only include awards where
-     *                 item == Scenario)
+     * @param awards   the awards to be processed (should only include awards where item == Scenario)
      */
     public static Map<Integer, List<Object>> ScenarioAwardsProcessor(Campaign campaign, UUID person,
-            List<Award> awards) {
+          List<Award> awards) {
         int logSize = campaign.getPerson(person).getScenarioLog().size();
         int requiredScenarioCount;
 
@@ -64,7 +67,7 @@ public class ScenarioAwards {
                     requiredScenarioCount = award.getQty();
                 } catch (Exception e) {
                     logger.warn("Award {} from the {} set has an invalid qty value {}",
-                            award.getName(), award.getSet(), award.getQty());
+                          award.getName(), award.getSet(), award.getQty());
                     continue;
                 }
 

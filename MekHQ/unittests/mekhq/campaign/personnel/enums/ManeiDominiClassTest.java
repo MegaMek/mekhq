@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -33,16 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class ManeiDominiClassTest {
     // region Variable Declarations
     private static final ManeiDominiClass[] classes = ManeiDominiClass.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Boolean Comparison Methods
@@ -136,12 +140,10 @@ class ManeiDominiClassTest {
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
-     * Testing to ensure the enum is properly parsed from a given String, dependent
-     * on whether it
-     * is parsing from ManeiDominiClass.name(), the ordinal (formerly magic
-     * numbers), or a failure
-     * condition
+     * Testing to ensure the enum is properly parsed from a given String, dependent on whether it is parsing from
+     * ManeiDominiClass.name(), the ordinal (formerly magic numbers), or a failure condition
      */
     @Test
     void testParseFromString() {

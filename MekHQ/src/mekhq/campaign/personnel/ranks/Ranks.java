@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.ranks;
 
@@ -43,11 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
@@ -56,11 +56,14 @@ import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Ranks keeps track of all data-file loaded rank systems. It does not include
- * the campaign rank
- * system, if there is a custom one there.
+ * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank system, if there is a
+ * custom one there.
  */
 public class Ranks {
     private static final MMLogger logger = MMLogger.create(Ranks.class);
@@ -106,7 +109,7 @@ public class Ranks {
     }
 
     public static void exportRankSystemsToFile(@Nullable File file,
-            final Collection<RankSystem> rankSystems) {
+          final Collection<RankSystem> rankSystems) {
         if (file == null) {
             return;
         }
@@ -117,9 +120,9 @@ public class Ranks {
         }
         int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
-                OutputStream bos = new BufferedOutputStream(fos);
-                OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-                PrintWriter pw = new PrintWriter(osw)) {
+              OutputStream bos = new BufferedOutputStream(fos);
+              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystems", "version", MHQConstants.VERSION);
@@ -147,7 +150,7 @@ public class Ranks {
                     File userDirRanks = new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH);
                     if (userDirRanks.exists()) {
                         rankSystems.addAll(
-                                loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
+                              loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
                     }
                 }
             }
@@ -160,7 +163,7 @@ public class Ranks {
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
             logger.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
-                    + " system. Initialization failure, shutting MekHQ down.");
+                               + " system. Initialization failure, shutting MekHQ down.");
             System.exit(-1);
         }
 
@@ -177,7 +180,7 @@ public class Ranks {
     }
 
     public static List<RankSystem> loadRankSystemsFromFile(final @Nullable File file,
-            final RankSystemType type) {
+          final RankSystemType type) {
         if (file == null) {
             return new ArrayList<>();
         }
@@ -205,7 +208,7 @@ public class Ranks {
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
                 final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version, true,
-                        type);
+                      type);
                 if (rankSystem != null) {
                     rankSystems.add(rankSystem);
                 }

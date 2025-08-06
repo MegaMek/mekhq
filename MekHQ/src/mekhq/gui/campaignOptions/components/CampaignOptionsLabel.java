@@ -45,17 +45,16 @@ import megamek.common.annotations.Nullable;
 /**
  * A specialized {@link JLabel} component designed for use in campaign options dialogs.
  * <p>
- * The label's text and tooltip are dynamically loaded from a resource bundle
- * based on the provided name. Tooltip text can also be configured for word wrapping,
- * and an option exists to create the label without a tooltip.
+ * The label's text and tooltip are dynamically loaded from a resource bundle based on the provided name. Tooltip text
+ * can also be configured for word wrapping, and an option exists to create the label without a tooltip.
  */
 public class CampaignOptionsLabel extends JLabel {
     /**
      * Constructs a {@link CampaignOptionsLabel} with the specified name.
      * <p>
-     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}.
-     * The tooltip is retrieved using the resource key {@code "lbl" + name + ".tooltip"}.
-     * If the keys do not exist in the resource bundle, an exception will be thrown.
+     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}. The tooltip is retrieved
+     * using the resource key {@code "lbl" + name + ".tooltip"}. If the keys do not exist in the resource bundle, an
+     * exception will be thrown.
      * <p>
      * A tooltip is included by default, and a default line wrapping size is used for the tooltip text.
      *
@@ -66,20 +65,19 @@ public class CampaignOptionsLabel extends JLabel {
     }
 
     /**
-     * Constructs a {@link CampaignOptionsLabel} with the specified name,
-     * optional custom tooltip wrap size, and optional tooltip exclusion.
+     * Constructs a {@link CampaignOptionsLabel} with the specified name, optional custom tooltip wrap size, and
+     * optional tooltip exclusion.
      * <p>
-     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}.
-     * If {@code noTooltip} is {@code false}, the tooltip is retrieved using the resource key
-     * {@code "lbl" + name + ".tooltip"} and word-wrapped based on the provided {@code customWrapSize},
-     * defaulting to 100 characters if {@code customWrapSize} is {@code null}.
-     * If {@code noTooltip} is {@code true}, no tooltip is set for the label.
+     * The label's text is retrieved using the resource key {@code "lbl" + name + ".text"}. If {@code noTooltip} is
+     * {@code false}, the tooltip is retrieved using the resource key {@code "lbl" + name + ".tooltip"} and word-wrapped
+     * based on the provided {@code customWrapSize}, defaulting to 100 characters if {@code customWrapSize} is
+     * {@code null}. If {@code noTooltip} is {@code true}, no tooltip is set for the label.
      * <p>
      * If the resource keys do not exist in the resource bundle, an exception will be thrown.
      *
      * @param name           the base name of the label, used to construct resource bundle keys
-     * @param customWrapSize the maximum number of characters per line in the tooltip, or {@code null}
-     *                       to use the default value of 100
+     * @param customWrapSize the maximum number of characters per line in the tooltip, or {@code null} to use the
+     *                       default value of 100
      * @param noTooltip      if {@code true}, the label is created without a tooltip
      */
     public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize, boolean noTooltip) {
@@ -89,7 +87,7 @@ public class CampaignOptionsLabel extends JLabel {
         // Configure the tooltip if not excluded
         if (!noTooltip) {
             setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"),
-                    processWrapSize(customWrapSize)));
+                  processWrapSize(customWrapSize)));
         }
 
         // Set the internal name of the label

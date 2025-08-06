@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -40,10 +45,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.skills.SkillType;
-import org.w3c.dom.Node;
 
 /**
  * Legacy part that represents standard ProtoMek jump jets.
@@ -52,10 +53,16 @@ import org.w3c.dom.Node;
  */
 public class ProtoMekJumpJet extends Part {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
-            .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
-            .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
-            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                          .setClanAdvancement(3055, 3060, 3060)
+                                                          .setClanApproximate(true, false, false)
+                                                          .setPrototypeFactions(Faction.CSJ)
+                                                          .setProductionFactions(Faction.CSJ)
+                                                          .setTechRating(TechRating.D)
+                                                          .setAvailability(AvailabilityValue.X,
+                                                                AvailabilityValue.X,
+                                                                AvailabilityValue.C,
+                                                                AvailabilityValue.C)
+                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public ProtoMekJumpJet() {
         this(0, null);
@@ -91,9 +98,9 @@ public class ProtoMekJumpJet extends Part {
     }
 
     @Override
-    public boolean isSamePartType (Part part) {
+    public boolean isSamePartType(Part part) {
         return part instanceof ProtoMekJumpJet
-                && getUnitTonnage() == part.getUnitTonnage();
+                     && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -164,7 +171,8 @@ public class ProtoMekJumpJet extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         //FIXME: implement check for destruction
         if (null != unit) {
-            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
+            hits = unit.getEntity()
+                         .getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
             if (hits > 2) {
                 remove(false);
                 return;
@@ -173,7 +181,7 @@ public class ProtoMekJumpJet extends Part {
             int damageJJ = 0;
             if (hits == 2) {
                 damageJJ = (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0);
-            } else if (hits==1) {
+            } else if (hits == 1) {
                 damageJJ = 1;
             }
             damageJJ -= getOtherDamagedJumpJets();
@@ -288,7 +296,7 @@ public class ProtoMekJumpJet extends Part {
                     continue;
                 }
                 if (p instanceof MissingProtoMekJumpJet
-                        || (p instanceof ProtoMekJumpJet && p.needsFixing())) {
+                          || (p instanceof ProtoMekJumpJet && p.needsFixing())) {
                     damagedJJ++;
                 }
             }

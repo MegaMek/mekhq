@@ -24,14 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -43,6 +45,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Ammo bin missing from a small support vehicle
@@ -69,7 +73,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
      * @param c          The campaign instance
      */
     public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
-            @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
+          @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, false, omniPodded, c);
         this.weaponType = weaponType;
         this.size = clips;
@@ -128,11 +132,11 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         // breaks Composability to a degree but in this case we've used
         // subclasses where they're not truly composable.
         if ((part instanceof InfantryAmmoBin)
-                && (part.getClass() == InfantryAmmoBin.class)) {
+                  && (part.getClass() == InfantryAmmoBin.class)) {
             InfantryAmmoBin bin = (InfantryAmmoBin) part;
             return getType().equals(bin.getType())
-                    && getWeaponType().equals(bin.getWeaponType())
-                    && (getClips() == bin.getClips());
+                         && getWeaponType().equals(bin.getWeaponType())
+                         && (getClips() == bin.getClips());
         }
         return false;
     }
@@ -145,7 +149,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     @Override
     public InfantryAmmoBin getNewPart() {
         return new InfantryAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(),
-                getWeaponType(), getClips(), omniPodded, campaign);
+              getWeaponType(), getClips(), omniPodded, campaign);
     }
 
     @Override

@@ -74,6 +74,7 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ScenarioViewPanel extends JScrollablePanel {
@@ -97,7 +98,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private StubTreeModel forceModel;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
         super();
@@ -172,8 +173,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlInfo = new JPanel(new BorderLayout());
         pnlInfo.setName("pnlStats");
         pnlInfo.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(scenario.getName())));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(scenario.getName())));
 
         JLabel lblStatus = new JLabel("<html><b>" + scenario.getStatus() + "</b></html>");
         lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
@@ -193,8 +194,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillForces() {
         pnlForces = new JPanel(new BorderLayout());
         pnlForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
 
         JTree forceTree = new JTree();
         forceTree.setModel(forceModel);
@@ -206,8 +207,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlOtherForces = new JPanel();
         pnlOtherForces.setLayout(new BoxLayout(pnlOtherForces, BoxLayout.PAGE_AXIS));
         pnlOtherForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
 
         for (BotForceStub stub : botStubs) {
             if (null == stub) {
@@ -232,8 +233,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillReport() {
         pnlReport = new JPanel(new BorderLayout());
         pnlReport.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
         JTextPane txtReport = new JTextPane();
         txtReport.setName("txtReport");
         txtReport.setEditable(false);
@@ -245,8 +246,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillLoot() {
         pnlLoot = new JPanel();
         pnlLoot.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
         pnlLoot.setLayout(new BoxLayout(pnlLoot, BoxLayout.PAGE_AXIS));
         for (Loot loot : scenario.getLoot()) {
             pnlLoot.add(new JLabel(loot.getShortDescription()));
@@ -257,8 +258,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlDeployment = new JPanel(new GridBagLayout());
         pnlDeployment.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -292,7 +293,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlDeployment.add(lblQuantityLimit, leftGbc);
 
-        JLabel lblQuantityLimitDesc = new JLabel(scenario.getDeploymentLimit().getQuantityLimitDesc(scenario, campaign));
+        JLabel lblQuantityLimitDesc = new JLabel(scenario.getDeploymentLimit()
+                                                       .getQuantityLimitDesc(scenario, campaign));
         rightGbc.gridy++;
         pnlDeployment.add(lblQuantityLimitDesc, rightGbc);
 
@@ -324,8 +326,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlObjectives = new JPanel(new BorderLayout());
         pnlObjectives.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
 
         StringBuilder objectiveBuilder = new StringBuilder();
 
@@ -390,8 +392,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlMap = new JPanel(new GridBagLayout());
         pnlMap.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -588,7 +590,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         @Override
         public boolean isLeaf(Object node) {
             return (node instanceof UnitStub)
-                    || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
+                         || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
         }
 
         @Override
@@ -618,8 +620,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
-                                                      boolean expanded, boolean leaf, int row,
-                                                      boolean hasFocus) {
+              boolean expanded, boolean leaf, int row,
+              boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
             return this;

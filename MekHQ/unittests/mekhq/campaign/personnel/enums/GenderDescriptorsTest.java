@@ -24,25 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
-
-import megamek.common.enums.Gender;
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ResourceBundle;
+
+import megamek.common.enums.Gender;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 public class GenderDescriptorsTest {
     //region Variable Declarations
     private static final GenderDescriptors[] genderDescriptors = GenderDescriptors.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Boolean Comparison Methods
@@ -116,24 +121,24 @@ public class GenderDescriptorsTest {
     @Test
     public void testGetDescriptor() {
         assertEquals(resources.getString("GenderDescriptors.HIM.text"),
-                GenderDescriptors.HIM_HER_THEM.getDescriptor(Gender.MALE));
+              GenderDescriptors.HIM_HER_THEM.getDescriptor(Gender.MALE));
         assertEquals(resources.getString("GenderDescriptors.SHE.text"),
-                GenderDescriptors.HE_SHE_THEY.getDescriptor(Gender.FEMALE));
+              GenderDescriptors.HE_SHE_THEY.getDescriptor(Gender.FEMALE));
         assertEquals(resources.getString("GenderDescriptors.THEIR.text"),
-                GenderDescriptors.HIS_HER_THEIR.getDescriptor(Gender.OTHER_MALE));
+              GenderDescriptors.HIS_HER_THEIR.getDescriptor(Gender.OTHER_MALE));
         assertEquals(resources.getString("GenderDescriptors.THEIRS.text"),
-                GenderDescriptors.HIS_HERS_THEIRS.getDescriptor(Gender.OTHER_FEMALE));
+              GenderDescriptors.HIS_HERS_THEIRS.getDescriptor(Gender.OTHER_FEMALE));
         assertEquals(resources.getString("GenderDescriptors.BOY.text"),
-                GenderDescriptors.BOY_GIRL.getDescriptor(Gender.OTHER_MALE));
+              GenderDescriptors.BOY_GIRL.getDescriptor(Gender.OTHER_MALE));
         assertEquals(resources.getString("GenderDescriptors.GIRL.text"),
-                GenderDescriptors.BOY_GIRL.getDescriptor(Gender.OTHER_FEMALE));
+              GenderDescriptors.BOY_GIRL.getDescriptor(Gender.OTHER_FEMALE));
     }
 
     @Test
     public void testGetDescriptorCapitalized() {
         // Test Capitalization
         final String expected = resources.getString("GenderDescriptors.HIS.text").substring(0, 1).toUpperCase()
-                + resources.getString("GenderDescriptors.HIS.text").substring(1);
+                                      + resources.getString("GenderDescriptors.HIS.text").substring(1);
         assertEquals(expected, GenderDescriptors.HIS_HERS_THEIRS.getDescriptorCapitalized(Gender.MALE));
 
         // Test Empty Return - Only possible with BOY_GIRL and Gender.RANDOMIZE

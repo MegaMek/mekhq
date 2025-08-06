@@ -272,7 +272,7 @@ public class OmniPod extends Part {
         shorthandedMod = 0;
         if (skillMin > SkillType.EXP_LEGENDARY) {
             return " <font color='" + ReportingUtilities.getNegativeColor()
-                    + "'><b> failed and part destroyed.</b></font>";
+                         + "'><b> failed and part destroyed.</b></font>";
         } else {
             // OmniPod is only added back to the warehouse if repair fails without
             // destroying part.

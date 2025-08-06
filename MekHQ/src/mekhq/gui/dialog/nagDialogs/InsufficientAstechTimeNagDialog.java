@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -89,7 +94,8 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
+          @Nullable AdministratorSpecialization specialization) {
         if (campaign == null) {
             return null;
         }
@@ -187,7 +193,8 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient AsTech time, {@code false}
      *       otherwise.
      */
-    public static boolean checkNag(Collection<Unit> units, int possibleAstechPoolMinutes, boolean isOvertimeAllowed, int possibleAstechPoolOvertime) {
+    public static boolean checkNag(Collection<Unit> units, int possibleAstechPoolMinutes, boolean isOvertimeAllowed,
+          int possibleAstechPoolOvertime) {
         final String NAG_KEY = NAG_INSUFFICIENT_ASTECH_TIME;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&

@@ -72,7 +72,7 @@ public class PercentageRandomDivorceTest {
 
         int diceSize = 5;
 
-        try(MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
             assertTrue(randomDivorce.randomDivorce());
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);

@@ -102,8 +102,8 @@ public class FactionCensureEvent {
     /**
      * Constructs a new {@link FactionCensureEvent} for the given campaign and censure level.
      *
-     * @param campaign     the campaign in which the event takes place
-     * @param censureLevel the censure level triggering this event
+     * @param campaign         the campaign in which the event takes place
+     * @param censureLevel     the censure level triggering this event
      * @param censuringFaction the {@link Faction} performing the censure
      *
      * @author Illiani
@@ -238,8 +238,8 @@ public class FactionCensureEvent {
      * <p>This method displays the seppuku judgment scene to the player, updates the commander's status to seppuku,
      * and applies loyalty changes across the affected personnel.</p>
      *
-     * @param campaign          the current {@link Campaign} instance
-     * @param censuringFaction  the {@link Faction} initiating the censure
+     * @param campaign         the current {@link Campaign} instance
+     * @param censuringFaction the {@link Faction} initiating the censure
      *
      * @author Illiani
      * @since 0.50.07
@@ -256,9 +256,9 @@ public class FactionCensureEvent {
      *
      * <p>Presents the going rogue dialog, and if the action is canceled, falls back to a standard censure event.</p>
      *
-     * @param campaign          the current {@link Campaign} instance
-     * @param censureLevel      the {@link FactionCensureLevel} for the event
-     * @param censuringFaction  the {@link Faction} issuing the censure
+     * @param campaign         the current {@link Campaign} instance
+     * @param censureLevel     the {@link FactionCensureLevel} for the event
+     * @param censuringFaction the {@link Faction} issuing the censure
      *
      * @author Illiani
      * @since 0.50.07

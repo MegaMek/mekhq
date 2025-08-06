@@ -50,18 +50,19 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * This class is responsible for setting up the forces for a Stratcon scenario
+ *
  * @author Luana Coppio
  */
 public class StratconSetupForces extends ScenarioSetupForces<AtBScenario> {
     private static final MMLogger LOGGER = MMLogger.create(StratconSetupForces.class);
 
     public StratconSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
-                               ForceConsolidation forceConsolidationMethod) {
+          ForceConsolidation forceConsolidationMethod) {
         this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
     }
 
     public StratconSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
-                               ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
+          ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         super(campaign, units, scenario, forceConsolidationMethod, orderFactory);
     }
 
@@ -76,8 +77,7 @@ public class StratconSetupForces extends ScenarioSetupForces<AtBScenario> {
     }
 
     /**
-     * Create a player object from the campaign and scenario wichi doesnt have a
-     * reference to the original player
+     * Create a player object from the campaign and scenario wichi doesnt have a reference to the original player
      *
      * @return The clean player object
      */
@@ -146,9 +146,9 @@ public class StratconSetupForces extends ScenarioSetupForces<AtBScenario> {
             }
             deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
             if (!useDropship
-                    && scenario.getCombatRole().isPatrol()
-                    && (scenario.getCombatTeamById(campaign) != null)
-                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+                      && scenario.getCombatRole().isPatrol()
+                      && (scenario.getCombatTeamById(campaign) != null)
+                      && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                 deploymentRound = Math.max(deploymentRound, 6 - speed);
             }
         }
@@ -189,9 +189,9 @@ public class StratconSetupForces extends ScenarioSetupForces<AtBScenario> {
             deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
             // Lances deployed in scout roles always deploy units in 6-walking speed turns
             if (scenario.getCombatRole().isPatrol()
-                    && (scenario.getCombatTeamById(campaign) != null)
-                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
-                    && !useDropship) {
+                      && (scenario.getCombatTeamById(campaign) != null)
+                      && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
+                      && !useDropship) {
                 deploymentRound = Math.max(deploymentRound, 6 - speed);
             }
         }
@@ -208,6 +208,7 @@ public class StratconSetupForces extends ScenarioSetupForces<AtBScenario> {
 
     /**
      * Check if using dropships for patrol scenario
+     *
      * @return True if using dropships under specific conditions, false otherwise
      */
     private boolean isUsingDropship() {

@@ -24,8 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.procurement;
+
+import static megamek.common.ITechnology.AvailabilityValue;
+import static megamek.common.ITechnology.getTechEra;
+import static megamek.common.SimpleTechLevel.INTRO;
+import static megamek.common.SimpleTechLevel.STANDARD;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
@@ -38,18 +51,10 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.universe.Faction;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static megamek.common.ITechnology.*;
-import static megamek.common.SimpleTechLevel.INTRO;
-import static megamek.common.SimpleTechLevel.STANDARD;
-
 /**
- * The Procurement class encapsulates the logic for deciding the availability
- * of parts based on factors such as era, technologies, and treaties between
- * various factions. It is capable of making procurement checks to simulate
- * rarity and scarcity of parts in a given time frame.
+ * The Procurement class encapsulates the logic for deciding the availability of parts based on factors such as era,
+ * technologies, and treaties between various factions. It is capable of making procurement checks to simulate rarity
+ * and scarcity of parts in a given time frame.
  */
 public class Procurement {
     private final int negotiatorSkillRating;
@@ -60,12 +65,12 @@ public class Procurement {
     private static final MMLogger logger = MMLogger.create(Procurement.class);
 
     /**
-     * Procurement constructor.
-     * Initializes class instance with negotiator skill rating, game year, and originating faction.
+     * Procurement constructor. Initializes class instance with negotiator skill rating, game year, and originating
+     * faction.
      *
      * @param negotiatorSkillRating the skill rating of the negotiator.
-     * @param gameYear the current year of the game.
-     * @param originFaction the faction from where procurement is initiated.
+     * @param gameYear              the current year of the game.
+     * @param originFaction         the faction from where procurement is initiated.
      */
     public Procurement(int negotiatorSkillRating, int gameYear, Faction originFaction) {
         this.negotiatorSkillRating = negotiatorSkillRating;
@@ -80,8 +85,9 @@ public class Procurement {
      * Given a faction, returns the corresponding tech faction code.
      *
      * @param faction Faction instance
+     *
      * @return returns corresponding faction.
-     * 
+     *
      * @deprecated Use {@link #getTechFaction(Faction)} instead.
      */
     @Deprecated
@@ -93,6 +99,7 @@ public class Procurement {
      * Given a faction, returns the corresponding tech faction code.
      *
      * @param faction Faction instance
+     *
      * @return returns corresponding faction.
      */
     public static ITechnology.Faction getTechFaction(Faction faction) {
@@ -105,7 +112,7 @@ public class Procurement {
         if (result.getCodeMM().toUpperCase().equals(faction.getShortName().toUpperCase())) {
             return result;
         }
- 
+
         logger.info("Unable to retrieve Tech Faction. Using fallback.");
 
         if (faction.isClan()) {
@@ -123,9 +130,10 @@ public class Procurement {
     /**
      * Makes procurement checks for a list of parts and returns successful parts.
      *
-     * @param parts List of parts that require procurement checks
+     * @param parts             List of parts that require procurement checks
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
-     * @param isResupply Flag indicating if procurement is for resupplying parts
+     * @param isResupply        Flag indicating if procurement is for resupplying parts
+     *
      * @return List of parts that were successful in the procurement checks
      */
     public List<Part> makeProcurementChecks(List<Part> parts, boolean useHardExtinction, boolean isResupply) {
@@ -145,9 +153,10 @@ public class Procurement {
     /**
      * Given a part, this method calculates the procurement target number.
      *
-     * @param part The part for which the procurement target number is to be calculated.
+     * @param part              The part for which the procurement target number is to be calculated.
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
-     * @param isResupply Flag indicating if procurement is for resupplying parts
+     * @param isResupply        Flag indicating if procurement is for resupplying parts
+     *
      * @return The calculated procurement target number
      */
     private int getProcurementTargetNumber(Part part, boolean useHardExtinction, boolean isResupply) {
@@ -207,14 +216,15 @@ public class Procurement {
     /**
      * Returns the base target number for the given consumable part.
      *
-     * @param part The part for which the target number should be calculated.
+     * @param part              The part for which the target number should be calculated.
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
+     *
      * @return The calculated base target number.
      */
     private int getConsumableBaseTargetNumber(Part part, boolean useHardExtinction) {
         AvailabilityValue availability = getAvailability(part, useHardExtinction);
 
-        int targetNumber =  switch (availability) {
+        int targetNumber = switch (availability) {
             case A -> 2;
             case B -> 3;
             case C -> 4;
@@ -241,8 +251,9 @@ public class Procurement {
     /**
      * Returns the base target number for the given part.
      *
-     * @param part The part for which the target number should be calculated.
+     * @param part              The part for which the target number should be calculated.
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
+     *
      * @return The calculated base target number.
      */
     private int getBaseTargetNumber(Part part, boolean useHardExtinction) {
@@ -263,8 +274,9 @@ public class Procurement {
     /**
      * Returns the availability rate for the given part.
      *
-     * @param part The part for which the availability is to be calculated.
+     * @param part              The part for which the availability is to be calculated.
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions
+     *
      * @return The calculated availability rate.
      */
     private AvailabilityValue getAvailability(Part part, boolean useHardExtinction) {
@@ -286,15 +298,17 @@ public class Procurement {
     }
 
     /**
-     * Assess the extinction state of a specific part and adjusts its availability
-     * rating based on whether the part is truly extinct or not.
+     * Assess the extinction state of a specific part and adjusts its availability rating based on whether the part is
+     * truly extinct or not.
      *
-     * @param part The part for which to assess the extinction state.
-     * @param availability The calculated availability rate for the part.
+     * @param part              The part for which to assess the extinction state.
+     * @param availability      The calculated availability rate for the part.
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
+     *
      * @return The revised availability rate based on the performed extinction check.
      */
-    private AvailabilityValue performTrulyExtinctCheck(Part part, AvailabilityValue availability, boolean useHardExtinction) {
+    private AvailabilityValue performTrulyExtinctCheck(Part part, AvailabilityValue availability,
+          boolean useHardExtinction) {
         if (part.isExtinct(gameYear, originFaction.isClan(), factionTechCode)) {
             int extinctionYear = part.getExtinctionDate(originFaction.isClan(), factionTechCode);
 
@@ -313,8 +327,9 @@ public class Procurement {
     /**
      * Procedure for calculating the final part availability for Clan tech base.
      *
-     * @param part The part for which the availability is to be calculated.
+     * @param part         The part for which the availability is to be calculated.
      * @param availability The calculated availability rate for the part.
+     *
      * @return The revised availability rate based on Clan Tech Base rules.
      */
     private AvailabilityValue getClanBaseAvailability(Part part, AvailabilityValue availability) {
@@ -343,8 +358,9 @@ public class Procurement {
     /**
      * Procedure for calculating the final part availability for Inner Sphere tech base.
      *
-     * @param part The part for which the availability is to be calculated.
+     * @param part         The part for which the availability is to be calculated.
      * @param availability The calculated availability rate for the part.
+     *
      * @return The revised availability rate based on Inner Sphere Tech Base rules.
      */
     private AvailabilityValue getInnerSphereBaseAvailability(Part part, AvailabilityValue availability) {
@@ -355,7 +371,7 @@ public class Procurement {
                 int extinctionYear = part.getExtinctionDate(true);
 
                 if ((techEra == Era.SW)
-                    && (gameYear >= extinctionYear)) {
+                          && (gameYear >= extinctionYear)) {
                     return Compute.d6() > 3 ? AvailabilityValue.F : AvailabilityValue.X;
                 } else {
                     return availability;
@@ -369,8 +385,9 @@ public class Procurement {
     /**
      * Procedure for calculating the final part availability for common tech base.
      *
-     * @param part The part for which the availability is to be calculated.
+     * @param part         The part for which the availability is to be calculated.
      * @param availability The calculated availability rate for the part.
+     *
      * @return The revised availability rate based on Common Tech Base rules.
      */
     private AvailabilityValue getCommonBaseAvailability(Part part, AvailabilityValue availability) {
@@ -380,7 +397,7 @@ public class Procurement {
                     int extinctionYear = part.getExtinctionDate();
 
                     if ((techEra == Era.SW)
-                        && (gameYear >= extinctionYear)) {
+                              && (gameYear >= extinctionYear)) {
                         return Compute.d6() > 3 ? AvailabilityValue.F : AvailabilityValue.X;
                     } else {
                         return availability;

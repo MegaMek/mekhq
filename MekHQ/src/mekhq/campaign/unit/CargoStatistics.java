@@ -24,11 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
 
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.FighterSquadron;
+import megamek.common.GunEmplacement;
+import megamek.common.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.parts.Part;
@@ -53,38 +61,38 @@ public class CargoStatistics {
 
     public double getTotalInsulatedCargoCapacity() {
         return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getInsulatedCargoCapacity)
-            .sum();
+                     .mapToDouble(Unit::getInsulatedCargoCapacity)
+                     .sum();
     }
 
     public double getTotalRefrigeratedCargoCapacity() {
         return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getRefrigeratedCargoCapacity)
-            .sum();
+                     .mapToDouble(Unit::getRefrigeratedCargoCapacity)
+                     .sum();
     }
 
     public double getTotalLivestockCargoCapacity() {
         return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLivestockCargoCapacity)
-            .sum();
+                     .mapToDouble(Unit::getLivestockCargoCapacity)
+                     .sum();
     }
 
     public double getTotalLiquidCargoCapacity() {
         return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLiquidCargoCapacity)
-            .sum();
+                     .mapToDouble(Unit::getLiquidCargoCapacity)
+                     .sum();
     }
 
     public double getTotalCargoCapacity() {
         return getHangar().getUnitsStream()
-            .mapToDouble(Unit::getCargoCapacity)
-            .sum();
+                     .mapToDouble(Unit::getCargoCapacity)
+                     .sum();
     }
 
     // Liquid not included
     public double getTotalCombinedCargoCapacity() {
         return getTotalCargoCapacity() + getTotalLivestockCargoCapacity()
-                + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
+                     + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
     }
 
     public double getCargoTonnage(boolean inTransit) {

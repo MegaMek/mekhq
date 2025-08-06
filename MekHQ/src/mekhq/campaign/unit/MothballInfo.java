@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit;
 
@@ -44,9 +49,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This class is used to store information about a particular unit that is
- * lost when a unit is mothballed, so that it may be restored to as close to
- * its prior state as possible when the unit is reactivated.
+ * This class is used to store information about a particular unit that is lost when a unit is mothballed, so that it
+ * may be restored to as close to its prior state as possible when the unit is reactivated.
  *
  * @author NickAragua
  */

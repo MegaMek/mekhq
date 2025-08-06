@@ -25,27 +25,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.BattleArmor;
 import megamek.common.EntityMovementMode;
 import megamek.common.IArmorState;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -72,13 +76,14 @@ public class MissingBattleArmorSuit extends MissingPart {
         super(0, null);
     }
 
-    public MissingBattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q, boolean clan, EntityMovementMode mode, Campaign c) {
+    public MissingBattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q, boolean clan,
+          EntityMovementMode mode, Campaign c) {
         super(ton, c);
         this.chassis = ch;
         this.model = m;
         this.trooper = t;
         this.quad = q;
-        this.weightClass= w;
+        this.weightClass = w;
         this.groundMP = gmp;
         this.jumpMP = jmp;
         this.jumpType = mode;
@@ -138,14 +143,14 @@ public class MissingBattleArmorSuit extends MissingPart {
         refreshEntityDetailsCache();
         if (entityDetailsCached) {
             return part instanceof BattleArmorSuit baSuit
-                && getSuitBV() == baSuit.getSuitBV()
-                && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash();
+                         && getSuitBV() == baSuit.getSuitBV()
+                         && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash();
         }
 
         // If we didn't successfully cache entity details, use the old method for comparing.
         return part instanceof BattleArmorSuit
-            && chassis.equals(((BattleArmorSuit) part).getChassis())
-            && model.equals(((BattleArmorSuit ) part).getModel());
+                     && chassis.equals(((BattleArmorSuit) part).getChassis())
+                     && model.equals(((BattleArmorSuit) part).getModel());
     }
 
     public int getSuitBV() {
@@ -160,7 +165,17 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new BattleArmorSuit(chassis, model, getUnitTonnage(), -1, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
+        return new BattleArmorSuit(chassis,
+              model,
+              getUnitTonnage(),
+              -1,
+              weightClass,
+              groundMP,
+              jumpMP,
+              quad,
+              clan,
+              jumpType,
+              campaign);
     }
 
     @Override
@@ -236,7 +251,7 @@ public class MissingBattleArmorSuit extends MissingPart {
             ArrayList<MissingBattleArmorEquipmentPart> missingStuff = new ArrayList<>();
             BaArmor origArmor = null;
             for (Part p : unit.getParts()) {
-                if (p instanceof BaArmor && p.getLocation()== trooper) {
+                if (p instanceof BaArmor && p.getLocation() == trooper) {
                     origArmor = (BaArmor) p;
                 }
                 if (!(p instanceof MissingBattleArmorEquipmentPart)) {
@@ -295,7 +310,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
             toReturn.append(unit.getEntity().getLocationName(trooper))
-                .append("<br>");
+                  .append("<br>");
         }
         toReturn.append(super.getDetails(includeRepairDetails));
         return toReturn.toString();
@@ -309,37 +324,37 @@ public class MissingBattleArmorSuit extends MissingPart {
         }
         // don't just return with the first part if it is damaged
         return campaign.getWarehouse().streamSpareParts()
-            .filter(MissingPart::isAvailableAsReplacement)
-            .reduce(null, (bestPart, part) -> {
-                if (isAcceptableReplacement(part, refit)) {
-                    if (bestPart == null) {
-                        return part;
-                    } else {
-                        int bestPartArmor = 0;
-                        int currentPartArmor = 0;
-                        int bestPartQuantity = 0;
-                        int currentPartQuantity = 0;
-                        for (Part p : bestPart.getChildParts()) {
-                            if (p instanceof BaArmor) {
-                                bestPartArmor = ((BaArmor) p).getAmount();
-                            } else {
-                                bestPartQuantity++;
-                            }
-                        }
-                        for (Part p : part.getChildParts()) {
-                            if (p instanceof BaArmor) {
-                                currentPartArmor = ((BaArmor) p).getAmount();
-                            } else {
-                                currentPartQuantity++;
-                            }
-                        }
-                        if ((currentPartQuantity > bestPartQuantity) || (currentPartArmor > bestPartArmor)) {
-                            return part;
-                        }
-                    }
-                }
-                return bestPart;
-            });
+                     .filter(MissingPart::isAvailableAsReplacement)
+                     .reduce(null, (bestPart, part) -> {
+                         if (isAcceptableReplacement(part, refit)) {
+                             if (bestPart == null) {
+                                 return part;
+                             } else {
+                                 int bestPartArmor = 0;
+                                 int currentPartArmor = 0;
+                                 int bestPartQuantity = 0;
+                                 int currentPartQuantity = 0;
+                                 for (Part p : bestPart.getChildParts()) {
+                                     if (p instanceof BaArmor) {
+                                         bestPartArmor = ((BaArmor) p).getAmount();
+                                     } else {
+                                         bestPartQuantity++;
+                                     }
+                                 }
+                                 for (Part p : part.getChildParts()) {
+                                     if (p instanceof BaArmor) {
+                                         currentPartArmor = ((BaArmor) p).getAmount();
+                                     } else {
+                                         currentPartQuantity++;
+                                     }
+                                 }
+                                 if ((currentPartQuantity > bestPartQuantity) || (currentPartArmor > bestPartArmor)) {
+                                     return part;
+                                 }
+                             }
+                         }
+                         return bestPart;
+                     });
     }
 
     @Override
@@ -355,7 +370,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     private void refreshEntityDetailsCache() {
         if (!entityDetailsCached) {
             mekhq.campaign.parts.utilities.BattleArmorSuitUtility battleArmorSuitUtility
-                = new  mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
+                  = new mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
             if (battleArmorSuitUtility.hasEntity()) {
                 suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
                 weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();

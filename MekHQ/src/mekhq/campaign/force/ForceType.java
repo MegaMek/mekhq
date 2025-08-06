@@ -24,17 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
-import megamek.logging.MMLogger;
-
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import megamek.logging.MMLogger;
 
 /**
  * Represents the various types of forces available.
  * <p>
- *     It is used to classify and manipulate forces within the game.
+ * It is used to classify and manipulate forces within the game.
  * </p>
  */
 public enum ForceType {
@@ -45,8 +50,7 @@ public enum ForceType {
     STANDARD(true, false),
 
     /**
-     * Support force type, used by forces that should be deployed in StratCon but not involved in
-     * combat.
+     * Support force type, used by forces that should be deployed in StratCon but not involved in combat.
      */
     SUPPORT(false, false),
 
@@ -69,10 +73,10 @@ public enum ForceType {
     /**
      * Constructor for the {@code ForceType} enum.
      *
-     * @param standardizeParents  Whether changing to this ForceType changes the ForceType in all
-     *                           parent forces to STANDARD
-     * @param childrenInherit     Whether changing to this ForceType changes the ForceType in all
-     *                           child forces to this ForceType.
+     * @param standardizeParents Whether changing to this ForceType changes the ForceType in all parent forces to
+     *                           STANDARD
+     * @param childrenInherit    Whether changing to this ForceType changes the ForceType in all child forces to this
+     *                           ForceType.
      */
     ForceType(boolean standardizeParents, boolean childrenInherit) {
         this.standardizeParents = standardizeParents;
@@ -82,14 +86,14 @@ public enum ForceType {
 
 
     // region Getters
+
     /**
-     * Retrieves the display name for the ForceType by fetching a localized label from the relevant
-     * resource bundle.
+     * Retrieves the display name for the ForceType by fetching a localized label from the relevant resource bundle.
      *
      * <p>The method uses the {@code name} of the current instance to construct a resource
-     * key in the format {@code [name].label}. This key is used to look up a localized string
-     * from the {@code ForceType} resource bundle located in the {@code mekhq.resources} package.
-     * The formatted text at the specified key is returned as the display name.</p>
+     * key in the format {@code [name].label}. This key is used to look up a localized string from the {@code ForceType}
+     * resource bundle located in the {@code mekhq.resources} package. The formatted text at the specified key is
+     * returned as the display name.</p>
      *
      * @return The localized display name for the current instance.
      */
@@ -104,13 +108,13 @@ public enum ForceType {
      * Retrieves the symbol associated with this ForceType.
      *
      * <p>The method determines the symbol to display for the current instance by looking up
-     * a localization resource key in the {@code ForceType} resource bundle, with keys formatted
-     * as {@code [enumName].symbol}.</p>
+     * a localization resource key in the {@code ForceType} resource bundle, with keys formatted as
+     * {@code [enumName].symbol}.</p>
      *
      * <p>If the current instance is {@code STANDARD}, an empty string is returned as the symbol.</p>
      *
-     * @return The localized symbol associated with the current instance, or an empty string
-     *         if the instance is {@code STANDARD}.
+     * @return The localized symbol associated with the current instance, or an empty string if the instance is
+     *       {@code STANDARD}.
      */
     public String getSymbol() {
         if (this == STANDARD) {
@@ -124,8 +128,8 @@ public enum ForceType {
     }
 
     /**
-     * This flag indicates whether, when changing to this ForceType, whether all parent forces
-     * should be changed to STANDARD.
+     * This flag indicates whether, when changing to this ForceType, whether all parent forces should be changed to
+     * STANDARD.
      *
      * @return {@code true} if parent relationships should be standardized; {@code false} otherwise.
      */
@@ -134,8 +138,8 @@ public enum ForceType {
     }
 
     /**
-     * This flag indicates whether, when changing to this ForceType, whether all child forces
-     * should be changed to the same ForceType.
+     * This flag indicates whether, when changing to this ForceType, whether all child forces should be changed to the
+     * same ForceType.
      *
      * @return {@code true} if children should inherit from parents; {@code false} otherwise.
      */
@@ -182,12 +186,13 @@ public enum ForceType {
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
      * Retrieves a {@code ForceType} based on its ordinal value.
      *
      * @param ordinal the ordinal index of the force type.
-     * @return the corresponding {@code ForceType} if the ordinal is valid;
-     *         otherwise, defaults to {@code STANDARD}.
+     *
+     * @return the corresponding {@code ForceType} if the ordinal is valid; otherwise, defaults to {@code STANDARD}.
      */
     public static ForceType fromOrdinal(int ordinal) {
         if ((ordinal >= 0) && (ordinal < values().length)) {

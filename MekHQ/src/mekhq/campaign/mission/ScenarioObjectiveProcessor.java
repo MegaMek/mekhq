@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -54,6 +59,7 @@ import org.apache.logging.log4j.LogManager;
 
 /**
  * Handles processing for objectives for a scenario that has them
+ *
  * @author NickAragua
  */
 public class ScenarioObjectiveProcessor {
@@ -70,8 +76,9 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Given a ResolveScenarioTracker, evaluate the units contained therein
-     * in an effort to determine the units associated and units that meet each objective in the scenario played.
+     * Given a ResolveScenarioTracker, evaluate the units contained therein in an effort to determine the units
+     * associated and units that meet each objective in the scenario played.
+     *
      * @param tracker Tracker to process
      */
     public void evaluateScenarioObjectives(ResolveScenarioTracker tracker) {
@@ -82,14 +89,14 @@ public class ScenarioObjectiveProcessor {
             potentialObjectiveUnits.put(objective, currentObjectiveUnitIDs);
 
             Set<String> qualifyingUnits = evaluateObjective(objective, currentObjectiveUnitIDs,
-                    tracker.getAllInvolvedUnits().values(), tracker);
+                  tracker.getAllInvolvedUnits().values(), tracker);
             qualifyingObjectiveUnits.put(objective, qualifyingUnits);
         }
     }
 
     /**
-     * Given an objective and a resolution tracker, "unroll" the force names specified in the objective
-     * into a set of unit IDs.
+     * Given an objective and a resolution tracker, "unroll" the force names specified in the objective into a set of
+     * unit IDs.
      */
     private Set<String> unrollObjectiveForces(ScenarioObjective objective, ResolveScenarioTracker tracker) {
         Set<String> objectiveUnitIDs = new HashSet<>();
@@ -138,10 +145,11 @@ public class ScenarioObjectiveProcessor {
 
     /**
      * Evaluates whether the given list of units meets the given objective.
+     *
      * @return The list of units that qualify for the given objective.
      */
     private Set<String> evaluateObjective(ScenarioObjective objective, Set<String> objectiveUnitIDs,
-            Collection<Entity> units, ResolveScenarioTracker tracker) {
+          Collection<Entity> units, ResolveScenarioTracker tracker) {
         Set<String> qualifyingUnits = new HashSet<>();
 
         for (Entity unit : units) {
@@ -159,15 +167,16 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Update the objective qualification status of a given entity based on its current state and
-     * on whether or not it has "escaped". Assumes that the entity is potentially eligible for the objective.
+     * Update the objective qualification status of a given entity based on its current state and on whether or not it
+     * has "escaped". Assumes that the entity is potentially eligible for the objective.
+     *
      * @param entity
-     * @param forceEntityEscape Whether the entity was marked as 'escaped', regardless of entity status
-     * @param forceEntityDestruction Whether the entity was marked as 'destroyed', regardless of entity status
+     * @param forceEntityEscape             Whether the entity was marked as 'escaped', regardless of entity status
+     * @param forceEntityDestruction        Whether the entity was marked as 'destroyed', regardless of entity status
      * @param opponentHasBattlefieldControl
      */
     public void updateObjectiveEntityState(Entity entity, boolean forceEntityEscape,
-            boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
+          boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
         if (entity == null) {
             return;
         }
@@ -179,26 +188,30 @@ public class ScenarioObjectiveProcessor {
                 switch (objective.getObjectiveCriterion()) {
                     case Destroy:
                         entityMeetsObjective = forceEntityDestruction ||
-                            !forceEntityEscape && entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                                                     !forceEntityEscape &&
+                                                           entityIsDestroyed(entity, opponentHasBattlefieldControl);
                         break;
                     case ForceWithdraw:
                         entityMeetsObjective = forceEntityDestruction ||
-                            !forceEntityEscape && entityIsForcedWithdrawal(entity);
+                                                     !forceEntityEscape && entityIsForcedWithdrawal(entity);
                         break;
                     case Capture:
-                        entityMeetsObjective = !forceEntityEscape && entityIsCaptured(entity, opponentHasBattlefieldControl);
+                        entityMeetsObjective = !forceEntityEscape &&
+                                                     entityIsCaptured(entity, opponentHasBattlefieldControl);
                         break;
                     case PreventReachMapEdge:
                         entityMeetsObjective = forceEntityDestruction ||
-                                !entityHasReachedDestinationEdge(entity, objective);
+                                                     !entityHasReachedDestinationEdge(entity, objective);
                         break;
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
-                            !forceEntityDestruction && !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                                                     !forceEntityDestruction &&
+                                                           !entityIsDestroyed(entity, opponentHasBattlefieldControl);
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
-                            !forceEntityDestruction && entityHasReachedDestinationEdge(entity, objective);
+                                                     !forceEntityDestruction &&
+                                                           entityHasReachedDestinationEdge(entity, objective);
                         break;
                     // criteria that we have no way of tracking will not be doing any updates
                     default:
@@ -216,12 +229,13 @@ public class ScenarioObjectiveProcessor {
 
     /**
      * Determines if the given entity has met the given objective
-     * @param entity Entity to check
-     * @param objective Objective to check
+     *
+     * @param entity                        Entity to check
+     * @param objective                     Objective to check
      * @param opponentHasBattlefieldControl Whether the entity's opponent has battlefield control
      */
     private boolean entityMeetsObjective(Entity entity, ScenarioObjective objective,
-            Set<String> objectiveUnitIDs, boolean opponentHasBattlefieldControl) {
+          Set<String> objectiveUnitIDs, boolean opponentHasBattlefieldControl) {
         if (objectiveUnitIDs.contains(entity.getExternalIdAsString())) {
             return switch (objective.getObjectiveCriterion()) {
                 case Destroy -> entityIsDestroyed(entity, opponentHasBattlefieldControl);
@@ -243,16 +257,20 @@ public class ScenarioObjectiveProcessor {
     private boolean entityIsDestroyed(Entity entity, boolean opponentHasBattlefieldControl) {
         // "destroy" is a kill
         // it's destroyed if it's destroyed, or if it's been disabled and the enemy has no chance to recover it
-        return entity.isDestroyed() || ((entity.getCrew().isDead() || entity.isImmobile()) && opponentHasBattlefieldControl);
+        return entity.isDestroyed() ||
+                     ((entity.getCrew().isDead() || entity.isImmobile()) && opponentHasBattlefieldControl);
     }
 
     /**
-     * Check whether we should consider an entity as being forced to withdraw for the purposes of a ForceWithdraw objective
+     * Check whether we should consider an entity as being forced to withdraw for the purposes of a ForceWithdraw
+     * objective
      */
     private boolean entityIsForcedWithdrawal(Entity entity) {
         // we consider an entity force-withdrawn if it's destroyed, crippled, or run off the field
         // note: immobility and having a dead crew are captured within 'crippled'
-        return entity.isDestroyed() || entity.isCrippled(true) || entity.getRetreatedDirection() != OffBoardDirection.NONE;
+        return entity.isDestroyed() ||
+                     entity.isCrippled(true) ||
+                     entity.getRetreatedDirection() != OffBoardDirection.NONE;
     }
 
     /**
@@ -262,27 +280,29 @@ public class ScenarioObjectiveProcessor {
         // we consider an entity captured if it's been immobilized but not destroyed and hasn't left the field
         // obviously can't capture it if we don't control the battlefield
         return entity.isImmobile() && !entity.isDestroyed() &&
-                entity.getRetreatedDirection() == OffBoardDirection.NONE && !opponentHasBattlefieldControl;
+                     entity.getRetreatedDirection() == OffBoardDirection.NONE && !opponentHasBattlefieldControl;
     }
 
     /**
      * Check whether or not the entity can be considered as having reached the destination edge in the given objective
      */
     private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective) {
-                // we've reached the destination edge if we've reached an edge and it's the right one
-        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge()));
+        // we've reached the destination edge if we've reached an edge and it's the right one
+        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) &&
+                      (entity.getRetreatedDirection() == objective.getDestinationEdge()));
     }
 
     /**
-     * Processes the given scenario and its objectives scenario objective, applying objective effects to the campaign
-     * as necessary
-     * @param scenario The scenario to process.
-     * @param objectiveOverrides Map containing user overrides of objective completion state
+     * Processes the given scenario and its objectives scenario objective, applying objective effects to the campaign as
+     * necessary
+     *
+     * @param scenario            The scenario to process.
+     * @param objectiveOverrides  Map containing user overrides of objective completion state
      * @param objectiveUnitCounts Map containing objectives and the number of units that qualified for each.
      */
     public ScenarioStatus determineScenarioStatus(Scenario scenario,
-                                                  Map<ScenarioObjective, Boolean> objectiveOverrides,
-                                                  Map<ScenarioObjective, Integer> objectiveUnitCounts) {
+          Map<ScenarioObjective, Boolean> objectiveOverrides,
+          Map<ScenarioObjective, Integer> objectiveUnitCounts) {
         int victoryScore = 0;
 
         if (!scenario.hasObjectives()) {
@@ -296,10 +316,14 @@ public class ScenarioObjectiveProcessor {
                 continue;
             }
 
-            boolean objectiveMet = (objectiveOverrides.containsKey(objective) && objectiveOverrides.get(objective) != null) ?
-                objectiveOverrides.get(objective) : objectiveMet(objective, objectiveUnitCounts.get(objective));
+            boolean objectiveMet = (objectiveOverrides.containsKey(objective) &&
+                                          objectiveOverrides.get(objective) != null) ?
+                                         objectiveOverrides.get(objective) :
+                                         objectiveMet(objective, objectiveUnitCounts.get(objective));
 
-            List<ObjectiveEffect> objectiveEffects = objectiveMet ? objective.getSuccessEffects() : objective.getFailureEffects();
+            List<ObjectiveEffect> objectiveEffects = objectiveMet ?
+                                                           objective.getSuccessEffects() :
+                                                           objective.getFailureEffects();
 
             for (ObjectiveEffect effect : objectiveEffects) {
                 if (effect.effectType == ObjectiveEffectType.ScenarioVictory) {
@@ -320,20 +344,27 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Processes a particular scenario objective, applying its effects to the
-     * current mission and campaign as necessary
-     * @param objective The objective to process.
-     * @param qualifyingUnitCount How many units qualified for the objective, used to scale the objective effect if necessary
-     * @param completionOverride If null, objective completion is calculated dynamically, otherwise a fixed objective completion state.
-     * @param tracker The tracker from which to draw unit data
-     * @param dryRun Whether we're actually applying the objectives or just generating a report.
+     * Processes a particular scenario objective, applying its effects to the current mission and campaign as necessary
+     *
+     * @param objective           The objective to process.
+     * @param qualifyingUnitCount How many units qualified for the objective, used to scale the objective effect if
+     *                            necessary
+     * @param completionOverride  If null, objective completion is calculated dynamically, otherwise a fixed objective
+     *                            completion state.
+     * @param tracker             The tracker from which to draw unit data
+     * @param dryRun              Whether we're actually applying the objectives or just generating a report.
      */
-    public String processObjective(Campaign campaign, ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
-            ResolveScenarioTracker tracker, boolean dryRun) {
+    public String processObjective(Campaign campaign, ScenarioObjective objective, int qualifyingUnitCount,
+          Boolean completionOverride,
+          ResolveScenarioTracker tracker, boolean dryRun) {
         // if we've overridden the objective completion flag, great, otherwise, calculate it here
-        boolean objectiveMet = completionOverride == null ? objectiveMet(objective, qualifyingUnitCount) : completionOverride;
+        boolean objectiveMet = completionOverride == null ?
+                                     objectiveMet(objective, qualifyingUnitCount) :
+                                     completionOverride;
 
-        List<ObjectiveEffect> objectiveEffects = objectiveMet ? objective.getSuccessEffects() : objective.getFailureEffects();
+        List<ObjectiveEffect> objectiveEffects = objectiveMet ?
+                                                       objective.getSuccessEffects() :
+                                                       objective.getFailureEffects();
 
         int numUnitsFailedObjective = potentialObjectiveUnits.get(objective).size() - qualifyingUnitCount;
 
@@ -347,8 +378,8 @@ public class ScenarioObjectiveProcessor {
 
         for (ObjectiveEffect effect : objectiveEffects) {
             sb.append(processObjectiveEffect(campaign, effect,
-                    effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : qualifyingUnitCount,
-                    tracker, dryRun));
+                  effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : qualifyingUnitCount,
+                  tracker, dryRun));
             sb.append("\n\t");
         }
 
@@ -356,9 +387,9 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Processes the specified objective effect during a scenario and applies the corresponding
-     * changes to the campaign or contract. This method determines the type of effect and executes
-     * its logic accordingly, supporting both dry-run and active execution modes.
+     * Processes the specified objective effect during a scenario and applies the corresponding changes to the campaign
+     * or contract. This method determines the type of effect and executes its logic accordingly, supporting both
+     * dry-run and active execution modes.
      *
      * <p>Effect types supported include (but are not limited to):
      * <ul>
@@ -373,16 +404,18 @@ public class ScenarioObjectiveProcessor {
      * applying any changes to the campaign or contract. In active mode, the effect is applied to
      * the appropriate {@link Campaign}, {@link AtBContract}, or scenario entities.</p>
      *
-     * @param campaign   the {@link Campaign} instance being updated.
-     * @param effect     the {@link ObjectiveEffect} defining the effect type and its further details.
+     * @param campaign    the {@link Campaign} instance being updated.
+     * @param effect      the {@link ObjectiveEffect} defining the effect type and its further details.
      * @param scaleFactor the factor by which the objective effect is scaled (used for value calculations).
-     * @param tracker    the {@link ResolveScenarioTracker} providing context about the scenario, mission, and contract.
-     * @param dryRun     a {@code boolean} flag indicating if the method should process in dry-run mode
-     *                   ({@code true}) or actively apply the effect ({@code false}).
+     * @param tracker     the {@link ResolveScenarioTracker} providing context about the scenario, mission, and
+     *                    contract.
+     * @param dryRun      a {@code boolean} flag indicating if the method should process in dry-run mode ({@code true})
+     *                    or actively apply the effect ({@code false}).
+     *
      * @return a {@link String} describing the effect, used during dry-run mode; otherwise an empty string is returned.
      */
     private String processObjectiveEffect(Campaign campaign, ObjectiveEffect effect, int scaleFactor,
-                                          ResolveScenarioTracker tracker, boolean dryRun) {
+          ResolveScenarioTracker tracker, boolean dryRun) {
         switch (effect.effectType) {
             case ScenarioVictory:
                 if (dryRun) {
@@ -403,7 +436,8 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return String.format("%d Contract Score/Campaign Victory Points", scoreEffect);
                     } else {
-                        contract.setContractScoreArbitraryModifier(contract.getContractScoreArbitraryModifier() + scoreEffect);
+                        contract.setContractScoreArbitraryModifier(contract.getContractScoreArbitraryModifier() +
+                                                                         scoreEffect);
                     }
                 }
                 break;
@@ -442,7 +476,8 @@ public class ScenarioObjectiveProcessor {
                     return "Contract ends with victory";
                 } else {
                     tracker.getCampaign().addReport(
-                            String.format("Victory in scenario %s ends the contract with a victory", tracker.getScenario().getDescription()));
+                          String.format("Victory in scenario %s ends the contract with a victory",
+                                tracker.getScenario().getDescription()));
                 }
                 break;
             case ContractDefeat:
@@ -450,7 +485,8 @@ public class ScenarioObjectiveProcessor {
                     return "Contract ends with loss";
                 } else {
                     tracker.getCampaign().addReport(
-                            String.format("Defeat in scenario %s ends the contract with a defeat", tracker.getScenario().getDescription()));
+                          String.format("Defeat in scenario %s ends the contract with a defeat",
+                                tracker.getScenario().getDescription()));
                 }
                 break;
             case BVBudgetUpdate:
@@ -465,7 +501,7 @@ public class ScenarioObjectiveProcessor {
                         int dropSize = 0;
                         for (int x = 0; x < numBonuses; x++) {
                             dropSize += contract.doBonusRoll(tracker.getCampaign(), true)
-                                ? 1 : 0;
+                                              ? 1 : 0;
                         }
 
                         if (dropSize > 0) {
@@ -481,7 +517,10 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will not be captured.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false, false);
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                              (AtBContract) tracker.getMission(),
+                              false,
+                              false);
                     }
                 }
                 break;
@@ -490,7 +529,10 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will be destroyed.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), true, false);
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                              (AtBContract) tracker.getMission(),
+                              true,
+                              false);
                     }
                 }
                 break;
@@ -499,7 +541,10 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "Allied forces will control this facility.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(), (AtBContract) tracker.getMission(), false, true);
+                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                              (AtBContract) tracker.getMission(),
+                              false,
+                              true);
                     }
                 }
         }

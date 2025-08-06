@@ -35,34 +35,32 @@ package mekhq.utilities;
 import mekhq.MekHQ;
 
 /**
- * This class has a collection of values and methods to make writing out various
- * parts of reports and XML easier by using methods for common outputs.
+ * This class has a collection of values and methods to make writing out various parts of reports and XML easier by
+ * using methods for common outputs.
  *
  * @author Richard J Hancock
  */
 public class ReportingUtilities {
     /**
-     * Just the closing part of the tag to prevent potential issues with strings in
-     * Java files and the warnings about constants when using the same string in
-     * multiple places.
+     * Just the closing part of the tag to prevent potential issues with strings in Java files and the warnings about
+     * constants when using the same string in multiple places.
      *
      */
     public static final String CLOSING_SPAN_TAG = "</span>";
 
     /**
-     * Private constructor as we have no use to initialize this for anything. All
-     * static methods to standardize output of various parts of reports. More need
-     * to be added as code is looked at and refactored.
+     * Private constructor as we have no use to initialize this for anything. All static methods to standardize output
+     * of various parts of reports. More need to be added as code is looked at and refactored.
      */
     private ReportingUtilities() {
         // No public use for this class, Only static.
     }
 
     /**
-     * Accepts a string of a color code to be used within an HTML span tag. Will
-     * output the full opening tag.
+     * Accepts a string of a color code to be used within an HTML span tag. Will output the full opening tag.
      *
      * @param colorToUse What color to make the eventual text.
+     *
      * @return The formatted string for the opening tag.
      */
     public static String spanOpeningWithCustomColor(String colorToUse) {
@@ -70,13 +68,12 @@ public class ReportingUtilities {
     }
 
     /**
-     * Takes the color and a message to create a full <span></span> message
-     * for output to simplify the process. Uses
-     * {@link #spanOpeningWithCustomColor(String)} and {@link #CLOSING_SPAN_TAG} in
-     * the process of formation.
+     * Takes the color and a message to create a full <span></span> message for output to simplify the process. Uses
+     * {@link #spanOpeningWithCustomColor(String)} and {@link #CLOSING_SPAN_TAG} in the process of formation.
      *
      * @param colorToUse Color for the text within the span tag.
      * @param message    Message to output.
+     *
      * @return Formatted string with color and message.
      */
     public static String messageSurroundedBySpanWithColor(String colorToUse, String message) {
@@ -84,15 +81,16 @@ public class ReportingUtilities {
     }
 
     /**
-     * Wraps the center argument with the start and end arguments if the center argument is
-     * not blank or null. For your optional parenthetical's and such.
+     * Wraps the center argument with the start and end arguments if the center argument is not blank or null. For your
+     * optional parenthetical's and such.
+     *
      * @param start String to begin with
-     * @param main String to contain, if it exists
-     * @param end String to end with
+     * @param main  String to contain, if it exists
+     * @param end   String to end with
+     *
      * @return String start + main + end if main else ""
      */
-    public static String surroundIf(String start, String main, String end)
-    {
+    public static String surroundIf(String start, String main, String end) {
         if (null == main || main.isEmpty()) {
             return "";
         }
@@ -100,16 +98,17 @@ public class ReportingUtilities {
     }
 
     /**
-     * Connects the first string with the second using separator, if both strings are non-null and
-     * non-empty. If only one string is valid, return that string. If neither string is valid,
-     * return "". For when using a StringJoiner is just overkill.
-     * @param first String to begin with
+     * Connects the first string with the second using separator, if both strings are non-null and non-empty. If only
+     * one string is valid, return that string. If neither string is valid, return "". For when using a StringJoiner is
+     * just overkill.
+     *
+     * @param first     String to begin with
      * @param separator String to separate with
-     * @param second String to end with
+     * @param second    String to end with
+     *
      * @return String first + separator + second or first or second or ""
      */
-    public static String separateIf(String first, String separator, String second)
-    {
+    public static String separateIf(String first, String separator, String second) {
         boolean isFirst = (null != first) && (!first.isEmpty());
         boolean isSecond = (null != second) && (!second.isEmpty());
 

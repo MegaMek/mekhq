@@ -338,7 +338,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testNoForces(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -354,7 +354,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testOneLance(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -371,7 +371,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testThreeLances(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -390,7 +390,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testNineLances(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -409,7 +409,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testOneCompany(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -426,7 +426,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testThreeCompanies(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -445,7 +445,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testNineCompanies(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -464,7 +464,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testOneLanceAndOneCompany(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -482,7 +482,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testThreeLanceAndOneCompany(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -502,7 +502,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testLancesWithTeams(int formationSize) {
             // Arrange
             int forceId = getNextForceId();
@@ -577,10 +577,11 @@ public class AtBContractTest {
         }
 
 
-
         /**
          * Lance-level formation, not necessarily a lance
+         *
          * @param formationSize number of units in the formation
+         *
          * @return A mocked CombatTeam of the desired size
          */
         private CombatTeam getMockLanceCombatTeam(int formationSize) {
@@ -596,7 +597,9 @@ public class AtBContractTest {
 
         /**
          * Lance-level formation, not necessarily a lance
+         *
          * @param formationSize number of units in the formation
+         *
          * @return A mocked Force of the desired size
          */
         private Force getMockLanceForce(int formationSize) {

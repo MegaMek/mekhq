@@ -24,12 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.enums;
 
 /**
- * This enum indicates whether a story arc has to start a new campaign, can be added to an existing
- * campaign or both.
+ * This enum indicates whether a story arc has to start a new campaign, can be added to an existing campaign or both.
  */
 public enum StoryLoadingType {
     //region Enum Declarations
@@ -57,7 +61,6 @@ public enum StoryLoadingType {
                 return false;
         }
     }
-
 
 
 }

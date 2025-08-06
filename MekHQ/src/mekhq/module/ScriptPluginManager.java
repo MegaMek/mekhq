@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module;
 
@@ -33,7 +38,6 @@ import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -42,11 +46,9 @@ import megamek.logging.MMLogger;
 import mekhq.module.api.MekHQModule;
 
 /**
- * Manages plugins requiring interpretation by a scripting engine. As scripts
- * are encountered while
- * parsing the plugins directory they are converted to instances of the
- * MekHQModule interface for
- * use by the various specific module managers.
+ * Manages plugins requiring interpretation by a scripting engine. As scripts are encountered while parsing the plugins
+ * directory they are converted to instances of the MekHQModule interface for use by the various specific module
+ * managers.
  *
  * @author Neoancient
  */

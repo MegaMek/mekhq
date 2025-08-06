@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.autoAwards;
 
@@ -40,13 +45,11 @@ public class TimeAwards {
     private static final MMLogger logger = MMLogger.create(TimeAwards.class);
 
     /**
-     * This function loops through Time Awards, checking whether the person is
-     * eligible to receive each type of award
+     * This function loops through Time Awards, checking whether the person is eligible to receive each type of award
      *
      * @param campaign the campaign to be processed
      * @param person   the person to check award eligibility for
-     * @param awards   the awards to be processed (should only include awards where
-     *                 item == Time)
+     * @param awards   the awards to be processed (should only include awards where item == Time)
      */
     public static Map<Integer, List<Object>> TimeAwardsProcessor(Campaign campaign, UUID person, List<Award> awards) {
         int requiredYearsOfService;
@@ -62,7 +65,7 @@ public class TimeAwards {
                 requiredYearsOfService = award.getQty();
             } catch (Exception e) {
                 logger.warn("Award {} from the {} set has an invalid qty value {}",
-                        award.getName(), award.getSet(), award.getQty());
+                      award.getName(), award.getSet(), award.getQty());
                 continue;
             }
 
@@ -70,7 +73,7 @@ public class TimeAwards {
                 isCumulative = award.isStackable();
             } catch (Exception e) {
                 logger.warn("Award {} from the {} set has an invalid stackable value {}",
-                        award.getName(), award.getSet(), award.getQty());
+                      award.getName(), award.getSet(), award.getQty());
                 continue;
             }
 
@@ -79,13 +82,13 @@ public class TimeAwards {
                     yearsOfService = campaign.getPerson(person).getYearsInService(campaign);
                 } catch (Exception e) {
                     logger.error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set.",
-                            campaign.getPerson(person).getFullName(), award.getName(), award.getSet());
+                          campaign.getPerson(person).getFullName(), award.getName(), award.getSet());
                     continue;
                 }
 
                 if (isCumulative) {
                     requiredYearsOfService *= campaign.getPerson(person).getAwardController().getNumberOfAwards(award)
-                            + 1;
+                                                    + 1;
                 }
 
                 if (yearsOfService >= requiredYearsOfService) {

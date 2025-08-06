@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.unit.actions;
 
 import java.util.HashMap;
@@ -40,12 +44,9 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * Checks for additional ammo bins and adds the appropriate part.
- *
- * Large craft can combine all the ammo of a single type into a single bin.
- * Switching the munition type
- * of one or more tons of ammo can require the addition of an ammo bin and can
- * change the ammo bin
- * capacity.
+ * <p>
+ * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type of one or more
+ * tons of ammo can require the addition of an ammo bin and can change the ammo bin capacity.
  */
 public class AdjustLargeCraftAmmoAction implements IUnitAction {
 
@@ -68,7 +69,7 @@ public class AdjustLargeCraftAmmoAction implements IUnitAction {
             LargeCraftAmmoBin part = ammoParts.get(eqNum);
             if (null == part) {
                 part = new LargeCraftAmmoBin((int) unit.getEntity().getWeight(), (AmmoType) m.getType(), eqNum,
-                        m.getOriginalShots() - m.getBaseShotsLeft(), m.getSize(), campaign);
+                      m.getOriginalShots() - m.getBaseShotsLeft(), m.getSize(), campaign);
 
                 // Add the part to the unit
                 unit.addPart(part);

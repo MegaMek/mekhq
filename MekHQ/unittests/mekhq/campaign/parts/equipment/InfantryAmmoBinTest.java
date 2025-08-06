@@ -95,7 +95,14 @@ public class InfantryAmmoBinTest {
         int equipmentNum = 18;
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         assertEquals(ammoType, ammoBin.getType());
         assertEquals(weaponType, ammoBin.getWeaponType());
@@ -114,7 +121,14 @@ public class InfantryAmmoBinTest {
         int equipmentNum = 18;
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * (clips - 1);
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Ensure the clone has all the same stuff
         InfantryAmmoBin clone = ammoBin.clone();
@@ -134,7 +148,14 @@ public class InfantryAmmoBinTest {
 
         int equipmentNum = 18;
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Ensure the clone has all the same stuff
         MissingInfantryAmmoBin missingBin = ammoBin.getMissingPart();
@@ -158,14 +179,21 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = 1;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
         AmmoMounted mockMounted = mock(AmmoMounted.class);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted )mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
         doAnswer(invocation -> {
@@ -222,7 +250,14 @@ public class InfantryAmmoBinTest {
         boolean isOmniPodded = false;
         int equipmentNum = 42;
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, 0, weaponType, clips,  isOmniPodded, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              0,
+              weaponType,
+              clips,
+              isOmniPodded,
+              mockCampaign);
         Unit unit = mock(Unit.class);
         when(unit.isSalvage()).thenReturn(true);
         Entity entity = mock(Entity.class);
@@ -256,7 +291,14 @@ public class InfantryAmmoBinTest {
         // An ammo bin whose ammo type matches the mount ...
         int equipmentNum = 42;
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
@@ -285,7 +327,14 @@ public class InfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
         Campaign mockCampaign = mock(Campaign.class);
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, infernoAmmoType, 42, weaponType.getShots() - (clips - 1), weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              infernoAmmoType,
+              42,
+              weaponType.getShots() - (clips - 1),
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Write the InfantryAmmoBin XML
@@ -327,7 +376,14 @@ public class InfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
         Campaign mockCampaign = mock(Campaign.class);
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, infernoAmmoType, 42, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              infernoAmmoType,
+              42,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Write the InfantryAmmoBin XML
@@ -370,7 +426,14 @@ public class InfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
         Campaign mockCampaign = mock(Campaign.class);
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, infernoAmmoType, 42, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              infernoAmmoType,
+              42,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Write the InfantryAmmoBin XML
@@ -412,7 +475,14 @@ public class InfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
         Campaign mockCampaign = mock(Campaign.class);
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, infernoAmmoType, 42, infernoAmmoType.getShots(), weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              infernoAmmoType,
+              42,
+              infernoAmmoType.getShots(),
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Write the InfantryAmmoBin XML
@@ -473,7 +543,14 @@ public class InfantryAmmoBinTest {
         Campaign mockCampaign = mock(Campaign.class);
 
         int clips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, infernoAmmoType, -1, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              infernoAmmoType,
+              -1,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Pick a different munition type
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
@@ -526,7 +603,14 @@ public class InfantryAmmoBinTest {
         // Create an empty Ammo Bin...
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and unload it.
         ammoBin.unload();
@@ -550,7 +634,14 @@ public class InfantryAmmoBinTest {
         // Create a full Ammo Bin...
         int clips = 5;
         int shotsNeeded = 0;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and unload it.
         ammoBin.unload();
@@ -583,7 +674,14 @@ public class InfantryAmmoBinTest {
         // Create an Ammo Bin with just one round...
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * (clips - 1);
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and unload it.
         ammoBin.unload();
@@ -617,7 +715,14 @@ public class InfantryAmmoBinTest {
         // Create an empty Ammo Bin...
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and salvage it.
         ammoBin.remove(true);
@@ -642,7 +747,14 @@ public class InfantryAmmoBinTest {
         // Create a full Ammo Bin...
         int clips = 5;
         int shotsNeeded = 0;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and salvage it.
         ammoBin.remove(true);
@@ -676,7 +788,14 @@ public class InfantryAmmoBinTest {
         // Create an Ammo Bin with just one clip...
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * (clips - 1);
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and salvage it.
         ammoBin.remove(true);
@@ -709,7 +828,14 @@ public class InfantryAmmoBinTest {
         // Create an Ammo Bin with no ammo...
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and try to load it when the warehouse is empty.
         ammoBin.loadBin();
@@ -735,7 +861,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -772,7 +905,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -816,7 +956,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -859,7 +1006,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -904,7 +1058,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -970,7 +1131,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = 0;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1031,7 +1199,14 @@ public class InfantryAmmoBinTest {
         // Create an Ammo Bin with no ammo...
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ...and try to load it when the warehouse is empty.
         ammoBin.fix();
@@ -1057,7 +1232,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1094,7 +1276,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1138,7 +1327,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1181,7 +1377,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1226,7 +1429,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = weaponType.getShots() * clips;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1291,7 +1501,14 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = 0;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1350,16 +1567,37 @@ public class InfantryAmmoBinTest {
         int clips = 5;
         int shotsNeeded = 0;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, shotsNeeded, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Same ammo type, weapon type, and clips
-        InfantryAmmoBin otherAmmoBin = new InfantryAmmoBin(0, ammoType, -1, ammoType.getShots(), weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin otherAmmoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              ammoType.getShots(),
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         assertTrue(ammoBin.isSamePartType(otherAmmoBin));
         assertTrue(otherAmmoBin.isSamePartType(ammoBin));
 
         // Different ammo type, same weapon type and clips
-        otherAmmoBin = new InfantryAmmoBin(0, otherAmmoType, -1, otherAmmoType.getShots(), weaponType, clips, false, mockCampaign);
+        otherAmmoBin = new InfantryAmmoBin(0,
+              otherAmmoType,
+              -1,
+              otherAmmoType.getShots(),
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         assertFalse(ammoBin.isSamePartType(otherAmmoBin));
         assertFalse(otherAmmoBin.isSamePartType(ammoBin));
@@ -1371,7 +1609,14 @@ public class InfantryAmmoBinTest {
         assertFalse(otherAmmoBin.isSamePartType(ammoBin));
 
         // Same ammo type and weapon type, different clips
-        otherAmmoBin = new InfantryAmmoBin(0, ammoType, -1, ammoType.getShots(), weaponType, clips + 1, false, mockCampaign);
+        otherAmmoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              ammoType.getShots(),
+              weaponType,
+              clips + 1,
+              false,
+              mockCampaign);
 
         assertFalse(ammoBin.isSamePartType(otherAmmoBin));
         assertFalse(otherAmmoBin.isSamePartType(ammoBin));
@@ -1396,7 +1641,14 @@ public class InfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
         int originalClips = 5;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, -1, 0, weaponType, originalClips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              0,
+              weaponType,
+              originalClips,
+              false,
+              mockCampaign);
 
         assertEquals(0, ammoBin.getShotsNeeded());
         assertEquals(originalClips, ammoBin.getClips());
@@ -1436,7 +1688,14 @@ public class InfantryAmmoBinTest {
         // Create an Ammo Bin to handle standard ammo ...
         int clips = 5;
         int equipmentNum = 42;
-        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0, ammoType, equipmentNum, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin ammoBin = new InfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1453,7 +1712,14 @@ public class InfantryAmmoBinTest {
         // Create an Inferno Ammo Bin ...
         int infernoClips = 3;
         int infernoEquipmentNum = 12;
-        InfantryAmmoBin infernoAmmoBin = new InfantryAmmoBin(0, infernoAmmoType, infernoEquipmentNum, 0, weaponType, infernoClips, false, mockCampaign);
+        InfantryAmmoBin infernoAmmoBin = new InfantryAmmoBin(0,
+              infernoAmmoType,
+              infernoEquipmentNum,
+              0,
+              weaponType,
+              infernoClips,
+              false,
+              mockCampaign);
 
         // Create a Mounted for the Inferno ammo bin ...
         Mounted mockInfernoMounted = mock(Mounted.class);
@@ -1466,7 +1732,14 @@ public class InfantryAmmoBinTest {
 
         // Create an AmmoBin which clearly isn't correct
         int incorrectEquipmentNum = 18;
-        InfantryAmmoBin incorrectBin = new InfantryAmmoBin(0, ammoType, incorrectEquipmentNum, 0, weaponType, 1, false, mockCampaign);
+        InfantryAmmoBin incorrectBin = new InfantryAmmoBin(0,
+              ammoType,
+              incorrectEquipmentNum,
+              0,
+              weaponType,
+              1,
+              false,
+              mockCampaign);
         Mounted mockIncorrectMounted = mock(Mounted.class);
         when(mockIncorrectMounted.getType()).thenReturn(ammoType);
         when(mockEntity.getEquipmentNum(eq(mockIncorrectMounted))).thenReturn(incorrectEquipmentNum);
@@ -1475,8 +1748,8 @@ public class InfantryAmmoBinTest {
 
         // Ensure the unit returns these parts
         when(mockUnit.getParts()).thenReturn(Arrays.asList(new Part[] {
-            incorrectBin, ammoBin, infernoAmmoBin,
-        }));
+              incorrectBin, ammoBin, infernoAmmoBin,
+              }));
 
         // Check that findPartnerBin pulls the correct bins ...
         assertEquals(infernoAmmoBin, ammoBin.findPartnerBin());

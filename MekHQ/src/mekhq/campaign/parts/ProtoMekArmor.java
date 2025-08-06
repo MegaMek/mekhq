@@ -25,8 +25,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.util.Objects;
@@ -69,7 +73,7 @@ public class ProtoMekArmor extends Armor {
     @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(
-                Money.of(amount * ArmorType.of(type, true).getWeightPerPoint()));
+              Money.of(amount * ArmorType.of(type, true).getWeightPerPoint()));
     }
 
     @Override
@@ -80,14 +84,14 @@ public class ProtoMekArmor extends Armor {
     @Override
     public Money getValueNeeded() {
         return adjustCostsForCampaignOptions(
-                Money.of(amountNeeded * ArmorType.of(type, clan).getCost()));
+              Money.of(amountNeeded * ArmorType.of(type, clan).getCost()));
     }
 
     @Override
     public Money getStickerPrice() {
         // always in 5-ton increments
         return Money.of(5.0 / ArmorType.of(type, true).getWeightPerPoint() * getArmorPointsPerTon()
-                * ArmorType.of(type, clan).getCost());
+                              * ArmorType.of(type, clan).getCost());
     }
 
     @Override
@@ -98,9 +102,9 @@ public class ProtoMekArmor extends Armor {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && getType() == ((ProtoMekArmor) part).getType()
-                && isClanTechBase() == part.isClanTechBase()
-                && Objects.equals(getRefitUnit(), part.getRefitUnit());
+                     && getType() == ((ProtoMekArmor) part).getType()
+                     && isClanTechBase() == part.isClanTechBase()
+                     && Objects.equals(getRefitUnit(), part.getRefitUnit());
     }
 
     @Override
@@ -110,13 +114,13 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public double getArmorWeight(int points) {
-        return points * 50/1000.0;
+        return points * 50 / 1000.0;
     }
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
         return new ProtoMekArmor(0, type, (int) Math.round(5.0 * getArmorPointsPerTon()),
-                -1, clan, campaign);
+              -1, clan, campaign);
     }
 
     @Override
@@ -132,7 +136,7 @@ public class ProtoMekArmor extends Armor {
     @Override
     public Part getNewPart() {
         return new ProtoMekArmor(0, type, (int) Math.round(5 * getArmorPointsPerTon()),
-                -1, clan, campaign);
+              -1, clan, campaign);
     }
 
     @Override
@@ -177,9 +181,11 @@ public class ProtoMekArmor extends Armor {
 
     /**
      * Not sure how true this title is, it was used in {@link ProtoMekArmor#getAmountAvailable}
+     *
      * @param part is this part the same
+     *
      * @return true if the two parts are the same, at least as far as {@link ProtoMekArmor#getAmountAvailable} is
-     * concerned
+     *       concerned
      */
     private boolean isSameProtoMekArmor(Part part) {
         return (part instanceof ProtoMekArmor protoMekArmor) &&

@@ -24,22 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
 
-import mekhq.MekHQ;
-import mekhq.MHQConstants;
-
 import java.util.ResourceBundle;
 
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+
 /**
- * This is the style of Operational Status indicator to use for a LayeredForceIcon when
- * automatically assigning and updating the value based on the assigned units.
+ * This is the style of Operational Status indicator to use for a LayeredForceIcon when automatically assigning and
+ * updating the value based on the assigned units.
  */
 public enum ForceIconOperationalStatusStyle {
     //region Enum Declarations
-    BORDER("ForceIconOperationalStatusStyle.BORDER.text", "ForceIconOperationalStatusStyle.BORDER.toolTipText", MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH),
-    TAB("ForceIconOperationalStatusStyle.TAB.text", "ForceIconOperationalStatusStyle.TAB.toolTipText", MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH);
+    BORDER("ForceIconOperationalStatusStyle.BORDER.text",
+          "ForceIconOperationalStatusStyle.BORDER.toolTipText",
+          MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH),
+    TAB("ForceIconOperationalStatusStyle.TAB.text",
+          "ForceIconOperationalStatusStyle.TAB.toolTipText",
+          MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH);
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -50,9 +59,9 @@ public enum ForceIconOperationalStatusStyle {
 
     //region Constructors
     ForceIconOperationalStatusStyle(final String name, final String toolTipText,
-                                    final String path) {
+          final String path) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.path = path;

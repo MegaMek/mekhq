@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
+
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.UUID;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.LoanRemovedEvent;
@@ -35,16 +49,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.model.LoanTableModel;
-
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
 
 public class LoanTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;
@@ -59,7 +63,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
 
     public static void connect(CampaignGUI gui, JTable loanTable, LoanTableModel loanModel) {
         new LoanTableMouseAdapter(gui, loanTable, loanModel)
-                .connect(loanTable);
+              .connect(loanTable);
     }
 
     @Override
@@ -70,24 +74,24 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
         Loan selectedLoan = loanModel.getLoan(loanTable
-                .convertRowIndexToModel(row));
+                                                    .convertRowIndexToModel(row));
         if (null == selectedLoan) {
             return;
         }
         if (command.equalsIgnoreCase("DEFAULT")) {
             if (0 == JOptionPane
-                    .showConfirmDialog(
-                            null,
-                            "Defaulting on this loan will affect your unit rating.\nDo you wish to proceed?",
-                            "Default on " + selectedLoan + "?", JOptionPane.YES_NO_OPTION)) {
+                           .showConfirmDialog(
+                                 null,
+                                 "Defaulting on this loan will affect your unit rating.\nDo you wish to proceed?",
+                                 "Default on " + selectedLoan + "?", JOptionPane.YES_NO_OPTION)) {
                 PayCollateralDialog pcd = new PayCollateralDialog(
-                        gui.getFrame(), true, gui.getCampaign(), selectedLoan);
+                      gui.getFrame(), true, gui.getCampaign(), selectedLoan);
                 pcd.setVisible(true);
                 if (pcd.wasCancelled()) {
                     return;
                 }
                 gui.getCampaign().getFinances().defaultOnLoan(selectedLoan,
-                        pcd.wasPaid());
+                      pcd.wasPaid());
                 if (pcd.wasPaid()) {
                     for (UUID id : pcd.getUnits()) {
                         gui.getCampaign().removeUnit(id);
@@ -104,7 +108,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                     gui.getCampaign().getFinances().setAssets(
-                            pcd.getRemainingAssets());
+                          pcd.getRemainingAssets());
                 }
             }
         } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
@@ -128,7 +132,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menu;
         // **lets fill the pop up menu**//
         menuItem = new JMenuItem("Pay Off Full Balance ("
-                + loan.determineRemainingValue().toAmountAndSymbolString() + ")");
+                                       + loan.determineRemainingValue().toAmountAndSymbolString() + ")");
         menuItem.setActionCommand("PAY_BALANCE");
         menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.determineRemainingValue()));
         menuItem.addActionListener(this);

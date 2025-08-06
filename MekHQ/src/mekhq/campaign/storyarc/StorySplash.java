@@ -24,22 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc;
 
 import java.awt.Image;
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
+import org.w3c.dom.Node;
 
 /**
- * Extension of AbstractIcon to handle splash images associated with a
- * StoryDialog
+ * Extension of AbstractIcon to handle splash images associated with a StoryDialog
  */
 public class StorySplash extends AbstractIcon {
     private static final MMLogger logger = MMLogger.create(StorySplash.class);
@@ -82,7 +85,7 @@ public class StorySplash extends AbstractIcon {
                 if (storyIcon == null) {
                     // if still null, then try default
                     storyIcon = (Image) MHQStaticDirectoryManager.getStorySplash().getItem("",
-                            DEFAULT_ICON_FILENAME);
+                          DEFAULT_ICON_FILENAME);
                 }
             }
         } catch (Exception e) {

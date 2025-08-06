@@ -140,11 +140,11 @@ public class ContractMarketDialog extends JDialog {
     }
 
     /**
-     * Returns the list of possible retainer contracts for a mercenary faction.
-     * A retainer contract becomes available when a faction has 6 or more
-     * successful contracts with the same employer.
+     * Returns the list of possible retainer contracts for a mercenary faction. A retainer contract becomes available
+     * when a faction has 6 or more successful contracts with the same employer.
      *
      * @param campaign the campaign to check retainer contracts for
+     *
      * @return the number of available retainer contracts
      */
     private static List<String> getPossibleRetainerContracts(Campaign campaign) {
@@ -166,27 +166,27 @@ public class ContractMarketDialog extends JDialog {
     }
 
     /**
-     * Returns the total number of contracts available for the given campaign.
-     * This includes regular contracts from the contract market and potential
-     * retainer contracts for mercenary factions.
+     * Returns the total number of contracts available for the given campaign. This includes regular contracts from the
+     * contract market and potential retainer contracts for mercenary factions.
      *
      * @param campaign the campaign to check contracts for
+     *
      * @return the total number of available contracts
      */
     public static int getAvailableContractsCount(Campaign campaign) {
         int contractCount = 0;
-        
+
         // Add regular contracts from the contract market
         AbstractContractMarket contractMarket = campaign.getContractMarket();
         if (contractMarket != null) {
             contractCount += contractMarket.getContracts().size();
         }
-        
+
         // Add retainer contracts if faction is mercenary
         if (campaign.getFaction().isMercenary()) {
             contractCount += getPossibleRetainerContracts(campaign).size();
         }
-        
+
         return contractCount;
     }
 
@@ -490,8 +490,8 @@ public class ContractMarketDialog extends JDialog {
             contract.initContractDetails(campaign);
             contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
             contract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
-                                        (Integer) spnSharePct.getValue() :
-                                        0);
+                                               (Integer) spnSharePct.getValue() :
+                                               0);
             contract.setStartDate(null);
             contract.setMRBCFee(payMRBC);
             contract.setAdvancePct(advance);

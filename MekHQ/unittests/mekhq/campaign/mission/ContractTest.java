@@ -185,7 +185,8 @@ public class ContractTest {
         when(mockAccountant.getContractBase()).thenReturn(contractBase);
         when(mockAccountant.getPeacetimeCost()).thenReturn(peacetimeCost);
 
-        when(mockCampaign.calculateJumpPath(nullable(PlanetarySystem.class), nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
+        when(mockCampaign.calculateJumpPath(nullable(PlanetarySystem.class),
+              nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
         when(mockCampaign.calculateCostPerJump(anyBoolean(), anyBoolean())).thenReturn(jumpCost);
         when(mockCampaign.getAtBUnitRatingMod()).thenReturn(10);
         when(mockCampaign.getAccountant()).thenReturn(mockAccountant);

@@ -24,19 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author MKerensky
@@ -101,7 +105,8 @@ public class MissingKFHeliumTank extends MissingPart {
                 //Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
                 //Otherwise, fix it all.
                 if (js.isKFDriveDamaged()) {
-                    js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
+                    js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()),
+                          js.getOKFIntegrity()));
                 } else {
                     js.setKFIntegrity(js.getOKFIntegrity());
                 }
@@ -117,8 +122,8 @@ public class MissingKFHeliumTank extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof KFHeliumTank
-                && coreType == ((KFHeliumTank) part).getCoreType()
-                && docks == ((KFHeliumTank) part).getDocks();
+                     && coreType == ((KFHeliumTank) part).getCoreType()
+                     && docks == ((KFHeliumTank) part).getDocks();
     }
 
     @Override

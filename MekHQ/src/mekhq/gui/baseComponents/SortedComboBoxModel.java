@@ -24,26 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.util.sorter.NaturalOrderComparator;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.util.sorter.NaturalOrderComparator;
 
 /**
- * This is a generic model that sorts objects extending E based on the provided comparator, or using
- * Java's natural sort (which is NOT the same as a {@link NaturalOrderComparator}) if a comparator
- * is not provided.
+ * This is a generic model that sorts objects extending E based on the provided comparator, or using Java's natural sort
+ * (which is NOT the same as a {@link NaturalOrderComparator}) if a comparator is not provided.
  *
- * @param <E> The parameter class to sort based on. This class must implement {@link Comparable} if
- *           they are using Java's natural sort. Further, do NOT use this to sort Collections, as
- *           that will break this class.
+ * @param <E> The parameter class to sort based on. This class must implement {@link Comparable} if they are using
+ *            Java's natural sort. Further, do NOT use this to sort Collections, as that will break this class.
  */
 public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     //region Variable Declarations
@@ -51,6 +54,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
      * Create an empty model that will use the natural sort order of any data added
      */
@@ -62,8 +66,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     }
 
     /**
-     * Create a model that will use the natural sort order of any data added, starting with the
-     * provided data.
+     * Create a model that will use the natural sort order of any data added, starting with the provided data.
+     *
      * @param elements the elements to add to this model
      */
     @SafeVarargs
@@ -72,8 +76,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     }
 
     /**
-     * Create a model that will use the natural sort order of any data added, starting with the
-     * provided data.
+     * Create a model that will use the natural sort order of any data added, starting with the provided data.
+     *
      * @param elements the elements to add to this model
      */
     public SortedComboBoxModel(final Collection<E> elements) {
@@ -82,6 +86,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
     /**
      * Create an empty model using the specified Comparator.
+     *
      * @param comparator the comparator to use in sorting any data added.
      */
     public SortedComboBoxModel(final Comparator<E> comparator) {
@@ -90,8 +95,9 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
     /**
      * Create a model using the specified Comparator and fills it with the provided data.
+     *
      * @param comparator the comparator to use in sorting any data added.
-     * @param elements the elements to add to this model.
+     * @param elements   the elements to add to this model.
      */
     @SafeVarargs
     public SortedComboBoxModel(final Comparator<E> comparator, final E... elements) {
@@ -100,8 +106,9 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
     /**
      * Create a model using the specified Comparator and fills it with the provided data, if any.
+     *
      * @param comparator the comparator to use in sorting any data added.
-     * @param elements the elements to add to this model.
+     * @param elements   the elements to add to this model.
      */
     public SortedComboBoxModel(final Comparator<E> comparator, final Collection<E> elements) {
         super();
@@ -111,6 +118,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     //endregion Constructors
 
     //region Getters
+
     /**
      * @return the comparator being used, if any
      */
@@ -120,9 +128,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     //endregion Getters
 
     /**
-     * Adds a single element to the current model, sorted based on the declared sorting method. This
-     * is identical to {@link #insertElementAt(Object, int)}, as we ignore the latter parameter in
-     * that method.
+     * Adds a single element to the current model, sorted based on the declared sorting method. This is identical to
+     * {@link #insertElementAt(Object, int)}, as we ignore the latter parameter in that method.
      *
      * @param element the element to add
      */
@@ -133,9 +140,9 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
     /**
      * Adds a single element to the current model, sorted based on the declared sorting method.
+     *
      * @param element the element to add
-     * @param index this parameter is ignored to ensure the data is sorted using the provided sort
-     *              order
+     * @param index   this parameter is ignored to ensure the data is sorted using the provided sort order
      */
     @Override
     @SuppressWarnings(value = "unchecked")
@@ -162,9 +169,8 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     }
 
     /**
-     * Adds the elements to the current model, sorted based on the declared sorting method. This
-     * is identical to {@link #addAll(int, Collection)}, as we ignore the first parameter in
-     * that method.
+     * Adds the elements to the current model, sorted based on the declared sorting method. This is identical to
+     * {@link #addAll(int, Collection)}, as we ignore the first parameter in that method.
      *
      * @param elements the elements to add
      */
@@ -176,8 +182,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     /**
      * Adds the elements to the current model, sorted based on the declared sorting method.
      *
-     * @param index this parameter is ignored to ensure the data is sorted using the provided sort
-     *              order
+     * @param index    this parameter is ignored to ensure the data is sorted using the provided sort order
      * @param elements the elements to add
      */
     @Override
@@ -188,11 +193,11 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
     }
 
     /**
-     * This is used to clear and then set all elements based on a new input collection of elements,
-     * retaining the selected item if possible, but otherwise reverting to a selected index of 0.
+     * This is used to clear and then set all elements based on a new input collection of elements, retaining the
+     * selected item if possible, but otherwise reverting to a selected index of 0.
      *
-     * @param elements the elements to replace the current elements with, which may be null to remove
-     *                 all elements, although this is not recommended.
+     * @param elements the elements to replace the current elements with, which may be null to remove all elements,
+     *                 although this is not recommended.
      */
     public void setElements(final @Nullable Collection<E> elements) {
         final E selectedElement = getSelectedItem();

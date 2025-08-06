@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 20202025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,29 +24,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
 
+import java.util.Objects;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 
-import java.util.Objects;
-
 /**
- * Represents an assignment to a specific bay on a transport ship.
- * Currently only used by SHIP_TRANSPORT
- * but this could be used by other transport types.
+ * Represents an assignment to a specific bay on a transport ship. Currently only used by SHIP_TRANSPORT but this could
+ * be used by other transport types.
+ *
  * @see ShipTransportedUnitsSummary
  * @see CampaignTransportType#SHIP_TRANSPORT
  */
-public class TransportShipAssignment extends TransportAssignment{
+public class TransportShipAssignment extends TransportAssignment {
     private final int bayNumber;
 
     /**
      * Initializes a new instance of the TransportShipAssignment class.
+     *
      * @param transportShip The transport ship.
-     * @param bayNumber The bay number on the transport ship.
+     * @param bayNumber     The bay number on the transport ship.
      */
     public TransportShipAssignment(Unit transportShip, int bayNumber) {
         super(transportShip);
@@ -75,19 +81,20 @@ public class TransportShipAssignment extends TransportAssignment{
      * After loading UnitRefs need converted to Units
      *
      * @param campaign Campaign we need to fix references for
-     * @param unit the unit that needs references fixed
+     * @param unit     the unit that needs references fixed
+     *
      * @see Unit#fixReferences(Campaign campaign)
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
-        if (getTransportShip() instanceof Unit.UnitRef){
+        if (getTransportShip() instanceof Unit.UnitRef) {
             Unit transportShip = campaign.getHangar().getUnit(getTransportShip().getId());
             if (transportShip != null) {
                 setTransport(transportShip);
             } else {
                 logger.error(
-                    String.format("Unit %s ('%s') references missing transport ship %s",
-                        unit.getId(), unit.getName(), getTransportShip().getId()));
+                      String.format("Unit %s ('%s') references missing transport ship %s",
+                            unit.getId(), unit.getName(), getTransportShip().getId()));
 
                 unit.setTransportShipAssignment(null);
             }
@@ -103,7 +110,7 @@ public class TransportShipAssignment extends TransportAssignment{
         } else {
             TransportShipAssignment other = (TransportShipAssignment) o;
             return Objects.equals(getTransportShip(), other.getTransportShip())
-                    && (getBayNumber() == other.getBayNumber());
+                         && (getBayNumber() == other.getBayNumber());
         }
     }
 

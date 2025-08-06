@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -39,7 +44,7 @@ public class PrisonersNagLogic {
      * </ul>
      *
      * @param hasActiveContract A flag indicating whether the campaign has an active contract.
-     * @param hasPrisoners A flag indicating whether the campaign's prisoner list is non-empty.
+     * @param hasPrisoners      A flag indicating whether the campaign's prisoner list is non-empty.
      *
      * @return {@code true} if there are prisoners in the campaign and no active contract; {@code false} otherwise.
      */

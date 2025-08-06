@@ -25,13 +25,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
@@ -41,27 +43,20 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- *
- * BA equipment is never critted so we are going to disable salvaging as well.
- * It would
- * be nice at some point to allow for this but we would need some way in MM of
- * tracking
- * how many actual weapons on the squad are operational (nWeapon?)
- * When an individual suit is removed we also remove all the equipment and keep
- * it with
- * the suit. See BattleArmorSuit for details.
- *
- * Taharqa: as of 8/7/2015, I am working on making a change to this to allow for
- * salvaging out parts
- * that are modularly mounted. The way I am planning on handling this is to set
- * up a check in Unit
- * for whether a BattleSuit is operable or not and if not then soldiers would
- * not be allowed to mount
- * it. It will be defined as inoperable if it is missing modular equipment. I
- * will also likely have
- * to make changes to the BattleArmorSuit object to accommodate this as well.
+ * BA equipment is never critted so we are going to disable salvaging as well. It would be nice at some point to allow
+ * for this but we would need some way in MM of tracking how many actual weapons on the squad are operational (nWeapon?)
+ * When an individual suit is removed we also remove all the equipment and keep it with the suit. See BattleArmorSuit
+ * for details.
+ * <p>
+ * Taharqa: as of 8/7/2015, I am working on making a change to this to allow for salvaging out parts that are modularly
+ * mounted. The way I am planning on handling this is to set up a check in Unit for whether a BattleSuit is operable or
+ * not and if not then soldiers would not be allowed to mount it. It will be defined as inoperable if it is missing
+ * modular equipment. I will also likely have to make changes to the BattleArmorSuit object to accommodate this as
+ * well.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -82,7 +77,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public EquipmentPart clone() {
         BattleArmorEquipmentPart clone = new BattleArmorEquipmentPart(getUnitTonnage(), type, equipmentNum, size,
-                trooper, campaign);
+              trooper, campaign);
         clone.copyBaseData(this);
         if (hasVariableTonnage(type)) {
             clone.setEquipTonnage(equipTonnage);
@@ -240,15 +235,15 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public MissingBattleArmorEquipmentPart getMissingPart() {
         return new MissingBattleArmorEquipmentPart(getUnitTonnage(), type, equipmentNum, size, trooper,
-                campaign, equipTonnage);
+              campaign, equipTonnage);
     }
 
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && getType().equals(((BattleArmorEquipmentPart) part).getType())
-                && getSize() == ((BattleArmorEquipmentPart) part).getSize()
-                && getTonnage() == part.getTonnage();
+                     && getType().equals(((BattleArmorEquipmentPart) part).getType())
+                     && getSize() == ((BattleArmorEquipmentPart) part).getSize()
+                     && getTonnage() == part.getTonnage();
     }
 
     public int getBaMountLocation() {
@@ -267,8 +262,8 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         }
         for (Mounted<?> m : unit.getEntity().getMisc()) {
             if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
-                    type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-                    && this.getBaMountLocation() == m.getBaMountLoc()) {
+                      type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+                      && this.getBaMountLocation() == m.getBaMountLoc()) {
                 return true;
             }
             /*

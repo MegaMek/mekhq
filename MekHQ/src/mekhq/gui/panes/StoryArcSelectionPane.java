@@ -24,11 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panes;
 
 import java.awt.GridLayout;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -39,10 +43,10 @@ import javax.swing.ListSelectionModel;
 import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;
-import mekhq.campaign.storyarc.StoryArcStub;
 
 public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     //region Variable Declarations
@@ -55,7 +59,7 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     //region Constructors
     public StoryArcSelectionPane(final JFrame frame, boolean startNew) {
         super(frame, "StoryArcSelectionPane", JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         this.startNew = startNew;
         initialize();
     }

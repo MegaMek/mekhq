@@ -24,23 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.personnel.enums.ModifierValue;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * A modifier is some kind of (usually temporary) effect that influences the character's base values.
  * <p>
- * Modifiers have three values: Which value they apply to, how much they change the value by (can
- * be positive or negative) and optionally what type of modifier they are. If a person has
- * multiple modifiers of the same type, only the highest positive one and the lowest negative
- * one applies. All modifiers without a type apply fully.
+ * Modifiers have three values: Which value they apply to, how much they change the value by (can be positive or
+ * negative) and optionally what type of modifier they are. If a person has multiple modifiers of the same type, only
+ * the highest positive one and the lowest negative one applies. All modifiers without a type apply fully.
  * <p>
  * In addition, modifiers can have a set of string tags, used for filtering and searching in them.
  */
@@ -77,8 +88,8 @@ public class Modifier {
         }
 
         result += untypedMods.stream()
-                .mapToLong(mod -> mod)
-                .sum();
+                        .mapToLong(mod -> mod)
+                        .sum();
 
         return (int) MathUtility.clamp(result, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
@@ -87,7 +98,7 @@ public class Modifier {
         this(value, mod, null);
     }
 
-    public Modifier(ModifierValue value, int mod, String type, String ... tags) {
+    public Modifier(ModifierValue value, int mod, String type, String... tags) {
         this.value = Objects.requireNonNull(value);
         this.mod = mod;
         this.type = type;

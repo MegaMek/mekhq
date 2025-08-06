@@ -116,7 +116,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param mode     the {@link CampaignOptionsDialogMode} defining the behavior of the dialog
      */
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset,
-                                 CampaignOptionsDialogMode mode) {
+          CampaignOptionsDialogMode mode) {
         super(frame,
               true,
               ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),

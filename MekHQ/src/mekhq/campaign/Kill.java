@@ -25,18 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.UUID;
 
 /**
  * A kill record
@@ -59,7 +64,7 @@ public class Kill {
     }
 
     public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId, int forceId,
-            long unitType) {
+          long unitType) {
         pilotId = id;
         this.killed = kill;
         this.killer = killer;
@@ -131,16 +136,15 @@ public class Kill {
      * <p>
      * This is used by autoAwards to identify duplicate kills across multi-crewed units.
      *
-     * @return The string representation of the award identifier combining {@code killed},
-     * {@code missionId}, {@code scenarioId}, {@code forceId}, and {@code unitType}
+     * @return The string representation of the award identifier combining {@code killed}, {@code missionId},
+     *       {@code scenarioId}, {@code forceId}, and {@code unitType}
      */
     public String getAwardIdentifier() {
         return killed + missionId + scenarioId + forceId + unitType;
     }
 
     /**
-     * @return the long corresponding to the Entity type killed,
-     *         or -1 if the kill does not have a unit type logged
+     * @return the long corresponding to the Entity type killed, or -1 if the kill does not have a unit type logged
      */
 
     public long getUnitType() {
@@ -202,6 +206,6 @@ public class Kill {
     @Override
     public Kill clone() {
         return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate(), getMissionId(), getScenarioId(),
-                getForceId(), getUnitType());
+              getForceId(), getUnitType());
     }
 }

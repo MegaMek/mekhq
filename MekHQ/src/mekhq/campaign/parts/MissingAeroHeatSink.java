@@ -25,16 +25,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
-
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
 
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.Node;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -60,7 +64,7 @@ public class MissingAeroHeatSink extends MissingPart {
 
     @Override
     public int getBaseTime() {
-        return isOmniPodded()? 30 : 90;
+        return isOmniPodded() ? 30 : 90;
     }
 
     @Override
@@ -92,7 +96,7 @@ public class MissingAeroHeatSink extends MissingPart {
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
             if (hits == 0) {
-                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks()-1);
+                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - 1);
             }
         }
     }

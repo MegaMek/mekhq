@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
+
+import java.util.ArrayList;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.common.Board;
@@ -34,12 +41,15 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.mission.enums.CombatRole;
-
-import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {
@@ -79,14 +89,14 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int attackerStartIndex = Compute.randomInt(4);
         int attackerStart = startPos[attackerStartIndex];
         int defenderStart = Board.START_CENTER;
         int defenderHome = (attackerStart + 4) % 8; // the defender's "retreat"
-                                                    // edge should always be the
-                                                    // opposite of the
-                                                    // attacker's edge
+        // edge should always be the
+        // opposite of the
+        // attacker's edge
 
         int enemyStart;
 
@@ -111,14 +121,15 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         CombatTeam combatTeam = getCombatTeamById(campaign);
         int allyForceWeight;
         if (combatTeam != null) {
-            allyForceWeight = Math.max(getCombatTeamById(campaign).getWeightClass(campaign) - 1, EntityWeightClass.WEIGHT_LIGHT);
+            allyForceWeight = Math.max(getCombatTeamById(campaign).getWeightClass(campaign) - 1,
+                  EntityWeightClass.WEIGHT_LIGHT);
         } else {
             allyForceWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         addLance(allyEntities, getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
-                getContract(campaign).getAllyQuality(), allyForceWeight, campaign);
+              getContract(campaign).getAllyQuality(), allyForceWeight, campaign);
         addLance(allyEntities, getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
-                getContract(campaign).getAllyQuality(), allyForceWeight, campaign);
+              getContract(campaign).getAllyQuality(), allyForceWeight, campaign);
 
         // the "second" force will be deployed (orthogonally) between 90 degrees
         // clockwise and counterclockwise from the "primary force".
@@ -129,7 +140,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         // direction as the player (in case of the player being the defender)
         // or where it came from (in case of the player being the attacker
         addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStartingPos(),
-                isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities), campaign);
+              isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities), campaign);
 
         // "base" force gets 8 civilian units and six turrets
         // set the civilians to "cowardly" behavior by default so they don't run
@@ -137,7 +148,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         ArrayList<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 8, campaign);
         BotForce civilianForce = new BotForce(BASE_CIVILIAN_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome,
-                otherForce);
+              otherForce);
         civilianForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().COWARDLY_BEHAVIOR);
         addBotForce(civilianForce, campaign);
 
@@ -145,13 +156,14 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             addTurrets(turretForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                    campaign, getContract(campaign).getEnemy());
+                  campaign, getContract(campaign).getEnemy());
         } else {
             addTurrets(turretForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
-                    campaign, getContract(campaign).getEmployerFaction());
+                  campaign, getContract(campaign).getEmployerFaction());
         }
 
-        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce), campaign);
+        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce),
+              campaign);
 
         /* Roll 2x on bot lances roll */
         int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
@@ -165,8 +177,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         ArrayList<Entity> secondBotEntities = new ArrayList<>();
         addEnemyForce(secondBotEntities, weightClass, campaign);
         BotForce secondBotForce = getEnemyBotForce(getContract(campaign),
-                isAttacker() ? enemyStart : secondAttackerForceStart,
-                isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);
+              isAttacker() ? enemyStart : secondAttackerForceStart,
+              isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);
         secondBotForce.setName(String.format("%s%s", secondBotForce.getName(), SECOND_ENEMY_FORCE_SUFFIX));
         addBotForce(secondBotForce, campaign);
     }
@@ -178,11 +190,14 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         destroyHostiles.addForce(String.format("%s%s", contract.getEnemyBotName(), SECOND_ENEMY_FORCE_SUFFIX));
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 50, false);
+              1, 50, false);
 
         ScenarioObjective preserveBaseUnits = null;
         if (!isAttacker()) {
-            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID, 1, 3, true);
+            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID,
+                  1,
+                  3,
+                  true);
             preserveBaseUnits.addForce(BASE_TURRET_FORCE_ID);
 
             ObjectiveEffect defeatEffect = new ObjectiveEffect();
@@ -200,11 +215,13 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             final CombatRole requiredLanceRole = contract.getContractType().getRequiredCombatRole();
             if (requiredLanceRole.isManeuver() || requiredLanceRole.isPatrol()) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
-                destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
+                destroyHostiles.addDetail(getResourceBundle().getString(
+                      "battleDetails.baseAttack.attacker.details.winnerFightScout"));
             } else {
                 victoryEffect.effectType = ObjectiveEffectType.ContractMoraleUpdate;
                 victoryEffect.howMuch = -3;
-                destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerDefendTraining"));
+                destroyHostiles.addDetail(getResourceBundle().getString(
+                      "battleDetails.baseAttack.attacker.details.winnerDefendTraining"));
             }
             destroyHostiles.addSuccessEffect(victoryEffect);
         }

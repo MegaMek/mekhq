@@ -32,26 +32,25 @@
  */
 package mekhq.gui.stratcon;
 
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.icons.enums.OperationalStatus;
-import mekhq.campaign.unit.Unit;
-import mekhq.utilities.ReportingUtilities;
-
 import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.Component;
-
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.enums.OperationalStatus;
+import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
+
 /**
  * Handles rendering individual units in lists in the StratCon scenario wizard.
+ *
  * @author NickAragua
  */
 public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRenderer<Unit> {
@@ -61,7 +60,7 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
 
     @Override
     public Component getListCellRendererComponent(JList<? extends Unit> list, Unit unit, int index,
-            boolean isSelected, boolean cellHasFocus) {
+          boolean isSelected, boolean cellHasFocus) {
         Campaign campaign = unit.getCampaign();
 
         int valueForceId = unit.getForceId();
@@ -73,11 +72,11 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";
             case MARGINALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                ReportingUtilities.getNegativeColor());
+                  ReportingUtilities.getNegativeColor());
             case SUBSTANTIALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                ReportingUtilities.getWarningColor());
+                  ReportingUtilities.getWarningColor());
             case FULLY_OPERATIONAL, FACTORY_FRESH -> spanOpeningWithCustomColor(
-                ReportingUtilities.getPositiveColor());
+                  ReportingUtilities.getPositiveColor());
         };
 
         String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;
@@ -91,10 +90,15 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         }
 
         // Format string
-        setText(String.format("<html><b>%s%s%s (%s/%s)</b> - Base BV: %d<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>%s</i></html>",
-            statusOpenFormat, unit.getName(), statusCloseFormat, unit.getEntity().getCrew().getGunnery(),
-            unit.getEntity().getCrew().getPiloting(), unit.getEntity().calculateBattleValue(true, true),
-            forceName));
+        setText(String.format(
+              "<html><b>%s%s%s (%s/%s)</b> - Base BV: %d<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>%s</i></html>",
+              statusOpenFormat,
+              unit.getName(),
+              statusCloseFormat,
+              unit.getEntity().getCrew().getGunnery(),
+              unit.getEntity().getCrew().getPiloting(),
+              unit.getEntity().calculateBattleValue(true, true),
+              forceName));
 
         if (isSelected) {
             setBackground(list.getSelectionBackground());

@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.stratcon;
 
 import java.io.File;
@@ -35,7 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
@@ -62,20 +65,17 @@ public class StratconBiomeManifest {
 
     // these constants will eventually be driven by planetary or track data
     /**
-     * The "Terran" default biome bucket, used as one of the possible arguments for
-     * calls to getTempMap()
+     * The "Terran" default biome bucket, used as one of the possible arguments for calls to getTempMap()
      */
     public static final String TERRAN_BIOME = "Terran";
 
     /**
-     * The "TerranFacility" default biome bucket, used as one of the possible
-     * arguments for calls to getTempMap()
+     * The "TerranFacility" default biome bucket, used as one of the possible arguments for calls to getTempMap()
      */
     public static final String TERRAN_FACILITY_BIOME = "TerranFacility";
 
     /**
-     * This enum is used to determine whether an image being retrieved is a terrain
-     * tile or a facility
+     * This enum is used to determine whether an image being retrieved is a terrain tile or a facility
      */
     public enum ImageType {
         /**
@@ -122,14 +122,13 @@ public class StratconBiomeManifest {
         }
 
         logger.warn(
-                "Biome image not defined in data\\stratconbiomedefinitions\\StratconBiomeManifest.xml: " + biomeType);
+              "Biome image not defined in data\\stratconbiomedefinitions\\StratconBiomeManifest.xml: " + biomeType);
         return null;
     }
 
     /**
-     * Get the file path for the facility image corresponding to the given facility
-     * type
-     * Returns default facility if specific facility type is not defined.
+     * Get the file path for the facility image corresponding to the given facility type Returns default facility if
+     * specific facility type is not defined.
      */
     public String getFacilityImage(String facilityType) {
         if (facilityImages.containsKey(facilityType)) {
@@ -172,7 +171,7 @@ public class StratconBiomeManifest {
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<StratconBiomeManifest> manifestElement = um.unmarshal(inputSource,
-                        StratconBiomeManifest.class);
+                      StratconBiomeManifest.class);
                 resultingManifest = manifestElement.getValue();
             }
         } catch (Exception e) {

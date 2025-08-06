@@ -111,11 +111,11 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
      * appropriately.</p>
      *
-     * @param name             a unique identifier used for resource bundle lookups and to form the panel's name
-     * @param imageAddress     the path to the image file to display at the top of the panel
-     * @param includeBodyText  if true, includes a body label beneath the image with descriptive text
-     * @param includeTipPanel  if true, displays a tip panel beneath the body text (or image if body text is excluded)
-     * @param tipPanelHeight   the number of empty line breaks to reserve vertical space for the tip panel area
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param includeTipPanel if true, displays a tip panel beneath the body text (or image if body text is excluded)
+     * @param tipPanelHeight  the number of empty line breaks to reserve vertical space for the tip panel area
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight) {

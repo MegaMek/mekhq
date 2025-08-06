@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.companyGeneration;
 
 import megamek.common.EntityWeightClass;
 
 /**
- * This class contains the parameters used to generate a random mek, and allows sorting and
- * swapping the order of rolled parameters while keeping them connected.
+ * This class contains the parameters used to generate a random mek, and allows sorting and swapping the order of rolled
+ * parameters while keeping them connected.
  *
  * @author Justin "Windchild" Bowen
  */

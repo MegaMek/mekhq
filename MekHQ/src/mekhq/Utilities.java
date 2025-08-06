@@ -797,7 +797,7 @@ public class Utilities {
      * a pre-selected portrait, provided one is to their index Additionally, any extraData parameters should be migrated
      * here
      *
-     * @param person           the person to be renamed, if applicable
+     * @param person      the person to be renamed, if applicable
      * @param oldCrew     the crew object they were a part of
      * @param crewIndex   the index of the person in the crew
      * @param crewOptions whether or not to run the populateOptionsFromCrew for this person

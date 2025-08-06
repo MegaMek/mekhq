@@ -24,26 +24,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.gui.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-
 public class MHQTabTypeTest {
     //region Variable Declarations
     private static final MHQTabType[] types = MHQTabType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
@@ -191,9 +200,8 @@ public class MHQTabTypeTest {
     //endregion Boolean Comparison Methods
 
     /**
-     * This test is disabled because it will run through all the GUI tabs and initialize them, which
-     * is not a quick process. This also requires lots more mock handling to actually go through
-     * the initializations too.
+     * This test is disabled because it will run through all the GUI tabs and initialize them, which is not a quick
+     * process. This also requires lots more mock handling to actually go through the initializations too.
      */
     @Disabled
     @Test

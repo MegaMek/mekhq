@@ -63,10 +63,17 @@ public class MRMSOption {
 
     // region Constructors
     public MRMSOption(PartRepairType type) {
-        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_LEGENDARY, TARGET_NUMBER_PREFERRED, TARGET_NUMBER_MAX, DAILY_TIME_MIN);
+        this(type,
+              false,
+              SkillType.EXP_ULTRA_GREEN,
+              SkillType.EXP_LEGENDARY,
+              TARGET_NUMBER_PREFERRED,
+              TARGET_NUMBER_MAX,
+              DAILY_TIME_MIN);
     }
 
-    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int targetNumberPreferred, int targetNumberMax, int dailyTimeMin) {
+    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int targetNumberPreferred,
+          int targetNumberMax, int dailyTimeMin) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;

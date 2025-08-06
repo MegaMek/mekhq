@@ -157,9 +157,11 @@ public class StratConReinforcementsConfirmationDialog {
             case 2 -> ReinforcementDialogResponseType.REINFORCE_INSTANTLY;
             case 3 -> ReinforcementDialogResponseType.REINFORCE_GM;
             case 4 -> ReinforcementDialogResponseType.REINFORCE_GM_INSTANTLY;
-            default -> throw new IllegalStateException("Unexpected dialog choice value: " 
-                    + dialog.getDialogChoice() 
-                    + ". Valid choices are 0-4 (or 0-2 for non-GM users). This may occur if an invalid dialog choice is returned.");
+            default -> throw new IllegalStateException("Unexpected dialog choice value: "
+                                                             +
+                                                             dialog.getDialogChoice()
+                                                             +
+                                                             ". Valid choices are 0-4 (or 0-2 for non-GM users). This may occur if an invalid dialog choice is returned.");
         };
     }
 

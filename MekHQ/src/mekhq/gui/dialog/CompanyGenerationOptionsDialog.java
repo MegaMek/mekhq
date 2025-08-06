@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Container;
+import javax.swing.JFrame;
 
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
@@ -33,9 +41,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
-
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -49,7 +54,7 @@ public class CompanyGenerationOptionsDialog extends AbstractMHQValidationButtonD
 
     //region Constructors
     public CompanyGenerationOptionsDialog(final JFrame frame, final Campaign campaign,
-                                          final @Nullable CompanyGenerationOptions companyGenerationOptions) {
+          final @Nullable CompanyGenerationOptions companyGenerationOptions) {
         super(frame, "CompanyGenerationOptionsDialog", "CompanyGenerationOptionsDialog.title");
         this.campaign = campaign;
         this.companyGenerationOptions = companyGenerationOptions;
@@ -79,7 +84,7 @@ public class CompanyGenerationOptionsDialog extends AbstractMHQValidationButtonD
     @Override
     protected Container createCenterPane() {
         setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
-                getCompanyGenerationOptions()));
+              getCompanyGenerationOptions()));
         return getCompanyGenerationOptionsPanel();
     }
     //endregion Initialization
@@ -93,6 +98,6 @@ public class CompanyGenerationOptionsDialog extends AbstractMHQValidationButtonD
 
     public @Nullable CompanyGenerationOptions getSelectedItem() {
         return getResult().isConfirmed() ? getCompanyGenerationOptionsPanel().createOptionsFromPanel()
-                : getCompanyGenerationOptions();
+                     : getCompanyGenerationOptions();
     }
 }

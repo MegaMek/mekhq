@@ -1050,7 +1050,6 @@ public enum PersonnelRole {
     }
 
 
-
     /**
      * @return {@code true} if the personnel has the Aerospace Pilot role, {@code false} otherwise.
      */

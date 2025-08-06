@@ -139,10 +139,10 @@ public enum FactionAccoladeLevel {
     /**
      * Constructs a new {@link FactionAccoladeLevel} constant.
      *
-     * @param lookupName       the string value used to fetch information about this accolade
-     * @param recognition      the integer value associated with this accolade recognition
+     * @param lookupName            the string value used to fetch information about this accolade
+     * @param recognition           the integer value associated with this accolade recognition
      * @param requiredStandingLevel the minimum Faction Standing required for the accolade
-     * @param mercenarySuitable whether the accolade level is suitable for mercenary factions
+     * @param mercenarySuitable     whether the accolade level is suitable for mercenary factions
      *
      * @author Illiani
      * @since 0.50.07

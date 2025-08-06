@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums.education;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum EducationStage {
     //region Enum Declarations
@@ -49,7 +54,7 @@ public enum EducationStage {
     //region Constructors
     EducationStage(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -103,8 +108,9 @@ public enum EducationStage {
             case "Journeying from Campus":
                 return JOURNEY_FROM_CAMPUS;
             default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationStage.java/parseFromString: "
-                        + educationLevel);
+                throw new IllegalStateException(
+                      "Unexpected value in mekhq/campaign/personnel/enums/education/EducationStage.java/parseFromString: "
+                            + educationLevel);
         }
     }
     //endregion File I/O

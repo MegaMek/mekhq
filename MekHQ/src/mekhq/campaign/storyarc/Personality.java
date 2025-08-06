@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc;
 
@@ -31,24 +36,20 @@ import java.awt.Image;
 import java.io.PrintWriter;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * The personality class holds information about a personality that may interact
- * with the players during the
- * story arc. This personality may be drawn from the campaign's own personnel,
- * but does not necessarily need to
- * do so. So it could be an employer, a liaison, a rival, etc.
+ * The personality class holds information about a personality that may interact with the players during the story arc.
+ * This personality may be drawn from the campaign's own personnel, but does not necessarily need to do so. So it could
+ * be an employer, a liaison, a rival, etc.
  * <p>
- * The Personality class mainly contains a Portrait and a title that is used
- * when displaying story related dialogs
+ * The Personality class mainly contains a Portrait and a title that is used when displaying story related dialogs
  * associated with the Personality
  * </p>
  */
@@ -67,9 +68,8 @@ public class Personality {
     private String title;
 
     /**
-     * optionally a personality can be connected to a Person in the campaign. The
-     * personCampaignId identifies
-     * this person
+     * optionally a personality can be connected to a Person in the campaign. The personCampaignId identifies this
+     * person
      */
     private UUID personCampaignId;
     // endregion Variable Declarations

@@ -24,16 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
-
-import mekhq.campaign.Hangar;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.campaignHasUnmaintainedUnits;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,17 +38,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
+import mekhq.campaign.Hangar;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 /**
- * This class is a test class for the {@link UnmaintainedUnitsNagDialog} class.
- * It tests the different combinations of unit states and verifies the behavior of the {@code checkHanger()} method.
+ * This class is a test class for the {@link UnmaintainedUnitsNagDialog} class. It tests the different combinations of
+ * unit states and verifies the behavior of the {@code checkHanger()} method.
  */
 class UnmaintainedUnitsNagLogicTest {
     private Hangar hangar;
     private Unit mockUnit1, mockUnit2;
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {
@@ -65,12 +70,12 @@ class UnmaintainedUnitsNagLogicTest {
      * Initializes the units by setting their maintenance status and salvage status.
      *
      * @param unit1Unmaintained A boolean indicating whether the first unit is unmaintained.
-     * @param unit1Salvage A boolean indicating whether the first unit is salvage.
+     * @param unit1Salvage      A boolean indicating whether the first unit is salvage.
      * @param unit2Unmaintained A boolean indicating whether the second unit is unmaintained.
-     * @param unit2Salvage A boolean indicating whether the second unit is salvage.
+     * @param unit2Salvage      A boolean indicating whether the second unit is salvage.
      */
     private void initializeUnits(boolean unit1Unmaintained, boolean unit1Salvage,
-                                 boolean unit2Unmaintained, boolean unit2Salvage) {
+          boolean unit2Unmaintained, boolean unit2Salvage) {
         when(mockUnit1.isUnmaintained()).thenReturn(unit1Unmaintained);
         when(mockUnit1.isSalvage()).thenReturn(unit1Salvage);
 

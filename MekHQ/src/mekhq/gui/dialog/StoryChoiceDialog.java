@@ -24,8 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.*;
 
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint;
@@ -34,18 +52,9 @@ import mekhq.gui.panels.StoryChoicePanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
 /**
- * Creates a {@link StoryDialog StoryDialog} with an optional image, text, and
- * choices from which the player can
- * choose a response.
+ * Creates a {@link StoryDialog StoryDialog} with an optional image, text, and choices from which the player can choose
+ * a response.
  */
 public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
@@ -88,7 +97,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
         String text = StoryArc.replaceTokens(((ChoiceStoryPoint) getStoryPoint()).getQuestion(),
-                getStoryPoint().getCampaign());
+              getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -168,15 +177,15 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
         @Override
         public Component getListCellRendererComponent(final JList list,
-                final String value, final int index,
-                final boolean isSelected,
-                final boolean cellHasFocus) {
+              final String value, final int index,
+              final boolean isSelected,
+              final boolean cellHasFocus) {
             final Color foreground = new Color((isSelected
-                    ? list.getSelectionForeground()
-                    : list.getForeground()).getRGB());
+                                                      ? list.getSelectionForeground()
+                                                      : list.getForeground()).getRGB());
             final Color background = new Color((isSelected
-                    ? list.getSelectionBackground()
-                    : list.getBackground()).getRGB());
+                                                      ? list.getSelectionBackground()
+                                                      : list.getBackground()).getRGB());
             // setOpaque(true);
             // setForeground(foreground);
             // setBackground(background);

@@ -171,12 +171,12 @@ public interface IPartWork extends IWork {
 
     static PartRepairType findCorrectRepairType(IPartWork part) {
         if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) ||
-              ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
-                     (missingEquipmentPart.getType() instanceof WeaponType))) {
+                  ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
+                         (missingEquipmentPart.getType() instanceof WeaponType))) {
             return PartRepairType.WEAPON;
         } else if ((part instanceof EquipmentPart equipmentPart) &&
-              (equipmentPart.getType() instanceof MiscType miscType) &&
-              miscType.hasFlag(MiscType.F_CLUB)) {
+                         (equipmentPart.getType() instanceof MiscType miscType) &&
+                         miscType.hasFlag(MiscType.F_CLUB)) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();

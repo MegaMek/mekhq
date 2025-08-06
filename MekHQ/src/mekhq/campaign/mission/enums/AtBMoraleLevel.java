@@ -192,7 +192,7 @@ public enum AtBMoraleLevel {
             }
         } catch (Exception ignored) {
         }
-        
+
         MMLogger.create(AtBMoraleLevel.class)
               .error("Unable to parse {} into an AtBMoraleLevel. Returning STALEMATE.", moraleLevel);
         return STALEMATE;

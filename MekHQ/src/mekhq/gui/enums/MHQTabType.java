@@ -24,22 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
+
+import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.gui.*;
 
-import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
-
 /**
- * Identifies the standard tabs and provides a creation method.
- * The mnemonics used in this are included in the list at {@link CampaignGUI#initMenu()}, and they
- * MUST be unique on that list.
- * The order in which the tabs appear on onthe CampaignGUI is determined by the order in which they
- * are declared here.
+ * Identifies the standard tabs and provides a creation method. The mnemonics used in this are included in the list at
+ * {@link CampaignGUI#initMenu()}, and they MUST be unique on that list. The order in which the tabs appear on onthe
+ * CampaignGUI is determined by the order in which they are declared here.
+ *
  * @author Neoancient
  */
 public enum MHQTabType {
@@ -66,7 +70,7 @@ public enum MHQTabType {
     //region Constructors
     MHQTabType(final String name, final int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.mnemonic = mnemonic;
     }

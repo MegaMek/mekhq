@@ -589,8 +589,8 @@ public class SimulateMissionDialog extends JDialog {
 
     /**
      * Use
-     * {@link #handleFactionRegardUpdates(Faction, Faction, Faction, MissionStatus, LocalDate, FactionStandings,
-     * double, int)} instead
+     * {@link #handleFactionRegardUpdates(Faction, Faction, Faction, MissionStatus, LocalDate, FactionStandings, double,
+     * int)} instead
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
@@ -600,17 +600,18 @@ public class SimulateMissionDialog extends JDialog {
     }
 
     /**
-     * Calculates and describes updates to faction regard values in response to mission simulation parameters, for
-     * both employer and enemy.
+     * Calculates and describes updates to faction regard values in response to mission simulation parameters, for both
+     * employer and enemy.
      *
-     * @param campaignFaction the current campaign faction
-     * @param employer        the employer faction, or {@code null} if not specified
-     * @param enemy           the enemy faction, or {@code null} if not specified
-     * @param status          the mission status applied to the simulation
-     * @param today           the current date of the simulation
+     * @param campaignFaction  the current campaign faction
+     * @param employer         the employer faction, or {@code null} if not specified
+     * @param enemy            the enemy faction, or {@code null} if not specified
+     * @param status           the mission status applied to the simulation
+     * @param today            the current date of the simulation
      * @param factionStandings the {@link FactionStandings} object holding all faction Regard data
      * @param regardMultiplier the regard multiplier set in campaign options
      * @param contractDuration how many months the contract or mission lasted
+     *
      * @return a list of strings detailing each regard update performed as a result
      *
      * @author Illiani

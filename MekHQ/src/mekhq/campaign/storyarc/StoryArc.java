@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc;
 
@@ -67,35 +72,25 @@ import org.w3c.dom.NodeList;
 /**
  * The Story Arc class manages a given story arc campaign.
  * <p>
- * The main component that makes up a story arc is a series of {@link StoryPoint
- * StoryPoint} objects. These objects are
- * tracked in a hash on StoryArc by their uuid. Each StoryPoint can point to
- * other StoryPoints and this can be used
- * to chain StoryPoints together into a (potentially branching) narrative. More
- * information on how StoryPoints work is
+ * The main component that makes up a story arc is a series of {@link StoryPoint StoryPoint} objects. These objects are
+ * tracked in a hash on StoryArc by their uuid. Each StoryPoint can point to other StoryPoints and this can be used to
+ * chain StoryPoints together into a (potentially branching) narrative. More information on how StoryPoints work is
  * provided in that class.
  * <p>
- * A secondary hash of {@link Personality Personality} objects contains
- * information on characters that may be associated
+ * A secondary hash of {@link Personality Personality} objects contains information on characters that may be associated
  * with the story arc.
  * <p>
- * The StoryArc uses listeners to implement several handle methods that are
- * waiting for various events to happen
- * in the game. These are used to complete certain StoryPoints that are left
- * active after starting (e.g. wait for a
- * scenario to be completed).
+ * The StoryArc uses listeners to implement several handle methods that are waiting for various events to happen in the
+ * game. These are used to complete certain StoryPoints that are left active after starting (e.g. wait for a scenario to
+ * be completed).
  * <p>
- * The StoryArc also tracks a has of string variables that can be used to track
- * variables associated with the story
- * arc that might change (e.g. said yes or no to some question).
+ * The StoryArc also tracks a has of string variables that can be used to track variables associated with the story arc
+ * that might change (e.g. said yes or no to some question).
  * <p>
  * <strong>A note to future developers:</strong> I have tried to implement story
- * arcs in a way that makes adding future
- * features straightforward and avoids creating complexity and bloat. Most
- * questions of "How can I add this feature?"
- * should be addressable by creating new StoryPoint and/or StoryTrigger classes
- * and should not require modifying the
- * fundamental architecture of Story Arcs.
+ * arcs in a way that makes adding future features straightforward and avoids creating complexity and bloat. Most
+ * questions of "How can I add this feature?" should be addressable by creating new StoryPoint and/or StoryTrigger
+ * classes and should not require modifying the fundamental architecture of Story Arcs.
  *
  * @author Aaron Gullickson (Taharqa)
  *
@@ -119,14 +114,12 @@ public class StoryArc {
     private Map<UUID, StoryPoint> storyPoints;
 
     /**
-     * A hash of possible personalities that the player might interact with in this
-     * story arc
+     * A hash of possible personalities that the player might interact with in this story arc
      **/
     private Map<UUID, Personality> personalities;
 
     /**
-     * a hash of custom string variables that the creator might specify with a
-     * string key
+     * a hash of custom string variables that the creator might specify with a string key
      **/
     private Map<String, String> customStringVariables;
 
@@ -139,13 +132,10 @@ public class StoryArc {
     private String directoryPath;
 
     /**
-     * A hash map of replacements for tokens in the narrative strings. The text will
-     * be searched for passages matching
-     * the String used for the key and will replace this with the String supplied by
-     * the value. Tokens in the text should
-     * be surrounded by curly brackets. For example, &#123;commanderName&#125; in
-     * the text would be replaced with the full
-     * name of the most senior active commander in the campaign.
+     * A hash map of replacements for tokens in the narrative strings. The text will be searched for passages matching
+     * the String used for the key and will replace this with the String supplied by the value. Tokens in the text
+     * should be surrounded by curly brackets. For example, &#123;commanderName&#125; in the text would be replaced with
+     * the full name of the most senior active commander in the campaign.
      **/
     private static Map<String, String> replacementTokens;
 
@@ -313,7 +303,7 @@ public class StoryArc {
             if (entry.getValue() instanceof TravelStoryPoint) {
                 storyPoint = (TravelStoryPoint) entry.getValue();
                 if (ev.getLocation().getCurrentSystem().getId().equals(storyPoint.getDestinationId()) &&
-                        storyPoint.isActive()) {
+                          storyPoint.isActive()) {
                     storyPoint.complete();
                     break;
                 }
@@ -330,7 +320,7 @@ public class StoryArc {
             if (entry.getValue() instanceof CheckDateReachedStoryPoint) {
                 dateStoryPoint = (CheckDateReachedStoryPoint) entry.getValue();
                 if (null != dateStoryPoint.getDate()
-                        && ev.getCampaign().getLocalDate().equals(dateStoryPoint.getDate())) {
+                          && ev.getCampaign().getLocalDate().equals(dateStoryPoint.getDate())) {
                     dateStoryPoint.start();
                 }
             }
@@ -344,7 +334,7 @@ public class StoryArc {
                     continue;
                 }
                 if (null != waitStoryPoint.getDate()
-                        && ev.getCampaign().getLocalDate().equals(waitStoryPoint.getDate())) {
+                          && ev.getCampaign().getLocalDate().equals(waitStoryPoint.getDate())) {
                     waitStoryPoint.complete();
                 }
             }
@@ -413,7 +403,7 @@ public class StoryArc {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        !wn.getNodeName().equals("storyPoint")) {
+                          !wn.getNodeName().equals("storyPoint")) {
                     continue;
                 }
                 StoryPoint storyPoint = StoryPoint.generateInstanceFromXML(wn, c, version);
@@ -432,7 +422,7 @@ public class StoryArc {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        !wn.getNodeName().equals("personality")) {
+                          !wn.getNodeName().equals("personality")) {
                     continue;
                 }
                 Personality personality = Personality.generateInstanceFromXML(wn, c);
@@ -448,7 +438,7 @@ public class StoryArc {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
                 if (wn.getNodeType() != Node.ELEMENT_NODE ||
-                        !wn.getNodeName().equals("customStringVariable")) {
+                          !wn.getNodeName().equals("customStringVariable")) {
                     continue;
                 }
                 parseCustomStringVariable(wn.getChildNodes());
@@ -583,6 +573,7 @@ public class StoryArc {
      * This method will replace tokens in narrative text
      *
      * @param text <code>String</code> containing the original text with tokens.
+     *
      * @return <code>String</code> containing the text with tokens replaced.
      */
     public static String replaceTokens(String text, Campaign c) {

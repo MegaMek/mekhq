@@ -140,7 +140,7 @@ public class FactionStandingReport extends JDialog {
      * Constructs a {@link FactionStandingReport} which generates a {@link JDialog} displaying faction standings for the
      * specified campaign and related data.
      *
-     * @param frame The parent {@link JFrame} that acts as the owner of this report dialog.
+     * @param frame    The parent {@link JFrame} that acts as the owner of this report dialog.
      * @param campaign The current campaign
      *
      * @author Illiani
@@ -470,6 +470,7 @@ public class FactionStandingReport extends JDialog {
      * Constructs a panel describing the specified faction, including logo, description, and regard slider.
      *
      * @param factionCode the code of the faction to be displayed
+     *
      * @return a {@link JPanel} representing the faction's standing information
      *
      * @author Illiani
@@ -533,8 +534,8 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified
-     * faction standing level, combined with internal padding.
+     * Creates a Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified faction
+     * standing level, combined with internal padding.
      *
      * <p>The color selection is determined by the faction standing level:<br>
      * <ul>
@@ -674,9 +675,9 @@ public class FactionStandingReport extends JDialog {
     /**
      * Calculates the standing effects description string for a given faction regard value.
      *
-     * @param isClan {@code true} if the faction is a Clan faction, otherwise {@code false}
+     * @param isClan                          {@code true} if the faction is a Clan faction, otherwise {@code false}
      * @param isPirateOrMercenaryOrganization {@code true} if the faction is a pirate or mercenary organization
-     * @param factionRegard the regard value of the faction
+     * @param factionRegard                   the regard value of the faction
      *
      * @return the standing effects description for the corresponding {@link FactionStandingLevel}
      *
@@ -690,10 +691,10 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a mouse adapter that updates the effects panel's text when the mouse enters the associated 
-     * component.
+     * Creates a mouse adapter that updates the effects panel's text when the mouse enters the associated component.
      *
      * @param replacementText the text to set in the effects panel; if null, an empty string is used
+     *
      * @return a {@link MouseAdapter} that updates the effects panel on mouse enter
      *
      * @author Illiani
@@ -720,9 +721,10 @@ public class FactionStandingReport extends JDialog {
      * name.
      *
      * @param container the container to search within
-     * @param name the name of the component to find
-     * @param type the class type of the component to find
-     * @param <T> the type parameter extending {@link Component}
+     * @param name      the name of the component to find
+     * @param type      the class type of the component to find
+     * @param <T>       the type parameter extending {@link Component}
+     *
      * @return the found component cast to the specified type, or null if not found
      *
      * @author Illiani

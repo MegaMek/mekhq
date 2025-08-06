@@ -67,6 +67,7 @@ public class TutorialHyperlinkPanel extends JPanel {
      *
      * <p>Displays HTML-formatted, centered text with hyperlinks on a transparent background. Hyperlinks are handled by
      * {@link NewGlossaryDialog#handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)}.</p>
+     *
      * @param key The resource key used to look up the tutorial/instructional text for display.
      *
      * @author Illiani

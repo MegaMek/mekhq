@@ -35,12 +35,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -238,7 +236,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 toReturn.append(inventories.getSupply()).append(" in stock");
             } else {
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(), "None in stock"));
+                      ReportingUtilities.getNegativeColor(), "None in stock"));
             }
 
             String incoming = inventories.getTransitOrderedDetails();
@@ -248,7 +246,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 incomingSB.append(" (").append(incoming).append(")");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getWarningColor(), incomingSB.toString()));
+                      ReportingUtilities.getWarningColor(), incomingSB.toString()));
             }
         }
         return toReturn.toString();
@@ -286,12 +284,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 skillMin = SkillType.EXP_GREEN;
             }
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(),
-                    "<b> failed and part destroyed</b>") + '.';
+                  ReportingUtilities.getNegativeColor(),
+                  "<b> failed and part destroyed</b>") + '.';
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(),
-                    "<b> failed</b>") + '.';
+                  ReportingUtilities.getNegativeColor(),
+                  "<b> failed</b>") + '.';
         }
     }
 
@@ -318,9 +316,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         AvailabilityValue avail = getAvailability();
         if (avail == null) {
             target.addModifier(
-                  TargetRoll.IMPOSSIBLE, 
+                  TargetRoll.IMPOSSIBLE,
                   MessageFormat.format(
-                        "Attempting to get availability modifier for null availability: {0}", 
+                        "Attempting to get availability modifier for null availability: {0}",
                         getPartName()
                   )
             );
@@ -389,14 +387,14 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         StringBuilder toReturn = new StringBuilder();
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
-                .append(". It will be delivered in ")
-                .append(transitDays)
-                .append(" days.");
+                        ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
+                  .append(". It will be delivered in ")
+                  .append(transitDays)
+                  .append(" days.");
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                ReportingUtilities.getNegativeColor(),
-                "<b> You cannot afford this part. Transaction cancelled</b>"));
+                  ReportingUtilities.getNegativeColor(),
+                  "<b> You cannot afford this part. Transaction cancelled</b>"));
         }
         return toReturn.toString();
     }
@@ -412,7 +410,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String failToFind() {
         // TODO: Move me to live with procurment functions?
         return ReportingUtilities.messageSurroundedBySpanWithColor(
-            ReportingUtilities.getNegativeColor(), "<b> part not found</b>") + ".";
+              ReportingUtilities.getNegativeColor(), "<b> part not found</b>") + ".";
     }
 
     @Override

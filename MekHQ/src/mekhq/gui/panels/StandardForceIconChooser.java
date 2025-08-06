@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
+
+import javax.swing.JFrame;
 
 import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
 import megamek.common.annotations.Nullable;
@@ -35,11 +42,10 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.gui.trees.StandardForceIconChooserTree;
 
-import javax.swing.*;
-
 /**
- * StandardForceIconChooser is an implementation of AbstractMHQIconChooser that is used to select a
- * StandardForceIcon from the Force Icon Directory.
+ * StandardForceIconChooser is an implementation of AbstractMHQIconChooser that is used to select a StandardForceIcon
+ * from the Force Icon Directory.
+ *
  * @see AbstractMHQIconChooser
  * @see abstractIconChooserPanel
  */
@@ -50,7 +56,7 @@ public class StandardForceIconChooser extends AbstractMHQIconChooser {
     }
 
     protected StandardForceIconChooser(final JFrame frame, final String name,
-                                       final @Nullable AbstractIcon icon) {
+          final @Nullable AbstractIcon icon) {
         super(frame, name, new StandardForceIconChooserTree(), icon);
     }
     //endregion Constructors

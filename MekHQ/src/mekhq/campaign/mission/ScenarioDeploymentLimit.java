@@ -51,45 +51,35 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This class is optionally used by Scenario to determine any limits on the type
- * and quantity of units that the player
- * can field for a scenario. It can be used to limit the types of units that are
- * deployed and to limit the quantity
- * of units. Quantity can be limited as a percent of player's valid force or as
- * an absolute number. This quantity
- * can also be a BV limit or a raw unit count limit. The structure here allows
- * for easy extension to other quantity
- * types.
- *
- * Additionally, this class also can specify UUIDs for required personnel and
- * units. The method Scenario#canStartScenario
- * will return false if these personnel or units are not present in the deployed
- * force.
+ * This class is optionally used by Scenario to determine any limits on the type and quantity of units that the player
+ * can field for a scenario. It can be used to limit the types of units that are deployed and to limit the quantity of
+ * units. Quantity can be limited as a percent of player's valid force or as an absolute number. This quantity can also
+ * be a BV limit or a raw unit count limit. The structure here allows for easy extension to other quantity types.
+ * <p>
+ * Additionally, this class also can specify UUIDs for required personnel and units. The method
+ * Scenario#canStartScenario will return false if these personnel or units are not present in the deployed force.
  */
 public class ScenarioDeploymentLimit {
     private static final MMLogger logger = MMLogger.create(ScenarioDeploymentLimit.class);
 
     // region Variable Declarations
+
     /**
-     * The QuantityType enum tells this class how to interpret the meaning
-     * quantityLimit variable
+     * The QuantityType enum tells this class how to interpret the meaning quantityLimit variable
      */
     public enum QuantityType {
         /**
-         * the PERCENT QuantityType will treat the quantityLimit variable as a percent
-         * of the player's valid forces
+         * the PERCENT QuantityType will treat the quantityLimit variable as a percent of the player's valid forces
          */
         PERCENT,
         /**
-         * The ABSOLUTE QuantityType will treat the quantityLimit variable as the raw
-         * amount of CountType
+         * The ABSOLUTE QuantityType will treat the quantityLimit variable as the raw amount of CountType
          */
         ABSOLUTE
     }
 
     /**
-     * The CountType enum tells this class what the units of the quantity limits
-     * should be
+     * The CountType enum tells this class what the units of the quantity limits should be
      */
     public enum CountType {
         /**
@@ -126,8 +116,7 @@ public class ScenarioDeploymentLimit {
     int quantityLimit;
 
     /**
-     * an enum indicating whether the quantity variable indicates percent or
-     * absolute number of units
+     * an enum indicating whether the quantity variable indicates percent or absolute number of units
      **/
     QuantityType quantityType;
 
@@ -193,6 +182,7 @@ public class ScenarioDeploymentLimit {
     }
 
     // region Unit type methods
+
     /**
      * Add a UnitType integer to the allowed unit types list
      *
@@ -203,11 +193,11 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * Determines whether a given unit type is allowed in the scenario. If no unit
-     * type limitations have been specified,
+     * Determines whether a given unit type is allowed in the scenario. If no unit type limitations have been specified,
      * then this method will return true.
      *
      * @param unitType - an integer giving the UnitType
+     *
      * @return a boolean indicating whether the UnitType is allowed.
      */
     public boolean isAllowedType(int unitType) {
@@ -215,8 +205,7 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * This method returns a description of what unit types are allowed for
-     * graphical presentation
+     * This method returns a description of what unit types are allowed for graphical presentation
      *
      * @return a String of comma separated unit type descriptions
      */
@@ -233,14 +222,14 @@ public class ScenarioDeploymentLimit {
     // endregion Unit type checks
 
     // region Unit quantity methods
+
     /**
-     * Determine how much unit quantity this unit counts toward, using the
-     * appropriate measurement provided by
+     * Determine how much unit quantity this unit counts toward, using the appropriate measurement provided by
      * CountType. Units that are not allowed in this scenario will return zero.
      *
      * @param u - the Unit to be evaluated
-     * @return an integer giving the quantity that this unit counts toward in the
-     *         appropriate units of CountType
+     *
+     * @return an integer giving the quantity that this unit counts toward in the appropriate units of CountType
      */
     public int getUnitQuantity(Unit u) {
         if ((null != u) && (null != u.getEntity()) && isAllowedType(u.getEntity().getUnitType())) {
@@ -258,8 +247,8 @@ public class ScenarioDeploymentLimit {
      *
      * @param f - a Force to be evaluated
      * @param c - a pointer to the Campaign
-     * @return the an integer giving the quantity that this force counts toward in
-     *         the appropriate units of CountType
+     *
+     * @return the an integer giving the quantity that this force counts toward in the appropriate units of CountType
      */
     public int getForceQuantity(Force f, Campaign c) {
         int quantity = 0;
@@ -280,13 +269,12 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * This method calculates the maximum quantity, in appropriate CountType units,
-     * that this
-     * scenario allows. If quantityType is PERCENT it will do this by looping
-     * through all the forces
-     * in the TO&amp;E and calculating force quantity.
+     * This method calculates the maximum quantity, in appropriate CountType units, that this scenario allows. If
+     * quantityType is PERCENT it will do this by looping through all the forces in the TO&amp;E and calculating force
+     * quantity.
      *
      * @param c a pointer to the campaign
+     *
      * @return an integer giving the maximum quantity allowed in this scenario
      */
     public int getQuantityCap(Campaign c) {
@@ -303,24 +291,23 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * Calculate the quantity, measured in CountType units, of forces currently
-     * deployed in the scenario
+     * Calculate the quantity, measured in CountType units, of forces currently deployed in the scenario
      *
      * @param s - a Scenario to be evaluated
      * @param c - a pointer to the campaign
-     * @return an integer giving the current quantity of deployed forces in this
-     *         scenario
+     *
+     * @return an integer giving the current quantity of deployed forces in this scenario
      */
     public int getCurrentQuantity(Scenario s, Campaign c) {
         return getForceQuantity(s.getForces(c), c);
     }
 
     /**
-     * Provides a String description of the quantity limits of the scenario for
-     * graphical display
+     * Provides a String description of the quantity limits of the scenario for graphical display
      *
      * @param s - a Scenario to get the description of
      * @param c - a point to the Campaign
+     *
      * @return a String describing the quantity limits
      */
     public String getQuantityLimitDesc(Scenario s, Campaign c) {
@@ -344,13 +331,14 @@ public class ScenarioDeploymentLimit {
     // endregion Unit quantity methods
 
     // region Required personnel methods
+
     /**
      * Checks whether any required personnel are currently deployed in the scenario
      *
      * @param s - a Scenario to evaluate
      * @param c - a pointer to the campaign
-     * @return a boolean that evaluates to true if all required personnel are
-     *         currently deployed in the scenario
+     *
+     * @return a boolean that evaluates to true if all required personnel are currently deployed in the scenario
      */
     public boolean checkRequiredPersonnel(Scenario s, Campaign c) {
         Force f = s.getForces(c);
@@ -377,8 +365,8 @@ public class ScenarioDeploymentLimit {
      * @param personId - the id of a Person
      * @param force    - a Force
      * @param c        - a pointer to the campaign
-     * @return a boolean that evaluates to true if the person identified by personId
-     *         is part of the force
+     *
+     * @return a boolean that evaluates to true if the person identified by personId is part of the force
      */
     public boolean isPersonInForce(UUID personId, Force force, Campaign c) {
         Vector<UUID> unitIds = force.getAllUnits(false);
@@ -394,10 +382,10 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * Returns a String giving a description of required personnel for graphical
-     * display
+     * Returns a String giving a description of required personnel for graphical display
      *
      * @param c - a pointer to the campaign
+     *
      * @return a String that is a comma separated list of required personnel names
      */
     public String getRequiredPersonnelDesc(Campaign c) {
@@ -416,13 +404,14 @@ public class ScenarioDeploymentLimit {
     // endregion Required personnel methods
 
     // region Required unit methods
+
     /**
      * Checks whether any required units are currently deployed in the scenario
      *
      * @param s - a Scenario to evaluate
      * @param c - a pointer to the campaign
-     * @return a boolean that evaluates to true if all required units are currently
-     *         deployed in the scenario
+     *
+     * @return a boolean that evaluates to true if all required units are currently deployed in the scenario
      */
     public boolean checkRequiredUnits(Scenario s, Campaign c) {
         Force f = s.getForces(c);
@@ -450,8 +439,8 @@ public class ScenarioDeploymentLimit {
      * @param unitId - the id of a Person
      * @param force  - a Force
      * @param c      - a pointer to the campaign
-     * @return a boolean that evaluates to true if the unit identified by unitId is
-     *         part of the force
+     *
+     * @return a boolean that evaluates to true if the unit identified by unitId is part of the force
      */
     public boolean isUnitInForce(UUID unitId, Force force, Campaign c) {
         Vector<UUID> unitIds = force.getAllUnits(false);
@@ -467,6 +456,7 @@ public class ScenarioDeploymentLimit {
      * Returns a String giving a description of required units for graphical display
      *
      * @param c - a pointer to the campaign
+     *
      * @return a String that is a comma separated list of required unit names
      */
     public String getRequiredUnitDesc(Campaign c) {

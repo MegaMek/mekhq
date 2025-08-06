@@ -347,14 +347,15 @@ public class AtBContract extends Contract {
     /**
      * Returns the directory for the camouflages of a faction based on the year and faction code.
      *
-     * @param year The year
+     * @param year        The year
      * @param factionCode The code representing the faction, e.g. FS or HL
+     *
      * @return The directory under data/images/camo for the camouflages of the faction
      */
     private static String getCamouflageDirectory(int year, String factionCode) {
         return Factions.getInstance().getFaction(factionCode)
-              .getCamosFolder(year)
-              .orElse("Standard Camouflage");
+                     .getCamosFolder(year)
+                     .orElse("Standard Camouflage");
     }
 
     public void calculateLength(final boolean variable) {
@@ -362,13 +363,13 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
-     *
-     * Calculates the number of lances required for this contract, based on [campaign].
-     *
      * @param campaign The campaign to reference.
      *
      * @return The number of lances required.
+     *
+     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
+     *       <p>
+     *       Calculates the number of lances required for this contract, based on [campaign].
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
@@ -376,33 +377,33 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * @deprecated use {@link ContractUtilities#getEffectiveNumUnits(Campaign)}
-     *
-     * Calculates the effective number of units available in the given campaign based on unit types and roles.
-     *
-     * <p>
-     * This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
-     * role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
-     * The unit contribution to the total is determined based on its type:
-     * <ul>
-     * <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for
-     * non-clan factions,
-     * and 0.5 for clan factions.</li>
-     * <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
-     * <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total).</li>
-     * <li><b>Other types:</b> Adds 1 to the total.</li>
-     * </ul>
-     *
-     * <p>
-     * Units that aren’t associated with a valid combat team or can’t be fetched due
-     * to missing
-     * data are ignored. The final result is returned as an integer by flooring the
-     * calculated total.
-     * </p>
-     *
      * @param campaign the campaign containing the combat teams and units to evaluate
      *
      * @return the effective number of units as an integer
+     *
+     * @deprecated use {@link ContractUtilities#getEffectiveNumUnits(Campaign)}
+     *       <p>
+     *       Calculates the effective number of units available in the given campaign based on unit types and roles.
+     *
+     *       <p>
+     *       This method iterates through all combat teams in the specified campaign, ignoring combat teams with the
+     *       auxiliary role. For each valid combat team, it retrieves the associated force and evaluates all units
+     *       within that force. The unit contribution to the total is determined based on its type:
+     *       <ul>
+     *       <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for
+     *       non-clan factions,
+     *       and 0.5 for clan factions.</li>
+     *       <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *       <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total).</li>
+     *       <li><b>Other types:</b> Adds 1 to the total.</li>
+     *       </ul>
+     *
+     *       <p>
+     *       Units that aren’t associated with a valid combat team or can’t be fetched due
+     *       to missing
+     *       data are ignored. The final result is returned as an integer by flooring the
+     *       calculated total.
+     *       </p>
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static int getEffectiveNumUnits(Campaign campaign) {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.enums;
 
@@ -34,16 +39,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class PartRepairTypeTest {
     // region Variable Declarations
     private static final PartRepairType[] types = PartRepairType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
@@ -255,10 +259,10 @@ class PartRepairTypeTest {
     @Test
     void testToStringOverride() {
         assertEquals(resources.getString("PartRepairType.ARMOUR.text"),
-                PartRepairType.ARMOUR.toString());
+              PartRepairType.ARMOUR.toString());
         assertEquals(resources.getString("PartRepairType.AMMUNITION.text"),
-                PartRepairType.AMMUNITION.toString());
+              PartRepairType.AMMUNITION.toString());
         assertEquals(resources.getString("PartRepairType.HEAT_SINK.text"),
-                PartRepairType.HEAT_SINK.toString());
+              PartRepairType.HEAT_SINK.toString());
     }
 }

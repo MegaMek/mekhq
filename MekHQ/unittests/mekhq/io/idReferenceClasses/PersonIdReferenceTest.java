@@ -24,8 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.io.idReferenceClasses;
+
+import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -38,22 +59,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(value = MockitoExtension.class)
 public class PersonIdReferenceTest {
     @Mock
@@ -64,8 +69,8 @@ public class PersonIdReferenceTest {
         // This is a smoke test to ensure we don't have an obvious ConMod. Deeper tests to fix each
         // reference type are separated below.
         final List<Person> personnel = IntStream.range(0, 100)
-                .mapToObj(i -> new Person(mockCampaign, "MERC"))
-                .collect(Collectors.toList());
+                                             .mapToObj(i -> new Person(mockCampaign, "MERC"))
+                                             .collect(Collectors.toList());
         when(mockCampaign.getPersonnel()).thenReturn(personnel);
         PersonIdReference.fixPersonIdReferences(mockCampaign);
     }
@@ -107,7 +112,7 @@ public class PersonIdReferenceTest {
 
         final Genealogy genealogy = new Genealogy(origin);
         genealogy.addFormerSpouse(new FormerSpouse(new PersonIdReference(formerSpouse.getId().toString()),
-                LocalDate.now(), FormerSpouseReason.DIVORCE));
+              LocalDate.now(), FormerSpouseReason.DIVORCE));
         when(origin.getGenealogy()).thenReturn(genealogy);
 
         // Testing Unknown Former Spouse
@@ -116,7 +121,7 @@ public class PersonIdReferenceTest {
 
         // Testing Known Former Spouse
         genealogy.addFormerSpouse(new FormerSpouse(new PersonIdReference(formerSpouse.getId().toString()),
-                LocalDate.now(), FormerSpouseReason.DIVORCE));
+              LocalDate.now(), FormerSpouseReason.DIVORCE));
         given(mockCampaign.getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
@@ -139,10 +144,16 @@ public class PersonIdReferenceTest {
         final Person parent2 = new Person(mockCampaign, "MERC");
 
         origin.getGenealogy().getFamily().put(FamilialRelationshipType.CHILD, new ArrayList<>());
-        origin.getGenealogy().getFamily().get(FamilialRelationshipType.CHILD).add(new PersonIdReference(child.getId().toString()));
+        origin.getGenealogy()
+              .getFamily()
+              .get(FamilialRelationshipType.CHILD)
+              .add(new PersonIdReference(child.getId().toString()));
         origin.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
         origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(parent1);
-        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
+        origin.getGenealogy()
+              .getFamily()
+              .get(FamilialRelationshipType.PARENT)
+              .add(new PersonIdReference(parent2.getId().toString()));
 
         doReturn(null).when(mockCampaign).getPerson(argThat(matchPersonUUID(child.getId())));
         doReturn(parent2).when(mockCampaign).getPerson(argThat(matchPersonUUID(parent2.getId())));

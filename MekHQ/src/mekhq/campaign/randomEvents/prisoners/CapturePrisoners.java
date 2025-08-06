@@ -145,8 +145,8 @@ public class CapturePrisoners {
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
         ITechnology.Faction techFaction = searchingFactionIsClan ?
-                                ITechnology.getFactionFromMMAbbr("CLAN") :
-                                ITechnology.getFactionFromMMAbbr("IS");
+                                                ITechnology.getFactionFromMMAbbr("CLAN") :
+                                                ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
             techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
@@ -166,13 +166,14 @@ public class CapturePrisoners {
             final AvailabilityValue isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
-            final AvailabilityValue clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
+            final AvailabilityValue clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
+                  today,
                   searchingFactionIsClan,
                   techFaction);
 
             final AvailabilityValue improvedSensorsAvailability = searchingFactionIsClan ?
-                                                          clanImprovedSensorsAvailability :
-                                                          isImprovedSensorsAvailability;
+                                                                        clanImprovedSensorsAvailability :
+                                                                        isImprovedSensorsAvailability;
 
             final AvailabilityValue activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
                   searchingFactionIsClan,

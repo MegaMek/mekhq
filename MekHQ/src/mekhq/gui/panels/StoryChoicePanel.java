@@ -24,13 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -69,13 +73,17 @@ public class StoryChoicePanel extends AbstractMHQPanel {
         // bolded and then switch for unselected cases.
         // the div business sets a fixed width on the label and forces it to wrap.
         lblChoice.setText("<html><div style=\"width:280px;\">"
-                + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens("**" + choice + "**", c)) + "</div></html>");
+                                +
+                                MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens("**" + choice + "**", c)) +
+                                "</div></html>");
         setBackground(bg);
         lblChoice.setForeground(fg);
         int height = lblChoice.getPreferredSize().height;
         if (!isSelected) {
             lblChoice.setText("<html><div style=\"width:280px;\">"
-                    + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(choice, c)) + "</div></html>");
+                                    +
+                                    MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(choice, c)) +
+                                    "</div></html>");
         }
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
         setMinimumSize(new Dimension(400, height + 10));

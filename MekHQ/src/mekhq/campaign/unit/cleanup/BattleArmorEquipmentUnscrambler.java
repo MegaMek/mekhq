@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import megamek.common.BattleArmor;
 import megamek.common.Mounted;
@@ -33,10 +42,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.unit.Unit;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
     // region Constructors
@@ -65,25 +70,27 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
 
         // Create a list that we can remove parts from as we match them
         final List<EquipmentPart> tempParts = unit.getParts().stream()
-                .filter(p -> p instanceof EquipmentPart)
-                .map(p -> (EquipmentPart) p)
-                .collect(Collectors.toList());
+                                                    .filter(p -> p instanceof EquipmentPart)
+                                                    .map(p -> (EquipmentPart) p)
+                                                    .collect(Collectors.toList());
 
         for (final Mounted<?> m : unit.getEntity().getEquipment()) {
             final int eqNum = unit.getEntity().getEquipmentNum(m);
             // Look for parts of the same type with the equipment number already set
             // correctly
             List<EquipmentPart> parts = tempParts.stream()
-                    .filter(part -> part.getType().getInternalName().equals(m.getType().getInternalName())
-                            && part.getEquipmentNum() == eqNum)
-                    .collect(Collectors.toList());
+                                              .filter(part -> part.getType()
+                                                                    .getInternalName()
+                                                                    .equals(m.getType().getInternalName())
+                                                                    && part.getEquipmentNum() == eqNum)
+                                              .collect(Collectors.toList());
 
             // If we don't find any, just match the internal name and set the equipment
             // number.
             if (parts.isEmpty()) {
                 parts = tempParts.stream()
-                        .filter(part -> part.getType().getInternalName().equals(m.getType().getInternalName()))
-                        .collect(Collectors.toList());
+                              .filter(part -> part.getType().getInternalName().equals(m.getType().getInternalName()))
+                              .collect(Collectors.toList());
 
                 parts.forEach(part -> part.setEquipmentNum(eqNum));
             }
@@ -148,7 +155,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
     @Override
     protected List<UnscrambleStep> createSteps() {
         return Arrays.asList(new ExactMatchStep(), new ApproximateMatchStep(),
-                new MovedEquipmentStep(), new MovedAmmoBinStep());
+              new MovedEquipmentStep(), new MovedAmmoBinStep());
     }
 
     @Override

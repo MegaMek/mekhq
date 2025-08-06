@@ -24,24 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
+
+import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 
-import java.io.IOException;
-
 /**
- * This generic class is designed to hold an absract value and a string
- * that indicates the source of that value. It is designed primarily to work
- * with planetary information, but could be used for other in-universe
- * sourceable information.
-**/
-@JsonIgnoreProperties(ignoreUnknown=true)
+ * This generic class is designed to hold an absract value and a string that indicates the source of that value. It is
+ * designed primarily to work with planetary information, but could be used for other in-universe sourceable
+ * information.
+ **/
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SourceableValue<T> {
 
     @JsonProperty("source")
@@ -62,7 +72,8 @@ public class SourceableValue<T> {
         return (null != source);
     }
 
-    public static class SourceableValueDeserializer extends JsonDeserializer<SourceableValue<Object>> implements ContextualDeserializer {
+    public static class SourceableValueDeserializer extends JsonDeserializer<SourceableValue<Object>>
+          implements ContextualDeserializer {
 
         private JavaType valueType;
 
@@ -73,12 +84,13 @@ public class SourceableValue<T> {
         }
 
         /**
-         * The purpose of this rather complex custom deserializer is that we want to allow for direct entry of
-         * values in the yaml when it is not sourced, but we want it split into a source, value pair when it has
-         * been sourced. That requires a custom deserializer of a generic class which is rather involved.
+         * The purpose of this rather complex custom deserializer is that we want to allow for direct entry of values in
+         * the yaml when it is not sourced, but we want it split into a source, value pair when it has been sourced.
+         * That requires a custom deserializer of a generic class which is rather involved.
          */
         @Override
-        public SourceableValue<Object> deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
+        public SourceableValue<Object> deserialize(JsonParser jsonParser, DeserializationContext context)
+              throws IOException {
             ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
             JsonNode root = mapper.readTree(jsonParser);
 
@@ -115,9 +127,12 @@ public class SourceableValue<T> {
         }
 
         @Override
-        public JsonDeserializer<?> createContextual(DeserializationContext context, BeanProperty property) throws JsonMappingException {
+        public JsonDeserializer<?> createContextual(DeserializationContext context, BeanProperty property)
+              throws JsonMappingException {
             JavaType type = context.getContextualType();
-            JavaType containedType = (type != null && type.containedTypeCount() > 0) ? type.containedType(0) : context.constructType(Object.class);
+            JavaType containedType = (type != null && type.containedTypeCount() > 0) ?
+                                           type.containedType(0) :
+                                           context.constructType(Object.class);
             return new SourceableValueDeserializer(containedType);
         }
     }

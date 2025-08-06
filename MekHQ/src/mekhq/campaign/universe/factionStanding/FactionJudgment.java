@@ -315,7 +315,9 @@ public class FactionJudgment {
      * @param today                      the current date for consideration in improvement logic
      * @param currentStandingWithFaction the current standing level with the faction, which may affect eligibility
      * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
+     *
      * @return the new {@link FactionAccoladeLevel} if increased, or {@code null} if no increase was made
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -404,6 +406,7 @@ public class FactionJudgment {
      * Constructs a new {@link FactionJudgment} instance by reading serialized censure data from an XML node.
      *
      * @param parentNode the XML parent node containing the censure entries
+     *
      * @return a new {@link FactionJudgment} instance populated from the XML data
      *
      * @author Illiani
@@ -436,6 +439,7 @@ public class FactionJudgment {
      * Reads all faction censure entries from the given XML node and returns them as a map.
      *
      * @param parentNode the XML node containing child nodes for each faction's censure entry
+     *
      * @return a map of faction code to {@link CensureEntry} read from the XML
      *
      * @author Illiani
@@ -460,6 +464,7 @@ public class FactionJudgment {
      * Creates a {@link CensureEntry} by reading censure data from the given XML node.
      *
      * @param codeNode the XML node containing "level" and "issueDate" elements
+     *
      * @return a {@link CensureEntry} populated from the node's content
      *
      * @author Illiani

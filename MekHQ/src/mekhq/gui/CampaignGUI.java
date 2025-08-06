@@ -1287,14 +1287,14 @@ public class CampaignGUI extends JPanel {
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         String labelKey = campaignOptions.getContractMarketMethod().isNone()
-              ? "manual" : "market";
+                                ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
 
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
-              ? "manual" : "market";
+                         ? "manual" : "market";
         label = resourceMap.getString("btnPersonnelMarket." + labelKey);
         btnPersonnelMarket.setText(label);
 
@@ -1728,8 +1728,8 @@ public class CampaignGUI extends JPanel {
 
             if (missionTypeDialog.isContract()) {
                 NewContractDialog newContractDialog = campaignOptions.isUseAtB() ?
-                      new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                      new NewContractDialog(getFrame(), true, getCampaign());
+                                                            new NewAtBContractDialog(getFrame(), true, getCampaign()) :
+                                                            new NewContractDialog(getFrame(), true, getCampaign());
                 newContractDialog.setVisible(true);
             }
 
@@ -2826,10 +2826,9 @@ public class CampaignGUI extends JPanel {
      * Handles the {@link DayEndingEvent} that is published immediately before a day ends in the campaign.
      *
      * <p>This method is subscribed to day-ending events and implements logic that can block or allow the end of the
-     * day,
-     * depending on the current campaign state and conditions. If certain criteria are met (such as outstanding loans,
-     * faction issues, overdue scenarios, or random retirement prompts), the event will be cancelled—preventing day
-     * transition.</p>
+     * day, depending on the current campaign state and conditions. If certain criteria are met (such as outstanding
+     * loans, faction issues, overdue scenarios, or random retirement prompts), the event will be cancelled—preventing
+     * day transition.</p>
      *
      * <ul>
      *   <li>Checks if daily nag dialogs should be shown and blocks day end if needed.</li>
@@ -3077,7 +3076,8 @@ public class CampaignGUI extends JPanel {
      * <p>Updates the visibility and availability of UI tabs and menu items based on the new campaign settings.
      * Also triggers a refresh of all tabs and schedules updates for funds and parts availability.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param optionsChangedEvent the event containing the updated options
      */
@@ -3103,7 +3103,8 @@ public class CampaignGUI extends JPanel {
      * <p>Schedules an update to the funds and refreshes parts availability to reflect the new state after
      * a transaction has occurred.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param transactionEvent the event signaling the completion of a transaction
      */
@@ -3118,7 +3119,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Schedules a funds update and refreshes parts availability after a loan transaction is processed.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param loanEvent the event representing a loan-related action
      */
@@ -3133,7 +3135,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Schedules a funds update to ensure the campaign's financial state is current when assets change.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param assetEvent the event indicating a change in assets
      */
@@ -3147,7 +3150,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Refreshes the temporary astech pool, updating the related UI and game state.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param astechPoolChangedEvent the event indicating a change in the astech pool
      */
@@ -3161,7 +3165,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Refreshes the temporary medic pool, updating the related UI and game state.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param medicPoolChangedEvent the event indicating a change in the medic pool
      */
@@ -3175,7 +3180,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Updates the visibility of the company generator menu item according to the new option settings.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param mhqOptionsChangedEvent the event containing the updated general options
      */

@@ -72,6 +72,7 @@ public class Quartermaster {
 
     /**
      * Initializes a new instance of the Quartermaster class.
+     *
      * @param campaign The campaign being managed by the Quartermaster.
      */
     public Quartermaster(Campaign campaign) {
@@ -100,17 +101,18 @@ public class Quartermaster {
     }
 
     /**
-     * Adds a part to the campaign, arriving in a set number of days. By default, the part is treated
-     * as not brand new. This method is deprecated in favor of the overloaded method that explicitly
-     * accepts a flag to indicate whether the part is brand new.
+     * Adds a part to the campaign, arriving in a set number of days. By default, the part is treated as not brand new.
+     * This method is deprecated in favor of the overloaded method that explicitly accepts a flag to indicate whether
+     * the part is brand new.
      *
      * <p>This method delegates its behavior to {@link #addPart(Part, int, boolean)} with the
      * {@code isBrandNew} flag set to {@code false}.</p>
      *
      * @param part        The part to add to the campaign. Cannot be {@code null}.
      * @param transitDays The number of days until the part arrives, or zero if the part is already here.
-     * @deprecated Use {@link #addPart(Part, int, boolean)} instead to explicitly indicate whether
-     * the part is brand new.
+     *
+     * @deprecated Use {@link #addPart(Part, int, boolean)} instead to explicitly indicate whether the part is brand
+     *       new.
      */
     @Deprecated
     public void addPart(Part part, int transitDays) {
@@ -118,19 +120,19 @@ public class Quartermaster {
     }
 
     /**
-     * Adds a part to the campaign's warehouse, specifying the number of transit days for its arrival
-     * and whether the part is considered brand new. The method validates the input and decides whether
-     * to skip the addition based on specific conditions, such as test units, spare ammo bins, or
-     * missing parts without associated units.
+     * Adds a part to the campaign's warehouse, specifying the number of transit days for its arrival and whether the
+     * part is considered brand new. The method validates the input and decides whether to skip the addition based on
+     * specific conditions, such as test units, spare ammo bins, or missing parts without associated units.
      *
      * <p>Once validated, the part is marked as new or used, set to arrive in the specified number of
      * days, processed for campaign addition, and added to the campaign's warehouse.</p>
      *
      * @param part        The part to add to the campaign. Cannot be {@code null}.
-     * @param transitDays The number of days until the part arrives. If the value is negative,
-     *                    it will be adjusted to zero, indicating the part is already here.
-     * @param isBrandNew  A {@code boolean} indicating whether the part is brand new.
-     *                    {@code true} if the part is new, otherwise {@code false}.
+     * @param transitDays The number of days until the part arrives. If the value is negative, it will be adjusted to
+     *                    zero, indicating the part is already here.
+     * @param isBrandNew  A {@code boolean} indicating whether the part is brand new. {@code true} if the part is new,
+     *                    otherwise {@code false}.
+     *
      * @throws NullPointerException If {@code part} is {@code null}.
      */
     public void addPart(Part part, int transitDays, boolean isBrandNew) {
@@ -170,8 +172,9 @@ public class Quartermaster {
 
     /**
      * Adds ammo to the campaign.
+     *
      * @param ammoType The type of ammo to add.
-     * @param shots The number of rounds of ammo to add.
+     * @param shots    The number of rounds of ammo to add.
      */
     public void addAmmo(AmmoType ammoType, int shots) {
         Objects.requireNonNull(ammoType);
@@ -183,9 +186,10 @@ public class Quartermaster {
 
     /**
      * Adds infantry ammo to the campaign.
-     * @param ammoType The type of ammo to add.
+     *
+     * @param ammoType       The type of ammo to add.
      * @param infantryWeapon The type of infantry weapon using the ammo.
-     * @param shots The number of rounds of ammo to add.
+     * @param shots          The number of rounds of ammo to add.
      */
     public void addAmmo(AmmoType ammoType, InfantryWeapon infantryWeapon, int shots) {
         Objects.requireNonNull(ammoType);
@@ -198,10 +202,12 @@ public class Quartermaster {
 
     /**
      * Removes ammo from the campaign, if available.
-     * @param ammoType The type of ammo to remove.
+     *
+     * @param ammoType    The type of ammo to remove.
      * @param shotsNeeded The number of rounds of ammo needed.
-     * @return The number of rounds of ammo removed from the campaign.
-     *         This value may be less than or equal to {@code shotsNeeded}.
+     *
+     * @return The number of rounds of ammo removed from the campaign. This value may be less than or equal to
+     *       {@code shotsNeeded}.
      */
     public int removeAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
@@ -228,7 +234,9 @@ public class Quartermaster {
 
     /**
      * Remove ammo directly from an AmmoStorage part.
+     *
      * @param shotsNeeded The number of shots needed.
+     *
      * @return The number of shots removed.
      */
     private int removeAmmo(@Nullable AmmoStorage ammoStorage, int shotsNeeded) {
@@ -255,10 +263,12 @@ public class Quartermaster {
 
     /**
      * Removes compatible ammo from the campaign, if available.
-     * @param ammoType The type of ammo to remove.
+     *
+     * @param ammoType    The type of ammo to remove.
      * @param shotsNeeded The number of rounds of ammo needed.
-     * @return The number of rounds of ammo removed from the campaign.
-     *         This value may be less than or equal to {@code shotsNeeded}.
+     *
+     * @return The number of rounds of ammo removed from the campaign. This value may be less than or equal to
+     *       {@code shotsNeeded}.
      */
     public int removeCompatibleAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
@@ -305,19 +315,23 @@ public class Quartermaster {
 
     /**
      * Finds spare ammo of a given type, if any.
+     *
      * @param ammoType The AmmoType to search for.
+     *
      * @return The matching spare {@code AmmoStorage} part, otherwise {@code null}.
      */
     private @Nullable AmmoStorage findSpareAmmo(AmmoType ammoType) {
         return (AmmoStorage) getWarehouse().findSparePart(part -> {
             return isAvailableAsSpareAmmo(part)
-                    && ((AmmoStorage) part).isSameAmmoType(ammoType);
+                         && ((AmmoStorage) part).isSameAmmoType(ammoType);
         });
     }
 
     /**
      * Find compatible ammo in the warehouse.
+     *
      * @param ammoType The AmmoType to search for compatible types.
+     *
      * @return A list of spare {@code AmmoStorage} parts in the warehouse.
      */
     private List<AmmoStorage> findCompatibleSpareAmmo(AmmoType ammoType) {
@@ -344,11 +358,13 @@ public class Quartermaster {
     }
 
     /**
-     * Converts shots from one ammo type to another.
-     * NB: it is up to the caller to ensure the ammo types are compatible.
-     * @param from The AmmoType for which {@code shots} represents.
+     * Converts shots from one ammo type to another. NB: it is up to the caller to ensure the ammo types are
+     * compatible.
+     *
+     * @param from  The AmmoType for which {@code shots} represents.
      * @param shots The number of shots of {@code from}.
-     * @param to The AmmoType which {@code shots} should be converted to.
+     * @param to    The AmmoType which {@code shots} should be converted to.
+     *
      * @return The value of {@code shots} when converted to a specific AmmoType.
      */
     public static int convertShots(AmmoType from, int shots, AmmoType to) {
@@ -368,11 +384,13 @@ public class Quartermaster {
     }
 
     /**
-     * Calculates the shots needed when converting from a source ammo to a target ammo.
-     * NB: it is up to the caller to ensure the ammo types are compatible.
-     * @param target The target ammo type.
+     * Calculates the shots needed when converting from a source ammo to a target ammo. NB: it is up to the caller to
+     * ensure the ammo types are compatible.
+     *
+     * @param target      The target ammo type.
      * @param shotsNeeded The number of shots needed in the target ammo type.
-     * @param source The source ammo type.
+     * @param source      The source ammo type.
+     *
      * @return The number of shots needed from the source ammo type.
      */
     public static int convertShotsNeeded(AmmoType target, int shotsNeeded, AmmoType source) {
@@ -395,7 +413,9 @@ public class Quartermaster {
 
     /**
      * Gets the amount of ammo available of a given type.
+     *
      * @param ammoType The type of ammo.
+     *
      * @return The number of shots available of the given ammo type.
      */
     public int getAmmoAvailable(AmmoType ammoType) {
@@ -407,50 +427,52 @@ public class Quartermaster {
             // ammo that have different qualities, so we should return
             // all of those counts as viable and not just the first we find.
             return getWarehouse()
-                .streamSpareParts()
-                .filter(Quartermaster::isAvailableAsSpareAmmo)
-                .mapToInt(part -> {
-                    AmmoStorage spare = (AmmoStorage) part;
-                    if (spare.isSameAmmoType(ammoType)) {
-                        return spare.getShots();
-                    }
-                    return 0;
-                })
-                .sum();
+                         .streamSpareParts()
+                         .filter(Quartermaster::isAvailableAsSpareAmmo)
+                         .mapToInt(part -> {
+                             AmmoStorage spare = (AmmoStorage) part;
+                             if (spare.isSameAmmoType(ammoType)) {
+                                 return spare.getShots();
+                             }
+                             return 0;
+                         })
+                         .sum();
 
         } else {
             // If we're using ammo by type, stream through all of
             // the ammo that matches strictly or is compatible.
             return getWarehouse()
-                    .streamSpareParts()
-                    .filter(Quartermaster::isAvailableAsSpareAmmo)
-                    .mapToInt(part -> {
-                        AmmoStorage spare = (AmmoStorage) part;
-                        if (spare.isSameAmmoType(ammoType)) {
-                            return spare.getShots();
-                        } else if (spare.isCompatibleAmmo(ammoType)) {
-                            return convertShots(spare.getType(), spare.getShots(), ammoType);
-                        }
-                        return 0;
-                    })
-                    .sum();
+                         .streamSpareParts()
+                         .filter(Quartermaster::isAvailableAsSpareAmmo)
+                         .mapToInt(part -> {
+                             AmmoStorage spare = (AmmoStorage) part;
+                             if (spare.isSameAmmoType(ammoType)) {
+                                 return spare.getShots();
+                             } else if (spare.isCompatibleAmmo(ammoType)) {
+                                 return convertShots(spare.getType(), spare.getShots(), ammoType);
+                             }
+                             return 0;
+                         })
+                         .sum();
         }
     }
 
     /**
-     * Gets a value indicating whether or not a given {@code Part}
-     * is available for use as spare ammo.
+     * Gets a value indicating whether or not a given {@code Part} is available for use as spare ammo.
+     *
      * @param part The part to check if it can be used as spare ammo.
      */
     private static boolean isAvailableAsSpareAmmo(@Nullable Part part) {
         return (part instanceof AmmoStorage)
-                && part.isPresent()
-                && !part.isReservedForRefit();
+                     && part.isPresent()
+                     && !part.isReservedForRefit();
     }
 
     /**
      * Gets the amount of ammo available of a given type.
+     *
      * @param ammoType The type of ammo.
+     *
      * @return The number of shots available of the given ammo type.
      */
     public int getAmmoAvailable(AmmoType ammoType, InfantryWeapon weaponType) {
@@ -462,8 +484,10 @@ public class Quartermaster {
 
     /**
      * Finds spare infantry ammo of a given type, if any.
-     * @param ammoType The {@code AmmoType} to search for.
+     *
+     * @param ammoType   The {@code AmmoType} to search for.
      * @param weaponType The {@code InfantryWeapon} which carries the ammo.
+     *
      * @return The matching spare {@code InfantryAmmoStorage} part, otherwise {@code null}.
      */
     private @Nullable InfantryAmmoStorage findSpareAmmo(AmmoType ammoType, InfantryWeapon weaponType) {
@@ -477,11 +501,13 @@ public class Quartermaster {
 
     /**
      * Removes infantry ammo from the campaign, if available.
-     * @param ammoType The type of ammo to remove.
+     *
+     * @param ammoType       The type of ammo to remove.
      * @param infantryWeapon The infantry weapon using the ammo.
-     * @param shotsNeeded The number of rounds of ammo needed.
-     * @return The number of rounds of ammo removed from the campaign.
-     *         This value may be less than or equal to {@code shotsNeeded}.
+     * @param shotsNeeded    The number of rounds of ammo needed.
+     *
+     * @return The number of rounds of ammo removed from the campaign. This value may be less than or equal to
+     *       {@code shotsNeeded}.
      */
     public int removeAmmo(AmmoType ammoType, InfantryWeapon infantryWeapon, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
@@ -499,8 +525,7 @@ public class Quartermaster {
     }
 
     /**
-     * Denotes that a part in-transit has arrived.
-     * Should be called when a part goes from 1 daysToArrival to zero.
+     * Denotes that a part in-transit has arrived. Should be called when a part goes from 1 daysToArrival to zero.
      *
      * @param part The part which has arrived.
      */
@@ -528,8 +553,10 @@ public class Quartermaster {
 
     /**
      * Tries to buy a unit.
-     * @param en The entity which represents the unit.
+     *
+     * @param en   The entity which represents the unit.
      * @param days The number of days until the new unit arrives.
+     *
      * @return True if the unit was purchased, otherwise false.
      */
     public boolean buyUnit(Entity en, int days) {
@@ -544,7 +571,7 @@ public class Quartermaster {
         if (getCampaignOptions().isPayForUnits()) {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
             if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
-                    cost, "Purchased " + en.getShortName())) {
+                  cost, "Purchased " + en.getShortName())) {
 
                 getCampaign().addNewUnit(en, false, days, quality);
 
@@ -561,6 +588,7 @@ public class Quartermaster {
 
     /**
      * Sells a unit.
+     *
      * @param unit The unit to sell.
      */
     public void sellUnit(Unit unit) {
@@ -569,13 +597,14 @@ public class Quartermaster {
         Money sellValue = unit.getSellValue();
 
         getCampaign().getFinances().credit(TransactionType.UNIT_SALE, getCampaign().getLocalDate(),
-                sellValue, "Sale of " + unit.getName());
+              sellValue, "Sale of " + unit.getName());
 
         getCampaign().removeUnit(unit.getId());
     }
 
     /**
      * Sell all of the parts on hand.
+     *
      * @param part The part to sell.
      */
     public void sellPart(Part part) {
@@ -594,7 +623,8 @@ public class Quartermaster {
 
     /**
      * Sell one or more units of a part.
-     * @param part The part to sell.
+     *
+     * @param part     The part to sell.
      * @param quantity The amount to sell of the part.
      */
     public void sellPart(Part part, int quantity) {
@@ -621,13 +651,14 @@ public class Quartermaster {
         }
 
         getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
-                cost, "Sale of " + quantity + " " + part.getName() + plural);
+              cost, "Sale of " + quantity + " " + part.getName() + plural);
 
         getWarehouse().removePart(part, quantity);
     }
 
     /**
      * Sell all of the ammo on hand.
+     *
      * @param ammo The ammo to sell.
      */
     public void sellAmmo(AmmoStorage ammo) {
@@ -638,7 +669,8 @@ public class Quartermaster {
 
     /**
      * Sell one or more shots of ammo.
-     * @param ammo The ammo to sell.
+     *
+     * @param ammo  The ammo to sell.
      * @param shots The number of shots of ammo to sell.
      */
     public void sellAmmo(AmmoStorage ammo, int shots) {
@@ -660,13 +692,14 @@ public class Quartermaster {
         Money cost = ammo.getActualValue().multipliedBy(saleProportion);
 
         getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
-                cost, "Sale of " + shots + " " + ammo.getName());
+              cost, "Sale of " + shots + " " + ammo.getName());
 
         getWarehouse().removeAmmo(ammo, shots);
     }
 
     /**
      * Sell all of the armor on hand.
+     *
      * @param armor The armor to sell.
      */
     public void sellArmor(Armor armor) {
@@ -677,7 +710,8 @@ public class Quartermaster {
 
     /**
      * Sell one or more points of armor
-     * @param armor The armor to sell.
+     *
+     * @param armor  The armor to sell.
      * @param points The number of points of armor to sell.
      */
     public void sellArmor(Armor armor, int points) {
@@ -699,13 +733,14 @@ public class Quartermaster {
         Money cost = armor.getActualValue().multipliedBy(saleProportion);
 
         getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
-                cost, "Sale of " + points + " " + armor.getName());
+              cost, "Sale of " + points + " " + armor.getName());
 
         getWarehouse().removeArmor(armor, points);
     }
 
     /**
      * Removes one or more parts from its OmniPod.
+     *
      * @param part The omnipodded part.
      */
     public void depodPart(Part part) {
@@ -716,7 +751,8 @@ public class Quartermaster {
 
     /**
      * Removes one or more parts from its OmniPod.
-     * @param part The omnipodded part.
+     *
+     * @param part     The omnipodded part.
      * @param quantity The number of omnipodded parts to de-pod.
      */
     public void depodPart(Part part, int quantity) {
@@ -760,14 +796,16 @@ public class Quartermaster {
 
     /**
      * Tries to buys a refurbishment for a given part.
+     *
      * @param part The part being refurbished.
+     *
      * @return True if the refurbishment was purchased, otherwise false.
      */
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().isPayForParts()) {
             return getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                    getCampaign().getLocalDate(), part.getActualValue(),
-                    "Purchase of " + part.getName());
+                  getCampaign().getLocalDate(), part.getActualValue(),
+                  "Purchase of " + part.getName());
         } else {
             return true;
         }
@@ -775,8 +813,10 @@ public class Quartermaster {
 
     /**
      * Tries to buy a part arriving in a given number of days.
-     * @param part The part to buy.
+     *
+     * @param part        The part to buy.
      * @param transitDays The number of days until the new part arrives.
+     *
      * @return True if the part was purchased, otherwise false.
      */
     public boolean buyPart(Part part, int transitDays) {
@@ -785,9 +825,11 @@ public class Quartermaster {
 
     /**
      * Tries to buy a part with a cost multiplier, arriving in a given number of days.
-     * @param part The part to buy.
+     *
+     * @param part           The part to buy.
      * @param costMultiplier The cost multiplier for the purchase.
-     * @param transitDays The number of days until the new part arrives.
+     * @param transitDays    The number of days until the new part arrives.
+     *
      * @return True if the part was purchased, otherwise false.
      */
     public boolean buyPart(Part part, double costMultiplier, int transitDays) {
@@ -796,8 +838,8 @@ public class Quartermaster {
         if (getCampaignOptions().isPayForParts()) {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                    getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
-                    addPart(part, transitDays, true);
+                  getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
+                addPart(part, transitDays, true);
                 return true;
             } else {
                 return false;

@@ -24,25 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.displayWrappers;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.campaign.personnel.Clan;
-import mekhq.campaign.universe.Faction;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import mekhq.campaign.personnel.Clan;
+import mekhq.campaign.universe.Faction;
+
 /**
- * I only exist because of our current Clan/Faction split, and need to be
- * removed alongside Clan.
+ * I only exist because of our current Clan/Faction split, and need to be removed alongside Clan.
  *
- * @deprecated Remove alongside {@link Clan}
  * @since 0.50.04
+ * @deprecated Remove alongside {@link Clan}
  */
 @Deprecated(since = "0.50.04")
 public class ClanDisplay {
@@ -55,7 +59,7 @@ public class ClanDisplay {
     public ClanDisplay(final Clan clan, final LocalDate today) {
         this.clan = clan;
         this.displayName = String.format("%s [%s]", getClan().getFullName(today.getYear()),
-                getClan().getCode());
+              getClan().getCode());
     }
     // endregion Constructors
 
@@ -66,12 +70,12 @@ public class ClanDisplay {
     // endregion Getters/Setters
 
     public static List<ClanDisplay> getSortedClanDisplays(
-            final Collection<Clan> clans, final LocalDate today) {
+          final Collection<Clan> clans, final LocalDate today) {
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
         return clans.stream()
-                .map(clan -> new ClanDisplay(clan, today))
-                .sorted((a, b) -> naturalOrderComparator.compare(a.toString(), b.toString()))
-                .collect(Collectors.toList());
+                     .map(clan -> new ClanDisplay(clan, today))
+                     .sorted((a, b) -> naturalOrderComparator.compare(a.toString(), b.toString()))
+                     .collect(Collectors.toList());
     }
 
     @Override

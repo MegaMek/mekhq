@@ -24,8 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.reportDialogs;
+
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JFrame;
+import javax.swing.JTextPane;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.parts.Part;
@@ -33,14 +48,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
-import javax.swing.*;
-import java.util.*;
-
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-
 /**
- * Represents a dialog for generating a part quality report.
- * Extends the {@link AbstractReportDialog} class.
+ * Represents a dialog for generating a part quality report. Extends the {@link AbstractReportDialog} class.
  */
 public class PartQualityReportDialog extends AbstractReportDialog {
     //region Variable Declarations
@@ -48,17 +57,18 @@ public class PartQualityReportDialog extends AbstractReportDialog {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
      * Constructs a new instance of {@link PartQualityReportDialog}.
      *
      * @param frame the parent {@link JFrame}
-     * @param unit the unit for which the parts quality report is being generated
+     * @param unit  the unit for which the parts quality report is being generated
      */
     public PartQualityReportDialog(final JFrame frame, final Unit unit) {
         super(frame, "PartQualityReportDialog", "PartQualityReportDialog.title");
         this.unit = unit;
         setTitle(String.format(resources.getString("PartQualityReportDialog.Unit.title"),
-            unit.getName()));
+              unit.getName()));
         initialize();
         pack();
         setModal(true);
@@ -66,6 +76,7 @@ public class PartQualityReportDialog extends AbstractReportDialog {
     //endregion Constructors
 
     //region Getters
+
     /**
      * @return the unit associated with this object
      */
@@ -86,10 +97,10 @@ public class PartQualityReportDialog extends AbstractReportDialog {
     //endregion Getters
 
     /**
-     * Produces a Part Quality report for the given unit. The report includes each part's location,
-     * name, and quality.
+     * Produces a Part Quality report for the given unit. The report includes each part's location, name, and quality.
      *
      * @param unit The unit to generate a report for.
+     *
      * @return An HTML string displaying the status of each part in the unit.
      */
     private String getPartsReport(Unit unit) {
@@ -130,16 +141,16 @@ public class PartQualityReportDialog extends AbstractReportDialog {
                 // Add the location and its colored quality rating to the report.
                 int headerFontSize = UIUtil.scaleForGUI(18);
                 report.append("<span style=\"font-size: ").append(headerFontSize).append("px;\">")
-                    .append(location)
-                    .append(" - ");
+                      .append(location)
+                      .append(" - ");
                 report.append("<span style=\"color: ").append(colorCode).append(";\">")
-                    .append(unit.getQualityName())
-                    .append("</span>");
+                      .append(unit.getQualityName())
+                      .append("</span>");
                 report.append("</span>");
             } else {
                 int headerFontSize = UIUtil.scaleForGUI(12);
                 report.append("<span style=\"font-size: ").append(headerFontSize).append("px;\">")
-                    .append(location).append("</span>");
+                      .append(location).append("</span>");
             }
             report.append("</b><br>");
 
@@ -150,7 +161,7 @@ public class PartQualityReportDialog extends AbstractReportDialog {
                 String colorCode = part.getQuality().getHexColor();
 
                 report.append(ReportingUtilities.spanOpeningWithCustomColor(colorCode))
-                    .append(part.getQualityName()).append(CLOSING_SPAN_TAG).append("<br>");
+                      .append(part.getQualityName()).append(CLOSING_SPAN_TAG).append("<br>");
             }
 
             // Add a line break between locations.

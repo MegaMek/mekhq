@@ -32,13 +32,15 @@
  */
 package mekhq.gui.utilities;
 
+import java.awt.Window;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.SwingWorker;
+import javax.swing.border.Border;
+
 import megamek.utilities.PDFReaderPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
 
 /**
  * {@code MHQPDFReaderPanel} is a reusable Swing {@link JPanel} component for viewing and navigating PDF documents.

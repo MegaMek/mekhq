@@ -71,9 +71,8 @@ public class ContractAutomation {
     private static final int DIALOG_CONFIRM_OPTION = 0;
 
     /**
-     * Main function to initiate a sequence of automated tasks when a contract is started.
-     * The tasks include prompt and execution for unit mothballing, calculating and starting the
-     * journey to the target system.
+     * Main function to initiate a sequence of automated tasks when a contract is started. The tasks include prompt and
+     * execution for unit mothballing, calculating and starting the journey to the target system.
      *
      * @param campaign The current campaign.
      * @param contract Selected contract.
@@ -121,7 +120,7 @@ public class ContractAutomation {
         int travelDays = contract.getTravelDays(campaign);
 
         Money costPerJump = campaign.calculateCostPerJump(true,
-                campaign.getCampaignOptions().isEquipmentContractBase());
+              campaign.getCampaignOptions().isEquipmentContractBase());
         String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountString();
 
 
@@ -154,10 +153,11 @@ public class ContractAutomation {
     }
 
     /**
-     * This method identifies all non-mothballed units within a campaign that are currently
-     * assigned to a {@link Force}. Those units are then GM Mothballed.
+     * This method identifies all non-mothballed units within a campaign that are currently assigned to a {@link Force}.
+     * Those units are then GM Mothballed.
      *
      * @param campaign The current campaign.
+     *
      * @return A list of all newly mothballed units.
      */
     private static List<UUID> performAutomatedMothballing(Campaign campaign) {
@@ -202,10 +202,9 @@ public class ContractAutomation {
     }
 
     /**
-     * Perform automated activation of units.
-     * Identifies all units that were mothballed previously and are now needing activation.
-     * The activation action is executed for each unit, and they are returned to their prior Force
-     * if it still exists.
+     * Perform automated activation of units. Identifies all units that were mothballed previously and are now needing
+     * activation. The activation action is executed for each unit, and they are returned to their prior Force if it
+     * still exists.
      *
      * @param campaign The current campaign.
      */

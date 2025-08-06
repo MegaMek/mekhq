@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.event;
@@ -35,7 +40,6 @@ import mekhq.campaign.CurrentLocation;
  * Event for a change of location (planetary system) for the campaign.
  *
  * @author Neoancient
- *
  */
 public class LocationChangedEvent extends MMEvent {
 
@@ -46,8 +50,8 @@ public class LocationChangedEvent extends MMEvent {
      * An event that is triggered when the campaign location changes to a different planetary system.
      *
      * @param location The campaign location object.
-     * @param kfJump   Whether the jump occurred as a result of moving to the next location in a jump
-     *                 path (as opposed to GM set location)
+     * @param kfJump   Whether the jump occurred as a result of moving to the next location in a jump path (as opposed
+     *                 to GM set location)
      */
     public LocationChangedEvent(CurrentLocation location, boolean kfJump) {
         this.location = location;
@@ -62,11 +66,8 @@ public class LocationChangedEvent extends MMEvent {
     }
 
     /**
-     * @return true if the location change is the result of moving to the next
-     *         location in a jump
-     *         path as part of the campaign new day process (as opposed changing the
-     *         location using
-     *         GM mode).
+     * @return true if the location change is the result of moving to the next location in a jump path as part of the
+     *       campaign new day process (as opposed changing the location using GM mode).
      */
     public boolean isKFJump() {
         return kfJump;

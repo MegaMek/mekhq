@@ -24,14 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.reportDialogs;
 
+import java.awt.Font;
+import javax.swing.JFrame;
+import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
+
 import mekhq.MHQConstants;
 import mekhq.campaign.report.PersonnelReport;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class PersonnelReportDialog extends AbstractReportDialog {
     //region Variable Declarations
@@ -66,7 +73,7 @@ public class PersonnelReportDialog extends AbstractReportDialog {
         txtSupportPersonnel.setEditable(false);
 
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                txtCombatPersonnel, txtSupportPersonnel);
+              txtCombatPersonnel, txtSupportPersonnel);
         splitPane.setName("personnelReportPane");
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0.5);

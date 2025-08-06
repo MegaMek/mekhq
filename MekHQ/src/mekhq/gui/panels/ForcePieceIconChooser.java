@@ -24,8 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.swing.JFrame;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
 import megamek.common.annotations.Nullable;
@@ -37,20 +48,14 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.trees.ForcePieceIconChooserTree;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
- * The ForcePieceIconChooser allows one to select ForcePieceIcons from a single
- * LayeredForceIconLayer layer's directory within the Force Icon Directory. It allows for single or
- * multiple selection, based on the layer's individual ListSelectionModel. Finally, it is coded to
- * have multiple initializations, namely one per layer, and to handle their individual preferences.
+ * The ForcePieceIconChooser allows one to select ForcePieceIcons from a single LayeredForceIconLayer layer's directory
+ * within the Force Icon Directory. It allows for single or multiple selection, based on the layer's individual
+ * ListSelectionModel. Finally, it is coded to have multiple initializations, namely one per layer, and to handle their
+ * individual preferences.
+ * <p>
+ * It is designed to be used as part of creating a LayeredForceIcon, and not to be used as its own chooser.
  *
- * It is designed to be used as part of creating a LayeredForceIcon, and not to be used as its
- * own chooser.
  * @see AbstractMHQIconChooser
  * @see abstractIconChooserPanel
  */
@@ -61,9 +66,9 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
 
     //region Constructors
     public ForcePieceIconChooser(final JFrame frame, final LayeredForceIconLayer layer,
-                                 final @Nullable AbstractIcon icon) {
+          final @Nullable AbstractIcon icon) {
         super(frame, layer.name() + "ForcePieceIconChooser", new ForcePieceIconChooserTree(layer),
-                null, false);
+              null, false);
         setLayer(layer);
         initialize();
         setSelection(icon);
@@ -81,9 +86,10 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     //endregion Getters/Setters
 
     //region Initialization
+
     /**
-     * This overrides the base initialization finalization to allow individualized preferences by
-     * layer and to set the selection mode on the image list (thereby allowing for multiselect).
+     * This overrides the base initialization finalization to allow individualized preferences by layer and to set the
+     * selection mode on the image list (thereby allowing for multiselect).
      */
     @Override
     protected void finalizeInitialization() throws Exception {
@@ -99,7 +105,7 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     @Override
     protected @Nullable AbstractDirectory getDirectory() {
         return (MHQStaticDirectoryManager.getForceIcons() == null) ? null
-                : MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath());
+                     : MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath());
     }
 
     @Override
@@ -109,8 +115,7 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     }
 
     /**
-     * This method should not be used for this icon chooser, as the method is not designed for
-     * multiselect.
+     * This method should not be used for this icon chooser, as the method is not designed for multiselect.
      *
      * @return the first selected ForcePieceIcons, which may be null if there is nothing selected.
      */
@@ -125,13 +130,12 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
      */
     public List<ForcePieceIcon> getSelectedItems() {
         return getImageList().getSelectedValuesList().stream()
-                .map(icon -> (ForcePieceIcon) icon)
-                .collect(Collectors.toList());
+                     .map(icon -> (ForcePieceIcon) icon)
+                     .collect(Collectors.toList());
     }
 
     /**
-     * This is overridden as it is required, but the general use case is to instead use the
-     * refreshTree method below.
+     * This is overridden as it is required, but the general use case is to instead use the refreshTree method below.
      */
     @Override
     public void refreshDirectory() {
@@ -140,9 +144,9 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     }
 
     /**
-     * This is separated as the general use case for refreshing is to have the force icon directory
-     * refreshed first, which is then followed by refreshing each individual force piece icon chooser
-     * without refreshing the actual directory.
+     * This is separated as the general use case for refreshing is to have the force icon directory refreshed first,
+     * which is then followed by refreshing each individual force piece icon chooser without refreshing the actual
+     * directory.
      */
     public void refreshTree() {
         refreshDirectory(new ForcePieceIconChooserTree(getLayer()));
@@ -150,11 +154,12 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
 
     /**
      * This override enables multiple categories to be selected based on the provided AbstractIcon.
+     * <p>
+     * Selects the given categories in the tree, updates the shown images to these categories, and selects the items
+     * given by the filenames in the image list.
      *
-     * Selects the given categories in the tree, updates the shown images to these categories, and
-     * selects the items given by the filenames in the image list.
-     * @param icon the icon to select, which should be a LayeredForceIcon. It may be null to set the
-     *             origin alone as selected.
+     * @param icon the icon to select, which should be a LayeredForceIcon. It may be null to set the origin alone as
+     *             selected.
      */
     @Override
     protected void setSelection(final @Nullable AbstractIcon icon) {
@@ -164,12 +169,12 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
 
         // Always start with the origin selected
         getTreeCategories().setSelectionPath(new TreePath(
-                ((DefaultMutableTreeNode) getTreeCategories().getModel().getRoot()).getPath()));
+              ((DefaultMutableTreeNode) getTreeCategories().getModel().getRoot()).getPath()));
 
         if (icon instanceof LayeredForceIcon) {
             final List<ForcePieceIcon> forcePieceIcons = ((LayeredForceIcon) icon).getPieces().get(getLayer());
             if ((forcePieceIcons != null) && !forcePieceIcons.isEmpty()) {
-                getImageList().setSelectedValues(forcePieceIcons.toArray(new ForcePieceIcon[]{}));
+                getImageList().setSelectedValues(forcePieceIcons.toArray(new ForcePieceIcon[] {}));
             } else {
                 getImageList().clearSelection();
             }

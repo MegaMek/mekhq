@@ -177,7 +177,7 @@ public abstract class AbstractMarriage {
      * @return true if the potential spouse is a safe spouse for the provided person
      */
     public boolean safeSpouse(final Campaign campaign, final LocalDate today, final Person person,
-                              final Person potentialSpouse, final boolean randomMarriage) {
+          final Person potentialSpouse, final boolean randomMarriage) {
         // Can't marry yourself
         // Can't marry someone who can't currently marry
         // Can't marry a close relative
@@ -213,7 +213,7 @@ public abstract class AbstractMarriage {
      * @param isBackground whether the marriage occurred as part of a character's background
      */
     public void marry(final Campaign campaign, final LocalDate today, final Person origin,
-                      final @Nullable Person spouse, final MergingSurnameStyle surnameStyle, boolean isBackground) {
+          final @Nullable Person spouse, final MergingSurnameStyle surnameStyle, boolean isBackground) {
         if (spouse == null) {
             return;
         }
@@ -236,7 +236,7 @@ public abstract class AbstractMarriage {
      * @param isBackground whether the marriage occurred as part of a character's background
      */
     public static void performMarriageChanges(Campaign campaign, LocalDate today, Person origin, Person spouse,
-                                              MergingSurnameStyle surnameStyle, boolean isBackground) {
+          MergingSurnameStyle surnameStyle, boolean isBackground) {
         // Immediately set both Maiden Names, to avoid any divorce bugs (as the default is now an empty string)
         origin.setMaidenName(origin.getSurname());
         spouse.setMaidenName(spouse.getSurname());
@@ -295,7 +295,7 @@ public abstract class AbstractMarriage {
      * @param isBackground whether the marriage occurred in a character's background
      */
     public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person,
-                               boolean isBackground) {
+          boolean isBackground) {
         if (canMarry(today, person, true) != null) {
             return;
         }
@@ -374,7 +374,7 @@ public abstract class AbstractMarriage {
      * @param isBackground whether the marriage occurred in a character's background
      */
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
-                                     final boolean sameSex, boolean isInterUnit, boolean isBackground) {
+          final boolean sameSex, boolean isInterUnit, boolean isBackground) {
         Gender personGender = person.getGender();
         Gender spouseGender;
         if (sameSex) {
@@ -466,7 +466,7 @@ public abstract class AbstractMarriage {
      * @param today           the current day
      * @param person          the person who is trying to find a random spouse
      * @param potentialSpouse the person to determine if they are a valid potential random spouse
-     * @param desiredGender          the desired gender to be married to
+     * @param desiredGender   the desired gender to be married to
      *
      * @return true if they are a valid potential random spouse
      */

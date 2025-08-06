@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.report;
 
@@ -61,15 +66,29 @@ public class CargoReport extends AbstractReport {
         final double overage = combined - transported;
 
         return resources.getString("CargoReport.Cargo.text")
-                + String.format(resources.getString("CargoReport.TotalCapacity.text"), ccc)
-                + String.format(resources.getString("CargoReport.GeneralCapacity.text"), gcc)
-                + String.format(resources.getString("CargoReport.InsulatedCapacity.text"), icc)
-                + String.format(resources.getString("CargoReport.LiquidCapacity.text"), lcc)
-                + String.format(resources.getString("CargoReport.LivestockCapacity.text"), scc)
-                + String.format(resources.getString("CargoReport.RefrigeratedCapacity.text"), rcc)
-                + String.format(resources.getString("CargoReport.CargoTransported.text"), tonnage)
-                + String.format(resources.getString("CargoReport.MothballedCargo.text"), mothballedUnits, mothballedTonnage)
-                + String.format(resources.getString("CargoReport.CargoTransportedVersusCapacity.text"), transported, ccc)
-                + String.format(resources.getString("CargoReport.UntransportedOverage.text"), overage);
+                     +
+                     String.format(resources.getString("CargoReport.TotalCapacity.text"), ccc)
+                     +
+                     String.format(resources.getString("CargoReport.GeneralCapacity.text"), gcc)
+                     +
+                     String.format(resources.getString("CargoReport.InsulatedCapacity.text"), icc)
+                     +
+                     String.format(resources.getString("CargoReport.LiquidCapacity.text"), lcc)
+                     +
+                     String.format(resources.getString("CargoReport.LivestockCapacity.text"), scc)
+                     +
+                     String.format(resources.getString("CargoReport.RefrigeratedCapacity.text"), rcc)
+                     +
+                     String.format(resources.getString("CargoReport.CargoTransported.text"), tonnage)
+                     +
+                     String.format(resources.getString("CargoReport.MothballedCargo.text"),
+                           mothballedUnits,
+                           mothballedTonnage)
+                     +
+                     String.format(resources.getString("CargoReport.CargoTransportedVersusCapacity.text"),
+                           transported,
+                           ccc)
+                     +
+                     String.format(resources.getString("CargoReport.UntransportedOverage.text"), overage);
     }
 }

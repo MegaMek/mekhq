@@ -24,9 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui.stratcon;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
@@ -36,13 +50,9 @@ import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.StratconTab;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
-
 /**
  * This class handles the UI for campaign VP/SP management
+ *
  * @author NickAragua
  */
 public class CampaignManagementDialog extends JDialog {
@@ -56,7 +66,7 @@ public class CampaignManagementDialog extends JDialog {
     private JLabel lblTrackScenarioOdds;
 
     final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
-        MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     public CampaignManagementDialog(StratconTab parent) {
         this.parent = parent;
@@ -68,7 +78,7 @@ public class CampaignManagementDialog extends JDialog {
      * Show the dialog for a given campaign state, and whether GM mode is on or not
      */
     public void display(Campaign campaign, StratconCampaignState campaignState,
-                        StratconTrackState currentTrack, boolean gmMode) {
+          StratconTrackState currentTrack, boolean gmMode) {
         currentCampaignState = campaignState;
 
         btnRemoveCVP.setEnabled(gmMode);
@@ -79,7 +89,7 @@ public class CampaignManagementDialog extends JDialog {
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
             lblTrackScenarioOdds.setText(String.format(resources.getString("trackScenarioOdds.text"),
-                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
+                  StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
                         false)));
         }
 

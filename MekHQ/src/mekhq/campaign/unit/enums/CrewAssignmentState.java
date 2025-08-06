@@ -24,21 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.enums;
 
-import mekhq.campaign.unit.Unit;
-
 import java.util.ResourceBundle;
 
+import mekhq.campaign.unit.Unit;
+
 /**
- * This is used to specify the current crew assignment state for a {@link Unit}.
- * The states mean the following:
- * Unsupported = no tech, no pilot/gunner
- * Unmaintained = no tech, 1+ pilot/gunner
- * Uncrewed = tech, no crew
- * Partially Crewed = tech, less than full pilot/gunner
- * Fully Crewed = tech, full crew
+ * This is used to specify the current crew assignment state for a {@link Unit}. The states mean the following:
+ * Unsupported = no tech, no pilot/gunner Unmaintained = no tech, 1+ pilot/gunner Uncrewed = tech, no crew Partially
+ * Crewed = tech, less than full pilot/gunner Fully Crewed = tech, full crew
  *
  * @author Justin "Windchild" Bowen
  */

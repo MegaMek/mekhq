@@ -61,13 +61,13 @@ public class GrayMonday {
      * @deprecated unused
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public final static LocalDate EVENT_DATE_CLARION_NOTE = LocalDate.of(3132, 8,4);
+    public final static LocalDate EVENT_DATE_CLARION_NOTE = LocalDate.of(3132, 8, 4);
 
     /**
      * @deprecated unused except in deprecated classes
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public final static LocalDate EVENT_DATE_GRAY_MONDAY = LocalDate.of(3132, 8,7);
+    public final static LocalDate EVENT_DATE_GRAY_MONDAY = LocalDate.of(3132, 8, 7);
 
     private final Campaign campaign;
 
@@ -193,10 +193,10 @@ public class GrayMonday {
      * falls within the defined period of the Gray Monday event.
      *
      * @param today           The current date as a {@link LocalDate} object.
-     * @param isUseGrayMonday A {@code boolean} flag indicating whether the campaign is tracking
-     *                       Gray Monday.
-     * @return {@code true} if Gray Monday is active for the given date and campaign configuration,
-     * {@code false} otherwise.
+     * @param isUseGrayMonday A {@code boolean} flag indicating whether the campaign is tracking Gray Monday.
+     *
+     * @return {@code true} if Gray Monday is active for the given date and campaign configuration, {@code false}
+     *       otherwise.
      */
     public static boolean isGrayMonday(LocalDate today, boolean isUseGrayMonday) {
         return isUseGrayMonday &&

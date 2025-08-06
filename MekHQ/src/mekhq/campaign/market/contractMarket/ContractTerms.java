@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
+
+import java.time.LocalDate;
 
 import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.universe.Faction;
 
-import java.time.LocalDate;
-
 /**
- * Structure that resolves and stores modifiers and contract terms as shown in the Master Contract
- * Terms Table on page 42 and Supplemental Contract Terms Table on page 43 of CamOps (4th printing).
+ * Structure that resolves and stores modifiers and contract terms as shown in the Master Contract Terms Table on page
+ * 42 and Supplemental Contract Terms Table on page 43 of CamOps (4th printing).
  */
 public class ContractTerms {
     private double operationsTempoMultiplier;
@@ -71,8 +76,8 @@ public class ContractTerms {
      * Determines the command rights based on a roll and the current CamOps command modifier.
      *
      * @param roll the result of a 2d6 roll
-     * @return the type of Command rights (Integrated, House, Liaison, or Independent) after
-     *         all applicable modifiers
+     *
+     * @return the type of Command rights (Integrated, House, Liaison, or Independent) after all applicable modifiers
      */
     public ContractCommandRights getCommandRights(int roll) {
         roll += commandModifier;
@@ -88,10 +93,11 @@ public class ContractTerms {
     }
 
     /**
-     * Determines whether the salvage rights being offered are Exchange based on a 2d6 roll and
-     * the current salvage modifier for the contract.
+     * Determines whether the salvage rights being offered are Exchange based on a 2d6 roll and the current salvage
+     * modifier for the contract.
      *
      * @param roll The result of a 2d6 roll
+     *
      * @return boolean representing whether the salvage type is exchange
      */
     public boolean isSalvageExchange(int roll) {
@@ -100,11 +106,11 @@ public class ContractTerms {
     }
 
     /**
-     * Determines the percentage of salvage being offered as part of the salvage terms of a
-     * contract, based on the results of a 2d6 roll and the current salvage modifier for the
-     * contract.
+     * Determines the percentage of salvage being offered as part of the salvage terms of a contract, based on the
+     * results of a 2d6 roll and the current salvage modifier for the contract.
      *
      * @param roll The result of a 2d6 roll
+     *
      * @return the salvage percentage being offered
      */
     public int getSalvagePercentage(int roll) {
@@ -125,16 +131,16 @@ public class ContractTerms {
     }
 
     /**
-     * Determines the support percentage being offered as part of the support terms of a
-     * contract, based on the results of a 2d6 roll and the current support modifier for the
-     * contract.
+     * Determines the support percentage being offered as part of the support terms of a contract, based on the results
+     * of a 2d6 roll and the current support modifier for the contract.
      *
      * @param roll The result of a 2d6 roll
+     *
      * @return the support percentage being offered
      */
     public int getSupportPercentage(int roll) {
         roll += supportModifier;
-        return switch(MathUtility.clamp(roll, 2, 13)) {
+        return switch (MathUtility.clamp(roll, 2, 13)) {
             case 2 -> 0;
             case 3, 9 -> 20;
             case 4, 10 -> 40;
@@ -146,10 +152,11 @@ public class ContractTerms {
     }
 
     /**
-     * Determines whether straight support is being offered based on a 2d6 roll and
-     * the current support modifier for the contract.
+     * Determines whether straight support is being offered based on a 2d6 roll and the current support modifier for the
+     * contract.
      *
      * @param roll The result of a 2d6 roll
+     *
      * @return boolean representing whether the Straight support type is being offered
      */
     public boolean isStraightSupport(int roll) {
@@ -158,12 +165,12 @@ public class ContractTerms {
     }
 
     /**
-     * Determines whether Battle Loss Compensation is being offered based on a 2d6 roll and
-     * the current support modifier for the contract.
+     * Determines whether Battle Loss Compensation is being offered based on a 2d6 roll and the current support modifier
+     * for the contract.
      *
      * @param roll The result of a 2d6 roll
-     * @return boolean representing whether the Battle Loss Compensation support type is
-     *         being offered
+     *
+     * @return boolean representing whether the Battle Loss Compensation support type is being offered
      */
     public boolean isBattleLossComp(int roll) {
         roll += supportModifier;
@@ -171,11 +178,11 @@ public class ContractTerms {
     }
 
     /**
-     * Determines the transport cost percentage being offered as part of the transport terms of a
-     * contract, based on the results of a 2d6 roll and the current transport modifier for the
-     * contract.
+     * Determines the transport cost percentage being offered as part of the transport terms of a contract, based on the
+     * results of a 2d6 roll and the current transport modifier for the contract.
      *
      * @param roll The result of a 2d6 roll
+     *
      * @return the transport percentage being offered
      */
     public int getTransportTerms(int roll) {
@@ -308,7 +315,7 @@ public class ContractTerms {
     private void addUnitReputationModifiers(double reputationFactor) {
         int flooredReputationFactor = (int) Math.floor(reputationFactor);
 
-        switch(MathUtility.clamp(flooredReputationFactor, 0, 10)) {
+        switch (MathUtility.clamp(flooredReputationFactor, 0, 10)) {
             case 0:
                 commandModifier -= 2;
                 salvageModifier -= 1;

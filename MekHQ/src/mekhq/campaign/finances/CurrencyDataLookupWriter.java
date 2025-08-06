@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.finances;
@@ -37,8 +42,7 @@ import org.joda.money.format.MoneyPrintContext;
 import org.joda.money.format.MoneyPrinter;
 
 /**
- * This is the writer used to write extra currency data based
- * on the currency code.
+ * This is the writer used to write extra currency data based on the currency code.
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */

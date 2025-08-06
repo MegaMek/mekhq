@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -33,7 +38,6 @@ import megamek.common.Aero;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.FuelType;
-import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
@@ -48,11 +52,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Engine for a support vehicle. An identical support vehicle engine will have
- * the same engine type,
- * unit tonnage, tech rating, and movement factor. The movement factor is the
- * vehicle's (cruise/safe thrust)^2 + 4.
- * ICEs will also have the same fuel type.
+ * Engine for a support vehicle. An identical support vehicle engine will have the same engine type, unit tonnage, tech
+ * rating, and movement factor. The movement factor is the vehicle's (cruise/safe thrust)^2 + 4. ICEs will also have the
+ * same fuel type.
  */
 public class SVEnginePart extends Part {
     private static final MMLogger logger = MMLogger.create(SVEnginePart.class);
@@ -75,18 +77,15 @@ public class SVEnginePart extends Part {
     /**
      * Creates a support vehicle engine part.
      *
-     * @param unitTonnage   The mass of the unit it is installed on/intended for, in
-     *                      tons.
+     * @param unitTonnage   The mass of the unit it is installed on/intended for, in tons.
      * @param engineTonnage The mass of the engine
      * @param etype         An {@link Engine} type constant
-     * @param techRating    The engine's tech rating, {@code TechRating.A} through
-     *                      {@code TechRating.F}
-     * @param fuelType      Needed to distinguish different types of internal
-     *                      combustion engines.
+     * @param techRating    The engine's tech rating, {@code TechRating.A} through {@code TechRating.F}
+     * @param fuelType      Needed to distinguish different types of internal combustion engines.
      * @param campaign      The campaign instance
      */
     public SVEnginePart(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
-            FuelType fuelType, Campaign campaign) {
+          FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = unitTonnage;
         this.etype = etype;
@@ -129,7 +128,7 @@ public class SVEnginePart extends Part {
     @Override
     public SVEnginePart clone() {
         SVEnginePart engine = new SVEnginePart(getUnitTonnage(), engineTonnage, etype, techRating,
-                fuelType, getCampaign());
+              fuelType, getCampaign());
         engine.copyBaseData(this);
         return engine;
     }
@@ -147,10 +146,10 @@ public class SVEnginePart extends Part {
     @Override
     public boolean isSamePartType(Part other) {
         return other instanceof SVEnginePart
-                && (engineTonnage == ((SVEnginePart) other).engineTonnage)
-                && (etype == ((SVEnginePart) other).etype)
-                && (techRating == ((SVEnginePart) other).techRating)
-                && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).fuelType));
+                     && (engineTonnage == ((SVEnginePart) other).engineTonnage)
+                     && (etype == ((SVEnginePart) other).etype)
+                     && (techRating == ((SVEnginePart) other).techRating)
+                     && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).fuelType));
     }
 
     @Override
@@ -216,7 +215,7 @@ public class SVEnginePart extends Part {
     @Override
     public MissingPart getMissingPart() {
         return new MissingSVEngine(getUnitTonnage(), engineTonnage, etype, techRating,
-                fuelType, getCampaign());
+              fuelType, getCampaign());
     }
 
     @Override

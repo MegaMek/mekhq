@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.icons;
 
@@ -39,24 +44,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * LayeredForceIcon is an implementation of StandardForceIcon that contains
- * ForcePieceIcons for the
- * LayeredForceIconLayer layers. The icons stored are merged in a set order when
- * the base image is
- * drawn, thereby allowing for the creation of a custom Force Icon from the
- * various Pieces located
- * in the Force Icon directory's Pieces category.
+ * LayeredForceIcon is an implementation of StandardForceIcon that contains ForcePieceIcons for the
+ * LayeredForceIconLayer layers. The icons stored are merged in a set order when the base image is drawn, thereby
+ * allowing for the creation of a custom Force Icon from the various Pieces located in the Force Icon directory's Pieces
+ * category.
  *
  * @see LayeredForceIconLayer
  * @see ForcePieceIcon
@@ -83,7 +84,7 @@ public class LayeredForceIcon extends StandardForceIcon {
     }
 
     public LayeredForceIcon(final String category, final String filename,
-            final @Nullable Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
+          final @Nullable Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
         super(category, filename);
 
         if (pieces == null) {
@@ -127,7 +128,9 @@ public class LayeredForceIcon extends StandardForceIcon {
 
                 for (final ForcePieceIcon value : getPieces().get(layer)) {
                     final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
-                            .getForceIcons().getItem(value.getCategoryPath(), value.getFilename());
+                                                                      .getForceIcons()
+                                                                      .getItem(value.getCategoryPath(),
+                                                                            value.getFilename());
                     if (image != null) {
                         width = Math.max(image.getWidth(), width);
                         height = Math.max(image.getHeight(), height);
@@ -139,7 +142,7 @@ public class LayeredForceIcon extends StandardForceIcon {
             // If there are valid images to draw
             if ((width > 0) && (height > 0)) {
                 base = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                        .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+                             .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 
                 final Graphics2D g2d = base.createGraphics();
                 for (final BufferedImage image : images) {
@@ -155,7 +158,7 @@ public class LayeredForceIcon extends StandardForceIcon {
         if (base == null) {
             try {
                 base = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem("",
-                        DEFAULT_FORCE_ICON_FILENAME);
+                      DEFAULT_FORCE_ICON_FILENAME);
             } catch (Exception ex) {
                 logger.error("", ex);
             }
@@ -215,7 +218,7 @@ public class LayeredForceIcon extends StandardForceIcon {
                 continue;
             }
             getPieces().put(LayeredForceIconLayer.valueOf(wn.getNodeName()),
-                    processIconMapSubNodes(wn.getChildNodes()));
+                  processIconMapSubNodes(wn.getChildNodes()));
         }
     }
 

@@ -51,9 +51,8 @@ import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.unit.Unit;
 
 /**
- * The {@code MedicalController} class manages the healing process and medical-related tasks
- * within the campaign. It handles natural healing, doctor-assisted healing, and advanced
- * medical options for campaign participants.
+ * The {@code MedicalController} class manages the healing process and medical-related tasks within the campaign. It
+ * handles natural healing, doctor-assisted healing, and advanced medical options for campaign participants.
  *
  * @author Illiani
  * @since MekHQ 0.50.06
@@ -73,7 +72,8 @@ public class MedicalController {
 
 
     /**
-     * Constructs a new {@link MedicalController} with the given campaign, setting fields based on {@link CampaignOptions}
+     * Constructs a new {@link MedicalController} with the given campaign, setting fields based on
+     * {@link CampaignOptions}
      *
      * @param campaign the {@link Campaign} this controller is associated with
      */
@@ -155,6 +155,7 @@ public class MedicalController {
      * Checks if the patient can heal naturally (without a doctor) and processes the healing if possible.
      *
      * @param patient the {@link Person} to check and heal naturally
+     *
      * @return {@code true} if the patient successfully heals naturally; otherwise, {@code false}
      */
     public boolean checkNaturalHealing(Person patient) {
@@ -219,6 +220,7 @@ public class MedicalController {
      * patient-specific healing adjustments.</p>
      *
      * @param patient the {@link Person} receiving medical care
+     *
      * @return a list of {@link TargetRollModifier}s that apply during the healing process
      */
     public List<TargetRollModifier> getAdditionalHealingModifiers(Person patient) {
@@ -252,6 +254,7 @@ public class MedicalController {
      *
      * @param patient the {@link Person} being checked
      * @param doctor  the {@link Person} being validated as a doctor
+     *
      * @return {@code true} if the doctor is valid; otherwise, {@code false}
      */
     private boolean isValidDoctor(Person patient, Person doctor) {

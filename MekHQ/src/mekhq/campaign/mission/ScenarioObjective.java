@@ -24,8 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import javax.xml.namespace.QName;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -37,10 +53,6 @@ import megamek.common.OffBoardDirection;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.util.*;
 
 /**
  * Contains metadata used to describe a scenario objective
@@ -324,19 +336,18 @@ public class ScenarioObjective {
 
     public String getTimeLimitString() {
         return (timeLimitType == TimeLimitType.None) ? ""
-                : String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least",
-                        getTimeLimit());
+                     : String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least",
+              getTimeLimit());
     }
 
     /**
-     * Generates a "short" string that describes the objective in a manner suitable
-     * for display in
-     * the objective resolution screen.
+     * Generates a "short" string that describes the objective in a manner suitable for display in the objective
+     * resolution screen.
      */
     public String toShortString() {
         String timeLimitString = getTimeLimitString();
         String edgeString = ((getDestinationEdge() != OffBoardDirection.NONE) &&
-                (getDestinationEdge() != null)) ? getDestinationEdge().toString() : "";
+                                   (getDestinationEdge() != null)) ? getDestinationEdge().toString() : "";
         String amountString = fixedAmount != null ? fixedAmount.toString() : String.format("%d%%", percentage);
 
         switch (getObjectiveCriterion()) {
@@ -345,20 +356,20 @@ public class ScenarioObjective {
             case Capture:
             case Preserve:
                 return String.format("<html>%s %s%s<span color='black'>%s%s</span></html>",
-                        getObjectiveCriterion().toString(), amountString,
-                        timeLimitString, buildEffects(true), buildEffects(false));
+                      getObjectiveCriterion().toString(), amountString,
+                      timeLimitString, buildEffects(true), buildEffects(false));
             case ReachMapEdge:
                 return String.format("<html>Reach %s edge with %s%s<span color='black'>%s%s</span></html>", edgeString,
-                        amountString,
-                        timeLimitString, buildEffects(true), buildEffects(false));
+                      amountString,
+                      timeLimitString, buildEffects(true), buildEffects(false));
             case PreventReachMapEdge:
                 return String.format("<html>Prevent %s from reaching %s%s<span color='black'>%s%s</span></html>",
-                        amountString, edgeString,
-                        timeLimitString, buildEffects(true), buildEffects(false));
+                      amountString, edgeString,
+                      timeLimitString, buildEffects(true), buildEffects(false));
             case Custom:
                 return String.format("<html>%s%s%s<span color='black'>%s%s</span></html>", getDescription(),
-                        amountString,
-                        timeLimitString, buildEffects(true), buildEffects(false));
+                      amountString,
+                      timeLimitString, buildEffects(true), buildEffects(false));
             default:
                 return "?";
         }
@@ -374,7 +385,7 @@ public class ScenarioObjective {
 
         for (ObjectiveEffect effect : effectCollection) {
             boolean scaledEffect = (effect.effectScaling == EffectScalingType.Linear) ||
-                    (effect.effectScaling == EffectScalingType.Inverted);
+                                         (effect.effectScaling == EffectScalingType.Inverted);
 
             String effectTypeText;
 
@@ -429,9 +440,8 @@ public class ScenarioObjective {
     }
 
     /**
-     * Whether this objective is applicable to a force template.
-     * This is the case if the objective's associated force names contain either the
-     * force template's name or any of the the force template's linked force names.
+     * Whether this objective is applicable to a force template. This is the case if the objective's associated force
+     * names contain either the force template's name or any of the the force template's linked force names.
      */
     public boolean isApplicableToForceTemplate(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario) {
         // no template = not applicable
@@ -451,7 +461,7 @@ public class ScenarioObjective {
                 boolean objectiveContainsLinkedForce = getAssociatedForceNames().contains(linkedForceName);
                 if (objectiveContainsLinkedForce) {
                     ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().getScenarioForces()
-                            .get(linkedForceName);
+                                                                      .get(linkedForceName);
 
                     try {
                         return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
@@ -475,11 +485,11 @@ public class ScenarioObjective {
         sb.append(objectiveCriterion.toString());
 
         if (objectiveCriterion == ObjectiveCriterion.ReachMapEdge ||
-                objectiveCriterion == ObjectiveCriterion.PreventReachMapEdge) {
+                  objectiveCriterion == ObjectiveCriterion.PreventReachMapEdge) {
             sb.append('\n');
 
             if ((destinationEdge != null) &&
-                    (destinationEdge != OffBoardDirection.NONE)) {
+                      (destinationEdge != OffBoardDirection.NONE)) {
                 sb.append(destinationEdge);
             } else {
                 sb.append("opposite deployment");
@@ -527,8 +537,7 @@ public class ScenarioObjective {
     }
 
     /**
-     * Serialize this instance of a ScenarioObjective to a PrintWriter
-     * Omits initial xml declaration
+     * Serialize this instance of a ScenarioObjective to a PrintWriter Omits initial xml declaration
      *
      * @param pw The destination print writer
      */
@@ -536,7 +545,7 @@ public class ScenarioObjective {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioObjective.class);
             JAXBElement<ScenarioObjective> objectiveElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
-                    ScenarioObjective.class, this);
+                  ScenarioObjective.class, this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -547,10 +556,10 @@ public class ScenarioObjective {
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioObjective from the passed-in
-     * XML Node
+     * Attempt to deserialize an instance of a ScenarioObjective from the passed-in XML Node
      *
      * @param xmlNode The node with the scenario template
+     *
      * @return Possibly an instance of a ScenarioTemplate
      */
     public static ScenarioObjective Deserialize(Node xmlNode) {

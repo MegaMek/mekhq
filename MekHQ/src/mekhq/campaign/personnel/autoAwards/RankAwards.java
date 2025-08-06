@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.personnel.autoAwards;
 
 import java.util.ArrayList;
@@ -60,13 +64,11 @@ public class RankAwards {
     // endRegion Enum Declarations
 
     /**
-     * This function loops through Rank Awards, checking whether the person is
-     * eligible to receive each type of award.
+     * This function loops through Rank Awards, checking whether the person is eligible to receive each type of award.
      *
      * @param campaign the current campaign
      * @param personId the person to check award eligibility for
-     * @param awards   the awards to be processed (should only include awards where
-     *                 item == Kill)
+     * @param awards   the awards to be processed (should only include awards where item == Kill)
      */
     public static Map<Integer, List<Object>> RankAwardsProcessor(Campaign campaign, UUID personId, List<Award> awards) {
         int requiredRankNumeric;
@@ -79,9 +81,9 @@ public class RankAwards {
                 requiredRankNumeric = award.getQty();
             } catch (Exception e) {
                 logger.warn("Award {} from the {} set has an invalid qty value {}",
-                        award.getName(),
-                        award.getSet(),
-                        award.getQty());
+                      award.getName(),
+                      award.getSet(),
+                      award.getQty());
                 continue;
             }
 
@@ -98,22 +100,24 @@ public class RankAwards {
 
             if (!matchFound) {
                 logger.warn("Award {} from the {} set has the invalid range {}",
-                        award.getName(),
-                        award.getSet(),
-                        award.getRange());
+                      award.getName(),
+                      award.getSet(),
+                      award.getRange());
             }
 
             Person person = campaign.getPerson(personId);
 
             isEligible = switch (award.getRange()) {
                 case "Promotion" -> (person.getRankNumeric() == requiredRankNumeric)
-                        && ((award.getSize() == null)
-                                || (award.getSize().equalsIgnoreCase(person.getRankSystem().getCode())));
+                                          && ((award.getSize() == null)
+                                                    ||
+                                                    (award.getSize()
+                                                           .equalsIgnoreCase(person.getRankSystem().getCode())));
                 case "Inclusive" -> person.getRankNumeric() >= requiredRankNumeric;
                 case "Exclusive" -> {
                     if (((requiredRankNumeric <= 20) && (person.getRankNumeric() <= 20))
-                            || ((requiredRankNumeric <= 30) && (person.getRankNumeric() <= 30))
-                            || ((requiredRankNumeric >= 31) && (person.getRankNumeric() >= 31))) {
+                              || ((requiredRankNumeric <= 30) && (person.getRankNumeric() <= 30))
+                              || ((requiredRankNumeric >= 31) && (person.getRankNumeric() >= 31))) {
                         yield person.getRankNumeric() >= requiredRankNumeric;
                     } else {
                         yield false;

@@ -40,13 +40,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.utilities.MHQXMLUtility;
@@ -63,10 +61,9 @@ public class FameAndInfamyController {
     private final static MMLogger logger = MMLogger.create(FameAndInfamyController.class);
 
     /**
-     * Constructor for the {@link FameAndInfamyController} class.
-     * Initializes the {@code trackingFactions} map with the provided map of factions.
-     * If any factions are missing from the provided map, they will be added with a default fame
-     * value of 3.0 (or 0.0 if the provided faction uses Batchalls).
+     * Constructor for the {@link FameAndInfamyController} class. Initializes the {@code trackingFactions} map with the
+     * provided map of factions. If any factions are missing from the provided map, they will be added with a default
+     * fame value of 3.0 (or 0.0 if the provided faction uses Batchalls).
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public FameAndInfamyController() {
@@ -108,8 +105,8 @@ public class FameAndInfamyController {
             }
         } catch (Exception e) {
             logger.error(String.format("FameAndInfamyController failed to parse contents of 'shortname'" +
-                " in 'data/universe/factions.xml'. Last successfully parsed Faction shortname: %s",
-                shortnames.get(shortnames.size() - 1)));
+                                             " in 'data/universe/factions.xml'. Last successfully parsed Faction shortname: %s",
+                  shortnames.get(shortnames.size() - 1)));
             return shortnames;
         }
 
@@ -117,11 +114,11 @@ public class FameAndInfamyController {
     }
 
     /**
-     * Retrieves the precise fame value for a given faction.
-     * Normally we don't care what the exact value is,
-     * so {@code getFameLevelForFaction} should be used, instead.
+     * Retrieves the precise fame value for a given faction. Normally we don't care what the exact value is, so
+     * {@code getFameLevelForFaction} should be used, instead.
      *
      * @param factionCode the code of the faction
+     *
      * @return the fame value for the faction
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -130,10 +127,11 @@ public class FameAndInfamyController {
     }
 
     /**
-     * Retrieves the fame level for a faction. This is determined by normally rounding raw fame to
-     * the nearest {@link Integer}
+     * Retrieves the fame level for a faction. This is determined by normally rounding raw fame to the nearest
+     * {@link Integer}
      *
      * @param factionCode The code of the faction.
+     *
      * @return The fame level of the faction.
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -145,7 +143,8 @@ public class FameAndInfamyController {
      * Retrieves the name of the fame level for a faction.
      *
      * @param factionCode The code of the faction.
-     * @param isInfamy Specifies whether to retrieve the fame name for infamy or fame.
+     * @param isInfamy    Specifies whether to retrieve the fame name for infamy or fame.
+     *
      * @return The name of the fame level for the faction.
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -161,7 +160,7 @@ public class FameAndInfamyController {
                 case 4 -> "Exalted";
                 case 5 -> "Legendary";
                 default -> throw new IllegalStateException("Unexpected value in getFameName, infamy: "
-                    + level);
+                                                                 + level);
             };
         } else {
             return switch (level) {
@@ -172,7 +171,7 @@ public class FameAndInfamyController {
                 case 4 -> "Infamous";
                 case 5 -> "Reviled";
                 default -> throw new IllegalStateException("Unexpected value in getFameName, fame: "
-                    + level);
+                                                                 + level);
             };
         }
     }
@@ -181,7 +180,7 @@ public class FameAndInfamyController {
      * Sets the fame value for a specific faction.
      *
      * @param factionCode The code representing the faction.
-     * @param fame The fame value to be set for the faction.
+     * @param fame        The fame value to be set for the faction.
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public void setFameForFaction(String factionCode, double fame) {
@@ -194,7 +193,7 @@ public class FameAndInfamyController {
      * Updates the fame of a faction by a specified adjustment.
      *
      * @param factionCode The code representing the faction.
-     * @param campaign The current campaign.
+     * @param campaign    The current campaign.
      * @param adjustment  The adjustment to be made to the faction's fame.
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -238,8 +237,8 @@ public class FameAndInfamyController {
     /**
      * Parses the XML {@link NodeList} and updates the fame values for factions in a {@link Campaign}.
      *
-     * @param nodeList  The XML {@link NodeList} containing the faction fame values.
-     * @param campaign  The {@link Campaign} object to update with the parsed fame values.
+     * @param nodeList The XML {@link NodeList} containing the faction fame values.
+     * @param campaign The {@link Campaign} object to update with the parsed fame values.
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static void parseFromXML(final NodeList nodeList, Campaign campaign) {

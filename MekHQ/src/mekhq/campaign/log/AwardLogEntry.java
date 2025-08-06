@@ -24,17 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.log;
+
+import java.time.LocalDate;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 
-import java.time.LocalDate;
-
 /**
  * This class is a specific log entry related to awards.
+ *
  * @author Miguel Azevedo
  */
 public class AwardLogEntry extends LogEntry {
@@ -44,8 +50,8 @@ public class AwardLogEntry extends LogEntry {
 
     @Override
     public void onLogEntryEdited(final LocalDate originalDate, final LocalDate newDate,
-                                 final String originalDesc, final String newDesc,
-                                 final @Nullable Person person) {
+          final String originalDesc, final String newDesc,
+          final @Nullable Person person) {
         final Award award = AwardLogger.getAwardFromLogEntry(person, originalDesc);
         if (award != null) {
             award.replaceDate(originalDate, newDate);

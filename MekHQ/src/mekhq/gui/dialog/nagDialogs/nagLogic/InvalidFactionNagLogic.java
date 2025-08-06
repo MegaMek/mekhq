@@ -24,23 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.universe.Faction;
-
 import java.time.LocalDate;
+
+import mekhq.campaign.universe.Faction;
 
 public class InvalidFactionNagLogic {
     /**
      * Determines whether the specified faction is invalid for the given date.
      *
      * <p>This method evaluates the validity of a faction by checking if it is applicable
-     * for the specified date using {@link Faction#validIn(LocalDate)}. A faction is deemed
-     * invalid if it is not valid for the provided date.</p>
+     * for the specified date using {@link Faction#validIn(LocalDate)}. A faction is deemed invalid if it is not valid
+     * for the provided date.</p>
      *
      * @param campaignFaction The {@link Faction} associated with the campaign to be validated.
      * @param today           The {@link LocalDate} representing the current in-game date.
+     *
      * @return {@code true} if the faction is invalid for the specified date, {@code false} otherwise.
      */
     public static boolean isFactionInvalid(Faction campaignFaction, LocalDate today) {

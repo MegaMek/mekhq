@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -44,7 +49,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.IntStream;
-
 import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
@@ -65,8 +69,7 @@ import mekhq.gui.utilities.MultiplyComposite;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
- * A component allowing to display a "paper doll" image, with overlays
- * for body locations.
+ * A component allowing to display a "paper doll" image, with overlays for body locations.
  */
 public class Paperdoll extends Component {
     private static final MMLogger logger = MMLogger.create(Paperdoll.class);
@@ -203,32 +206,32 @@ public class Paperdoll extends Component {
         // Check for image overlays first, and record what we have drawn
         Set<BodyLocation> drawnOverlays = EnumSet.noneOf(BodyLocation.class);
         locTags.entrySet().stream().filter(Objects::nonNull)
-                .filter(entry -> ((null != entry.getValue()) && locOverlays.containsKey(entry.getKey())
-                        && locOverlays.get(entry.getKey()).containsKey(entry.getValue())))
-                .forEach(entry -> {
-                    final Image image = locOverlays.get(entry.getKey()).get(entry.getValue());
-                    g2.drawImage(image, 0, 0, scaledWidth, scaledHeight, this);
-                    drawnOverlays.add(entry.getKey());
-                });
+              .filter(entry -> ((null != entry.getValue()) && locOverlays.containsKey(entry.getKey())
+                                      && locOverlays.get(entry.getKey()).containsKey(entry.getValue())))
+              .forEach(entry -> {
+                  final Image image = locOverlays.get(entry.getKey()).get(entry.getValue());
+                  g2.drawImage(image, 0, 0, scaledWidth, scaledHeight, this);
+                  drawnOverlays.add(entry.getKey());
+              });
         g2.scale(scale, scale);
         locColors.entrySet().stream().filter(Objects::nonNull)
-                .filter(entry -> ((null != entry.getValue()) && locShapes.containsKey(entry.getKey())
-                        && !drawnOverlays.contains(entry.getKey())))
-                .forEach(entry -> {
-                    final Path2D overlay = locShapes.get(entry.getKey());
-                    g2.setPaint(entry.getValue());
-                    g2.setComposite(MultiplyComposite.INSTANCE);
+              .filter(entry -> ((null != entry.getValue()) && locShapes.containsKey(entry.getKey())
+                                      && !drawnOverlays.contains(entry.getKey())))
+              .forEach(entry -> {
+                  final Path2D overlay = locShapes.get(entry.getKey());
+                  g2.setPaint(entry.getValue());
+                  g2.setComposite(MultiplyComposite.INSTANCE);
 
-                    // The try catch is required because of a Java bug:
-                    // https://bugs.openjdk.java.net/browse/JDK-6689349
-                    // It falls back to just overwriting everything below, instead of nicely merging
-                    try {
-                        g2.fill(overlay);
-                    } catch (InternalError ignored) {
-                        g2.setComposite(AlphaComposite.SrcOver);
-                        g2.fill(overlay);
-                    }
-                });
+                  // The try catch is required because of a Java bug:
+                  // https://bugs.openjdk.java.net/browse/JDK-6689349
+                  // It falls back to just overwriting everything below, instead of nicely merging
+                  try {
+                      g2.fill(overlay);
+                  } catch (InternalError ignored) {
+                      g2.setComposite(AlphaComposite.SrcOver);
+                      g2.fill(overlay);
+                  }
+              });
         g2.setComposite(AlphaComposite.SrcOver); // Revert to default composite
 
         if ((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
@@ -242,8 +245,8 @@ public class Paperdoll extends Component {
         final double scaledX = x / scale;
         final double scaledY = y / scale;
         return locShapes.entrySet().stream()
-                .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
-                .map(Map.Entry::getKey).orElse(BodyLocation.GENERIC);
+                     .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
+                     .map(Map.Entry::getKey).orElse(BodyLocation.GENERIC);
     }
 
     @Override
@@ -311,7 +314,7 @@ public class Paperdoll extends Component {
             if ((null != path) && !path.isEmpty()) {
                 result.moveTo(path.get(0).getX(), path.get(0).getY());
                 IntStream.range(1, path.size()).mapToObj(i -> path.get(i))
-                        .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));
+                      .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));
                 result.closePath();
             }
             return result;

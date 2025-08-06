@@ -24,9 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui.stratcon;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -37,22 +53,10 @@ import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
-import javax.swing.JScrollPane;
-
 /**
- * This class handles the "assign force to track" interaction,
- * where a user may assign a force to a track directly, either to a facility or to an
- * empty hex
+ * This class handles the "assign force to track" interaction, where a user may assign a force to a track directly,
+ * either to a facility or to an empty hex
+ *
  * @author NickAragua
  */
 public class TrackForceAssignmentUI extends JDialog implements ActionListener {
@@ -95,8 +99,8 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
         // if we're waiting to assign primary forces, we can only do so from the current track
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
-            StratconRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
-                campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
+              StratconRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
+                    campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
 
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
@@ -137,7 +141,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
             btnConfirm.setEnabled(false);
             for (Force force : availableForceList.getSelectedValuesList()) {
                 StratconRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
-                    force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
+                      force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
             }
             setVisible(false);
             ownerPanel.repaint();

@@ -24,12 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.ranks;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.swing.DefaultComboBoxModel;
 
 import megamek.common.annotations.Nullable;
@@ -52,15 +56,14 @@ public class RankValidator {
     }
 
     /**
-     * @param rankSystemsModel the combo box model to use in checking the rank
-     *                         system code, or null
-     * @param rankSystem       the rank system to check, which may be null to
-     *                         indicate an invalid system
+     * @param rankSystemsModel the combo box model to use in checking the rank system code, or null
+     * @param rankSystem       the rank system to check, which may be null to indicate an invalid system
      * @param checkCode        the code to check
+     *
      * @return whether the rank system is valid
      */
     public boolean validate(final @Nullable DefaultComboBoxModel<RankSystem> rankSystemsModel,
-            final @Nullable RankSystem rankSystem, final boolean checkCode) {
+          final @Nullable RankSystem rankSystem, final boolean checkCode) {
         // Null is never a valid rank system, but this catches some default returns
         // whose errors are
         // caught during the loading process. This MUST be the first check and CANNOT be
@@ -86,12 +89,12 @@ public class RankValidator {
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
                     logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
-                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
-                            + " is duplicated by userData Rank System " + rankSystem);
+                                       + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
+                                       + " is duplicated by userData Rank System " + rankSystem);
                 } else {
                     logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
-                            + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
-                            + " is duplicated by " + rankSystem);
+                                       + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
+                                       + " is duplicated by " + rankSystem);
                 }
                 return false;
             }
@@ -108,7 +111,7 @@ public class RankValidator {
         // rank tiers
         if (rankSystem.getRanks().size() != Rank.RC_NUM) {
             logger.error(String.format("Illegal number of ranks of %d when %d is required",
-                    rankSystem.getRanks().size(), Rank.RC_NUM));
+                  rankSystem.getRanks().size(), Rank.RC_NUM));
             return false;
         }
 
@@ -155,7 +158,7 @@ public class RankValidator {
             // Now we need to validate the rest of this system's ranks for this profession
             for (final Rank rank : rankSystem.getRanks()) {
                 if (rank.indicatesAlternativeSystem(profession)
-                        && !validateRankAlternatives(rank, profession, professions.length, 0)) {
+                          && !validateRankAlternatives(rank, profession, professions.length, 0)) {
                     return false;
                 }
             }
@@ -172,10 +175,11 @@ public class RankValidator {
      * @param profession    the current profession
      * @param maxRecursions the maximum level of recursion
      * @param recursion     the current recursion level
+     *
      * @return if the alternatives are valid
      */
     private boolean validateRankAlternatives(final Rank rank, final Profession profession,
-            final int maxRecursions, final int recursion) {
+          final int maxRecursions, final int recursion) {
         if (recursion > maxRecursions) {
             logger.error("Hit max recursions, rank system contains an infinite loop");
             return false;
@@ -184,16 +188,14 @@ public class RankValidator {
             return false;
         } else if (rank.indicatesAlternativeSystem(profession)) {
             return validateRankAlternatives(rank, profession.getAlternateProfession(rank),
-                    maxRecursions, recursion + 1);
+                  maxRecursions, recursion + 1);
         } else {
             return true;
         }
     }
 
     /**
-     * Check assigned rank systems for the campaign, updating if needed, and then do
-     * the same for
-     * all personnel
+     * Check assigned rank systems for the campaign, updating if needed, and then do the same for all personnel
      *
      * @param campaign the campaign to check the rank systems for
      */
@@ -208,21 +210,20 @@ public class RankValidator {
 
         // Then, we need to fix any old rank system assignments for personnel
         campaign.getPersonnel().stream().filter(person -> !person.getRankSystem().getType().isCampaign())
-                .forEach(person -> person.setRankSystem(this,
-                        Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
+              .forEach(person -> person.setRankSystem(this,
+                    Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
     }
 
     /**
-     * Checks the rank of a person to ensure it is valid, and decreases the rank
-     * down to the highest
-     * one that is valid for the rank system.
+     * Checks the rank of a person to ensure it is valid, and decreases the rank down to the highest one that is valid
+     * for the rank system.
      *
      * @param person the person whose rank needs to be checked
      */
     public void checkPersonRank(final Person person) {
         final RankSystem rankSystem = person.getRankSystem();
         final Profession baseProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
-                .getBaseProfession(rankSystem);
+                                                .getBaseProfession(rankSystem);
         if (person.getRank().isEmpty(baseProfession)) {
             for (int i = person.getRankNumeric() - 1; i >= 0; i--) {
                 if (!rankSystem.getRank(i).isEmpty(baseProfession)) {

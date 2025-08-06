@@ -24,12 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.backgrounds;
-
-import megamek.common.util.weightedMaps.WeightedIntMap;
-import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,12 +42,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import megamek.common.util.weightedMaps.WeightedIntMap;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+
 
 /**
- * Save File Formatting:
- * word, weight
- * word is a String that does not include a ','
- * Weight is an integer weight used during generation
+ * Save File Formatting: word, weight word is a String that does not include a ',' Weight is an integer weight used
+ * during generation
  */
 public class RandomCompanyNameGenerator implements Serializable {
     //region Variable Declarations
@@ -116,11 +119,11 @@ public class RandomCompanyNameGenerator implements Serializable {
     //endregion Getters/Setters
 
     /**
-     * Returns an instance of the RandomCompanyNameGenerator class. The method applies the double-check locking
-     * pattern to ensure that only one instance of the class is created.
+     * Returns an instance of the RandomCompanyNameGenerator class. The method applies the double-check locking pattern
+     * to ensure that only one instance of the class is created.
      *
-     * @return The instance of RandomCompanyNameGenerator. If the instance does not exist, it creates a new
-     * instance and initializes it by running the thread loader for various origin values.
+     * @return The instance of RandomCompanyNameGenerator. If the instance does not exist, it creates a new instance and
+     *       initializes it by running the thread loader for various origin values.
      */
     //region Synchronization
     public static RandomCompanyNameGenerator getInstance() {
@@ -143,14 +146,13 @@ public class RandomCompanyNameGenerator implements Serializable {
     /**
      * Generates a random company name segment based on the given origin.
      *
-     * @param origin The origin of the company name. Possible values are:
-     *               - NAME_MIDDLE_WORD_CORPORATE (0)
-     *               - NAME_END_WORD_CORPORATE (1)
-     *               - NAME_MIDDLE_WORD_MERCENARY (2)
-     *               - NAME_END_WORD_MERCENARY (3)
-     *               - NAME_PRE_FAB (4)
-     * @return The generated name segment as a string. If the list of company name segments is not initialized,
-     *         it returns an empty string.
+     * @param origin The origin of the company name. Possible values are: - NAME_MIDDLE_WORD_CORPORATE (0) -
+     *               NAME_END_WORD_CORPORATE (1) - NAME_MIDDLE_WORD_MERCENARY (2) - NAME_END_WORD_MERCENARY (3) -
+     *               NAME_PRE_FAB (4)
+     *
+     * @return The generated name segment as a string. If the list of company name segments is not initialized, it
+     *       returns an empty string.
+     *
      * @throws IllegalStateException if the given origin value is unexpected
      */
     //region Generation
@@ -174,19 +176,16 @@ public class RandomCompanyNameGenerator implements Serializable {
     /**
      * Runs a thread loader for populating company name segments based on the given origin.
      *
-     * @param origin The origin of the company name segments. Possible values are:
-     *               - NAME_MIDDLE_WORD_CORPORATE (0)
-     *               - NAME_END_WORD_CORPORATE (1)
-     *               - NAME_MIDDLE_WORD_MERCENARY (2)
-     *               - NAME_END_WORD_MERCENARY (3)
-     *               - NAME_PRE_FAB (4)
+     * @param origin The origin of the company name segments. Possible values are: - NAME_MIDDLE_WORD_CORPORATE (0) -
+     *               NAME_END_WORD_CORPORATE (1) - NAME_MIDDLE_WORD_MERCENARY (2) - NAME_END_WORD_MERCENARY (3) -
+     *               NAME_PRE_FAB (4)
      *
      * @throws IllegalStateException if the given origin value is unexpected
      */
     //region Initialization
     private void runThreadLoader(int origin) {
         Thread loader = new Thread(() -> randomCompanyNameGenerator.populateCompanyNameSegments(origin),
-                "Random Company Name Generator initializer");
+              "Random Company Name Generator initializer");
         loader.setPriority(Thread.NORM_PRIORITY - 1);
         loader.start();
     }
@@ -194,13 +193,10 @@ public class RandomCompanyNameGenerator implements Serializable {
     /**
      * Populates the segments of the company name based on the given origin.
      *
-     * @param origin The origin of the company name segments.
-     *               Possible values are:
-     *               - NAME_MIDDLE_WORD_CORPORATE (0)
-     *               - NAME_END_WORD_CORPORATE (1)
-     *               - NAME_MIDDLE_WORD_MERCENARY (2)
-     *               - NAME_END_WORD_MERCENARY (3)
-     *               - NAME_PRE_FAB (4)
+     * @param origin The origin of the company name segments. Possible values are: - NAME_MIDDLE_WORD_CORPORATE (0) -
+     *               NAME_END_WORD_CORPORATE (1) - NAME_MIDDLE_WORD_MERCENARY (2) - NAME_END_WORD_MERCENARY (3) -
+     *               NAME_PRE_FAB (4)
+     *
      * @throws IllegalStateException if the given origin value is unexpected
      */
     private void populateCompanyNameSegments(int origin) {
@@ -233,8 +229,9 @@ public class RandomCompanyNameGenerator implements Serializable {
                 filePath = MHQConstants.NAME_PRE_FAB;
                 userFilePath = MHQConstants.NAME_PRE_FAB_USER;
             }
-            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/backgrounds/RandomCompanyNameGenerator.java/populateCompanyNameSegments 1 of 2: "
-                    + origin);
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/backgrounds/RandomCompanyNameGenerator.java/populateCompanyNameSegments 1 of 2: "
+                        + origin);
         }
 
         final Map<String, Integer> nameSegments = new HashMap<>();
@@ -243,13 +240,16 @@ public class RandomCompanyNameGenerator implements Serializable {
 
         for (final Entry<String, Integer> entry : nameSegments.entrySet()) {
             switch (origin) {
-                case NAME_MIDDLE_WORD_CORPORATE -> getWeightedMiddleWordCorporate().add(entry.getValue(), entry.getKey());
+                case NAME_MIDDLE_WORD_CORPORATE ->
+                      getWeightedMiddleWordCorporate().add(entry.getValue(), entry.getKey());
                 case NAME_END_WORD_CORPORATE -> getWeightedEndWordCorporate().add(entry.getValue(), entry.getKey());
-                case NAME_MIDDLE_WORD_MERCENARY -> getWeightedMiddleWordMercenary().add(entry.getValue(), entry.getKey());
+                case NAME_MIDDLE_WORD_MERCENARY ->
+                      getWeightedMiddleWordMercenary().add(entry.getValue(), entry.getKey());
                 case NAME_END_WORD_MERCENARY -> getWeightedEndWordMercenary().add(entry.getValue(), entry.getKey());
                 case NAME_PRE_FAB -> getWeightedPreFab().add(entry.getValue(), entry.getKey());
-                default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/backgrounds/RandomCompanyNameGenerator.java/populateCompanyNameSegments 2 of 2: "
-                        + origin);
+                default -> throw new IllegalStateException(
+                      "Unexpected value in mekhq/campaign/personnel/backgrounds/RandomCompanyNameGenerator.java/populateCompanyNameSegments 2 of 2: "
+                            + origin);
             }
         }
 
@@ -270,7 +270,7 @@ public class RandomCompanyNameGenerator implements Serializable {
         int lineNumber = 0;
 
         try (InputStream is = new FileInputStream(file);
-             Scanner input = new Scanner(is, StandardCharsets.UTF_8)) {
+              Scanner input = new Scanner(is, StandardCharsets.UTF_8)) {
             // skip the first line, as that's the header
             lineNumber++;
             input.nextLine();

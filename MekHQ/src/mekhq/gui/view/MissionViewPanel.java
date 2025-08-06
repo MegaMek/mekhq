@@ -72,6 +72,7 @@ import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
@@ -131,7 +132,7 @@ public class MissionViewPanel extends JScrollablePanel {
     protected JTable scenarioTable;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
         super();
@@ -565,17 +566,22 @@ public class MissionViewPanel extends JScrollablePanel {
             int currentSalvagePct = 0;
             if (contract.getSalvagedByUnit().plus(contract.getSalvagedByUnit()).isPositive()) {
                 currentSalvagePct = contract.getSalvagedByUnit()
-                        .multipliedBy(100)
-                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
-                        .getAmount()
-                        .intValue();
+                                          .multipliedBy(100)
+                                          .dividedBy(contract.getSalvagedByUnit()
+                                                           .plus(contract.getSalvagedByEmployer()))
+                                          .getAmount()
+                                          .intValue();
             }
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
                 lead = "<html><font color='" + ReportingUtilities.getNegativeColor() + "'>";
             }
-            lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
+            lblSalvagePct2.setText(lead +
+                                         currentSalvagePct +
+                                         "%</font> <span>(max " +
+                                         maxSalvagePct +
+                                         "%)</span></html>");
         }
 
         gridBagConstraints = new GridBagConstraints();
@@ -615,7 +621,7 @@ public class MissionViewPanel extends JScrollablePanel {
         Campaign campaign = gui.getCampaign();
 
         // TODO : Switch me to use IUnitRating
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] ratingNames = { "F", "D", "C", "B", "A" };
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
@@ -964,10 +970,11 @@ public class MissionViewPanel extends JScrollablePanel {
             int currentSalvagePct = 0;
             if (contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).isPositive()) {
                 currentSalvagePct = contract.getSalvagedByUnit()
-                        .multipliedBy(100)
-                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
-                        .getAmount()
-                        .intValue();
+                                          .multipliedBy(100)
+                                          .dividedBy(contract.getSalvagedByUnit()
+                                                           .plus(contract.getSalvagedByEmployer()))
+                                          .getAmount()
+                                          .intValue();
             }
 
             txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");
@@ -1065,8 +1072,8 @@ public class MissionViewPanel extends JScrollablePanel {
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
         // do not display it in that situation
         boolean showContractScore = !gui.getCampaign().getCampaignOptions().isUseStratCon()
-                && (mission instanceof AtBContract)
-                && (((AtBContract) mission).getStratconCampaignState() == null);
+                                          && (mission instanceof AtBContract)
+                                          && (((AtBContract) mission).getStratconCampaignState() == null);
 
         if (showContractScore) {
             lblScore.setName("lblScore");

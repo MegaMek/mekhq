@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -113,7 +118,8 @@ public class UntreatedPersonnelNagLogic {
      * @return The total medical capacity of the doctors in the provided list, as an integer representing the total
      *       number of beds or patients they can collectively manage.
      */
-    public static int calculateTotalDoctorCapacity(final List<Person> activePersonnel, final boolean isDoctorsUseAdministration, final int baseBedCount) {
+    public static int calculateTotalDoctorCapacity(final List<Person> activePersonnel,
+          final boolean isDoctorsUseAdministration, final int baseBedCount) {
         int totalCapacity = 0;
 
         for (Person person : activePersonnel) {

@@ -403,8 +403,7 @@ public class SystemsTab {
     }
 
     /**
-     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its
-     * header.
+     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its header.
      *
      * @return a {@link JPanel} component representing the entire ATOW tab UI
      *
@@ -495,8 +494,8 @@ public class SystemsTab {
      * Loads values from the specified {@code presetCampaignOptions}, or the current campaign's options if {@code null},
      * into the UI form fields and controls.
      *
-     * @param presetCampaignOptions an alternative {@link CampaignOptions}, or {@code null} to use the current
-     *                              campaign's options
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions}, or {@code null} to use the current
+     *                                     campaign's options
      * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
      *                                     {@code null}, values are loaded from the current skill preferences.
      *
@@ -549,8 +548,8 @@ public class SystemsTab {
      * Applies the currently selected values in the UI controls to modify the campaign's options. If a preset is
      * provided, that preset is updated instead of the campaign's default options.
      *
-     * @param presetCampaignOptions an alternative {@link CampaignOptions} object to update, or {@code null} to update
-     *                              the campaign's own options
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions} object to update, or {@code null} to
+     *                                     update the campaign's own options
      * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
      *                                     {@code null}, values are applied to the current skill preferences.
      *

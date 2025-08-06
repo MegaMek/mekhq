@@ -43,9 +43,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -32,9 +37,6 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
@@ -49,6 +51,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -80,7 +84,7 @@ public class MissingMekLocation extends MissingPart {
     }
 
     public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad,
-            Campaign c) {
+          Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
@@ -204,11 +208,11 @@ public class MissingMekLocation extends MissingPart {
         } else if (part instanceof MekLocation) {
             MekLocation mekLoc = (MekLocation) part;
             return (mekLoc.getLoc() == loc)
-                    && (mekLoc.getUnitTonnage() == getUnitTonnage())
-                    && (mekLoc.isTsm() == tsm)
-                    && (mekLoc.clan == clan)
-                    && (mekLoc.getStructureType() == structureType)
-                    && (!isArm() || (mekLoc.forQuad() == forQuad));
+                         && (mekLoc.getUnitTonnage() == getUnitTonnage())
+                         && (mekLoc.isTsm() == tsm)
+                         && (mekLoc.clan == clan)
+                         && (mekLoc.getStructureType() == structureType)
+                         && (!isArm() || (mekLoc.forQuad() == forQuad));
         } else {
             return false;
         }
@@ -222,10 +226,10 @@ public class MissingMekLocation extends MissingPart {
         if (unit.getEntity() instanceof Mek) {
             // Can't replace appendages when corresponding torso is gone
             if (loc == Mek.LOC_LARM
-                    && unit.getEntity().isLocationBad(Mek.LOC_LT)) {
+                      && unit.getEntity().isLocationBad(Mek.LOC_LT)) {
                 return "must replace left torso first";
             } else if (loc == Mek.LOC_RARM
-                    && unit.getEntity().isLocationBad(Mek.LOC_RT)) {
+                             && unit.getEntity().isLocationBad(Mek.LOC_RT)) {
                 return "must replace right torso first";
             }
         }
@@ -246,7 +250,7 @@ public class MissingMekLocation extends MissingPart {
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 // Skip Hip and Shoulder actuators
                 if ((slot.getIndex() == Mek.ACTUATOR_HIP)
-                        || (slot.getIndex() == Mek.ACTUATOR_SHOULDER)) {
+                          || (slot.getIndex() == Mek.ACTUATOR_SHOULDER)) {
                     continue;
                 }
                 if (unit.getEntity() instanceof LandAirMek) {
@@ -256,7 +260,7 @@ public class MissingMekLocation extends MissingPart {
                             continue;
                         } else {
                             partsToSalvageOrScrap
-                                    .add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
+                                  .add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
                         }
                         // Skip Avionics if already gone
                     } else if (slot.getIndex() == LandAirMek.LAM_AVIONICS) {
@@ -264,7 +268,7 @@ public class MissingMekLocation extends MissingPart {
                             continue;
                         } else {
                             partsToSalvageOrScrap
-                                    .add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
+                                  .add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
                         }
                     }
                 }
@@ -293,7 +297,9 @@ public class MissingMekLocation extends MissingPart {
                     }
 
                     Part repairablePart = unit.findPart(p -> (p instanceof EquipmentPart)
-                            && (((EquipmentPart) p).getEquipmentNum() == equipmentNum));
+                                                                   &&
+                                                                   (((EquipmentPart) p).getEquipmentNum() ==
+                                                                          equipmentNum));
                     if (repairablePart != null) {
                         partName = repairablePart.getName();
                     }
@@ -321,7 +327,7 @@ public class MissingMekLocation extends MissingPart {
         boolean lifeSupport = (loc == Mek.LOC_HEAD);
         boolean sensors = (loc == Mek.LOC_HEAD);
         return new MekLocation(loc, getUnitTonnage(), structureType, clan,
-                tsm, forQuad, sensors, lifeSupport, campaign);
+              tsm, forQuad, sensors, lifeSupport, campaign);
     }
 
     @Override

@@ -24,8 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
@@ -36,18 +49,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.dialog.helpDialogs.AutoResolveBehaviorSettingsHelpDialog;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
-
 public class AutoResolveBehaviorSettingsDialog
-    extends BotConfigDialog
-{
+      extends BotConfigDialog {
     private final static MMLogger logger = MMLogger.create(AutoResolveBehaviorSettingsDialog.class);
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AutoResolveBehaviorSettingsDialog",
-        MekHQ.getMHQOptions().getLocale());
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.AutoResolveBehaviorSettingsDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     private Campaign campaign;
     private final BehaviorSettingsFactory behaviorSettingsFactory = BehaviorSettingsFactory.getInstance();
@@ -56,11 +64,11 @@ public class AutoResolveBehaviorSettingsDialog
     /**
      * Creates a new instance of AutoResolveBehaviorSettingsDialog.
      * <p>
-     * This dialog is used to configure the auto resolve behavior settings for a campaign.
-     * It creates a default preset with a predetermined name and sets the behavior settings
-     * to the campaign's auto resolve behavior settings.
+     * This dialog is used to configure the auto resolve behavior settings for a campaign. It creates a default preset
+     * with a predetermined name and sets the behavior settings to the campaign's auto resolve behavior settings.
      * </p>
-     * @param frame The parent frame.
+     *
+     * @param frame    The parent frame.
      * @param campaign The campaign to get the auto resolve behavior settings from.
      */
     public AutoResolveBehaviorSettingsDialog(final JFrame frame, final Campaign campaign) {
@@ -89,9 +97,9 @@ public class AutoResolveBehaviorSettingsDialog
         result.setAlignmentX(LEFT_ALIGNMENT);
 
         setAutoResolveHelpButton(new MMButton("btnNewYear",
-            resourceMap.getString("AutoResolveBehaviorSettingsDialog.help"),
-            resourceMap.getString("AutoResolveBehaviorSettingsDialog.helpTooltip"),
-            this::autoResolveHelpActionPerformed));
+              resourceMap.getString("AutoResolveBehaviorSettingsDialog.help"),
+              resourceMap.getString("AutoResolveBehaviorSettingsDialog.helpTooltip"),
+              this::autoResolveHelpActionPerformed));
 
         result.add(getAutoResolveHelpButton());
         return result;

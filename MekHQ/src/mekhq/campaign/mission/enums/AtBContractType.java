@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.enums;
+
+import static mekhq.campaign.mission.enums.AtBEventType.*;
+
+import java.util.ResourceBundle;
 
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
@@ -34,10 +43,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
-
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.mission.enums.AtBEventType.*;
 
 public enum AtBContractType {
     // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
@@ -48,13 +53,13 @@ public enum AtBContractType {
     SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText", 6, 1.2),
     RIOT_DUTY("AtBContractType.RIOT_DUTY.text", "AtBContractType.RIOT_DUTY.toolTipText", 4, 1.0),
     PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText", 9,
-            1.5),
+          1.5),
     RELIEF_DUTY("AtBContractType.RELIEF_DUTY.text", "AtBContractType.RELIEF_DUTY.toolTipText", 9, 1.4),
     GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText", 24,
-            2.1),
+          2.1),
     PIRATE_HUNTING("AtBContractType.PIRATE_HUNTING.text", "AtBContractType.PIRATE_HUNTING.toolTipText", 6, 1.0),
     DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText", 3,
-            1.8),
+          1.8),
     OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText", 3, 1.6),
     RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText", 3, 1.6),
     EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText", 3, 1.6);
@@ -69,9 +74,9 @@ public enum AtBContractType {
 
     // region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
-            final double operationsTempoMultiplier) {
+          final double operationsTempoMultiplier) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;
@@ -182,12 +187,11 @@ public enum AtBContractType {
     }
 
     /**
-     * Determines the availability level of parts and units based on the type of operation being
-     * conducted.
+     * Determines the availability level of parts and units based on the type of operation being conducted.
      *
      * <p>The availability level is represented as an integer and varies depending on the specific
-     * mission type. Higher values indicate worse availability, while lower values signify more
-     * restricted access to parts.
+     * mission type. Higher values indicate worse availability, while lower values signify more restricted access to
+     * parts.
      *
      * @return an integer representing the availability level of parts for the current mission type.
      */
@@ -205,8 +209,8 @@ public enum AtBContractType {
      * Determines the required combat role for the current contract type.
      *
      * <p>Each contract type specifies a primary {@link CombatRole} that defines
-     * the focus of the contract. For example, some contracts may require a patrol role,
-     * while others require maneuver or frontline support.</p>
+     * the focus of the contract. For example, some contracts may require a patrol role, while others require maneuver
+     * or frontline support.</p>
      *
      * @return the {@link CombatRole} required for the current contract type.
      */
@@ -229,6 +233,7 @@ public enum AtBContractType {
      * {@link #generateStratConEvent()} method.</p>
      *
      * @param campaign the {@link Campaign} instance for which the event is being generated.
+     *
      * @return an AtBEvent enum representing the event type.
      */
     public AtBEventType generateEventType(Campaign campaign) {
@@ -244,65 +249,65 @@ public enum AtBContractType {
             case RECON_RAID:
             case EXTRACTION_RAID:
                 switch (roll) {
-                    case 21, 20 -> { return BIGBATTLE; }
-                    case 19 -> { return SPECIALEVENTS; }
-                    case 18 -> { return REINFORCEMENTS; }
-                    case 17 -> { return LOGISTICSFAILURE; }
-                    case 16 -> { return TREACHERY; }
-                    case 15, 14 -> { return BETRAYAL; }
-                    case 13, 12, 11, 10 -> { return SPECIAL_SCENARIO; }
-                    default -> { return BONUSROLL; }
+                    case 21, 20 -> {return BIGBATTLE;}
+                    case 19 -> {return SPECIALEVENTS;}
+                    case 18 -> {return REINFORCEMENTS;}
+                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 16 -> {return TREACHERY;}
+                    case 15, 14 -> {return BETRAYAL;}
+                    case 13, 12, 11, 10 -> {return SPECIAL_SCENARIO;}
+                    default -> {return BONUSROLL;}
                 }
             case GARRISON_DUTY:
                 switch (roll) {
-                    case 21, 20 -> { return BIGBATTLE; }
-                    case 19 -> { return SPECIALEVENTS; }
-                    case 18 -> { return REINFORCEMENTS; }
-                    case 17 -> { return LOGISTICSFAILURE; }
-                    case 16 -> { return TREACHERY; }
-                    case 15 -> { return BETRAYAL; }
-                    case 14 -> { return REBELLION; }
-                    case 13 -> { return SPORADICUPRISINGS; }
-                    case 12 -> { return CIVILDISTURBANCE; }
-                    case 11, 10, 9, 8 -> { return SPECIAL_SCENARIO; }
-                    default -> { return BONUSROLL; }
+                    case 21, 20 -> {return BIGBATTLE;}
+                    case 19 -> {return SPECIALEVENTS;}
+                    case 18 -> {return REINFORCEMENTS;}
+                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 16 -> {return TREACHERY;}
+                    case 15 -> {return BETRAYAL;}
+                    case 14 -> {return REBELLION;}
+                    case 13 -> {return SPORADICUPRISINGS;}
+                    case 12 -> {return CIVILDISTURBANCE;}
+                    case 11, 10, 9, 8 -> {return SPECIAL_SCENARIO;}
+                    default -> {return BONUSROLL;}
                 }
             case RIOT_DUTY:
                 switch (roll) {
-                    case 21, 20 -> { return BIGBATTLE; }
-                    case 19 -> { return SPECIALEVENTS; }
-                    case 18 -> { return REINFORCEMENTS; }
-                    case 17 -> { return LOGISTICSFAILURE; }
-                    case 16 -> { return TREACHERY; }
-                    case 15 -> { return BETRAYAL; }
-                    case 14, 13 -> { return REBELLION; }
-                    case 12 -> { return SPORADICUPRISINGS; }
-                    case 11 -> { return CIVILDISTURBANCE; }
-                    case 10, 9, 8 -> { return SPECIAL_SCENARIO; }
-                    default -> { return BONUSROLL; }
+                    case 21, 20 -> {return BIGBATTLE;}
+                    case 19 -> {return SPECIALEVENTS;}
+                    case 18 -> {return REINFORCEMENTS;}
+                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 16 -> {return TREACHERY;}
+                    case 15 -> {return BETRAYAL;}
+                    case 14, 13 -> {return REBELLION;}
+                    case 12 -> {return SPORADICUPRISINGS;}
+                    case 11 -> {return CIVILDISTURBANCE;}
+                    case 10, 9, 8 -> {return SPECIAL_SCENARIO;}
+                    default -> {return BONUSROLL;}
                 }
             case PIRATE_HUNTING:
                 switch (roll) {
-                    case 21, 20 -> { return BIGBATTLE; }
-                    case 19 -> { return SPECIALEVENTS; }
-                    case 18 -> { return REINFORCEMENTS; }
-                    case 17 -> { return LOGISTICSFAILURE; }
-                    case 16 -> { return TREACHERY; }
-                    case 15 -> { return BETRAYAL; }
-                    case 14 -> { return CIVILDISTURBANCE; }
-                    case 13, 12, 11, 10 -> { return SPECIAL_SCENARIO; }
-                    default -> { return BONUSROLL; }
+                    case 21, 20 -> {return BIGBATTLE;}
+                    case 19 -> {return SPECIALEVENTS;}
+                    case 18 -> {return REINFORCEMENTS;}
+                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 16 -> {return TREACHERY;}
+                    case 15 -> {return BETRAYAL;}
+                    case 14 -> {return CIVILDISTURBANCE;}
+                    case 13, 12, 11, 10 -> {return SPECIAL_SCENARIO;}
+                    default -> {return BONUSROLL;}
                 }
             default:
                 switch (roll) {
-                    case 21, 20 -> { return BIGBATTLE; }
-                    case 19 -> { return SPECIALEVENTS; }
-                    case 18 -> { return REINFORCEMENTS; }
-                    case 17 -> { return LOGISTICSFAILURE; }
-                    case 16 -> { return TREACHERY; }
-                    case 15 -> { return BETRAYAL; }
-                    case 14, 13, 12, 11, 10 -> { return SPECIAL_SCENARIO; }
-                    default -> { return BONUSROLL; }
+                    case 21, 20 -> {return BIGBATTLE;}
+                    case 19 -> {return SPECIALEVENTS;}
+                    case 18 -> {return REINFORCEMENTS;}
+                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 16 -> {return TREACHERY;}
+                    case 15 -> {return BETRAYAL;}
+                    case 14, 13, 12, 11, 10 -> {return SPECIAL_SCENARIO;}
+                    default -> {return BONUSROLL;}
                 }
         }
     }
@@ -311,8 +316,8 @@ public enum AtBContractType {
      * Generates an event type based on the current contract type.
      *
      * <p>This method is similar to {@link #generateEventType(Campaign)} but is specifically
-     * tailored for StratCon-enabled campaigns. It uses a die roll to determine the
-     * resulting event, with probabilities varying by contract type.</p>
+     * tailored for StratCon-enabled campaigns. It uses a die roll to determine the resulting event, with probabilities
+     * varying by contract type.</p>
      *
      * @return an integer representing the event type.
      */
@@ -385,7 +390,7 @@ public enum AtBContractType {
         // War there
         // cannot be Star League Caches as the Star League hasn't formed
         final int roll = Compute.randomInt(campaign.getEra().hasFlag(EraFlag.PRE_SPACEFLIGHT,
-                EraFlag.EARLY_SPACEFLIGHT, EraFlag.AGE_OF_WAR) ? 12 : 20) + 1;
+              EraFlag.EARLY_SPACEFLIGHT, EraFlag.AGE_OF_WAR) ? 12 : 20) + 1;
         return switch (this) {
             case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
                 if (roll <= 1) {
@@ -541,8 +546,10 @@ public enum AtBContractType {
     }
 
     // region File I/O
+
     /**
      * @param text containing the AtBContractType
+     *
      * @return the saved AtBContractType
      */
     public static AtBContractType parseFromString(final String text) {
@@ -586,7 +593,7 @@ public enum AtBContractType {
         }
 
         MMLogger.create(AtBContractType.class)
-                .error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
+              .error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }

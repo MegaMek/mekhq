@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui;
@@ -32,8 +37,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IPartWork;
 
 /**
- * Interface implemented by any panel that manages tech work. Needed to provide selectedTask
- * to the TechTableModel and the selectedTech to the TaskTableModel.
+ * Interface implemented by any panel that manages tech work. Needed to provide selectedTask to the TechTableModel and
+ * the selectedTech to the TaskTableModel.
  *
  */
 public interface ITechWorkPanel {

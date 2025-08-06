@@ -25,20 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.ProtoMek;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -66,7 +69,7 @@ public class MissingProtoMekJumpJet extends MissingPart {
 
     @Override
     public double getTonnage() {
-        if (getUnitTonnage() <=5) {
+        if (getUnitTonnage() <= 5) {
             return 0.05;
         } else {
             return 0.1;
@@ -129,7 +132,7 @@ public class MissingProtoMekJumpJet extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof ProtoMekJumpJet
-                && getUnitTonnage() == ((ProtoMekJumpJet) part).getUnitTonnage();
+                     && getUnitTonnage() == ((ProtoMekJumpJet) part).getUnitTonnage();
     }
 
     @Override
@@ -145,7 +148,7 @@ public class MissingProtoMekJumpJet extends MissingPart {
                     continue;
                 }
                 if (p instanceof MissingProtoMekJumpJet
-                        || (p instanceof ProtoMekJumpJet && ((ProtoMekJumpJet) p).needsFixing())) {
+                          || (p instanceof ProtoMekJumpJet && ((ProtoMekJumpJet) p).needsFixing())) {
                     damagedJJ++;
                 }
             }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -90,7 +95,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
                 if (((Part) p).checkScrappable() != null) {
                     JOptionPane.showMessageDialog(gui.getFrame(), ((Part) p).checkScrappable(), "Cannot scrap part",
-                            JOptionPane.ERROR_MESSAGE);
+                          JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Unit u = p.getUnit();
@@ -157,7 +162,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         boolean isFixable = true;
         for (IPartWork p : parts) {
             canChangeMode &= p.canChangeWorkMode()
-                    && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
+                                   && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
             isScrappable &= (p instanceof Part) && !((Part) p).canNeverScrap();
             isBeingWorked |= (p instanceof Part) && p.isBeingWorkedOn();
             isFixable &= (p.checkFixable() == null);

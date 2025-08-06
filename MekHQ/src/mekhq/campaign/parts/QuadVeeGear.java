@@ -24,13 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -40,6 +42,7 @@ import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import org.w3c.dom.Node;
 
 /**
  * Conversion gear for QuadVees
@@ -48,12 +51,19 @@ import mekhq.campaign.finances.Money;
  */
 public class QuadVeeGear extends Part {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
-            .setTechRating(TechRating.F)
-            .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-            .setClanAdvancement(3130, 3135, DATE_NONE, DATE_NONE, DATE_NONE)
-            .setClanApproximate(true).setPrototypeFactions(Faction.CHH)
-            .setProductionFactions(Faction.CHH)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                          .setTechRating(TechRating.F)
+                                                          .setAvailability(AvailabilityValue.X,
+                                                                AvailabilityValue.X,
+                                                                AvailabilityValue.X,
+                                                                AvailabilityValue.F)
+                                                          .setClanAdvancement(3130,
+                                                                3135,
+                                                                DATE_NONE,
+                                                                DATE_NONE,
+                                                                DATE_NONE)
+                                                          .setClanApproximate(true).setPrototypeFactions(Faction.CHH)
+                                                          .setProductionFactions(Faction.CHH)
+                                                          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     public QuadVeeGear() {
         this(0, null);
@@ -75,7 +85,7 @@ public class QuadVeeGear extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-                    QuadVee.SYSTEM_CONVERSION_GEAR);
+                  QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
 

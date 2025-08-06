@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.enums;
 
@@ -47,7 +52,7 @@ public enum PlanetaryAcquisitionFactionLimit {
     // region Constructors
     PlanetaryAcquisitionFactionLimit(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -107,7 +112,7 @@ public enum PlanetaryAcquisitionFactionLimit {
         }
 
         MMLogger.create(PlanetaryAcquisitionFactionLimit.class)
-                .error("Unable to parse " + text + " into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.");
+              .error("Unable to parse " + text + " into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.");
         return NEUTRAL;
     }
     // endregion File I/O

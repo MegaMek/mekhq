@@ -107,10 +107,10 @@ public class FactionAccoladeEvent {
      * <p>Handles user dialog interaction, confirmation (if required), processing narrative events, and generating
      * new units awarded by the accolade.</p>
      *
-     * @param campaign      the campaign receiving the accolade
-     * @param accoladingFaction       the faction granting the accolade
-     * @param accoladeLevel the type/level of accolade
-     * @param isSameFaction whether the campaign's commander currently belongs to the awarding faction
+     * @param campaign          the campaign receiving the accolade
+     * @param accoladingFaction the faction granting the accolade
+     * @param accoladeLevel     the type/level of accolade
+     * @param isSameFaction     whether the campaign's commander currently belongs to the awarding faction
      *
      * @author Illiani
      * @since 0.50.07
@@ -289,12 +289,13 @@ public class FactionAccoladeEvent {
      * <p>The result is based on the combination of the accolade level and the attributes of the awarding faction,
      * with special cases for Clans, the Magistracy of Canopus, ComStar, and Word of Blake.</p>
      *
-     * @param accoladingFaction  the {@link Faction} giving the accolade
-     * @param accoladeLevel      the level of accolade as a {@link FactionAccoladeLevel}
+     * @param accoladingFaction the {@link Faction} giving the accolade
+     * @param accoladeLevel     the level of accolade as a {@link FactionAccoladeLevel}
+     *
      * @return {@code true} if a news article should be triggered as a result of this accolade, {@code false} otherwise
      *
-     * @since 0.50.07
      * @author Illiani
+     * @since 0.50.07
      */
     private static boolean isTriggerNewsArticle(Faction accoladingFaction, FactionAccoladeLevel accoladeLevel) {
         boolean isClan = accoladingFaction.isClan() && !accoladingFaction.isMercenaryOrganization();

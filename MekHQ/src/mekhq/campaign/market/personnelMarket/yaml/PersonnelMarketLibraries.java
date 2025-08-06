@@ -49,8 +49,8 @@ import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
- * Loads and provides access to different personnel market entry configurations  for various market styles (e.g.,
- * MekHQ, Campaign Operations Revised, Campaign Operations Strict).
+ * Loads and provides access to different personnel market entry configurations  for various market styles (e.g., MekHQ,
+ * Campaign Operations Revised, Campaign Operations Strict).
  *
  * <p>This class initializes its data from YAML configuration files, mapping each personnel role to its corresponding
  * market entry parameters for Clan and Inner Sphere contexts, according to the selected ruleset.</p>
@@ -158,9 +158,11 @@ public class PersonnelMarketLibraries {
      * Reads a list of personnel market entries from a YAML file and returns a mapping from personnel role to entry.
      *
      * @param fileAddress the full path to the YAML file
-     * @return a map linking each {@link PersonnelRole} to its {@link PersonnelMarketEntry}, or an empty map if unavailable
-     * @throws RuntimeException if the file could not be read or parsed
      *
+     * @return a map linking each {@link PersonnelRole} to its {@link PersonnelMarketEntry}, or an empty map if
+     *       unavailable
+     *
+     * @throws RuntimeException if the file could not be read or parsed
      * @author Illiani
      * @since 0.50.06
      */
