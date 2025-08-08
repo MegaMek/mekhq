@@ -242,6 +242,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             person.setWealth(0);
         }
 
+        // Extra Income
+        roll = d6();
+        if (roll == 6 || roll == 1) {
+            person.setExtraIncomeFromTraitLevel(roll == 6 ? 1 : -1);
+        } else {
+            person.setExtraIncomeFromTraitLevel(0);
+        }
+
         // Unlucky
         roll = randomInt(20);
         if (roll == 0) {
