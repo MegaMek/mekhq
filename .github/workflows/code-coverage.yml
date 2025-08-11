@@ -18,18 +18,18 @@ jobs:
         java-version: [ 17, 21 ]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           path: mekhq
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megamek
           path: megamek
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megameklab
           path: megameklab
