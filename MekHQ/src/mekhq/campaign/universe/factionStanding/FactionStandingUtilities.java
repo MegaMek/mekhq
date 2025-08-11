@@ -107,7 +107,7 @@ public class FactionStandingUtilities {
         // I'm not expecting this to happen, given we already accept all values between Integer#MIN_VALUE and
         // Integer#MAX_VALUE. But if it somehow does, we'll just return STANDING_LEVEL_4 as a default.
         LOGGER.warn("Regard value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
-              FactionStandingLevel.STANDING_LEVEL_4);
+              regard);
 
         return FactionStandingLevel.STANDING_LEVEL_4;
     }
