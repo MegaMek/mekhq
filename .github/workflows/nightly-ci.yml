@@ -22,12 +22,18 @@ jobs:
     name: Nightly MekHQ CI ${{ matrix.os }} on ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Data Repo
+        uses: actions/checkout@v5
+        with:
+          repository: megamek/mm-data
+          path: mm-data
+
+      - uses: actions/checkout@v5
         with:
           path: mekhq
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megamek
           path: megamek
@@ -39,7 +45,7 @@ jobs:
           echo "$calculatedSha" >> megamek/docs/mm-revision.txt
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megameklab
           path: megameklab
