@@ -25,6 +25,12 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Checkout Data Repo
+        uses: actions/checkout@v5
+        with:
+          repository: megamek/mm-data
+          path: mm-data
+
       - name: Checkout out MekHQ
         uses: actions/checkout@v5
         with:
