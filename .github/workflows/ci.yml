@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout out MekHQ
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: mekhq
 
@@ -46,7 +46,7 @@ jobs:
           exit 0
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.find_mm.outputs.mmRepo }}
           ref: ${{ steps.find_mm.outputs.mmBranch }}
@@ -74,7 +74,7 @@ jobs:
           exit 0
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
