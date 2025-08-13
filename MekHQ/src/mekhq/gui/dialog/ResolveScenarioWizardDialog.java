@@ -33,6 +33,7 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -40,6 +41,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -61,10 +63,10 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.GunEmplacement;
 import megamek.logging.MMLogger;
@@ -1932,8 +1934,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         dialog.getContentPane().add(btn, gridBagConstraints);
 
-        dialog.setMinimumSize(UIUtil.scaleForGUI(450, 700));
-        dialog.setPreferredSize(UIUtil.scaleForGUI(450, 700));
+        Dimension dimension = scaleForGUI(700, 700);
+        dialog.setMinimumSize(dimension);
+        dialog.setPreferredSize(dimension);
         dialog.validate();
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
