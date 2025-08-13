@@ -25,22 +25,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
-import megamek.codeUtilities.StringUtility;
-import mekhq.Utilities;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.List;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
+
+import megamek.codeUtilities.StringUtility;
+import megamek.utilities.FastJScrollPane;
+import mekhq.Utilities;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into its own
@@ -52,6 +60,7 @@ import java.util.List;
 public class DailyReportLogPanel extends JPanel {
     //region Variable Declarations
     private final CampaignGUI gui;
+    final JScrollPane logPanel = new FastJScrollPane();
     private JTextPane txtLog;
     private String logText = "";
     //endregion Variable Declarations
@@ -99,7 +108,8 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().getAccessibleContext().setAccessibleName("Daily Log");
         getTxtLog().addHyperlinkListener(gui.getReportHLL());
 
-        final JScrollPane logPanel = new JScrollPaneWithSpeed(getTxtLog());
+        logPanel.setViewportView(getTxtLog());
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
         logPanel.setBorder(new EmptyBorder(2,5,2,2));
         add(logPanel, BorderLayout.CENTER);
     }
@@ -108,6 +118,7 @@ public class DailyReportLogPanel extends JPanel {
     public void clearLogPanel() {
         setLogText("");
         getTxtLog().setText("");
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
     public void refreshLog(final String text) {
@@ -126,7 +137,9 @@ public class DailyReportLogPanel extends JPanel {
         }
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
+
         getGUI().checkDailyLogNag();
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
     public void appendLog(final List<String> newReports) {
@@ -150,5 +163,6 @@ public class DailyReportLogPanel extends JPanel {
         }
         getTxtLog().setCaretPosition(doc.getLength());
         getGUI().checkDailyLogNag();
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 }
