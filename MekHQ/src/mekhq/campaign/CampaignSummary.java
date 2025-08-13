@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.math.BigDecimal;
@@ -380,16 +381,23 @@ public class CampaignSummary {
     public String getHRCapacityReport(Campaign campaign) {
         int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
-        StringBuilder hrCapacityReport = new StringBuilder().append(getHRStrain(campaign))
-                                                           .append(" / ")
-                                                           .append(campaign.getCampaignOptions()
-                                                                         .getHRCapacity() *
-                                                                         combinedSkillValues)
-                                                           .append(" personnel");
+        StringBuilder hrCapacityReport = new StringBuilder().append("<html>")
+                                               .append(getHRStrain(campaign))
+                                               .append(" / ")
+                                               .append(campaign.getCampaignOptions().getHRCapacity() *
+                                                             combinedSkillValues)
+                                               .append(" personnel");
 
         if (getHRStrainModifier(campaign) > 0) {
-            hrCapacityReport.append(" (+").append(getHRStrainModifier(campaign)).append(')');
+            hrCapacityReport.append(spanOpeningWithCustomColor(getNegativeColor()))
+                  .append(" (<b>+")
+                  .append(getHRStrainModifier(campaign))
+                  .append("</b>)")
+                  .append(CLOSING_SPAN_TAG)
+                  .append(" \u26A0");
         }
+
+        hrCapacityReport.append("</html>");
 
         return hrCapacityReport.toString();
     }
