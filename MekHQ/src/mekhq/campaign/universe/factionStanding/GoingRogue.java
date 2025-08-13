@@ -192,7 +192,7 @@ public class GoingRogue {
 
         processMassLoyaltyChange(campaign, true, true);
 
-        if (isDefection) {
+        if (isDefection && !isUltimatum) {
             new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
                   FactionStandingJudgmentType.WELCOME, false, chosenFaction);
 
@@ -200,13 +200,13 @@ public class GoingRogue {
             Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
             new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-        } else if (!isUltimatum) {
-            if (chosenFaction.isMercenaryOrganization()) {
-                PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
-                Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
-                new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
-                      FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-            }
+        }
+
+        if (chosenFaction.isMercenaryOrganization()) {
+            PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
+            Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
+            new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
+                  FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
         }
 
         campaign.setFaction(chosenFaction);
