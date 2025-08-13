@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.factionStanding;
 
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.campaign.universe.factionStanding.GoingRogue.processGoingRogue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -79,7 +80,8 @@ public class FactionStandingUltimatumDialog {
     private static final String KEY_NEWS_AGAINST = "newsAgainst";
 
     private static final int CHOICE_INDEX_CHALLENGER = 0;
-    private static final int CHOICE_INDEX_GO_ROGUE = 2;
+    private static final int CHOICE_INDEX_GO_MERCENARY = 2;
+    private static final int CHOICE_INDEX_GO_PIRATE = 3;
 
     private final Campaign campaign;
 
@@ -127,7 +129,9 @@ public class FactionStandingUltimatumDialog {
                         "FactionStandingUltimatumDialog.support",
                         incumbent.getGivenName()),
                   getFormattedTextAt(RESOURCE_BUNDLE,
-                        "FactionStandingUltimatumDialog.goRogue")
+                        "FactionStandingUltimatumDialog.goRogue.mercenary"),
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "FactionStandingUltimatumDialog.goRogue.pirate")
             );
             ultimatumDialog = new ImmersiveDialogSimple(
                   campaign, challenger, incumbent,
@@ -136,9 +140,12 @@ public class FactionStandingUltimatumDialog {
             );
         } while (!new ImmersiveDialogConfirmation(campaign).wasConfirmed());
 
-        boolean choseGoRogue = ultimatumDialog.getDialogChoice() == CHOICE_INDEX_GO_ROGUE;
-        if (choseGoRogue) {
-            processBecomingMercenary(campaign, isViolentTransition, commander, secondInCommand, thirdInCommand);
+        int dialogChoice = ultimatumDialog.getDialogChoice();
+        boolean mercenaryChoice = dialogChoice == CHOICE_INDEX_GO_MERCENARY;
+        boolean pirateChoice = dialogChoice == CHOICE_INDEX_GO_PIRATE;
+        if (mercenaryChoice || pirateChoice) {
+            processBecomingMercenaryOrPirate(campaign, isViolentTransition, commander, secondInCommand,
+                  thirdInCommand, mercenaryChoice);
             return;
         }
 
@@ -221,12 +228,14 @@ public class FactionStandingUltimatumDialog {
      * @param commander           the current commanding {@link Person}
      * @param secondInCommand     the second-in-command {@link Person}, may be {@code null}
      * @param thirdInCommand      the third-in-command {@link Person}, may be {@code null}
+     * @param isMercenary         {@code true} if the campaign is changing to the mercenary faction; {@code false} if
+     *                                       the campaign is changing to the pirate faction
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static void processBecomingMercenary(Campaign campaign, boolean isViolentTransition, Person commander,
-          Person secondInCommand, Person thirdInCommand) {
+    private static void processBecomingMercenaryOrPirate(Campaign campaign, boolean isViolentTransition,
+          Person commander, Person secondInCommand, Person thirdInCommand, boolean isMercenary) {
         new FactionJudgmentSceneDialog(campaign,
               commander,
               secondInCommand,
@@ -234,9 +243,10 @@ public class FactionStandingUltimatumDialog {
               campaign.getFaction());
 
         Faction oldFaction = campaign.getFaction();
-        Faction newFaction = Factions.getInstance().getFaction(MERCENARY_FACTION_CODE);
+        Faction newFaction = Factions.getInstance()
+                                   .getFaction(isMercenary ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
         GoingRogue.processGoingRogue(campaign, newFaction, commander, secondInCommand,
-              isViolentTransition, false, campaign.getCampaignOptions().isTrackFactionStanding());
+              isViolentTransition, true, campaign.getCampaignOptions().isTrackFactionStanding());
 
         if (secondInCommand != null &&
                   !(secondInCommand.getStatus().isDepartedUnit() || secondInCommand.getStatus().isDead())) {
