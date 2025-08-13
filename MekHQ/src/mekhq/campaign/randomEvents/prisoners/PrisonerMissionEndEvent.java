@@ -165,7 +165,7 @@ public class PrisonerMissionEndEvent {
               getEndOfContractDialogButtons(isAllied, isSuccess, isGoodEvent),
               outOfCharacterMessage,
               null,
-              true);
+              false);
 
         processPlayerResponse(ransom, isGoodEvent, dialog.getDialogChoice(), prisoners);
     }
