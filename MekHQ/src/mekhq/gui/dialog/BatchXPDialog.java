@@ -381,7 +381,7 @@ public final class BatchXPDialog extends JDialog {
 
                 Person person = personnelModel.getPerson(personnelTable.convertRowIndexToModel(i));
 
-                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
+                int cost = person.getCostToImprove(skillName);
                 double costMultiplier = campaignOptions.getXpCostMultiplier();
 
                 cost = (int) round(cost * costMultiplier);
@@ -452,7 +452,7 @@ public final class BatchXPDialog extends JDialog {
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
                 Skill skill = person.getSkill(skillName);
-                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
+                int cost = person.getCostToImprove(skillName);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (null == skill) {

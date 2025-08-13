@@ -1303,13 +1303,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_BUY_EDGE: {
                 int baseCost = getCampaignOptions().getEdgeCost();
                 final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
-                final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
                 for (Person person : people) {
-                    double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
-
-                    // Reasoning cost changes should always take place before global changes
-                    int cost = (int) round(baseCost * reasoningXpCostMultiplier);
-                    cost = (int) round(cost * xpCostMultiplier);
+                    int cost = (int) round(baseCost * xpCostMultiplier);
 
                     selectedPerson.spendXP(cost);
                     person.changeEdge(1);
@@ -2707,8 +2702,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         // region Spend XP Menu
         if (oneSelected && person.getStatus().isActive()) {
-            final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
-            final double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
             final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
 
             menu = new JMenu(resources.getString("spendXP.text"));
@@ -2737,10 +2730,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    // Reasoning cost changes should always take place before global changes
+
                     int baseCost = spa.getCost();
-                    cost = (int) round(baseCost > 0 ? baseCost * reasoningXpCostMultiplier : baseCost);
-                    cost = (int) round(cost * xpCostMultiplier);
+                    cost = (int) round(baseCost * xpCostMultiplier);
 
                     String costDesc = String.format(resources.getString("costValue.format"), cost);
                     boolean available = person.getXP() >= cost;
@@ -3187,7 +3179,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String typeName = SkillType.getSkillList()[i];
 
-                int cost = person.getCostToImprove(typeName, isUseReasoningMultiplier);
+                int cost = person.getCostToImprove(typeName);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
@@ -3475,10 +3467,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-
-                // Reasoning cost changes should always take place before global changes
-                int cost = (int) round(getCampaignOptions().getEdgeCost() * reasoningXpCostMultiplier);
-                cost = (int) round(cost * xpCostMultiplier);
+                int cost = (int) round(getCampaignOptions().getEdgeCost() * xpCostMultiplier);
 
                 if ((cost >= 0) && (person.getXP() >= cost)) {
                     menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));

@@ -43,12 +43,15 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@Deprecated(since = "0.50.07", forRemoval = true)
+@Disabled("Reasoning is no longer used in the campaign")
 public class ReasoningTest {
     @ParameterizedTest
     @CsvSource(value = { "UNINTELLIGENT,UNINTELLIGENT", "INVALID_STATUS,AVERAGE", "'',AVERAGE", "'null',AVERAGE",
