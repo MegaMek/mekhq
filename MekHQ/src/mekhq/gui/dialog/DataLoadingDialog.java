@@ -400,7 +400,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                                               .getMethod(campaign.getCampaignOptions()));
 
                 // Setup Markets
-                campaign.refreshPersonnelMarkets();
+                campaign.refreshPersonnelMarkets(true);
                 ContractMarketMethod contractMarketMethod = campaign.getCampaignOptions().getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
                 if (!contractMarketMethod.isNone()) {
