@@ -600,28 +600,28 @@ public class SpecialAbility {
     }
 
     public String getAllPrereqDesc() {
-        String toReturn = "";
+        StringBuilder toReturn = new StringBuilder();
         for (String prereq : prereqAbilities) {
-            toReturn += getDisplayName(prereq) + "<br>";
+            toReturn.append(getDisplayName(prereq)).append("<br>");
         }
 
         for (SkillPrerequisite skPr : prereqSkills) {
-            toReturn += skPr + "<br>";
+            toReturn.append(skPr).append("<br>");
         }
 
         for (String pr : prereqMisc.keySet()) {
-            toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
+            toReturn.append(pr).append(": ").append(prereqMisc.get(pr)).append("<br/>");
         }
 
-        return toReturn.isEmpty() ? "None" : toReturn;
+        return (toReturn.isEmpty()) ? "" : toReturn.toString();
     }
 
     public String getInvalidDesc() {
-        String toReturn = "";
+        StringBuilder toReturn = new StringBuilder();
         for (String invalid : invalidAbilities) {
-            toReturn += getDisplayName(invalid) + "<br>";
+            toReturn.append(getDisplayName(invalid)).append("<br>");
         }
-        return toReturn.isEmpty() ? "None" : toReturn;
+        return (toReturn.isEmpty()) ? "" : toReturn.toString();
     }
 
     public String getRemovedDesc() {
@@ -629,7 +629,7 @@ public class SpecialAbility {
         for (String remove : removeAbilities) {
             toReturn.append(getDisplayName(remove)).append("<br>");
         }
-        return (toReturn.length() == 0) ? "None" : toReturn.toString();
+        return (toReturn.isEmpty()) ? "" : toReturn.toString();
     }
 
     public static String getDisplayName(String name) {
