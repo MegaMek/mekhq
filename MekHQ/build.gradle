@@ -475,7 +475,7 @@ tasks.register("testAll") {
 }
 
 run {
-    mustRunAfter(stageDataFiles)
+    dependsOn(stageDataFiles)
     jvmArgs = mhqJvmOptions
 }
 
