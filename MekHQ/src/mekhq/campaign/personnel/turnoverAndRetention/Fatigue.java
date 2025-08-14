@@ -67,11 +67,12 @@ public class Fatigue {
      * Calculates the total field kitchen capacity for a given list of units.
      *
      * <p>Deployed, damaged, uncrewed, or partially crewed units are excluded from the calculation.
-     * Each remaining unit contributes to the overall capacity based on the presence of
-     * the {@link MiscType#F_FIELD_KITCHEN} flag in its equipment.</p>
+     * Each remaining unit contributes to the overall capacity based on the presence of the
+     * {@link MiscType#F_FIELD_KITCHEN} flag in its equipment.</p>
      *
      * @param units                the list of units to evaluate for field kitchen capacity.
      * @param fieldKitchenCapacity the capacity provided by each field kitchen.
+     *
      * @return the total field kitchen capacity available from all eligible units.
      */
     public static int checkFieldKitchenCapacity(List<Unit> units, int fieldKitchenCapacity) {
@@ -79,9 +80,9 @@ public class Fatigue {
 
         for (Unit unit : units) {
             if ((unit.isDeployed())
-                  || (unit.isDamaged())
-                  || (unit.getCrewState().isUncrewed())
-                  || (unit.getCrewState().isPartiallyCrewed())) {
+                      || (unit.isDamaged())
+                      || (unit.getCrewState().isUncrewed())
+                      || (unit.getCrewState().isPartiallyCrewed())) {
                 continue;
             }
 
@@ -99,14 +100,16 @@ public class Fatigue {
      * Calculates the number of personnel who require field kitchen support.
      *
      * <p>Personnel assigned to units with sufficient onboard field kitchen facilities
-     * (e.g., small or large craft units) are excluded. Non-combatant personnel may also
-     * be excluded based on the {@code isUseFieldKitchenIgnoreNonCombatants} parameter.</p>
+     * (e.g., small or large craft units) are excluded. Non-combatant personnel may also be excluded based on the
+     * {@code isUseFieldKitchenIgnoreNonCombatants} parameter.</p>
      *
      * @param activePersonnel                      the list of active personnel to evaluate.
      * @param isUseFieldKitchenIgnoreNonCombatants flag to exclude non-combatants from the total.
+     *
      * @return the total number of personnel requiring field kitchen support.
      */
-    public static int checkFieldKitchenUsage(List<Person> activePersonnel, boolean isUseFieldKitchenIgnoreNonCombatants) {
+    public static int checkFieldKitchenUsage(List<Person> activePersonnel,
+          boolean isUseFieldKitchenIgnoreNonCombatants) {
         int fieldKitchenUsage = 0;
 
         for (Person person : activePersonnel) {
@@ -145,6 +148,7 @@ public class Fatigue {
      *
      * @param fieldKitchenCapacity the total available field kitchen capacity.
      * @param fieldKitchenUsage    the total field kitchen usage based on personnel requirements.
+     *
      * @return {@code true} if the available capacity is sufficient; {@code false} otherwise.
      */
     public static boolean areFieldKitchensWithinCapacity(int fieldKitchenCapacity, int fieldKitchenUsage) {
@@ -155,16 +159,16 @@ public class Fatigue {
      * Processes fatigue-related actions for a given person in the campaign.
      *
      * <p>This method calculates the effective fatigue of the person, determines their fatigue
-     * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their
-     * fatigue level, and updates their recovery status. If the fatigue exceeds the campaign's
-     * leave threshold, the person's status is updated to {@code ON_LEAVE}.</p>
+     * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their fatigue level, and
+     * updates their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is
+     * updated to {@code ON_LEAVE}.</p>
      *
      * @param campaign the campaign context in which the person operates.
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+              person.getSkillLevel(campaign, false));
 
         if (!campaign.getCampaignOptions().isUseFatigue()) {
             return;
@@ -201,10 +205,17 @@ public class Fatigue {
         }
 
         if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
-                && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
+                  && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }
+
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel,
+          boolean areFieldKitchensWithinCapacity) {
+        return getEffectiveFatigue(fatigue, isClan, skillLevel);
+    }
+
 
     /**
      * Calculates the effective fatigue level for a given person based on various modifiers.
@@ -219,11 +230,9 @@ public class Fatigue {
      * @param fatigue                        the base fatigue level of the person.
      * @param isClan                         flag indicating whether the person is Clan personnel.
      * @param skillLevel                     the person's skill level.
-     * @param areFieldKitchensWithinCapacity flag indicating if field kitchens are within capacity.
      * @return the calculated effective fatigue value.
      */
-    public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel,
-                                          boolean areFieldKitchensWithinCapacity) {
+    public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel) {
         int effectiveFatigue = fatigue;
 
         if (isClan) {
@@ -236,11 +245,12 @@ public class Fatigue {
             default -> {}
         }
 
-        if (areFieldKitchensWithinCapacity) {
-            effectiveFatigue--;
-        }
-
         return effectiveFatigue;
+    }
+
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static void processFatigueRecovery(Campaign campaign, Person person) {
+        processFatigueRecovery(campaign, person, false);
     }
 
     /**
@@ -253,16 +263,18 @@ public class Fatigue {
      *
      * @param campaign the campaign context in which the fatigue recovery occurs.
      * @param person   the person whose fatigue recovery is being handled.
+     * @param fieldKitchensAreWithinCapacity flag indicating if field kitchens are within capacity.
      */
-    public static void processFatigueRecovery(Campaign campaign, Person person) {
+    public static void processFatigueRecovery(Campaign campaign, Person person,
+          boolean fieldKitchensAreWithinCapacity) {
         if (person.getFatigue() > 0) {
             int fatigueAdjustment = FATIGUE_RECOVERY_RATE;
 
-            if (person.getStatus().isOnLeave()) {
+            if (person.getStatus().isOnLeave() || campaign.getActiveContracts().isEmpty()) {
                 fatigueAdjustment++;
             }
 
-            if (campaign.getActiveContracts().isEmpty()) {
+            if (fieldKitchensAreWithinCapacity) {
                 fatigueAdjustment++;
             }
 

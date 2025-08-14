@@ -2155,8 +2155,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int baseFatigue = person.getFatigue();
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
               person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false),
-              campaign.getFieldKitchenWithinCapacity());
+              person.getSkillLevel(campaign, false));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);

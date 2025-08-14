@@ -27,6 +27,18 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+
+import java.awt.Component;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JTable;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
@@ -42,15 +54,6 @@ import mekhq.gui.BasicInfo;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 /**
  * A table Model for displaying information about personnel
@@ -183,7 +186,7 @@ public class PersonnelTableModel extends DataTableModel {
             }
             boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
                     && (getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-                  person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity()) >= 5));
+                  person.getSkillLevel(campaign, false)) >= 5));
 
             if (!isSelected) {
                 if (person.getStatus().isAbsent()) {

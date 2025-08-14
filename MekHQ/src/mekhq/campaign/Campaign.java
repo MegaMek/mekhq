@@ -5382,7 +5382,7 @@ public class Campaign implements ITechManager {
                 person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
-                    processFatigueRecovery(this, person);
+                    processFatigueRecovery(this, person, fieldKitchenWithinCapacity);
                 }
 
                 processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
