@@ -39,10 +39,19 @@ import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
+import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -53,7 +62,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -282,7 +290,7 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
 
-        addStandardTab(MHQTabType.COMMAND_CENTER);
+        addStandardTab(COMMAND_CENTER);
         addStandardTab(MHQTabType.TOE);
         addStandardTab(MHQTabType.BRIEFING_ROOM);
         if (getCampaign().getCampaignOptions().isUseStratCon()) {
@@ -1439,7 +1447,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public @Nullable CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
+        return (CommandCenterTab) getTab(COMMAND_CENTER);
     }
 
     public @Nullable TOETab getTOETab() {
@@ -2655,14 +2663,41 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Check to see if the command center tab is currently active and if not, color the tab. Should be called when items
-     * are added to daily report log panel and user is not on the command center tab in order to draw attention to it
+     * Checks if the user should be prompted (nagged) to view the daily log and highlights the Command Center tab if
+     * needed.
+     *
+     * <p>If the {@code logNagActive} flag is already set, the method returns immediately to prevent repeat
+     * processing. If the currently selected tab is the Command Center, no nag is performed. Otherwise, the method
+     * iterates through the tab list and highlights the Command Center tab by changing its label color
+     * and sets the {@code logNagActive} flag.</p>
+     *
+     * <p>If no tab is currently selected, a warning is logged and no action is taken.</p>
      */
     public void checkDailyLogNag() {
-        if (!logNagActive) {
-            if (tabMain.getSelectedIndex() != 0) {
-                tabMain.setBackgroundAt(0, Color.RED);
+        // If we're already nagging, no need to nag again
+        if (logNagActive) {
+            return;
+        }
+
+        final int selectedIndex = tabMain.getSelectedIndex();
+        if (selectedIndex < 0 || selectedIndex >= tabMain.getTabCount()) {
+            logger.warn("No tab selected, cannot check for daily log nag");
+            return;
+        }
+
+        // Already on the Command Center tab, no nag necessary
+        final Component selectedTab = tabMain.getComponentAt(selectedIndex);
+        if (selectedTab instanceof CommandCenterTab) {
+            return;
+        }
+
+        // Loop through the tabs until we find the Command Center tab, then color that tab's label.
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            Component component = tabMain.getComponentAt(i);
+            if (component instanceof CommandCenterTab) {
+                tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
                 logNagActive = true;
+                break;
             }
         }
     }
