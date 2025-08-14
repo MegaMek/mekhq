@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -661,56 +660,77 @@ public class Resupply {
     }
 
     /**
-     * Applies modifiers to adjust the weight of parts based on their usage and availability in the warehouse. This
-     * method calculates the adjusted weight for each part by taking into account its use count, store count, and a
-     * multiplier specific to the part.
+     * Applies warehouse-based weight modifiers to a set of parts currently in use.
      *
-     * <p>The resulting adjusted weight is used to determine the importance or priority of the part,
-     * and only parts with a positive weight are included in the output map.</p>
+     * <p>Each part will be assigned a weight representing its resupply priority or need, based on its usage count,
+     * the current store's supply, and any applicable multipliers.</p>
      *
-     * @param partsInUse A {@link Set} of {@link PartInUse} objects containing information about parts currently in use
-     *                   and their quantities in the warehouse.
+     * <p>Parts always have a minimum weight of 1, ensuring resupply requests are never empty. If a part cannot be
+     * acquired or is invalid, it will be skipped.</p>
      *
-     * @return A {@link Map} where:
-     *       <ul>
-     *           <li>The key is a {@link Part} object representing the eligible part.</li>
-     *           <li>The value is a {@link PartDetails} object containing the adjusted weight of
-     *               the part, calculated using its usage data and a multiplier.</li>
-     *       </ul>
-     *       Only parts with a positive adjusted weight are included in the resulting map.
+     * <p>When not performing a loot or smuggler resupply, all processed parts are marked as brand new.</p>
+     *
+     * @param partsInUse a set of {@link PartInUse} representing the parts currently needed
+     * @return a map of {@link Part} to its {@link PartDetails}, with adjusted weights
      */
-
     private Map<Part, PartDetails> applyWarehouseWeightModifiers(Set<PartInUse> partsInUse) {
-        Map<Part, PartDetails> parts = new HashMap<>();
+        Map<Part, PartDetails> partDetailsMap = new HashMap<>();
 
-        // Adjust based on the quantity in the warehouse
         for (PartInUse partInUse : partsInUse) {
-            int weight = partInUse.getUseCount();
-            weight -= partInUse.getStoreCount();
-
-            Part part = partInUse.getPartToBuy().getAcquisitionPart();
-
+            Part part = getValidAcquisitionPart(partInUse);
             if (part == null) {
                 continue;
             }
 
-            if ((resupplyType != ResupplyType.RESUPPLY_LOOT) && (resupplyType != ResupplyType.RESUPPLY_SMUGGLER)) {
-                part.setBrandNew(true);
-            }
+            int weight = calculateBaseWeight(partInUse);
 
-            weight = (int) floor(weight * getPartMultiplier(part));
+            // Only mark new for certain resupply types
+            part.setBrandNew(!isLootOrSmugglerResupply());
 
-            if (weight <= 0) {
-                continue;
-            }
+            // Apply multiplier and minimum weight constraint
+            weight = Math.max(1, (int) Math.floor(weight * getPartMultiplier(part)));
 
-            PartDetails partDetails = new PartDetails(part, weight);
-
-            parts.put(part, partDetails);
+            partDetailsMap.put(part, new PartDetails(part, weight));
         }
 
-        return parts;
+        return partDetailsMap;
     }
+
+    /**
+     * Safely retrieves the acquisition part for a given {@link PartInUse}, or returns null if unavailable.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Part getValidAcquisitionPart(PartInUse partInUse) {
+        if (partInUse == null || partInUse.getPartToBuy() == null) {
+            return null;
+        }
+        return partInUse.getPartToBuy().getAcquisitionPart();
+    }
+
+    /**
+     * Calculates the base weight for a given PartInUse, applying a minimum of 1.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int calculateBaseWeight(PartInUse partInUse) {
+        // Always at least 1 to avoid empty resupplies
+        return Math.max(1, partInUse.getUseCount() - partInUse.getStoreCount());
+    }
+
+    /**
+     * Checks if the current resupply type is loot or smuggler resupply.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private boolean isLootOrSmugglerResupply() {
+        return resupplyType == ResupplyType.RESUPPLY_LOOT ||
+                     resupplyType == ResupplyType.RESUPPLY_SMUGGLER;
+    }
+
 
     /**
      * Retrieves the multiplier value for a specific part type to calculate its priority in the resupply process. This
