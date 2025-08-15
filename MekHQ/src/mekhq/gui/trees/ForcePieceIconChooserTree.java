@@ -24,20 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.trees;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import megamek.client.ui.trees.AbstractIconChooserTree;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 /**
- * ForcePieceIconChooserTree is an implementation of AbstractIconChooserTree that uses a delayed
- * initialization so that the layer can first be specified, and then initializes the tree using the
- * subset of the Force Icon Directory specified by the layer's path.
+ * ForcePieceIconChooserTree is an implementation of AbstractIconChooserTree that uses a delayed initialization so that
+ * the layer can first be specified, and then initializes the tree using the subset of the Force Icon Directory
+ * specified by the layer's path.
+ *
  * @see AbstractIconChooserTree
  */
 public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
@@ -67,7 +73,7 @@ public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
     @Override
     protected DefaultTreeModel createTreeModel() {
         return createTreeModel(new DefaultMutableTreeNode(getLayer()),
-                MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath()));
+              MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath()));
     }
     //endregion Initialization
 }

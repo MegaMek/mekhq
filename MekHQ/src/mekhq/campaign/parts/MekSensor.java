@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -38,11 +43,6 @@ import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.skills.SkillType;
-import org.w3c.dom.Node;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -154,7 +154,7 @@ public class MekSensor extends Part {
                 }
             }
             if (checkForDestruction && hits > priorHits && hits >= 2
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -227,7 +227,7 @@ public class MekSensor extends Part {
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i) > 0
-                    && unit.isLocationDestroyed(i)) {
+                      && unit.isLocationDestroyed(i)) {
                 return true;
             }
         }

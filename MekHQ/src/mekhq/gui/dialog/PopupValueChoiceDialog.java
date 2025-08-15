@@ -24,19 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
-import mekhq.MekHQ;
-
-import javax.swing.*;
-import javax.swing.text.DefaultFormatter;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.WindowConstants;
+import javax.swing.text.DefaultFormatter;
+
+import mekhq.MekHQ;
 
 /**
  * @author natit
@@ -48,15 +62,13 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     private SpinnerNumberModel model;
 
     /**
-     * This was originally set up as a text entry dialog, but there is
-     * really no reason to use it instead of the pre-fab inputdialog that
-     * comes with java and it was actually causing problems because it uses
-     * a textpane instead of a textfield. Since it is currently only called by
-     * the set xp command in MekHQView, I am going to refactor it into a
+     * This was originally set up as a text entry dialog, but there is really no reason to use it instead of the pre-fab
+     * inputdialog that comes with java and it was actually causing problems because it uses a textpane instead of a
+     * textfield. Since it is currently only called by the set xp command in MekHQView, I am going to refactor it into a
      * numeric value setter using a spinner.
      */
     public PopupValueChoiceDialog(final JFrame frame, final boolean modal, final String title,
-                                  final int current, final int min) {
+          final int current, final int min) {
         super(frame, modal);
         model = new SpinnerNumberModel(current, min, null, 1);
         setTitle(title);
@@ -67,7 +79,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     public PopupValueChoiceDialog(final JFrame parent, final boolean modal, final String title,
-                                  final int current, final int min, final int max) {
+          final int current, final int min, final int max) {
         super(parent, modal);
         model = new SpinnerNumberModel(current, min, max, 1);
         setTitle(title);
@@ -88,7 +100,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         df.setCommitsOnValidEdit(true);
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
 
@@ -100,7 +112,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         btnCancel.setName("btnCancel");
         btnCancel.addActionListener(this::btnCancelActionPerformed);
 
-        pnlButton.setLayout(new GridLayout(0,2));
+        pnlButton.setLayout(new GridLayout(0, 2));
         pnlButton.add(btnDone);
         pnlButton.add(btnCancel);
 
@@ -108,7 +120,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
 
         getContentPane().setLayout(new BorderLayout());
 
-        getContentPane().add(value,BorderLayout.CENTER);
+        getContentPane().add(value, BorderLayout.CENTER);
         getContentPane().add(pnlButton, BorderLayout.PAGE_END);
         pack();
     }
@@ -123,8 +135,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(new JFrame(), true, "Label", 0, 0, 1);

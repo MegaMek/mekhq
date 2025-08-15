@@ -112,6 +112,7 @@ public class Factions {
      * factions (those whose short name contains a dot, {@code .}) are not included in the results.</p>
      *
      * @param date the date for which to check faction activity
+     *
      * @return a collection of active factions (excluding Commands) for the specified date
      */
     public Collection<Faction> getActiveFactions(LocalDate date) {
@@ -151,16 +152,17 @@ public class Factions {
 
     public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
         return factions.values().stream()
-                .filter(faction -> faction.getFullName(year).equals(factionName))
-                .findFirst()
-                .orElse(null);
+                     .filter(faction -> faction.getFullName(year).equals(factionName))
+                     .findFirst()
+                     .orElse(null);
     }
 
     /**
-     * Helper function that gets the faction record for the specified faction, or a
-     * fallback general faction record. Useful for RAT generator activity.
+     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
+     * Useful for RAT generator activity.
      *
      * @param faction The faction whose MegaMek faction record to retrieve.
+     *
      * @return Found faction record or null.
      */
     public FactionRecord getFactionRecordOrFallback(String faction) {
@@ -217,7 +219,7 @@ public class Factions {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public static ImageIcon getFactionLogo(Campaign campaign, String factionCode,
-                                           boolean fallbackDateDependent) {
+          boolean fallbackDateDependent) {
         return getFactionLogo(campaign.getGameYear(), factionCode);
     }
 

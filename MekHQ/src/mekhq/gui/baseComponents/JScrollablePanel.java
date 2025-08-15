@@ -24,19 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
 /**
- * JScrollablePanel is an extension of JPanel that implements scrollable, so that it can be
- * properly used within a JScrollPane.
+ * JScrollablePanel is an extension of JPanel that implements scrollable, so that it can be properly used within a
+ * JScrollPane.
  *
  * @author aarong original author
  */
@@ -47,6 +51,7 @@ public class JScrollablePanel extends JPanel implements Scrollable {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
      * @see JPanel#JPanel()
      */
@@ -70,13 +75,13 @@ public class JScrollablePanel extends JPanel implements Scrollable {
 
     @Override
     public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation,
-                                          final int direction) {
+          final int direction) {
         return 16;
     }
 
     @Override
     public int getScrollableBlockIncrement(final Rectangle visible, final int orientation,
-                                           final int direction) {
+          final int direction) {
         return (SwingConstants.VERTICAL == orientation) ? visible.height : visible.width;
     }
 

@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -39,7 +44,8 @@ public enum MysteryBoxType {
     THIRD_SUCCESSION_WAR("MysteryBoxType.THIRD_SUCCESSION_WAR.text", "MysteryBoxType.THIRD_SUCCESSION_WAR.toolTipText"),
     STAR_LEAGUE_ROYAL("MysteryBoxType.STAR_LEAGUE_ROYAL.text", "MysteryBoxType.STAR_LEAGUE_ROYAL.toolTipText"),
     STAR_LEAGUE_REGULAR("MysteryBoxType.STAR_LEAGUE_REGULAR.text", "MysteryBoxType.STAR_LEAGUE_REGULAR.toolTipText"),
-    INNER_SPHERE_EXPERIMENTAL("MysteryBoxType.INNER_SPHERE_EXPERIMENTAL.text", "MysteryBoxType.INNER_SPHERE_EXPERIMENTAL.toolTipText"),
+    INNER_SPHERE_EXPERIMENTAL("MysteryBoxType.INNER_SPHERE_EXPERIMENTAL.text",
+          "MysteryBoxType.INNER_SPHERE_EXPERIMENTAL.toolTipText"),
     CLAN_KESHIK("MysteryBoxType.CLAN_KESHIK.text", "MysteryBoxType.CLAN_KESHIK.toolTipText"),
     CLAN_FRONT_LINE("MysteryBoxType.CLAN_FRONT_LINE.text", "MysteryBoxType.CLAN_FRONT_LINE.toolTipText"),
     CLAN_SECOND_LINE("MysteryBoxType.CLAN_SECOND_LINE.text", "MysteryBoxType.CLAN_SECOND_LINE.toolTipText"),
@@ -54,7 +60,7 @@ public enum MysteryBoxType {
     //region Constructors
     MysteryBoxType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

@@ -32,6 +32,23 @@
  */
 package mekhq.gui;
 
+import static java.lang.Math.round;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.XTableColumnModel;
@@ -57,23 +74,6 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static java.lang.Math.round;
 
 /**
  * Tab for interacting with all personnel

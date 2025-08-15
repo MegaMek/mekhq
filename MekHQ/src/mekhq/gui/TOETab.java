@@ -201,7 +201,7 @@ public final class TOETab extends CampaignGuiTab {
                 crewList.addListSelectionListener(e -> {
                     if (null != model.getElementAt(crewList.getSelectedIndex())) {
                         scrollPerson.setViewportView(new PersonViewPanel(model.getElementAt(crewList.getSelectedIndex()),
-                                getCampaign(), getCampaignGui()));
+                              getCampaign(), getCampaignGui()));
                     }
                 });
                 crewList.setSelectedIndex(0);

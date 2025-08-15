@@ -63,7 +63,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
             p = c.newPerson(PersonnelRole.DOCTOR);
         } else if (roll == 3) { // ASF or Proto Pilot
             if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
-                    && Compute.d6(2) < 6) {
+                      && Compute.d6(2) < 6) {
                 p = c.newPerson(PersonnelRole.PROTOMEK_PILOT);
             } else {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
@@ -74,7 +74,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
             p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER : PersonnelRole.VEHICLE_GUNNER);
         } else if (roll == 6 || roll == 8) { // Infantry
             p = c.newPerson((c.getFaction().isClan() && Compute.d6(2) > 3)
-                    ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);
+                                  ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);
         } else if (roll == 11) { // Tech
             p = c.newPerson(techRoles.get(Compute.randomInt(techRoles.size())));
         } else if (roll == 12) { // Vessel Crew
