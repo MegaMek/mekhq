@@ -62,7 +62,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class FactionStandingLevelTest {
     private final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingLevel";
     private static final List<String> SUPPORTED_FACTIONS = List.of("CC", "DC", "LA", "FS", "FWL", "TH",
-            "ROS", "SL", "FC", "RWR", "TC", "MOC", "OA", "MH", "TD", "CS", "WOB", "innerSphere", "periphery", "clan");
+          "ROS", "SL", "FC", "RWR", "TC", "MOC", "OA", "MH", "TD", "CS", "WOB", "innerSphere", "periphery", "clan");
 
     @Test
     void test_allStandingLevelsAreExclusive() {
@@ -70,7 +70,7 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             int currentLevel = standingLevel.getStandingLevel();
             assertFalse(standingLevels.contains(currentLevel),
-                    "The standing level of " + standingLevel.name() + " is not exclusive.");
+                  "The standing level of " + standingLevel.name() + " is not exclusive.");
             standingLevels.add(currentLevel);
         }
     }
@@ -82,7 +82,7 @@ class FactionStandingLevelTest {
             int currentLevel = standingLevel.getStandingLevel();
             int expectedLevel = lastStandingLevel + 1;
             assertEquals(expectedLevel, currentLevel,
-                    "The standing level of " + standingLevel.name() + " should be " + expectedLevel + ".");
+                  "The standing level of " + standingLevel.name() + " should be " + expectedLevel + ".");
             lastStandingLevel = currentLevel;
         }
     }
@@ -107,11 +107,11 @@ class FactionStandingLevelTest {
             FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
             int currentStandingLevel = factionStanding.getStandingLevel();
             assertTrue(currentStandingLevel >= lastStandingLevel,
-                    "The standing level for " +
-                            regard +
-                            " regard should be greater than or equal to " +
-                            lastStandingLevel +
-                            ".");
+                  "The standing level for " +
+                        regard +
+                        " regard should be greater than or equal to " +
+                        lastStandingLevel +
+                        ".");
             lastStandingLevel = currentStandingLevel;
         }
     }
@@ -122,11 +122,11 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             int currentNegotiationModifier = standingLevel.getNegotiationModifier();
             assertTrue(currentNegotiationModifier >= lastNegotiationModifier,
-                    "The negotiation modifier of " +
-                            standingLevel.name() +
-                            " should be greater than or equal to " +
-                            lastNegotiationModifier +
-                            ".");
+                  "The negotiation modifier of " +
+                        standingLevel.name() +
+                        " should be greater than or equal to " +
+                        lastNegotiationModifier +
+                        ".");
             lastNegotiationModifier = currentNegotiationModifier;
         }
     }
@@ -137,11 +137,11 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             double currentResupplyModifier = standingLevel.getResupplyWeightModifier();
             assertTrue(currentResupplyModifier >= lastResupplyModifier,
-                    "The resupply weight modifier of " +
-                            standingLevel.name() +
-                            " should be greater than or equal to " +
-                            lastResupplyModifier +
-                            ".");
+                  "The resupply weight modifier of " +
+                        standingLevel.name() +
+                        " should be greater than or equal to " +
+                        lastResupplyModifier +
+                        ".");
             lastResupplyModifier = currentResupplyModifier;
         }
     }
@@ -191,11 +191,11 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             int currentTickets = standingLevel.getRecruitmentTickets();
             assertTrue(currentTickets >= lastTickets,
-                    "The recruitment tickets of " +
-                            standingLevel.name() +
-                            " should be greater than or equal to " +
-                            lastTickets +
-                            ".");
+                  "The recruitment tickets of " +
+                        standingLevel.name() +
+                        " should be greater than or equal to " +
+                        lastTickets +
+                        ".");
             lastTickets = currentTickets;
         }
     }
@@ -206,11 +206,11 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             double currentRolls = standingLevel.getRecruitmentRollsModifier();
             assertTrue(currentRolls >= lastRolls,
-                    "The recruitment roll modifier for " +
-                            standingLevel.name() +
-                            " should be greater than or equal to " +
-                            lastRolls +
-                            ".");
+                  "The recruitment roll modifier for " +
+                        standingLevel.name() +
+                        " should be greater than or equal to " +
+                        lastRolls +
+                        ".");
             lastRolls = currentRolls;
         }
     }
@@ -221,8 +221,8 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             double currentMultiplier = standingLevel.getBarrackCostsMultiplier();
             assertTrue(currentMultiplier <= lastMultiplier,
-                    "The barrack cost modifier for " + standingLevel.name() + " should be less than or equal to " +
-                            lastMultiplier + ".");
+                  "The barrack cost modifier for " + standingLevel.name() + " should be less than or equal to " +
+                        lastMultiplier + ".");
             lastMultiplier = currentMultiplier;
         }
     }
@@ -233,8 +233,8 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             double currentMultiplier = standingLevel.getContractPayMultiplier();
             assertTrue(currentMultiplier >= lastMultiplier,
-                    "The barrack cost modifier for " + standingLevel.name() + " should be greater than or equal to " +
-                            lastMultiplier + ".");
+                  "The barrack cost modifier for " + standingLevel.name() + " should be greater than or equal to " +
+                        lastMultiplier + ".");
             lastMultiplier = currentMultiplier;
         }
     }
@@ -245,12 +245,12 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             int currentRolls = standingLevel.getSupportPointModifierContractStart();
             assertTrue(currentRolls >= lastModifier,
-                    "The contract start support point modifier for " +
-                            standingLevel.name() +
-                            " should be greater than" +
-                            " or equal to " +
-                            lastModifier +
-                            ".");
+                  "The contract start support point modifier for " +
+                        standingLevel.name() +
+                        " should be greater than" +
+                        " or equal to " +
+                        lastModifier +
+                        ".");
             lastModifier = currentRolls;
         }
     }
@@ -261,16 +261,16 @@ class FactionStandingLevelTest {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             int currentRolls = standingLevel.getSupportPointModifierPeriodic();
             assertTrue(currentRolls >= lastModifier,
-                    "The periodic support point modifier for " + standingLevel.name() + " should be greater than" +
-                            " or equal to " + lastModifier + ".");
+                  "The periodic support point modifier for " + standingLevel.name() + " should be greater than" +
+                        " or equal to " + lastModifier + ".");
             lastModifier = currentRolls;
         }
     }
 
     static Stream<Arguments> labelsProvider() {
         return Stream.of(FactionStandingLevel.values())
-                       .flatMap(level -> SUPPORTED_FACTIONS.stream()
-                                                 .map(faction -> Arguments.of(level, faction)));
+                     .flatMap(level -> SUPPORTED_FACTIONS.stream()
+                                             .map(faction -> Arguments.of(level, faction)));
     }
 
     @ParameterizedTest
@@ -289,7 +289,7 @@ class FactionStandingLevelTest {
         String description = getTextAt(RESOURCE_BUNDLE, key);
 
         assertTrue(isResourceKeyValid(description),
-                "The description " + description + " is not valid for " + factionCode + ".");
+              "The description " + description + " is not valid for " + factionCode + ".");
     }
 
     @Test
@@ -342,15 +342,15 @@ class FactionStandingLevelTest {
 
     private static Stream<Arguments> fromStringTestCases() {
         return Stream.of(
-                Arguments.of("STANDING_LEVEL_1", FactionStandingLevel.STANDING_LEVEL_1),
-                Arguments.of("standing_level_2", FactionStandingLevel.STANDING_LEVEL_2),
-                Arguments.of("standing level 3", FactionStandingLevel.STANDING_LEVEL_3),
-                Arguments.of("0", FactionStandingLevel.STANDING_LEVEL_0),
-                Arguments.of("1", FactionStandingLevel.STANDING_LEVEL_1),
-                Arguments.of("not_a_level", FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of("99", FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of("-1", FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of(null, FactionStandingLevel.STANDING_LEVEL_4)
+              Arguments.of("STANDING_LEVEL_1", FactionStandingLevel.STANDING_LEVEL_1),
+              Arguments.of("standing_level_2", FactionStandingLevel.STANDING_LEVEL_2),
+              Arguments.of("standing level 3", FactionStandingLevel.STANDING_LEVEL_3),
+              Arguments.of("0", FactionStandingLevel.STANDING_LEVEL_0),
+              Arguments.of("1", FactionStandingLevel.STANDING_LEVEL_1),
+              Arguments.of("not_a_level", FactionStandingLevel.STANDING_LEVEL_4),
+              Arguments.of("99", FactionStandingLevel.STANDING_LEVEL_4),
+              Arguments.of("-1", FactionStandingLevel.STANDING_LEVEL_4),
+              Arguments.of(null, FactionStandingLevel.STANDING_LEVEL_4)
         );
     }
 

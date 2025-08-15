@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -31,7 +36,6 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.UUID;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -53,7 +57,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public static final int N_COL = 3;
 
     private static final String[] colNames = {
-            "Unit", "Class", "Cost"
+          "Unit", "Class", "Cost"
     };
 
     private Campaign campaign;
@@ -153,8 +157,8 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
@@ -169,7 +173,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);

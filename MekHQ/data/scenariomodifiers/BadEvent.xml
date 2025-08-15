@@ -1,8 +1,0 @@
-<AtBScenarioModifier>
-	<additionalBriefingText>Hostiles are coordinating more front line units in the area.</additionalBriefingText>
-	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
-	<eventRecipient>Opposing</eventRecipient>
-	<qualityAdjustment>1</qualityAdjustment>
-	<bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>
-</AtBScenarioModifier>

@@ -35,18 +35,16 @@ package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 
-import mekhq.utilities.ReportingUtilities;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class UnitStub {
     private static final MMLogger logger = MMLogger.create(UnitStub.class);

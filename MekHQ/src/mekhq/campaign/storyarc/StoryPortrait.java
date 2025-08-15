@@ -24,25 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc;
 
 import java.awt.Image;
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
+import org.w3c.dom.Node;
 
 /**
- * This class extends the Portrait class to look in the story arc data directory
- * for additional portraits that may be available. It could be extended in other
- * ways in the future
- * if needed.
+ * This class extends the Portrait class to look in the story arc data directory for additional portraits that may be
+ * available. It could be extended in other ways in the future if needed.
  */
 public class StoryPortrait extends Portrait {
     private static final MMLogger logger = MMLogger.create(StoryPortrait.class);
@@ -81,7 +83,7 @@ public class StoryPortrait extends Portrait {
                 if (portrait == null) {
                     // if it's still null, then try the default image
                     portrait = (Image) MMStaticDirectoryManager.getPortraits().getItem("",
-                            DEFAULT_PORTRAIT_FILENAME);
+                          DEFAULT_PORTRAIT_FILENAME);
                 }
             }
         } catch (Exception e) {

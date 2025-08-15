@@ -46,17 +46,16 @@ import megamek.common.annotations.Nullable;
 /**
  * A specialized {@link JTextField} component designed for use in campaign options dialogs.
  * <p>
- * This text field fetches its tooltip text dynamically from a resource bundle
- * based on the provided name. It also supports a customizable tooltip wrap size while
- * maintaining consistent UI scaling.
+ * This text field fetches its tooltip text dynamically from a resource bundle based on the provided name. It also
+ * supports a customizable tooltip wrap size while maintaining consistent UI scaling.
  */
 public class CampaignOptionsTextField extends JTextField {
     /**
      * Constructs a {@link CampaignOptionsTextField} with a default tooltip wrap size.
      * <p>
-     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched
-     * using the key {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are
-     * word-wrapped to a default width of 100 characters.
+     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched using the key
+     * {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are word-wrapped to a default width of 100
+     * characters.
      *
      * @param name the base name used to generate the text field's name and tooltip text.
      */
@@ -67,13 +66,13 @@ public class CampaignOptionsTextField extends JTextField {
     /**
      * Constructs a {@link CampaignOptionsTextField} with a customizable tooltip wrap size.
      * <p>
-     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched
-     * using the key {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are
-     * word-wrapped to the specified width in {@code customWrapSize}.
+     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched using the key
+     * {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are word-wrapped to the specified width in
+     * {@code customWrapSize}.
      *
      * @param name           the base name used to generate the text field's name and tooltip text.
-     * @param customWrapSize the maximum number of characters (including spaces) per line in the tooltip text.
-     *                       If {@code null}, a default wrap size of 100 characters is used.
+     * @param customWrapSize the maximum number of characters (including spaces) per line in the tooltip text. If
+     *                       {@code null}, a default wrap size of 100 characters is used.
      */
     public CampaignOptionsTextField(String name, @Nullable Integer customWrapSize) {
         super();

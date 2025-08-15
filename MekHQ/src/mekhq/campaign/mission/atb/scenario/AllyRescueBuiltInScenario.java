@@ -24,19 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.*;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
-import mekhq.campaign.mission.*;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
-import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import megamek.common.Board;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.UnitType;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class AllyRescueBuiltInScenario extends AtBScenario {
@@ -88,7 +101,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
 
         setStartingPos(Board.START_S);
         setDeploymentDelay(12);
@@ -97,9 +110,9 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 
         for (int i = 0; i < 4; i++) {
             getAlliesPlayer().add(getEntity(contract.getEmployerCode(), contract.getAllySkill(),
-                    contract.getAllyQuality(), UnitType.MEK,
-                    AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, contract.getEmployerFaction()),
-                    campaign));
+                  contract.getAllyQuality(), UnitType.MEK,
+                  AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, contract.getEmployerFaction()),
+                  campaign));
         }
 
         List<Entity> otherForce = new ArrayList<>();
@@ -107,10 +120,12 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
         for (int i = 0; i < 8; i++) {
             int weightClass;
             do {
-                weightClass = AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, contract.getEmployerFaction());
+                weightClass = AtBStaticWeightGenerator.getRandomWeight(campaign,
+                      UnitType.MEK,
+                      contract.getEmployerFaction());
             } while (weightClass >= EntityWeightClass.WEIGHT_ASSAULT);
             otherForce.add(getEntity(contract.getEmployerCode(), contract.getAllySkill(),
-                    contract.getAllyQuality(), UnitType.MEK, weightClass, campaign));
+                  contract.getAllyQuality(), UnitType.MEK, weightClass, campaign));
         }
 
         addBotForce(new BotForce(contract.getAllyBotName(), 1, Board.START_CENTER, otherForce), campaign);
@@ -121,7 +136,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
                 weightClass = AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, contract.getEnemy());
             } while (weightClass <= EntityWeightClass.WEIGHT_LIGHT);
             enemyEntities.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
-                    contract.getEnemyQuality(), UnitType.MEK, weightClass, campaign));
+                  contract.getEnemyQuality(), UnitType.MEK, weightClass, campaign));
         }
 
         addBotForce(getEnemyBotForce(contract, Board.START_N, enemyEntities), campaign);
@@ -133,15 +148,15 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 50, false);
+              1, 50, false);
 
         // in addition to the standard destroy 50/preserve 50, you need to keep
         // at least 3/8 of the "allied" units alive.
         ScenarioObjective keepAlliesAlive = new ScenarioObjective();
         keepAlliesAlive.setFixedAmount(3);
         keepAlliesAlive.setDescription(
-                String.format(defaultResourceBundle.getString("commonObjectives.preserveFriendlyUnits.text"),
-                        keepAlliesAlive.getFixedAmount(), ""));
+              String.format(defaultResourceBundle.getString("commonObjectives.preserveFriendlyUnits.text"),
+                    keepAlliesAlive.getFixedAmount(), ""));
         keepAlliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
 
         keepAlliesAlive.addForce(contract.getAllyBotName());

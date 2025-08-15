@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.partGenerators;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Armor;
@@ -34,10 +43,6 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 import mekhq.campaign.work.WorkTime;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -60,47 +65,51 @@ public abstract class AbstractPartGenerator {
     //endregion Getters
 
     /**
-     * This generates based on the parts from a list of units, optionally excluding armour and
-     * ammunition.
+     * This generates based on the parts from a list of units, optionally excluding armour and ammunition.
      *
-     * @param units the list of units to generate parts based off of
-     * @param includeArmour whether to include armour in the parts generated
+     * @param units             the list of units to generate parts based off of
+     * @param includeArmour     whether to include armour in the parts generated
      * @param includeAmmunition whether to include ammunition in the parts generated
+     *
      * @return the generated list of parts
      */
     public List<Part> generate(final List<Unit> units, final boolean includeArmour,
-                               final boolean includeAmmunition) {
+          final boolean includeAmmunition) {
         final List<Part> parts = new ArrayList<>();
         units.forEach(unit -> unit.getParts().stream()
-                .filter(part -> (includeArmour || !(part instanceof Armor))
-                        && (includeAmmunition || !(part instanceof AmmoBin)))
-                .forEach(parts::add));
+                                    .filter(part -> (includeArmour || !(part instanceof Armor))
+                                                          && (includeAmmunition || !(part instanceof AmmoBin)))
+                                    .forEach(parts::add));
         return generate(parts);
     }
 
     /**
-     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor
-     *                   unassigned. Implementors are required to clone the parts as required.
+     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor unassigned. Implementors
+     *                   are required to clone the parts as required.
+     *
      * @return the list of generated parts
      */
     public List<Part> generate(final List<Part> inputParts) {
         final List<Part> parts = generateWarehouse(inputParts).getParts().stream()
-                .filter(part -> part.getQuantity() > 0)
-                .collect(Collectors.toList());
+                                       .filter(part -> part.getQuantity() > 0)
+                                       .collect(Collectors.toList());
         parts.forEach(part -> part.setId(0));
         return parts;
     }
 
     /**
-     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor
-     *                   unassigned. Implementors are required to clone the parts as required.
+     * @param inputParts a list of parts, which are not guaranteed to be unique, sorted, nor unassigned. Implementors
+     *                   are required to clone the parts as required.
+     *
      * @return a warehouse containing the generated parts
      */
     public abstract Warehouse generateWarehouse(List<Part> inputParts);
 
     /**
      * This creates a clone of the input part, with it not being omni-podded if it was originally.
+     *
      * @param inputPart the input part to clone
+     *
      * @return the cloned part
      */
     protected Part clonePart(final Part inputPart) {

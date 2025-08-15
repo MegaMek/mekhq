@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.enums;
 
@@ -34,25 +39,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class FinancialTermTest {
     // region Variable Declarations
     private static final FinancialTerm[] terms = FinancialTerm.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("FinancialTerm.BIWEEKLY.toolTipText"),
-                FinancialTerm.BIWEEKLY.getToolTipText());
+              FinancialTerm.BIWEEKLY.getToolTipText());
         assertEquals(resources.getString("FinancialTerm.ANNUALLY.toolTipText"),
-                FinancialTerm.ANNUALLY.getToolTipText());
+              FinancialTerm.ANNUALLY.getToolTipText());
     }
     // endregion Getters
 
@@ -116,89 +120,89 @@ class FinancialTermTest {
     @Test
     void testNextValidDate() {
         assertEquals(LocalDate.of(3025, 1, 10),
-                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3024, 12, 27)));
+              FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3024, 12, 27)));
         assertEquals(LocalDate.of(3025, 1, 10),
-                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+              FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 1)));
         assertEquals(LocalDate.of(3025, 1, 24),
-                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 3)));
+              FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 3)));
         assertEquals(LocalDate.of(3025, 1, 24),
-                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 4)));
+              FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 4)));
         assertEquals(LocalDate.of(3025, 1, 24),
-                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 10)));
+              FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 10)));
 
         assertEquals(LocalDate.of(3025, 2, 1),
-                FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+              FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 1, 1)));
         assertEquals(LocalDate.of(3025, 3, 1),
-                FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+              FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 1, 2)));
         assertEquals(LocalDate.of(3025, 3, 1),
-                FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 2, 1)));
+              FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 2, 1)));
 
         assertEquals(LocalDate.of(3025, 4, 1),
-                FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+              FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 1, 1)));
         assertEquals(LocalDate.of(3025, 7, 1),
-                FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+              FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 1, 2)));
         assertEquals(LocalDate.of(3025, 7, 1),
-                FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 4, 1)));
+              FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 4, 1)));
 
         assertEquals(LocalDate.of(3025, 7, 1),
-                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+              FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 1, 1)));
         assertEquals(LocalDate.of(3026, 1, 1),
-                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+              FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 1, 2)));
         assertEquals(LocalDate.of(3026, 1, 1),
-                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 5, 1)));
+              FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 5, 1)));
         assertEquals(LocalDate.of(3026, 1, 1),
-                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 7, 1)));
+              FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 7, 1)));
         assertEquals(LocalDate.of(3026, 7, 1),
-                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 8, 1)));
+              FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 8, 1)));
         assertEquals(LocalDate.of(3026, 7, 1),
-                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 12, 1)));
+              FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 12, 1)));
 
         assertEquals(LocalDate.of(3026, 1, 1),
-                FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+              FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3025, 1, 1)));
         assertEquals(LocalDate.of(3027, 1, 1),
-                FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+              FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3025, 1, 2)));
         assertEquals(LocalDate.of(3027, 1, 1),
-                FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3026, 1, 1)));
+              FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3026, 1, 1)));
     }
 
     @Test
     void testEndsToday() {
         assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3024, 12, 31),
-                LocalDate.of(3025, 1, 1)));
+              LocalDate.of(3025, 1, 1)));
         assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 8),
-                LocalDate.of(3025, 1, 9)));
+              LocalDate.of(3025, 1, 9)));
         assertTrue(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 9),
-                LocalDate.of(3025, 1, 10)));
+              LocalDate.of(3025, 1, 10)));
         assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 16),
-                LocalDate.of(3025, 1, 17)));
+              LocalDate.of(3025, 1, 17)));
         assertTrue(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 23),
-                LocalDate.of(3025, 1, 24)));
+              LocalDate.of(3025, 1, 24)));
 
         assertTrue(FinancialTerm.MONTHLY.endsToday(LocalDate.of(3024, 12, 31),
-                LocalDate.of(3025, 1, 1)));
+              LocalDate.of(3025, 1, 1)));
         assertFalse(FinancialTerm.MONTHLY.endsToday(LocalDate.of(3025, 1, 1),
-                LocalDate.of(3025, 1, 31)));
+              LocalDate.of(3025, 1, 31)));
 
         assertTrue(FinancialTerm.QUARTERLY.endsToday(LocalDate.of(3025, 3, 31),
-                LocalDate.of(3025, 4, 1)));
+              LocalDate.of(3025, 4, 1)));
         assertFalse(FinancialTerm.QUARTERLY.endsToday(LocalDate.of(3025, 4, 1),
-                LocalDate.of(3025, 5, 1)));
+              LocalDate.of(3025, 5, 1)));
 
         assertTrue(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3024, 12, 31),
-                LocalDate.of(3025, 1, 1)));
+              LocalDate.of(3025, 1, 1)));
         assertFalse(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 1, 1),
-                LocalDate.of(3025, 1, 2)));
+              LocalDate.of(3025, 1, 2)));
         assertFalse(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 3, 31),
-                LocalDate.of(3025, 4, 1)));
+              LocalDate.of(3025, 4, 1)));
         assertTrue(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 6, 30),
-                LocalDate.of(3025, 7, 1)));
+              LocalDate.of(3025, 7, 1)));
 
         assertFalse(FinancialTerm.ANNUALLY.endsToday(LocalDate.ofYearDay(3026, 1),
-                LocalDate.ofYearDay(3026, 2)));
+              LocalDate.ofYearDay(3026, 2)));
         assertFalse(FinancialTerm.ANNUALLY.endsToday(LocalDate.ofYearDay(3029, 364),
-                LocalDate.ofYearDay(3029, 365)));
+              LocalDate.ofYearDay(3029, 365)));
         assertTrue(FinancialTerm.ANNUALLY.endsToday(LocalDate.ofYearDay(3029, 365),
-                LocalDate.ofYearDay(3030, 1)));
+              LocalDate.ofYearDay(3030, 1)));
     }
 
     @Test

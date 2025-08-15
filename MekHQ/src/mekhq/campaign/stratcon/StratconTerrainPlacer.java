@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -49,7 +54,7 @@ public class StratconTerrainPlacer {
         // TODO: Map category being displayed for some reason
         int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
         StratconBiome biome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_BIOME)
-                .floorEntry(kelvinTemp).getValue();
+                                    .floorEntry(kelvinTemp).getValue();
 
         int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
 

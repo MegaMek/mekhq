@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -35,15 +40,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import megamek.common.*;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class CrewSkillUpgraderTest {
 
@@ -77,31 +81,31 @@ class CrewSkillUpgraderTest {
         ArrayList<Entity> entities = new ArrayList<>();
         // Iterate over these to make units
         ArrayList<Class> eClasses = new ArrayList<>(List.of(
-                BipedMek.class,
-                VTOL.class,
-                Tank.class,
-                TripodMek.class,
-                AeroSpaceFighter.class,
-                BattleArmor.class,
-                Infantry.class,
-                QuadMek.class,
-                Jumpship.class));
+              BipedMek.class,
+              VTOL.class,
+              Tank.class,
+              TripodMek.class,
+              AeroSpaceFighter.class,
+              BattleArmor.class,
+              Infantry.class,
+              QuadMek.class,
+              Jumpship.class));
         ArrayList<CrewType> crewTypes = new ArrayList<>(List.of(
-                CrewType.SINGLE,
-                CrewType.DUAL,
-                CrewType.CREW,
-                CrewType.INFANTRY_CREW,
-                CrewType.TRIPOD,
-                CrewType.VESSEL,
-                CrewType.QUADVEE,
-                CrewType.COMMAND_CONSOLE,
-                CrewType.SUPERHEAVY_TRIPOD));
+              CrewType.SINGLE,
+              CrewType.DUAL,
+              CrewType.CREW,
+              CrewType.INFANTRY_CREW,
+              CrewType.TRIPOD,
+              CrewType.VESSEL,
+              CrewType.QUADVEE,
+              CrewType.COMMAND_CONSOLE,
+              CrewType.SUPERHEAVY_TRIPOD));
 
         for (int i = 0; i < 1000; i++) {
             Entity e = (Entity) eClasses.get(i % eClasses.size()).getDeclaredConstructor().newInstance();
             CrewType t = crewTypes.get(i % crewTypes.size());
             Crew c = new Crew(t, "Pilot #" + String.valueOf(i), t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2 == 0,
-                    null);
+                  null);
             assertTrue(allSPAsFalse(c));
             e.setCrew(c);
             entities.add(e);
