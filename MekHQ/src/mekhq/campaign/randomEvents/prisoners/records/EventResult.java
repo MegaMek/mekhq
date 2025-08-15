@@ -24,28 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.records;
+
+import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 
-import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.NONE;
-
 /**
- * Represents the result of an event response, including the effect type,
- * the guard flag, the magnitude, and an optional skill type.
+ * Represents the result of an event response, including the effect type, the guard flag, the magnitude, and an optional
+ * skill type.
  *
- * @param effect The type of effect this result describes
- * @param isGuard Whether this result applies to a guard
+ * @param effect    The type of effect this result describes
+ * @param isGuard   Whether this result applies to a guard
  * @param magnitude The intensity or magnitude of the effect
  * @param skillType An optional skill type associated with the effect
  */
 public record EventResult(
-    @JsonProperty(value = "effect") EventResultEffect effect,
-    @JsonProperty(value = "isGuard") boolean isGuard,
-    @JsonProperty(value = "magnitude") int magnitude,
-    @JsonProperty(value = "skillType") String skillType
+      @JsonProperty(value = "effect") EventResultEffect effect,
+      @JsonProperty(value = "isGuard") boolean isGuard,
+      @JsonProperty(value = "magnitude") int magnitude,
+      @JsonProperty(value = "skillType") String skillType
 ) {
     // Additional logic to provide defaults for missing properties
     public EventResult {

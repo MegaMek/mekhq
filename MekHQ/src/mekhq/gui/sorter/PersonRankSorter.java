@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
+
+import java.util.Comparator;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.personnel.Person;
-
-import java.util.Comparator;
 
 public class PersonRankSorter implements Comparator<Person> {
     //region Variable Declarations
@@ -68,7 +73,7 @@ public class PersonRankSorter implements Comparator<Person> {
 
         // First we sort based on prisoner status
         final int prisonerStatusComparison = getPrisonerStatusSorter().compare(
-                p0.getPrisonerStatus(), p1.getPrisonerStatus());
+              p0.getPrisonerStatus(), p1.getPrisonerStatus());
         if (prisonerStatusComparison != 0) {
             return prisonerStatusComparison;
         }

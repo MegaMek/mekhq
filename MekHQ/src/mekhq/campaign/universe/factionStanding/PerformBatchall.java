@@ -82,6 +82,7 @@ public class PerformBatchall {
      * @param campaign         The current campaign context.
      * @param clanOpponent     The opponent issuing the Batchall challenge.
      * @param enemyFactionCode The internal code of the opponent's faction.
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -118,6 +119,7 @@ public class PerformBatchall {
      * options in the Batchall process.
      *
      * @param factionStanding The {@link FactionStandings} object tracking campaign standing toward all factions.
+     *
      * @return The {@link FactionStandingLevel} of the campaign toward the current Clan.
      *
      * @author Illiani
@@ -182,8 +184,8 @@ public class PerformBatchall {
     }
 
     /**
-     * Displays the initial Batchall challenge dialog to the player and returns their selection.
-     * The dialog options and message use randomized and context-aware narrative variations.
+     * Displays the initial Batchall challenge dialog to the player and returns their selection. The dialog options and
+     * message use randomized and context-aware narrative variations.
      *
      * @return The index of the option chosen by the player in the dialog.
      *
@@ -222,8 +224,10 @@ public class PerformBatchall {
 
         if (!opponentClanName.contains(getTextAt(RESOURCE_BUNDLE, "performBatchall.clanName.prefix.empire"))) {
             opponentClanName = opponentClanName.replace(
-                    getTextAt(RESOURCE_BUNDLE, "performBatchall.clanName.prefix.clan") + ' ', "");
-            opponentClanName = getFormattedTextAt(RESOURCE_BUNDLE, "performBatchall.clanName.formatted", opponentClanName);
+                  getTextAt(RESOURCE_BUNDLE, "performBatchall.clanName.prefix.clan") + ' ', "");
+            opponentClanName = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "performBatchall.clanName.formatted",
+                  opponentClanName);
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, bundleKey, campaignName, opponentName, opponentClanName);
@@ -269,6 +273,7 @@ public class PerformBatchall {
      * The narrative varies by standing and context.
      *
      * @param isRefuse {@code true} for the refusal variant; {@code false} for acceptance.
+     *
      * @return The appropriate narrative text.
      *
      * @author Illiani
@@ -331,6 +336,6 @@ public class PerformBatchall {
      */
     private List<String> getAreYouSureDialogOptions() {
         return List.of(getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.cancel"),
-                getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.confirm"));
+              getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.confirm"));
     }
 }

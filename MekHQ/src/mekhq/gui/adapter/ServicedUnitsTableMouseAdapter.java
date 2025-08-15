@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
+
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
 import megamek.common.AmmoType;
 import mekhq.MekHQ;
@@ -43,10 +57,6 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.mrms.MRMSService;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-
 public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 
     private CampaignGUI gui;
@@ -54,7 +64,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
     private UnitTableModel servicedUnitModel;
 
     protected ServicedUnitsTableMouseAdapter(CampaignGUI gui, JTable servicedUnitTable,
-            UnitTableModel servicedUnitModel) {
+          UnitTableModel servicedUnitModel) {
         this.gui = gui;
         this.servicedUnitTable = servicedUnitTable;
         this.servicedUnitModel = servicedUnitModel;
@@ -62,14 +72,14 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 
     public static void connect(CampaignGUI gui, JTable servicedUnitTable, UnitTableModel servicedUnitModel) {
         new ServicedUnitsTableMouseAdapter(gui, servicedUnitTable, servicedUnitModel)
-                .connect(servicedUnitTable);
+              .connect(servicedUnitTable);
     }
 
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(
-                servicedUnitTable.getSelectedRow()));
+              servicedUnitTable.getSelectedRow()));
         int[] rows = servicedUnitTable.getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
@@ -112,13 +122,13 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 Unit unit = units[0];
                 if (unit.isDeployed()) {
                     JOptionPane.showMessageDialog(gui.getFrame(),
-                            "Unit is currently deployed and can not be repaired.",
-                            "Unit is deployed", JOptionPane.ERROR_MESSAGE);
+                          "Unit is currently deployed and can not be repaired.",
+                          "Unit is deployed", JOptionPane.ERROR_MESSAGE);
                 } else {
                     String message = MRMSService.performSingleUnitMRMS(gui.getCampaign(), unit);
 
                     JOptionPane.showMessageDialog(gui.getFrame(), message, "Complete",
-                            JOptionPane.INFORMATION_MESSAGE);
+                          JOptionPane.INFORMATION_MESSAGE);
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
@@ -137,11 +147,11 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
         int row = servicedUnitTable.getSelectedRow();
         boolean oneSelected = servicedUnitTable.getSelectedRowCount() == 1;
         Unit unit = servicedUnitModel.getUnit(servicedUnitTable
-                .convertRowIndexToModel(row));
+                                                    .convertRowIndexToModel(row));
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
             units[i] = servicedUnitModel.getUnit(servicedUnitTable
-                    .convertRowIndexToModel(rows[i]));
+                                                       .convertRowIndexToModel(rows[i]));
         }
         JMenuItem menuItem;
         JCheckBoxMenuItem cbMenuItem;
@@ -176,8 +186,9 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                     ammoMenu = new JMenu(ammo.getType().getDesc());
                     AmmoType curType = ammo.getType();
                     for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, gui.getCampaign()
-                            .getCampaignOptions().getTechLevel())) {
+                                                                          .getEntity(), curType, gui.getCampaign()
+                                                                                                       .getCampaignOptions()
+                                                                                                       .getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
                         if (atype.equals(curType)) {
                             cbMenuItem.setSelected(true);
@@ -201,7 +212,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setActionCommand("REPAIR");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(unit.isAvailable()
-                        && unit.isRepairable());
+                                          && unit.isRepairable());
                 popup.add(menuItem);
             } else {
                 menuItem = new JMenuItem("Salvage");

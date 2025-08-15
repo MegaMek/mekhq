@@ -24,13 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
-
 import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
@@ -56,8 +60,7 @@ public class StratconFacilityManifest {
     public List<String> facilityFileNames;
 
     /**
-     * Attempt to deserialize an instance of a StratconFacilityManifest from the
-     * passed-in file path
+     * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file path
      *
      * @return Possibly an instance of a StratconFacilityManifest
      */
@@ -75,7 +78,7 @@ public class StratconFacilityManifest {
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<StratconFacilityManifest> manifestElement = um.unmarshal(inputSource,
-                        StratconFacilityManifest.class);
+                      StratconFacilityManifest.class);
                 resultingManifest = manifestElement.getValue();
             }
         } catch (Exception e) {

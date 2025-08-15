@@ -105,8 +105,8 @@ public enum FactionStandingLevel {
      * Constructs a standing level with all modifiers and properties.
      *
      * @param standingLevel                     The level of the standing. Should be exclusive to this standing level.
-     * @param minimumRegard                       Minimum regard for this level (inclusive).
-     * @param maximumRegard                       Maximum regard for this level (exclusive).
+     * @param minimumRegard                     Minimum regard for this level (inclusive).
+     * @param maximumRegard                     Maximum regard for this level (exclusive).
      * @param negotiationModifier               Modifier to contract negotiations.
      * @param resupplyWeightModifier            Modifier for resupply weight calculations.
      * @param hasCommandCircuitAccess           Whether Command Circuit access is granted at this level.
@@ -441,13 +441,15 @@ public enum FactionStandingLevel {
      * relevant for the given context (e.g., depending on whether the organization is a Clan or on available campaign
      * options).</p>
      *
-     * @param isClan           {@code true} if the organization being described is a Clan; enables consideration of
-     *                                     Clan-specific modifiers.
-     * @param isPirateOrMercenaryOrganization           {@code true} if the organization being described is a pirate
-     *                                                              or mercenary organization
-     * @param campaignOptions  the current {@link CampaignOptions} that determine which standing effects are in use.
-     * @return a comma-separated {@link String} listing all non-default, active faction standing effects;
-     *         returns an empty string if there are no applicable effects.
+     * @param isClan                          {@code true} if the organization being described is a Clan; enables
+     *                                        consideration of Clan-specific modifiers.
+     * @param isPirateOrMercenaryOrganization {@code true} if the organization being described is a pirate or mercenary
+     *                                        organization
+     * @param campaignOptions                 the current {@link CampaignOptions} that determine which standing effects
+     *                                        are in use.
+     *
+     * @return a comma-separated {@link String} listing all non-default, active faction standing effects; returns an
+     *       empty string if there are no applicable effects.
      */
     public String getEffectsDescription(boolean isClan, boolean isPirateOrMercenaryOrganization,
           CampaignOptions campaignOptions) {

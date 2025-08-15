@@ -24,8 +24,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Checkbox;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.logging.MMLogger;
@@ -38,15 +65,6 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.AutoAwardsTableModel;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.*;
 
 public class AutoAwardsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(AutoAwardsDialog.class);
@@ -71,7 +89,7 @@ public class AutoAwardsDialog extends JDialog {
     private JButton btnDone;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     public AutoAwardsDialog(Campaign c, Map<Integer, Map<Integer, List<Object>>> allAwardData, int ceremonyCount) {
         campaign = c;
@@ -107,7 +125,7 @@ public class AutoAwardsDialog extends JDialog {
         JPanel imageAndInstructionsPanel = new JPanel(new BorderLayout());
 
         Image image = new ImageIcon("data/images/awards/awardceremony.jpg")
-                .getImage().getScaledInstance(screenWidth, (screenHeight / 4), Image.SCALE_FAST);
+                            .getImage().getScaledInstance(screenWidth, (screenHeight / 4), Image.SCALE_FAST);
         JLabel lblImage = new JLabel(new ImageIcon(image));
         imageAndInstructionsPanel.add(lblImage, BorderLayout.CENTER);
 
@@ -117,8 +135,8 @@ public class AutoAwardsDialog extends JDialog {
         txtInstructions.setLineWrap(true);
         txtInstructions.setText(resourceMap.getString("txtInstructions.text"));
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         imageAndInstructionsPanel.add(txtInstructions, BorderLayout.SOUTH);
         add(imageAndInstructionsPanel, BorderLayout.PAGE_START);
@@ -168,7 +186,7 @@ public class AutoAwardsDialog extends JDialog {
         cboPersonnelFilter.addActionListener(evt -> filterPersonnel(personnelSorter, cboPersonnelFilter));
 
         TableColumn awardColumn = personnelTable.getColumnModel()
-                .getColumn(personnelTable.convertColumnIndexToModel(AutoAwardsTableModel.COL_AWARD));
+                                        .getColumn(personnelTable.convertColumnIndexToModel(AutoAwardsTableModel.COL_AWARD));
 
         DefaultCellEditor cellEditor = (DefaultCellEditor) awardColumn.getCellEditor();
 
@@ -245,11 +263,11 @@ public class AutoAwardsDialog extends JDialog {
                         List<Award> awardsForRemoval = new ArrayList<>();
 
                         if ((award.canBeAwarded(person))
-                                && (award.getItem().equalsIgnoreCase("rank"))
-                                && (award.getRange().equalsIgnoreCase("Promotion"))) {
+                                  && (award.getItem().equalsIgnoreCase("rank"))
+                                  && (award.getRange().equalsIgnoreCase("Promotion"))) {
                             for (Award existingAward : person.getAwardController().getAwards()) {
                                 if ((!existingAward.getItem().equalsIgnoreCase("rank"))
-                                        || (!existingAward.getRange().equalsIgnoreCase("promotion"))) {
+                                          || (!existingAward.getRange().equalsIgnoreCase("promotion"))) {
                                     continue;
                                 }
 
@@ -260,14 +278,14 @@ public class AutoAwardsDialog extends JDialog {
                         if (!awardsForRemoval.isEmpty()) {
                             for (Award awardPendingRemoval : awardsForRemoval) {
                                 person.getAwardController().removeAwardSilent(
-                                        awardPendingRemoval.getSet(),
-                                        awardPendingRemoval.getName(),
-                                        null);
+                                      awardPendingRemoval.getSet(),
+                                      awardPendingRemoval.getName(),
+                                      null);
                             }
                         }
 
                         person.getAwardController().addAndLogAward(campaign, award.getSet(),
-                                award.getName(), campaign.getLocalDate());
+                              award.getName(), campaign.getLocalDate());
                     }
                 }
 
@@ -299,9 +317,9 @@ public class AutoAwardsDialog extends JDialog {
 
     private void filterPersonnel(TableRowSorter<AutoAwardsTableModel> sorter, JComboBox<PersonnelFilter> comboBox) {
         PersonnelFilter filter = (comboBox.getSelectedItem() == null)
-                // this needs to be ALL, as we may have dead personnel in the table
-                ? PersonnelFilter.ALL
-                : (PersonnelFilter) comboBox.getSelectedItem();
+                                       // this needs to be ALL, as we may have dead personnel in the table
+                                       ? PersonnelFilter.ALL
+                                       : (PersonnelFilter) comboBox.getSelectedItem();
 
         sorter.setRowFilter(new RowFilter<>() {
             @Override
@@ -336,6 +354,6 @@ class AutoAwardsTable extends JTable {
         setShowGrid(false);
 
         getColumnModel().getColumn(convertColumnIndexToView(AutoAwardsTableModel.COL_AWARD))
-                .setCellEditor(new DefaultCellEditor(new JCheckBox()));
+              .setCellEditor(new DefaultCellEditor(new JCheckBox()));
     }
 }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -32,10 +37,6 @@ import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -66,8 +67,6 @@ import megamek.common.Minefield;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.util.BoardUtilities;
 import megamek.logging.MMLogger;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;

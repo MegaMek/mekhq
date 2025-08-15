@@ -24,29 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.partGenerators;
 
+import java.util.List;
+
 import megamek.common.Mek;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.MekCockpit;
+import mekhq.campaign.parts.MekGyro;
+import mekhq.campaign.parts.MekLifeSupport;
+import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
-import java.util.List;
-
 /**
- * The Rules for this Generator:
- * 1) Remove all non-'Mek Units
- * 2) Start with Triple Parts
- * 3) Remove all Engines
- * 3) All Heat Sinks are capped at 30 per type
- * 4) All 'Mek Heads [Sensors, Life Support] are capped at 2 per weight/type
- * 5) All Gyros are capped at 1 per weight/type
- * 6) MASC is capped at 1 per type
- * 7) Any other parts are capped at 6.
+ * The Rules for this Generator: 1) Remove all non-'Mek Units 2) Start with Triple Parts 3) Remove all Engines 3) All
+ * Heat Sinks are capped at 30 per type 4) All 'Mek Heads [Sensors, Life Support] are capped at 2 per weight/type 5) All
+ * Gyros are capped at 1 per weight/type 6) MASC is capped at 1 per type 7) Any other parts are capped at 6.
  *
  * @author Justin "Windchild" Bowen
  */
@@ -59,7 +64,7 @@ public class MishraPartGenerator extends MultiplePartGenerator {
 
     @Override
     public List<Part> generate(final List<Unit> units, final boolean includeArmour,
-                               final boolean includeAmmunition) {
+          final boolean includeAmmunition) {
         units.removeIf(unit -> !(unit.getEntity() instanceof Mek));
         return super.generate(units, includeArmour, includeAmmunition);
     }
@@ -72,8 +77,8 @@ public class MishraPartGenerator extends MultiplePartGenerator {
             if (part instanceof HeatSink) {
                 part.setQuantity(Math.min(part.getQuantity(), 30));
             } else if ((part instanceof MekCockpit) || (part instanceof MekLifeSupport)
-                    || (part instanceof MekSensor)
-                    || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mek.LOC_HEAD)) {
+                             || (part instanceof MekSensor)
+                             || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mek.LOC_HEAD)) {
                 part.setQuantity(Math.min(part.getQuantity(), 2));
             } else if ((part instanceof MekGyro) || (part instanceof MASC)) {
                 part.setQuantity(Math.min(part.getQuantity(), 1));

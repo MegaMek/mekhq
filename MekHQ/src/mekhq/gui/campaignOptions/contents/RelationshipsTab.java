@@ -60,13 +60,12 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * Represents a tab in the campaign options UI for configuring relationship-related options,
- * such as marriage, divorce, and procreation settings.
+ * Represents a tab in the campaign options UI for configuring relationship-related options, such as marriage, divorce,
+ * and procreation settings.
  * <p>
- * This tab allows users to manage manual and random settings for the relationships
- * between personnel in a campaign, applying user-defined rules and configurations.
- * The class generates UI components for the respective configurations and interacts
- * with {@link CampaignOptions} to store and apply these settings.
+ * This tab allows users to manage manual and random settings for the relationships between personnel in a campaign,
+ * applying user-defined rules and configurations. The class generates UI components for the respective configurations
+ * and interacts with {@link CampaignOptions} to store and apply these settings.
  * </p>
  * <p>
  * The tab is divided into three main sections:
@@ -176,8 +175,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the Procreation Tab and its components.
-     * This tab controls general procreation settings and allows configuring random procreation options.
+     * Initializes the Procreation Tab and its components. This tab controls general procreation settings and allows
+     * configuring random procreation options.
      */
     private void initializeProcreationTab() {
         pnlProcreationGeneralOptionsPanel = new JPanel();
@@ -200,7 +199,7 @@ public class RelationshipsTab {
         pnlRandomProcreationPanel = new JPanel();
         lblRandomProcreationMethod = new JLabel();
         comboRandomProcreationMethod = new MMComboBox<>("comboRandomProcreationMethod",
-            RandomProcreationMethod.values());
+              RandomProcreationMethod.values());
         chkUseRelationshiplessRandomProcreation = new JCheckBox();
         chkUseRandomClanPersonnelProcreation = new JCheckBox();
         chkUseRandomPrisonerProcreation = new JCheckBox();
@@ -211,8 +210,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the Divorce Tab and its components.
-     * This tab controls general divorce settings and allows configuring random divorce options.
+     * Initializes the Divorce Tab and its components. This tab controls general divorce settings and allows configuring
+     * random divorce options.
      */
     private void initializeDivorceTab() {
         chkUseManualDivorce = new JCheckBox();
@@ -231,8 +230,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the Marriage Tab and its components.
-     * This tab controls general marriage settings and allows configuring random marriage options.
+     * Initializes the Marriage Tab and its components. This tab controls general marriage settings and allows
+     * configuring random marriage options.
      */
     private void initializeMarriageTab() {
         pnlMarriageGeneralOptions = new JPanel();
@@ -247,12 +246,12 @@ public class RelationshipsTab {
 
         pnlRandomMarriage = new JPanel();
         comboRandomMarriageMethod = new MMComboBox<>("comboRandomMarriageMethod",
-            RandomMarriageMethod.values());
+              RandomMarriageMethod.values());
 
         pnlRandomMarriage = new JPanel();
         lblRandomMarriageMethod = new JLabel();
         comboRandomMarriageMethod = new MMComboBox<>("comboRandomMarriageMethod",
-            RandomMarriageMethod.values());
+              RandomMarriageMethod.values());
         chkUseRandomClanPersonnelMarriages = new JCheckBox();
         chkUseRandomPrisonerMarriages = new JCheckBox();
         lblRandomMarriageAgeRange = new JLabel();
@@ -302,8 +301,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the panel for general marriage settings.
-     * This panel includes controls like manual marriage toggles and ancestor checks.
+     * Creates the panel for general marriage settings. This panel includes controls like manual marriage toggles and
+     * ancestor checks.
      *
      * @return a {@link JPanel} containing general marriage options.
      */
@@ -321,7 +320,7 @@ public class RelationshipsTab {
         lblNoInterestInMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "NoInterestInMarriageDiceSize"));
         spnNoInterestInMarriageDiceSize = new CampaignOptionsSpinner("NoInterestInMarriageDiceSize",
-            10, 1, 100000, 1);
+              10, 1, 100000, 1);
         spnNoInterestInMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "NoInterestInMarriageDiceSize"));
 
@@ -329,7 +328,7 @@ public class RelationshipsTab {
         lblCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater(marriageHeader,
               "CheckMutualAncestorsDepth"));
         spnCheckMutualAncestorsDepth = new CampaignOptionsSpinner("CheckMutualAncestorsDepth",
-            4, 0, 20, 1);
+              4, 0, 20, 1);
         spnCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater(marriageHeader,
               "CheckMutualAncestorsDepth"));
 
@@ -370,8 +369,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the panel for configuring random marriage settings.
-     * Options include random clan marriages, prisoner marriages, and other random marriage rules.
+     * Creates the panel for configuring random marriage settings. Options include random clan marriages, prisoner
+     * marriages, and other random marriage rules.
      *
      * @return a {@link JPanel} containing random marriage settings.
      */
@@ -382,8 +381,8 @@ public class RelationshipsTab {
         comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RandomMarriageMethod) {
                     list.setToolTipText(((RandomMarriageMethod) value).getToolTipText());
@@ -403,14 +402,14 @@ public class RelationshipsTab {
         lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange");
         lblRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
         spnRandomMarriageAgeRange = new CampaignOptionsSpinner("RandomMarriageAgeRange",
-            10, 0, 100, 1);
+              10, 0, 100, 1);
         spnRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
 
         lblRandomMarriageOppositeSexDiceSize = new CampaignOptionsLabel("RandomMarriageOppositeSexDiceSize");
         lblRandomMarriageOppositeSexDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomMarriageOppositeSexDiceSize"));
         spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageOppositeSexDiceSize",
-            5000, 0, 100000, 1);
+              5000, 0, 100000, 1);
         spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomMarriageOppositeSexDiceSize"));
 
@@ -418,7 +417,7 @@ public class RelationshipsTab {
         lblRandomSameSexMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomSameSexMarriageDiceSize"));
         spnRandomSameSexMarriageDiceSize = new CampaignOptionsSpinner("RandomSameSexMarriageDiceSize",
-            14, 0, 100000, 1);
+              14, 0, 100000, 1);
         spnRandomSameSexMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomSameSexMarriageDiceSize"));
 
@@ -426,13 +425,13 @@ public class RelationshipsTab {
         lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomNewDependentMarriage"));
         spnRandomNewDependentMarriage = new CampaignOptionsSpinner("RandomNewDependentMarriage",
-            20, 0, 100000, 1);
+              20, 0, 100000, 1);
         spnRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomNewDependentMarriage"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomMarriages", true,
-            "RandomMarriages");
+              "RandomMarriages");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -534,8 +533,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the panel for configuring random divorce settings.
-     * Options include toggles for random same-sex and opposite-sex divorces.
+     * Creates the panel for configuring random divorce settings. Options include toggles for random same-sex and
+     * opposite-sex divorces.
      *
      * @return a {@link JPanel} containing random divorce settings.
      */
@@ -546,8 +545,8 @@ public class RelationshipsTab {
         comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RandomDivorceMethod) {
                     list.setToolTipText(((RandomDivorceMethod) value).getToolTipText());
@@ -571,12 +570,12 @@ public class RelationshipsTab {
         lblRandomDivorceDiceSize = new CampaignOptionsLabel("RandomDivorceDiceSize");
         lblRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceDiceSize"));
         spnRandomDivorceDiceSize = new CampaignOptionsSpinner("RandomDivorceDiceSize",
-            900, 0, 100000, 1);
+              900, 0, 100000, 1);
         spnRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceDiceSize"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomDivorcePanel", true,
-            "RandomDivorcePanel");
+              "RandomDivorcePanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -646,8 +645,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the panel for general procreation settings.
-     * This panel includes controls for determining maternity leave, surname styles, and logging options.
+     * Creates the panel for general procreation settings. This panel includes controls for determining maternity leave,
+     * surname styles, and logging options.
      *
      * @return a {@link JPanel} containing general procreation options.
      */
@@ -665,7 +664,7 @@ public class RelationshipsTab {
         lblMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater(procreationHeader,
               "MultiplePregnancyOccurrences"));
         spnMultiplePregnancyOccurrences = new CampaignOptionsSpinner("MultiplePregnancyOccurrences",
-            50, 1, 1000, 1);
+              50, 1, 1000, 1);
         spnMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater(procreationHeader,
               "MultiplePregnancyOccurrences"));
 
@@ -674,8 +673,8 @@ public class RelationshipsTab {
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof BabySurnameStyle) {
                     list.setToolTipText(((BabySurnameStyle) value).getToolTipText());
@@ -700,7 +699,7 @@ public class RelationshipsTab {
         lblNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "NoInterestInChildrenDiceSize"));
         spnNoInterestInChildrenDiceSize = new CampaignOptionsSpinner("NoInterestInChildrenDiceSize",
-            3, 1, 100000, 1);
+              3, 1, 100000, 1);
         spnNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "NoInterestInChildrenDiceSize"));
 
@@ -766,8 +765,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the panel for configuring random procreation options.
-     * Options include toggles for relationshipless procreation and dice settings.
+     * Creates the panel for configuring random procreation options. Options include toggles for relationshipless
+     * procreation and dice settings.
      *
      * @return a {@link JPanel} containing random procreation settings.
      */
@@ -779,8 +778,8 @@ public class RelationshipsTab {
         comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RandomProcreationMethod) {
                     list.setToolTipText(((RandomProcreationMethod) value).getToolTipText());
@@ -791,7 +790,7 @@ public class RelationshipsTab {
         comboRandomProcreationMethod.addMouseListener(createTipPanelUpdater(procreationHeader,
               "RandomProcreationMethod"));
 
-        chkUseRelationshiplessRandomProcreation =new CampaignOptionsCheckBox("UseRelationshiplessRandomProcreation");
+        chkUseRelationshiplessRandomProcreation = new CampaignOptionsCheckBox("UseRelationshiplessRandomProcreation");
         chkUseRelationshiplessRandomProcreation.addMouseListener(createTipPanelUpdater(procreationHeader,
               "UseRelationshiplessRandomProcreation"));
         chkUseRandomClanPersonnelProcreation = new CampaignOptionsCheckBox("UseRandomClanPersonnelProcreation");
@@ -805,21 +804,26 @@ public class RelationshipsTab {
         lblRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "RandomProcreationRelationshipDiceSize"));
         spnRandomProcreationRelationshipDiceSize = new CampaignOptionsSpinner("RandomProcreationRelationshipDiceSize",
-            621, 0, 100000, 1);
+              621, 0, 100000, 1);
         spnRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "RandomProcreationRelationshipDiceSize"));
 
-        lblRandomProcreationRelationshiplessDiceSize = new CampaignOptionsLabel("RandomProcreationRelationshiplessDiceSize");
+        lblRandomProcreationRelationshiplessDiceSize = new CampaignOptionsLabel(
+              "RandomProcreationRelationshiplessDiceSize");
         lblRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "RandomProcreationRelationshiplessDiceSize"));
-        spnRandomProcreationRelationshiplessDiceSize = new CampaignOptionsSpinner("RandomProcreationRelationshiplessDiceSize",
-            1861, 0, 100000, 1);
+        spnRandomProcreationRelationshiplessDiceSize = new CampaignOptionsSpinner(
+              "RandomProcreationRelationshiplessDiceSize",
+              1861,
+              0,
+              100000,
+              1);
         spnRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "RandomProcreationRelationshiplessDiceSize"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomProcreationPanel", true,
-            "RandomProcreationPanel");
+              "RandomProcreationPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -857,18 +861,19 @@ public class RelationshipsTab {
     }
 
     /**
-     * Loads the default {@link CampaignOptions} values into the RelationshipsTab components.
-     * This is a shortcut for calling {@link #loadValuesFromCampaignOptions(CampaignOptions)} with {@code null}.
+     * Loads the default {@link CampaignOptions} values into the RelationshipsTab components. This is a shortcut for
+     * calling {@link #loadValuesFromCampaignOptions(CampaignOptions)} with {@code null}.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
     /**
-     * Loads values from the specified {@link CampaignOptions} instance into the RelationshipsTab components.
-     * If no custom options are provided, the current {@link CampaignOptions} instance is used.
+     * Loads values from the specified {@link CampaignOptions} instance into the RelationshipsTab components. If no
+     * custom options are provided, the current {@link CampaignOptions} instance is used.
      *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} to load. If {@code null}, default options are used.
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} to load. If {@code null}, default options
+     *                              are used.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -924,10 +929,11 @@ public class RelationshipsTab {
     }
 
     /**
-     * Applies the current settings from the RelationshipsTab components to the specified {@link CampaignOptions}.
-     * If no custom options are provided, changes are applied to the current {@link CampaignOptions} instance.
+     * Applies the current settings from the RelationshipsTab components to the specified {@link CampaignOptions}. If no
+     * custom options are provided, changes are applied to the current {@link CampaignOptions} instance.
      *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply changes to. If {@code null}, default options are used.
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply changes to. If {@code null},
+     *                              default options are used.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;

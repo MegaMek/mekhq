@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
@@ -48,12 +53,13 @@ public class HangarSorter {
     /**
      * Creates a new instance of the HangarSorter class.
      *
-     * @param weightClassSorted True if the unit list is sorted by weight class in format heaviest to lightest, otherwise false
+     * @param weightClassSorted True if the unit list is sorted by weight class in format heaviest to lightest,
+     *                          otherwise false
      * @param weightSorted      True if the unit list is sorted by weight descending, otherwise false
      * @param unitTypeSorted    True if the unit list is sorted by the unit type
      */
     public HangarSorter(boolean weightClassSorted, boolean weightSorted,
-        boolean unitTypeSorted) {
+          boolean unitTypeSorted) {
         this.weightClassSorted = weightClassSorted;
         this.weightSorted = weightSorted;
         this.unitTypeSorted = unitTypeSorted;
@@ -75,7 +81,9 @@ public class HangarSorter {
 
     /**
      * Gets a sorted list of units from the given hangar.
+     *
      * @param hangar The hangar to retrieve units from in sorted order.
+     *
      * @return A sorted list of units.
      */
     public List<Unit> getUnits(Hangar hangar) {
@@ -84,7 +92,8 @@ public class HangarSorter {
 
     /**
      * Executes a consumer function on each unit in the hangar in sorted order.
-     * @param hangar The hangar to retrieve units from in sorted order.
+     *
+     * @param hangar   The hangar to retrieve units from in sorted order.
      * @param consumer A function to apply to each unit.
      */
     public void forEachUnit(Hangar hangar, Consumer<Unit> consumer) {
@@ -93,6 +102,7 @@ public class HangarSorter {
 
     /**
      * This sorts a stream of units, sorted alphabetically and potentially by other methods
+     *
      * @return a stream with the applicable sort format
      */
     public Stream<Unit> sort(final Stream<Unit> units) {
