@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -50,15 +55,23 @@ public class KfBoom extends Part {
     private static final MMLogger logger = MMLogger.create(KfBoom.class);
 
     static final TechAdvancement TA_KFBOOM = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
-            .setAvailability(AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                   .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
+                                                   .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
+                                                   .setAvailability(AvailabilityValue.D,
+                                                         AvailabilityValue.C,
+                                                         AvailabilityValue.C,
+                                                         AvailabilityValue.C)
+                                                   .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
-            .setAvailability(AvailabilityValue.F, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                              .setAdvancement(2458, 2470, 2500)
+                                                              .setPrototypeFactions(Faction.TH)
+                                                              .setProductionFactions(Faction.TH)
+                                                              .setTechRating(TechRating.C)
+                                                              .setAvailability(AvailabilityValue.F,
+                                                                    AvailabilityValue.X,
+                                                                    AvailabilityValue.X,
+                                                                    AvailabilityValue.X)
+                                                              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int boomType = Dropship.BOOM_STANDARD;
 
@@ -96,8 +109,8 @@ public class KfBoom extends Part {
                 hits = 0;
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -188,7 +201,7 @@ public class KfBoom extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof KfBoom)
-                && (boomType == ((KfBoom) part).boomType);
+                     && (boomType == ((KfBoom) part).boomType);
     }
 
     @Override

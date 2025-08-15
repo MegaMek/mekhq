@@ -169,7 +169,9 @@ public final class InjuryUtil {
             case RIGHT_FOOT:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ?
+                                                        InjuryTypes.PUNCTURE :
+                                                        InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
                         newInjuries.add(gen.apply(InjuryTypes.TORN_MUSCLE, 1));
@@ -202,7 +204,9 @@ public final class InjuryUtil {
             case CHEST:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ?
+                                                        InjuryTypes.PUNCTURE :
+                                                        InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
                         newInjuries.add(gen.apply(InjuryTypes.BROKEN_RIB, 1));

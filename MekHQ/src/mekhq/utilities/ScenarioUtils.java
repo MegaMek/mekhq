@@ -58,10 +58,11 @@ public class ScenarioUtils {
     private ScenarioUtils() {}
 
     /**
-     * Creates a game board based on the settings in the provided Scenario.
-     * This method extracts map configuration from the scenario and delegates to the board creation logic.
+     * Creates a game board based on the settings in the provided Scenario. This method extracts map configuration from
+     * the scenario and delegates to the board creation logic.
      *
      * @param scenario The Scenario containing board configuration parameters
+     *
      * @return A Board object configured according to the scenario settings, or a default board if invalid parameters
      */
     public static Board getBoardFor(Scenario scenario) {

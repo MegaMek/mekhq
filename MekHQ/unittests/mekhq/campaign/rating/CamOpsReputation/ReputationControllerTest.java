@@ -94,43 +94,43 @@ class ReputationControllerTest {
     @Test
     void testGetReputationModifierShouldBeFour() {
         averageExperienceRating.when(() ->
-            AverageExperienceRating.getSkillLevel(campaign, true))
-            .thenReturn(SkillLevel.VETERAN);
+                                           AverageExperienceRating.getSkillLevel(campaign, true))
+              .thenReturn(SkillLevel.VETERAN);
         averageExperienceRating.when(() ->
-            AverageExperienceRating.getAverageExperienceModifier(SkillLevel.VETERAN))
-            .thenReturn(20);
+                                           AverageExperienceRating.getAverageExperienceModifier(SkillLevel.VETERAN))
+              .thenReturn(20);
         commandRating.when(() ->
-            CommandRating.calculateCommanderRating(campaign, null))
-            .thenReturn(Collections.singletonMap("total", 3));
+                                 CommandRating.calculateCommanderRating(campaign, null))
+              .thenReturn(Collections.singletonMap("total", 3));
         combatRecordRating.when(() ->
-            CombatRecordRating.calculateCombatRecordRating(campaign))
-            .thenReturn(Collections.singletonMap("total", 3));
+                                      CombatRecordRating.calculateCombatRecordRating(campaign))
+              .thenReturn(Collections.singletonMap("total", 3));
 
         List<Map<String, Integer>> transportationData = new ArrayList<>();
         transportationData.add(Collections.singletonMap("total", 3));
         transportationData.add(Collections.singletonMap("total", 3));
         transportationData.add(Collections.singletonMap("total", 3));
         transportationRating.when(() ->
-            TransportationRating.calculateTransportationRating(campaign))
-            .thenReturn(transportationData);
+                                        TransportationRating.calculateTransportationRating(campaign))
+              .thenReturn(transportationData);
 
         Map<String, Map<String, ?>> supportData = new HashMap<>();
         supportData.put("total", Collections.singletonMap("total", 3));
         supportRating.when(() ->
-            SupportRating.calculateSupportRating(campaign, transportationData.get(1)))
-            .thenReturn(supportData);
+                                 SupportRating.calculateSupportRating(campaign, transportationData.get(1)))
+              .thenReturn(supportData);
 
         financialRating.when(() ->
-            FinancialRating.calculateFinancialRating(campaign.getFinances()))
-            .thenReturn(Collections.singletonMap("total", 3));
+                                   FinancialRating.calculateFinancialRating(campaign.getFinances()))
+              .thenReturn(Collections.singletonMap("total", 3));
 
         crimeRating.when(() ->
-            CrimeRating.calculateCrimeRating(campaign))
-            .thenReturn(Collections.singletonMap("total", 3));
+                               CrimeRating.calculateCrimeRating(campaign))
+              .thenReturn(Collections.singletonMap("total", 3));
 
         otherModifiersRating.when(() ->
-            OtherModifiers.calculateOtherModifiers(campaign))
-            .thenReturn(Collections.singletonMap("total", 3));
+                                        OtherModifiers.calculateOtherModifiers(campaign))
+              .thenReturn(Collections.singletonMap("total", 3));
 
         reputation.initializeReputation(campaign);
         assertEquals(41, reputation.getReputationRating());
@@ -140,43 +140,43 @@ class ReputationControllerTest {
     @Test
     void testGetReputationModifierShouldBeZero() {
         averageExperienceRating.when(() ->
-                AverageExperienceRating.getSkillLevel(campaign, true))
-            .thenReturn(SkillLevel.ULTRA_GREEN);
+                                           AverageExperienceRating.getSkillLevel(campaign, true))
+              .thenReturn(SkillLevel.ULTRA_GREEN);
         averageExperienceRating.when(() ->
-                AverageExperienceRating.getAverageExperienceModifier(SkillLevel.ULTRA_GREEN))
-            .thenReturn(5);
+                                           AverageExperienceRating.getAverageExperienceModifier(SkillLevel.ULTRA_GREEN))
+              .thenReturn(5);
         commandRating.when(() ->
-                CommandRating.calculateCommanderRating(campaign, null))
-            .thenReturn(Collections.singletonMap("total", 0));
+                                 CommandRating.calculateCommanderRating(campaign, null))
+              .thenReturn(Collections.singletonMap("total", 0));
         combatRecordRating.when(() ->
-                CombatRecordRating.calculateCombatRecordRating(campaign))
-            .thenReturn(Collections.singletonMap("total", 0));
+                                      CombatRecordRating.calculateCombatRecordRating(campaign))
+              .thenReturn(Collections.singletonMap("total", 0));
 
         List<Map<String, Integer>> transportationData = new ArrayList<>();
         transportationData.add(Collections.singletonMap("total", 0));
         transportationData.add(Collections.singletonMap("total", 0));
         transportationData.add(Collections.singletonMap("total", 0));
         transportationRating.when(() ->
-                TransportationRating.calculateTransportationRating(campaign))
-            .thenReturn(transportationData);
+                                        TransportationRating.calculateTransportationRating(campaign))
+              .thenReturn(transportationData);
 
         Map<String, Map<String, ?>> supportData = new HashMap<>();
         supportData.put("total", Collections.singletonMap("total", 0));
         supportRating.when(() ->
-                SupportRating.calculateSupportRating(campaign, transportationData.get(1)))
-            .thenReturn(supportData);
+                                 SupportRating.calculateSupportRating(campaign, transportationData.get(1)))
+              .thenReturn(supportData);
 
         financialRating.when(() ->
-                FinancialRating.calculateFinancialRating(campaign.getFinances()))
-            .thenReturn(Collections.singletonMap("total", 0));
+                                   FinancialRating.calculateFinancialRating(campaign.getFinances()))
+              .thenReturn(Collections.singletonMap("total", 0));
 
         crimeRating.when(() ->
-                CrimeRating.calculateCrimeRating(campaign))
-            .thenReturn(Collections.singletonMap("total", 0));
+                               CrimeRating.calculateCrimeRating(campaign))
+              .thenReturn(Collections.singletonMap("total", 0));
 
         otherModifiersRating.when(() ->
-                OtherModifiers.calculateOtherModifiers(campaign))
-            .thenReturn(Collections.singletonMap("total", 0));
+                                        OtherModifiers.calculateOtherModifiers(campaign))
+              .thenReturn(Collections.singletonMap("total", 0));
 
         reputation.initializeReputation(campaign);
         assertEquals(5, reputation.getReputationRating());

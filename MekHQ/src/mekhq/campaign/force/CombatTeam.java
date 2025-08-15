@@ -190,21 +190,22 @@ public class CombatTeam {
     }
 
     /**
-     * Effective size used when determining for many units this combat team is. Sometimes a unit may count as less
-     * than a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
+     * Effective size used when determining for many units this combat team is. Sometimes a unit may count as less than
+     * a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
      * <p>
-     *     This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
-     *     role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
-     *     The unit contribution to the total is determined based on its type: </p>
-     *     <ul>
-     *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
-     *         for clan factions.</li>
-     *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
-     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total, unless no other units).</li>
-     *         <li><b>Other types:</b> Adds 1 to the total.</li>
-     *     </ul>
+     * This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
+     * role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
+     * The unit contribution to the total is determined based on its type: </p>
+     * <ul>
+     *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *     for clan factions.</li>
+     *     <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *     <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total, unless no other units).</li>
+     *     <li><b>Other types:</b> Adds 1 to the total.</li>
+     * </ul>
      *
      * @param campaign
+     *
      * @return effective size of the combat team
      */
     public int getSize(Campaign campaign) {
@@ -221,19 +222,20 @@ public class CombatTeam {
     /**
      * Effective size used when determining for many combat elements this combat team is.
      * <p>
-     *     Retrieves the associated force and evaluates all units within that force.
-     *     The unit contribution to the total is determined based on its type: </p>
-     *     <ul>
-     *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
-     *         for clan factions.</li>
-     *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
-     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 1. Infantry squads add 1/3. (excluded from the total if count
-     *         of infantry is less than the count of everything else)
-     *         .</li>
-     *         <li><b>Other types:</b> Adds 1 to the total.</li>
-     *         </ul>
+     * Retrieves the associated force and evaluates all units within that force. The unit contribution to the total is
+     * determined based on its type: </p>
+     * <ul>
+     *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *     for clan factions.</li>
+     *     <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *     <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 1. Infantry squads add 1/3. (excluded from the total if count
+     *     of infantry is less than the count of everything else)
+     *     .</li>
+     *     <li><b>Other types:</b> Adds 1 to the total.</li>
+     *     </ul>
      *
      * @param campaign
+     *
      * @return effective size of the lance for calculating contract requirements
      */
     private double getEffectiveLanceSize(Campaign campaign) {

@@ -24,21 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import static java.lang.Math.round;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.Math.round;
 
 /**
  * A table model for displaying personnel in the infirmary
@@ -87,11 +95,11 @@ public class PatientTableModel extends AbstractListModel<Person> {
 
         @Override
         public Component getListCellRendererComponent(
-                JList<?> list,
-                Object value,
-                int index,
-                boolean isSelected,
-                boolean cellHasFocus) {
+              JList<?> list,
+              Object value,
+              int index,
+              boolean isSelected,
+              boolean cellHasFocus) {
             final int maximumWidth = UIUtil.scaleForGUI(300);
             final int maximumHeight = UIUtil.scaleForGUI(100);
 
@@ -116,21 +124,21 @@ public class PatientTableModel extends AbstractListModel<Person> {
     }
 
     /**
-     * Generates a styled HTML string describing the injuries of a person, formatted with a specified
-     * maximum width.
+     * Generates a styled HTML string describing the injuries of a person, formatted with a specified maximum width.
      *
      * <p>The generated string includes the person's full title in bold and a list of their injuries,
-     * each formatted with descriptive text and the time required to heal. Injuries are separated
-     * by commas, and the list is wrapped at the specified width to allow proper text wrapping.</p>
+     * each formatted with descriptive text and the time required to heal. Injuries are separated by commas, and the
+     * list is wrapped at the specified width to allow proper text wrapping.</p>
      *
      * @param person       The person whose injury description is to be generated.
      * @param maximumWidth The maximum width (in pixels) for the HTML content, ensuring text wrapping.
+     *
      * @return A styled HTML string describing the person's injuries.
      */
     private String getInjuriesDesc(Person person, int maximumWidth) {
         StringBuilder toReturn = new StringBuilder("<html><div style='width:")
-              .append(maximumWidth).append("px'><b>").append(person.getFullTitle())
-              .append("</b>");
+                                       .append(maximumWidth).append("px'><b>").append(person.getFullTitle())
+                                       .append("</b>");
 
         List<Injury> injuries = person.getInjuries();
 

@@ -106,8 +106,8 @@ public class GMTools extends JDialog {
     /**
      * Constructs a new {@link GMTools} dialog window.
      *
-     * @param parent           the parent {@link JDialog} for modality
-     * @param campaign         the current campaign
+     * @param parent   the parent {@link JDialog} for modality
+     * @param campaign the current campaign
      *
      * @author Illiani
      * @since 0.50.07

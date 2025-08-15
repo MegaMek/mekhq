@@ -277,7 +277,10 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyUnit(mockEntity, transitDays));
 
         // ...and the new unit should be added to the campaign.
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(transitDays), eq(PartQuality.QUALITY_D));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity),
+              eq(false),
+              eq(transitDays),
+              eq(PartQuality.QUALITY_D));
     }
 
     @Test
@@ -320,7 +323,8 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
+        doReturn(true).when(mockFinances)
+              .debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         Entity mockEntity = mock(Entity.class);
         double cost = 1.0;
@@ -351,7 +355,8 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
+        doReturn(true).when(mockFinances)
+              .debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         Infantry mockEntity = mock(Infantry.class);
         double cost = 2.0;
@@ -385,7 +390,8 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
+        doReturn(true).when(mockFinances)
+              .debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         // ...and the unit is a clan unit...
         Entity mockEntity = mock(Entity.class);
@@ -421,7 +427,8 @@ public class QuartermasterTest {
         Finances mockFinances = mock(Finances.class);
         when(mockCampaign.getFinances()).thenReturn(mockFinances);
         ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
-        doReturn(true).when(mockFinances).debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
+        doReturn(true).when(mockFinances)
+              .debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
         // ...and the unit is clan infantry...
         Infantry mockEntity = mock(Infantry.class);
@@ -601,7 +608,7 @@ public class QuartermasterTest {
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
-                any(), costCaptor.capture(), anyString());
+              any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the part...
         quartermaster.buyPart(mockPart, 0);
@@ -630,7 +637,7 @@ public class QuartermasterTest {
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
-                any(), costCaptor.capture(), anyString());
+              any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the part...
         double costMultiplier = 10.0;
@@ -660,7 +667,7 @@ public class QuartermasterTest {
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
-                any(), costCaptor.capture(), anyString());
+              any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the refit kit...
         quartermaster.buyPart(mockRefit, 0);
@@ -689,7 +696,7 @@ public class QuartermasterTest {
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
-                any(), costCaptor.capture(), anyString());
+              any(), costCaptor.capture(), anyString());
 
         // ...when we try to buy the refit kit with a cost multiplier...
         double costMultiplier = 2.0;
@@ -905,7 +912,10 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart, 2);
 
         // ...and we should be credited 2 C-bills for the sale!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(2.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(2.0)),
+              anyString());
     }
 
     @Test
@@ -975,7 +985,7 @@ public class QuartermasterTest {
 
         // ...and we should be credited for no more than we have!
         verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
-                any(), eq(Money.of(warehouseQuantity * value)), anyString());
+              any(), eq(Money.of(warehouseQuantity * value)), anyString());
     }
 
     @Test
@@ -1018,7 +1028,10 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockPart);
 
         // ...and we should remove all of them!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(10.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(10.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removePart(eq(mockPart), eq(warehouseQuantity));
     }
 
@@ -1097,7 +1110,10 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, 2);
 
         // ...and we should be credited 2 C-bills for the sale!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(2.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(2.0)),
+              anyString());
     }
 
     @Test
@@ -1166,7 +1182,10 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(value)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(value)),
+              anyString());
     }
 
     @Test
@@ -1209,7 +1228,10 @@ public class QuartermasterTest {
         quartermaster.sellAmmo(mockAmmo);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(100.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(warehouseQuantity));
     }
 
@@ -1232,7 +1254,10 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockAmmo, saleQuantity);
 
         // ...and we should sell and remove that exact number!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(7.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(7.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(saleQuantity));
     }
 
@@ -1255,7 +1280,10 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockAmmo);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(100.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removeAmmo(eq(mockAmmo), eq(warehouseQuantity));
     }
 
@@ -1334,7 +1362,10 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, 2);
 
         // ...and we should be credited 2 C-bills for the sale!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(2.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(2.0)),
+              anyString());
     }
 
     @Test
@@ -1403,7 +1434,10 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor, saleQuantity);
 
         // ...and we should be credited for no more than we have!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(value)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(value)),
+              anyString());
     }
 
     @Test
@@ -1446,7 +1480,10 @@ public class QuartermasterTest {
         quartermaster.sellArmor(mockArmor);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(100.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(warehouseQuantity));
     }
 
@@ -1469,7 +1506,10 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockArmor, saleQuantity);
 
         // ...and we should sell and remove that exact number!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(7.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(7.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(saleQuantity));
     }
 
@@ -1492,7 +1532,10 @@ public class QuartermasterTest {
         quartermaster.sellPart(mockArmor);
 
         // ...and we should sell and remove all of them!
-        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE), any(), eq(Money.of(100.0)), anyString());
+        verify(mockFinances, times(1)).credit(eq(TransactionType.EQUIPMENT_SALE),
+              any(),
+              eq(Money.of(100.0)),
+              anyString());
         verify(mockWarehouse, times(1)).removeArmor(eq(mockArmor), eq(warehouseQuantity));
     }
 
@@ -1592,7 +1635,7 @@ public class QuartermasterTest {
         // OmniPods cost 1/5th the part's cost, so since our mock part costs
         // 5 C-bills, if we're calculating things properly then the OmniPod will cost only a buck.
         assertEquals(Money.of(1.0), omniPod.getActualValue());
-    
+
     }
 
     @Test
@@ -2290,14 +2333,14 @@ public class QuartermasterTest {
 
         // Calculate the shots removed from the compatible ammo type ...
         int compatibleShotsRemoved = ((shotsRemoved - originalShots) * ammoType.getRackSize())
-                / compatibleAmmoType.getRackSize();
+                                           / compatibleAmmoType.getRackSize();
 
         // ... and ensure they were deducted.
         assertEquals(compatibleShots - compatibleShotsRemoved, compatible.getShots());
 
         // Also ensure we calculate the correct amount of ammo available.
         int convertedShots = ((compatibleShots - compatibleShotsRemoved) * compatibleAmmoType.getRackSize())
-                / ammoType.getRackSize();
+                                   / ammoType.getRackSize();
         assertEquals(convertedShots, quartermaster.getAmmoAvailable(ammoType));
         assertEquals(compatibleShots - compatibleShotsRemoved, quartermaster.getAmmoAvailable(compatibleAmmoType));
     }
@@ -2433,7 +2476,7 @@ public class QuartermasterTest {
 
         // Calculate the shots removed from the compatible ammo type ...
         int compatibleShotsRemoved = ((shotsRemoved - originalShots) * ammoType.getRackSize())
-                / compatibleAmmoType.getRackSize();
+                                           / compatibleAmmoType.getRackSize();
 
         // ... and ensure they were deducted.
         assertEquals(compatibleShots - compatibleShotsRemoved, compatible.getShots());
@@ -2531,7 +2574,8 @@ public class QuartermasterTest {
         // We'll have some converted shots "left over", as an LRM20 shot breaks
         // down into more than one LRM5 shot ...
         int convertedShots = compatibleAmmoType.getRackSize() / ammoType.getRackSize();
-        assertEquals((convertedShots - shotsRemoved) + ((compatibleShots - 1) * convertedShots), quartermaster.getAmmoAvailable(ammoType));
+        assertEquals((convertedShots - shotsRemoved) + ((compatibleShots - 1) * convertedShots),
+              quartermaster.getAmmoAvailable(ammoType));
 
         // ... and some more left over in our compatible type as well.
         assertTrue(warehouse.getParts().contains(compatible));
@@ -2572,7 +2616,7 @@ public class QuartermasterTest {
         // There should be compatible ammo available ...
         int convertedShots = ammoType.getRackSize() / compatibleAmmoType.getRackSize();
         assertEquals((compatibleAmmoType.getRackSize() * (compatibleShots - convertedShots)) / ammoType.getRackSize(),
-                quartermaster.getAmmoAvailable(ammoType));
+              quartermaster.getAmmoAvailable(ammoType));
 
         // ... which should result in the existing ammo being removed from the campaign,
         // and not some weird situation where some part is there with negative or zero
@@ -2629,7 +2673,11 @@ public class QuartermasterTest {
 
         // Setup a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
-        InfantryAmmoStorage inTransit = new InfantryAmmoStorage(0, ammoType, ammoType.getShots(), weaponType, mockCampaign);
+        InfantryAmmoStorage inTransit = new InfantryAmmoStorage(0,
+              ammoType,
+              ammoType.getShots(),
+              weaponType,
+              mockCampaign);
         inTransit.setDaysToArrival(10);
         warehouse.addPart(inTransit);
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
@@ -2674,7 +2722,11 @@ public class QuartermasterTest {
         Warehouse warehouse = new Warehouse();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon otherWeaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_TAG);
-        InfantryAmmoStorage otherAmmo = new InfantryAmmoStorage(0, ammoType, ammoType.getShots(), otherWeaponType, mockCampaign);
+        InfantryAmmoStorage otherAmmo = new InfantryAmmoStorage(0,
+              ammoType,
+              ammoType.getShots(),
+              otherWeaponType,
+              mockCampaign);
         warehouse.addPart(otherAmmo);
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
