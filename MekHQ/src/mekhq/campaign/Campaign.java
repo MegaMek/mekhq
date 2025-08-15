@@ -2232,13 +2232,13 @@ public class Campaign implements ITechManager {
      *
      * <p>The method also manages staff role-specific timing pools and can log recruitment events.</p>
      *
-     * @param person         the person to recruit; must not be {@code null}
-     * @param prisonerStatus the prison status to assign to the person
-     * @param gmAdd          if {@code true}, indicates the recruitment is being performed by a game master (bypassing
-     *                       funds check)
-     * @param log            if {@code true}, a record of the recruitment will be added to campaign logs
-     * @param employ         if {@code true}, the person is marked as employed in the campaign
-     * @param bypassSimulateRelationships         if {@code true}, relationship simulation does not occur
+     * @param person                      the person to recruit; must not be {@code null}
+     * @param prisonerStatus              the prison status to assign to the person
+     * @param gmAdd                       if {@code true}, indicates the recruitment is being performed by a game master
+     *                                    (bypassing funds check)
+     * @param log                         if {@code true}, a record of the recruitment will be added to campaign logs
+     * @param employ                      if {@code true}, the person is marked as employed in the campaign
+     * @param bypassSimulateRelationships if {@code true}, relationship simulation does not occur
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} on failure
      *       or insufficient funds
@@ -3701,7 +3701,7 @@ public class Campaign implements ITechManager {
      * commander (if one exists). If multiple candidates have the same rank, a skill-based tiebreaker is used.</p>
      *
      * @return the {@link Person} who is considered the second-in-command, or {@code null} if there are no suitable
-     * candidates.
+     *       candidates.
      *
      * @author Illiani
      * @since 0.50.07
@@ -3751,7 +3751,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        return new Person[] { commander, secondInCommand};
+        return new Person[] { commander, secondInCommand };
     }
 
     /**
@@ -6175,7 +6175,7 @@ public class Campaign implements ITechManager {
      * <p>Finally, at the end of the checks, it processes censure degradation for all factions.</p>
      *
      * @param isFirstOfMonth {@code true} if called on the first day of the month.
-     * @param isNewYear {@code true} if called on the first day of a new year
+     * @param isNewYear      {@code true} if called on the first day of a new year
      *
      * @author Illiani
      * @since 0.50.07
@@ -7080,8 +7080,8 @@ public class Campaign implements ITechManager {
     private void addInMemoryLogHistory(LogEntry le) {
         Iterator<LogEntry> iterator = inMemoryLogHistory.iterator();
         while (iterator.hasNext() &&
-              ChronoUnit.DAYS.between(iterator.next().getDate(), le.getDate()) >
-                     MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
+                     ChronoUnit.DAYS.between(iterator.next().getDate(), le.getDate()) >
+                           MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
             // we've hit the max size for the in-memory based on the UI display limit prune
             // the oldest entry
             iterator.remove();
@@ -7656,13 +7656,13 @@ public class Campaign implements ITechManager {
      * <p>Implementation is based on:
      * <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">Policy Almanac A* Tutorial</a></p>
      *
-     * @param start The starting planetary system
-     * @param end   The destination planetary system
-     * @param skipAccessCheck   {@code true} to skip checking for Outlaw status in system, {@code false} otherwise.
-     *                                      Should be {@code false} when determining contract-related jump paths as
-     *                                      system access is guaranteed for contract target systems.
-     * @param skipEmptySystemCheck   {@code true} to skip checking for empty system status, {@code false} otherwise.
-     *                                      Should be {@code false} when determining contract-related jump paths.
+     * @param start                The starting planetary system
+     * @param end                  The destination planetary system
+     * @param skipAccessCheck      {@code true} to skip checking for Outlaw status in system, {@code false} otherwise.
+     *                             Should be {@code false} when determining contract-related jump paths as system access
+     *                             is guaranteed for contract target systems.
+     * @param skipEmptySystemCheck {@code true} to skip checking for empty system status, {@code false} otherwise.
+     *                             Should be {@code false} when determining contract-related jump paths.
      *
      * @return A {@link JumpPath} containing the sequence of systems to traverse, or {@code null} if no valid path
      *       exists between the systems. If start and end are the same system, returns a path containing only that
@@ -8443,29 +8443,29 @@ public class Campaign implements ITechManager {
     }
 
     public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
-            PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-            if (scenario instanceof AtBScenario atBScenario) {
-                if (getCampaignOptions().isUseLightConditions()) {
-                    planetaryConditions.setLight(atBScenario.getLight());
-                }
-                if (getCampaignOptions().isUseWeatherConditions()) {
-                    planetaryConditions.setWeather(atBScenario.getWeather());
-                    planetaryConditions.setWind(atBScenario.getWind());
-                    planetaryConditions.setFog(atBScenario.getFog());
-                    planetaryConditions.setEMI(atBScenario.getEMI());
-                    planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
-                    planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
-
-                }
-                if (getCampaignOptions().isUsePlanetaryConditions()) {
-                    planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
-                    planetaryConditions.setGravity(atBScenario.getGravity());
-                }
-            } else {
-                planetaryConditions = scenario.createPlanetaryConditions();
+        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+        if (scenario instanceof AtBScenario atBScenario) {
+            if (getCampaignOptions().isUseLightConditions()) {
+                planetaryConditions.setLight(atBScenario.getLight());
             }
+            if (getCampaignOptions().isUseWeatherConditions()) {
+                planetaryConditions.setWeather(atBScenario.getWeather());
+                planetaryConditions.setWind(atBScenario.getWind());
+                planetaryConditions.setFog(atBScenario.getFog());
+                planetaryConditions.setEMI(atBScenario.getEMI());
+                planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
+                planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
 
-            return planetaryConditions;
+            }
+            if (getCampaignOptions().isUsePlanetaryConditions()) {
+                planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                planetaryConditions.setGravity(atBScenario.getGravity());
+            }
+        } else {
+            planetaryConditions = scenario.createPlanetaryConditions();
+        }
+
+        return planetaryConditions;
 
     }
 
@@ -8619,7 +8619,8 @@ public class Campaign implements ITechManager {
     }
 
     public int getAstechNeed() {
-        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * MHQConstants.ASTECH_TEAM_SIZE) -
+        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) *
+                      MHQConstants.ASTECH_TEAM_SIZE) -
                      getNumberAstechs();
     }
 
@@ -9598,6 +9599,7 @@ public class Campaign implements ITechManager {
 
         return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
     }
+
     /**
      * Calculates the transit time for the arrival of parts or supplies based on the availability of the item, a random
      * roll, and campaign-specific transit time settings.
@@ -10210,7 +10212,8 @@ public class Campaign implements ITechManager {
                     person.setFounder(true);
                 }
                 if (person.getPrimaryRole().isMekWarrior() ||
-                          (person.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits()) ||
+                          (person.getPrimaryRole().isAerospacePilot() &&
+                                 getCampaignOptions().isAeroRecruitsHaveUnits()) ||
                           person.getPrimaryRole().isProtoMekPilot()) {
                     for (LogEntry logEntry : person.getPersonalLog()) {
                         if (logEntry.getDate().equals(join) && logEntry.getDesc().startsWith("Assigned to ")) {
@@ -10684,13 +10687,13 @@ public class Campaign implements ITechManager {
      * necessary, ultimately falls back to the planet Terra as a default universal location.</p>
      *
      * <p>The method also includes special handling for Clan campaigns: if the fallback logic would result in the
-     * campaign starting on Terra but the campaign is clan-based, it attempts to relocate the starting planet to
-     * Strana Mechty.</p>
+     * campaign starting on Terra but the campaign is clan-based, it attempts to relocate the starting planet to Strana
+     * Mechty.</p>
      *
      * @return the {@link Planet} instance where the campaign should start
      *
-     * @since 0.50.07
      * @author Illiani
+     * @since 0.50.07
      */
     public Planet getNewCampaignStartingPlanet() {
         Factions factions = Factions.getInstance();

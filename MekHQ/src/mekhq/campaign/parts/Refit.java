@@ -2635,9 +2635,11 @@ public class Refit extends Part implements IAcquisitionWork {
         AvailabilityValue avail = AvailabilityValue.A;
         int techBaseMod = 0;
         for (Part part : shoppingList) {
-            if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
+            if (getTechBase() == TechBase.CLAN &&
+                      campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
                 techBaseMod = campaign.getCampaignOptions().getClanAcquisitionPenalty();
-            } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {
+            } else if (getTechBase() == TechBase.IS &&
+                             campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {
                 techBaseMod = campaign.getCampaignOptions().getIsAcquisitionPenalty();
             } else if (getTechBase() == TechBase.ALL) {
                 int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),

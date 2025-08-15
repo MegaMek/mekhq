@@ -47,9 +47,8 @@ import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 /**
  * A specialized {@link JCheckBox} used in the campaign options dialog.
  * <p>
- * This check box's text and tooltip are dynamically loaded from a resource bundle
- * based on a given name. The tooltip can optionally include word wrapping
- * with a configurable wrap size.
+ * This check box's text and tooltip are dynamically loaded from a resource bundle based on a given name. The tooltip
+ * can optionally include word wrapping with a configurable wrap size.
  * <p>
  * The checkbox also supports font scaling adjustments.
  */
@@ -57,14 +56,14 @@ public class CampaignOptionsCheckBox extends JCheckBox {
     /**
      * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name.
      * <p>
-     * The name is used to determine the checkbox's visible text and tooltip, as well
-     * as to generate its unique internal name.
+     * The name is used to determine the checkbox's visible text and tooltip, as well as to generate its unique internal
+     * name.
      * <p>
-     * The text is located in the resource bundle key {@code "lbl" + name + ".text"}.
-     * The tooltip is located in the resource bundle key {@code "lbl" + name + ".tooltip"}.
+     * The text is located in the resource bundle key {@code "lbl" + name + ".text"}. The tooltip is located in the
+     * resource bundle key {@code "lbl" + name + ".tooltip"}.
      * <p>
-     * A default wrap size is used for the tooltip text if {@link CampaignOptionsUtilities#processWrapSize}
-     * is not overridden.
+     * A default wrap size is used for the tooltip text if {@link CampaignOptionsUtilities#processWrapSize} is not
+     * overridden.
      *
      * @param name the name used to fetch the checkbox's text and tooltip, and to set its name
      */
@@ -73,20 +72,19 @@ public class CampaignOptionsCheckBox extends JCheckBox {
     }
 
     /**
-     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified
-     * name and a custom tooltip wrap size.
+     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name and a custom tooltip wrap
+     * size.
      * <p>
-     * The name is used to determine the checkbox's visible text and tooltip, as well
-     * as to generate its unique internal name. The text and tooltip are fetched
-     * from the resource bundle, located at keys {@code "lbl" + name + ".text"}
+     * The name is used to determine the checkbox's visible text and tooltip, as well as to generate its unique internal
+     * name. The text and tooltip are fetched from the resource bundle, located at keys {@code "lbl" + name + ".text"}
      * and {@code "lbl" + name + ".tooltip"} respectively.
      * <p>
-     * If a custom wrap size is provided, the tooltip text will be word-wrapped
-     * accordingly. If {@code customWrapSize} is {@code null}, a default wrap size is used.
+     * If a custom wrap size is provided, the tooltip text will be word-wrapped accordingly. If {@code customWrapSize}
+     * is {@code null}, a default wrap size is used.
      *
      * @param name           the name used to fetch the checkbox's text and tooltip, and to set its name
-     * @param customWrapSize the maximum number of characters per tooltip line,
-     *                       or {@code null} for the default wrap size
+     * @param customWrapSize the maximum number of characters per tooltip line, or {@code null} for the default wrap
+     *                       size
      */
     public CampaignOptionsCheckBox(String name, @Nullable Integer customWrapSize) {
         // Sets the checkbox's text from the resource bundle, wrapped in HTML tags

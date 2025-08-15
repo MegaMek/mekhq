@@ -63,12 +63,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private final ProcurementTableModel model;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Constructors
     protected ProcurementTableMouseAdapter(final CampaignGUI gui, final JTable table,
-            final ProcurementTableModel model) {
+          final ProcurementTableModel model) {
         this.gui = gui;
         this.table = table;
         this.model = model;
@@ -178,6 +178,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
     /**
      * @param acquisition the
+     *
      * @return whether the procurement attempt succeeded or not
      */
     private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
@@ -198,23 +199,27 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (success) {
-            gui.getCampaign().addReport("<font color='" + ReportingUtilities.getPositiveColor() + "'>"
-                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
-                            acquisition.getAcquisitionName()));
+            gui.getCampaign().addReport("<font color='" +
+                                              ReportingUtilities.getPositiveColor() +
+                                              "'>"
+                                              +
+                                              String.format(resources.getString(
+                                                          "ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
+                                                    acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
             gui.getCampaign().addReport("<font color='" + ReportingUtilities.getNegativeColor() + "'>"
-                    + String.format(
-                            resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
-                                    + "</font>",
-                            acquisition.getAcquisitionName()));
+                                              + String.format(
+                  resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
+                        + "</font>",
+                  acquisition.getAcquisitionName()));
         }
         return success;
     }
 
     /**
-     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit,
-     * or logging an error if the acquisition type is unrecognized.
+     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit, or logging an
+     * error if the acquisition type is unrecognized.
      *
      * <p>The method performs the following steps:</p>
      * <ul>
@@ -234,6 +239,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
      * </ul>
      *
      * @param acquisition The acquisition work containing the item and metadata to process. Must not be {@code null}.
+     *
      * @throws NullPointerException If {@code acquisition} is {@code null}.
      */
     private void addOneItem(final IAcquisitionWork acquisition) {
@@ -260,9 +266,13 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
-        gui.getCampaign().addReport("<font color='" + ReportingUtilities.getPositiveColor() + "'>"
-                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
-                        acquisition.getAcquisitionName()));
+        gui.getCampaign().addReport("<font color='" +
+                                          ReportingUtilities.getPositiveColor() +
+                                          "'>"
+                                          +
+                                          String.format(resources.getString(
+                                                      "ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
+                                                acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }
 }

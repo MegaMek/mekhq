@@ -165,12 +165,13 @@ public class FactionJudgmentDialog {
      * periphery) dialog strings.</p>
      *
      * @param judgmentTypeLookupName the lookup name for the type of judgment
-     * @param lookupName a unique name referring to the specific judgment event/action
-     * @param judgingFaction the {@link Faction} making the judgment
+     * @param lookupName             a unique name referring to the specific judgment event/action
+     * @param judgingFaction         the {@link Faction} making the judgment
+     *
      * @return the constructed string resource key for dialog text lookup
      *
-     * @since 0.50.07
      * @author Illiani
+     * @since 0.50.07
      */
     private static String getDialogKey(String judgmentTypeLookupName, String lookupName, Faction judgingFaction) {
         String censuringFactionCode = judgingFaction.getShortName();
@@ -197,14 +198,15 @@ public class FactionJudgmentDialog {
      *
      * <p>The returned order of options matches their visual and logical order in the dialog interface.</p>
      *
-     * @param judgmentLookupName the identifier for this judgment scenario
+     * @param judgmentLookupName   the identifier for this judgment scenario
      * @param includeGoRogueOption if {@code true}, adds a "go rogue" button to the dialog
-     * @param includeSeppukuOption if {@code true}, adds a "commit seppuku" button to the dialog (only if "go rogue"
-     *                             is present and faction is correct)
+     * @param includeSeppukuOption if {@code true}, adds a "commit seppuku" button to the dialog (only if "go rogue" is
+     *                             present and faction is correct)
+     *
      * @return a list of button label strings as shown to the user
      *
-     * @since 0.50.07
      * @author Illiani
+     * @since 0.50.07
      */
     private static List<String> getButtonLabels(String judgmentLookupName, boolean includeGoRogueOption,
           boolean includeSeppukuOption) {

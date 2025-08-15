@@ -444,9 +444,9 @@ public class PersonalityController {
 
 
     /**
-     * Generates an {@link Reasoning} enum value for a person based on a randomly rolled value. Each reasoning
-     * level is mapped to a specific range of values, with lower rolls producing less intelligent results and higher
-     * rolls producing more intelligent results.
+     * Generates an {@link Reasoning} enum value for a person based on a randomly rolled value. Each reasoning level is
+     * mapped to a specific range of values, with lower rolls producing less intelligent results and higher rolls
+     * producing more intelligent results.
      *
      * @param roll the random roll value used to determine the {@link Reasoning} enum value
      *

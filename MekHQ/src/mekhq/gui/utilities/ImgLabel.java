@@ -24,21 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-
 import javax.swing.JLabel;
 
 /**
- * A custom label that paints an image to the label that resizes based on the size of the label while
- * maintaining the aspect ratio of the original image.
- *
- * Code borrowed from:
- * https://stackoverflow.com/questions/10245220/java-image-resize-maintain-aspect-ratio
+ * A custom label that paints an image to the label that resizes based on the size of the label while maintaining the
+ * aspect ratio of the original image.
+ * <p>
+ * Code borrowed from: https://stackoverflow.com/questions/10245220/java-image-resize-maintain-aspect-ratio
  *
  * @author Taharqa
  */
@@ -52,6 +55,7 @@ public class ImgLabel extends JLabel {
 
     /**
      * Get the scaled dimensions for the image that allow it to fit into the label's current size
+     *
      * @return <code>Dimension</code> giving the new scaled dimensions
      */
     private Dimension getScaledDimension() {
@@ -81,8 +85,7 @@ public class ImgLabel extends JLabel {
     }
 
     @Override
-    public void paintComponent(Graphics g)
-    {
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Dimension dims = getScaledDimension();
         g.drawImage(image, 0, 0, (int) dims.getWidth(), (int) dims.getHeight(), this);
