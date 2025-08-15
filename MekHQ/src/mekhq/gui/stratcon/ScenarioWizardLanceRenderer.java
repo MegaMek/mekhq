@@ -32,7 +32,19 @@
  */
 package mekhq.gui.stratcon;
 
-import mekhq.MekHQ;
+import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.util.UUID;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
@@ -41,18 +53,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.UUID;
-
-import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
+ *
  * @author NickAragua
  */
 public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRenderer<Force> {
@@ -67,14 +70,14 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends Force> list, final Force force,
-                                                  final int index, final boolean isSelected,
-                                                  final boolean cellHasFocus) {
+          final int index, final boolean isSelected,
+          final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
         // default return on all themes, but by recreating the colour it works properly
         final Color foreground = new Color((isSelected
-                ? list.getSelectionForeground() : list.getForeground()).getRGB());
+                                                  ? list.getSelectionForeground() : list.getForeground()).getRGB());
         final Color background = new Color((isSelected
-                ? list.getSelectionBackground() : list.getBackground()).getRGB());
+                                                  ? list.getSelectionBackground() : list.getBackground()).getRGB());
         setForeground(foreground);
         setBackground(background);
 
@@ -84,11 +87,11 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";
             case MARGINALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                ReportingUtilities.getNegativeColor());
+                  ReportingUtilities.getNegativeColor());
             case SUBSTANTIALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                ReportingUtilities.getWarningColor());
+                  ReportingUtilities.getWarningColor());
             case FULLY_OPERATIONAL, FACTORY_FRESH -> spanOpeningWithCustomColor(
-                ReportingUtilities.getPositiveColor());
+                  ReportingUtilities.getPositiveColor());
         };
 
         String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;
@@ -118,7 +121,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
                 for (Person person : unit.getCrew()) {
                     if (person.getFatigue() > highestFatigue) {
                         highestFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-                              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+                              person.getSkillLevel(campaign, false));
                     }
                 }
             }

@@ -74,11 +74,11 @@ public enum FactionCensureLevel {
     /**
      * Constructs a {@link FactionCensureLevel} with the specified severity.
      *
-     * @param severity the numeric severity level of this censure
+     * @param severity          the numeric severity level of this censure
      * @param innerSphereAction the censure action taken at this level for normal Inner Sphere factions
-     * @param clanAction the censure action taken at this level for normal Clan factions
-     * @param mercenaryAction the censure action taken at this level for Mercenary factions
-     * @param pirateAction the censure action taken at this level for the pirate factions
+     * @param clanAction        the censure action taken at this level for normal Clan factions
+     * @param mercenaryAction   the censure action taken at this level for Mercenary factions
+     * @param pirateAction      the censure action taken at this level for the pirate factions
      *
      * @author Illiani
      * @since 0.50.07

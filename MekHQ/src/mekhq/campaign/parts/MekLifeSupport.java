@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -145,8 +150,8 @@ public class MekLifeSupport extends Part {
                 }
             }
             if (checkForDestruction
-                    && hits > priorHits && hits >= 2
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits && hits >= 2
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -214,11 +219,11 @@ public class MekLifeSupport extends Part {
         }
 
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-             if ((unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0)
-                     && unit.isLocationDestroyed(i)) {
-                 return true;
-             }
-         }
+            if ((unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0)
+                      && unit.isLocationDestroyed(i)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -258,18 +263,18 @@ public class MekLifeSupport extends Part {
 
     @Override
     public boolean isInLocation(String loc) {
-         if (null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mek)) {
-             return false;
-         }
-         if (((Mek) unit.getEntity()).getCockpitType() == Mek.COCKPIT_TORSO_MOUNTED) {
-             if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
-                     || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT) {
-                 return true;
-             }
-         } else if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_HEAD) {
-             return true;
-         }
-         return false;
+        if (null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mek)) {
+            return false;
+        }
+        if (((Mek) unit.getEntity()).getCockpitType() == Mek.COCKPIT_TORSO_MOUNTED) {
+            if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
+                      || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT) {
+                return true;
+            }
+        } else if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_HEAD) {
+            return true;
+        }
+        return false;
     }
 
     @Override

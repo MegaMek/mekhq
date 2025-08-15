@@ -173,8 +173,8 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     public void generateApplicants() {
         calculateNumberOfRecruitmentRolls();
         Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
-                                                                       getClanMarketEntries() :
-                                                                       getInnerSphereMarketEntries();
+                                                                                getClanMarketEntries() :
+                                                                                getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
         List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
 

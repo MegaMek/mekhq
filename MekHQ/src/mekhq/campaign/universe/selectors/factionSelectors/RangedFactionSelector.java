@@ -24,16 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.universe.FactionTag;
-import megamek.common.util.weightedMaps.WeightedDoubleMap;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.universe.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -41,9 +38,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.universe.FactionTag;
+import megamek.common.util.weightedMaps.WeightedDoubleMap;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+
 /**
- * An implementation of {@link AbstractFactionSelector} which chooses
- * a faction from a defined range of planets.
+ * An implementation of {@link AbstractFactionSelector} which chooses a faction from a defined range of planets.
  */
 public class RangedFactionSelector extends AbstractFactionSelector {
     //region Variable Declarations
@@ -102,8 +110,8 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     public @Nullable Faction selectFaction(final Campaign campaign) {
         final Planet planet = getOptions().determinePlanet(campaign.getCurrentSystem().getPrimaryPlanet());
         if ((getCachedFactions() == null)
-                || !planet.equals(getCachedPlanet())
-                || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
+                  || !planet.equals(getCachedPlanet())
+                  || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
             createLookupMap(campaign, planet);
         }
 
@@ -132,39 +140,42 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
         final Map<Faction, Double> weights = new HashMap<>();
         Systems.getInstance().visitNearbySystems(currentSystem, getOptions().getOriginSearchRadius(),
-                planetarySystem -> {
-            Planet planet = planetarySystem.getPrimaryPlanet();
-            Long pop = planet.getPopulation(now);
-            if ((pop == null) || (pop <= 0)) {
-                return;
-            }
+              planetarySystem -> {
+                  Planet planet = planetarySystem.getPrimaryPlanet();
+                  Long pop = planet.getPopulation(now);
+                  if ((pop == null) || (pop <= 0)) {
+                      return;
+                  }
 
-            final double distance = planetarySystem.getDistanceTo(currentSystem);
+                  final double distance = planetarySystem.getDistanceTo(currentSystem);
 
-            // Weight the faction by the planet's population divided by its
-            // distance from our current system. The scaling factor is used
-            // to affect the 'spread'.
-            final double delta = Math.log10(pop) / (1.0 + distance * getOptions().getOriginDistanceScale());
-            for (Faction faction : planetarySystem.getFactionSet(now)) {
-                if (faction.is(FactionTag.ABANDONED) || faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)
-                        || faction.isMercenary()) {
-                    continue;
-                }
+                  // Weight the faction by the planet's population divided by its
+                  // distance from our current system. The scaling factor is used
+                  // to affect the 'spread'.
+                  final double delta = Math.log10(pop) / (1.0 + distance * getOptions().getOriginDistanceScale());
+                  for (Faction faction : planetarySystem.getFactionSet(now)) {
+                      if (faction.is(FactionTag.ABANDONED) ||
+                                faction.is(FactionTag.HIDDEN) ||
+                                faction.is(FactionTag.SPECIAL)
+                                ||
+                                faction.isMercenary()) {
+                          continue;
+                      }
 
-                if (faction.is(FactionTag.INACTIVE) && !faction.isComStar()) {
-                    // Skip INACTIVE factions [excepting ComStar]
-                    continue;
-                }
+                      if (faction.is(FactionTag.INACTIVE) && !faction.isComStar()) {
+                          // Skip INACTIVE factions [excepting ComStar]
+                          continue;
+                      }
 
-                if (faction.isClan() && !(isClan || getOptions().isAllowClanOrigins())) {
-                    continue;
-                }
+                      if (faction.isClan() && !(isClan || getOptions().isAllowClanOrigins())) {
+                          continue;
+                      }
 
-                // each faction on planet is given even weighting here, and then faction tag
-                // weights are applied before calculating the probabilities
-                weights.compute(faction, (f, total) -> total != null ? total + delta : delta);
-            }
-        });
+                      // each faction on planet is given even weighting here, and then faction tag
+                      // weights are applied before calculating the probabilities
+                      weights.compute(faction, (f, total) -> total != null ? total + delta : delta);
+                  }
+              });
 
         final Faction mercenaries = Factions.getInstance().getFaction("MERC");
         final WeightedDoubleMap<Faction> factions = new WeightedDoubleMap<>();
@@ -223,7 +234,9 @@ public class RangedFactionSelector extends AbstractFactionSelector {
 
     /**
      * Gets the set of enemies for the {@link Campaign}.
+     *
      * @param campaign The current campaign.
+     *
      * @return A set of current enemies for the {@link Campaign}.
      */
     private Set<Faction> getEnemies(final Campaign campaign) {
@@ -231,10 +244,10 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     }
 
     /**
-     * Gets a weight to apply to a {@link Faction}. This is based on the tags assigned to the
-     * faction.
+     * Gets a weight to apply to a {@link Faction}. This is based on the tags assigned to the faction.
      *
      * @param faction The {@link Faction} to get a weight when calculating probabilities.
+     *
      * @return A weight to apply to the given {@link Faction}.
      */
     private double getFactionWeight(final Faction faction) {

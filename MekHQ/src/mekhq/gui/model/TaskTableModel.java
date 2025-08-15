@@ -111,8 +111,8 @@ public class TaskTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             table.setRowHeight(UIUtil.scaleForGUI(100));
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
@@ -138,7 +138,8 @@ public class TaskTableModel extends DataTableModel {
             } else {
                 if (part instanceof MissingPart) {
                     if (!((MissingPart) part).isReplacementAvailable()) {
-                        PartInventory inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
+                        PartInventory inventories = gui.getCampaign()
+                                                          .getPartInventory(((MissingPart) part).getNewPart());
 
                         if ((inventories.getTransit() > 0) || (inventories.getOrdered() > 0)) {
                             availableLevel = REPAIR_STATE.IN_TRANSIT;
@@ -147,7 +148,8 @@ public class TaskTableModel extends DataTableModel {
                         }
                     }
                 } else if (part instanceof PodSpace && !part.isSalvaging()) {
-                    Matcher m = Pattern.compile(".*(\\d+)/(\\d+).*(\\d+) in transit, (\\d+) on order.*").matcher(part.getDetails());
+                    Matcher m = Pattern.compile(".*(\\d+)/(\\d+).*(\\d+) in transit, (\\d+) on order.*")
+                                      .matcher(part.getDetails());
                     if (m.matches()) {
                         //Show available if at least one replacement can be made
                         if (m.group(2).equals("0")) {
@@ -203,7 +205,9 @@ public class TaskTableModel extends DataTableModel {
                     if (null != tech) {
                         TargetRoll roll = gui.getCampaign().getTargetFor(part, tech);
 
-                        if ((roll.getValue() == TargetRoll.IMPOSSIBLE) || (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) || (roll.getValue() == TargetRoll.CHECK_FALSE)) {
+                        if ((roll.getValue() == TargetRoll.IMPOSSIBLE) ||
+                                  (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
+                                  (roll.getValue() == TargetRoll.CHECK_FALSE)) {
                             availableLevel = REPAIR_STATE.BLOCKED;
                         }
                     }

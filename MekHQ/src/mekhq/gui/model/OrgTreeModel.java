@@ -24,11 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.util.Vector;
-
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -79,7 +83,7 @@ public class OrgTreeModel implements TreeModel {
     @Override
     public boolean isLeaf(Object node) {
         return (node instanceof Unit)
-                || ((node instanceof Force) && ((Force) node).getAllChildren(campaign).isEmpty());
+                     || ((node instanceof Force) && ((Force) node).getAllChildren(campaign).isEmpty());
     }
 
     @Override

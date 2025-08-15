@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -47,20 +52,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Battle Armor suits are crazy - you can't crit the equipment in them, so
- * if we remove the suit we should remove all the equipment with the same
- * trooper and
- * track its value and tonnage in the suit object. As of 0.3.16, we are doing
- * this differently. We are
- * now using the linked child and parent part ids from the Part java to link the
- * suit to all of its
- * constituent equipment and armor. This stuff is then pulled off the unit and
- * put back on with the
- * BattleArmorSuit.remove and MissingBattleArmorSuit.fix methods. This allows us
- * to adjust for the fact
- * that modular equipment can now be removed separately. We still need to figure
- * out how to acquire
- * new suits that come pre-packaged with all of their equipment.
+ * Battle Armor suits are crazy - you can't crit the equipment in them, so if we remove the suit we should remove all
+ * the equipment with the same trooper and track its value and tonnage in the suit object. As of 0.3.16, we are doing
+ * this differently. We are now using the linked child and parent part ids from the Part java to link the suit to all of
+ * its constituent equipment and armor. This stuff is then pulled off the unit and put back on with the
+ * BattleArmorSuit.remove and MissingBattleArmorSuit.fix methods. This allows us to adjust for the fact that modular
+ * equipment can now be removed separately. We still need to figure out how to acquire new suits that come pre-packaged
+ * with all of their equipment.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -117,7 +115,7 @@ public class BattleArmorSuit extends Part {
     }
 
     public BattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q,
-            boolean clan, EntityMovementMode mode, Campaign c) {
+          boolean clan, EntityMovementMode mode, Campaign c) {
         super(ton, c);
         this.trooper = t;
         this.quad = q;
@@ -135,7 +133,7 @@ public class BattleArmorSuit extends Part {
     @Override
     public BattleArmorSuit clone() {
         BattleArmorSuit clone = new BattleArmorSuit(chassis, model, getUnitTonnage(), trooper,
-                weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
+              weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
         clone.copyBaseData(this);
         clone.alternateCost = this.alternateCost;
         clone.alternateTon = this.alternateTon;
@@ -338,18 +336,18 @@ public class BattleArmorSuit extends Part {
         refreshEntityDetailsCache();
         if (entityDetailsCached) {
             return part instanceof BattleArmorSuit baSuit
-                && getSuitBV() == baSuit.getSuitBV()
-                && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash()
-                && getStickerPrice().equals(baSuit.getStickerPrice());
+                         && getSuitBV() == baSuit.getSuitBV()
+                         && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash()
+                         && getStickerPrice().equals(baSuit.getStickerPrice());
         }
         // If we didn't successfully cache entity details, use the old method for comparing.
         // because of the linked children parts, we always need to consider these as
         // different
         // return false;
         return part instanceof BattleArmorSuit
-            && chassis.equals(((BattleArmorSuit) part).getChassis())
-            && model.equals(((BattleArmorSuit) part).getModel())
-            && getStickerPrice().equals(part.getStickerPrice());
+                     && chassis.equals(((BattleArmorSuit) part).getChassis())
+                     && model.equals(((BattleArmorSuit) part).getModel())
+                     && getStickerPrice().equals(part.getStickerPrice());
     }
 
     public int getSuitBV() {
@@ -427,7 +425,7 @@ public class BattleArmorSuit extends Part {
     @Override
     public MissingPart getMissingPart() {
         return new MissingBattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP,
-                quad, clan, jumpType, campaign);
+              quad, clan, jumpType, campaign);
     }
 
     @Override
@@ -446,7 +444,7 @@ public class BattleArmorSuit extends Part {
 
             for (Part part : unit.getParts()) {
                 if ((part instanceof BattleArmorEquipmentPart)
-                        && (((BattleArmorEquipmentPart) part).getTrooper() == trooper)) {
+                          && (((BattleArmorEquipmentPart) part).getTrooper() == trooper)) {
                     trooperParts.add(part);
                     addChildPart(part);
                 }
@@ -601,9 +599,7 @@ public class BattleArmorSuit extends Part {
     }
 
     /**
-     * This method will load up a TestUnit in order to identify the parts that need
-     * to be
-     * added to the suit
+     * This method will load up a TestUnit in order to identify the parts that need to be added to the suit
      */
     private void addSubParts() {
         // first get a copy of the entity, so we can create a test unit
@@ -628,13 +624,13 @@ public class BattleArmorSuit extends Part {
             // find method
             for (Part part : newUnit.getParts()) {
                 if ((part instanceof BattleArmorEquipmentPart)
-                        && (((BattleArmorEquipmentPart) part).getTrooper() == BattleArmor.LOC_TROOPER_1)) {
+                          && (((BattleArmorEquipmentPart) part).getTrooper() == BattleArmor.LOC_TROOPER_1)) {
                     Part newEquip = part.clone();
                     newEquip.setParentPart(this);
                     campaign.getQuartermaster().addPart(newEquip, 0);
                     addChildPart(newEquip);
                 } else if ((part instanceof BaArmor)
-                        && (part.getLocation() == BattleArmor.LOC_TROOPER_1)) {
+                                 && (part.getLocation() == BattleArmor.LOC_TROOPER_1)) {
                     BaArmor armorClone = (BaArmor) part.clone();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
                     armorClone.setParentPart(this);
@@ -646,8 +642,7 @@ public class BattleArmorSuit extends Part {
     }
 
     /**
-     * Sets a value indicating whether or not this part is being used as a
-     * replacement.
+     * Sets a value indicating whether or not this part is being used as a replacement.
      */
     public void isReplacement(boolean value) {
         isReplacement = value;
@@ -683,7 +678,7 @@ public class BattleArmorSuit extends Part {
     private void refreshEntityDetailsCache() {
         if (!entityDetailsCached) {
             mekhq.campaign.parts.utilities.BattleArmorSuitUtility battleArmorSuitUtility
-                = new  mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
+                  = new mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
             if (battleArmorSuitUtility.hasEntity()) {
                 suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
                 weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();

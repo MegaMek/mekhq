@@ -24,33 +24,38 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
-
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 public class MysteryBoxTypeTest {
     //region Variable Declarations
     private static final MysteryBoxType[] types = MysteryBoxType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("MysteryBoxType.THIRD_SUCCESSION_WAR.toolTipText"),
-                MysteryBoxType.THIRD_SUCCESSION_WAR.getToolTipText());
+              MysteryBoxType.THIRD_SUCCESSION_WAR.getToolTipText());
         assertEquals(resources.getString("MysteryBoxType.CLAN_EXPERIMENTAL.toolTipText"),
-                MysteryBoxType.CLAN_EXPERIMENTAL.getToolTipText());
+              MysteryBoxType.CLAN_EXPERIMENTAL.getToolTipText());
     }
     //endregion Getters
 
@@ -147,6 +152,7 @@ public class MysteryBoxTypeTest {
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("MysteryBoxType.CLAN_KESHIK.text"), MysteryBoxType.CLAN_KESHIK.toString());
-        assertEquals(resources.getString("MysteryBoxType.CLAN_SECOND_LINE.text"), MysteryBoxType.CLAN_SECOND_LINE.toString());
+        assertEquals(resources.getString("MysteryBoxType.CLAN_SECOND_LINE.text"),
+              MysteryBoxType.CLAN_SECOND_LINE.toString());
     }
 }

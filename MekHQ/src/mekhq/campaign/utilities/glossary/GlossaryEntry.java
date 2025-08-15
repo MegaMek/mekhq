@@ -167,6 +167,7 @@ public enum GlossaryEntry {
      * Returns the localized title for this glossary entry.
      *
      * @return the title string for this entry
+     *
      * @author Illiani
      * @since 0.50.07
      */

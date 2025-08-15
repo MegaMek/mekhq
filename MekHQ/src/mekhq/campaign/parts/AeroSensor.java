@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -51,9 +56,13 @@ import org.w3c.dom.NodeList;
  */
 public class AeroSensor extends Part {
     final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-            .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
-            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                          .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                          .setTechRating(TechRating.C)
+                                                          .setAvailability(AvailabilityValue.C,
+                                                                AvailabilityValue.C,
+                                                                AvailabilityValue.C,
+                                                                AvailabilityValue.C)
+                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private boolean largeCraft;
 
@@ -81,9 +90,9 @@ public class AeroSensor extends Part {
         if (null != unit && unit.getEntity() instanceof Aero) {
             hits = ((Aero) unit.getEntity()).getSensorHits();
             if (checkForDestruction
-                    && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -216,7 +225,7 @@ public class AeroSensor extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof AeroSensor && largeCraft == ((AeroSensor) part).isForSpaceCraft()
-                && (largeCraft || getUnitTonnage() == part.getUnitTonnage());
+                     && (largeCraft || getUnitTonnage() == part.getUnitTonnage());
     }
 
     public boolean isForSpaceCraft() {
