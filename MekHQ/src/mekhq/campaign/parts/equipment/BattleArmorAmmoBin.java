@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -41,9 +46,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
 
 /**
- * Battle Armor ammo bins need to look for shots for all the remaining troopers
- * in the
- * squad.
+ * Battle Armor ammo bins need to look for shots for all the remaining troopers in the squad.
  * TODO: Think about how to handle the case of understrength squads. Right now
  * they
  * pay for more ammo than they need, but this is easier than trying to track
@@ -61,15 +64,15 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     public BattleArmorAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum,
-            int shots, boolean singleShot, @Nullable Campaign c) {
+          int shots, boolean singleShot, @Nullable Campaign c) {
         super(tonnage, et, equipNum, shots, singleShot, false, c);
     }
 
     @Override
     public BattleArmorAmmoBin clone() {
         BattleArmorAmmoBin clone = new BattleArmorAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded,
-                isOneShot(),
-                campaign);
+              isOneShot(),
+              campaign);
         clone.copyBaseData(this);
         clone.shotsNeeded = this.shotsNeeded;
         return clone;
@@ -142,10 +145,9 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     /**
-     * Requisition ammo for this bin and remove it
-     * from the warehouse.
-     * Only allow Battle Armor Ammo bins to be loaded
-     * in <code>getNumTroopers()</code> bins at a time.
+     * Requisition ammo for this bin and remove it from the warehouse. Only allow Battle Armor Ammo bins to be loaded in
+     * <code>getNumTroopers()</code> bins at a time.
+     *
      * @see #getNumTroopers()
      */
     @Override
@@ -155,8 +157,9 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
             // Calculate the actual shots needed
             int shotsPerTrooper = shotsNeeded / getNumTroopers();
-            int shotsToReload = Math.min(shotsPerTrooper, (int) Math.floor( (double) getAmountAvailable() / getNumTroopers()));
-            for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++ ) {
+            int shotsToReload = Math.min(shotsPerTrooper,
+                  (int) Math.floor((double) getAmountAvailable() / getNumTroopers()));
+            for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++) {
                 int shots = requisitionAmmo(getType(), getNumTroopers());
                 shotsNeeded -= shots;
             }

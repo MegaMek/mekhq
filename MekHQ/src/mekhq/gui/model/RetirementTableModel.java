@@ -82,9 +82,9 @@ public class RetirementTableModel extends AbstractTableModel {
     public static final int N_COL = 10;
 
     private static final String[] colNames = {
-            "Person", "Assignment", "Force", "Target Number",
-            "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
-            "Payout", "Unit"
+          "Person", "Assignment", "Force", "Target Number",
+          "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
+          "Payout", "Unit"
     };
 
     private final Campaign campaign;
@@ -121,9 +121,9 @@ public class RetirementTableModel extends AbstractTableModel {
         for (UUID id : targets.keySet()) {
             data.add(id);
             payBonus.put(id,
-                    ((campaign.getCampaignOptions().isPayBonusDefault())
-                            && (targets.get(id).getValue() >= campaign.getCampaignOptions()
-                                    .getPayBonusDefaultThreshold())));
+                  ((campaign.getCampaignOptions().isPayBonusDefault())
+                         && (targets.get(id).getValue() >= campaign.getCampaignOptions()
+                                                                 .getPayBonusDefaultThreshold())));
             miscMods.put(id, 0);
         }
         fireTableDataChanged();
@@ -274,10 +274,10 @@ public class RetirementTableModel extends AbstractTableModel {
                  */
                 if ((campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass() == 0 &&
                            null != unitAssignments.get(person.getId())) ||
-                        (campaign.getCampaignOptions().isUseShareSystem() &&
-                                campaign.getCampaignOptions().isTrackOriginalUnit() &&
-                               Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
-                               null != campaign.getUnit(unitAssignments.get(person.getId())))) {
+                          (campaign.getCampaignOptions().isUseShareSystem() &&
+                                 campaign.getCampaignOptions().isTrackOriginalUnit() &&
+                                 Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
+                                 null != campaign.getUnit(unitAssignments.get(person.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getBuyCost());
                 }
 
@@ -293,7 +293,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
                                                                                                     .getPayout(person.getId())
                                                                                                     .getWeightClass(),
-                                RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
+                              RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
                     }
 
                     // if the person requires a unit, but doesn't have one...
@@ -303,7 +303,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
                                                                                                     .getPayout(person.getId())
                                                                                                     .getWeightClass(),
-                                0));
+                              0));
                     }
                 }
 
@@ -319,7 +319,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 if (null != unitAssignments.get(person.getId())) {
                     return campaign.getUnit(unitAssignments.get(person.getId())).getName();
                 } else if (campaign.getRetirementDefectionTracker().getPayout(person.getId())
-                        .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
+                                 .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
                     return "";
                 } else {
                     return "Class " +
@@ -391,9 +391,9 @@ public class RetirementTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, row, column);
+                  hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
 
@@ -408,7 +408,7 @@ public class RetirementTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);

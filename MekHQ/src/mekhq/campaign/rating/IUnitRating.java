@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating;
 
@@ -61,6 +66,7 @@ public interface IUnitRating {
      * Returns the static constant representation of the passed in Unit rating.
      *
      * @param score The total Dragoon's score.
+     *
      * @return
      */
     int getUnitRating(int score);
@@ -80,6 +86,7 @@ public interface IUnitRating {
      * Returns the letter code of the passed in Unit rating.
      *
      * @param rating The numeric rating to be converted.
+     *
      * @return
      */
     String getUnitRatingName(int rating);
@@ -186,6 +193,7 @@ public interface IUnitRating {
 
     /**
      * Returns the typs of unit rating method used.
+     *
      * @return
      */
     UnitRatingMethod getUnitRatingMethod();

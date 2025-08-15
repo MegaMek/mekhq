@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -56,7 +61,7 @@ public enum Profession {
     // region Constructors
     Profession(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -107,13 +112,12 @@ public enum Profession {
     // endregion Boolean Comparison Methods
 
     /**
-     * This takes this, the initial profession, converts it into a base profession,
-     * and then calls
-     * getProfessionFromBase to determine the profession to use for the provided
-     * rank.
+     * This takes this, the initial profession, converts it into a base profession, and then calls getProfessionFromBase
+     * to determine the profession to use for the provided rank.
      *
      * @param rankSystem the rank system to determine the profession within
      * @param rank       the rank to determine the profession for
+     *
      * @return the determined profession
      */
     public Profession getProfession(final RankSystem rankSystem, final Rank rank) {
@@ -121,12 +125,12 @@ public enum Profession {
     }
 
     /**
-     * This takes this, the base profession, and uses it to determine the profession
-     * to use for the
-     * provided rank in the provided rank system
+     * This takes this, the base profession, and uses it to determine the profession to use for the provided rank in the
+     * provided rank system
      *
      * @param rankSystem the rank system to determine the profession within
      * @param rank       the rank to determine the profession for
+     *
      * @return the determined profession
      */
     public Profession getProfessionFromBase(final RankSystem rankSystem, final Rank rank) {
@@ -146,14 +150,12 @@ public enum Profession {
     }
 
     /**
-     * This is used to get the base profession for the rank column following any
-     * required redirects
-     * based on this, the initial profession.
+     * This is used to get the base profession for the rank column following any required redirects based on this, the
+     * initial profession.
      *
      * @param rankSystem the rank system to get the base profession for
-     * @return the final base profession for this rank system based on this being
-     *         the initial base
-     *         profession
+     *
+     * @return the final base profession for this rank system based on this being the initial base profession
      */
     public Profession getBaseProfession(final RankSystem rankSystem) {
         Profession baseProfession = this;
@@ -164,11 +166,11 @@ public enum Profession {
     }
 
     /**
-     * This is used to determine if a profession is empty, which means the first
-     * rank is an
-     * alternative system while every other rank tier is empty.
+     * This is used to determine if a profession is empty, which means the first rank is an alternative system while
+     * every other rank tier is empty.
      *
      * @param rankSystem the rank system to determine if this profession is empty in
+     *
      * @return whether the profession is empty or not
      */
     public boolean isEmptyProfession(final RankSystem rankSystem) {
@@ -195,17 +197,17 @@ public enum Profession {
         } else {
             // Return true if all ranks except the first are empty
             return rankSystem.getRanks()
-                    .subList(1, rankSystem.getRanks().size())
-                    .stream()
-                    .allMatch(r -> r.isEmpty(this));
+                         .subList(1, rankSystem.getRanks().size())
+                         .stream()
+                         .allMatch(r -> r.isEmpty(this));
         }
     }
 
     /**
      * Determines the alternative profession to use based on the initial rank value
      *
-     * @param rankSystem the rank system to use to determine the alternative
-     *                   profession
+     * @param rankSystem the rank system to use to determine the alternative profession
+     *
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final RankSystem rankSystem) {
@@ -216,6 +218,7 @@ public enum Profession {
      * Determines the alternative profession to use based on the provided rank
      *
      * @param rank the rank to determine the alternative profession for
+     *
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final Rank rank) {
@@ -225,8 +228,8 @@ public enum Profession {
     /**
      * Determines the alternative profession to use based on the name of a rank
      *
-     * @param name the name of the rank to use in determining the alternative
-     *             profession
+     * @param name the name of the rank to use in determining the alternative profession
+     *
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final String name) {
@@ -251,13 +254,14 @@ public enum Profession {
                 return CIVILIAN;
             default:
                 MMLogger.create(Profession.class).debug("Cannot get alternate profession for unknown alternative "
-                        + name + " returning MEKWARRIOR.");
+                                                              + name + " returning MEKWARRIOR.");
                 return MEKWARRIOR;
         }
     }
 
     /**
      * @param role the personnel role to get the profession for
+     *
      * @return the profession for the role
      */
     public static Profession getProfessionFromPersonnelRole(final PersonnelRole role) {
@@ -269,7 +273,7 @@ public enum Profession {
             case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH -> TECH;
             case DOCTOR, MEDIC -> MEDICAL;
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, ADMINISTRATOR_TRANSPORT ->
-                    ADMINISTRATOR;
+                  ADMINISTRATOR;
             case MEKWARRIOR, LAM_PILOT, PROTOMEK_PILOT -> MEKWARRIOR;
             default -> CIVILIAN;
         };

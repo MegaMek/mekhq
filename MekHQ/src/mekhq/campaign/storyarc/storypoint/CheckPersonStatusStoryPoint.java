@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
@@ -31,22 +36,19 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This StoryPoint checks the status of a Person in the campaign by their UUID
- * and returns the raw status enum value
- * (e.g. ACTIVE, KIA) as the result. Can be used, for example, to check whether
- * a person is active before assigning
- * them a dialog.
+ * This StoryPoint checks the status of a Person in the campaign by their UUID and returns the raw status enum value
+ * (e.g. ACTIVE, KIA) as the result. Can be used, for example, to check whether a person is active before assigning them
+ * a dialog.
  */
 public class CheckPersonStatusStoryPoint extends StoryPoint {
     private static final MMLogger logger = MMLogger.create(CheckPersonStatusStoryPoint.class);

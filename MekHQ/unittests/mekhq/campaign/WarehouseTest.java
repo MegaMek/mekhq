@@ -24,8 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -35,19 +61,13 @@ import mekhq.EventSpy;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class WarehouseTest {
     @Test
@@ -181,9 +201,9 @@ public class WarehouseTest {
             // This part never existed so there should be
             // a PartNewEvent fired.
             assertTrue(eventSpy.getEvents()
-                    .stream()
-                    .filter(e -> e instanceof PartNewEvent)
-                    .anyMatch(e -> mockPart == ((PartNewEvent) e).getPart()));
+                             .stream()
+                             .filter(e -> e instanceof PartNewEvent)
+                             .anyMatch(e -> mockPart == ((PartNewEvent) e).getPart()));
 
             // Add the part again, simulating being say removed from a
             // unit or something
@@ -192,11 +212,11 @@ public class WarehouseTest {
             // There should be only ONE event as we did not add
             // this part to the warehouse
             assertEquals(1,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartNewEvent)
-                            .filter(e -> mockPart == ((PartNewEvent) e).getPart())
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartNewEvent)
+                        .filter(e -> mockPart == ((PartNewEvent) e).getPart())
+                        .count());
         }
     }
 
@@ -215,8 +235,8 @@ public class WarehouseTest {
 
             // If we didn't remove a part, we should have no event
             assertFalse(eventSpy.getEvents()
-                    .stream()
-                    .anyMatch(e -> e instanceof PartRemovedEvent));
+                              .stream()
+                              .anyMatch(e -> e instanceof PartRemovedEvent));
 
             // Add the mock part to our warehouse
             warehouse.addPart(mockPart);
@@ -226,11 +246,11 @@ public class WarehouseTest {
 
             // There should be an event where we removed the mock part
             assertEquals(1,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartRemovedEvent)
-                            .filter(e -> mockPart == ((PartRemovedEvent) e).getPart())
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartRemovedEvent)
+                        .filter(e -> mockPart == ((PartRemovedEvent) e).getPart())
+                        .count());
         }
     }
 
@@ -261,10 +281,10 @@ public class WarehouseTest {
 
             // There should be three events where we removed parts
             assertEquals(3,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartRemovedEvent)
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartRemovedEvent)
+                        .count());
 
             // And the three events should correlate to the child parts being removed
             assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
@@ -304,10 +324,10 @@ public class WarehouseTest {
 
             // There should be four events where we removed parts
             assertEquals(4,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartRemovedEvent)
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartRemovedEvent)
+                        .count());
 
             // And the four events should correlate to the child parts being removed
             assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
@@ -946,7 +966,8 @@ public class WarehouseTest {
         mockSparePartUnderRepair.setTech(createMockTech());
         addedPart = warehouse.addPart(mockSparePartUnderRepair, true);
         assertEquals(mockSparePartUnderRepair, addedPart);
-        assertEquals(mockSparePartUnderRepair, warehouse.findSparePart(spare -> spare.getId() == mockSparePartUnderRepair.getId()));
+        assertEquals(mockSparePartUnderRepair,
+              warehouse.findSparePart(spare -> spare.getId() == mockSparePartUnderRepair.getId()));
 
         Part mockPartForRefit = spy(new MekLocation());
         mockPartForRefit.setRefitUnit(createMockUnit());
@@ -995,7 +1016,9 @@ public class WarehouseTest {
 
     /**
      * Creates a mock part with the given ID.
+     *
      * @param id The unique ID of the part.
+     *
      * @return The mocked part with the given ID.
      */
     private Part createMockPart(int id) {
@@ -1007,6 +1030,7 @@ public class WarehouseTest {
 
     /**
      * Creates a mock unit.
+     *
      * @return The mock unit.
      */
     private Unit createMockUnit() {
@@ -1021,6 +1045,7 @@ public class WarehouseTest {
 
     /**
      * Creates a mock tech.
+     *
      * @return The mock tech.
      */
     private Person createMockTech() {
@@ -1031,9 +1056,10 @@ public class WarehouseTest {
 
     /**
      * Creates mock Armor for the campaign.
-     * @param campaign The campaign to assign to the Armor.
+     *
+     * @param campaign  The campaign to assign to the Armor.
      * @param armorType The type of armor.
-     * @param points The number of points of armor.
+     * @param points    The number of points of armor.
      */
     private Armor createMockArmor(Campaign campaign, int armorType, int points) {
         return spy(new Armor(1, armorType, points, Entity.LOC_NONE, false, false, campaign));
@@ -1041,18 +1067,20 @@ public class WarehouseTest {
 
     /**
      * Creates mock AmmoStorage for the campaign.
+     *
      * @param campaign The campaign to assign to the AmmoStorage.
      * @param ammoType The type of ammo.
-     * @param shots The number of shots ammo.
+     * @param shots    The number of shots ammo.
      */
     private AmmoStorage createMockAmmoStorage(Campaign campaign, AmmoType ammoType, int shots) {
         return spy(new AmmoStorage(1, ammoType, shots, campaign));
     }
 
     /**
-     * Gets an AmmoType by name (performing any initialization required
-     * on the MM side).
+     * Gets an AmmoType by name (performing any initialization required on the MM side).
+     *
      * @param name The lookup name for the AmmoType.
+     *
      * @return The ammo type for the given name.
      */
     private synchronized static AmmoType getAmmoType(String name) {

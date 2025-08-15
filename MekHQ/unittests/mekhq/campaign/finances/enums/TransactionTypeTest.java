@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.enums;
 
@@ -33,25 +38,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class TransactionTypeTest {
     // region Variable Declarations
     private static final TransactionType[] types = TransactionType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("TransactionType.RECRUITMENT.toolTipText"),
-                TransactionType.RECRUITMENT.getToolTipText());
+              TransactionType.RECRUITMENT.getToolTipText());
         assertEquals(resources.getString("TransactionType.UNIT_SALE.toolTipText"),
-                TransactionType.UNIT_SALE.getToolTipText());
+              TransactionType.UNIT_SALE.getToolTipText());
     }
     // endregion Getters
 
@@ -382,7 +386,7 @@ class TransactionTypeTest {
         // Enum.valueOf Testing
         assertEquals(TransactionType.CONSTRUCTION, TransactionType.parseFromString("CONSTRUCTION"));
         assertEquals(TransactionType.FINANCIAL_TERM_END_CARRYOVER,
-                TransactionType.parseFromString("FINANCIAL_TERM_END_CARRYOVER"));
+              TransactionType.parseFromString("FINANCIAL_TERM_END_CARRYOVER"));
         assertEquals(TransactionType.MEDICAL_EXPENSES, TransactionType.parseFromString("MEDICAL_EXPENSES"));
 
         // Failure Testing
@@ -396,10 +400,10 @@ class TransactionTypeTest {
     @Test
     void testToStringOverride() {
         assertEquals(resources.getString("TransactionType.BATTLE_LOSS_COMPENSATION.text"),
-                TransactionType.BATTLE_LOSS_COMPENSATION.toString());
+              TransactionType.BATTLE_LOSS_COMPENSATION.toString());
         assertEquals(resources.getString("TransactionType.MISCELLANEOUS.text"),
-                TransactionType.MISCELLANEOUS.toString());
+              TransactionType.MISCELLANEOUS.toString());
         assertEquals(resources.getString("TransactionType.TRANSPORTATION.text"),
-                TransactionType.TRANSPORTATION.toString());
+              TransactionType.TRANSPORTATION.toString());
     }
 }

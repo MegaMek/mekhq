@@ -24,21 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
-import mekhq.campaign.log.*;
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import mekhq.campaign.log.AwardLogEntry;
+import mekhq.campaign.log.CustomLogEntry;
+import mekhq.campaign.log.HistoricalLogEntry;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.MedicalLogEntry;
+import mekhq.campaign.log.PersonalLogEntry;
+import mekhq.campaign.log.ServiceLogEntry;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 public class LogEntryTest {
     @Test
@@ -64,8 +76,8 @@ public class LogEntryTest {
             Node node;
             try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
                 node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                        .parse(new InputSource(bais))
-                        .getDocumentElement();
+                             .parse(new InputSource(bais))
+                             .getDocumentElement();
             }
 
             assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));

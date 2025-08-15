@@ -24,22 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui.stratcon;
-
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-
 import javax.swing.DefaultListModel;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 
 /**
  * List data model for the StratCon scenario wizard.
+ *
  * @author NickAragua
  */
 public class ScenarioWizardLanceModel extends DefaultListModel<Force> {
