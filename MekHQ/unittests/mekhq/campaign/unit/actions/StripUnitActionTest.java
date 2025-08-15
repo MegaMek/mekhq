@@ -43,7 +43,7 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import testUtilities.TestUtilities;
+import testUtilities.MHQTestUtilities;
 
 public class StripUnitActionTest {
     @BeforeAll
@@ -60,7 +60,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedMekHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.execute(campaign, unit);
         assertTrue(unit.getSalvageableParts().isEmpty());
@@ -69,7 +69,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedLAMHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getWaspLAMMk1());
         action.execute(campaign, unit);
         assertTrue(unit.getSalvageableParts().isEmpty());
@@ -78,7 +78,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedQuadVeeHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getArionStandard());
         action.execute(campaign, unit);
         assertTrue(unit.getSalvageableParts().isEmpty());
@@ -87,7 +87,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedUnitIsSalvaged() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.execute(campaign, unit);
         assertTrue(unit.isSalvage());

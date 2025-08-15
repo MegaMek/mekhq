@@ -33,6 +33,7 @@
 package mekhq.service.mrms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -42,10 +43,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static testUtilities.MHQTestConstants.TEST_MTF;
-import static testUtilities.MHQTestConstants.TEST_UNIT_DATA_DIR;
+import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,12 +178,8 @@ public class MRMSServiceTest {
         int targetNumberMax = 6;
         int dailyTimeMin = 0;
 
-        String unitName = "UrbanMech UM-R69";
-        File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
-        Entity entity = MekSummary.loadEntity(unitFile);
-        assert entity != null;
+        Entity entity = getUrbanMek();
         Unit unit = new Unit(entity, mockCampaign);
-        assert unit != null;
         addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred, targetNumberMax, dailyTimeMin);
 
         when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
@@ -214,6 +209,13 @@ public class MRMSServiceTest {
         verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
     }
 
+    private static Entity getUrbanMek() {
+        String unitName = "UrbanMech UM-R69";
+        Entity entity = getEntityForUnitTesting(unitName, false);
+        assertNotNull(entity, "Entity not found for " + unitName);
+        return entity;
+    }
+
     @Nested
     public class testMRMSUnitsSkillLevels {
         Unit unit;
@@ -227,12 +229,9 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            String unitName = "UrbanMech UM-R69";
-            File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
-            Entity entity = MekSummary.loadEntity(unitFile);
+            Entity entity = getUrbanMek();
             assert entity != null;
             unit = new Unit(entity, mockCampaign);
-            assert unit != null;
             unit.initializeParts(true);
         }
 
@@ -316,12 +315,8 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            String unitName = "UrbanMech UM-R69";
-            File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
-            Entity entity = MekSummary.loadEntity(unitFile);
-            assert entity != null;
+            Entity entity = getUrbanMek();
             unit = new Unit(entity, mockCampaign);
-            assert unit != null;
             unit.initializeParts(true);
         }
 

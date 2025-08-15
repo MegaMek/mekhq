@@ -34,19 +34,17 @@ package mekhq.campaign.mission;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static testUtilities.MHQTestConstants.TEST_MTF;
-import static testUtilities.MHQTestConstants.TEST_UNIT_DATA_DIR;
+import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
-import java.io.File;
 import java.io.IOException;
 
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Game;
-import megamek.common.MekSummary;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -102,9 +100,8 @@ class AtBDynamicScenarioFactoryTest {
 
     private static Entity getShadowHawk() {
         String unitName = "Shadow Hawk SHD-2H";
-        File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
-        Entity entity = MekSummary.loadEntity(unitFile);
-        assert entity != null;
+        Entity entity = getEntityForUnitTesting(unitName, false);
+        assertNotNull(entity, unitName + " couldn't be found");
         return entity;
     }
 
