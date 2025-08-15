@@ -24,20 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.LayoutManager;
 import java.util.ResourceBundle;
+import javax.swing.JFrame;
 
 /**
- * This is the default Scrollable Panel implementation, designed to be used as a basic
- * implementation of AbstractMHQScrollablePanel for inline scrollable panels that can then be used
- * within a scrollpane. It handles the frame while ignoring preferences and resources.
+ * This is the default Scrollable Panel implementation, designed to be used as a basic implementation of
+ * AbstractMHQScrollablePanel for inline scrollable panels that can then be used within a scrollpane. It handles the
+ * frame while ignoring preferences and resources.
  */
 public final class DefaultMHQScrollablePanel extends AbstractMHQScrollablePanel {
     //region Constructors
+
     /**
      * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle.
      */
@@ -46,40 +52,39 @@ public final class DefaultMHQScrollablePanel extends AbstractMHQScrollablePanel 
     }
 
     /**
-     * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle and specified
-     * double buffered boolean.
+     * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle and specified double buffered
+     * boolean.
      */
     public DefaultMHQScrollablePanel(final JFrame frame, final String name,
-                                     final boolean isDoubleBuffered) {
+          final boolean isDoubleBuffered) {
         super(frame, name, isDoubleBuffered);
     }
 
     /**
-     * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle and specified
-     * layout manager.
+     * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle and specified layout manager.
      */
     public DefaultMHQScrollablePanel(final JFrame frame, final String name,
-                                     final LayoutManager layoutManager) {
+          final LayoutManager layoutManager) {
         super(frame, name, layoutManager);
     }
 
     /**
-     * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle and specified
-     * layout manager and double buffered boolean.
+     * This creates a DefaultMHQScrollablePanel using the default MHQ resource bundle and specified layout manager and
+     * double buffered boolean.
      */
     public DefaultMHQScrollablePanel(final JFrame frame, final String name,
-                                     final LayoutManager layoutManager,
-                                     final boolean isDoubleBuffered) {
+          final LayoutManager layoutManager,
+          final boolean isDoubleBuffered) {
         super(frame, name, layoutManager, isDoubleBuffered);
     }
 
     /**
-     * This creates a DefaultMHQScrollablePanel using the specified resource bundle, layout manager,
-     * and double buffered boolean. This is not recommended by default.
+     * This creates a DefaultMHQScrollablePanel using the specified resource bundle, layout manager, and double buffered
+     * boolean. This is not recommended by default.
      */
     public DefaultMHQScrollablePanel(final JFrame frame, final ResourceBundle resources,
-                                     final String name, final LayoutManager layoutManager,
-                                     final boolean isDoubleBuffered) {
+          final String name, final LayoutManager layoutManager,
+          final boolean isDoubleBuffered) {
         super(frame, resources, name, layoutManager, isDoubleBuffered);
     }
     //endregion Constructors

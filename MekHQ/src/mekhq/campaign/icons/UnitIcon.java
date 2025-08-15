@@ -24,23 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.icons;
 
 import java.awt.Image;
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Unit Icon is an implementation of StandardForceIcon that permits a null
- * filename, thereby
- * allowing it to purposefully return a null image when a unit icon is absent.
+ * Unit Icon is an implementation of StandardForceIcon that permits a null filename, thereby allowing it to purposefully
+ * return a null image when a unit icon is absent.
  *
  * @see StandardForceIcon
  */
@@ -78,7 +81,7 @@ public class UnitIcon extends StandardForceIcon {
     @Override
     public boolean hasDefaultFilename() {
         return DEFAULT_ICON_FILENAME.equals(getFilename())
-                || ((getFilename() != null) && getFilename().isBlank());
+                     || ((getFilename() != null) && getFilename().isBlank());
     }
     // endregion Boolean Methods
 

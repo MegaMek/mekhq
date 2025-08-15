@@ -25,10 +25,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.CriticalSlot;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 
@@ -83,9 +92,7 @@ public class JumpJet extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer
-     * detail, boolean ignoreAmmo)
-     *
+     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      */
     @Override
     public Money getStickerPrice() {
@@ -125,11 +132,11 @@ public class JumpJet extends EquipmentPart {
                     return;
                 }
                 hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
-                        mounted.getLocation());
+                      mounted.getLocation());
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }

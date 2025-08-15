@@ -25,24 +25,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.util.StringJoiner;
 
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
-
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMek;
 import megamek.common.Mek;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.Node;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -68,7 +71,7 @@ public class MissingAvionics extends MissingPart {
                 time = 600;
             }
             return time;
-	// CamOps, 3rd printing, page 207: 80 hours for Large Craft, 8 hours otherwise
+            // CamOps, 3rd printing, page 207: 80 hours for Large Craft, 8 hours otherwise
         } else if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
             return 4800;
         } else {
@@ -102,8 +105,8 @@ public class MissingAvionics extends MissingPart {
             }
 
             return missingLocs.length() == 0
-                    ? null
-                    : "Cannot reinstall avionics when missing: " + missingLocs;
+                         ? null
+                         : "Cannot reinstall avionics when missing: " + missingLocs;
         }
 
         return null;

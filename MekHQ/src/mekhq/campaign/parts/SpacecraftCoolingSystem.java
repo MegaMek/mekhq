@@ -52,16 +52,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking
- * hundreds/thousands
- * of individual heat sink parts for spacecraft.
- *
- * The remove action adds a single heatsink of the appropriate type to the
- * warehouse.
- * Fix action replaces one.
- * Small craft and up don't actually track damage to heatsinks, so you only fix
- * this part if you're salvaging/replacing.
- * There might be 5,000 heatsinks in here. Have fun with that.
+ * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands of individual heat sink
+ * parts for spacecraft.
+ * <p>
+ * The remove action adds a single heatsink of the appropriate type to the warehouse. Fix action replaces one. Small
+ * craft and up don't actually track damage to heatsinks, so you only fix this part if you're salvaging/replacing. There
+ * might be 5,000 heatsinks in here. Have fun with that.
  *
  * @author MKerensky
  */
@@ -155,17 +151,16 @@ public class SpacecraftCoolingSystem extends Part {
         if (isSalvaging()) {
             remove(true);
             return " <font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> salvaged.</b></font>";
+                         + "'><b> salvaged.</b></font>";
         } else {
             fix();
             return " <font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> replaced.</b></font>";
+                         + "'><b> replaced.</b></font>";
         }
     }
 
     /**
-     * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds
-     * them to the cooling system
+     * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds them to the cooling system
      */
     public void replaceHeatSinks() {
         if (unit != null && unit.getEntity() instanceof Aero) {
@@ -175,15 +170,14 @@ public class SpacecraftCoolingSystem extends Part {
             if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
                 ((Aero) unit.getEntity())
-                        .setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
+                      .setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
             }
         }
         updateConditionFromEntity(false);
     }
 
     /**
-     * Calculates 'weight free' heatsinks included with this spacecraft's engine.
-     * You can't remove or replace these
+     * Calculates 'weight free' heatsinks included with this spacecraft's engine. You can't remove or replace these
      *
      */
     public void setEngineHeatSinks() {
@@ -206,8 +200,7 @@ public class SpacecraftCoolingSystem extends Part {
     }
 
     /**
-     * Pulls up to 50 heatsinks of the appropriate type from the cooling system and
-     * adds them to the warehouse
+     * Pulls up to 50 heatsinks of the appropriate type from the cooling system and adds them to the warehouse
      *
      */
     public void removeHeatSinks(boolean salvage) {
@@ -230,7 +223,7 @@ public class SpacecraftCoolingSystem extends Part {
                 campaign.getQuartermaster().addPart(spareHeatSink, 0);
             }
             ((Aero) unit.getEntity())
-                    .setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
+                  .setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
         updateConditionFromEntity(false);
     }

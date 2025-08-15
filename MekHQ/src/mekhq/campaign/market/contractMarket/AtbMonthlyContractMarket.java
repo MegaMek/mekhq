@@ -328,7 +328,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod,
-                                                      int retries) {
+          int retries) {
         if (employer == null) {
             logger.warn("Could not generate an AtB Contract because there was no employer!");
             return null;
@@ -702,12 +702,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * factors.
      *
      * <p>This method sets up and calculates the negotiation modifiers for each contract clause, such as command,
-     * salvage,
-     * transport, and support. It takes into account the experience level of the best administrators in relevant roles,
-     * campaign options (such as age effects, faction type, unit rating, and size limitations), contract specifics,
-     * enemy faction characteristics, mission type, and employer details. Clause modifiers are further adjusted for
-     * special circumstances like government or retainer contracts, high-performing units, and employer faction
-     * type.</p>
+     * salvage, transport, and support. It takes into account the experience level of the best administrators in
+     * relevant roles, campaign options (such as age effects, faction type, unit rating, and size limitations), contract
+     * specifics, enemy faction characteristics, mission type, and employer details. Clause modifiers are further
+     * adjusted for special circumstances like government or retainer contracts, high-performing units, and employer
+     * faction type.</p>
      *
      * <p>After all modifiers are applied for the contract, the method triggers the resolution of each contract clause
      * (command, salvage, support, transport) using the final calculated modifiers.</p>
@@ -754,8 +753,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 PersonnelOptions options = adminCommand.getOptions();
                 Attributes attributes = adminCommand.getATOWAttributes();
                 int adjustedReputation = adminCommand.getAdjustedReputation(isUseAgeEffects,
-                        isClanCampaign,
-                        today,
+                      isClanCampaign,
+                      today,
                       adminCommand.getRankNumeric());
 
                 adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
@@ -768,8 +767,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 PersonnelOptions options = adminTransport.getOptions();
                 Attributes attributes = adminTransport.getATOWAttributes();
                 int adjustedReputation = adminTransport.getAdjustedReputation(isUseAgeEffects,
-                        isClanCampaign,
-                        today,
+                      isClanCampaign,
+                      today,
                       adminTransport.getRankNumeric());
 
                 adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
@@ -782,8 +781,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 PersonnelOptions options = adminLogistics.getOptions();
                 Attributes attributes = adminLogistics.getATOWAttributes();
                 int adjustedReputation = adminLogistics.getAdjustedReputation(isUseAgeEffects,
-                        isClanCampaign,
-                        today,
+                      isClanCampaign,
+                      today,
                       adminLogistics.getRankNumeric());
 
                 adminLogisticsExp = skill.getExperienceLevel(options, attributes, adjustedReputation);

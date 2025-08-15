@@ -24,33 +24,37 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.Objects;
+import javax.swing.JPanel;
+
 import megamek.common.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Objects;
-
 /**
- * A custom implementation of {@link GridBagConstraints} designed for use with
- * panels in the campaign options dialog.
+ * A custom implementation of {@link GridBagConstraints} designed for use with panels in the campaign options dialog.
  * <p>
- * This class allows for simplified initialization of {@link GridBagConstraints}
- * with configurable anchor and fill properties, as well as preset insets.
+ * This class allows for simplified initialization of {@link GridBagConstraints} with configurable anchor and fill
+ * properties, as well as preset insets.
  * <p>
- * It is intended to be paired with {@code CampaignOptionsStandardPanel} or similar components
- * using the {@link GridBagLayout}.
+ * It is intended to be paired with {@code CampaignOptionsStandardPanel} or similar components using the
+ * {@link GridBagLayout}.
  */
 public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
 
     /**
-     * Constructs an instance of {@link GridBagConstraints} with default settings
-     * for the specified {@link JPanel}.
+     * Constructs an instance of {@link GridBagConstraints} with default settings for the specified {@link JPanel}.
      * <p>
-     * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}.
-     * Default constraints include:
+     * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}. Default constraints include:
      * </p>
      * <ul>
      *   <li> {@code anchor} set to {@link GridBagConstraints#NORTHWEST} </li>
@@ -65,11 +69,11 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
     }
 
     /**
-     * Constructs an instance of {@link GridBagConstraints} with configurable
-     * anchor and fill properties for the specified {@link JPanel}.
+     * Constructs an instance of {@link GridBagConstraints} with configurable anchor and fill properties for the
+     * specified {@link JPanel}.
      * <p>
-     * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}.
-     * If {@code anchor} or {@code fill} values are not provided, the following default
+     * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}. If {@code anchor} or {@code fill}
+     * values are not provided, the following default
      * </p>
      * values are used:
      * <ul>
@@ -79,10 +83,10 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * Default {@code insets} are set to {@code new Insets(5, 5, 5, 5)}.
      *
      * @param panel  the {@link JPanel} for which the {@link GridBagConstraints} is created
-     * @param anchor the anchor setting for the {@link GridBagConstraints}, or {@code null} to use
-     *               the default value {@link GridBagConstraints#NORTHWEST}
-     * @param fill   the fill setting for the {@link GridBagConstraints}, or {@code null} to use the
-     *               default value {@link GridBagConstraints#BOTH}
+     * @param anchor the anchor setting for the {@link GridBagConstraints}, or {@code null} to use the default value
+     *               {@link GridBagConstraints#NORTHWEST}
+     * @param fill   the fill setting for the {@link GridBagConstraints}, or {@code null} to use the default value
+     *               {@link GridBagConstraints#BOTH}
      */
     public CampaignOptionsGridBagConstraints(JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
         super();

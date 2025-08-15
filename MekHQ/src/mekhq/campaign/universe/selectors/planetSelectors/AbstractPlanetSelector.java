@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.selectors.planetSelectors;
 
@@ -34,8 +39,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
 /**
- * Represents a class which selects a {@link Planet}
- * from a {@link Campaign} and optionally a {@link Faction}.
+ * Represents a class which selects a {@link Planet} from a {@link Campaign} and optionally a {@link Faction}.
  */
 public abstract class AbstractPlanetSelector {
     //region Variable Declarations
@@ -65,15 +69,19 @@ public abstract class AbstractPlanetSelector {
 
     /**
      * Select a {@link Planet} for a {@link Campaign}.
+     *
      * @param campaign The {@link Campaign} to use when selecting a planet.
+     *
      * @return A {@link Planet} or {@code null}.
      */
     public abstract @Nullable Planet selectPlanet(Campaign campaign);
 
     /**
      * Select a {@link Planet} for a {@link Campaign} and optional {@link} Faction.
+     *
      * @param campaign The {@link Campaign} to use when selecting a planet.
-     * @param faction An optional {@link Faction} to use when selecting a planet.
+     * @param faction  An optional {@link Faction} to use when selecting a planet.
+     *
      * @return A {@link Planet} or {@code null}.
      */
     public abstract @Nullable Planet selectPlanet(Campaign campaign, @Nullable Faction faction);

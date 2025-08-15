@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.work;
 
@@ -49,11 +54,12 @@ public interface IWork {
     /**
      * @return the team assigned to this work unit, or <code>null</code> if nobody is working on it
      */
-    @Nullable Person getTech();
+    @Nullable
+    Person getTech();
 
     /**
-     * @return the current work time modifier set for this work unit; only override if the work
-     * unit supports more than the default, constant work time
+     * @return the current work time modifier set for this work unit; only override if the work unit supports more than
+     *       the default, constant work time
      */
     default WorkTime getMode() {
         return WorkTime.NORMAL;

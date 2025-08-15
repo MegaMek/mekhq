@@ -51,9 +51,8 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.Utilities;
 
 /**
- * This is a panel for displaying the reporting log for each day. We are putting it into its own
- * panel so that we can later extend this to include chat and maybe break up the log into different
- * sections.
+ * This is a panel for displaying the reporting log for each day. We are putting it into its own panel so that we can
+ * later extend this to include chat and maybe break up the log into different sections.
  *
  * @author Jay Lawson
  */
