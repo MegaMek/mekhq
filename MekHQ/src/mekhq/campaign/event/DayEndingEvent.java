@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.event;
 
@@ -34,10 +39,10 @@ import mekhq.campaign.Campaign;
  * <p>
  * The current about-to-end day can be queried via <code>event.getCampaign().getDate()</code>
  * <p>
- * Since it's a cancellable event, it's not guaranteed that an event handler will get to see
- * it every time the player tries to advance the day. The <i>first</i> event which cancel
- * it will make the game skip querying all the other events. Consequently, this event
- * like all cancellable events should not change any game state - use NewDayEvent for that.
+ * Since it's a cancellable event, it's not guaranteed that an event handler will get to see it every time the player
+ * tries to advance the day. The <i>first</i> event which cancel it will make the game skip querying all the other
+ * events. Consequently, this event like all cancellable events should not change any game state - use NewDayEvent for
+ * that.
  */
 public final class DayEndingEvent extends CampaignEvent {
     public DayEndingEvent(Campaign campaign) {

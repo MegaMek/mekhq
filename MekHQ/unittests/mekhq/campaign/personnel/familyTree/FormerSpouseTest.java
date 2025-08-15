@@ -24,8 +24,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.familyTree;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.UUID;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -39,21 +59,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
 public class FormerSpouseTest {
@@ -75,8 +80,10 @@ public class FormerSpouseTest {
             formerSpouse.writeToXML(pw, 0);
 
             // Assert the written XML equals to the expected text, ignoring line ending differences
-            assertEquals(String.format("<formerSpouse>\t<id>%s</id>\t<date>3025-01-01</date>\t<reason>DIVORCE</reason></formerSpouse>", id),
-                    sw.toString().replaceAll("\\n|\\r\\n", ""));
+            assertEquals(String.format(
+                        "<formerSpouse>\t<id>%s</id>\t<date>3025-01-01</date>\t<reason>DIVORCE</reason></formerSpouse>",
+                        id),
+                  sw.toString().replaceAll("\\n|\\r\\n", ""));
         }
     }
 
@@ -84,7 +91,9 @@ public class FormerSpouseTest {
     public void testGenerateInstanceFromXML() throws Exception {
         final UUID id = UUID.randomUUID();
 
-        final String text = String.format("<formerSpouse>\n\t<id>%s</id>\n\t<date>3025-01-01</date>\n\t<reason>DIVORCE</reason>\n</formerSpouse>\n", id);
+        final String text = String.format(
+              "<formerSpouse>\n\t<id>%s</id>\n\t<date>3025-01-01</date>\n\t<reason>DIVORCE</reason>\n</formerSpouse>\n",
+              id);
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
@@ -113,7 +122,7 @@ public class FormerSpouseTest {
         final FormerSpouse formerSpouse = new FormerSpouse(mockPerson, date, FormerSpouseReason.DIVORCE);
 
         final String expected = String.format("%s: Lee Jae-dong (%s)", FormerSpouseReason.DIVORCE,
-                MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+              MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         assertEquals(expected, formerSpouse.toString());
     }
 

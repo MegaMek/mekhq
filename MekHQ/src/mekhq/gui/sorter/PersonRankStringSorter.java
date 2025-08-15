@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -37,8 +42,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 /**
- * A comparator for ranks written as strings with "-" sorted to the bottom
- * always
+ * A comparator for ranks written as strings with "-" sorted to the bottom always
  *
  * @author Jay Lawson
  */
@@ -101,7 +105,7 @@ public class PersonRankStringSorter implements Comparator<String> {
             final String id1 = matcher.group(1);
 
             return getPersonRankSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
-                    getCampaign().getPerson(UUID.fromString(id1)));
+                  getCampaign().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
             logger.error(String.format("s0: %s, s1: %s", s0, s1), e);
             return 0;

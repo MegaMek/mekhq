@@ -24,13 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.iconDialogs;
 
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -48,11 +52,9 @@ import mekhq.gui.panels.LayeredForceIconCreationPanel;
 import mekhq.gui.panels.StandardForceIconChooser;
 
 /**
- * A LayeredForceIconDialog is used to select a Force Icon, which may be either
- * a LayeredForceIcon
- * or a StandardForceIcon. It allows one to swap a force between the two types
- * without issue, and
- * handles having both types open at the same time.
+ * A LayeredForceIconDialog is used to select a Force Icon, which may be either a LayeredForceIcon or a
+ * StandardForceIcon. It allows one to swap a force between the two types without issue, and handles having both types
+ * open at the same time.
  */
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     private static final MMLogger logger = MMLogger.create(LayeredForceIconDialog.class);
@@ -70,9 +72,9 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
         if (originalForceIcon instanceof UnitIcon) {
             logger.error(
-                    "This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
+                  "This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
             setOriginalForceIcon(
-                    new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
+                  new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
         } else {
             setOriginalForceIcon(originalForceIcon);
         }
@@ -147,11 +149,11 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         panel.setName("buttonPanel");
 
         panel.add(new MMButton("btnOk", resources, "Ok.text", "Ok.toolTipText",
-                this::okButtonActionPerformed));
+              this::okButtonActionPerformed));
         panel.add(new MMButton("btnCancel", resources, "Cancel.text", "Cancel.toolTipText",
-                this::cancelActionPerformed));
+              this::cancelActionPerformed));
         panel.add(new MMButton("btnRefresh", resources, "RefreshDirectory.text",
-                "RefreshDirectory.toolTipText", this::refreshDirectory));
+              "RefreshDirectory.toolTipText", this::refreshDirectory));
 
         return panel;
     }
@@ -173,14 +175,11 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     // endregion Initialization
 
     // region Button Actions
+
     /**
-     * This does a complete directory refresh, starting with the
-     * StandardForceIconChooser (which
-     * refreshes the Force Icon directory and implements it), and then refreshing
-     * the
-     * implementations under the LayeredForceIconCreationPanel without actually
-     * refreshing the Force
-     * Icon Directory.
+     * This does a complete directory refresh, starting with the StandardForceIconChooser (which refreshes the Force
+     * Icon directory and implements it), and then refreshing the implementations under the
+     * LayeredForceIconCreationPanel without actually refreshing the Force Icon Directory.
      *
      * @param evt the triggering event
      */

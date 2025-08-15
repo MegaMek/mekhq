@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit;
 
@@ -412,7 +417,7 @@ public class UnitPersonTest {
         Person mockTechOfficer = mock(Person.class);
         when(mockTechOfficer.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockTechOfficer);
-         when(mockTechOfficer.getUnit()).thenReturn(unit);
+        when(mockTechOfficer.getUnit()).thenReturn(unit);
 
         // This person is NOT a tech officer (yet)
         assertFalse(unit.isTechOfficer(mockTechOfficer));

@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.enums;
 
+import java.util.ResourceBundle;
+
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-
-import java.util.ResourceBundle;
 
 public enum ScenarioStatus {
     // region Enum Declarations
@@ -54,7 +59,7 @@ public enum ScenarioStatus {
     // region Constructors
     ScenarioStatus(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -146,7 +151,7 @@ public enum ScenarioStatus {
         }
 
         MMLogger.create(ScenarioStatus.class)
-                .error("Unable to parse " + text + " into a ScenarioStatus. Returning CURRENT.");
+              .error("Unable to parse " + text + " into a ScenarioStatus. Returning CURRENT.");
         return CURRENT;
     }
     // endregion File I/O

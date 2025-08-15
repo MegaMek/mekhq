@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -32,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Vector;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
@@ -67,7 +71,7 @@ public class RankTableModel extends DefaultTableModel {
     public static final int COL_NUM = 12;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Constructors
@@ -82,11 +86,8 @@ public class RankTableModel extends DefaultTableModel {
     }
 
     /**
-     * @param rankSystem The system to set the model for. Null values are properly
-     *                   handled but are
-     *                   considered to be an unexpected error condition and thus do
-     *                   not change the
-     *                   underlying model.
+     * @param rankSystem The system to set the model for. Null values are properly handled but are considered to be an
+     *                   unexpected error condition and thus do not change the underlying model.
      */
     public void setRankSystem(final @Nullable RankSystem rankSystem) {
         if (rankSystem == null) {
@@ -226,17 +227,16 @@ public class RankTableModel extends DefaultTableModel {
             // Java annoyingly doesn't have typed vectors in the DefaultTableModel, but we
             // can just
             // suppress the warnings this causes
-            @SuppressWarnings(value = "rawtypes")
-            final Vector<Vector> vectors = getDataVector();
+            @SuppressWarnings(value = "rawtypes") final Vector<Vector> vectors = getDataVector();
             for (@SuppressWarnings(value = "rawtypes")
             Vector row : vectors) {
                 final String[] names = {
-                        (String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
-                        (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
-                        (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH),
-                        (String) row.get(RankTableModel.COL_NAME_MEDICAL),
-                        (String) row.get(RankTableModel.COL_NAME_ADMIN),
-                        (String) row.get(RankTableModel.COL_NAME_CIVILIAN)
+                      (String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
+                      (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
+                      (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH),
+                      (String) row.get(RankTableModel.COL_NAME_MEDICAL),
+                      (String) row.get(RankTableModel.COL_NAME_ADMIN),
+                      (String) row.get(RankTableModel.COL_NAME_CIVILIAN)
                 };
                 final boolean officer = (boolean) row.get(RankTableModel.COL_OFFICER);
                 final double paymentMultiplier = (double) row.get(RankTableModel.COL_PAYMULT);
@@ -256,8 +256,8 @@ public class RankTableModel extends DefaultTableModel {
     public class Renderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(final JTable table, final Object value,
-                final boolean isSelected, final boolean hasFocus,
-                final int row, final int column) {
+              final boolean isSelected, final boolean hasFocus,
+              final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             final int actualCol = table.convertColumnIndexToModel(column);
             setToolTipText(getToolTip(actualCol));

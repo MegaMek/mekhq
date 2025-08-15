@@ -534,8 +534,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * Worker function that generates UI elements appropriate for planet-side scenarios
      *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
+     * @param resourceMap        Text resource
+     * @param y                  current row in the parent UI element
      *
      * @return the row at which we wind up after doing all this
      */
@@ -763,8 +763,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * Worker function that generates UI elements appropriate for space scenarios
      *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
+     * @param resourceMap        Text resource
+     * @param y                  current row in the parent UI element
      *
      * @return the row at which we wind up after doing all this
      */
@@ -808,8 +808,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * Worker function that generates UI elements appropriate for low atmosphere scenarios
      *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
+     * @param resourceMap        Text resource
+     * @param y                  current row in the parent UI element
      *
      * @return the row at which we wind up after doing all this
      */
@@ -984,7 +984,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         @Override
         public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected,
               final boolean expanded, final boolean leaf, final int row,
-                                                      final boolean hasFocus) {
+              final boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
             return this;

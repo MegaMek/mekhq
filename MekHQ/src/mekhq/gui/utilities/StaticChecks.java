@@ -53,7 +53,7 @@ public class StaticChecks {
     public static boolean areAllForcesUndeployed(final Campaign campaign, final List<Force> forces) {
         return forces.stream().noneMatch(Force::isDeployed)
                      && forces.stream().flatMap(force -> force.getAllUnits(false).stream())
-                        .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
+                              .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
     public static boolean areAllStandardForces(Vector<Force> forces) {
@@ -81,9 +81,11 @@ public class StaticChecks {
     }
 
     /**
-     * Used to test a selection of Units provided by the player and determine whether or not they have a
-     * Transport ship assignment
+     * Used to test a selection of Units provided by the player and determine whether or not they have a Transport ship
+     * assignment
+     *
      * @param units Vector of units that the player has selected
+     *
      * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
      */
     public static boolean areAllUnitsTransported(Vector<Unit> units) {
@@ -91,11 +93,14 @@ public class StaticChecks {
     }
 
     /**
-     * Used to test a selection of Units provided by the player and a larger Transport to determine
-     * whether or not the Transport can carry all of the selected units
+     * Used to test a selection of Units provided by the player and a larger Transport to determine whether or not the
+     * Transport can carry all of the selected units
+     *
      * @param units Vector of units that the player has selected
-     * @param ship A single Transport-Bay-equipped Unit whose capacity we want to test the selection against
-     * @return a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
+     * @param ship  A single Transport-Bay-equipped Unit whose capacity we want to test the selection against
+     *
+     * @return a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it
+     *       can
      */
     public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
         StringJoiner reason = new StringJoiner("");
@@ -120,7 +125,7 @@ public class StaticChecks {
             } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
                 numberSC++;
             } else if (unit.getEntity().getUnitType() == UnitType.AEROSPACEFIGHTER
-                        || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
+                             || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
                 // Includes conventional fighters
                 numberASF++;
             } else if (unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) {
@@ -134,8 +139,8 @@ public class StaticChecks {
             } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
                 numberProto++;
             } else if (unit.getEntity().getUnitType() == UnitType.TANK
-                        || unit.getEntity().getUnitType() == UnitType.VTOL
-                        || unit.getEntity().getUnitType() == UnitType.NAVAL) {
+                             || unit.getEntity().getUnitType() == UnitType.VTOL
+                             || unit.getEntity().getUnitType() == UnitType.NAVAL) {
                 // Tanks, VTOLs and wet naval vessels
                 double weight = unit.getEntity().getWeight();
                 if (unit.getEntity().isSuperHeavy()) {
@@ -191,16 +196,18 @@ public class StaticChecks {
         }
 
         // Heavy vehicles can fit into unused SuperHeavy bays
-        if (numberHVee > (ship.getCurrentHeavyVehicleCapacity() + (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee))) {
+        if (numberHVee >
+                  (ship.getCurrentHeavyVehicleCapacity() +
+                         (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee))) {
             reason.add("    Selection of Units includes too many Heavy Vehicles. \n");
             loadOK = false;
         }
 
         // Light vehicles can fit into any unused vehicle bays
         if (numberLVee >
-            (ship.getCurrentLightVehicleCapacity() +
-                    (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee) +
-                    (ship.getCurrentHeavyVehicleCapacity() - numberHVee))) {
+                  (ship.getCurrentLightVehicleCapacity() +
+                         (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee) +
+                         (ship.getCurrentHeavyVehicleCapacity() - numberHVee))) {
             reason.add("    Selection of Units includes too many Light Vehicles. \n");
             loadOK = false;
         }
@@ -214,13 +221,16 @@ public class StaticChecks {
     }
 
     public static boolean areAllUnitsNotC3iNetworked(Vector<Unit> units) {
-        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
-                && (u.getEntity().calculateFreeC3Nodes() == 5)); // 5 is the magic number for C3 network
+        return units.stream().allMatch(u -> (u.getEntity() != null) &&
+                                                  u.getEntity().hasC3i()
+                                                  &&
+                                                  (u.getEntity().calculateFreeC3Nodes() ==
+                                                         5)); // 5 is the magic number for C3 network
     }
 
     public static boolean areAllUnitsC3iNetworked(Vector<Unit> units) {
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
-                && (u.getEntity().calculateFreeC3Nodes() != 5));
+                                                  && (u.getEntity().calculateFreeC3Nodes() != 5));
     }
 
     public static boolean areAllUnitsOnSameC3iNetwork(Vector<Unit> units) {
@@ -232,12 +242,14 @@ public class StaticChecks {
             return false;
         }
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
-                && network.equalsIgnoreCase(u.getEntity().getC3NetId()));
+                                                  && network.equalsIgnoreCase(u.getEntity().getC3NetId()));
     }
 
     /**
      * Tests a selection of units to see if all of them have Naval C3 equipment
+     *
      * @param units A vector of units to test for Naval C3 equipment
+     *
      * @return false if any unit in the selection does not have a functioning NC3
      */
     public static boolean doAllUnitsHaveNC3(Vector<Unit> units) {
@@ -246,29 +258,36 @@ public class StaticChecks {
 
     /**
      * Tests a selection of units to see if all of them have no Naval C3 network assigned
+     *
      * @param units A vector of units to test for Naval C3 network assignment
+     *
      * @return false if any unit in the selection does not have a functioning NC3 or is already on an NC3 network
      */
     public static boolean areAllUnitsNotNC3Networked(Vector<Unit> units) {
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNavalC3()
-                && (u.getEntity().calculateFreeC3Nodes() == 5));
+                                                  && (u.getEntity().calculateFreeC3Nodes() == 5));
     }
 
     /**
      * Tests a selection of units to see if all of them are on a Naval C3 network
+     *
      * @param units A vector of units to test for Naval C3 network assignment
-     * @return false if any unit in the selection does not have a functioning NC3 or is not on an NC3 network with any other units
+     *
+     * @return false if any unit in the selection does not have a functioning NC3 or is not on an NC3 network with any
+     *       other units
      */
     public static boolean areAllUnitsNC3Networked(Vector<Unit> units) {
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNavalC3()
-                && (u.getEntity().calculateFreeC3Nodes() != 5));
+                                                  && (u.getEntity().calculateFreeC3Nodes() != 5));
     }
 
     /**
      * Tests a selection of units to see if all of them are on the same Naval C3 network by ID
+     *
      * @param units A vector of units to test for Naval C3 network assignment
-     * @return false if any unit in the selection does not have a functioning NC3, or is not on an NC3 network,
-     *     or if any of the units is on a different NC3 network from the others.
+     *
+     * @return false if any unit in the selection does not have a functioning NC3, or is not on an NC3 network, or if
+     *       any of the units is on a different NC3 network from the others.
      */
     public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
         if (units.isEmpty() || (units.get(0).getEntity() == null)) {
@@ -279,7 +298,7 @@ public class StaticChecks {
             return false;
         }
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNavalC3()
-                && network.equals(u.getEntity().getC3NetId()));
+                                                  && network.equals(u.getEntity().getC3NetId()));
     }
 
     public static boolean areAllUnitsC3Slaves(Vector<Unit> units) {
@@ -288,23 +307,32 @@ public class StaticChecks {
 
     public static boolean areAllUnitsIndependentC3Masters(Vector<Unit> units) {
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3M()
-                && !u.getEntity().C3MasterIs(u.getEntity()));
+                                                  && !u.getEntity().C3MasterIs(u.getEntity()));
     }
 
     public static boolean areAllUnitsCompanyLevelMasters(Vector<Unit> units) {
-        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3M()
-                && !u.getEntity().hasC3MM() && u.getEntity().C3MasterIs(u.getEntity()));
+        return units.stream().allMatch(u -> (u.getEntity() != null) &&
+                                                  u.getEntity().hasC3M()
+                                                  &&
+                                                  !u.getEntity().hasC3MM() &&
+                                                  u.getEntity().C3MasterIs(u.getEntity()));
     }
 
     public static boolean doAllUnitsHaveC3Master(Vector<Unit> units) {
-        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3()
-                && (u.getEntity().getC3Master() != null) && !u.getEntity().C3MasterIs(u.getEntity()));
+        return units.stream().allMatch(u -> (u.getEntity() != null) &&
+                                                  u.getEntity().hasC3()
+                                                  &&
+                                                  (u.getEntity().getC3Master() != null) &&
+                                                  !u.getEntity().C3MasterIs(u.getEntity()));
     }
     //endregion C3
 
     /**
-     * Used to test a selection of Units provided by the player and determine whether they all share a designated unitType.
+     * Used to test a selection of Units provided by the player and determine whether they all share a designated
+     * unitType.
+     *
      * @param units Vector of units that the player has selected
+     *
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
     public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
@@ -312,11 +340,14 @@ public class StaticChecks {
             return false;
         }
         final boolean isTank = (unitType == UnitType.TANK) || (unitType == UnitType.VTOL)
-                || (unitType == UnitType.NAVAL);
+                                     || (unitType == UnitType.NAVAL);
         final int weightClass = units.get(0).getEntity().getWeightClass();
         return units.stream().allMatch(u -> (u.getEntity() == null)
-                || ((u.getEntity() != null) && (u.getEntity().getUnitType() == unitType)
-                && (!isTank || (u.getEntity().getWeightClass() == weightClass))));
+                                                  ||
+                                                  ((u.getEntity() != null) &&
+                                                         (u.getEntity().getUnitType() == unitType)
+                                                         &&
+                                                         (!isTank || (u.getEntity().getWeightClass() == weightClass))));
     }
 
     public static boolean areAllActive(Person... people) {
@@ -365,13 +396,18 @@ public class StaticChecks {
     public static boolean areAllEligible(final boolean ignorePrisonerStatus, final Person... people) {
         final Profession profession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
         return Stream.of(people).allMatch(p -> (p.getPrisonerStatus().isFree() || ignorePrisonerStatus)
-                && (profession == Profession.getProfessionFromPersonnelRole(p.getPrimaryRole()))
-                && people[0].getRankSystem().equals(p.getRankSystem()));
+                                                     &&
+                                                     (profession ==
+                                                            Profession.getProfessionFromPersonnelRole(p.getPrimaryRole()))
+                                                     &&
+                                                     people[0].getRankSystem().equals(p.getRankSystem()));
     }
 
     /**
      * Checks if there is at least one award in the selected group of people
+     *
      * @param people the selected group of people
+     *
      * @return true if at least one has one award
      */
     public static boolean doAnyHaveAnAward(Person... people) {

@@ -115,8 +115,7 @@ public class AtBEventProcessor {
      * personnel market.
      *
      * <p>The recruitment process considers the type of recruit being sought, the campaign's unit rating, financial
-     * state,
-     * and the experience level of the best available HR administrator. Based on these factors, it computes a
+     * state, and the experience level of the best available HR administrator. Based on these factors, it computes a
      * recruitment roll using two six-sided dice plus all modifiers. The number of new recruits to generate is
      * determined by the result of this roll. Each new recruit is created and added to the campaign's personnel
      * market.</p>

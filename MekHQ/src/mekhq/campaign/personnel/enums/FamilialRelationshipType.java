@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
+import java.util.ResourceBundle;
+
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-
-import java.util.ResourceBundle;
 
 /**
  * This is used to determine the relationship type between related personnel
@@ -39,63 +44,63 @@ public enum FamilialRelationshipType {
     //region Enum Declarations
     // Direct Line
     GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
-            "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
-            "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
+          "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
+          "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
     PARENT("FamilialRelationshipType.PARENT.MALE.text",
-            "FamilialRelationshipType.PARENT.FEMALE.text",
-            "FamilialRelationshipType.PARENT.OTHER.text"),
+          "FamilialRelationshipType.PARENT.FEMALE.text",
+          "FamilialRelationshipType.PARENT.OTHER.text"),
     SIBLING("FamilialRelationshipType.SIBLING.MALE.text",
-            "FamilialRelationshipType.SIBLING.FEMALE.text",
-            "FamilialRelationshipType.SIBLING.OTHER.text"),
+          "FamilialRelationshipType.SIBLING.FEMALE.text",
+          "FamilialRelationshipType.SIBLING.OTHER.text"),
     HALF_SIBLING("FamilialRelationshipType.HALF_SIBLING.MALE.text",
-            "FamilialRelationshipType.HALF_SIBLING.FEMALE.text",
-            "FamilialRelationshipType.HALF_SIBLING.OTHER.text"),
+          "FamilialRelationshipType.HALF_SIBLING.FEMALE.text",
+          "FamilialRelationshipType.HALF_SIBLING.OTHER.text"),
     CHILD("FamilialRelationshipType.CHILD.MALE.text",
-            "FamilialRelationshipType.CHILD.FEMALE.text",
-            "FamilialRelationshipType.CHILD.OTHER.text"),
+          "FamilialRelationshipType.CHILD.FEMALE.text",
+          "FamilialRelationshipType.CHILD.OTHER.text"),
     GRANDCHILD("FamilialRelationshipType.GRANDCHILD.MALE.text",
-            "FamilialRelationshipType.GRANDCHILD.FEMALE.text",
-            "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
+          "FamilialRelationshipType.GRANDCHILD.FEMALE.text",
+          "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
 
     // Relatives
     GRANDPIBLING("FamilialRelationshipType.GRANDPIBLING.MALE.text",
-            "FamilialRelationshipType.GRANDPIBLING.FEMALE.text",
-            "FamilialRelationshipType.GRANDPIBLING.OTHER.text"),
+          "FamilialRelationshipType.GRANDPIBLING.FEMALE.text",
+          "FamilialRelationshipType.GRANDPIBLING.OTHER.text"),
     PIBLING("FamilialRelationshipType.PIBLING.MALE.text",
-            "FamilialRelationshipType.PIBLING.FEMALE.text",
-            "FamilialRelationshipType.PIBLING.OTHER.text"),
+          "FamilialRelationshipType.PIBLING.FEMALE.text",
+          "FamilialRelationshipType.PIBLING.OTHER.text"),
     COUSIN("FamilialRelationshipType.COUSIN.text"),
     NIBLING("FamilialRelationshipType.NIBLING.MALE.text",
-            "FamilialRelationshipType.NIBLING.FEMALE.text",
-            "FamilialRelationshipType.NIBLING.OTHER.text"),
+          "FamilialRelationshipType.NIBLING.FEMALE.text",
+          "FamilialRelationshipType.NIBLING.OTHER.text"),
 
     // Family-in-law Relationships
     SPOUSE("FamilialRelationshipType.SPOUSE.MALE.text",
-            "FamilialRelationshipType.SPOUSE.FEMALE.text",
-            "FamilialRelationshipType.SPOUSE.OTHER.text"),
+          "FamilialRelationshipType.SPOUSE.FEMALE.text",
+          "FamilialRelationshipType.SPOUSE.OTHER.text"),
     DIVORCE("FamilialRelationshipType.DIVORCE.text"),
     WIDOW("FamilialRelationshipType.WIDOW.text"),
     PARTNER("FamilialRelationshipType.PARTNER.text"),
     PARENT_IN_LAW("FamilialRelationshipType.PARENT_IN_LAW.MALE.text",
-            "FamilialRelationshipType.PARENT_IN_LAW.FEMALE.text",
-            "FamilialRelationshipType.PARENT_IN_LAW.OTHER.text"),
+          "FamilialRelationshipType.PARENT_IN_LAW.FEMALE.text",
+          "FamilialRelationshipType.PARENT_IN_LAW.OTHER.text"),
     SIBLING_IN_LAW("FamilialRelationshipType.SIBLING_IN_LAW.MALE.text",
-            "FamilialRelationshipType.SIBLING_IN_LAW.FEMALE.text",
-            "FamilialRelationshipType.SIBLING_IN_LAW.OTHER.text"),
+          "FamilialRelationshipType.SIBLING_IN_LAW.FEMALE.text",
+          "FamilialRelationshipType.SIBLING_IN_LAW.OTHER.text"),
     CHILD_IN_LAW("FamilialRelationshipType.CHILD_IN_LAW.MALE.text",
-            "FamilialRelationshipType.CHILD_IN_LAW.FEMALE.text",
-            "FamilialRelationshipType.CHILD_IN_LAW.OTHER.text"),
+          "FamilialRelationshipType.CHILD_IN_LAW.FEMALE.text",
+          "FamilialRelationshipType.CHILD_IN_LAW.OTHER.text"),
 
     // Stepfamily Relationships
     STEPPARENT("FamilialRelationshipType.STEPPARENT.MALE.text",
-            "FamilialRelationshipType.STEPPARENT.FEMALE.text",
-            "FamilialRelationshipType.STEPPARENT.OTHER.text"),
+          "FamilialRelationshipType.STEPPARENT.FEMALE.text",
+          "FamilialRelationshipType.STEPPARENT.OTHER.text"),
     STEPSIBLING("FamilialRelationshipType.STEPSIBLING.MALE.text",
-            "FamilialRelationshipType.STEPSIBLING.FEMALE.text",
-            "FamilialRelationshipType.STEPSIBLING.OTHER.text"),
+          "FamilialRelationshipType.STEPSIBLING.FEMALE.text",
+          "FamilialRelationshipType.STEPSIBLING.OTHER.text"),
     STEPCHILD("FamilialRelationshipType.STEPCHILD.MALE.text",
-            "FamilialRelationshipType.STEPCHILD.FEMALE.text",
-            "FamilialRelationshipType.STEPCHILD.OTHER.text");
+          "FamilialRelationshipType.STEPCHILD.FEMALE.text",
+          "FamilialRelationshipType.STEPCHILD.OTHER.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -104,7 +109,7 @@ public enum FamilialRelationshipType {
     private final String other; // Genderless form of the relationship type, like Parent for Parent
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -114,8 +119,8 @@ public enum FamilialRelationshipType {
 
     /**
      * @param masculine the masculine form of the relationship type
-     * @param feminine the feminine form of the relationship type
-     * @param other the non-gendered form of the relationship type
+     * @param feminine  the feminine form of the relationship type
+     * @param other     the non-gendered form of the relationship type
      */
     FamilialRelationshipType(final String masculine, final String feminine, final String other) {
         this.masculine = resources.getString(masculine);
@@ -215,16 +220,21 @@ public enum FamilialRelationshipType {
     }
 
     /**
-     * This is used to get the specific type name for a relationship between two people, based on the
-     * gender of the relative
-     * @param gender the relative's gender
+     * This is used to get the specific type name for a relationship between two people, based on the gender of the
+     * relative
+     *
+     * @param gender    the relative's gender
      * @param numGreats how many greats to add to the front of the relationship type
-     * @param adopted whether the relative was adopted
+     * @param adopted   whether the relative was adopted
+     *
      * @return the FamilialRelationshipType name
      */
     public String getTypeName(final Gender gender, final int numGreats, final boolean adopted) {
         final StringBuilder name = new StringBuilder(adopted
-                ? resources.getString("FamilialRelationshipType.adopted") + ' ' : "");
+                                                           ?
+                                                           resources.getString("FamilialRelationshipType.adopted") +
+                                                                 ' ' :
+                                                           "");
 
         for (int i = 0; i < numGreats; i++) {
             name.append(resources.getString("FamilialRelationshipType.great"));

@@ -73,14 +73,10 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
- *
- *         Class that handles configuration options for Against the Bot
- *         campaigns
- *         more extensive than what is handled by CampaignOptions. Most of the
- *         options
- *         fall into one of two categories: they allow users to customize the
- *         various
- *         tables in the rules, or they avoid hard-coding universe details.
+ *       <p>
+ *       Class that handles configuration options for Against the Bot campaigns more extensive than what is handled by
+ *       CampaignOptions. Most of the options fall into one of two categories: they allow users to customize the various
+ *       tables in the rules, or they avoid hard-coding universe details.
  */
 public class AtBConfiguration {
     private static final MMLogger logger = MMLogger.create(AtBConfiguration.class);
@@ -111,8 +107,8 @@ public class AtBConfiguration {
     private WeightedTable<String> jsTable;
 
     private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle(
-            "mekhq.resources.AtBConfigDefaults",
-            MekHQ.getMHQOptions().getLocale());
+          "mekhq.resources.AtBConfigDefaults",
+          MekHQ.getMHQOptions().getLocale());
 
     private AtBConfiguration() {
         dsTable = new WeightedTable<>();
@@ -133,8 +129,8 @@ public class AtBConfiguration {
         if (index >= fields.length) {
             // Deal with too short field lengths
             logger.error(
-                    String.format("Default force tables have %d weight entries; limiting the original value of %d.",
-                            fields.length, index));
+                  String.format("Default force tables have %d weight entries; limiting the original value of %d.",
+                        fields.length, index));
             index = fields.length - 1;
         }
         return parseDefaultWeightedTable(fields[index]);
@@ -162,7 +158,7 @@ public class AtBConfiguration {
      * Used if the config file is missing.
      */
     private void setAllValuesToDefaults() {
-        for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements();) {
+        for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             String property = defaultProperties.getString(key);
             switch (key) {
@@ -228,15 +224,13 @@ public class AtBConfiguration {
     }
 
     /**
-     * Selects a bot lance based on the organization, weight class, and roll
-     * modifier.
+     * Selects a bot lance based on the organization, weight class, and roll modifier.
      *
      * @param org         The organization of the bot force tables.
      * @param weightClass The weight class of the bot.
-     * @param rollMod     A modifier to the die roll, expressed as a fraction of the
-     *                    total weight.
-     * @return The selected bot lance, or null if the organization's bot force
-     *         tables are not found or invalid.
+     * @param rollMod     A modifier to the die roll, expressed as a fraction of the total weight.
+     *
+     * @return The selected bot lance, or null if the organization's bot force tables are not found or invalid.
      */
     public @Nullable String selectBotLances(String org, int weightClass, float rollMod) {
         // Check if the bot force tables contain the required organization
@@ -254,8 +248,9 @@ public class AtBConfiguration {
         // Check if the weightClassIndex is within valid range
         if (weightClassIndex < 0 || weightClassIndex >= botForceTable.size()) {
             logger.error(String.format(
-                    "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
-                    org, weightClass));
+                  "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
+                  org,
+                  weightClass));
 
             // Limit the weightClassIndex within valid range
             weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
@@ -285,14 +280,13 @@ public class AtBConfiguration {
     }
 
     /**
-     * Translates character code in the indicated position to the appropriate weight
-     * class constant.
+     * Translates character code in the indicated position to the appropriate weight class constant.
      *
-     * @param s A String of single-character codes that indicate the weight classes
-     *          of the units in a lance (e.g. "LMMH")
+     * @param s A String of single-character codes that indicate the weight classes of the units in a lance (e.g.
+     *          "LMMH")
      * @param i The index of the code to be translated
-     * @return The value used by UnitTableData to find the correct RAT for the
-     *         weight class
+     *
+     * @return The value used by UnitTableData to find the correct RAT for the weight class
      */
     public static int decodeWeightStr(String s, int i) {
         return switch (s.charAt(i)) {
@@ -475,7 +469,7 @@ public class AtBConfiguration {
             if (wn.getNodeName().equals("weightedTable")) {
                 try {
                     int weightClass = weightClassIndex(wn.getAttributes()
-                            .getNamedItem("weightClass").getTextContent());
+                                                             .getNamedItem("weightClass").getTextContent());
                     while (retVal.size() <= weightClass) {
                         retVal.add(null);
                     }
@@ -594,11 +588,12 @@ public class AtBConfiguration {
 
         /**
          * @param d date to check
+         *
          * @return true if d is between the start and end date, inclusive
          */
         public boolean fitsDate(LocalDate d) {
             return ((start == null) || !start.isAfter(d))
-                    && ((end == null) || !end.isBefore(d));
+                         && ((end == null) || !end.isBefore(d));
         }
     }
 
@@ -618,15 +613,15 @@ public class AtBConfiguration {
         /**
          * Select random entry proportionally to the weight values
          *
-         * @param rollMod - a modifier to the die roll, expressed as a fraction of the
-         *                total weight
+         * @param rollMod - a modifier to the die roll, expressed as a fraction of the total weight
+         *
          * @return
          */
         public @Nullable T select(float rollMod) {
             int total = weights.stream().mapToInt(Integer::intValue).sum();
             if (total > 0) {
                 int roll = Math.min(Compute.randomInt(total) + (int) (total * rollMod + 0.5f),
-                        total - 1);
+                      total - 1);
                 for (int i = 0; i < weights.size(); i++) {
                     if (roll < weights.get(i)) {
                         return values.get(i);
