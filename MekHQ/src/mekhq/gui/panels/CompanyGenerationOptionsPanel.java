@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
@@ -40,9 +45,9 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSpinner.NumberEditor;
 
-import megamek.client.ui.panels.JDisableablePanel;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
+import megamek.client.ui.panels.JDisableablePanel;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;

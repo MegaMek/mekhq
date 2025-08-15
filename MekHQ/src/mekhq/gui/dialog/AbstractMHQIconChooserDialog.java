@@ -24,28 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.util.ResourceBundle;
+import javax.swing.JFrame;
 
 import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import mekhq.MekHQ;
 import mekhq.gui.panels.AbstractMHQIconChooser;
 
-import javax.swing.*;
-import java.util.ResourceBundle;
-
 /**
- * AbstractMHQIconChooserDialog is an extension of AbstractIconChooserDialog that moves the
- * preferences and localization to MekHQ.
+ * AbstractMHQIconChooserDialog is an extension of AbstractIconChooserDialog that moves the preferences and localization
+ * to MekHQ.
+ *
  * @see AbstractIconChooserDialog
  */
 public abstract class AbstractMHQIconChooserDialog extends AbstractIconChooserDialog {
     //region Constructors
     protected AbstractMHQIconChooserDialog(final JFrame frame, final String name, final String title,
-                                           final AbstractMHQIconChooser chooser) {
+          final AbstractMHQIconChooser chooser) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale()),
-                name, title, chooser, false);
+                    MekHQ.getMHQOptions().getLocale()),
+              name, title, chooser, false);
     }
     //endregion Constructors
 

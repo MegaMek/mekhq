@@ -55,6 +55,7 @@ import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
+ *
  * @author NickAragua
  */
 public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRenderer<Force> {
@@ -69,14 +70,14 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends Force> list, final Force force,
-                                                  final int index, final boolean isSelected,
-                                                  final boolean cellHasFocus) {
+          final int index, final boolean isSelected,
+          final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
         // default return on all themes, but by recreating the colour it works properly
         final Color foreground = new Color((isSelected
-                ? list.getSelectionForeground() : list.getForeground()).getRGB());
+                                                  ? list.getSelectionForeground() : list.getForeground()).getRGB());
         final Color background = new Color((isSelected
-                ? list.getSelectionBackground() : list.getBackground()).getRGB());
+                                                  ? list.getSelectionBackground() : list.getBackground()).getRGB());
         setForeground(foreground);
         setBackground(background);
 
@@ -86,11 +87,11 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";
             case MARGINALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                ReportingUtilities.getNegativeColor());
+                  ReportingUtilities.getNegativeColor());
             case SUBSTANTIALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                ReportingUtilities.getWarningColor());
+                  ReportingUtilities.getWarningColor());
             case FULLY_OPERATIONAL, FACTORY_FRESH -> spanOpeningWithCustomColor(
-                ReportingUtilities.getPositiveColor());
+                  ReportingUtilities.getPositiveColor());
         };
 
         String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;

@@ -312,14 +312,15 @@ public class SupportPointNegotiation {
      * Calculates the total skill value for a given person by combining their skill level and relevant bonuses.
      *
      * <p>This method retrieves the specified skill from the person and computes the total skill level,
-     * taking into account the person's options, attributes, and adjusted reputation (which itself can be
-     * influenced by aging effects, campaign type, the current date, and rank index).</p>
+     * taking into account the person's options, attributes, and adjusted reputation (which itself can be influenced by
+     * aging effects, campaign type, the current date, and rank index).</p>
      *
      * @param person            The {@link Person} whose skill value is being calculated.
      * @param isUseAgingEffects Whether to apply aging effects to the reputation calculation.
      * @param isClanCampaign    Indicates whether the current campaign is a Clan campaign.
      * @param today             The current in-game date for age/reputation calculations.
      * @param rankIndex         The index representing the current rank for modifiers.
+     *
      * @return An {@link Integer} representing the total skill value after modifiers.
      */
     private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,

@@ -43,8 +43,7 @@ import megamek.common.enums.Gender;
  * lowercased variations, and additional data for pluralization handling.
  *
  * <p>This record encapsulates information related to personal pronouns for use in linguistic or grammatical
- * processing.
- * It includes pronoun forms commonly required for sentence construction and supports pluralization when
+ * processing. It includes pronoun forms commonly required for sentence construction and supports pluralization when
  * applicable.</p>
  *
  * @param subjectPronoun             The subject pronoun (e.g., "He", "She", "They").

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -67,7 +72,7 @@ public class EnginePart extends Part {
     @Override
     public EnginePart clone() {
         EnginePart clone = new EnginePart(getUnitTonnage(),
-                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
+              new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
         clone.copyBaseData(this);
         return clone;
     }
@@ -156,13 +161,13 @@ public class EnginePart extends Part {
     public boolean isSamePartType(Part part) {
         int year = campaign.getGameYear();
         return part instanceof EnginePart && getName().equals(part.getName())
-                && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
-                && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
-                && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
-                && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
-                        .hasFlag(Engine.TANK_ENGINE)
-                && getUnitTonnage() == part.getUnitTonnage()
-                && getTonnage() == part.getTonnage();
+                     && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
+                     && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
+                     && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
+                     && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
+                                                                         .hasFlag(Engine.TANK_ENGINE)
+                     && getUnitTonnage() == part.getUnitTonnage()
+                     && getTonnage() == part.getTonnage();
     }
 
     @Override
@@ -225,7 +230,7 @@ public class EnginePart extends Part {
     @Override
     public MissingPart getMissingPart() {
         return new MissingEnginePart(getUnitTonnage(),
-                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
+              new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
     }
 
     @Override
@@ -387,7 +392,7 @@ public class EnginePart extends Part {
                 return unit.getEntity().getLocationName(i) + " is breached.";
             }
             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
-                    && unit.isLocationDestroyed(i)) {
+                      && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
         }
@@ -401,7 +406,7 @@ public class EnginePart extends Part {
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
-                    && unit.isLocationDestroyed(i)) {
+                      && unit.isLocationDestroyed(i)) {
                 return true;
             }
         }
@@ -467,7 +472,7 @@ public class EnginePart extends Part {
                 break;
         }
         if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
-                || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT)) {
+                                     || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT)) {
             return true;
         }
         return false;

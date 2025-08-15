@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb;
 
@@ -31,7 +36,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
@@ -44,8 +48,7 @@ import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
- * Class intended for local use that holds a manifest of scenario modifier
- * definition file names.
+ * Class intended for local use that holds a manifest of scenario modifier definition file names.
  *
  * @author NickAragua
  */
@@ -58,10 +61,10 @@ class ScenarioModifierManifest {
     public List<String> fileNameList = new ArrayList<>();
 
     /**
-     * Attempt to deserialize an instance of a scenario modifier list from the
-     * passed-in file
+     * Attempt to deserialize an instance of a scenario modifier list from the passed-in file
      *
      * @param fileName Name of the file that contains the scenario modifier list
+     *
      * @return Possibly an instance of a scenario modifier list
      */
     public static ScenarioModifierManifest Deserialize(String fileName) {
@@ -79,7 +82,7 @@ class ScenarioModifierManifest {
             try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource,
-                        ScenarioModifierManifest.class);
+                      ScenarioModifierManifest.class);
                 resultingList = templateElement.getValue();
             }
         } catch (Exception ex) {

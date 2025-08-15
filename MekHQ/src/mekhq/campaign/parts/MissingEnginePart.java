@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -171,10 +176,10 @@ public class MissingEnginePart extends MissingPart {
             Engine eng = ((EnginePart) part).getEngine();
             if (null != eng) {
                 return (getEngine().getEngineType() == eng.getEngineType())
-                        && (getEngine().getRating() == eng.getRating())
-                        && (getEngine().getTechType(year) == eng.getTechType(year))
-                        && (getUnitTonnage() == part.getUnitTonnage())
-                        && (getTonnage() == part.getTonnage());
+                             && (getEngine().getRating() == eng.getRating())
+                             && (getEngine().getTechType(year) == eng.getTechType(year))
+                             && (getUnitTonnage() == part.getUnitTonnage())
+                             && (getTonnage() == part.getTonnage());
             }
         }
         return false;
@@ -206,7 +211,7 @@ public class MissingEnginePart extends MissingPart {
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
-                    && unit.isLocationDestroyed(i)) {
+                      && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
         }
@@ -216,9 +221,9 @@ public class MissingEnginePart extends MissingPart {
     @Override
     public Part getNewPart() {
         boolean useHover = null != unit && unit.getEntity().getMovementMode() == EntityMovementMode.HOVER
-                && unit.getEntity() instanceof Tank;
+                                 && unit.getEntity() instanceof Tank;
         return new EnginePart(getUnitTonnage(),
-                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
+              new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
     }
 
     @Override
@@ -276,8 +281,8 @@ public class MissingEnginePart extends MissingPart {
                 break;
         }
         return needsSideTorso
-                && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT)
-                        || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
+                     && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT)
+                               || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
     }
 
     @Override

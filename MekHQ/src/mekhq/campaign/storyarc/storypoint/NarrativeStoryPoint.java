@@ -24,24 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.gui.dialog.StoryNarrativeDialog;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This story point creates a {@link StoryNarrativeDialog StoryNarrativeDialog}
- * with a simple narrative description.
+ * This story point creates a {@link StoryNarrativeDialog StoryNarrativeDialog} with a simple narrative description.
  */
 public class NarrativeStoryPoint extends DialogStoryPoint {
     private static final MMLogger logger = MMLogger.create(NarrativeStoryPoint.class);

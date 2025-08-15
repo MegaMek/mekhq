@@ -49,14 +49,13 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
 /**
- * The {@code Fatigue} class provides utility methods for managing and processing
- * fatigue-related mechanics in the campaign. This includes calculating effective fatigue,
- * processing daily and weekly fatigue recovery, handling field kitchen requirements,
- * and generating related reports.
+ * The {@code Fatigue} class provides utility methods for managing and processing fatigue-related mechanics in the
+ * campaign. This includes calculating effective fatigue, processing daily and weekly fatigue recovery, handling field
+ * kitchen requirements, and generating related reports.
  *
  * <p>Fatigue is a system that affects personnel as part of campaign management. This class
- * ensures consistent handling of fatigue calculations, recovery, and statuses
- * based on campaign settings and personnel conditions.</p>
+ * ensures consistent handling of fatigue calculations, recovery, and statuses based on campaign settings and personnel
+ * conditions.</p>
  */
 public class Fatigue {
     final private static String RESOURCE_BUNDLE = "mekhq.resources.Fatigue";
@@ -161,7 +160,7 @@ public class Fatigue {
      * <p>This method calculates the effective fatigue of the person, determines their fatigue
      * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their fatigue level, and
      * updates their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is
-     * updated to {@code ON_LEAVE}.</p>
+     * updated to {@link PersonnelStatus#ON_LEAVE}.</p>
      *
      * @param campaign the campaign context in which the person operates.
      * @param person   the person whose fatigue actions are being processed.
@@ -257,9 +256,9 @@ public class Fatigue {
      * Handles daily fatigue recovery for a specific person in the campaign.
      *
      * <p>If the person has fatigue, their fatigue is reduced based on a standard recovery rate,
-     * with additional adjustments if they are on leave or if the campaign has no active contracts.
-     * If fatigue becomes zero or less, the person's recovery state is cleared, and their
-     * status may be updated to {@code ACTIVE} if they were previously on leave.</p>
+     * with additional adjustments if they are on leave or if the campaign has no active contracts. If fatigue becomes
+     * zero or less, the person's recovery state is cleared, and their status may be updated to {@code ACTIVE} if they
+     * were previously on leave.</p>
      *
      * @param campaign the campaign context in which the fatigue recovery occurs.
      * @param person   the person whose fatigue recovery is being handled.
@@ -300,7 +299,7 @@ public class Fatigue {
                     person.setIsRecoveringFromFatigue(false);
 
                     if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
-                            && (person.getStatus().isOnLeave())) {
+                              && (person.getStatus().isOnLeave())) {
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
                     }
                 }
