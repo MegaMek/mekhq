@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
@@ -31,10 +36,9 @@ package mekhq.campaign.randomEvents.prisoners.enums;
  * Represents the collection of possible events related to prisoners in MekHQ.
  *
  * <p>The {@code PrisonerEvent} enumeration is used to define various prisoner-related random
- * events that can occur during a campaign. These events include interactions and behaviors
- * among prisoners, as well as outcomes that can affect morale, resources, and the overall
- * state of the campaign. Each event describes a unique scenario or theme triggered under certain
- * circumstances.</p>
+ * events that can occur during a campaign. These events include interactions and behaviors among prisoners, as well as
+ * outcomes that can affect morale, resources, and the overall state of the campaign. Each event describes a unique
+ * scenario or theme triggered under certain circumstances.</p>
  */
 public enum PrisonerEvent {
     ARGUMENT, WILD_STORIES, TAMPERING, CONVERSATIONS, RATIONS, TRADE, DRAINED, RESCUE, REPAIRS,

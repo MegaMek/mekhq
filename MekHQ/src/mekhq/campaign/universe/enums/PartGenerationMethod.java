@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
@@ -57,7 +62,7 @@ public enum PartGenerationMethod {
     // region Constructors
     PartGenerationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -107,7 +112,7 @@ public enum PartGenerationMethod {
                 return new MultiplePartGenerator(this, 3);
             case DISABLED:
                 MMLogger.create(PartGenerationMethod.class)
-                        .error("Attempted to get a generator when the part generator is Disabled. Returning Windchild");
+                      .error("Attempted to get a generator when the part generator is Disabled. Returning Windchild");
             case WINDCHILD:
             default:
                 return new WindchildPartGenerator();

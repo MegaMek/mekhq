@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -56,12 +55,12 @@ public class TechTableModel extends DataTableModel {
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
-            SkillType.S_TECH_MEK,
-            SkillType.S_TECH_MECHANIC,
-            SkillType.S_TECH_BA,
-            SkillType.S_TECH_AERO,
-            SkillType.S_TECH_VESSEL,
-    };
+          SkillType.S_TECH_MEK,
+          SkillType.S_TECH_MECHANIC,
+          SkillType.S_TECH_BA,
+          SkillType.S_TECH_AERO,
+          SkillType.S_TECH_VESSEL,
+          };
 
     private CampaignGUI tab;
     private ITechWorkPanel panel;
@@ -97,7 +96,7 @@ public class TechTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              int row, int column) {
             Component c = this;
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
@@ -160,14 +159,15 @@ public class TechTableModel extends DataTableModel {
             int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
 
             toReturn.append("<b>")
-                    .append(SkillType.getColoredExperienceLevelName(experienceLevel))
-                    .append("</b> ").append(skillName);
+                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                  .append("</b> ").append(skillName);
             first = false;
         }
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
         // if Edge usage is allowed for techs, display remaining edge in the dialogue
-        if (getCampaign().getCampaignOptions().isUseSupportEdge() && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
+        if (getCampaign().getCampaignOptions().isUseSupportEdge() &&
+                  tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
             toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
         } else {
             toReturn.append(')');

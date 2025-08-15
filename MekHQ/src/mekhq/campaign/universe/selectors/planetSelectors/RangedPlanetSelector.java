@@ -24,8 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.selectors.planetSelectors;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
@@ -36,14 +46,9 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * An implementation of {@link AbstractPlanetSelector} which chooses
- * a planet from a range of planets and a {@link Faction}.
+ * An implementation of {@link AbstractPlanetSelector} which chooses a planet from a range of planets and a
+ * {@link Faction}.
  */
 public class RangedPlanetSelector extends AbstractPlanetSelector {
     //region Variable Declarations
@@ -104,9 +109,9 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     public @Nullable Planet selectPlanet(final Campaign campaign, final Faction faction) {
         final Planet planet = getOptions().determinePlanet(campaign.getCurrentSystem().getPrimaryPlanet());
         if ((getCachedPlanets() == null)
-                || !getCachedPlanets().containsKey(faction)
-                || !planet.equals(getCachedPlanet())
-                || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
+                  || !getCachedPlanets().containsKey(faction)
+                  || !planet.equals(getCachedPlanet())
+                  || (getCachedDate() == null) || campaign.getLocalDate().isAfter(getCachedDate())) {
             createLookupMap(campaign, faction, planet);
         }
 
@@ -125,14 +130,14 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     }
 
     private void createLookupMap(final Campaign campaign, final Faction faction,
-                                 final Planet centralPlanet) {
+          final Planet centralPlanet) {
         final LocalDate now = campaign.getLocalDate();
 
         final PlanetarySystem currentSystem = centralPlanet.getParentSystem();
 
         final WeightedDoubleMap<Planet> planets = new WeightedDoubleMap<>();
         final List<PlanetarySystem> systems = Systems.getInstance().getNearbySystems(currentSystem,
-                getOptions().getOriginSearchRadius());
+              getOptions().getOriginSearchRadius());
 
         double total = 0.0;
         for (final PlanetarySystem system : systems) {

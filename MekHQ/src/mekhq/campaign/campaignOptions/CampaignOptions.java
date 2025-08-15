@@ -195,7 +195,8 @@ public class CampaignOptions {
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-    private final EnumMap<PlanetarySophistication, Integer> planetTechAcquisitionBonus = new EnumMap<>(PlanetarySophistication.class);
+    private final EnumMap<PlanetarySophistication, Integer> planetTechAcquisitionBonus = new EnumMap<>(
+          PlanetarySophistication.class);
     private final EnumMap<PlanetaryRating, Integer> planetIndustryAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
     private final EnumMap<PlanetaryRating, Integer> planetOutputAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
 
@@ -5181,7 +5182,8 @@ public class CampaignOptions {
     /**
      * Determines if faction standing batchall restriction is enabled.
      *
-     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()} as
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()}
+     * as
      * that also verifies that Faction Standing is enabled.</p>
      *
      * @return {@code true} if faction standing batchall restriction is enabled, {@code false} otherwise.
@@ -5194,8 +5196,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing batchall restrictions are
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing batchall restrictions
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing batchall restrictions usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingBatchallRestrictionsSafe() {
         return trackFactionStanding && useFactionStandingBatchallRestrictions;
@@ -5221,8 +5223,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing recruitment modifiers is
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing recruitment modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing recruitment modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingRecruitmentSafe() {
         return trackFactionStanding && useFactionStandingRecruitment;
@@ -5248,8 +5250,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing barrack cost modifiers is
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing barrack cost modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing barrack cost modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingBarracksCostsSafe() {
         return trackFactionStanding && useFactionStandingBarracksCosts;
@@ -5275,8 +5277,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing unit market modifiers is
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing unit market modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing unit market modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingUnitMarketSafe() {
         return trackFactionStanding && useFactionStandingUnitMarket;
@@ -5302,8 +5304,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing contract payment modifiers
      * is active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing contract pay modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing contract pay modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingContractPaySafe() {
         return trackFactionStanding && useFactionStandingContractPay;
@@ -5326,11 +5328,11 @@ public class CampaignOptions {
     }
 
     /**
-     * Checks whether tracking faction standing is enabled and if the use of faction standing support point modifiers
-     * is active.
+     * Checks whether tracking faction standing is enabled and if the use of faction standing support point modifiers is
+     * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing resupply modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing resupply modifier usage are enabled;
+     *       {@code false} otherwise.
      */
     public boolean isUseFactionStandingSupportPointsSafe() {
         return trackFactionStanding && useFactionStandingSupportPoints;
@@ -5355,19 +5357,19 @@ public class CampaignOptions {
     public void setRegardMultiplier(double regardMultiplier) {
         this.regardMultiplier = regardMultiplier;
     }
-    
+
     public boolean isAutoGenerateOpForCallsigns() {
         return autoGenerateOpForCallsigns;
     }
-    
+
     public void setAutoGenerateOpForCallsigns(boolean autoGenerateOpForCallsigns) {
         this.autoGenerateOpForCallsigns = autoGenerateOpForCallsigns;
     }
-    
+
     public SkillLevel getMinimumCallsignSkillLevel() {
         return minimumCallsignSkillLevel;
     }
-    
+
     public void setMinimumCallsignSkillLevel(SkillLevel skillLevel) {
         this.minimumCallsignSkillLevel = skillLevel;
     }

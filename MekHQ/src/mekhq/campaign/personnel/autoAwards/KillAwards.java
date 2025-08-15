@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.autoAwards;
 
@@ -58,18 +63,16 @@ public class KillAwards {
     private static final MMLogger logger = MMLogger.create(KillAwards.class);
 
     /**
-     * This function loops through Kill Awards, checking whether the person is
-     * eligible to receive each type of award
+     * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
      *
      * @param campaign the campaign to be processed
      * @param mission  the mission just completed
      * @param person   the person to check award eligibility for
-     * @param awards   the awards to be processed (should only include awards where
-     *                 item == Kill)
+     * @param awards   the awards to be processed (should only include awards where item == Kill)
      * @param killData the pre-processed list of kills mapped to Force ID
      */
     public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person,
-            List<Award> awards, Map<Integer, List<Kill>> killData) {
+          List<Award> awards, Map<Integer, List<Kill>> killData) {
         List<Award> individualAwards = new ArrayList<>();
 
         List<Award> groupAwards = new ArrayList<>();
@@ -97,7 +100,7 @@ public class KillAwards {
                     awardScope = award.getRange().toLowerCase();
                 } else {
                     logger.warn("Award {} from the {} set has invalid range value {}. Skipping",
-                            award.getName(), award.getSet(), award.getRange());
+                          award.getName(), award.getSet(), award.getRange());
                     continue;
                 }
 
@@ -110,7 +113,7 @@ public class KillAwards {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
                     logger.warn("Award {} from the {} set has invalid range qty {}. Skipping",
-                            award.getName(), award.getSet(), award.getQty());
+                          award.getName(), award.getSet(), award.getQty());
                     continue;
                 }
 
@@ -122,15 +125,15 @@ public class KillAwards {
                     killCount.add(campaign.getKillsFor(person).size());
                 } else if ((!awardDepth.isNone()) && (awardScope.equalsIgnoreCase("lifetime"))) {
                     logger.warn(
-                            "Award {} from the {} set has a invalid combination: range value {} with size {}. Skipping",
-                            award.getName(), award.getSet(), award.getRange(), award.getSize());
+                          "Award {} from the {} set has a invalid combination: range value {} with size {}. Skipping",
+                          award.getName(), award.getSet(), award.getRange(), award.getSize());
                     continue;
                 }
 
                 if (awardScope.equalsIgnoreCase("mission")) {
                     List<Kill> killCredits = campaign.getKillsFor(person).stream()
-                            .filter(kill -> kill.getMissionId() == mission.getId())
-                            .toList();
+                                                   .filter(kill -> kill.getMissionId() == mission.getId())
+                                                   .toList();
 
                     // -1 corresponds to 'individual', so we only care about the pilot's personal
                     // kills
@@ -300,8 +303,8 @@ public class KillAwards {
                         case 5 -> targetList = awardsDepth5;
                         case 6 -> targetList = awardsDepth6;
                         case 7 -> targetList = awardsDepth7;
-                        default ->
-                            throw new IllegalStateException("Unexpected value in getFormation: " + getFormation(award));
+                        default -> throw new IllegalStateException("Unexpected value in getFormation: " +
+                                                                         getFormation(award));
                     }
 
                     targetList.add(award);
@@ -310,7 +313,7 @@ public class KillAwards {
                 // As mentioned previously, the int after 'groupAwards' corresponds to
                 // formationDepth
                 List<List<Award>> allGroupAwards = Arrays.asList(awardsDepth0, awardsDepth1, awardsDepth2,
-                        awardsDepth3, awardsDepth4, awardsDepth5, awardsDepth6, awardsDepth7);
+                      awardsDepth3, awardsDepth4, awardsDepth5, awardsDepth6, awardsDepth7);
 
                 for (List<Award> awardGroup : allGroupAwards) {
                     if (!awardGroup.isEmpty()) {
@@ -334,16 +337,14 @@ public class KillAwards {
     }
 
     /**
-     * Traverses the graph of Forces, starting from an origin Force, to collect
-     * associated kills from each eligible Force node in the graph.
-     * The traversal uses a depth-first search approach to visit each Force node.
+     * Traverses the graph of Forces, starting from an origin Force, to collect associated kills from each eligible
+     * Force node in the graph. The traversal uses a depth-first search approach to visit each Force node.
      *
-     * @param killData     the map containing kill records wherein the key is the
-     *                     Force ID and the value is a list of associated Kill
-     *                     objects.
-     * @param originNode   the initial Force node from which the traversal begins.
-     * @return a list of Kill objects that are associated with the traversed Force
-     *         nodes
+     * @param killData   the map containing kill records wherein the key is the Force ID and the value is a list of
+     *                   associated Kill objects.
+     * @param originNode the initial Force node from which the traversal begins.
+     *
+     * @return a list of Kill objects that are associated with the traversed Force nodes
      */
     private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode) {
         List<Kill> kills = new ArrayList<>();
@@ -374,9 +375,9 @@ public class KillAwards {
     }
 
     /**
-     * @return the FormationLevel enum based on the size of the award.
-     *
      * @param award the award to determine the FormationLevel for
+     *
+     * @return the FormationLevel enum based on the size of the award.
      */
     private static FormationLevel getFormation(Award award) {
         return switch (award.getSize().toLowerCase()) {
@@ -391,9 +392,9 @@ public class KillAwards {
             case "army" -> ARMY;
             default -> {
                 logger.warn("Award {} from the {} set has invalid size value {}",
-                        award.getName(),
-                        award.getSet(),
-                        award.getSize());
+                      award.getName(),
+                      award.getSet(),
+                      award.getSize());
                 yield NONE;
             }
         };

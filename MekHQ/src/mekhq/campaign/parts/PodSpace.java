@@ -264,11 +264,11 @@ public class PodSpace implements IPartWork {
         if (isSalvaging()) {
             remove(true);
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getPositiveColor(), "<b> removed</b>") + ".";
+                  ReportingUtilities.getPositiveColor(), "<b> removed</b>") + ".";
         } else {
             fix();
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getPositiveColor(), "<b> fixed</b>") + ".";
+                  ReportingUtilities.getPositiveColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -285,12 +285,12 @@ public class PodSpace implements IPartWork {
             }
         }
         if (rating >= SkillType.EXP_LEGENDARY && replacing) {
-                return ReportingUtilities.messageSurroundedBySpanWithColor(
-                        ReportingUtilities.getNegativeColor(),
-                        "<b> failed and part(s) destroyed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                  ReportingUtilities.getNegativeColor(),
+                  "<b> failed and part(s) destroyed</b>") + ".";
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(),"<b> failed</b>") + ".";
+                  ReportingUtilities.getNegativeColor(), "<b> failed</b>") + ".";
         }
     }
 

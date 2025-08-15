@@ -24,19 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
-
-import org.junit.jupiter.api.Test;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 /**
- * This class contains test cases for the {@link InsufficientMedicsNagLogicTest} class.
- * It tests the different combinations of Medic requirements and verifies the behavior of the
- * {@code checkMedicsNeededCount()} method.
+ * This class contains test cases for the {@link InsufficientMedicsNagLogicTest} class. It tests the different
+ * combinations of Medic requirements and verifies the behavior of the {@code checkMedicsNeededCount()} method.
  */
 class InsufficientMedicsNagLogicTest {
     @Test

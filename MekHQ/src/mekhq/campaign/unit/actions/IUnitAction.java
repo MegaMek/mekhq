@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.unit.actions;
 
 import mekhq.campaign.Campaign;
@@ -36,10 +40,10 @@ import mekhq.campaign.unit.Unit;
  */
 public interface IUnitAction {
     /**
-     * Executes an action against a unit in a campaign. The action
-     * may have side effects.
+     * Executes an action against a unit in a campaign. The action may have side effects.
+     *
      * @param campaign The campaign object this action is executed against.
-     * @param unit The unit object this action is executed against.
+     * @param unit     The unit object this action is executed against.
      */
     void execute(Campaign campaign, Unit unit);
 }

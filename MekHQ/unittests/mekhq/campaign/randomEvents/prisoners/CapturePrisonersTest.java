@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
@@ -59,14 +64,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the
- * prisoner capture and processing mechanisms. This class contains a variety of unit test cases to
- * ensure all intended scenarios for capturing and handling prisoners are resolved correctly.
+ * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the prisoner capture and
+ * processing mechanisms. This class contains a variety of unit test cases to ensure all intended scenarios for
+ * capturing and handling prisoners are resolved correctly.
  *
  * <p>The test cases examine different settings such as ground and space environments, the use of
- * sensors and probes, the capture of NPCs, and the processing of prisoners under specific factions
- * or capture methods such as Campaign Operations and MekHQ. Additionally, scenarios regarding
- * prisoner defection are also tested for various factions and conditions.</p>
+ * sensors and probes, the capture of NPCs, and the processing of prisoners under specific factions or capture methods
+ * such as Campaign Operations and MekHQ. Additionally, scenarios regarding prisoner defection are also tested for
+ * various factions and conditions.</p>
  */
 class CapturePrisonersTest {
     private static Factions factions;
@@ -95,9 +100,9 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + GOING_TO_GROUND
-            + SAR_CONTAINS_VTOL_OR_WIGE;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + GOING_TO_GROUND
+                                         + SAR_CONTAINS_VTOL_OR_WIGE;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -119,14 +124,17 @@ class CapturePrisonersTest {
         AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, activeProbeAvailability.getIndex());
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              activeProbeAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + GOING_TO_GROUND
-            + SAR_CONTAINS_VTOL_OR_WIGE
-            + SAR_HAS_ACTIVE_PROBE;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + GOING_TO_GROUND
+                                         + SAR_CONTAINS_VTOL_OR_WIGE
+                                         + SAR_HAS_ACTIVE_PROBE;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -146,14 +154,17 @@ class CapturePrisonersTest {
         AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, improvedSensorsAvailability.getIndex());
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              improvedSensorsAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + GOING_TO_GROUND
-            + SAR_CONTAINS_VTOL_OR_WIGE
-            + SAR_HAS_IMPROVED_SENSORS;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + GOING_TO_GROUND
+                                         + SAR_CONTAINS_VTOL_OR_WIGE
+                                         + SAR_HAS_IMPROVED_SENSORS;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -177,9 +188,9 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + NOT_IN_PLANET_ORBIT
-            + SAR_INCLUDES_DROPSHIP;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + NOT_IN_PLANET_ORBIT
+                                         + SAR_INCLUDES_DROPSHIP;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -301,7 +312,10 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MIN_VALUE;
@@ -336,7 +350,10 @@ class CapturePrisonersTest {
         Faction prisonerFaction = factions.getFaction("CJF");
         prisoner.setOriginFaction(prisonerFaction);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MAX_VALUE;
@@ -402,7 +419,10 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MIN_VALUE;
@@ -437,7 +457,10 @@ class CapturePrisonersTest {
         Faction prisonerFaction = factions.getFaction("LA");
         prisoner.setOriginFaction(prisonerFaction);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MAX_VALUE;
@@ -573,13 +596,13 @@ class CapturePrisonersTest {
     // Utility Methods
 
     /**
-     * Determines the availability of a particular part based on the current date
-     * and whether an active probe is being used.
+     * Determines the availability of a particular part based on the current date and whether an active probe is being
+     * used.
      *
-     * @param today The current date represented as a LocalDate object.
+     * @param today         The current date represented as a LocalDate object.
      * @param isActiveProbe A boolean indicating if an active probe is being utilized.
-     * @return An integer representing the availability of the part for the given year
-     *         and technology type.
+     *
+     * @return An integer representing the availability of the part for the given year and technology type.
      */
     private AvailabilityValue getPartAvailability(LocalDate today, boolean isActiveProbe) {
         int year = today.getYear();

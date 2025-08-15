@@ -117,7 +117,7 @@ public class ReplacementLimbDialog {
      * @return A {@link List} of {@link String} objects representing the dialog buttons.
      */
     private static List<String> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside,
-                                                              boolean hasSufficientFunds) {
+          boolean hasSufficientFunds) {
         List<String> buttons = new ArrayList<>();
 
         if (!hasSufficientFunds || (!hasQualifiedDoctor && !isPlanetside)) {
@@ -145,8 +145,8 @@ public class ReplacementLimbDialog {
      * @return A {@link String} containing the localized in-character message for the dialog.
      */
     private static String createInCharacterMessage(boolean isPlanetside, boolean hasQualifiedDoctors,
-                                                   String commanderAddress, Person patient, Money cost,
-                                                   boolean hasSufficientFunds) {
+          String commanderAddress, Person patient, Money cost,
+          boolean hasSufficientFunds) {
         String keyAddendum = "normal";
 
         if (!hasQualifiedDoctors && hasSufficientFunds) {
