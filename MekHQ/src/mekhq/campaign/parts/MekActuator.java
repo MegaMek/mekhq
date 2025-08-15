@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -43,7 +48,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -52,11 +56,15 @@ import org.w3c.dom.NodeList;
  */
 public class MekActuator extends Part {
     static final TechAdvancement TA_STANDARD = new TechAdvancement(TechBase.ALL).setAdvancement(2300, 2350, 2505)
-            .setApproximate(true, false, false).setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
-            .setStaticTechLevel(SimpleTechLevel.INTRO);
+                                                     .setApproximate(true, false, false)
+                                                     .setPrototypeFactions(Faction.TA)
+                                                     .setProductionFactions(Faction.TH)
+                                                     .setStaticTechLevel(SimpleTechLevel.INTRO);
     static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TechBase.IS).setAdvancement(2905, 2940, 3076)
-            .setApproximate(true, false, false).setPrototypeFactions(Faction.FW).setProductionFactions(Faction.FW)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                       .setApproximate(true, false, false)
+                                                       .setPrototypeFactions(Faction.FW)
+                                                       .setProductionFactions(Faction.FW)
+                                                       .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     protected int type;
     protected int location;
@@ -131,7 +139,7 @@ public class MekActuator extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof MekActuator && getType() == ((MekActuator) part).getType()
-                && getUnitTonnage() == part.getUnitTonnage();
+                     && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -212,7 +220,7 @@ public class MekActuator extends Part {
             }
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);
             if (checkForDestruction && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }

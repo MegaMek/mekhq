@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.event;
@@ -34,8 +39,8 @@ import megamek.common.event.MMEvent;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when units are added to or removed from a network, or a C3 master is toggled
- * between independent and company command.
+ * Triggered when units are added to or removed from a network, or a C3 master is toggled between independent and
+ * company command.
  */
 
 public class NetworkChangedEvent extends MMEvent {

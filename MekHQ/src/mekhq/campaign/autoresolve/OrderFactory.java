@@ -24,9 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.autoresolve;
+
+import java.util.Set;
 
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
@@ -38,8 +45,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
-
-import java.util.Set;
 
 /**
  * @author Luana Coppio
@@ -100,7 +105,7 @@ public class OrderFactory {
     // Make the enemy withdraw
     private void createForceWithdrawOrder(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.ATTACK_TARGET_NOT_WITHDRAWING)
-                .withCondition(Condition.alwaysTrue());
+                                 .withCondition(Condition.alwaysTrue());
         if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None) {
             orderBuilder.withCondition(context -> context.getCurrentRound() <= objective.getTimeLimit());
         }
@@ -111,21 +116,22 @@ public class OrderFactory {
         if (objective.getDestinationEdge() != null && objective.getDestinationEdge() != OffBoardDirection.NONE) {
             var northSide = Set.of(OffBoardDirection.NORTH, OffBoardDirection.EAST);
             var orderType = northSide.contains(objective.getDestinationEdge()) ? OrderType.FLEE_NORTH
-                    : OrderType.FLEE_SOUTH;
+                                  : OrderType.FLEE_SOUTH;
             var orderBuilder = Order.OrderBuilder.anOrder(ownerId, orderType)
-                    .withCondition(Condition.alwaysTrue());
+                                     .withCondition(Condition.alwaysTrue());
             orders.add(orderBuilder.build());
         } else {
             var orderBuilder = Order.OrderBuilder
-                    .anOrder(ownerId, scenario.getStartingPos() > 4 ? OrderType.FLEE_NORTH : OrderType.FLEE_SOUTH)
-                    .withCondition(Condition.alwaysTrue());
+                                     .anOrder(ownerId,
+                                           scenario.getStartingPos() > 4 ? OrderType.FLEE_NORTH : OrderType.FLEE_SOUTH)
+                                     .withCondition(Condition.alwaysTrue());
             addOrder(orderBuilder.build());
         }
     }
 
     private void createPreventReachMapEdgeOrder(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.ATTACK_TARGET_WITHDRAWING)
-                .withCondition(Condition.alwaysTrue());
+                                 .withCondition(Condition.alwaysTrue());
         if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None) {
             orderBuilder.withCondition(context -> context.getCurrentRound() <= objective.getTimeLimit());
         }
@@ -145,85 +151,89 @@ public class OrderFactory {
 
     private Order createOrderForPreserveAssociatedForces(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.WITHDRAW_IF_CONDITION_IS_MET)
-                .withCondition(context -> {
-                    var attackTypeOrders = Set.of(OrderType.ATTACK_TARGET, OrderType.ATTACK_TARGET_NOT_WITHDRAWING,
-                            OrderType.ATTACK_TARGET_WITHDRAWING);
-                    var hasOutstandingAttackOrders = context.getOrders().getOrders(ownerId).stream()
-                            .filter(o -> attackTypeOrders.contains(o.getOrderType()))
-                            .anyMatch(order -> order.isEligible(context));
-                    int totalUnits = 0;
-                    var currentUnits = 0;
-                    for (var forceName : objective.getAssociatedForceNames()) {
-                        for (var force : context.getForces().getTopLevelForces()) {
-                            if (force.getName().equals(forceName)) {
-                                totalUnits += force.getEntities().size();
-                                for (var entityId : force.getEntities()) {
-                                    currentUnits += context
-                                            .getSelectedEntityCount(entity -> entity.getId() == entityId);
-                                }
-                            }
-                        }
-                    }
+                                 .withCondition(context -> {
+                                     var attackTypeOrders = Set.of(OrderType.ATTACK_TARGET,
+                                           OrderType.ATTACK_TARGET_NOT_WITHDRAWING,
+                                           OrderType.ATTACK_TARGET_WITHDRAWING);
+                                     var hasOutstandingAttackOrders = context.getOrders().getOrders(ownerId).stream()
+                                                                            .filter(o -> attackTypeOrders.contains(o.getOrderType()))
+                                                                            .anyMatch(order -> order.isEligible(context));
+                                     int totalUnits = 0;
+                                     var currentUnits = 0;
+                                     for (var forceName : objective.getAssociatedForceNames()) {
+                                         for (var force : context.getForces().getTopLevelForces()) {
+                                             if (force.getName().equals(forceName)) {
+                                                 totalUnits += force.getEntities().size();
+                                                 for (var entityId : force.getEntities()) {
+                                                     currentUnits += context
+                                                                           .getSelectedEntityCount(entity -> entity.getId() ==
+                                                                                                                   entityId);
+                                                 }
+                                             }
+                                         }
+                                     }
 
-                    if (totalUnits == 0) {
-                        return true;
-                    } else {
+                                     if (totalUnits == 0) {
+                                         return true;
+                                     } else {
 
-                        var timeLimit = false;
-                        if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None
-                                && objective.isTimeLimitAtMost()) {
-                            timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
-                        }
-                        if (!hasOutstandingAttackOrders) {
-                            if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
-                                return currentUnits < objective.getFixedAmount() || timeLimit;
-                            } else {
-                                int percent = (int) ((totalUnits / (double) currentUnits) * 100);
-                                return percent < objective.getPercentage() || timeLimit;
-                            }
-                        } else {
-                            if (timeLimit) {
-                                return context.getCurrentRound() >= objective.getTimeLimit();
-                            } else {
-                                return true;
-                            }
-                        }
-                    }
-                });
+                                         var timeLimit = false;
+                                         if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None
+                                                   && objective.isTimeLimitAtMost()) {
+                                             timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
+                                         }
+                                         if (!hasOutstandingAttackOrders) {
+                                             if (objective.getAmountType()
+                                                       .equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
+                                                 return currentUnits < objective.getFixedAmount() || timeLimit;
+                                             } else {
+                                                 int percent = (int) ((totalUnits / (double) currentUnits) * 100);
+                                                 return percent < objective.getPercentage() || timeLimit;
+                                             }
+                                         } else {
+                                             if (timeLimit) {
+                                                 return context.getCurrentRound() >= objective.getTimeLimit();
+                                             } else {
+                                                 return true;
+                                             }
+                                         }
+                                     }
+                                 });
 
         return orderBuilder.build();
     }
 
     private Order createOrderForPreserveAssociatedUnits(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.WITHDRAW_IF_CONDITION_IS_MET)
-                .withCondition(context -> {
-                    var inGameObjects = context.getInGameObjects();
-                    var unitIds = objective.getAssociatedUnitIDs();
-                    var entitiesOfInterest = inGameObjects.stream().filter(Entity.class::isInstance)
-                            .map(Entity.class::cast)
-                            .filter(e -> e.getOwnerId() == ownerId).toList();
-                    var currentUnits = 0;
-                    var totalUnits = unitIds.size();
-                    if (totalUnits == 0) {
-                        return true;
-                    }
-                    for (var unit : entitiesOfInterest) {
-                        if (unitIds.contains(unit.getExternalIdAsString())) {
-                            currentUnits++;
-                        }
-                    }
-                    var timeLimit = false;
-                    if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None
-                            && objective.isTimeLimitAtMost()) {
-                        timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
-                    }
-                    if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
-                        return currentUnits < objective.getFixedAmount() || timeLimit;
-                    } else {
-                        int percent = (int) ((totalUnits / (double) currentUnits) * 100);
-                        return percent < objective.getPercentage() || timeLimit;
-                    }
-                });
+                                 .withCondition(context -> {
+                                     var inGameObjects = context.getInGameObjects();
+                                     var unitIds = objective.getAssociatedUnitIDs();
+                                     var entitiesOfInterest = inGameObjects.stream().filter(Entity.class::isInstance)
+                                                                    .map(Entity.class::cast)
+                                                                    .filter(e -> e.getOwnerId() == ownerId).toList();
+                                     var currentUnits = 0;
+                                     var totalUnits = unitIds.size();
+                                     if (totalUnits == 0) {
+                                         return true;
+                                     }
+                                     for (var unit : entitiesOfInterest) {
+                                         if (unitIds.contains(unit.getExternalIdAsString())) {
+                                             currentUnits++;
+                                         }
+                                     }
+                                     var timeLimit = false;
+                                     if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None
+                                               && objective.isTimeLimitAtMost()) {
+                                         timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
+                                     }
+                                     if (objective.getAmountType()
+                                               .equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
+                                         return currentUnits < objective.getFixedAmount() || timeLimit;
+                                     } else {
+                                         int percent = (int) ((totalUnits / (double) currentUnits) * 100);
+                                         return percent < objective.getPercentage() || timeLimit;
+                                     }
+                                 });
         return orderBuilder.build();
     }
 
@@ -234,7 +244,7 @@ public class OrderFactory {
         } else {
             orderBuilder.withCondition(context -> {
                 var enemyPlayers = context.getPlayersList().stream().filter(p -> p.isEnemyOf(campaign.getPlayer()))
-                        .toList();
+                                         .toList();
                 var totalUnits = 0;
                 var currentUnits = 0;
                 for (var player : enemyPlayers) {

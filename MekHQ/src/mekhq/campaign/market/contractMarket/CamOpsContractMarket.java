@@ -131,7 +131,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
 
         int numOffers = getNumberOfOffers(rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) -
-                BASE_NEGOTIATION_TARGET) + negotiatorModifier;
+                                                BASE_NEGOTIATION_TARGET) + negotiatorModifier;
 
         if (isGrayMonday) {
             for (int i = 0; i < numOffers; i++) {
@@ -245,7 +245,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private Optional<AtBContract> generateContract(Campaign campaign, ReputationController reputation,
-                                                   HiringHallModifiers hiringHallModifiers) {
+          HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);

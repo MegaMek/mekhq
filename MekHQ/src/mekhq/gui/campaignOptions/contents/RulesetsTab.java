@@ -68,9 +68,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.
  * <p>
- * This class organizes and manages options related to universal rules, legacy AtB rules (Against the Bot),
- * and StratCon (Strategic Context) settings. It provides a UI to customize configurations such as
- * opponent force generation, scenario rules, equipment behavior, and campaign-specific variations.
+ * This class organizes and manages options related to universal rules, legacy AtB rules (Against the Bot), and StratCon
+ * (Strategic Context) settings. It provides a UI to customize configurations such as opponent force generation,
+ * scenario rules, equipment behavior, and campaign-specific variations.
  * </p>
  *
  * <strong>Tab Sections:</strong>
@@ -181,7 +181,8 @@ public class RulesetsTab {
     /**
      * Constructs a {@code RulesetsTab} instance for managing ruleset options.
      *
-     * @param campaignOptions the {@link CampaignOptions} object to manage repair, maintenance, and other ruleset options.
+     * @param campaignOptions the {@link CampaignOptions} object to manage repair, maintenance, and other ruleset
+     *                        options.
      */
     public RulesetsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -192,9 +193,9 @@ public class RulesetsTab {
     /**
      * Initializes the tab by setting up all three sections:
      * <p>
-     *     <li>Universal Options</li>
-     *     <li>StratCon Tab</li>
-     *     <li>Legacy Tab</li>
+     * <li>Universal Options</li>
+     * <li>StratCon Tab</li>
+     * <li>Legacy Tab</li>
      * </p>
      */
     private void initialize() {
@@ -206,8 +207,8 @@ public class RulesetsTab {
     /**
      * Initializes the universal options section of the tab.
      * <p>
-     * Universal options include settings like skill levels, scenario modifiers,
-     * map generation parameters, and auto-resolve behavior.
+     * Universal options include settings like skill levels, scenario modifiers, map generation parameters, and
+     * auto-resolve behavior.
      * </p>
      */
     private void initializeUniversalOptions() {
@@ -266,10 +267,10 @@ public class RulesetsTab {
         pnlAutoResolve = new JPanel();
         lblAutoResolveMethod = new JLabel();
         final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
-                AutoResolveMethod.values());
+              AutoResolveMethod.values());
         comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
         minimapThemeSelector = new MMComboBox<>("minimapThemeSelector",
-            new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
+              new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
         chkAutoResolveVictoryChanceEnabled = new JCheckBox();
         lblAutoResolveNumberOfScenarios = new JLabel();
         spnAutoResolveNumberOfScenarios = new JSpinner();
@@ -282,15 +283,15 @@ public class RulesetsTab {
     /**
      * Configures and initializes universal options components for use across tabs.
      * <p>
-     * This method sets up and organizes the various UI elements for universal options,
-     * such as skill levels, scenario generation, map generation, and more. These initialized
-     * components are then used in other methods to build the complete universal options UI.
+     * This method sets up and organizes the various UI elements for universal options, such as skill levels, scenario
+     * generation, map generation, and more. These initialized components are then used in other methods to build the
+     * complete universal options UI.
      * </p>
      */
     private void substantializeUniversalOptions() {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
-        
+
         // Callsigns
         pnlCallsigns = createCallsignsPanel();
 
@@ -306,7 +307,7 @@ public class RulesetsTab {
         chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
         lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity",
-            0, -1, 3, 1);
+              0, -1, 3, 1);
         chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions");
 
         // Other
@@ -322,15 +323,15 @@ public class RulesetsTab {
     /**
      * Retrieves the available skill levels as a {@link DefaultComboBoxModel}.
      * <p>
-     * Returns the predefined {@link SkillLevel} values, excluding {@link SkillLevel#NONE}.
-     * Used for populating the skill level selector in the universal options UI.
+     * Returns the predefined {@link SkillLevel} values, excluding {@link SkillLevel#NONE}. Used for populating the
+     * skill level selector in the universal options UI.
      * </p>
      *
      * @return a {@link DefaultComboBoxModel} containing available {@link SkillLevel} options
      */
     private static DefaultComboBoxModel<SkillLevel> getSkillLevelOptions() {
         final DefaultComboBoxModel<SkillLevel> skillLevelModel = new DefaultComboBoxModel<>(
-            Skills.SKILL_LEVELS);
+              Skills.SKILL_LEVELS);
 
         skillLevelModel.removeElement(SkillLevel.NONE);
 
@@ -340,8 +341,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for configuring universal scenario generation options.
      * <p>
-     * Allows users to define settings for opponent force configurations, such as
-     * enabling dropships, VTOLs, and clan vehicles, as well as other universal scenario parameters.
+     * Allows users to define settings for opponent force configurations, such as enabling dropships, VTOLs, and clan
+     * vehicles, as well as other universal scenario parameters.
      * </p>
      *
      * @return a {@link JPanel} containing controls to configure universal scenario generation
@@ -349,7 +350,7 @@ public class RulesetsTab {
     private JPanel createUniversalScenarioGenerationPanel() {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalScenarioGenerationPanel", true,
-            "UniversalScenarioGenerationPanel");
+              "UniversalScenarioGenerationPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -378,7 +379,7 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkAutoConfigMunitions, layout);
-        
+
         layout.gridy++;
         layout.gridwidth = 1;
         panel.add(lblSPAUpgradeIntensity, layout);
@@ -399,8 +400,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for configuring the auto-resolve options in campaigns.
      * <p>
-     * Includes controls to set the auto-resolve method, enable victory chance calculation,
-     * and specify the number of scenarios to consider during auto-resolution.
+     * Includes controls to set the auto-resolve method, enable victory chance calculation, and specify the number of
+     * scenarios to consider during auto-resolution.
      * </p>
      *
      * @return a {@link JPanel} containing controls to configure auto-resolve behavior
@@ -410,14 +411,14 @@ public class RulesetsTab {
         lblAutoResolveMethod = new CampaignOptionsLabel("AutoResolveMethod");
         lblAutoResolveNumberOfScenarios = new CampaignOptionsLabel("AutoResolveNumberOfScenarios");
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
-                250, 10, 1000, 10);
+              250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled");
         lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme");
         chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox("AutoResolveExperimentalPacarGuiEnabled");
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoResolvePanel", true,
-            "AutoResolvePanel");
+              "AutoResolvePanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 1;
@@ -445,8 +446,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for configuring unit ratios in universal options.
      * <p>
-     * Includes spinners for setting the ratio of various unit types, such as
-     * mechs, mixed units, and vehicles, for the opponent forces.
+     * Includes spinners for setting the ratio of various unit types, such as mechs, mixed units, and vehicles, for the
+     * opponent forces.
      * </p>
      *
      * @return a {@link JPanel} containing controls for unit ratio configuration
@@ -455,17 +456,17 @@ public class RulesetsTab {
         // Content
         lblOpForLanceTypeMeks = new CampaignOptionsLabel("OpForLanceTypeMeks");
         spnOpForLanceTypeMeks = new CampaignOptionsSpinner("OpForLanceTypeMeks",
-            0, 0, 10, 1);
+              0, 0, 10, 1);
         lblOpForLanceTypeMixed = new CampaignOptionsLabel("OpForLanceTypeMixed");
         spnOpForLanceTypeMixed = new CampaignOptionsSpinner("OpForLanceTypeMixed",
-            0, 0, 10, 1);
+              0, 0, 10, 1);
         lblOpForLanceTypeVehicle = new CampaignOptionsLabel("OpForLanceTypeVehicle");
         spnOpForLanceTypeVehicles = new CampaignOptionsSpinner("OpForLanceTypeVehicle",
-            0, 0, 10, 1);
-        
+              0, 0, 10, 1);
+
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalUnitRatioPanel", true,
-            "UniversalUnitRatioPanel");
+              "UniversalUnitRatioPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -491,7 +492,7 @@ public class RulesetsTab {
         chkAutoGenerateOpForCallsigns = new CampaignOptionsCheckBox("AutoGenerateOpForCallsigns");
         lblMinimumCallsignSkillLevel = new CampaignOptionsLabel("MinimumCallsignSkillLevel");
         comboMinimumCallsignSkillLevel = new MMComboBox<>("comboMinimumCallsignSkillLevel", getSkillLevelOptions());
-        
+
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoGeneratedCallsignsPanel", true,
               "AutoGeneratedCallsignsPanel");
@@ -505,16 +506,16 @@ public class RulesetsTab {
         panel.add(lblMinimumCallsignSkillLevel, layout);
         layout.gridx++;
         panel.add(comboMinimumCallsignSkillLevel, layout);
-        
+
         return panel;
     }
-    
+
     /**
      * Creates the UI panel for configuring universal scenario modifiers.
      * <p>
-     * This panel includes controls to adjust the maximum modifiers for scenario generation,
-     * modifier chance percentages, and BV (Battle Value) impact. It is designed to provide
-     * flexible settings for campaign customization.
+     * This panel includes controls to adjust the maximum modifiers for scenario generation, modifier chance
+     * percentages, and BV (Battle Value) impact. It is designed to provide flexible settings for campaign
+     * customization.
      * </p>
      *
      * @return a {@link JPanel} containing controls to configure universal scenario modifiers
@@ -523,17 +524,17 @@ public class RulesetsTab {
         //Content
         lblScenarioModMax = new CampaignOptionsLabel("ScenarioModMax");
         spnScenarioModMax = new CampaignOptionsSpinner("ScenarioModMax",
-            3, 0, 10, 1);
+              3, 0, 10, 1);
         lblScenarioModChance = new CampaignOptionsLabel("ScenarioModChance");
         spnScenarioModChance = new CampaignOptionsSpinner("ScenarioModChance",
-            25, 5, 100, 5);
+              25, 5, 100, 5);
         lblScenarioModBV = new CampaignOptionsLabel("ScenarioModBV");
         spnScenarioModBV = new CampaignOptionsSpinner("ScenarioModBV",
-            50, 5, 100, 5);
+              50, 5, 100, 5);
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalModifiersPanel", true,
-            "UniversalModifiersPanel");
+              "UniversalModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -561,8 +562,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for configuring universal map generation settings.
      * <p>
-     * Includes options for enabling weather, light, planetary conditions, and fixed map chances,
-     * with spinners and checkboxes for user input.
+     * Includes options for enabling weather, light, planetary conditions, and fixed map chances, with spinners and
+     * checkboxes for user input.
      * </p>
      *
      * @return a {@link JPanel} containing controls to configure map generation options
@@ -574,11 +575,11 @@ public class RulesetsTab {
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
         lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance",
-            0, 0, 100, 1);
+              0, 0, 100, 1);
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalMapGenerationPanel", true,
-            "UniversalMapGenerationPanel");
+              "UniversalMapGenerationPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -604,8 +605,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel that consolidates universal campaign options.
      * <p>
-     * This panel combines sub-panels like the parts panel, lance panel, and map generation panel
-     * into a single cohesive UI for configuring general campaign options.
+     * This panel combines sub-panels like the parts panel, lance panel, and map generation panel into a single cohesive
+     * UI for configuring general campaign options.
      * </p>
      *
      * @return a {@link JPanel} containing all universal campaign options organized in sections
@@ -639,7 +640,7 @@ public class RulesetsTab {
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalPartsPanel", true,
-            "UniversalPartsPanel");
+              "UniversalPartsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -662,8 +663,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for the StratCon configuration.
      * <p>
-     * This section includes settings for using generic battle values,
-     * enabling verbose bidding, and other Strategic Conquest-specific rules.
+     * This section includes settings for using generic battle values, enabling verbose bidding, and other Strategic
+     * Conquest-specific rules.
      * </p>
      *
      * @return a {@link JPanel} containing all StratCon settings.
@@ -707,9 +708,12 @@ public class RulesetsTab {
         spnScenarioModBV.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModBV"));
         lblSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
         comboSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
-        chkAutoGenerateOpForCallsigns.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoGenerateOpForCallsigns"));
-        lblMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,"MinimumCallsignSkillLevel"));
-        comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "MinimumCallsignSkillLevel"));
+        chkAutoGenerateOpForCallsigns.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "AutoGenerateOpForCallsigns"));
+        lblMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "MinimumCallsignSkillLevel"));
+        comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "MinimumCallsignSkillLevel"));
         chkUseDropShips.addMouseListener(createTipPanelUpdater(stratConHeader, "UseDropShips"));
         chkOpForUsesVTOLs.addMouseListener(createTipPanelUpdater(stratConHeader, "OpForUsesVTOLs"));
         chkClanVehicles.addMouseListener(createTipPanelUpdater(stratConHeader, "ClanVehicles"));
@@ -801,8 +805,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for the Legacy AtB configuration.
      * <p>
-     * This section configures opponent force generation, scenario generation probabilities,
-     * and customization of battle intensities for "Against the Bot" campaigns.
+     * This section configures opponent force generation, scenario generation probabilities, and customization of battle
+     * intensities for "Against the Bot" campaigns.
      * </p>
      *
      * @return a {@link JPanel} containing all Legacy AtB settings.
@@ -843,8 +847,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for configuring the Legacy AtB opponent force (OpFor) generation settings.
      * <p>
-     * Options include enabling vehicle support, aero unit chances, local forces, and player
-     * vehicle adjustments. The panel provides various checkboxes and spinners for user interaction.
+     * Options include enabling vehicle support, aero unit chances, local forces, and player vehicle adjustments. The
+     * panel provides various checkboxes and spinners for user interaction.
      * </p>
      *
      * @return a {@link JPanel} containing controls to configure AtB opponent force generation options
@@ -860,7 +864,7 @@ public class RulesetsTab {
         lblOpForAeroChance = new CampaignOptionsLabel("OpForAeroChance");
         lblOpForAeroChance.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForAeroChance"));
         spnOpForAeroChance = new CampaignOptionsSpinner("OpForAeroChance",
-            0, 0, 6, 1);
+              0, 0, 6, 1);
         spnOpForAeroChance.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForAeroChance"));
         chkOpForUsesLocalForces = new CampaignOptionsCheckBox("OpForUsesLocalForces");
         chkOpForUsesLocalForces.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForUsesLocalForces"));
@@ -869,7 +873,7 @@ public class RulesetsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyOpForGenerationPanel", true,
-            "LegacyOpForGenerationPanel");
+              "LegacyOpForGenerationPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -904,8 +908,8 @@ public class RulesetsTab {
     /**
      * Creates the UI panel for configuring the Legacy AtB (Against the Bot) scenario generation settings.
      * <p>
-     * This panel includes settings for enabling chase generation, adjusting battle role chances
-     * (Fight, Defend, Scout, Training), and updating these values based on a calculated intensity.
+     * This panel includes settings for enabling chase generation, adjusting battle role chances (Fight, Defend, Scout,
+     * Training), and updating these values based on a calculated intensity.
      * </p>
      *
      * @return a {@link JPanel} containing controls to configure AtB scenario generation options
@@ -917,7 +921,7 @@ public class RulesetsTab {
         lblIntensity = new CampaignOptionsLabel("AtBBattleIntensity");
         lblIntensity.addMouseListener(createTipPanelUpdater(legacyHeader, "AtBBattleIntensity"));
         spnAtBBattleIntensity = new CampaignOptionsSpinner("AtBBattleIntensity",
-            0.0, 0.0, 100.0, 0.1);
+              0.0, 0.0, 100.0, 0.1);
         spnAtBBattleIntensity.addMouseListener(createTipPanelUpdater(legacyHeader, "AtBBattleIntensity"));
 
         lblFightChance = new JLabel(CombatRole.MANEUVER.toString());
@@ -928,7 +932,7 @@ public class RulesetsTab {
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
             spnAtBBattleChance[i] = new JSpinner(
-                new SpinnerNumberModel(0, 0, 100, 1));
+                  new SpinnerNumberModel(0, 0, 100, 1));
         }
 
         btnIntensityUpdate = new CampaignOptionsButton("IntensityUpdate");
@@ -970,7 +974,7 @@ public class RulesetsTab {
         panelBattleChance.add(spnAtBBattleChance[CombatRole.TRAINING.ordinal()], layoutBattleChance);
 
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
-            "LegacyScenarioGenerationPanel");
+              "LegacyScenarioGenerationPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -997,12 +1001,11 @@ public class RulesetsTab {
     }
 
     /**
-     * Determines the AtB (Against the Bot) battle intensity value based on the current
-     * settings of battle role chance spinners.
+     * Determines the AtB (Against the Bot) battle intensity value based on the current settings of battle role chance
+     * spinners.
      * <p>
-     * Each role (e.g., Maneuver, Frontline, Patrol, Training) contributes to the overall
-     * battle intensity value based on complex formulas. The result is normalized, capped
-     * at 100.0, and rounded to a single decimal place.
+     * Each role (e.g., Maneuver, Frontline, Patrol, Training) contributes to the overall battle intensity value based
+     * on complex formulas. The result is normalized, capped at 100.0, and rounded to a single decimal place.
      * </p>
      *
      * @return the calculated battle intensity value as a {@code double}
@@ -1034,18 +1037,18 @@ public class RulesetsTab {
     /**
      * A listener to manage changes in the AtB (Against the Bot) battle intensity spinner value.
      * <p>
-     * It listens for changes in the battle intensity spinner, recalculates the values for different
-     * battle roles (e.g., Maneuver, Frontline, Patrol, Training), and updates the corresponding spinners
-     * for the player to see the effects of the intensity change.
+     * It listens for changes in the battle intensity spinner, recalculates the values for different battle roles (e.g.,
+     * Maneuver, Frontline, Patrol, Training), and updates the corresponding spinners for the player to see the effects
+     * of the intensity change.
      * </p>
      */
     private class AtBBattleIntensityChangeListener implements ChangeListener {
         /**
          * Called when the state of the AtB battle intensity spinner changes.
          * <p>
-         * Updates the battle role chance spinners based on the current value of the battle intensity
-         * spinner. If the intensity is below the minimum defined in {@link AtBContract#MINIMUM_INTENSITY},
-         * all role chance spinners are set to zero.
+         * Updates the battle role chance spinners based on the current value of the battle intensity spinner. If the
+         * intensity is below the minimum defined in {@link AtBContract#MINIMUM_INTENSITY}, all role chance spinners are
+         * set to zero.
          * </p>
          *
          * @param e the {@link ChangeEvent} triggered when the spinner value changes
@@ -1056,13 +1059,13 @@ public class RulesetsTab {
 
             if (intensity >= AtBContract.MINIMUM_INTENSITY) {
                 int value = (int) Math.min(
-                    Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
+                      Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
                 spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05),
-                    100);
+                      100);
                 spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05),
-                    100);
+                      100);
                 spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
@@ -1078,12 +1081,12 @@ public class RulesetsTab {
     /**
      * Applies the current values configured in the tab back to the provided {@link CampaignOptions}.
      * <p>
-     * If no custom {@link CampaignOptions} is provided, it uses the default {@link CampaignOptions}
-     * associated with the tab.
+     * If no custom {@link CampaignOptions} is provided, it uses the default {@link CampaignOptions} associated with the
+     * tab.
      * </p>
      *
-     * @param presetCampaignOptions an optional custom {@link CampaignOptions} object to apply the values to;
-     *                              if {@code null}, the default options are used.
+     * @param presetCampaignOptions an optional custom {@link CampaignOptions} object to apply the values to; if
+     *                              {@code null}, the default options are used.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -1150,12 +1153,12 @@ public class RulesetsTab {
     /**
      * Loads the ruleset values from a {@link CampaignOptions} object into the UI components.
      * <p>
-     * If no custom {@link CampaignOptions} is provided, it will fetch values from the default
-     * {@link CampaignOptions} instance.
+     * If no custom {@link CampaignOptions} is provided, it will fetch values from the default {@link CampaignOptions}
+     * instance.
      * </p>
      *
-     * @param presetCampaignOptions an optional custom {@link CampaignOptions} object to load values from;
-     *                              if {@code null}, the default options are used.
+     * @param presetCampaignOptions an optional custom {@link CampaignOptions} object to load values from; if
+     *                              {@code null}, the default options are used.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;

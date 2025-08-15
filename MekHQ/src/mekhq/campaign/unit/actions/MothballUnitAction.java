@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
 
@@ -45,10 +50,10 @@ public class MothballUnitAction implements IUnitAction {
 
     /**
      * Initializes a new instance of the MothballUnitAction class.
-     * @param tech The ID of the technician performing the work, or null
-     *             if noone is needed to perform the work (self crewed or GM).
-     * @param isGM A boolean value indicating whether or not GM mode should be used
-     *             to complete the action.
+     *
+     * @param tech The ID of the technician performing the work, or null if noone is needed to perform the work (self
+     *             crewed or GM).
+     * @param isGM A boolean value indicating whether or not GM mode should be used to complete the action.
      */
     public MothballUnitAction(@Nullable Person tech, boolean isGM) {
         this.tech = tech;

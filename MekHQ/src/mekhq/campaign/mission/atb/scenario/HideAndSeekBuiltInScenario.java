@@ -24,8 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import megamek.common.Board;
 import megamek.common.Compute;
@@ -40,11 +50,6 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
@@ -70,10 +75,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
         } while (getTerrainType().equals("ColdSea")
-                || getTerrainType().equals("FrozenSea")
-                || getTerrainType().equals("HotSea")
-                || getTerrainType().equals("Plains")
-                || getTerrainType().equals("Savannah"));
+                       || getTerrainType().equals("FrozenSea")
+                       || getTerrainType().equals("HotSea")
+                       || getTerrainType().equals("Plains")
+                       || getTerrainType().equals("Savannah"));
     }
 
     @Override
@@ -88,7 +93,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -122,10 +127,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 2,
-                0, campaign);
+                  0, campaign);
         } else {
             addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_HEAVY, 0,
-                0, campaign);
+                  0, campaign);
         }
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
@@ -138,11 +143,11 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         // Attacker must destroy 50% and keep 66% alive
         // Defender must destroy 33% and keep 50% alive
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1,
-                isAttacker() ? 50 : 33);
+              isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
+              campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
 
         if (keepAttachedUnitsAlive != null) {
             getScenarioObjectives().add(keepAttachedUnitsAlive);

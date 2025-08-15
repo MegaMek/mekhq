@@ -534,9 +534,9 @@ public enum PersonnelTableModelColumn {
         return this == CHARISMA;
     }
 
-    public boolean isShipTransport() { return this == SHIP_TRANSPORT; }
+    public boolean isShipTransport() {return this == SHIP_TRANSPORT;}
 
-    public boolean isTacticalTransport() { return this == TACTICAL_TRANSPORT; }
+    public boolean isTacticalTransport() {return this == TACTICAL_TRANSPORT;}
 
     public boolean isATOWAttribute() {
         return isStrength() ||
@@ -700,7 +700,7 @@ public enum PersonnelTableModelColumn {
                 return "-";
             }
             case SHIP_TRANSPORT:
-                if (person.getUnit() != null){
+                if (person.getUnit() != null) {
                     if (person.getUnit().getTransportShipAssignment() != null) {
                         return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
                     }
@@ -713,7 +713,7 @@ public enum PersonnelTableModelColumn {
                         return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
                     }
                 }
-                return  "-";
+                return "-";
 
             case FORCE:
                 final Force force = campaign.getForceFor(person);
@@ -1161,7 +1161,7 @@ public enum PersonnelTableModelColumn {
                      PERSONNEL_ROLE,
                      UNIT_ASSIGNMENT,
                      SHIP_TRANSPORT,
-                     TACTICAL_TRANSPORT-> true;
+                     TACTICAL_TRANSPORT -> true;
                 default -> false;
             };
             case BIOGRAPHICAL -> switch (this) {

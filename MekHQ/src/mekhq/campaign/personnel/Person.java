@@ -1059,7 +1059,6 @@ public class Person {
     }
 
 
-
     public void setPrimaryRoleDirect(final PersonnelRole primaryRole) {
         this.primaryRole = primaryRole;
     }
@@ -6081,11 +6080,11 @@ public class Person {
         final int PATHOLOGIC_RACISM_REPUTATION_PENALTY = -2;
 
         int modifiers = isUseAgingEffects ?
-                             getReputationAgeModifier(getAge(today),
-                                   isClanCampaign,
-                                   !isNullOrBlank(bloodname),
-                                   rankNumeric) :
-                             0;
+                              getReputationAgeModifier(getAge(today),
+                                    isClanCampaign,
+                                    !isNullOrBlank(bloodname),
+                                    rankNumeric) :
+                              0;
 
         boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
         modifiers -= hasRacism ? 1 : 0;
@@ -7279,15 +7278,16 @@ public class Person {
      * Processes a potential catatonia episode fthe character, applying relevant effects and status changes.
      *
      * <p>If both {@code hasCatatonia} and {@code failedWillpowerCheck} are {@code true}, this method applies an
-     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of
-     * injuries or trauma exceeds a predefined death threshold, the person's status is changed to indicate medical
-     * complications. In either case, the method returns a formatted string describing the catatonia episode. If the
-     * conditions are not met, it returns an empty string.</p>
+     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of injuries or
+     * trauma exceeds a predefined death threshold, the person's status is changed to indicate medical complications. In
+     * either case, the method returns a formatted string describing the catatonia episode. If the conditions are not
+     * met, it returns an empty string.</p>
      *
      * @param campaign             the current campaign context
      * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
      * @param hasCatatonia         {@code true} if the person is suffering from catatonia
      * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     *
      * @return description of the resulting catatonia episode, or an empty string if no episode occurred
      *
      * @author Illiani
@@ -7414,8 +7414,8 @@ public class Person {
 
                 if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
                     victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
-                                                                          PersonnelStatus.MEDICAL_COMPLICATIONS :
-                                                                          PersonnelStatus.HOMICIDE);
+                                                                                 PersonnelStatus.MEDICAL_COMPLICATIONS :
+                                                                                 PersonnelStatus.HOMICIDE);
                 }
             }
 
@@ -7588,7 +7588,7 @@ public class Person {
      * <p>If the secret is not revealed, returns an empty string.</p>
      *
      * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
-     * {@link #hasDarkSecret()}
+     *                      {@link #hasDarkSecret()}
      * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
      *
      * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise

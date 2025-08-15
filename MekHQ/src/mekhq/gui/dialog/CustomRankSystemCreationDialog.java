@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Component;
+import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
@@ -37,14 +51,6 @@ import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
@@ -63,7 +69,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
 
     //region Constructors
     public CustomRankSystemCreationDialog(final JFrame frame, final List<RankSystem> rankSystems,
-                                          final List<Rank> ranks) {
+          final List<Rank> ranks) {
         super(frame, "CustomRankSystemCreationDialog", "CustomRankSystemCreationDialog.title");
         this.rankSystems = rankSystems;
         setRankSystem(null);
@@ -166,8 +172,8 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         getComboRankSystemType().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RankSystemType) {
                     list.setToolTipText(((RankSystemType) value).getToolTipText());
@@ -257,41 +263,41 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblRankSystemCode)
-                                .addComponent(getTxtRankSystemCode(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblRankSystemType)
-                                .addComponent(getComboRankSystemType(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblRankSystemName)
-                                .addComponent(getTxtRankSystemName(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblRankSystemDescription)
-                                .addComponent(getTxtRankSystemDescription(), GroupLayout.Alignment.LEADING))
-                        .addComponent(getChkUseROMDesignation())
-                        .addComponent(getChkUseManeiDomini())
-                        .addComponent(getChkSwapToRankSystem())
+              layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblRankSystemCode)
+                                    .addComponent(getTxtRankSystemCode(), GroupLayout.Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblRankSystemType)
+                                    .addComponent(getComboRankSystemType(), GroupLayout.Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblRankSystemName)
+                                    .addComponent(getTxtRankSystemName(), GroupLayout.Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblRankSystemDescription)
+                                    .addComponent(getTxtRankSystemDescription(), GroupLayout.Alignment.LEADING))
+                    .addComponent(getChkUseROMDesignation())
+                    .addComponent(getChkUseManeiDomini())
+                    .addComponent(getChkSwapToRankSystem())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRankSystemCode)
-                                .addComponent(getTxtRankSystemCode()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRankSystemType)
-                                .addComponent(getComboRankSystemType()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRankSystemName)
-                                .addComponent(getTxtRankSystemName()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRankSystemDescription)
-                                .addComponent(getTxtRankSystemDescription()))
-                        .addComponent(getChkUseROMDesignation())
-                        .addComponent(getChkUseManeiDomini())
-                        .addComponent(getChkSwapToRankSystem())
+              layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblRankSystemCode)
+                                    .addComponent(getTxtRankSystemCode()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblRankSystemType)
+                                    .addComponent(getComboRankSystemType()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblRankSystemName)
+                                    .addComponent(getTxtRankSystemName()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblRankSystemDescription)
+                                    .addComponent(getTxtRankSystemDescription()))
+                    .addComponent(getChkUseROMDesignation())
+                    .addComponent(getChkUseManeiDomini())
+                    .addComponent(getChkSwapToRankSystem())
         );
 
         return panel;
@@ -312,8 +318,8 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
 
         // First, we need to create the new rank system
         setRankSystem(new RankSystem(getTxtRankSystemCode().getText().toUpperCase(Locale.ENGLISH),
-                getTxtRankSystemName().getText(), getTxtRankSystemDescription().getText(),
-                getComboRankSystemType().getSelectedItem()));
+              getTxtRankSystemName().getText(), getTxtRankSystemDescription().getText(),
+              getComboRankSystemType().getSelectedItem()));
 
         getRankSystem().setUseROMDesignation(getChkUseROMDesignation().isSelected());
         getRankSystem().setUseManeiDomini(getChkUseManeiDomini().isSelected());
@@ -333,7 +339,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
         } else if (getTxtRankSystemName().getText().isBlank()) {
             text = resources.getString("CustomRankSystemCreationDialog.BlankRankSystemName.text");
         } else if (getRankSystems().stream().anyMatch(rankSystem -> getTxtRankSystemCode().getText()
-                .equalsIgnoreCase(rankSystem.getCode()))) {
+                                                                          .equalsIgnoreCase(rankSystem.getCode()))) {
             text = resources.getString("CustomRankSystemCreationDialog.DuplicateCode.text");
         } else {
             text = resources.getString("ValidationSuccess.text");
@@ -344,7 +350,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
 
         if (display) {
             JOptionPane.showMessageDialog(getFrame(), text, resources.getString("ValidationFailure.title"),
-                    JOptionPane.ERROR_MESSAGE);
+                  JOptionPane.ERROR_MESSAGE);
         }
         getOkButton().setEnabled(false);
         getOkButton().setToolTipText(text);

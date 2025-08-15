@@ -4538,9 +4538,9 @@ public class Unit implements ITechnology {
             // TODO : Mobile structures, large naval support vehicles
             if (!commanderOnly &&
                       (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
-                      entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
-                      entity.hasETypeFlag(Entity.ETYPE_TANK) ||
-                      entity.hasETypeFlag(Entity.ETYPE_INFANTRY) ||
+                             entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
+                             entity.hasETypeFlag(Entity.ETYPE_TANK) ||
+                             entity.hasETypeFlag(Entity.ETYPE_INFANTRY) ||
                              entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK))) {
                 // If there is no crew, there's nothing left to do here.
                 if (null == commander) {
@@ -6547,10 +6547,11 @@ public class Unit implements ITechnology {
      * Calculates the average monthly hydrogen fuel usage for a given spacefaring entity.
      *
      * <p>The calculation is based on the entity's class and mass, with values derived from CamOps. Different formulas
-     * are applied depending on whether the entity is a DropShip (with subtypes and weight considerations), Small
-     * Craft, Jumpship, or Warship.</p>
+     * are applied depending on whether the entity is a DropShip (with subtypes and weight considerations), Small Craft,
+     * Jumpship, or Warship.</p>
      *
      * @param entity the {@link Entity} representing the spacecraft whose monthly hydrogen usage is to be calculated
+     *
      * @return the total tons of hydrogen fuel consumed in an average month for the provided entity
      */
     public double getCraftMonthlyHydrogenUsage(Entity entity) {

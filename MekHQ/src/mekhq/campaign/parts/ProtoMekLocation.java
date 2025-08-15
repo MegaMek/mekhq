@@ -64,11 +64,16 @@ public class ProtoMekLocation extends Part {
     private static final MMLogger logger = MMLogger.create(ProtoMekLocation.class);
 
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
-            .setClanAdvancement(3055, 3060, 3060)
-            .setClanApproximate(AdvancementPhase.PROTOTYPE)
-            .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
-            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D, AvailabilityValue.D)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                          .setClanAdvancement(3055, 3060, 3060)
+                                                          .setClanApproximate(AdvancementPhase.PROTOTYPE)
+                                                          .setPrototypeFactions(Faction.CSJ)
+                                                          .setProductionFactions(Faction.CSJ)
+                                                          .setTechRating(TechRating.D)
+                                                          .setAvailability(AvailabilityValue.X,
+                                                                AvailabilityValue.X,
+                                                                AvailabilityValue.D,
+                                                                AvailabilityValue.D)
+                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     // some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;

@@ -125,7 +125,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
-        
+
         // roll Administration skill
         if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);

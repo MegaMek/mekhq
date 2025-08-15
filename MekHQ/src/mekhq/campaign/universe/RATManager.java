@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -32,13 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 import java.util.function.Predicate;
-
 import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ratgenerator.MissionRole;
@@ -54,13 +53,14 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Provides a front end to RandomUnitGenerator that allows the user to generate
- * units
- * based on criteria such as faction, unit type, and weight class. May be
- * restricted to
- * a certain subset of all available RATs.
+ * Provides a front end to RandomUnitGenerator that allows the user to generate units based on criteria such as faction,
+ * unit type, and weight class. May be restricted to a certain subset of all available RATs.
  *
  * @author Neoancient
  */
@@ -223,9 +223,7 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Scans ratdata directory for list of available RATs that can be used by
-     * CampaignOptions
-     * to provide a list.
+     * Scans ratdata directory for list of available RATs that can be used by CampaignOptions to provide a list.
      */
     public static void populateCollectionNames() {
         allCollections = new HashMap<>();
@@ -293,8 +291,8 @@ public class RATManager extends AbstractUnitGenerator {
                 }
                 for (String f : factionList) {
                     Optional<RAT> match = collection.get(era).stream()
-                            .filter(rat -> rat.matches(f, unitType, weightClass, quality))
-                            .findFirst();
+                                                .filter(rat -> rat.matches(f, unitType, weightClass, quality))
+                                                .findFirst();
                     if (match.isPresent()) {
                         return match.get();
                     }
@@ -313,8 +311,8 @@ public class RATManager extends AbstractUnitGenerator {
                 for (int era : eras) {
                     for (String f : factionList) {
                         Optional<RAT> match = collection.get(era).stream()
-                                .filter(rat -> rat.matches(f, unitType, weightClass, quality))
-                                .findFirst();
+                                                    .filter(rat -> rat.matches(f, unitType, weightClass, quality))
+                                                    .findFirst();
                         if (match.isPresent()) {
                             return match.get();
                         }
@@ -336,7 +334,7 @@ public class RATManager extends AbstractUnitGenerator {
         final Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction.getAlternativeFactionCodes() != null) {
             final List<String> alternativeFactionCodes = new ArrayList<>(
-                    Arrays.asList(faction.getAlternativeFactionCodes()));
+                  Arrays.asList(faction.getAlternativeFactionCodes()));
             while (!alternativeFactionCodes.isEmpty()) {
                 factionTree.add(alternativeFactionCodes.remove(Compute.randomInt(alternativeFactionCodes.size())));
             }
@@ -357,12 +355,12 @@ public class RATManager extends AbstractUnitGenerator {
     @Override
     public boolean isSupportedUnitType(final int unitType) {
         return (unitType == UnitType.MEK)
-                || (unitType == UnitType.TANK)
-                || (unitType == UnitType.AEROSPACEFIGHTER)
-                || (unitType == UnitType.DROPSHIP)
-                || (unitType == UnitType.INFANTRY)
-                || (unitType == UnitType.BATTLE_ARMOR)
-                || (unitType == UnitType.PROTOMEK);
+                     || (unitType == UnitType.TANK)
+                     || (unitType == UnitType.AEROSPACEFIGHTER)
+                     || (unitType == UnitType.DROPSHIP)
+                     || (unitType == UnitType.INFANTRY)
+                     || (unitType == UnitType.BATTLE_ARMOR)
+                     || (unitType == UnitType.PROTOMEK);
     }
 
     /*
@@ -373,17 +371,17 @@ public class RATManager extends AbstractUnitGenerator {
      */
     @Override
     public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
-            final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         final List<MekSummary> list = generate(1, faction, unitType, weightClass, year, quality, filter);
         return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
-            final int year, final int quality,
-            final Collection<EntityMovementMode> movementModes,
-            final Collection<MissionRole> missionRoles,
-            @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality,
+          final Collection<EntityMovementMode> movementModes,
+          final Collection<MissionRole> missionRoles,
+          @Nullable Predicate<MekSummary> filter) {
         final List<MekSummary> list = generate(1, faction, unitType, weightClass, year, quality, movementModes, filter);
         return list.isEmpty() ? null : list.get(0);
     }
@@ -396,7 +394,7 @@ public class RATManager extends AbstractUnitGenerator {
      */
     @Override
     public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-            final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (unitType == UnitType.TANK) {
@@ -419,15 +417,15 @@ public class RATManager extends AbstractUnitGenerator {
 
     @Override
     public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-            final int year, final int quality,
-            final Collection<EntityMovementMode> movementModes,
-            final Collection<MissionRole> missionRoles,
-            @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality,
+          final Collection<EntityMovementMode> movementModes,
+          final Collection<MissionRole> missionRoles,
+          @Nullable Predicate<MekSummary> filter) {
         final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (!movementModes.isEmpty()) {
                 final Predicate<MekSummary> moveFilter = ms -> movementModes
-                        .contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
+                                                                     .contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
                 filter = (filter == null) ? moveFilter : filter.and(moveFilter);
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
@@ -436,27 +434,23 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Generates a single unit, for the given faction, using the given set of
-     * parameters.
-     * Note that some of the properties of the parameters may be ignored for
-     * generation mechanisms that aren't the RAT Generator
+     * Generates a single unit, for the given faction, using the given set of parameters. Note that some of the
+     * properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
      *
      * @param parameters data structure containing unit generation parameters
+     *
      * @return Generated units. Null if none generated.
      */
     @Override
     public @Nullable MekSummary generate(final UnitGeneratorParameters parameters) {
         return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
-                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
+              parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
 
     /**
-     * Generates a list of mek summaries from a RAT determined by the given faction,
-     * quality and other parameters.
-     * Note that for the purposes of this implementation, the only properties of
-     * "parameters" used are
-     * unit type, year, weight classes and movement modes. We also expect the rating
-     * to be a number 1-5, rather than A-F.
+     * Generates a list of mek summaries from a RAT determined by the given faction, quality and other parameters. Note
+     * that for the purposes of this implementation, the only properties of "parameters" used are unit type, year,
+     * weight classes and movement modes. We also expect the rating to be a number 1-5, rather than A-F.
      *
      * @param count      How many units to generate
      * @param parameters RATGenerator parameters (some are ignored)
@@ -464,7 +458,7 @@ public class RATManager extends AbstractUnitGenerator {
     @Override
     public List<MekSummary> generate(final int count, final UnitGeneratorParameters parameters) {
         return generate(count, parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
-                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
+              parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
 
     private static class RAT {
@@ -476,9 +470,9 @@ public class RATManager extends AbstractUnitGenerator {
 
         public boolean matches(String faction, int unitType, int weightClass, int quality) {
             return (factions.contains(faction) || factions.isEmpty())
-                    && (unitTypes.contains(unitType) || unitTypes.isEmpty())
-                    && (weightClasses.contains(weightClass) || weightClasses.isEmpty() || weightClass < 0)
-                    && (ratings.contains(quality) || ratings.isEmpty());
+                         && (unitTypes.contains(unitType) || unitTypes.isEmpty())
+                         && (weightClasses.contains(weightClass) || weightClasses.isEmpty() || weightClass < 0)
+                         && (ratings.contains(quality) || ratings.isEmpty());
         }
 
         public static RAT createFromXml(Node node) {

@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.unit.actions;
 
 import megamek.common.Entity;
@@ -46,10 +50,10 @@ public class ActivateUnitAction implements IUnitAction {
 
     /**
      * Initializes a new instance of the ActivateUnitAction class.
-     * @param tech The technician performing the work, or null
-     *             if noone is needed to perform the work (self crewed or GM).
-     * @param isGM A boolean value indicating whether or not GM mode should be used
-     *             to complete the action.
+     *
+     * @param tech The technician performing the work, or null if noone is needed to perform the work (self crewed or
+     *             GM).
+     * @param isGM A boolean value indicating whether or not GM mode should be used to complete the action.
      */
     public ActivateUnitAction(@Nullable Person tech, boolean isGM) {
         this.tech = tech;

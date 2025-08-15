@@ -122,14 +122,14 @@ public class Faction {
         eraMods = faction2.getEraMods();
         if (faction2.getBackground() != null) {
             Path backgroundPath = Path.of(faction2.getBackground());
-            if (backgroundPath.getParent()!=null) {
+            if (backgroundPath.getParent() != null) {
                 layeredForceIconBackgroundCategory = backgroundPath.getParent().toString();
             }
             layeredForceIconBackgroundFilename = backgroundPath.getFileName().toString();
         }
         if (faction2.getLogo() != null) {
             Path logoPath = Path.of(faction2.getLogo());
-            if (logoPath.getParent()!=null) {
+            if (logoPath.getParent() != null) {
                 layeredForceIconLogoCategory = logoPath.getParent().toString();
             }
             layeredForceIconLogoFilename = logoPath.getFileName().toString();
@@ -240,13 +240,11 @@ public class Faction {
     }
 
     /**
-     * Updates the set of tags associated with the faction. Tags represent various
-     * attributes or characteristics that describe the faction, such as its size,
-     * alignment, behavior, or role within the campaign universe.
+     * Updates the set of tags associated with the faction. Tags represent various attributes or characteristics that
+     * describe the faction, such as its size, alignment, behavior, or role within the campaign universe.
      *
-     * @param tags the set of tags to be assigned to the faction. Each tag represents
-     *             a specific characteristic or quality of the faction, such as
-     *             {@code PIRATE}, {@code SUPER}, {@code REBEL}, among others.
+     * @param tags the set of tags to be assigned to the faction. Each tag represents a specific characteristic or
+     *             quality of the faction, such as {@code PIRATE}, {@code SUPER}, {@code REBEL}, among others.
      */
     public void setTags(Set<FactionTag> tags) {
         this.tags = tags;
@@ -400,7 +398,7 @@ public class Faction {
 
     public boolean isGovernment() {
         return !isClan() && (isComStar() || isISMajorOrSuperPower() || isMinorPower()
-            || isPlanetaryGovt() || isIndependent());
+                                   || isPlanetaryGovt() || isIndependent());
     }
 
     public boolean isComStar() {
@@ -544,6 +542,7 @@ public class Faction {
      * post-invasion. Thus, in those years, the result may vary between calls with otherwise equal parameters.
      *
      * @param campaign the ongoing campaign
+     *
      * @return the honor rating as an {@link HonorRating} enum
      */
     public HonorRating getHonorRating(Campaign campaign) {
