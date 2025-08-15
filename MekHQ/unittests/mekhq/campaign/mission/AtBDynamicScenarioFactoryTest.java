@@ -37,17 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestConstants.TEST_MTF;
+import static testUtilities.MHQTestConstants.TEST_UNIT_DATA_DIR;
 
+import java.io.File;
 import java.io.IOException;
 
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
 import megamek.common.Game;
 import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +66,7 @@ class AtBDynamicScenarioFactoryTest {
 
     @BeforeAll
     public static void setUpBeforeClass() throws IOException, DOMException {
+        EquipmentType.initializeTypes();
     }
 
     @BeforeEach
@@ -86,32 +91,42 @@ class AtBDynamicScenarioFactoryTest {
     @Test
     public void testCreateEntityWithCrewNoCallsigns() {
         // Auto-generated callsigns disabled
-        String factionCode = "LC";
-        String unitName = "Shadow Hawk SHD-2H";
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
+        Faction faction = new Faction();
+        Entity entity = getShadowHawk();
+
         SkillLevel skill = SkillLevel.VETERAN;
-        Entity entity = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
+        createEntityWithCrew(faction, skill, campaign, entity);
+
         assertTrue(entity.getCrew().getNickname(0).isEmpty());
     }
 
+    private static Entity getShadowHawk() {
+        String unitName = "Shadow Hawk SHD-2H";
+        File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
+        Entity entity = MekSummary.loadEntity(unitFile);
+        assert entity != null;
+        return entity;
+    }
+
     @Test
-    public void testCreateEntityWithCrewCallsigns() {
+    public void testCreateEntityWithCrew_allPossible() {
         // Auto-generated callsigns enabled for all
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.ULTRA_GREEN);
 
-        String factionCode = "LC";
-        String unitName = "Shadow Hawk SHD-2H";
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
-        SkillLevel skill = SkillLevel.ULTRA_GREEN;
+        // Auto-generated callsigns disabled
+        Faction faction = new Faction();
+        Entity entity = getShadowHawk();
 
-        Entity entity = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
+        SkillLevel skill = SkillLevel.ULTRA_GREEN;
+        createEntityWithCrew(faction, skill, campaign, entity);
+
         assertFalse(entity.getCrew().getNickname(0).isEmpty());
     }
 
     @Test
-    public void testCreateEntityWithCrewCutoffForCallsigns() {
+    public void testCreateEntityWithCrew_RegularPlus() {
         // Auto-generated callsigns enabled for pilots above a certain skill
         // VETERAN will always be >= REGULAR even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
@@ -119,56 +134,47 @@ class AtBDynamicScenarioFactoryTest {
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
         // Two mekwarriors, both alike in dignity (but not in exp or pay grade)
-        String factionCode = "LC";
-        String unitName = "Shadow Hawk SHD-2H";
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
-        SkillLevel skill = SkillLevel.ULTRA_GREEN;
+        Faction faction = new Faction();
+        Entity entity1 = getShadowHawk();
+        Entity entity2 = getShadowHawk();
 
         // First crew, scrub, gets no callsign
-        Entity entity = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
-        assertTrue(entity.getCrew().getNickname(0).isEmpty());
+        SkillLevel skill = SkillLevel.ULTRA_GREEN;
+        createEntityWithCrew(faction, skill, campaign, entity1);
+        assertTrue(entity1.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets a callsign
         skill = SkillLevel.VETERAN;
-
-        Entity entity2 = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
+        createEntityWithCrew(faction, skill, campaign, entity2);
         assertFalse(entity2.getCrew().getNickname(0).isEmpty());
     }
 
     @Test
-    public void testCreateEntityWithCrewHigherCutoffForCallsigns() {
+    public void testCreateEntityWithCrew_HeroicPlus() {
         // Auto-generated callsigns enabled for pilots above a certain skill
         // VETERAN will always be < HEROIC even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.HEROIC);
 
-        String factionCode = "LC";
-        String unitName = "Shadow Hawk SHD-2H";
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
-        SkillLevel skill = SkillLevel.ULTRA_GREEN;
+        Faction faction = new Faction();
+        Entity entity1 = getShadowHawk();
+        Entity entity2 = getShadowHawk();
+        Entity entity3 = getShadowHawk();
 
         // First crew, scrub, gets no callsign
-        Entity entity = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
-        assertTrue(entity.getCrew().getNickname(0).isEmpty());
+        SkillLevel skill = SkillLevel.ULTRA_GREEN;
+        createEntityWithCrew(faction, skill, campaign, entity1);
+        assertTrue(entity1.getCrew().getNickname(0).isEmpty());
 
-        // 2nd crew, regular, gets no callsign
-        skill = SkillLevel.REGULAR;
-
-        Entity entity2 = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
+        // 2nd crew, vet, gets no callsign
+        skill = SkillLevel.VETERAN;
+        createEntityWithCrew(faction, skill, campaign, entity2);
         assertTrue(entity2.getCrew().getNickname(0).isEmpty());
 
-        // 3rd crew, vet, gets no callsign
-        skill = SkillLevel.VETERAN;
-
-        Entity entity3 = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
-        assertTrue(entity3.getCrew().getNickname(0).isEmpty());
-
-        // 4th crew, HEROIC, gets a callsign
+        // 2nd crew, vet, gets a callsign
         skill = SkillLevel.LEGENDARY;
-
-        Entity entity4 = createEntityWithCrew(factionCode, skill, campaign, mekSummary);
-        assertFalse(entity4.getCrew().getNickname(0).isEmpty());
+        createEntityWithCrew(faction, skill, campaign, entity3);
+        assertFalse(entity3.getCrew().getNickname(0).isEmpty());
     }
-
 }

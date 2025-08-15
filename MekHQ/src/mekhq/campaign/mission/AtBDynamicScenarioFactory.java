@@ -2738,6 +2738,29 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
+        return createEntityWithCrew(faction, skill, campaign, entity);
+    }
+
+    /**
+     * Initializes the specified {@link Entity} with a generated crew according to the given faction, skill level, and
+     * campaign.
+     *
+     * <p>This method sets ownership, game context, names, gender (which may be non-binary depending on campaign
+     * settings), and skills.</p>
+     *
+     * <p>For certain factions, special attributes such as phenotype and bloodname may also be assigned.
+     * Additionally, callsigns or command bonuses are configured if enabled by campaign options.</p>
+     *
+     * <p>The new crew is assigned to the entity, and a unique external identifier is set.</p>
+     *
+     * @param faction  the {@link Faction} used for crew characteristics, naming, and special attributes
+     * @param skill    the base {@link SkillLevel} for the crew, potentially adjusted by a random roll
+     * @param campaign the owning {@link Campaign} instance providing context and options
+     * @param entity   the {@link Entity} to configure with crew, ownership, and random details
+     *
+     * @return the {@link Entity} with its crew assigned and campaign-related attributes set
+     */
+    public static Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, Entity entity) {
         entity.setOwner(campaign.getPlayer());
         entity.setGame(campaign.getGame());
 

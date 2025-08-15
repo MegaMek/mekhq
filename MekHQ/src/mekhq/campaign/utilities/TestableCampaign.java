@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.utilities;
 
-import java.io.IOException;
-
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -41,15 +39,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.universe.Systems;
 
 /**
- * The {@code TestableCampaign} class provides a static utility method for preparing the minimal required subsystems to
- * create and test a {@link Campaign} object.
- *
- * @author Illiani
- * @since 0.50.07
+ * No longer functions since the data changes in 0.50.07.
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class TestableCampaign {
     private final static MMLogger LOGGER = MMLogger.create(TestableCampaign.class);
 
@@ -81,12 +75,6 @@ public class TestableCampaign {
      * @since 0.50.07
      */
     public static Campaign initializeCampaignForTesting(boolean shouldInitializeSkillTypes) {
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (IOException e) {
-            LOGGER.error("Failed to load default systems", e);
-        }
-
         EquipmentType.initializeTypes();
 
         Ranks.initializeRankSystems();

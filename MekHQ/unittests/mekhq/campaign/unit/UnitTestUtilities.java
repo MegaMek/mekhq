@@ -41,9 +41,9 @@ import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.*;
 import megamek.common.util.BuildingBlock;
-import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
+import testUtilities.TestUtilities;
 
 public final class UnitTestUtilities {
 

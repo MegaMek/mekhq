@@ -39,7 +39,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestConstants.TEST_MTF;
+import static testUtilities.MHQTestConstants.TEST_UNIT_DATA_DIR;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -329,7 +332,8 @@ public class ResolverTest {
 
         for (var i = 0; i < unitFullNames.length; i++) {
             var fullName = unitFullNames[i];
-            var entity = MekSummary.loadEntity(fullName);
+            File unitFile = new File(TEST_UNIT_DATA_DIR + fullName + TEST_MTF);
+            var entity = MekSummary.loadEntity(unitFile);
             assert entity != null;
 
             var crew = switch (teamArrangement) {
@@ -358,7 +362,8 @@ public class ResolverTest {
             var fullName = unitFullNames[i];
             var unit = new Unit();
             unit.setCampaign(campaign);
-            var entity = MekSummary.loadEntity(fullName);
+            File unitFile = new File(TEST_UNIT_DATA_DIR + fullName + TEST_MTF);
+            var entity = MekSummary.loadEntity(unitFile);
             assert entity != null;
             entity.setOwner(campaign.getPlayer());
             entity.setForceString("Valkiries|1||Third Support Company|31||9th Scout Lance|544||");

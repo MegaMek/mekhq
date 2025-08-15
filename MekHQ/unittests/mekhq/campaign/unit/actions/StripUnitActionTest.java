@@ -35,7 +35,6 @@ package mekhq.campaign.unit.actions;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.EquipmentType;
-import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
@@ -44,6 +43,7 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import testUtilities.TestUtilities;
 
 public class StripUnitActionTest {
     @BeforeAll

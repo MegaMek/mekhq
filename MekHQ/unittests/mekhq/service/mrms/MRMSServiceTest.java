@@ -42,7 +42,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestConstants.TEST_MTF;
+import static testUtilities.MHQTestConstants.TEST_UNIT_DATA_DIR;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -176,8 +179,12 @@ public class MRMSServiceTest {
         int targetNumberMax = 6;
         int dailyTimeMin = 0;
 
-        Unit unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
-
+        String unitName = "UrbanMech UM-R69";
+        File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
+        Entity entity = MekSummary.loadEntity(unitFile);
+        assert entity != null;
+        Unit unit = new Unit(entity, mockCampaign);
+        assert unit != null;
         addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred, targetNumberMax, dailyTimeMin);
 
         when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
@@ -196,10 +203,7 @@ public class MRMSServiceTest {
         unit.getEntity().setArmor(1, Mek.LOC_HEAD);
         unit.initializeParts(true);
         unit.getEntity().setArmor(0, Mek.LOC_HEAD);
-        unit.getParts().stream().filter(p -> p instanceof Armor).map(p -> (Armor) p).forEach(armor -> {
-            breakArmor(armor);
-
-        });
+        unit.getParts().stream().filter(p -> p instanceof Armor).map(p -> (Armor) p).forEach(this::breakArmor);
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(6);
@@ -223,7 +227,12 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            String unitName = "UrbanMech UM-R69";
+            File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
+            Entity entity = MekSummary.loadEntity(unitFile);
+            assert entity != null;
+            unit = new Unit(entity, mockCampaign);
+            assert unit != null;
             unit.initializeParts(true);
         }
 
@@ -307,7 +316,12 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            String unitName = "UrbanMech UM-R69";
+            File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + TEST_MTF);
+            Entity entity = MekSummary.loadEntity(unitFile);
+            assert entity != null;
+            unit = new Unit(entity, mockCampaign);
+            assert unit != null;
             unit.initializeParts(true);
         }
 

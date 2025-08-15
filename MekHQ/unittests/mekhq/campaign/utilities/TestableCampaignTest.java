@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,6 +52,8 @@ import org.junit.jupiter.api.Test;
  * @author Illiani
  * @since 0.50.07
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
+@Disabled()
 class TestableCampaignTest {
     static Campaign campaign;
 

@@ -35,8 +35,8 @@ package mekhq.campaign.personnel;
 import java.io.InputStream;
 import java.util.UUID;
 
-import mekhq.TestUtilities;
 import org.mockito.ArgumentMatcher;
+import testUtilities.TestUtilities;
 
 public final class PersonnelTestUtilities {
 

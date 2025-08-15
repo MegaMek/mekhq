@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+package testUtilities;/*
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,34 +30,12 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+public class MHQTestConstants {
+    private static final String TEST_RESOURCES_DIR = "testresources/";
+    private static final String TEST_DATA_DIR = TEST_RESOURCES_DIR + "data/";
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.ParseException;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.DOMException;
-
-@Disabled("This test is no longer valid following the data changes in 50.07")
-public class SystemsIntegrationTest {
-    @Test
-    public void loadDefaultTest() throws DOMException, FileNotFoundException, IOException, ParseException {
-        Systems systems = Systems.loadDefault();
-
-        assertNotNull(systems);
-
-        PlanetarySystem terra = systems.getSystemById("Terra");
-        assertNotNull(terra);
-        assertEquals(0.0, terra.getX(), 0.001);
-        assertEquals(0.0, terra.getY(), 0.001);
-
-        Planet thirdRock = terra.getPlanetById("Terra");
-        assertNotNull(thirdRock);
-        assertEquals(thirdRock, terra.getPlanet(3));
-    }
+    public static final String TEST_UNIT_DATA_DIR = TEST_DATA_DIR + "mekfiles/";
+    public static final String TEST_BLK = ".blk";
+    public static final String TEST_MTF = ".mtf";
 }

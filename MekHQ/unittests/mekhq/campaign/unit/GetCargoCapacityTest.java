@@ -37,20 +37,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestConstants.TEST_BLK;
+import static testUtilities.MHQTestConstants.TEST_MTF;
+import static testUtilities.MHQTestConstants.TEST_UNIT_DATA_DIR;
 
+import java.io.File;
 import java.util.UUID;
 
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
-import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -76,14 +80,19 @@ class CargoCapacityTest {
     private final String CARGO_MEK = "Buster BC XV-M-B HaulerMech MOD";
     private final CargoUnit cargoMek = new CargoUnit(CARGO_MEK, 0, 2);
 
-    private final String CARGO_DROP_SHIP = "Hoshiryokou (Tug Boat)";
+    private final String CARGO_DROP_SHIP = "Hoshiryokou Tug Boat";
     private final CargoUnit cargoDropShip = new CargoUnit(CARGO_DROP_SHIP, 7, 100);
 
     private final String CARGO_FIGHTER = "Caravan Heavy Transport";
     private final CargoUnit cargoFighter = new CargoUnit(CARGO_FIGHTER, 60, 0);
 
-    private final String CARGO_TANK = "Prime Mover (LRM)";
+    private final String CARGO_TANK = "Prime Mover";
     private final CargoUnit cargoTank = new CargoUnit(CARGO_TANK, 0, 20);
+
+    @BeforeAll
+    public static void beforeAll() {
+        EquipmentType.initializeTypes();
+    }
 
     @BeforeEach
     public void setup() {
@@ -93,13 +102,13 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoMek() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         testCargoTotal(entity, cargoMek.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoMekKilledLocations() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         testCargoTotal(entity, cargoMek.bayCargoCapacity);
@@ -107,7 +116,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoMekKilledBays() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killBays(entity);
         testCargoTotal(entity, cargoMek.otherCargoCapacity);
@@ -115,7 +124,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoMekKillEverything() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
@@ -124,13 +133,13 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoDropShip() {
-        Entity entity = createEntity(cargoDropShip.name);
+        Entity entity = createEntity(cargoDropShip.name, true);
         testCargoTotal(entity, cargoDropShip.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoDropShipKilledLocations() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         testCargoTotal(entity, cargoMek.bayCargoCapacity);
@@ -138,7 +147,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoDropShipKilledBays() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killBays(entity);
         testCargoTotal(entity, cargoMek.otherCargoCapacity);
@@ -146,7 +155,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoDropShipKillEverything() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
@@ -155,13 +164,13 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoFighter() {
-        Entity entity = createEntity(cargoFighter.name);
+        Entity entity = createEntity(cargoFighter.name, true);
         testCargoTotal(entity, cargoFighter.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoFighterKilledLocations() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         testCargoTotal(entity, cargoMek.bayCargoCapacity);
@@ -169,7 +178,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoFighterKilledBays() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killBays(entity);
         testCargoTotal(entity, cargoMek.otherCargoCapacity);
@@ -177,7 +186,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoFighterKillEverything() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
@@ -186,13 +195,13 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoTank() {
-        Entity entity = createEntity(cargoTank.name);
+        Entity entity = createEntity(cargoTank.name, true);
         testCargoTotal(entity, cargoTank.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoTankKilledLocations() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         testCargoTotal(entity, cargoMek.bayCargoCapacity);
@@ -200,7 +209,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoTankKilledBays() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killBays(entity);
         testCargoTotal(entity, cargoMek.otherCargoCapacity);
@@ -208,7 +217,7 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoTankKillEverything() {
-        Entity entity = createEntity(cargoMek.name);
+        Entity entity = createEntity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
@@ -218,31 +227,15 @@ class CargoCapacityTest {
     /**
      * Creates an {@link Entity} from the given unit name by retrieving its information from the cache.
      *
-     * <p>If the unit cannot be found or loaded, appropriate error logging occurs, and {@code null}
-     * is returned.
-     * </p>
-     *
      * @param unitName The name of the unit to retrieve and parse.
      *
      * @return The {@link Entity} representing the unit, or {@code null} if the unit cannot be loaded.
      */
-    private Entity createEntity(String unitName) {
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
-        if (mekSummary == null) {
-            logger.error("Cannot find entry for {}", unitName);
-            return null;
-        }
-
-        MekFileParser mekFileParser;
-
-        try {
-            mekFileParser = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName());
-        } catch (Exception ex) {
-            logger.error("Unable to load unit: {}", mekSummary.getEntryName(), ex);
-            return null;
-        }
-
-        return mekFileParser.getEntity();
+    private Entity createEntity(String unitName, boolean isBLK) {
+        File unitFile = new File(TEST_UNIT_DATA_DIR + unitName + (isBLK ? TEST_BLK : TEST_MTF));
+        Entity entity = MekSummary.loadEntity(unitFile);
+        assert entity != null;
+        return entity;
     }
 
     /**

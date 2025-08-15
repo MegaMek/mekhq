@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq;
+package testUtilities;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
