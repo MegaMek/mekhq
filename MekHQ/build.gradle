@@ -459,6 +459,7 @@ tasks.register("buildAllPackages", Copy) {
 tasks.register("cleanAll") {
     description = "Cleans all build projects to ensure a clean slate"
     group = "build"
+    dependsOn gradle.includedBuild('mm-data').task(':clean')
     dependsOn gradle.includedBuild('megamek').task(':megamek:clean')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:clean')
     dependsOn clean
@@ -475,7 +476,7 @@ tasks.register("testAll") {
 }
 
 run {
-    mustRunAfter(stageDataFiles)
+    dependsOn(stageDataFiles)
     jvmArgs = mhqJvmOptions
 }
 
