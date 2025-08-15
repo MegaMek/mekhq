@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -42,8 +47,8 @@ import mekhq.campaign.work.IAcquisitionWork;
 public class BaArmor extends Armor {
     public static boolean canBeClan(int type) {
         return type == EquipmentType.T_ARMOR_BA_STANDARD || type == EquipmentType.T_ARMOR_BA_STEALTH_BASIC
-                || type == EquipmentType.T_ARMOR_BA_STEALTH_IMP || type == EquipmentType.T_ARMOR_BA_STEALTH
-                || type == EquipmentType.T_ARMOR_BA_FIRE_RESIST;
+                     || type == EquipmentType.T_ARMOR_BA_STEALTH_IMP || type == EquipmentType.T_ARMOR_BA_STEALTH
+                     || type == EquipmentType.T_ARMOR_BA_FIRE_RESIST;
     }
 
     public static boolean canBeIs(int type) {
@@ -134,9 +139,9 @@ public class BaArmor extends Armor {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && (isClanTechBase() == part.isClanTechBase())
-                && Objects.equals(getRefitUnit(), part.getRefitUnit())
-                && (((BaArmor) part).getType() == getType());
+                     && (isClanTechBase() == part.isClanTechBase())
+                     && Objects.equals(getRefitUnit(), part.getRefitUnit())
+                     && (((BaArmor) part).getType() == getType());
     }
 
     @Override
@@ -189,7 +194,9 @@ public class BaArmor extends Armor {
 
     /**
      * Not sure how true this title is, it was used in {@link BaArmor#getAmountAvailable}
+     *
      * @param part is this part the same
+     *
      * @return true if the two parts are the same, at least as far as {@link BaArmor#getAmountAvailable} is concerned
      */
     private boolean isSameBAArmorPart(Part part) {

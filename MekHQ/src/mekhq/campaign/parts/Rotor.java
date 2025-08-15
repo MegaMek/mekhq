@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -41,10 +46,16 @@ import mekhq.campaign.finances.Money;
  */
 public class Rotor extends TankLocation {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
-            .setPrototypeFactions(Faction.TH).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                          .setAdvancement(2460, 2470, 2510)
+                                                          .setApproximate(true, false, false)
+                                                          .setPrototypeFactions(Faction.TH)
+                                                          .setProductionFactions(Faction.TH)
+                                                          .setTechRating(TechRating.D)
+                                                          .setAvailability(AvailabilityValue.C,
+                                                                AvailabilityValue.D,
+                                                                AvailabilityValue.C,
+                                                                AvailabilityValue.C)
+                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public Rotor() {
         this(0, null);
@@ -70,10 +81,10 @@ public class Rotor extends TankLocation {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Rotor
-                && getLoc() == ((Rotor) part).getLoc()
-                && getUnitTonnage() == part.getUnitTonnage()
-                && this.getDamage() == ((Rotor) part).getDamage()
-                && part.getSkillMin() == this.getSkillMin();
+                     && getLoc() == ((Rotor) part).getLoc()
+                     && getUnitTonnage() == part.getUnitTonnage()
+                     && this.getDamage() == ((Rotor) part).getDamage()
+                     && part.getSkillMin() == this.getSkillMin();
     }
 
     @Override

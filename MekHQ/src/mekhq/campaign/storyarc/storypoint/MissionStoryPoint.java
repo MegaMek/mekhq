@@ -49,29 +49,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * A StoryPoint class to start a new mission. A MissionStoryPoint will not
- * complete until triggered by a
- * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger
- * CompleteMissionStoryTrigger}. That trigger
- * may include the final status of the mission (i.e. Success, Failure). If it
- * does not, the MissionStoryPoint will
- * determine success based on the percentage of successful scenarios. The
- * default will be 50%, but this can be adjusted
+ * A StoryPoint class to start a new mission. A MissionStoryPoint will not complete until triggered by a
+ * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger CompleteMissionStoryTrigger}. That trigger
+ * may include the final status of the mission (i.e. Success, Failure). If it does not, the MissionStoryPoint will
+ * determine success based on the percentage of successful scenarios. The default will be 50%, but this can be adjusted
  * with the <code>percentWin</code> variable.
  * <p>
  * A MissionStoryPoint can also include a list of starting UUIDs that identify
- * {@link ScenarioStoryPoint ScenarioStoryPoint} objects, but is not required to
- * do so as scenarios can also be assigned
- * to the mission later through a{@link ScenarioStoryPoint ScenarioStoryPoint}.
- * If multiple scenarios are included,
- * keep in mind that the player can decide which order they are completed. If
- * the author wants to specify order, it is
- * better to start with one scenario and when that scenario is completed it can
- * point to another
- * {@link ScenarioStoryPoint ScenarioStoryPoint}, and so on until the final
- * scenario is reached at which point a
- * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger
- * CompleteMissionStoryTrigger} is triggered.
+ * {@link ScenarioStoryPoint ScenarioStoryPoint} objects, but is not required to do so as scenarios can also be assigned
+ * to the mission later through a{@link ScenarioStoryPoint ScenarioStoryPoint}. If multiple scenarios are included, keep
+ * in mind that the player can decide which order they are completed. If the author wants to specify order, it is better
+ * to start with one scenario and when that scenario is completed it can point to another
+ * {@link ScenarioStoryPoint ScenarioStoryPoint}, and so on until the final scenario is reached at which point a
+ * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger CompleteMissionStoryTrigger} is triggered.
  * </p>
  */
 public class MissionStoryPoint extends StoryPoint {
@@ -81,17 +71,14 @@ public class MissionStoryPoint extends StoryPoint {
     private Mission mission;
 
     /**
-     * A double that tracks what percent of scenarios must be successful for
-     * successful mission. This
-     * may not be relevant if mission will be closed in other ways.
+     * A double that tracks what percent of scenarios must be successful for successful mission. This may not be
+     * relevant if mission will be closed in other ways.
      **/
     private double percentWin;
 
     /**
-     * A list of ScenarioStoryPoint ids to add to this mission when it is created.
-     * not all Scenarios
-     * need to be added at the start as ScenarioStoryPoints may also trigger further
-     * ScenarioStoryPoints
+     * A list of ScenarioStoryPoint ids to add to this mission when it is created. not all Scenarios need to be added at
+     * the start as ScenarioStoryPoints may also trigger further ScenarioStoryPoints
      */
     private List<UUID> scenarioStoryPointIds;
 
@@ -132,9 +119,9 @@ public class MissionStoryPoint extends StoryPoint {
             // status based on percent
             // of successful scenarios
             double wins = mission.getCompletedScenarios().stream().filter(s -> s.getStatus().isOverallVictory())
-                    .count();
+                                .count();
             if ((!mission.getCompletedScenarios().isEmpty()) &&
-                    ((wins / mission.getCompletedScenarios().size()) >= percentWin)) {
+                      ((wins / mission.getCompletedScenarios().size()) >= percentWin)) {
                 mission.setStatus(MissionStatus.SUCCESS);
             } else {
                 mission.setStatus(MissionStatus.FAILED);

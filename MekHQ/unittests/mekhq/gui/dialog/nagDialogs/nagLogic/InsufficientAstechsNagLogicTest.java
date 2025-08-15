@@ -24,20 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
-
-import mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog;
-import org.junit.jupiter.api.Test;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog;
+import org.junit.jupiter.api.Test;
+
 /**
- * This class contains test cases for the {@link InsufficientAstechsNagDialog} class.
- * It tests the different combinations of Astech requirements and verifies the behavior of the
- * {@code checkAstechsNeededCount()} method.
+ * This class contains test cases for the {@link InsufficientAstechsNagDialog} class. It tests the different
+ * combinations of Astech requirements and verifies the behavior of the {@code checkAstechsNeededCount()} method.
  */
 class InsufficientAstechsNagLogicTest {
     @Test

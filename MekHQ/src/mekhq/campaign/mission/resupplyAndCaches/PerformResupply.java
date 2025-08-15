@@ -427,7 +427,8 @@ public class PerformResupply {
      * @param convoyContents     a list of {@link Part} objects representing convoy cargo.
      * @param interceptionChance the calculated chance of interception for the convoy.
      */
-    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy, @Nullable List<Part> convoyContents, int interceptionChance) {
+    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy,
+          @Nullable List<Part> convoyContents, int interceptionChance) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
@@ -512,7 +513,8 @@ public class PerformResupply {
      * @param targetConvoy   the {@link Force} representing the player's convoy. Can be {@code null} for NPC convoys.
      * @param convoyContents a list of {@link Part} objects representing the resupply cargo.
      */
-    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy, @Nullable List<Part> convoyContents) {
+    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy,
+          @Nullable List<Part> convoyContents) {
         final String DIRECTORY = "data/scenariotemplates/";
         final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
         final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.xml";

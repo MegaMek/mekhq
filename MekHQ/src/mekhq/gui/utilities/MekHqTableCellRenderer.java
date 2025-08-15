@@ -24,20 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
 
 public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table,
-            Object value, boolean isSelected, boolean hasFocus,
-            int row, int column) {
+          Object value, boolean isSelected, boolean hasFocus,
+          int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected,
-                hasFocus, row, column);
+              hasFocus, row, column);
 
         setupTableColors(this, table, isSelected, hasFocus, row);
 
@@ -45,7 +52,7 @@ public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
     }
 
     public static void setupTableColors(Component c, JTable table, boolean isSelected,
-            boolean hasFocus, int row) {
+          boolean hasFocus, int row) {
         if (isSelected) {
             c.setForeground(table.getSelectionForeground());
             c.setBackground(table.getSelectionBackground());
@@ -54,7 +61,7 @@ public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
         }
 
         if (hasFocus) {
-            if (!isSelected ) {
+            if (!isSelected) {
                 Color color = UIManager.getColor("Table.focusCellForeground");
                 if (color != null) {
                     c.setForeground(color);

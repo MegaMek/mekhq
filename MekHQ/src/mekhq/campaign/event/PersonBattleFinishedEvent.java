@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.event;
 
@@ -33,11 +38,9 @@ import mekhq.campaign.personnel.Person;
 /**
  * An event fired for every person who just came back from battle, dead or alive.
  * <p>
- * Event handlers can modify the status before its get passed on to MekHQ. This event
- * gets fired for both your own personnel as well as possible prisoners. If
- * an event handler sets the prisoner's status to "dead", they will not show
- * up in the list of prisoners made; this is a way to "filter out" specific
- * people who shouldn't be taken prisoner.
+ * Event handlers can modify the status before its get passed on to MekHQ. This event gets fired for both your own
+ * personnel as well as possible prisoners. If an event handler sets the prisoner's status to "dead", they will not show
+ * up in the list of prisoners made; this is a way to "filter out" specific people who shouldn't be taken prisoner.
  */
 public class PersonBattleFinishedEvent extends PersonChangedEvent {
     private PersonStatus status;

@@ -32,16 +32,16 @@
  */
 package mekhq;
 
+import java.awt.Color;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import javax.swing.UIManager;
+
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
-
-import javax.swing.UIManager;
-import java.awt.Color;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public final class MHQOptions extends SuiteOptions {
     // region Display Tab

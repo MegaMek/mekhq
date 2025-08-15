@@ -76,9 +76,9 @@ import org.w3c.dom.NodeList;
  * Handles logic for simulating random deaths in a campaign.
  *
  * <p>The {@code RandomDeath} class is responsible for determining whether a person dies randomly
- * based on various factors such as age, gender, campaign settings, and defined death causes.
- * It provides functionality to configure and process random deaths, manage XML-based cause sources,
- * and track different categories of death causes.</p>
+ * based on various factors such as age, gender, campaign settings, and defined death causes. It provides functionality
+ * to configure and process random deaths, manage XML-based cause sources, and track different categories of death
+ * causes.</p>
  *
  * <p><b>Core Features:</b></p>
  * <ul>
@@ -102,17 +102,17 @@ public class RandomDeath {
 
     // Base Chances
     private final List<RandomDeathChance> deathChances = List.of(
-        new RandomDeathChance(9, 4, 2),
-        new RandomDeathChance(19, 9, 4),
-        new RandomDeathChance(29, 17, 8),
-        new RandomDeathChance(39, 20, 10),
-        new RandomDeathChance(49, 30, 18),
-        new RandomDeathChance(59, 70, 40),
-        new RandomDeathChance(69, 149, 90),
-        new RandomDeathChance(79, 385, 233),
-        new RandomDeathChance(89, 1000, 714),
-        new RandomDeathChance(99, 2500, 2000),
-        new RandomDeathChance(Integer.MAX_VALUE, 5000, 3333)
+          new RandomDeathChance(9, 4, 2),
+          new RandomDeathChance(19, 9, 4),
+          new RandomDeathChance(29, 17, 8),
+          new RandomDeathChance(39, 20, 10),
+          new RandomDeathChance(49, 30, 18),
+          new RandomDeathChance(59, 70, 40),
+          new RandomDeathChance(69, 149, 90),
+          new RandomDeathChance(79, 385, 233),
+          new RandomDeathChance(89, 1000, 714),
+          new RandomDeathChance(99, 2500, 2000),
+          new RandomDeathChance(Integer.MAX_VALUE, 5000, 3333)
     );
 
     // Multipliers
@@ -141,12 +141,13 @@ public class RandomDeath {
 
     // Die Size
     private final int DIE_SIZE = 1000000;
+
     /**
      * Constructs a {@code RandomDeath} object using campaign-specific options.
      *
      * <p>Initializes configurable options such as enabling specific age groups for random deaths,
-     * enabling or disabling suicide causes, and retrieving the base random death chances.
-     * The death causes map is also initialized by reading relevant files.</p>
+     * enabling or disabling suicide causes, and retrieving the base random death chances. The death causes map is also
+     * initialized by reading relevant files.</p>
      *
      * @param campaign The current campaign.
      */
@@ -177,8 +178,7 @@ public class RandomDeath {
      * Initializes the random death causes by reading them from an XML file.
      *
      * <p>The XML file contains structured data about causes of random deaths, organized by
-     * gender, age range, and personnel statuses. The method parses the file and populates
-     * the {@code causes} map.</p>
+     * gender, age range, and personnel statuses. The method parses the file and populates the {@code causes} map.</p>
      *
      * @param file The XML file containing the cause definitions.
      */
@@ -215,13 +215,14 @@ public class RandomDeath {
      * Parses the specified XML file into a DOM {@link Element}.
      *
      * @param file The input file.
+     *
      * @return The root {@link Element} of the parsed XML document, or {@code null} if an error occurred.
      */
     private Element parseXmlFile(final File file) {
         try (InputStream is = new FileInputStream(file)) {
             final Element element = MHQXMLUtility.newSafeDocumentBuilder()
-                .parse(is)
-                .getDocumentElement();
+                                          .parse(is)
+                                          .getDocumentElement();
             element.normalize();
             return element;
         } catch (Exception ex) {
@@ -284,8 +285,8 @@ public class RandomDeath {
      * Processes a status node and updates the details in the age range's causes map.
      *
      * <p>This method handles parsing of the text content (probability weight) and
-     * links it to the specified {@code PersonnelStatus}. Factors such as whether
-     * suicide causes are enabled are also considered.</p>
+     * links it to the specified {@code PersonnelStatus}. Factors such as whether suicide causes are enabled are also
+     * considered.</p>
      *
      * @param ageRangeCauses The map of causes for a particular age range.
      * @param statusNode     The node representing a specific personnel status.
@@ -308,8 +309,8 @@ public class RandomDeath {
      * Determines if an XML node is invalid for processing.
      *
      * @param node The node to validate.
-     * @return {@code true} if the node is invalid (e.g., null or without child nodes),
-     *         {@code false} otherwise.
+     *
+     * @return {@code true} if the node is invalid (e.g., null or without child nodes), {@code false} otherwise.
      */
     private boolean isInvalidNode(final Node node) {
         return node == null || !node.hasChildNodes();
@@ -319,6 +320,7 @@ public class RandomDeath {
      * Checks if a node is an XML element node.
      *
      * @param node The node to check.
+     *
      * @return {@code true} if the node is an element node; {@code false} otherwise.
      */
     private boolean isElementNode(final Node node) {
@@ -332,6 +334,7 @@ public class RandomDeath {
      * and other modifiers, then performs a random roll to decide if the person dies.</p>
      *
      * @param person the person to evaluate for random death.
+     *
      * @return {@code true} if the person randomly dies, {@code false} otherwise.
      */
     public boolean randomlyDies(Person person) {
@@ -379,10 +382,11 @@ public class RandomDeath {
      * Retrieves the base death chance for a person based on their age and gender.
      *
      * <p>This method iterates over the list of predefined {@link RandomDeathChance} configurations
-     * and finds the matching rule based on the age of the person. Gender-based multipliers
-     * are applied accordingly.</p>
+     * and finds the matching rule based on the age of the person. Gender-based multipliers are applied
+     * accordingly.</p>
      *
      * @param person the person whose death chance is being calculated.
+     *
      * @return the base death chance as a double, based on the matching {@link RandomDeathChance}.
      */
     double getBaseDeathChance(Person person) {
@@ -410,13 +414,14 @@ public class RandomDeath {
      * {@link EraFlag}).</p>
      *
      * @param era the current era being analyzed.
+     *
      * @return the death chance multiplier specific to the provided era.
      */
     double getEraMultiplier(Era era) {
         Set<EraFlag> flags = era.getFlags();
 
         if (flags.contains(PRE_SPACEFLIGHT) || flags.contains(EARLY_SPACEFLIGHT)
-            || flags.contains(AGE_OF_WAR)) {
+                  || flags.contains(AGE_OF_WAR)) {
             return ERA_MULTIPLIER_AGE_OF_WAR;
         }
 
@@ -425,7 +430,7 @@ public class RandomDeath {
         }
 
         if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOSTECH)
-            || flags.contains(LATE_SUCCESSION_WARS_RENAISSANCE)) {
+                  || flags.contains(LATE_SUCCESSION_WARS_RENAISSANCE)) {
             return ERA_MULTIPLIER_SUCCESSION_WARS;
         }
 
@@ -457,10 +462,11 @@ public class RandomDeath {
      * Retrieves the faction-based multiplier for determining the death chance.
      *
      * <p>The multiplier is determined based on the type of faction the campaign belongs to,
-     * such as Clan, Periphery, Major Power, or Mercenary. Each faction type has a predefined
-     * multiplier applied to the death chance.</p>
+     * such as Clan, Periphery, Major Power, or Mercenary. Each faction type has a predefined multiplier applied to the
+     * death chance.</p>
      *
      * @param faction the faction to calculate the multiplier for.
+     *
      * @return the death chance multiplier specific to the provided faction.
      */
     double getFactionMultiplier(Faction faction) {
@@ -503,10 +509,11 @@ public class RandomDeath {
      * Calculates the health-based multiplier for determining the death chance.
      *
      * <p>The health multiplier accounts for HPG access, injuries, and other health modifiers.
-     * When cumulative injuries (transient or permanent) are present, and depending on the use of
-     * advanced medical care, additional multipliers are applied to represent the overall health.</p>
+     * When cumulative injuries (transient or permanent) are present, and depending on the use of advanced medical care,
+     * additional multipliers are applied to represent the overall health.</p>
      *
      * @param person the person to evaluate for health-related modifiers.
+     *
      * @return the health multiplier as a double.
      */
     double getHealthModifier(Person person) {
@@ -540,10 +547,11 @@ public class RandomDeath {
      * Calculates the modifier based on the injuries of the person.
      *
      * <p>If advanced medical care is enabled in the campaign options, individual injuries are
-     * evaluated for either transient or permanent injuries. Otherwise, a simpler calculation is
-     * applied based on the total number of injuries.</p>
+     * evaluated for either transient or permanent injuries. Otherwise, a simpler calculation is applied based on the
+     * total number of injuries.</p>
      *
      * @param person the person whose injuries are evaluated.
+     *
      * @return the injury-related health multiplier.
      */
     private double getInjuryModifier(Person person) {
@@ -562,6 +570,7 @@ public class RandomDeath {
      * <p>Counts both transient and permanent injuries, and applies appropriate modifiers.</p>
      *
      * @param injuries the list of injuries to evaluate.
+     *
      * @return the calculated health multiplier for advanced injuries.
      */
     private double calculateAdvancedInjuryModifier(List<Injury> injuries) {
@@ -597,6 +606,7 @@ public class RandomDeath {
      *
      * @param person      The individual to evaluate.
      * @param randomDeath Whether random deaths are enabled in the campaign.
+     *
      * @return A string describing why the individual cannot die, or {@code null} if no restrictions apply.
      */
     public @Nullable String canDie(final Person person, final boolean randomDeath) {
@@ -625,6 +635,7 @@ public class RandomDeath {
      * Retrieves a localized message for why a person cannot die.
      *
      * @param messageKey The key for the message in the resource bundle.
+     *
      * @return The localized reason message.
      */
     private String getCannotDieMessage(final String messageKey) {
@@ -635,16 +646,17 @@ public class RandomDeath {
      * Processes random death checks for the given individual in a weekly tick.
      *
      * <p>If the person dies, this method updates the campaign and individual status accordingly,
-     * and generates a detailed death report. Random death reasons and causes are evaluated as per
-     * the configuration and individual factors.</p>
+     * and generates a detailed death report. Random death reasons and causes are evaluated as per the configuration and
+     * individual factors.</p>
      *
      * @param campaign The active campaign to update.
      * @param today    The current date.
      * @param person   The person being evaluated.
+     *
      * @return {@code true} if the person dies during this week; otherwise, {@code false}.
      */
     public boolean processNewWeek(final Campaign campaign, final LocalDate today,
-                                  final Person person) {
+          final Person person) {
         final int age = person.getAge(today);
         final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
 
@@ -658,7 +670,7 @@ public class RandomDeath {
             String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
             campaign.addReport(String.format("%s has %s<b>died</b>%s.",
-                person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
+                  person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
 
             person.changeStatus(campaign, today, getCause(person, ageGroup, age));
 
@@ -672,12 +684,12 @@ public class RandomDeath {
      * Determines the reason or cause of death for a person.
      *
      * <p>Factors including age, gender, injuries, and other conditions like pregnancy
-     * are considered in determining the death cause. If no specific cause is found,
-     * a default cause is selected.</p>
+     * are considered in determining the death cause. If no specific cause is found, a default cause is selected.</p>
      *
      * @param person   The person who has died.
      * @param ageGroup The age group of the person.
      * @param age      The person's age.
+     *
      * @return The {@code PersonnelStatus} representing the cause of death.
      */
     public PersonnelStatus getCause(final Person person, final AgeGroup ageGroup, final int age) {
@@ -695,7 +707,7 @@ public class RandomDeath {
         }
 
         final Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>> genderedCauses = causes
-            .get(person.getGender());
+                                                                                              .get(person.getGender());
         if (genderedCauses == null) {
             return getDefaultCause(ageGroup);
         }
@@ -713,30 +725,32 @@ public class RandomDeath {
      * Determines whether a person's death was caused by major or deadly injuries.
      *
      * <p>This method evaluates the person's injuries and checks if any of them are classified
-     * as "major or deadly." Only significant injuries are considered for this determination,
-     * while minor or chronic conditions are ignored.</p>
+     * as "major or deadly." Only significant injuries are considered for this determination, while minor or chronic
+     * conditions are ignored.</p>
      *
      * @param person The person whose injuries are being evaluated.
-     * @return {@link PersonnelStatus#WOUNDS} if major or deadly injuries caused the death;
-     *         otherwise, {@link PersonnelStatus#ACTIVE} if no significant injuries are found.
+     *
+     * @return {@link PersonnelStatus#WOUNDS} if major or deadly injuries caused the death; otherwise,
+     *       {@link PersonnelStatus#ACTIVE} if no significant injuries are found.
      */
     private PersonnelStatus determineIfInjuriesCausedTheDeath(final Person person) {
         // We care about injuries that are major or deadly. We do not want any chronic conditions nor scratches
         return person.getInjuries().stream().anyMatch(injury -> injury.getLevel().isMajorOrDeadly())
-            ? PersonnelStatus.WOUNDS
-            : PersonnelStatus.ACTIVE;
+                     ? PersonnelStatus.WOUNDS
+                     : PersonnelStatus.ACTIVE;
     }
 
     /**
      * Determines the default cause of death based on the age group of the person.
      *
      * <p>The method assigns a default cause of death based on whether the person is considered
-     * elderly. Elderly persons are assigned {@link PersonnelStatus#OLD_AGE} as the cause,
-     * while younger individuals are assigned {@link PersonnelStatus#NATURAL_CAUSES}.</p>
+     * elderly. Elderly persons are assigned {@link PersonnelStatus#OLD_AGE} as the cause, while younger individuals are
+     * assigned {@link PersonnelStatus#NATURAL_CAUSES}.</p>
      *
      * @param ageGroup The age group of the person.
-     * @return {@link PersonnelStatus#OLD_AGE} if the person is in the elder age group;
-     *         otherwise, {@link PersonnelStatus#NATURAL_CAUSES}.
+     *
+     * @return {@link PersonnelStatus#OLD_AGE} if the person is in the elder age group; otherwise,
+     *       {@link PersonnelStatus#NATURAL_CAUSES}.
      */
     private PersonnelStatus getDefaultCause(final AgeGroup ageGroup) {
         return ageGroup.isElder() ? PersonnelStatus.OLD_AGE : PersonnelStatus.NATURAL_CAUSES;
@@ -749,6 +763,7 @@ public class RandomDeath {
      * `randomlyDies` method.</p>
      *
      * @param bound The upper bound for the random number.
+     *
      * @return A random integer between 0 (inclusive) and {@code bound} (exclusive).
      */
     protected int randomInt(int bound) {
@@ -770,11 +785,11 @@ public class RandomDeath {
          * Constructs a new {@code RandomDeathChance} record, which ensures the values are valid.
          *
          * @param maximumAge The maximum age limit for the death chance.
-         * @param male The death chance multiplier for males.
-         * @param female The death chance multiplier for females.
-         * @throws IllegalArgumentException if any values are invalid:
-         *                                  - {@code maximumAge} must be greater than 0.
-         *                                  - {@code male} and {@code female} must be non-negative.
+         * @param male       The death chance multiplier for males.
+         * @param female     The death chance multiplier for females.
+         *
+         * @throws IllegalArgumentException if any values are invalid: - {@code maximumAge} must be greater than 0. -
+         *                                  {@code male} and {@code female} must be non-negative.
          */
         public RandomDeathChance {
             if (maximumAge < 0) {
@@ -782,7 +797,7 @@ public class RandomDeath {
             }
             if (male < 0 || female < 0) {
                 throw new IllegalArgumentException("male and female multipliers must be non-negative: male="
-                    + male + ", female=" + female);
+                                                         + male + ", female=" + female);
             }
         }
     }

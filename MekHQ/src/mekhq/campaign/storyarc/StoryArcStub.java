@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc;
 
@@ -34,11 +39,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
@@ -46,12 +46,14 @@ import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.enums.StoryLoadingType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This class just reads in a few fields from a Story Arc XML object. it is used
- * to produce the story arc
- * selection dialog without having to load the full story arcs which depend on
- * the Campaign object.
+ * This class just reads in a few fields from a Story Arc XML object. it is used to produce the story arc selection
+ * dialog without having to load the full story arcs which depend on the Campaign object.
  */
 public class StoryArcStub {
     private static final MMLogger logger = MMLogger.create(StoryArcStub.class);
@@ -61,8 +63,7 @@ public class StoryArcStub {
     private String description;
 
     /**
-     * Can this story arc be added to existing campaign or does it need to start
-     * fresh?
+     * Can this story arc be added to existing campaign or does it need to start fresh?
      **/
     private StoryLoadingType storyLoadingType;
 
@@ -183,16 +184,16 @@ public class StoryArcStub {
      */
     public static List<StoryArcStub> getStoryArcStubs(boolean startNew) {
         final List<StoryArcStub> stubs = loadStoryArcStubsFromDirectory(
-                new File(MHQConstants.STORY_ARC_DIRECTORY), startNew);
+              new File(MHQConstants.STORY_ARC_DIRECTORY), startNew);
         stubs.addAll(loadStoryArcStubsFromDirectory(
-                new File(MHQConstants.USER_STORY_ARC_DIRECTORY), startNew));
+              new File(MHQConstants.USER_STORY_ARC_DIRECTORY), startNew));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
         stubs.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
         return stubs;
     }
 
     private static List<StoryArcStub> loadStoryArcStubsFromDirectory(final @Nullable File directory,
-            boolean startNew) {
+          boolean startNew) {
         if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return new ArrayList<>();
         }
@@ -209,20 +210,20 @@ public class StoryArcStub {
         for (String arcDirectoryName : arcDirectories) {
             // find the expected items within this story arc directory
             final File storyArcFile = new File(
-                    directory.getPath() + '/' + arcDirectoryName + '/' + MHQConstants.STORY_ARC_FILE);
+                  directory.getPath() + '/' + arcDirectoryName + '/' + MHQConstants.STORY_ARC_FILE);
             if (!storyArcFile.exists()) {
                 continue;
             }
             final StoryArcStub storyArcStub = parseFromFile(storyArcFile);
             final File initCampaignFile = new File(
-                    directory.getPath() + '/' + arcDirectoryName + '/' + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
+                  directory.getPath() + '/' + arcDirectoryName + '/' + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
             if (storyArcStub != null) {
                 storyArcStub.setDirectoryPath(directory.getPath() + '/' + arcDirectoryName);
                 if (initCampaignFile.exists()) {
                     storyArcStub.setInitCampaignPath(initCampaignFile.getPath());
                 }
                 if (startNew ? storyArcStub.getStoryLoadingType().canStartNew()
-                        : storyArcStub.getStoryLoadingType().canLoadExisting()) {
+                          : storyArcStub.getStoryLoadingType().canLoadExisting()) {
                     storyArcStubs.add(storyArcStub);
                 }
             }

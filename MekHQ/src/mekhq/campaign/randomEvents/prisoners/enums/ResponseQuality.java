@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
@@ -31,8 +36,8 @@ package mekhq.campaign.randomEvents.prisoners.enums;
  * Represents the quality of a response in prisoner-related random events.
  *
  * <p>This enumeration defines three levels of response quality, which influence how various
- * prisoner events and interactions are processed in the campaign. It is used to categorize
- * reactions or results in situations involving prisoners.</p>
+ * prisoner events and interactions are processed in the campaign. It is used to categorize reactions or results in
+ * situations involving prisoners.</p>
  */
 public enum ResponseQuality {
     /**
@@ -55,8 +60,7 @@ public enum ResponseQuality {
      * Represents a negative response quality.
      *
      * <p>Indicates an unfavorable interaction or result, often leading to deteriorated
-     * outcomes during prisoner-related events, such as failed negotiations or missed
-     * rescues.</p>
+     * outcomes during prisoner-related events, such as failed negotiations or missed rescues.</p>
      */
     RESPONSE_NEGATIVE
 }
