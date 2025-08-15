@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -47,26 +52,17 @@ import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 
 /**
- * Checks all planets within a given region of space and can report which
- * factions control one or more
- * planets in the region, which planets they control, and which
- * foreign-controlled planets are within a
- * certain distance of a friendly planet. For improved performance the region is
- * defined as a hexagon
- * rather than a circle, with the radius being the distance from the center to
- * each vertex.
- *
- * Recalculates in the background whenever the date or the bound of the region
- * to examine change. By
- * default, queries made while the background thread is working will block until
- * it finishes, but thresholds
- * can be set for a number of days or a distance, any query made while a change
- * falls under that threshold
- * will use the partially updated data.
- *
- * Changes in campaign date or location will update automatically on each new
- * campaign day if the instance
- * is registered with the event bus.
+ * Checks all planets within a given region of space and can report which factions control one or more planets in the
+ * region, which planets they control, and which foreign-controlled planets are within a certain distance of a friendly
+ * planet. For improved performance the region is defined as a hexagon rather than a circle, with the radius being the
+ * distance from the center to each vertex.
+ * <p>
+ * Recalculates in the background whenever the date or the bound of the region to examine change. By default, queries
+ * made while the background thread is working will block until it finishes, but thresholds can be set for a number of
+ * days or a distance, any query made while a change falls under that threshold will use the partially updated data.
+ * <p>
+ * Changes in campaign date or location will update automatically on each new campaign day if the instance is registered
+ * with the event bus.
  *
  * @author Neoancient
  */
@@ -93,8 +89,7 @@ public class FactionBorderTracker {
     private volatile boolean cancelTask = false;
 
     /**
-     * Constructs a FactionBorderTracker with the default region of a 1000 ly radius
-     * around Terra.
+     * Constructs a FactionBorderTracker with the default region of a 1000 ly radius around Terra.
      */
     public FactionBorderTracker() {
         this(0, 0, 1000);
@@ -132,17 +127,14 @@ public class FactionBorderTracker {
     }
 
     /**
-     * @return The radius coordinate of the bounding hex (distance from the center
-     *         to each vertex)
+     * @return The radius coordinate of the bounding hex (distance from the center to each vertex)
      */
     public double getRadius() {
         return regionHex.radius;
     }
 
     /**
-     * Sets the center of the region's bounding hex and recalculates the faction
-     * borders
-     * if it has moved.
+     * Sets the center of the region's bounding hex and recalculates the faction borders if it has moved.
      *
      * @param x The x coordinate of the center of the region
      * @param y The y coordinate of the center of the region
@@ -159,9 +151,8 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Sets the size of the region's bounding hex and recalculates the faction
-     * borders if it has changed.
-     * Any value less than zero will include the entire map.
+     * Sets the size of the region's bounding hex and recalculates the faction borders if it has changed. Any value less
+     * than zero will include the entire map.
      *
      * @param radius The distance from the center of the hex to each vertex.
      */
@@ -183,7 +174,7 @@ public class FactionBorderTracker {
      */
     public synchronized void setDate(LocalDate when) {
         invalid |= now.plusDays(dayThreshold).isAfter(when)
-                || now.minusDays(dayThreshold).isBefore(when);
+                         || now.minusDays(dayThreshold).isBefore(when);
         now = when;
         recalculate();
     }
@@ -196,16 +187,12 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Retrieves a {@code Set} of all factions that control at least one planet in
-     * the region.
-     *
-     * If the borders are being recalculated, this method may block until the
-     * calculation is complete.
-     * If the change that caused the borders to be recalculated are under the time
-     * or distance thresholds,
-     * the return value will be current if it has already been calculated, otherwise
-     * it will be the value
-     * determined by the last completed recalculation.
+     * Retrieves a {@code Set} of all factions that control at least one planet in the region.
+     * <p>
+     * If the borders are being recalculated, this method may block until the calculation is complete. If the change
+     * that caused the borders to be recalculated are under the time or distance thresholds, the return value will be
+     * current if it has already been calculated, otherwise it will be the value determined by the last completed
+     * recalculation.
      *
      * @return A {@code Set} of the factions present in the region
      *
@@ -226,20 +213,16 @@ public class FactionBorderTracker {
 
     /**
      * Retrieves a FactionBorders object for the given faction.
-     *
-     * If the borders are being recalculated, this method may block until the
-     * calculation is complete.
-     * If the change that caused the borders to be recalculated are under the time
-     * or distance thresholds,
-     * the return value will be current if it has already been calculated, otherwise
-     * it will be the value
-     * determined by the last completed recalculation.
-     * recalculation.
+     * <p>
+     * If the borders are being recalculated, this method may block until the calculation is complete. If the change
+     * that caused the borders to be recalculated are under the time or distance thresholds, the return value will be
+     * current if it has already been calculated, otherwise it will be the value determined by the last completed
+     * recalculation. recalculation.
      *
      * @param f A faction
-     * @return A {@link FactionBorders} instance for the faction, or null if the
-     *         faction does not control
-     *         any systems in the region's bounding hex
+     *
+     * @return A {@link FactionBorders} instance for the faction, or null if the faction does not control any systems in
+     *       the region's bounding hex
      *
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
@@ -257,20 +240,16 @@ public class FactionBorderTracker {
 
     /**
      * Retrieves a FactionBorders object for the given faction.
-     *
-     * If the borders are being recalculated, this method may block until the
-     * calculation is complete.
-     * If the change that caused the borders to be recalculated are under the time
-     * or distance thresholds,
-     * the return value will be current if it has already been calculated, otherwise
-     * it will be the value
-     * determined by the last completed recalculation.
-     * recalculation.
+     * <p>
+     * If the borders are being recalculated, this method may block until the calculation is complete. If the change
+     * that caused the borders to be recalculated are under the time or distance thresholds, the return value will be
+     * current if it has already been calculated, otherwise it will be the value determined by the last completed
+     * recalculation. recalculation.
      *
      * @param fKey A faction key
-     * @return A {@link FactionBorders} instance for the faction, or null if the
-     *         faction does not control
-     *         any systems in the region's bounding hex or the key is invalid
+     *
+     * @return A {@link FactionBorders} instance for the faction, or null if the faction does not control any systems in
+     *       the region's bounding hex or the key is invalid
      *
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
@@ -288,28 +267,21 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Retrieves list of all planets controlled by one faction that are within a set
-     * distance of planets
-     * controlled by another faction, all within the defined region. The distance
-     * used to determine the
-     * border size is the larger of {@link #getBorderSize(Faction)} for the two
-     * factions.
-     *
-     * If the borders are being recalculated, this method may block until the
-     * calculation is complete.
-     * If the change that caused the borders to be recalculated are under the time
-     * or distance thresholds,
-     * the return value will be current if it has already been calculated, otherwise
-     * it will be the value
-     * determined by the last completed recalculation.
+     * Retrieves list of all planets controlled by one faction that are within a set distance of planets controlled by
+     * another faction, all within the defined region. The distance used to determine the border size is the larger of
+     * {@link #getBorderSize(Faction)} for the two factions.
+     * <p>
+     * If the borders are being recalculated, this method may block until the calculation is complete. If the change
+     * that caused the borders to be recalculated are under the time or distance thresholds, the return value will be
+     * current if it has already been calculated, otherwise it will be the value determined by the last completed
+     * recalculation.
      *
      * @param self  The faction whose planets are used to test proximity
-     * @param other The faction whose planets are added to the returned {@code List}
-     *              if they are within a certain
+     * @param other The faction whose planets are added to the returned {@code List} if they are within a certain
      *              distance.
-     * @return A List of all planets in the region that are controlled by
-     *         {@code other} that are considered
-     *         to be within the border region.
+     *
+     * @return A List of all planets in the region that are controlled by {@code other} that are considered to be within
+     *       the border region.
      *
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
@@ -324,18 +296,14 @@ public class FactionBorderTracker {
         }
 
         return (borderSystems.containsKey(self) && borderSystems.get(self).containsKey(other))
-                ? borderSystems.get(self).get(other)
-                : Collections.emptyList();
+                     ? borderSystems.get(self).get(other)
+                     : Collections.emptyList();
     }
 
     /**
-     * Sets the distance threshold for blocking recalculations. If the size or
-     * position of the
-     * bounding hex is changed by more than this distance, methods that access
-     * calculated border
-     * data will block until the calculation is complete. Any distance less than
-     * this is considered
-     * close enough that the previous data is accurate enough.
+     * Sets the distance threshold for blocking recalculations. If the size or position of the bounding hex is changed
+     * by more than this distance, methods that access calculated border data will block until the calculation is
+     * complete. Any distance less than this is considered close enough that the previous data is accurate enough.
      *
      * @param distance A distance in light years
      */
@@ -344,13 +312,9 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Retrieves the distance threshold for blocking recalculations. If the size or
-     * position of the
-     * bounding hex is changed by more than this distance, methods that access
-     * calculated border
-     * data will block until the calculation is complete. Any distance less than
-     * this is considered
-     * close enough that the previous data is accurate enough.
+     * Retrieves the distance threshold for blocking recalculations. If the size or position of the bounding hex is
+     * changed by more than this distance, methods that access calculated border data will block until the calculation
+     * is complete. Any distance less than this is considered close enough that the previous data is accurate enough.
      *
      * @return The distance in light years
      */
@@ -359,13 +323,9 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Sets the time threshold for blocking recalculations. If the campaign date
-     * changes by more than
-     * this in either direction, methods that access calculated border data will
-     * block until the
-     * calculation is complete. Any distance less than this is considered close
-     * enough that the
-     * previous data is accurate enough.
+     * Sets the time threshold for blocking recalculations. If the campaign date changes by more than this in either
+     * direction, methods that access calculated border data will block until the calculation is complete. Any distance
+     * less than this is considered close enough that the previous data is accurate enough.
      *
      * @param days A number of days
      */
@@ -374,26 +334,20 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Retrieves the time threshold for blocking recalculations. If the campaign
-     * date changes by more than
-     * this in either direction, methods that access calculated border data will
-     * block until the
-     * calculation is complete. Any distance less than this is considered close
-     * enough that the
-     * previous data is accurate enough.
+     * Retrieves the time threshold for blocking recalculations. If the campaign date changes by more than this in
+     * either direction, methods that access calculated border data will block until the calculation is complete. Any
+     * distance less than this is considered close enough that the previous data is accurate enough.
      */
     public int getDayThreshold() {
         return dayThreshold;
     }
 
     /**
-     * The distance from a faction's borders to check for neighboring foreign
-     * planets. This defaults
-     * to a set value depending on whether the faction is IS, Clan, or Periphery,
-     * but can be set
-     * for factions individually.
+     * The distance from a faction's borders to check for neighboring foreign planets. This defaults to a set value
+     * depending on whether the faction is IS, Clan, or Periphery, but can be set for factions individually.
      *
      * @param f A faction
+     *
      * @return The distance in light years to look for neighboring foreign planets.
      *
      * @see #getDefaultBorderSize(Faction)
@@ -403,13 +357,11 @@ public class FactionBorderTracker {
     }
 
     /**
-     * The default distance from a faction's borders to check for neighboring
-     * foreign planets. This
-     * is the value that is used if a specific value has not be set, and is based on
-     * whether the
-     * faction is IS, Clan, or Periphery.
+     * The default distance from a faction's borders to check for neighboring foreign planets. This is the value that is
+     * used if a specific value has not be set, and is based on whether the faction is IS, Clan, or Periphery.
      *
      * @param f A faction
+     *
      * @return The distance in light years to look for neighboring foreign planets.
      */
     public double getDefaultBorderSize(Faction f) {
@@ -423,13 +375,11 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Sets the distance from a faction's borders to check for neighboring foreign
-     * planets. This
-     * overrides the default distance for this faction.
+     * Sets the distance from a faction's borders to check for neighboring foreign planets. This overrides the default
+     * distance for this faction.
      *
      * @param faction    A faction
-     * @param borderSize The distance in light years to look for neighboring foreign
-     *                   planets.
+     * @param borderSize The distance in light years to look for neighboring foreign planets.
      *
      * @see #setDefaultBorderSize(double, double, double)
      */
@@ -442,11 +392,8 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Sets the default border size for IS, Periphery, and Clan factions. This value
-     * will be used
-     * as the distance from a faction's borders to check for neighboring foreign
-     * planets unless a
-     * specific value is provided for this faction.
+     * Sets the default border size for IS, Periphery, and Clan factions. This value will be used as the distance from a
+     * faction's borders to check for neighboring foreign planets unless a specific value is provided for this faction.
      *
      * @param is        Default border size for Inner Sphere factions
      * @param periphery Default border size for Periphery factions
@@ -459,9 +406,7 @@ public class FactionBorderTracker {
     }
 
     /**
-     * Recalculates planetary borders as a background task, after first canceling
-     * any that are currently
-     * running.
+     * Recalculates planetary borders as a background task, after first canceling any that are currently running.
      */
     private void recalculate() {
         cancelTask = true;
@@ -478,9 +423,8 @@ public class FactionBorderTracker {
     }
 
     /**
-     * The task that checks all planets within the region and notes which are
-     * controlled by which factions
-     * and which are within a certain distance of another faction's systems.
+     * The task that checks all planets within the region and notes which are controlled by which factions and which are
+     * within a certain distance of another faction's systems.
      */
     private synchronized void rebuildBorderData() {
         cancelTask = false;
@@ -490,7 +434,7 @@ public class FactionBorderTracker {
             Set<Faction> oldFactions = new HashSet<>(borders.keySet());
             for (PlanetarySystem system : getSystemList()) {
                 if ((regionHex.radius < 0)
-                        || regionHex.contains(system.getX(), system.getY())) {
+                          || regionHex.contains(system.getX(), system.getY())) {
                     systemList.add(system);
                     factionSet.addAll(system.getFactionSet(now));
                 }
@@ -536,9 +480,8 @@ public class FactionBorderTracker {
     }
 
     /**
-     * If this instance has been registered with the event bus, listens for new day
-     * events and
-     * starts the recalculation process.
+     * If this instance has been registered with the event bus, listens for new day events and starts the recalculation
+     * process.
      *
      * @param event The event
      */
@@ -546,21 +489,20 @@ public class FactionBorderTracker {
     public synchronized void handleNewDayEvent(NewDayEvent event) {
         now = event.getCampaign().getLocalDate();
         invalid |= now.minusDays(dayThreshold).isAfter(lastUpdate)
-                || now.plusDays(dayThreshold).isBefore(lastUpdate);
+                         || now.plusDays(dayThreshold).isBefore(lastUpdate);
 
         PlanetarySystem loc = event.getCampaign().getLocation().getCurrentSystem();
         if (!regionHex.isCenter(loc.getX(), loc.getY())) {
             invalid |= (distanceThreshold > 0)
-                    && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
+                             && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
             regionHex.setCenter(loc.getX(), loc.getY());
         }
         recalculate();
     }
 
     /**
-     * If this instance has been registered with the event bus, listens for location
-     * change events
-     * and starts the recalculation thread.
+     * If this instance has been registered with the event bus, listens for location change events and starts the
+     * recalculation thread.
      *
      * @param event The event
      */
@@ -570,7 +512,7 @@ public class FactionBorderTracker {
             PlanetarySystem loc = event.getLocation().getCurrentSystem();
             if (!regionHex.isCenter(loc.getX(), loc.getY())) {
                 invalid |= (distanceThreshold > 0)
-                        && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
+                                 && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
                 regionHex.setCenter(loc.getX(), loc.getY());
             }
             recalculate();
@@ -625,7 +567,7 @@ public class FactionBorderTracker {
 
         boolean contains(double x, double y) {
             if ((x < vertices[LEFT_MID][0]) || (x > vertices[RIGHT_MID][0])
-                    || (y > vertices[LEFT_TOP][1]) || (y < vertices[LEFT_BOTTOM][1])) {
+                      || (y > vertices[LEFT_TOP][1]) || (y < vertices[LEFT_BOTTOM][1])) {
                 return false;
             }
             if ((x >= vertices[LEFT_TOP][0]) && (x <= vertices[RIGHT_TOP][0])) {
@@ -656,7 +598,7 @@ public class FactionBorderTracker {
 
         boolean isCenter(double x, double y) {
             return (Math.abs(vertices[LEFT_MID][1]) - y < 0.001)
-                    && (Math.abs((vertices[LEFT_MID][0] + vertices[RIGHT_MID][0]) / 2.0 - x) < 0.001);
+                         && (Math.abs((vertices[LEFT_MID][0] + vertices[RIGHT_MID][0]) / 2.0 - x) < 0.001);
         }
     }
 }

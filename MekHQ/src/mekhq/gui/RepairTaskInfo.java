@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -31,7 +36,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -42,8 +46,8 @@ import javax.swing.border.LineBorder;
 import mekhq.IconPackage;
 
 /**
- * A specialized JPanel wrapper for repair tasks. This is different from
- * BasicInfo due to the need for an extra image on the right side.
+ * A specialized JPanel wrapper for repair tasks. This is different from BasicInfo due to the need for an extra image on
+ * the right side.
  *
  * @author Cord Awtry (kipstafoo)
  */
@@ -95,7 +99,7 @@ public class RepairTaskInfo extends JPanel {
 
     public void highlightBorder() {
         this.setBorder(new LineBorder(
-                UIManager.getColor("Tree.selectionBorderColor"), 4, true));
+              UIManager.getColor("Tree.selectionBorderColor"), 4, true));
     }
 
     public void unhighlightBorder() {

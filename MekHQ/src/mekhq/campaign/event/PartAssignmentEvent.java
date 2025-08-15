@@ -24,18 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.event;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 
-import megamek.common.annotations.Nullable;
-
 /**
- * Triggered when a part is assigned to a tech for repair. If getTech() == null, the tech has
- * been removed from the assignment.
- *
+ * Triggered when a part is assigned to a tech for repair. If getTech() == null, the tech has been removed from the
+ * assignment.
  */
 public class PartAssignmentEvent extends PartChangedEvent {
 

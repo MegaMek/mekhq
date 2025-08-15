@@ -24,43 +24,47 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.codeUtilities.ObjectUtility;
-import megamek.logging.MMLogger;
+import static megamek.common.Compute.randomInt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
-import static megamek.common.Compute.randomInt;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.logging.MMLogger;
 
 /**
  * Represents blood groups and their genetic inheritance logic in the MekHQ campaign system.
  *
  * <p>
- * This enum defines blood groups with their associated probabilities of occurrence, Rh Factor,
- * genetic composition (alleles), and utility methods for determining inherited blood groups
- * and localized labels. BloodGroup is designed to model real-world blood group inheritance and
- * probability.
+ * This enum defines blood groups with their associated probabilities of occurrence, Rh Factor, genetic composition
+ * (alleles), and utility methods for determining inherited blood groups and localized labels. BloodGroup is designed to
+ * model real-world blood group inheritance and probability.
  * </p>
  */
 public enum BloodGroup {
-    AA_POSITIVE(7,  true,  Allele.A, Allele.A),
-    AA_NEGATIVE(1,  false, Allele.A, Allele.A),
-    AO_POSITIVE(27, true,  Allele.A, Allele.O),
-    AO_NEGATIVE(5,  false, Allele.A, Allele.O),
+    AA_POSITIVE(7, true, Allele.A, Allele.A),
+    AA_NEGATIVE(1, false, Allele.A, Allele.A),
+    AO_POSITIVE(27, true, Allele.A, Allele.O),
+    AO_NEGATIVE(5, false, Allele.A, Allele.O),
 
-    AB_POSITIVE(4,  true,  Allele.A, Allele.B),
-    AB_NEGATIVE(1,  false, Allele.A, Allele.B),
+    AB_POSITIVE(4, true, Allele.A, Allele.B),
+    AB_NEGATIVE(1, false, Allele.A, Allele.B),
 
-    BB_POSITIVE(1,  true,  Allele.B, Allele.B),
-    BB_NEGATIVE(1,  false, Allele.B, Allele.B),
-    BO_POSITIVE(9,  true,  Allele.B, Allele.O),
-    BO_NEGATIVE(1,  false, Allele.B, Allele.O),
+    BB_POSITIVE(1, true, Allele.B, Allele.B),
+    BB_NEGATIVE(1, false, Allele.B, Allele.B),
+    BO_POSITIVE(9, true, Allele.B, Allele.O),
+    BO_NEGATIVE(1, false, Allele.B, Allele.O),
 
-    OO_POSITIVE(37, true,  Allele.O, Allele.O),
-    OO_NEGATIVE(6,  false, Allele.O, Allele.O);
+    OO_POSITIVE(37, true, Allele.O, Allele.O),
+    OO_NEGATIVE(6, false, Allele.O, Allele.O);
 
     private final int chance;  // Represents the probability of occurrence for the blood group.
     private final boolean hasPositiveRhFactor;  // Indicates if the blood group has a positive Rh factor.
@@ -69,9 +73,9 @@ public enum BloodGroup {
     /**
      * Constructor to initialize the blood group.
      *
-     * @param chance the chance of occurrence of this blood group.
+     * @param chance              the chance of occurrence of this blood group.
      * @param hasPositiveRhFactor {@code true} if the blood group has a positive Rh factor, {@code false} otherwise.
-     * @param alleles the alleles that define the genetic composition of the blood group.
+     * @param alleles             the alleles that define the genetic composition of the blood group.
      */
     BloodGroup(int chance, boolean hasPositiveRhFactor, Allele... alleles) {
         this.chance = chance;
@@ -79,7 +83,8 @@ public enum BloodGroup {
         this.alleles = List.of(alleles);  // Store alleles as an immutable list.
     }
 
-    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();;
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
+    ;
 
     /**
      * Gets the chance value for this blood group.
@@ -138,41 +143,43 @@ public enum BloodGroup {
     }
 
     /**
-     * Determines the inherited blood group of a child based on the blood groups of the mother and
-     * the father. This is determined by randomly selecting an allele from each parent's blood group
-     * and accounting for whether the Rh factor is positive or negative.
+     * Determines the inherited blood group of a child based on the blood groups of the mother and the father. This is
+     * determined by randomly selecting an allele from each parent's blood group and accounting for whether the Rh
+     * factor is positive or negative.
      *
      * @param motherBloodGroup The blood group of the mother.
      * @param fatherBloodGroup The blood group of the father.
+     *
      * @return The resulting {@link BloodGroup} inherited by the child.
      *
-     * <p>The inheritance is calculated as follows:</p>
-     * <ul>
-     *     <li>An allele is randomly chosen from each parent's blood group using their genetic composition.</li>
-     *     <li>The Rh Factor is determined to be negative only if both parents have a negative Rh Factor.
-     *         Otherwise, it is positive (dominant).</li>
-     *     <li>The alleles are combined, and the resulting blood group is calculated based on standard
-     *         inheritance rules.</li>
-     * </ul>
-     *
-     * For example:
-     * <ul>
-     *     <li>If the mother's blood group is A_POSITIVE and the father's is B_NEGATIVE, the inherited blood
-     *         group may be AB_POSITIVE, AB_NEGATIVE, AO_POSITIVE, or AO_NEGATIVE.</li>
-     *     <li>If both parents have O_NEGATIVE, the child will always inherit OO_NEGATIVE (recessive).</li>
-     * </ul>
+     *       <p>The inheritance is calculated as follows:</p>
+     *       <ul>
+     *           <li>An allele is randomly chosen from each parent's blood group using their genetic composition.</li>
+     *           <li>The Rh Factor is determined to be negative only if both parents have a negative Rh Factor.
+     *               Otherwise, it is positive (dominant).</li>
+     *           <li>The alleles are combined, and the resulting blood group is calculated based on standard
+     *               inheritance rules.</li>
+     *       </ul>
+     *       <p>
+     *       For example:
+     *       <ul>
+     *           <li>If the mother's blood group is A_POSITIVE and the father's is B_NEGATIVE, the inherited blood
+     *               group may be AB_POSITIVE, AB_NEGATIVE, AO_POSITIVE, or AO_NEGATIVE.</li>
+     *           <li>If both parents have O_NEGATIVE, the child will always inherit OO_NEGATIVE (recessive).</li>
+     *       </ul>
      */
     public static BloodGroup getInheritedBloodGroup(BloodGroup motherBloodGroup, BloodGroup fatherBloodGroup) {
         Allele motherAllele = ObjectUtility.getRandomItem(motherBloodGroup.getAlleles());
         Allele fatherAllele = ObjectUtility.getRandomItem(fatherBloodGroup.getAlleles());
 
-        boolean inheritedRhFactorIsNegative = !motherBloodGroup.hasPositiveRhFactor() && !fatherBloodGroup.hasPositiveRhFactor();
+        boolean inheritedRhFactorIsNegative = !motherBloodGroup.hasPositiveRhFactor() &&
+                                                    !fatherBloodGroup.hasPositiveRhFactor();
 
         // Combine alleles to form a key for selecting the blood group
         String alleleKey = (motherAllele.name() + fatherAllele.name()).chars()
-              .sorted() // Sort allele characters alphabetically (e.g., "AB" or "AO")
-              .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-              .toString();
+                                 .sorted() // Sort allele characters alphabetically (e.g., "AB" or "AO")
+                                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                                 .toString();
 
         return switch (alleleKey) {
             case "AA" -> inheritedRhFactorIsNegative ? AA_NEGATIVE : AA_POSITIVE;
@@ -185,12 +192,12 @@ public enum BloodGroup {
     }
 
     /**
-     * Selects a random {@link BloodGroup} based on predefined probabilities for each blood group.
-     * The method generates a random integer (0-99) and uses the cumulative probability of all blood
-     * groups to determine which group is selected.
+     * Selects a random {@link BloodGroup} based on predefined probabilities for each blood group. The method generates
+     * a random integer (0-99) and uses the cumulative probability of all blood groups to determine which group is
+     * selected.
      *
-     * @return A randomly selected {@link BloodGroup} instance, weighted by its probability (chance).
-     * If an error occurs where probabilities do not sum to 100, it returns {@link BloodGroup#OO_POSITIVE}.
+     * @return A randomly selected {@link BloodGroup} instance, weighted by its probability (chance). If an error occurs
+     *       where probabilities do not sum to 100, it returns {@link BloodGroup#OO_POSITIVE}.
      */
     public static BloodGroup getRandomBloodGroup() {
         int roll = randomInt(100);
@@ -213,6 +220,7 @@ public enum BloodGroup {
      * Converts a string into a {@link BloodGroup}.
      *
      * @param text the string to convert. Expected to match blood group names or ordinal values.
+     *
      * @return the corresponding {@link BloodGroup} or defaults to {@code O_POSITIVE}.
      */
     public static BloodGroup fromString(String text) {

@@ -24,8 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
@@ -36,11 +49,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.utilities.MHQXMLUtility;
 
-import java.time.LocalDate;
-import java.util.*;
-
 /**
  * Track-level state object for a StratCon campaign.
+ *
  * @author NickAragua
  */
 @XmlRootElement(name = "campaignTrack")
@@ -138,8 +149,7 @@ public class StratconTrackState {
     }
 
     /**
-     * Used for serialization/deserialization.
-     * Do not manipulate directly, or things get unpleasant.
+     * Used for serialization/deserialization. Do not manipulate directly, or things get unpleasant.
      */
     @XmlElementWrapper(name = "trackScenarios")
     @XmlElement(name = "scenario")
@@ -152,8 +162,8 @@ public class StratconTrackState {
     }
 
     /**
-     * Adds a StratconScenario to this track. Assumes it already has some coordinates assigned,
-     * and a valid campaign scenario ID for its backing AtB scenario
+     * Adds a StratconScenario to this track. Assumes it already has some coordinates assigned, and a valid campaign
+     * scenario ID for its backing AtB scenario
      */
     public void addScenario(StratconScenario scenario) {
         scenarios.put(scenario.getCoords(), scenario);
@@ -242,12 +252,11 @@ public class StratconTrackState {
     }
 
     /**
-     * Convenience function that determines if there are any forces deployed to the given
-     * coordinates.
+     * Convenience function that determines if there are any forces deployed to the given coordinates.
      */
     public boolean areAnyForceDeployedTo(StratconCoords coords) {
         return getAssignedCoordForces().containsKey(coords) &&
-                !getAssignedCoordForces().get(coords).isEmpty();
+                     !getAssignedCoordForces().get(coords).isEmpty();
     }
 
     /**
@@ -308,7 +317,8 @@ public class StratconTrackState {
      */
     public void restoreReturnDates() {
         for (int forceID : getAssignedForceReturnDatesForStorage().keySet()) {
-            assignedForceReturnDates.put(forceID, MHQXMLUtility.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
+            assignedForceReturnDates.put(forceID,
+                  MHQXMLUtility.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
         }
     }
 
@@ -377,7 +387,8 @@ public class StratconTrackState {
     }
 
     /**
-     * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the board.
+     * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the
+     * board.
      */
     @Nullable
     public StratconCoords findClosestAlliedFacilityCoords(StratconCoords coords) {
@@ -399,8 +410,7 @@ public class StratconTrackState {
     }
 
     /**
-     * Returns (and possibly initializes, if necessary) a map between
-     * scenario IDs and stratcon scenario pointers
+     * Returns (and possibly initializes, if necessary) a map between scenario IDs and stratcon scenario pointers
      */
     public Map<Integer, StratconScenario> getBackingScenariosMap() {
         if (backingScenarioMap == null) {
@@ -414,8 +424,7 @@ public class StratconTrackState {
     }
 
     /**
-     * Returns (and possibly initializes, if necessary) a map between
-     * coordinates and strategic objectives
+     * Returns (and possibly initializes, if necessary) a map between coordinates and strategic objectives
      */
     public Map<StratconCoords, StratconStrategicObjective> getObjectivesByCoords() {
         if (specificStrategicObjectives == null) {
@@ -430,12 +439,13 @@ public class StratconTrackState {
 
     /**
      * Moves a strategic objectives from the source to the destination coordinates.
+     *
      * @return True if the operation succeeded, false if it failed
      */
     public boolean moveObjective(StratconCoords source, StratconCoords destination) {
         // safety: don't move it if it's not there; logic prevents two objectives in the same coords
         if (getObjectivesByCoords().containsKey(source) &&
-                !getObjectivesByCoords().containsKey(destination)) {
+                  !getObjectivesByCoords().containsKey(destination)) {
             StratconStrategicObjective objective = getObjectivesByCoords().get(source);
             // gotta get the cache
             getObjectivesByCoords().remove(source);
@@ -470,8 +480,7 @@ public class StratconTrackState {
      * how many of them have the ability to reveal the track, as determined by the facility's
      * {@link StratconFacility#getIncreaseScanRange()} method.</p>
      *
-     * @return an integer representing the total number of facilities on this track
-     *         that are actively revealing it.
+     * @return an integer representing the total number of facilities on this track that are actively revealing it.
      */
     public int getScanRangeIncrease() {
         int scanRange = 0;
@@ -484,8 +493,7 @@ public class StratconTrackState {
     }
 
     /**
-     * Count of all the scenario odds adjustments from facilities
-     * (and potentially other sources) on this track.
+     * Count of all the scenario odds adjustments from facilities (and potentially other sources) on this track.
      */
     public int getScenarioOddsAdjustment() {
         int accumulator = 0;

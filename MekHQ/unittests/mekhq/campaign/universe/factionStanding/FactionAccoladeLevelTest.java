@@ -32,14 +32,14 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.NO_ACCOLADE;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE_0;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class FactionAccoladeLevelTest {
     @Test
@@ -49,7 +49,12 @@ class FactionAccoladeLevelTest {
             int actual = accoladeLevel.getRecognition();
             int expected = ++lastRecognitionLevel;
             assertEquals(expected, actual,
-                    "Accolade level ordering for " + accoladeLevel + " is incorrect. Was " + actual + ", expected " + expected);
+                  "Accolade level ordering for " +
+                        accoladeLevel +
+                        " is incorrect. Was " +
+                        actual +
+                        ", expected " +
+                        expected);
             lastRecognitionLevel = actual;
         }
     }
@@ -66,7 +71,14 @@ class FactionAccoladeLevelTest {
             int lowerBound = lastRequiredStandingLevel;
             int upperBound = ++lastRequiredStandingLevel;
             assertTrue(actual == lowerBound || actual == upperBound,
-                    "Standing level ordering for " + accoladeLevel + " is incorrect. Was " + actual + ", expected " + lowerBound + " or " + upperBound);
+                  "Standing level ordering for " +
+                        accoladeLevel +
+                        " is incorrect. Was " +
+                        actual +
+                        ", expected " +
+                        lowerBound +
+                        " or " +
+                        upperBound);
             lastRequiredStandingLevel = actual;
         }
     }
@@ -77,6 +89,7 @@ class FactionAccoladeLevelTest {
         String name = accoladeLevel.name();
         String lookupName = accoladeLevel.getLookupName();
         boolean isValid = name.contains(lookupName);
-        assertTrue(isValid, "Lookup name for " + accoladeLevel + " is invalid. Was " + lookupName + ". It should contain " + name);
+        assertTrue(isValid,
+              "Lookup name for " + accoladeLevel + " is invalid. Was " + lookupName + ". It should contain " + name);
     }
 }

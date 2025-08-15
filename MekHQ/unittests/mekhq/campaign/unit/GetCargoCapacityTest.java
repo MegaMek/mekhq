@@ -55,9 +55,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * CargoCapacityTest is a test suite for verifying the cargo capacity calculations of different
- * entity types. It ensures that factoring accurately computes the cargo capacity in the state of
- * transport bays, mounted equipment, and damage to specific locations.
+ * CargoCapacityTest is a test suite for verifying the cargo capacity calculations of different entity types. It ensures
+ * that factoring accurately computes the cargo capacity in the state of transport bays, mounted equipment, and damage
+ * to specific locations.
  *
  * <p>The test primarily validates conditions where:</p>
  * <ul>
@@ -216,14 +216,14 @@ class CargoCapacityTest {
     }
 
     /**
-     * Creates an {@link Entity} from the given unit name by retrieving its information from the
-     * cache.
+     * Creates an {@link Entity} from the given unit name by retrieving its information from the cache.
      *
      * <p>If the unit cannot be found or loaded, appropriate error logging occurs, and {@code null}
      * is returned.
      * </p>
      *
      * @param unitName The name of the unit to retrieve and parse.
+     *
      * @return The {@link Entity} representing the unit, or {@code null} if the unit cannot be loaded.
      */
     private Entity createEntity(String unitName) {
@@ -254,7 +254,7 @@ class CargoCapacityTest {
      * <p>Mock {@link Person} crew members are added to satisfy crewing requirements.
      * Drivers, gunners, and vessel crew are set up as needed by the entity being tested.</p>
      *
-     * @param entity            The {@link Entity} whose cargo capacity is to be tested.
+     * @param entity             The {@link Entity} whose cargo capacity is to be tested.
      * @param expectedCargoTotal The expected total cargo capacity for the provided entity.
      */
     private void testCargoTotal(Entity entity, double expectedCargoTotal) {
@@ -322,20 +322,18 @@ class CargoCapacityTest {
     }
 
     /**
-     * CargoRecord is an immutable data class representing information about the cargo capacity of
-     * an entity. It contains the name of the entity, the cargo capacity from transport bays, the
-     * cargo capacity from other mounted equipment, and a utility method to calculate the total
-     * cargo capacity.
+     * CargoRecord is an immutable data class representing information about the cargo capacity of an entity. It
+     * contains the name of the entity, the cargo capacity from transport bays, the cargo capacity from other mounted
+     * equipment, and a utility method to calculate the total cargo capacity.
      *
-     * @param name             The name of the entity associated with the cargo.
-     * @param bayCargoCapacity The cargo capacity contributed by transport bays.
+     * @param name               The name of the entity associated with the cargo.
+     * @param bayCargoCapacity   The cargo capacity contributed by transport bays.
      * @param otherCargoCapacity The cargo capacity contributed by other mounted equipment.
      */
     public record CargoUnit(String name, double bayCargoCapacity, double otherCargoCapacity) {
 
         /**
-         * Calculates the total cargo capacity as the sum of {@code bayCargoCapacity} and
-         * {@code otherCargoCapacity}.
+         * Calculates the total cargo capacity as the sum of {@code bayCargoCapacity} and {@code otherCargoCapacity}.
          *
          * @return The total cargo capacity of the entity.
          */

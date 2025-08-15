@@ -25,22 +25,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.CriticalSlot;
 import megamek.common.IArmorState;
 import megamek.common.ProtoMek;
 import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -57,7 +61,8 @@ public class MissingProtoMekLocation extends MissingPart {
     }
 
 
-    public MissingProtoMekLocation(int loc, int tonnage, int structureType, boolean hasBooster, boolean quad, Campaign c) {
+    public MissingProtoMekLocation(int loc, int tonnage, int structureType, boolean hasBooster, boolean quad,
+          Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
@@ -70,7 +75,7 @@ public class MissingProtoMekLocation extends MissingPart {
             case ProtoMek.LOC_HEAD:
                 this.name = "ProtoMek Head";
                 break;
-                case ProtoMek.LOC_TORSO:
+            case ProtoMek.LOC_TORSO:
                 this.name = "ProtoMek Torso";
                 break;
             case ProtoMek.LOC_LARM:
@@ -170,10 +175,10 @@ public class MissingProtoMekLocation extends MissingPart {
         if (part instanceof ProtoMekLocation) {
             ProtoMekLocation mekLoc = (ProtoMekLocation) part;
             return mekLoc.getLoc() == loc
-                && mekLoc.getUnitTonnage() == getUnitTonnage()
-                && mekLoc.hasBooster() == booster
-                && (!isLeg() || mekLoc.forQuad() == forQuad);
-                //&& mekLoc.getStructureType() == structureType;
+                         && mekLoc.getUnitTonnage() == getUnitTonnage()
+                         && mekLoc.hasBooster() == booster
+                         && (!isLeg() || mekLoc.forQuad() == forQuad);
+            //&& mekLoc.getStructureType() == structureType;
         }
         return false;
     }
@@ -185,15 +190,17 @@ public class MissingProtoMekLocation extends MissingPart {
     @Override
     public @Nullable String checkFixable() {
         if (null == unit) {
-             return null;
-         }
+            return null;
+        }
         //there must be no usable equipment currently in the location
         //you can only salvage a location that has nothing left on it
         for (Part part : unit.getParts()) {
             if ((part.getLocation() == getLocation())
-                    && !(part instanceof MissingPart)
-                    && (!(part instanceof ProtoMekArmor) || ((ProtoMekArmor) part).getAmount() > 0)) {
-                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+                      && !(part instanceof MissingPart)
+                      && (!(part instanceof ProtoMekArmor) || ((ProtoMekArmor) part).getAmount() > 0)) {
+                return "Repairable parts in " +
+                             unit.getEntity().getLocationName(loc) +
+                             " must be salvaged or scrapped first. They can then be re-installed.";
             }
         }
         return null;

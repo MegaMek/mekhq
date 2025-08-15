@@ -1,9 +1,0 @@
-<StratconFacility>
-	<capturedDefinition>HostileDataCenter.xml</capturedDefinition>
-	<displayableName>Data Center</displayableName>
-	<facilityType>DataCenter</facilityType>
-	<owner>Allied</owner>
-	<increaseScanRange>true</increaseScanRange>
-    <userDescription><![CDATA[Increases the scan range of all friendly forces by 1.]]></userDescription>
-	<visible>true</visible>
-</StratconFacility>

@@ -55,8 +55,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class is a test class for the {@link UnresolvedStratConContactsNagDialog} class.
- * It contains tests for various scenarios related to the {@code nagUnresolvedContacts} method
+ * This class is a test class for the {@link UnresolvedStratConContactsNagDialog} class. It contains tests for various
+ * scenarios related to the {@code nagUnresolvedContacts} method
  */
 public class UnresolvedStratConContactsNagLogicTest {
     private Campaign campaign;
@@ -68,8 +68,8 @@ public class UnresolvedStratConContactsNagLogicTest {
     private StratconScenario stratconScenario1, stratconScenario2;
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {
@@ -99,7 +99,10 @@ public class UnresolvedStratConContactsNagLogicTest {
         when(contract.getStratconCampaignState()).thenReturn(stratconCampaignState);
         when(stratconCampaignState.getTracks()).thenReturn(List.of(track));
 
-        when(track.getScenarios()).thenReturn(Map.of(mockCoordinates1, stratconScenario1, mockCoordinates2, stratconScenario2));
+        when(track.getScenarios()).thenReturn(Map.of(mockCoordinates1,
+              stratconScenario1,
+              mockCoordinates2,
+              stratconScenario2));
         when(stratconScenario1.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
         when(stratconScenario2.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
         when(campaign.getLocalDate()).thenReturn(today);
