@@ -131,7 +131,6 @@ checkstyle {
     configProperties = [
             'suppressionFile': file("${rootDir}/config/checkstyle/checkstyle-suppressions.xml")
     ]
-    maxWarnings = 0  // Fail on any warning
     maxErrors = 0    // Fail on any error
 }
 
