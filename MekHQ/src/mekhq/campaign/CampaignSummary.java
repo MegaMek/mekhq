@@ -381,11 +381,11 @@ public class CampaignSummary {
         int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         StringBuilder hrCapacityReport = new StringBuilder().append(getHRStrain(campaign))
-                                                           .append(" / ")
-                                                           .append(campaign.getCampaignOptions()
-                                                                         .getHRCapacity() *
-                                                                         combinedSkillValues)
-                                                           .append(" personnel");
+                                               .append(" / ")
+                                               .append(campaign.getCampaignOptions()
+                                                             .getHRCapacity() *
+                                                             combinedSkillValues)
+                                               .append(" personnel");
 
         if (getHRStrainModifier(campaign) > 0) {
             hrCapacityReport.append(" (+").append(getHRStrainModifier(campaign)).append(')');

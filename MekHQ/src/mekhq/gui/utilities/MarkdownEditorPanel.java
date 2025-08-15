@@ -24,18 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import javax.swing.*;
 
 /**
- * This class implements a markdown editor that comes with buttons for common markup as well as a preview
- * tab for seeing what the results look like. It can be embedded as a panel in other components.
+ * This class implements a markdown editor that comes with buttons for common markup as well as a preview tab for seeing
+ * what the results look like. It can be embedded as a panel in other components.
+ *
  * @author Taharqa (Aaron Gullickson)
  */
 public class MarkdownEditorPanel extends JPanel {
@@ -61,8 +68,10 @@ public class MarkdownEditorPanel extends JPanel {
     public MarkdownEditorPanel() {
         this(null);
     }
+
     /**
      * Constructor for new MarkdownEditorPanel
+     *
      * @param title - a <code>String</code> to show up as the title of the editor at the top
      */
     public MarkdownEditorPanel(String title) {
@@ -104,7 +113,8 @@ public class MarkdownEditorPanel extends JPanel {
         btnBold.addActionListener(ev -> boldText());
         pnlButtons.add(btnBold);
 
-        btnItalic = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_italic_48px_352387.png")); // TODO : Remove inline file path
+        btnItalic = new JButton(new ImageIcon(
+              "data/images/misc/markdown_editor/iconfinder_ic_format_italic_48px_352387.png")); // TODO : Remove inline file path
         btnItalic.setToolTipText("Italicize");
         btnItalic.setPreferredSize(new Dimension(36, 36));
         btnItalic.addActionListener(ev -> italicizeText());
@@ -116,13 +126,15 @@ public class MarkdownEditorPanel extends JPanel {
         btnHR.addActionListener(ev -> insertHR());
         pnlButtons.add(btnHR);
 
-        btnUL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_bulleted_48px_352389.png")); // TODO : Remove inline file path
+        btnUL = new JButton(new ImageIcon(
+              "data/images/misc/markdown_editor/iconfinder_ic_format_list_bulleted_48px_352389.png")); // TODO : Remove inline file path
         btnUL.setToolTipText("Unordered list");
         btnUL.setPreferredSize(new Dimension(36, 36));
         btnUL.addActionListener(ev -> insertBullet(false));
         pnlButtons.add(btnUL);
 
-        btnOL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_numbered_48px_352390.png")); // TODO : Remove inline file path
+        btnOL = new JButton(new ImageIcon(
+              "data/images/misc/markdown_editor/iconfinder_ic_format_list_numbered_48px_352390.png")); // TODO : Remove inline file path
         btnOL.setToolTipText("Ordered list");
         btnOL.setPreferredSize(new Dimension(36, 36));
         btnOL.addActionListener(ev -> insertBullet(true));
@@ -132,7 +144,7 @@ public class MarkdownEditorPanel extends JPanel {
         btnQuestion.setToolTipText("More information");
         btnQuestion.setPreferredSize(new Dimension(36, 36));
         btnQuestion.addActionListener(ev -> JOptionPane.showMessageDialog(null,
-                "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>"));
+              "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>"));
         pnlButtons.add(btnQuestion);
 
         JPanel editorPanel = new JPanel(new BorderLayout());
@@ -148,7 +160,7 @@ public class MarkdownEditorPanel extends JPanel {
         tabPane.add("Preview", scrollViewer);
 
         tabPane.addChangeListener(e -> {
-            if (tabPane.getSelectedIndex()==1) {
+            if (tabPane.getSelectedIndex() == 1) {
                 viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
                 SwingUtilities.invokeLater(() -> scrollViewer.getVerticalScrollBar().setValue(0));
             }
@@ -177,8 +189,8 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * Set the text for the editor. This can be used when called up on existing text to initially
-     * fill the editor.
+     * Set the text for the editor. This can be used when called up on existing text to initially fill the editor.
+     *
      * @param text - a <code>String</code> of text to fill the editor with
      */
     public void setText(String text) {
@@ -188,6 +200,7 @@ public class MarkdownEditorPanel extends JPanel {
 
     /**
      * Get the text of the editor
+     *
      * @return <code>String</code> of the text in the editor
      */
     public String getText() {
@@ -195,8 +208,8 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * Insert bold (**) markup on the selection. If an existing word or phrase is highlighted, this will put
-     * the markup at either ends. Otherwise it will put an empty markup (****) with the cursor in the middle.
+     * Insert bold (**) markup on the selection. If an existing word or phrase is highlighted, this will put the markup
+     * at either ends. Otherwise it will put an empty markup (****) with the cursor in the middle.
      */
     private void boldText() {
         int start = editor.getSelectionStart();
@@ -212,8 +225,8 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * Insert italic (*) markup on the selection. If an existing word or phrase is highlighted, this will put
-     * the markup at either ends. Otherwise it will put an empty markup (**) with the cursor in the middle.
+     * Insert italic (*) markup on the selection. If an existing word or phrase is highlighted, this will put the markup
+     * at either ends. Otherwise it will put an empty markup (**) with the cursor in the middle.
      */
     private void italicizeText() {
         int start = editor.getSelectionStart();
@@ -230,6 +243,7 @@ public class MarkdownEditorPanel extends JPanel {
 
     /**
      * Insert a header (#) into the text at the currently selected start
+     *
      * @param level - the level of heading
      */
     private void insertHeader(int level) {
@@ -256,8 +270,9 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * Insert a bullet point into the text. To ensure it looks correct, the bullet point is surrounded
-     * by two carriage returns on either side.
+     * Insert a bullet point into the text. To ensure it looks correct, the bullet point is surrounded by two carriage
+     * returns on either side.
+     *
      * @param ordered - a <code>boolean</code> for whether the bullet point should be ordered or not.
      */
     private void insertBullet(boolean ordered) {
@@ -268,7 +283,7 @@ public class MarkdownEditorPanel extends JPanel {
         int start = editor.getSelectionStart();
         int end = editor.getSelectionEnd();
         editor.insert(toInsert, start);
-        if (start!=end) {
+        if (start != end) {
             editor.insert("\n\n", end + toInsert.length());
         }
         editor.setCaretPosition(start + toInsert.length());

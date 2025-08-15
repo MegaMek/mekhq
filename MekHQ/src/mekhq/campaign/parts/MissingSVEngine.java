@@ -24,29 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Aero;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.FuelType;
-import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Placeholder for an engine that has been destroyed or removed from a support
- * vehicle
+ * Placeholder for an engine that has been destroyed or removed from a support vehicle
  */
 public class MissingSVEngine extends MissingPart {
     private double engineTonnage;
@@ -67,18 +69,15 @@ public class MissingSVEngine extends MissingPart {
     /**
      * Creates a support vehicle engine part.
      *
-     * @param unitTonnage   The mass of the unit it is installed on/intended for, in
-     *                      tons.
+     * @param unitTonnage   The mass of the unit it is installed on/intended for, in tons.
      * @param engineTonnage The mass of the engine
      * @param etype         An {@link Engine} type constant
-     * @param techRating    The engine's tech rating, {@code TechRating.A} through
-     *                      {@code TechRating.F}
-     * @param fuelType      Needed to distinguish different types of internal
-     *                      combustion engines.
+     * @param techRating    The engine's tech rating, {@code TechRating.A} through {@code TechRating.F}
+     * @param fuelType      Needed to distinguish different types of internal combustion engines.
      * @param campaign      The campaign instance
      */
     public MissingSVEngine(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
-            FuelType fuelType, Campaign campaign) {
+          FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = engineTonnage;
         this.etype = etype;
@@ -175,10 +174,10 @@ public class MissingSVEngine extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part other, boolean refit) {
         return other instanceof SVEnginePart
-                && (engineTonnage == ((SVEnginePart) other).getEngineTonnage())
-                && (etype == ((SVEnginePart) other).getEType())
-                && (techRating == other.getTechRating())
-                && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).getFuelType()));
+                     && (engineTonnage == ((SVEnginePart) other).getEngineTonnage())
+                     && (etype == ((SVEnginePart) other).getEType())
+                     && (techRating == other.getTechRating())
+                     && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).getFuelType()));
     }
 
     @Override
@@ -190,7 +189,7 @@ public class MissingSVEngine extends MissingPart {
     @Override
     public Part getNewPart() {
         return new SVEnginePart(getUnitTonnage(), engineTonnage, etype, techRating,
-                fuelType, getCampaign());
+              fuelType, getCampaign());
     }
 
     @Override

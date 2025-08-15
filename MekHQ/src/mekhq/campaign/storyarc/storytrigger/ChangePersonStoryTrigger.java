@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storytrigger;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -37,10 +46,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.UUID;
 
 /**
  * A StoryTrigger that can change various characteristics of a Person
@@ -59,8 +64,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     private PersonnelStatus status;
 
     /**
-     * Boolean for whether Persons switched to inactive status also take any unit
-     * they are assigned to with them
+     * Boolean for whether Persons switched to inactive status also take any unit they are assigned to with them
      */
     boolean takeUnit = false;
 
@@ -89,8 +93,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     private String bloodname;
 
     /**
-     * A boolean indicator for whether the bloodname variable is a key to variable
-     * in the Story Arc
+     * A boolean indicator for whether the bloodname variable is a key to variable in the Story Arc
      */
     private boolean assignKeyBloodname = false;
 

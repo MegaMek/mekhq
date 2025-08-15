@@ -24,20 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storytrigger;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A StoryTrigger to change the value of a stored string variable in StoryArc.

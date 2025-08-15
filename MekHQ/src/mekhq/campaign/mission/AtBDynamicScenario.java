@@ -69,6 +69,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
+ *
  * @author NickAragua
  */
 public class AtBDynamicScenario extends AtBScenario {
@@ -148,7 +149,7 @@ public class AtBDynamicScenario extends AtBScenario {
         if (template != null) {
             for (ScenarioForceTemplate forceTemplate : template.getAllScenarioForces()) {
                 if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
-                        !playerForceTemplates.containsValue(forceTemplate)) {
+                          !playerForceTemplates.containsValue(forceTemplate)) {
                     playerForceTemplates.put(forceID, forceTemplate);
                     return;
                 }
@@ -160,7 +161,8 @@ public class AtBDynamicScenario extends AtBScenario {
 
     /**
      * Add a force to the scenario, explicitly linked to the given template.
-     * @param forceID ID of the force to add.
+     *
+     * @param forceID      ID of the force to add.
      * @param templateName Name of the force template.
      */
     public void addForce(int forceID, String templateName) {
@@ -206,7 +208,7 @@ public class AtBDynamicScenario extends AtBScenario {
         // and there's a player force template associated with the first force
         // then return the generated deployment zone associated with the first force
         if (!getForceIDs().isEmpty() &&
-                playerForceTemplates.containsKey(getForceIDs().get(0))) {
+                  playerForceTemplates.containsKey(getForceIDs().get(0))) {
             return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
         }
 
@@ -214,9 +216,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Horizontal map size.
-     * Unlike the AtBScenario, we only perform map size calculations once (once all primary forces are committed),
-     * so we don't re-calculate the map size each time.
+     * Horizontal map size. Unlike the AtBScenario, we only perform map size calculations once (once all primary forces
+     * are committed), so we don't re-calculate the map size each time.
      */
     @Override
     public int getMapX() {
@@ -224,9 +225,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Vertical map size.
-     * Unlike the AtBScenario, we only perform map size calculations once (once all primary forces are committed),
-     * so we don't re-calculate the map size each time.
+     * Vertical map size. Unlike the AtBScenario, we only perform map size calculations once (once all primary forces
+     * are committed), so we don't re-calculate the map size each time.
      */
     @Override
     public int getMapY() {
@@ -380,13 +380,13 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * This is used to indicate that player forces have been assigned to this scenario
-     * and that AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to
-     * generate opposing forces and their bots, apply any present scenario modifiers,
-     * set up deployment turns, calculate which units belong to which objectives, and many other things.
+     * This is used to indicate that player forces have been assigned to this scenario and that
+     * AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to generate opposing forces and
+     * their bots, apply any present scenario modifiers, set up deployment turns, calculate which units belong to which
+     * objectives, and many other things.
      * <p>
-     * Further "post-force-generation" modifiers can be applied to this scenario, but calling
-     * finalizeScenario() on it again will lead to "unsupported" behavior.
+     * Further "post-force-generation" modifiers can be applied to this scenario, but calling finalizeScenario() on it
+     * again will lead to "unsupported" behavior.
      * <p>
      * Can be called as a short hand way of telling "is this scenario ready to play".
      */
@@ -415,6 +415,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
     /**
      * Convenience method that returns the commander of the first force assigned to this scenario.
+     *
      * @return
      */
     public Person getLanceCommander(Campaign campaign) {
@@ -433,10 +434,12 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Convenience method to return the int value of the lance commander's skill in the specified area.
-     * Encapsulates a fairly obnoxious number of null checks and other safety code.
+     * Convenience method to return the int value of the lance commander's skill in the specified area. Encapsulates a
+     * fairly obnoxious number of null checks and other safety code.
+     *
      * @param skillType The type of skill to check
-     * @param campaign The campaign the lance commander is a part of
+     * @param campaign  The campaign the lance commander is a part of
+     *
      * @return The skill level. SKILL_NONE (0) if not present.
      */
     public int getLanceCommanderSkill(String skillType, Campaign campaign) {
@@ -444,7 +447,7 @@ public class AtBDynamicScenario extends AtBScenario {
         int skillValue = SkillType.SKILL_NONE;
 
         if ((commander != null) &&
-                commander.hasSkill(skillType)) {
+                  commander.hasSkill(skillType)) {
             skillValue = commander.getSkill(skillType)
                                .getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
         }
@@ -462,8 +465,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Adds a scenario modifier and any linked modifiers to this scenario,
-     * provided that the modifier exists and can be applied to the scenario (e.g. ground units on air map)
+     * Adds a scenario modifier and any linked modifiers to this scenario, provided that the modifier exists and can be
+     * applied to the scenario (e.g. ground units on air map)
      */
     public void addScenarioModifier(@Nullable AtBScenarioModifier modifier) {
         if (modifier == null) {
@@ -472,7 +475,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
         // the default is that this modifier is allowed to apply to any map
         if ((modifier.getAllowedMapLocations() != null) && !modifier.getAllowedMapLocations().isEmpty() &&
-                !modifier.getAllowedMapLocations().contains(getTemplate().mapParameters.getMapLocation())) {
+                  !modifier.getAllowedMapLocations().contains(getTemplate().mapParameters.getMapLocation())) {
             return;
         }
 
@@ -516,7 +519,7 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public String getScenarioTypeDescription() {
         return (getTemplate() != null) && (getTemplate().name != null) && !getTemplate().name.isBlank() ?
-                getTemplate().name : "Dynamic Scenario";
+                     getTemplate().name : "Dynamic Scenario";
     }
 
     @Override
@@ -531,15 +534,30 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((getTemplate() != null) && getStatus().isCurrent()) {
             getTemplate().Serialize(pw);
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "friendlyDelayedReinforcements", getFriendlyDelayedReinforcements());
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "effectivePlayerUnitCountMultiplier",
+                  getEffectivePlayerUnitCountMultiplier());
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "effectivePlayerBVMultiplier",
+                  getEffectivePlayerBVMultiplier());
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "friendlyReinforcementDelayReduction",
+                  getFriendlyReinforcementDelayReduction());
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "friendlyDelayedReinforcements",
+                  getFriendlyDelayedReinforcements());
             MHQXMLUtility.writeSimpleXMLTag(pw,
                   indent,
                   "friendlyInstantReinforcements",
                   getFriendlyInstantReinforcements());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "hostileReinforcementDelayReduction",
+                  getHostileReinforcementDelayReduction());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
 
@@ -553,8 +571,13 @@ public class AtBDynamicScenario extends AtBScenario {
                     MHQXMLUtility.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
 
                     BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
-                    pw.println(MHQXMLUtility.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
+                    MHQXMLUtility.writeSimpleXMLTag(pw,
+                          indent,
+                          PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT,
+                          benchedEntityData.templateName);
+                    pw.println(MHQXMLUtility.writeEntityToXmlString(benchedEntityData.entity,
+                          indent,
+                          Collections.emptyList()));
                     MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAP_ELEMENT);
                 }
 
@@ -568,7 +591,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
-            throws ParseException {
+          throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -614,7 +637,8 @@ public class AtBDynamicScenario extends AtBScenario {
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
                                 benchedEntityData.templateName = dataNode.getTextContent();
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ENTITY_ELEMENT)) {
-                                benchedEntityData.entity = MHQXMLUtility.parseSingleEntityMul((Element) dataNode, campaign);
+                                benchedEntityData.entity = MHQXMLUtility.parseSingleEntityMul((Element) dataNode,
+                                      campaign);
                             }
                         }
 
@@ -647,22 +671,21 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     /**
-     * Returns the total battle value (BV) either for allied forces or opposing forces in
-     * a given contract campaign, as per the parameter {@code isAllied}.
+     * Returns the total battle value (BV) either for allied forces or opposing forces in a given contract campaign, as
+     * per the parameter {@code isAllied}.
      * <p>
-     * If {@code isAllied} is {@code true}, the method calculates the total BV for the allied
-     * forces inclusive of player forces. If {@code isAllied} is {@code false}, the total BV for
-     * opposing forces is calculated.
+     * If {@code isAllied} is {@code true}, the method calculates the total BV for the allied forces inclusive of player
+     * forces. If {@code isAllied} is {@code false}, the total BV for opposing forces is calculated.
      * <p>
-     * The calculation is done based on Bot forces attributed to each side. In the case of
-     * PlanetOwner, the alignment of the owner faction is considered to determine the ownership of
-     * Bot forces.
+     * The calculation is done based on Bot forces attributed to each side. In the case of PlanetOwner, the alignment of
+     * the owner faction is considered to determine the ownership of Bot forces.
      *
-     * @param campaign  The campaign in which the forces are participating.
-     * @param isAllied  A boolean value indicating whether to calculate the total BV for
-     *                  allied forces (if true) or opposing forces (if false).
-     * @return          The total battle value (BV) either for the allied forces or
-     *                  opposing forces, as specified by the parameter isAllied.
+     * @param campaign The campaign in which the forces are participating.
+     * @param isAllied A boolean value indicating whether to calculate the total BV for allied forces (if true) or
+     *                 opposing forces (if false).
+     *
+     * @return The total battle value (BV) either for the allied forces or opposing forces, as specified by the
+     *       parameter isAllied.
      */
     public int getTeamTotalBattleValue(Campaign campaign, boolean isAllied) {
         AtBContract contract = getContract(campaign);
@@ -675,7 +698,9 @@ public class AtBDynamicScenario extends AtBScenario {
 
             if (team == PlanetOwner.ordinal()) {
                 String planetOwnerFaction = getPlanetOwnerFaction(contract, campaign.getLocalDate());
-                ForceAlignment forceAlignment = getPlanetOwnerAlignment(contract, planetOwnerFaction, campaign.getLocalDate());
+                ForceAlignment forceAlignment = getPlanetOwnerAlignment(contract,
+                      planetOwnerFaction,
+                      campaign.getLocalDate());
                 team = forceAlignment.ordinal();
             }
 
