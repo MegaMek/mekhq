@@ -258,7 +258,7 @@ public class Force {
     }
 
     /**
-     * Set scenario ID (e.g. deploy to scenario) for a force and all of its subforces and units
+     * Set scenario ID (e.g. deploy to scenario) for a force and all of its subForces and units
      *
      * @param scenarioId scenario to deploy to
      * @param campaign   campaign - required to update units
@@ -431,7 +431,7 @@ public class Force {
     /**
      * @param standardForcesOnly to only include combat forces or to also include support forces
      *
-     * @return all the unit ids in this force and all of its subforces
+     * @return all the unit ids in this force and all of its subForces
      */
     public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
         Vector<UUID> allUnits = new Vector<>();
@@ -796,11 +796,11 @@ public class Force {
         }
 
         if (!subForces.isEmpty()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "subForces");
             for (Force sub : subForces) {
                 sub.writeToXML(pw1, indent);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "subForces");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "force");
     }
@@ -845,7 +845,7 @@ public class Force {
                     force.forceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     processUnitNodes(force, wn2, version);
-                } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("subForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -997,7 +997,7 @@ public class Force {
     }
 
     /**
-     * Calculates the unit type most represented in this force and all subforces.
+     * Calculates the unit type most represented in this force and all subForces.
      *
      * @param campaign Working campaign
      *
@@ -1062,7 +1062,7 @@ public class Force {
     }
 
     /**
-     * Populates the formation levels of a force hierarchy starting from the origin force. For all subforces of the
+     * Populates the formation levels of a force hierarchy starting from the origin force. For all subForces of the
      * given force, it sets the formation level to one level lower than the current level. If the resulting formation
      * level is below the lower boundary determined by available formation level enums, it sets the formation level to
      * INVALID.
