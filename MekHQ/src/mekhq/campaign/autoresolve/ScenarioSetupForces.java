@@ -71,6 +71,7 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * This class is responsible for setting up the forces for a scenario
+ *
  * @author Luana Coppio
  */
 public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces {
@@ -85,12 +86,12 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
     private final Game dummyGame;
 
     public ScenarioSetupForces(Campaign campaign, List<Unit> units, SCENARIO scenario,
-                               ForceConsolidation forceConsolidationMethod) {
+          ForceConsolidation forceConsolidationMethod) {
         this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
     }
 
     public ScenarioSetupForces(Campaign campaign, List<Unit> units, SCENARIO scenario,
-                               ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
+          ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         this.campaign = campaign;
         this.dummyGame = campaign.getGame();
         this.units = units;
@@ -146,11 +147,9 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
     }
 
     /**
-     * Convert the forces in the game to formations, this is the most important step
-     * in the setup of the game,
-     * it converts every top level force into a single formation, and those
-     * formations are then added to the game
-     * and used in the auto resolve in place of the original entities
+     * Convert the forces in the game to formations, this is the most important step in the setup of the game, it
+     * converts every top level force into a single formation, and those formations are then added to the game and used
+     * in the auto resolve in place of the original entities
      *
      * @param game The game object to convert the forces in
      */
@@ -165,7 +164,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
             } catch (Exception e) {
                 Sentry.captureException(e);
                 var entities = game.getForces().getFullEntities(force).stream().filter(Entity.class::isInstance)
-                        .map(Entity.class::cast).toList();
+                                     .map(Entity.class::cast).toList();
                 LOGGER.error("Error converting force to formation {} - {}", force, entities, e);
                 throw new FailedToConvertForceToFormationException(e);
             }
@@ -173,8 +172,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
     }
 
     /**
-     * Setup the player, its forces and entities in the game, it also sets the
-     * player skill level.
+     * Setup the player, its forces and entities in the game, it also sets the player skill level.
      *
      * @param game The game object to setup the player in
      */
@@ -196,8 +194,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
     }
 
     /**
-     * Setup the bots, their forces and entities in the game, it also sets the
-     * player skill level.
+     * Setup the bots, their forces and entities in the game, it also sets the player skill level.
      *
      * @param game The game object to setup the bots in
      */
@@ -236,8 +233,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
     }
 
     /**
-     * Create a player object from the campaign and scenario wichi doesnt have a
-     * reference to the original player
+     * Create a player object from the campaign and scenario wichi doesnt have a reference to the original player
      *
      * @return The clean player object
      */
@@ -268,6 +264,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
      * Setup the player forces and entities for the game
      *
      * @param player The player object to setup the forces for
+     *
      * @return A list of entities for the player
      */
     private List<Entity> setupPlayerForces(Player player) {
@@ -300,6 +297,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
 
     protected interface EntitySource {
         Iterable<?> getSources();
+
         Entity setupEntity(Player player, Object source, boolean useDropship);
     }
 
@@ -330,7 +328,9 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
 
     /**
      * Move the entity by copying it, this is used to break references to the original instance
+     *
      * @param entity The entity to copy
+     *
      * @return The copied entity
      */
     protected Entity moveByCopy(Entity entity) {
@@ -343,7 +343,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
                     byte[] serializedData = byteArrayOutputStream.toByteArray();
 
                     // Deserialize to create new instances
-                    try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData)) {
+                    try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData)) {
                         try (ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
                             return (Entity) objectInputStream.readObject();
                         }
@@ -414,6 +414,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
 
     /**
      * Check if using dropships for patrol scenario
+     *
      * @return True if using dropships under specific conditions, false otherwise
      */
     private boolean isUsingDropship() {
@@ -462,6 +463,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
      * @param bot              The bot player object
      * @param originalEntities The original entities for the bot
      * @param deployRound      The deployment round for the bot
+     *
      * @return A list of entities for the bot
      */
     private List<Entity> setupBotEntities(Player bot, List<Entity> originalEntities, int deployRound) {
@@ -549,6 +551,6 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
 
         // Give the unit a spotlight, if it has the spotlight quirk
         entity.setExternalSearchlight(entity.hasExternalSearchlight()
-                || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
+                                            || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
     }
 }

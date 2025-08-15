@@ -24,36 +24,41 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.enums;
-
-import mekhq.MekHQ;
-import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
-import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
+import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
+import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import org.junit.jupiter.api.Test;
+
 public class UnitMarketMethodTest {
     //region Variable Declarations
     private static final UnitMarketMethod[] methods = UnitMarketMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("UnitMarketMethod.NONE.toolTipText"),
-                UnitMarketMethod.NONE.getToolTipText());
+              UnitMarketMethod.NONE.getToolTipText());
         assertEquals(resources.getString("UnitMarketMethod.ATB_MONTHLY.toolTipText"),
-                UnitMarketMethod.ATB_MONTHLY.getToolTipText());
+              UnitMarketMethod.ATB_MONTHLY.getToolTipText());
     }
     //endregion Getters
 
@@ -90,8 +95,8 @@ public class UnitMarketMethodTest {
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("UnitMarketMethod.NONE.text"),
-                UnitMarketMethod.NONE.toString());
+              UnitMarketMethod.NONE.toString());
         assertEquals(resources.getString("UnitMarketMethod.ATB_MONTHLY.text"),
-                UnitMarketMethod.ATB_MONTHLY.toString());
+              UnitMarketMethod.ATB_MONTHLY.toString());
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,29 +24,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts.utilities;
 
+import java.util.List;
+
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
+import megamek.common.BattleArmor;
+import megamek.common.Entity;
+import megamek.common.MULParser;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.battlevalue.BVCalculator;
 import megamek.common.battlevalue.BattleArmorBVCalculator;
 import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;
 
-import java.util.List;
-
 /**
- * Battle Armor Suits and Missing Battle Armor Suits do not
- * track enough information to determine if two suits with
- * same chassis but different model names are actually the
- * same - for example, an Elemental [Flamer](Sqd5) suit being
- * used for Elemental [Flamer](Sqd3). This utility class will
- * look up a BA part's corresponding entity and can be used
- * to get the information needed for the part/missing part
- * to make the comparison.
+ * Battle Armor Suits and Missing Battle Armor Suits do not track enough information to determine if two suits with same
+ * chassis but different model names are actually the same - for example, an Elemental [Flamer](Sqd5) suit being used
+ * for Elemental [Flamer](Sqd3). This utility class will look up a BA part's corresponding entity and can be used to get
+ * the information needed for the part/missing part to make the comparison.
  *
  * @see mekhq.campaign.parts.MissingBattleArmorSuit
  * @see mekhq.campaign.parts.BattleArmorSuit
@@ -68,6 +74,7 @@ public class BattleArmorSuitUtility {
 
     /**
      * The entity might be null if there was an exception.
+     *
      * @return true if the entity exists, false if the entity is null
      */
     public boolean hasEntity() {
@@ -76,6 +83,7 @@ public class BattleArmorSuitUtility {
 
     /**
      * The same BA chassis in different sizes should have the same suit BV
+     *
      * @return int BV of the individual BA suit
      */
     public int getBattleArmorSuitBV() {
@@ -83,10 +91,10 @@ public class BattleArmorSuitUtility {
     }
 
     /**
-     * The same BA chassis in different sizes should have the same weapon
-     * type list hash. It's hashed because we don't actually care about
-     * the details, we just need to compare if two BA entities have the same
-     * weapons. This should do that.
+     * The same BA chassis in different sizes should have the same weapon type list hash. It's hashed because we don't
+     * actually care about the details, we just need to compare if two BA entities have the same weapons. This should do
+     * that.
+     *
      * @return int the list of weapon types this BA entity has, hashed
      */
     public int getWeaponTypeListHash() {
@@ -110,9 +118,9 @@ public class BattleArmorSuitUtility {
     }
 
     /**
-     * Parts don't store their entity. We can look it up in the same way that
-     * the MUL parser does, using the chassis and model. This is based on the
-     * MULParser's implementation.
+     * Parts don't store their entity. We can look it up in the same way that the MUL parser does, using the chassis and
+     * model. This is based on the MULParser's implementation.
+     *
      * @see MULParser#getEntity(String, String)
      */
     private static Entity getEntity(String chassis, @Nullable String model) {
@@ -134,7 +142,8 @@ public class BattleArmorSuitUtility {
                 newEntity = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
-            }}
+            }
+        }
         return newEntity;
     }
 }

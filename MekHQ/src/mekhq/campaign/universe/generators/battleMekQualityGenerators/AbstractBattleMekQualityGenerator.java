@@ -24,14 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
 import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 
 /**
- * This was designed to provide options for the method of quality generation for Company Generators,
- * and any use outside of them should take this specific design into consideration.
+ * This was designed to provide options for the method of quality generation for Company Generators, and any use outside
+ * of them should take this specific design into consideration.
+ *
  * @author Justin "Windchild" Bowen
  */
 public abstract class AbstractBattleMekQualityGenerator {
@@ -53,6 +59,7 @@ public abstract class AbstractBattleMekQualityGenerator {
 
     /**
      * @param roll the modified roll to use
+     *
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
     public abstract int generate(int roll);

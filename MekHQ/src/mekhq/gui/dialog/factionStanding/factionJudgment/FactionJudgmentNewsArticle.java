@@ -192,7 +192,12 @@ public class FactionJudgmentNewsArticle {
     private static String getDialogKey(FactionStandingJudgmentType judgmentType, String judgmentLookupName,
           Faction judgingFaction) {
         String censuringFactionCode = judgingFaction.getShortName();
-        String dialogKey = KEY_FORWARD + judgmentType.getLookupName() + '.' + judgmentLookupName + '.' + censuringFactionCode;
+        String dialogKey = KEY_FORWARD +
+                                 judgmentType.getLookupName() +
+                                 '.' +
+                                 judgmentLookupName +
+                                 '.' +
+                                 censuringFactionCode;
 
         // If testReturn fails, we use a fallback value
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);

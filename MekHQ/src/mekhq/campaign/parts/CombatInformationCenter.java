@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -36,7 +41,6 @@ import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
@@ -72,9 +76,9 @@ public class CombatInformationCenter extends Part {
         if (null != unit && unit.getEntity() instanceof Aero) {
             hits = ((Aero) unit.getEntity()).getCICHits();
             if (checkForDestruction
-                    && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -185,7 +189,11 @@ public class CombatInformationCenter extends Part {
         if (null != unit) {
             // There's more to CIC than just Fire Control
             // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
-            cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship) unit.getEntity()).getArcswGuns()));
+            cost = Money.of(200000 +
+                                  (10 * unit.getEntity().getWeight()) +
+                                  200000 +
+                                  100000 +
+                                  (10000 * ((Jumpship) unit.getEntity()).getArcswGuns()));
         }
     }
 

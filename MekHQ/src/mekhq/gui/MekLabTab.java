@@ -49,7 +49,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import megamek.common.*;
-import megamek.common.ITechnology.FactionAffiliation;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
 import megamek.logging.MMLogger;
@@ -140,8 +139,8 @@ public class MekLabTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         entityVerifier = EntityVerifier.getInstance(new File("data/mekfiles/UnitVerifierOptions.xml")); // TODO : Remove
-                                                                                                        // inline file
-                                                                                                        // path
+        // inline file
+        // path
         CConfig.load();
         UnitUtil.loadFonts();
         logger.info("Starting MegaMekLab version: " + MMLConstants.VERSION);
@@ -150,7 +149,7 @@ public class MekLabTab extends CampaignGuiTab {
             Entity entity = labPanel.getEntity();
             if (null != entity && entity.getWeight() > testEntity.calculateWeight()) {
                 int response = JOptionPane.showConfirmDialog(null, "This unit is underweight. Do you want to continue?",
-                        "Underweight Unit", JOptionPane.YES_NO_OPTION);
+                      "Underweight Unit", JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.NO_OPTION) {
                     return;
                 }
@@ -265,7 +264,8 @@ public class MekLabTab extends CampaignGuiTab {
         // options settings.
         CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
-        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() != ITechnology.Faction.NONE));
+        CConfig.setParam(CConfig.TECH_SHOW_FACTION,
+              String.valueOf(campaignGUI.getCampaign().getTechFaction() != ITechnology.Faction.NONE));
         CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
@@ -289,8 +289,8 @@ public class MekLabTab extends CampaignGuiTab {
 
         if (mekSummary == null) {
             logger.error(String.format(
-                    "Cannot reset unit %s as it cannot be found in the cache.",
-                    unit.getEntity().getDisplayName()));
+                  "Cannot reset unit %s as it cannot be found in the cache.",
+                  unit.getEntity().getDisplayName()));
             return;
         }
 
@@ -398,26 +398,26 @@ public class MekLabTab extends CampaignGuiTab {
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
-                    + ReportingUtilities.getPositiveColor() + "'>+"
-                    + bvDiff + "</font>)</html>");
+                                + ReportingUtilities.getPositiveColor() + "'>+"
+                                + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
-                    + ReportingUtilities.getNegativeColor() + "'>" + bvDiff
-                    + "</font>)</html>");
+                                + ReportingUtilities.getNegativeColor() + "'>" + bvDiff
+                                + "</font>)</html>");
         } else {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
         }
 
         if (currentTonnage != tonnage) {
             lblTons.setText(
-                    "<html>Tonnage: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
-                            + currentTonnage + '/' + tonnage + "</font></html>");
+                  "<html>Tonnage: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
+                        + currentTonnage + '/' + tonnage + "</font></html>");
         } else {
             lblTons.setText("Tonnage: " + currentTonnage + '/' + tonnage);
         }
         if (totalHeat > heat) {
             lblHeat.setText("<html>Heat: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
-                    + totalHeat + '/' + heat + "</font></html>");
+                                  + totalHeat + '/' + heat + "</font></html>");
         } else {
             lblHeat.setText("<html>Heat: " + totalHeat + '/' + heat + "</html>");
         }
@@ -477,7 +477,8 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // double heat for ultras
-            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) || (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
+            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) ||
+                      (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
                 weaponHeat *= 2;
             }
 
@@ -488,7 +489,7 @@ public class MekLabTab extends CampaignGuiTab {
 
             // half heat for streaks
             if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
-                    || (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_STREAK)) {
+                      || (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_STREAK)) {
                 weaponHeat *= 0.5;
             }
             heat += weaponHeat;
@@ -520,7 +521,8 @@ public class MekLabTab extends CampaignGuiTab {
         }
     }
 
-    private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource, FileNameManager {
+    private abstract static class EntityPanel extends JTabbedPane
+          implements RefreshListener, EntitySource, FileNameManager {
 
         private boolean refreshRequired = false;
         private String fileName = "";

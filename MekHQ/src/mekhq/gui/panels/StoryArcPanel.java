@@ -24,12 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -53,7 +57,7 @@ public class StoryArcPanel extends AbstractMHQPanel {
 
     //region Constructors
     public StoryArcPanel(final JFrame frame, final @Nullable Campaign campaign,
-                               final @Nullable StoryArcStub stub) {
+          final @Nullable StoryArcStub stub) {
         super(frame, "StoryArcPanel");
         this.campaign = campaign;
         setStoryArcStub(stub);
@@ -92,10 +96,10 @@ public class StoryArcPanel extends AbstractMHQPanel {
     protected void initialize() {
         // Set up the Panel
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createLineBorder(Color.BLACK, 2)));
+              BorderFactory.createEmptyBorder(5, 5, 5, 5),
+              BorderFactory.createLineBorder(Color.BLACK, 2)));
         setName("storyArcPanel");
-        setLayout(new GridLayout(2,1));
+        setLayout(new GridLayout(2, 1));
 
         // Create Components and Layout
         setLblTitle(new JLabel(""));
