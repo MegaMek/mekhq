@@ -24,35 +24,40 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
+
+import java.util.ResourceBundle;
+import javax.swing.JFrame;
 
 import megamek.client.ui.panes.AbstractSplitPane;
 import mekhq.MekHQ;
 
-import javax.swing.*;
-import java.util.ResourceBundle;
-
 /**
  * This is the default SplitPane. It handles preferences, resources, the frame, and setup.
- *
- * Inheriting classes must call initialize() in their constructors and override createLeftComponent()
- * and createRightComponent()
+ * <p>
+ * Inheriting classes must call initialize() in their constructors and override createLeftComponent() and
+ * createRightComponent()
  */
 public abstract class AbstractMHQSplitPane extends AbstractSplitPane {
     //region Constructors
+
     /**
-     * This creates an AbstractMHQSplitPane using the default MHQ resource bundle. This is the
-     * normal constructor to use for an AbstractMHQSplitPane.
+     * This creates an AbstractMHQSplitPane using the default MHQ resource bundle. This is the normal constructor to use
+     * for an AbstractMHQSplitPane.
      */
     protected AbstractMHQSplitPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale()), name);
+              MekHQ.getMHQOptions().getLocale()), name);
     }
 
     /**
-     * This creates an AbstractMHQSplitPane using the specified resource bundle. This is not recommended
-     * by default.
+     * This creates an AbstractMHQSplitPane using the specified resource bundle. This is not recommended by default.
      */
     protected AbstractMHQSplitPane(final JFrame frame, final ResourceBundle resources, final String name) {
         super(frame, resources, name);
@@ -61,8 +66,9 @@ public abstract class AbstractMHQSplitPane extends AbstractSplitPane {
 
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     * @throws Exception if there's an issue initializing the preferences. Normally this means
-     * a component has <strong>not</strong> had its name value set.
+     *
+     * @throws Exception if there's an issue initializing the preferences. Normally this means a component has
+     *                   <strong>not</strong> had its name value set.
      */
     @Override
     protected void setPreferences() throws Exception {

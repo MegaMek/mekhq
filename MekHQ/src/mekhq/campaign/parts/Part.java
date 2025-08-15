@@ -95,10 +95,13 @@ public abstract class Part implements IPartWork, ITechnology {
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
     protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TechBase.ALL)
-        .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
-        .setTechRating(TechRating.C)
-        .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-        .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                              .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                              .setTechRating(TechRating.C)
+                                                              .setAvailability(AvailabilityValue.C,
+                                                                    AvailabilityValue.C,
+                                                                    AvailabilityValue.C,
+                                                                    AvailabilityValue.C)
+                                                              .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected String name;
     protected int id;
@@ -661,13 +664,15 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Fixes the class name for renamed classes.
-     * This is used to handle cases where the class name has changed in a way that would break XML loading.
+     * Fixes the class name for renamed classes. This is used to handle cases where the class name has changed in a way
+     * that would break XML loading.
      * <p>
      * Example: "OldClassName" have been renamed to "NewClassName".
      * <p>
      * In this case, you would add a case for "OldClassName" that returns NewClassName.class.getSimpleName().
+     *
      * @param className the name of the class to fix (if necessary)
+     *
      * @return the fixed class name, or the passed class name if no fix is needed
      */
     private static String fixForRenamedClasses(String className) {
@@ -764,7 +769,7 @@ public abstract class Part implements IPartWork, ITechnology {
                                                        "class was not renamed, if thats the case, register its new " +
                                                        "name in the function Part#fixForRenamedClasses", className);
         } catch (Exception ex) {
-            logger.error(ex,"Unexpected error {}", ex.getMessage());
+            logger.error(ex, "Unexpected error {}", ex.getMessage());
         }
 
         return retVal;
@@ -1706,9 +1711,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public AvailabilityValue calcYearAvailability(int year, boolean clan) {
-        AvailabilityValue av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
+        AvailabilityValue av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(),
+              campaign.getFaction().isClan());
         if (omniPodded) {
-            AvailabilityValue podRating = TA_POD.calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
+            AvailabilityValue podRating = TA_POD.calcYearAvailability(campaign.getGameYear(),
+                  campaign.getFaction().isClan());
             if (podRating.isBetterThan(av)) {
                 av = podRating;
             }
@@ -1785,7 +1792,10 @@ public abstract class Part implements IPartWork, ITechnology {
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    logger.error("Part {} ('{}') references missing child part {}", getId(), getName(), childPart.getId());
+                    logger.error("Part {} ('{}') references missing child part {}",
+                          getId(),
+                          getName(),
+                          childPart.getId());
                     childParts.remove(ii);
                 }
             }

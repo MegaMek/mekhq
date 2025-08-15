@@ -54,30 +54,24 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 public class MiscAwards {
 
     /**
-     * This function processes miscellaneous awards for a given person in a
-     * campaign.
-     * It checks the eligibility of the person for each type of award and returns a
-     * map of eligible awards grouped by their respective IDs.
+     * This function processes miscellaneous awards for a given person in a campaign. It checks the eligibility of the
+     * person for each type of award and returns a map of eligible awards grouped by their respective IDs.
      *
      * @param campaign               the current campaign
-     * @param mission                the mission just completed (null if no mission
-     *                               was completed)
+     * @param mission                the mission just completed (null if no mission was completed)
      * @param person                 the person to check award eligibility for
-     * @param awards                 the awards to be processed (should only include
-     *                               awards where item == Kill)
-     * @param missionWasSuccessful   true if the completed mission was successful,
-     *                               false otherwise
-     * @param isCivilianHelp         true if the completed scenario was AtB Scenario
-     *                               CIVILIANHELP
+     * @param awards                 the awards to be processed (should only include awards where item == Kill)
+     * @param missionWasSuccessful   true if the completed mission was successful, false otherwise
+     * @param isCivilianHelp         true if the completed scenario was AtB Scenario CIVILIANHELP
      * @param killCount              the number of kills (null if not applicable)
      * @param injuryCount            the number of injuries (null if not applicable)
-     * @param supportPersonOfTheYear a UUID identifying the candidate for Support
-     *                               Person of the Year awards
+     * @param supportPersonOfTheYear a UUID identifying the candidate for Support Person of the Year awards
+     *
      * @return a map of eligible awards grouped by their respective IDs
      */
     public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission,
-            UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
-            @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear) {
+          UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
+          @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear) {
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
@@ -129,7 +123,7 @@ public class MiscAwards {
                 }
                 case "supportpersonoftheyear" -> {
                     if ((supportPersonOfTheYear != null)
-                            && (supportPersonOfTheYear(campaign, award, person, supportPersonOfTheYear))) {
+                              && (supportPersonOfTheYear(campaign, award, person, supportPersonOfTheYear))) {
                         eligibleAwards.add(award);
                     }
                 }
@@ -142,8 +136,7 @@ public class MiscAwards {
     }
 
     /**
-     * This function checks whether Mission Accomplished awards can be awarded to
-     * Person
+     * This function checks whether Mission Accomplished awards can be awarded to Person
      *
      * @param campaign the current campaign
      * @param award    the award to be processed
@@ -154,8 +147,7 @@ public class MiscAwards {
     }
 
     /**
-     * This function checks whether House World War/No War awards can be awarded to
-     * Person
+     * This function checks whether House World War/No War awards can be awarded to Person
      *
      * @param campaign the current campaign
      * @param mission  the Mission just completed
@@ -164,7 +156,7 @@ public class MiscAwards {
      * @param isYesWar true if this is a Yes War Award
      */
     private static boolean HouseWorldWar(Campaign campaign, @Nullable Mission mission, Award award, UUID person,
-            boolean isYesWar) {
+          boolean isYesWar) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
                 if (mission instanceof AtBContract) {
@@ -175,7 +167,7 @@ public class MiscAwards {
                     for (Faction faction : system.getFactionSet(campaign.getLocalDate())) {
                         if (faction.isISMajorOrSuperPower()) {
                             boolean isAtWar = RandomFactionGenerator.getInstance().getFactionHints()
-                                    .isAtWarWith(enemyFaction, faction, date);
+                                                    .isAtWarWith(enemyFaction, faction, date);
 
                             if ((isAtWar) && (isYesWar)) {
                                 return true;
@@ -197,6 +189,7 @@ public class MiscAwards {
      * @param mission  the mission just completed (nullable)
      * @param award    the award to be processed
      * @param person   the person to check award eligibility for
+     *
      * @return true if the person is eligible for the award, false otherwise
      */
     private static boolean Periphery(Campaign campaign, @Nullable Mission mission, Award award, UUID person) {
@@ -215,19 +208,19 @@ public class MiscAwards {
     }
 
     /**
-     * Determines if a person is eligible for the Medal of Honor award based on the
-     * campaign, award, person, kill count, and injury count.
+     * Determines if a person is eligible for the Medal of Honor award based on the campaign, award, person, kill count,
+     * and injury count.
      *
      * @param campaign    the campaign in which the person is participating
      * @param award       the award being considered
      * @param person      the unique identifier of the person
      * @param killCount   the number of kills achieved by the person (nullable)
      * @param injuryCount the number of injuries suffered by the person (nullable)
-     * @return true if the person is eligible for the Medal of Honor award, false
-     *         otherwise
+     *
+     * @return true if the person is eligible for the Medal of Honor award, false otherwise
      */
     private static boolean MedalOfHonor(Campaign campaign, Award award, UUID person, @Nullable Integer killCount,
-            @Nullable Integer injuryCount) {
+          @Nullable Integer injuryCount) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if ((killCount != null) && (injuryCount != null)) {
                 return (killCount >= Integer.parseInt(award.getSize())) && (injuryCount >= award.getQty());
@@ -243,6 +236,7 @@ public class MiscAwards {
      * @param award    the award to be checked
      * @param person   the UUID of the person to be checked
      * @param mission  the mission the person is assigned to (nullable)
+     *
      * @return true if the person is eligible for the award, false otherwise
      */
     private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person, @Nullable Mission mission) {
@@ -250,9 +244,9 @@ public class MiscAwards {
             if (mission != null) {
                 if (mission instanceof Contract) {
                     PlanetarySystem capitalSystem = Factions.getInstance()
-                            .getFactionFromFullNameAndYear(((Contract) mission).getEmployer(),
-                                    campaign.getGameYear())
-                            .getStartingPlanet(campaign, campaign.getLocalDate());
+                                                          .getFactionFromFullNameAndYear(((Contract) mission).getEmployer(),
+                                                                campaign.getGameYear())
+                                                          .getStartingPlanet(campaign, campaign.getLocalDate());
                     try {
                         if (campaign.getCurrentSystem().equals(capitalSystem)) {
                             return true;
@@ -267,14 +261,13 @@ public class MiscAwards {
     }
 
     /**
-     * Checks if a person is a prisoner of war in a given campaign and is eligible
-     * to receive an award.
+     * Checks if a person is a prisoner of war in a given campaign and is eligible to receive an award.
      *
      * @param campaign the campaign in which the person is participating
      * @param award    the award to be given
      * @param person   the unique identifier of the person to check
-     * @return true if the person is a prisoner of war and is eligible to receive
-     *         the award, false otherwise
+     *
+     * @return true if the person is a prisoner of war and is eligible to receive the award, false otherwise
      */
     private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
@@ -285,51 +278,46 @@ public class MiscAwards {
     }
 
     /**
-     * Checks if the given person is a training lance leader and is eligible for the
-     * given award.
+     * Checks if the given person is a training lance leader and is eligible for the given award.
      *
      * @param campaign the campaign object representing the current campaign
      * @param award    the award object representing the award to be checked
      * @param person   the UUID of the person to be checked
-     * @return true if the person is a training lance leader and is eligible for the
-     *         award, false otherwise
+     *
+     * @return true if the person is a training lance leader and is eligible for the award, false otherwise
      */
     private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person)) && campaign.hasActiveAtBContract()) {
             return campaign.getAllCombatTeams().stream()
-                    .anyMatch(lance -> (lance.getRole().isTraining()) && (lance.getCommanderId().equals(person)));
+                         .anyMatch(lance -> (lance.getRole().isTraining()) && (lance.getCommanderId().equals(person)));
         }
 
         return false;
     }
 
     /**
-     * Determines if a person is eligible for the Support Person of the Year award
-     * in a given campaign.
+     * Determines if a person is eligible for the Support Person of the Year award in a given campaign.
      *
-     * @param campaign               The campaign in which the award is being
-     *                               considered.
-     * @param award                  The Support Person of the Year award being
-     *                               considered.
-     * @param person                 The UUID of the person being evaluated for the
-     *                               award.
-     * @param supportPersonOfTheYear The UUID of the person chosen as the Support
-     *                               Person of the Year.
+     * @param campaign               The campaign in which the award is being considered.
+     * @param award                  The Support Person of the Year award being considered.
+     * @param person                 The UUID of the person being evaluated for the award.
+     * @param supportPersonOfTheYear The UUID of the person chosen as the Support Person of the Year.
+     *
      * @return true if the person is eligible for the award, false otherwise.
      */
     private static boolean supportPersonOfTheYear(Campaign campaign, Award award, UUID person,
-            UUID supportPersonOfTheYear) {
+          UUID supportPersonOfTheYear) {
         if (supportPersonOfTheYear.equals(person)) {
             if (award.canBeAwarded(campaign.getPerson(person))) {
                 return true;
             } else {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
-                        MekHQ.getMHQOptions().getLocale());
+                      MekHQ.getMHQOptions().getLocale());
 
                 campaign.addReport(String.format(resources.getString("supportPersonOfTheYear.tex"),
-                        campaign.getPerson(person).getHyperlinkedFullTitle(),
-                        award.getName(),
-                        award.getSet()));
+                      campaign.getPerson(person).getHyperlinkedFullTitle(),
+                      award.getName(),
+                      award.getSet()));
 
                 return false;
             }

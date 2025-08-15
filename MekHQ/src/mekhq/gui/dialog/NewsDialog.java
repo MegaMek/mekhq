@@ -74,7 +74,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
      * even though no specific person is associated with the message. Only the provided central message is shown.
      * </p>
      *
-     * @param campaign the current {@link Campaign} context
+     * @param campaign      the current {@link Campaign} context
      * @param centerMessage the main message to display in the dialog
      */
     public NewsDialog(Campaign campaign, String centerMessage) {

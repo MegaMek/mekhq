@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
@@ -59,7 +64,9 @@ public class HangarStatistics {
 
     /**
      * Tally all used bay types and return a hashmap of ETYPE : Count
+     *
      * @param inTransit
+     *
      * @return
      */
     public HashMap<Long, Integer> tallyBaysByType(boolean inTransit) {
@@ -102,12 +109,12 @@ public class HangarStatistics {
                 double weight = en.getWeight();
                 if (weight <= 50.0) {
                     hashMap.put(Entity.ETYPE_TANK | LIGHT_VEHICLE_BIT,
-                            hashMap.getOrDefault(Entity.ETYPE_TANK | LIGHT_VEHICLE_BIT, 0) + 1);
+                          hashMap.getOrDefault(Entity.ETYPE_TANK | LIGHT_VEHICLE_BIT, 0) + 1);
                 } else if (weight > 50.0 && weight <= 100.0) {
                     hashMap.put(Entity.ETYPE_TANK, hashMap.getOrDefault(Entity.ETYPE_TANK, 0) + 1);
                 } else {
                     hashMap.put(Entity.ETYPE_TANK | SUPER_HEAVY_BIT,
-                            hashMap.getOrDefault(Entity.ETYPE_TANK | SUPER_HEAVY_BIT, 0) + 1);
+                          hashMap.getOrDefault(Entity.ETYPE_TANK | SUPER_HEAVY_BIT, 0) + 1);
                 }
             } else if (en instanceof ProtoMek) {
                 hashMap.put(Entity.ETYPE_PROTOMEK, hashMap.getOrDefault(Entity.ETYPE_PROTOMEK, 0) + 1);
@@ -175,56 +182,56 @@ public class HangarStatistics {
 
     public int getTotalMekBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getMekCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getMekCapacity)
+                                      .sum());
     }
 
     public int getTotalASFBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getASFCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getASFCapacity)
+                                      .sum());
     }
 
     public int getTotalSmallCraftBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getSmallCraftCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getSmallCraftCapacity)
+                                      .sum());
     }
 
     public int getTotalBattleArmorBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getBattleArmorCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getBattleArmorCapacity)
+                                      .sum());
     }
 
     public int getTotalInfantryBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getInfantryCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getInfantryCapacity)
+                                      .sum());
     }
 
     public int getTotalHeavyVehicleBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getHeavyVehicleCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getHeavyVehicleCapacity)
+                                      .sum());
     }
 
     public int getTotalLightVehicleBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getLightVehicleCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getLightVehicleCapacity)
+                                      .sum());
     }
 
     public int getTotalProtomekBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getProtoMekCapacity)
-            .sum());
+                                      .mapToDouble(Unit::getProtoMekCapacity)
+                                      .sum());
     }
 
     public int getTotalDockingCollars() {
         return getHangar().getUnitsStream()
-            .filter(u -> u.getEntity() instanceof Jumpship)
-            .mapToInt(Unit::getDocks)
-            .sum();
+                     .filter(u -> u.getEntity() instanceof Jumpship)
+                     .mapToInt(Unit::getDocks)
+                     .sum();
     }
 }

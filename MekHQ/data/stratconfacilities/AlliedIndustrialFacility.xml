@@ -1,9 +1,0 @@
-<StratconFacility>
-    <capturedDefinition>HostileIndustrialFacility.xml</capturedDefinition>
-    <displayableName>Industrial Center</displayableName>
-    <facilityType>IndustrialFacility</facilityType>
-    <owner>Allied</owner>
-    <monthlySPModifier>1</monthlySPModifier>
-    <userDescription><![CDATA[Provides 1 SP/month of allied logistical support.]]></userDescription>
-    <visible>true</visible>
-</StratconFacility>

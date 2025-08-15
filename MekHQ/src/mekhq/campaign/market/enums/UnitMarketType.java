@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.enums;
 
@@ -52,7 +57,7 @@ public enum UnitMarketType {
     // region Constructors
     UnitMarketType(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -107,7 +112,7 @@ public enum UnitMarketType {
         }
 
         MMLogger.create(UnitMarketType.class)
-                .error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
+              .error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
         return OPEN;
     }
     // endregion File I/O
@@ -120,9 +125,10 @@ public enum UnitMarketType {
     /**
      * Calculates the price percentage based on a given modifier and d6 roll.
      *
-     * @param modifier the modifier to adjust the price (a negative modifier
-     *                 decreases price, positive increases price)
+     * @param modifier the modifier to adjust the price (a negative modifier decreases price, positive increases price)
+     *
      * @return the calculated price
+     *
      * @throws IllegalStateException if the roll value is unexpected
      */
     public static int getPricePercentage(int modifier) {
@@ -157,8 +163,8 @@ public enum UnitMarketType {
                 break;
             default:
                 throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
-                                + roll);
+                      "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
+                            + roll);
         }
 
         return 100 + (value * 5);
@@ -168,19 +174,20 @@ public enum UnitMarketType {
      * Returns the quality of a unit based on the given market type.
      *
      * @param market the type of market
+     *
      * @return the quality of the unit
      */
     public static PartQuality getQuality(Campaign campaign, UnitMarketType market) {
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-            return Unit.getRandomUnitQuality(switch(market) {
+            return Unit.getRandomUnitQuality(switch (market) {
                 case OPEN, MERCENARY -> 0;
                 case EMPLOYER -> -1;
                 case BLACK_MARKET -> Compute.d6(1) <= 2 ? -12 : 12; // forces A/F
                 case FACTORY -> 12; // Forces F
             });
         } else {
-            return switch(market) {
+            return switch (market) {
                 case OPEN, MERCENARY -> PartQuality.QUALITY_C;
                 case EMPLOYER -> PartQuality.QUALITY_B;
                 case BLACK_MARKET -> Compute.d6(1) <= 2 ? PartQuality.QUALITY_A : PartQuality.QUALITY_F;

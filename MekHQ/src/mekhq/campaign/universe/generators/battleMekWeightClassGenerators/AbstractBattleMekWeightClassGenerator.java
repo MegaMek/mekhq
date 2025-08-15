@@ -24,14 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.battleMekWeightClassGenerators;
 
 import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 
 /**
- * This was designed to provide options for the method of weight generation for Company Generators,
- * and any use outside of them should take this specific design into consideration.
+ * This was designed to provide options for the method of weight generation for Company Generators, and any use outside
+ * of them should take this specific design into consideration.
+ *
  * @author Justin "Windchild" Bowen
  */
 public abstract class AbstractBattleMekWeightClassGenerator {
@@ -53,9 +59,9 @@ public abstract class AbstractBattleMekWeightClassGenerator {
 
     /**
      * @param roll the modified roll to use
-     * @return the generated EntityWeightClass, returning EntityWeightClass.WEIGHT_ULTRA_LIGHT to
-     * signify no generation and EntityWeightClass.WEIGHT_SUPER_HEAVY to signify Star League-era
-     * generation.
-    */
+     *
+     * @return the generated EntityWeightClass, returning EntityWeightClass.WEIGHT_ULTRA_LIGHT to signify no generation
+     *       and EntityWeightClass.WEIGHT_SUPER_HEAVY to signify Star League-era generation.
+     */
     public abstract int generate(int roll);
 }

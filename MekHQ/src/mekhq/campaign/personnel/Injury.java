@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -33,8 +38,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
-
-import org.w3c.dom.Node;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -51,9 +54,10 @@ import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.enums.InjuryHiding;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import org.w3c.dom.Node;
 
 /**
  * Injury class based on Jayof9s' (jayof9s@gmail.com) Advanced Medical documents
@@ -70,6 +74,7 @@ public class Injury {
     // Marshaller / unmarshaller instances
     private static Marshaller marshaller;
     private static Unmarshaller unmarshaller;
+
     static {
         try {
             JAXBContext context = JAXBContext.newInstance(Injury.class, BodyLocation.class, InjuryType.class);
@@ -140,14 +145,14 @@ public class Injury {
     // Constructor if this injury has been treated by a doctor, but without extended
     // time
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm,
-            boolean workedOn) {
+          boolean workedOn) {
         this(time, text, loc, type, num, start, perm, workedOn, false);
     }
 
     // Constructor for when this injury has extended time, full options including
     // worked on by a doctor
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start,
-            boolean perm, boolean workedOn, boolean extended) {
+          boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
         setOriginalTime(time);
         setFluff(text);

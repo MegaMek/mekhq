@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.autoAwards;
 
@@ -40,17 +45,17 @@ public class ScenarioKillAwards {
     private static final MMLogger logger = MMLogger.create(ScenarioKillAwards.class);
 
     /**
-     * This function loops through Scenario Kill Awards, checking whether the person
-     * is eligible to receive each type of award.
+     * This function loops through Scenario Kill Awards, checking whether the person is eligible to receive each type of
+     * award.
      *
      * @param campaign  the campaign to be processed
      * @param person    the Person to check award eligibility for
      * @param killCount the number of relevant kills scored by 'person'
-     * @param awards    awards the awards to be processed (should only include
-     *                  awards where item == kill &amp;&amp; ranges == scenario)
+     * @param awards    awards the awards to be processed (should only include awards where item == kill &amp;&amp;
+     *                  ranges == scenario)
      */
     public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person,
-            List<Award> awards, int killCount) {
+          List<Award> awards, int killCount) {
         int killsNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();
@@ -63,7 +68,7 @@ public class ScenarioKillAwards {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
                     logger.warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
-                            award.getName(), award.getSet(), award.getQty());
+                          award.getName(), award.getSet(), award.getQty());
                     continue;
                 }
 

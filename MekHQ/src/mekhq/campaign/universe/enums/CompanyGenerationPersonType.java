@@ -24,21 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 /**
  * @author Justin "Windchild" Bowen
  */
 public enum CompanyGenerationPersonType {
     //region Enum Declarations
-    MEKWARRIOR_COMPANY_COMMANDER("CompanyGenerationPersonType.MEKWARRIOR_COMPANY_COMMANDER.text", "CompanyGenerationPersonType.MEKWARRIOR_COMPANY_COMMANDER.toolTipText"),
-    MEKWARRIOR_CAPTAIN("CompanyGenerationPersonType.MEKWARRIOR_CAPTAIN.text", "CompanyGenerationPersonType.MEKWARRIOR_CAPTAIN.toolTipText"),
-    MEKWARRIOR_LIEUTENANT("CompanyGenerationPersonType.MEKWARRIOR_LIEUTENANT.text", "CompanyGenerationPersonType.MEKWARRIOR_LIEUTENANT.toolTipText"),
+    MEKWARRIOR_COMPANY_COMMANDER("CompanyGenerationPersonType.MEKWARRIOR_COMPANY_COMMANDER.text",
+          "CompanyGenerationPersonType.MEKWARRIOR_COMPANY_COMMANDER.toolTipText"),
+    MEKWARRIOR_CAPTAIN("CompanyGenerationPersonType.MEKWARRIOR_CAPTAIN.text",
+          "CompanyGenerationPersonType.MEKWARRIOR_CAPTAIN.toolTipText"),
+    MEKWARRIOR_LIEUTENANT("CompanyGenerationPersonType.MEKWARRIOR_LIEUTENANT.text",
+          "CompanyGenerationPersonType.MEKWARRIOR_LIEUTENANT.toolTipText"),
     MEKWARRIOR("CompanyGenerationPersonType.MEKWARRIOR.text", "CompanyGenerationPersonType.MEKWARRIOR.toolTipText"),
     SUPPORT("CompanyGenerationPersonType.SUPPORT.text", "CompanyGenerationPersonType.SUPPORT.toolTipText"),
     ASSISTANT("CompanyGenerationPersonType.ASSISTANT.text", "CompanyGenerationPersonType.ASSISTANT.toolTipText");
@@ -52,7 +60,7 @@ public enum CompanyGenerationPersonType {
     //region Constructors
     CompanyGenerationPersonType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -95,7 +103,7 @@ public enum CompanyGenerationPersonType {
 
     public boolean isCombat() {
         return isMekWarriorCompanyCommander() || isMekWarriorCaptain()
-                || isMekWarriorLieutenant() || isMekWarrior();
+                     || isMekWarriorLieutenant() || isMekWarrior();
     }
     //endregion Boolean Comparison Methods
 

@@ -25,14 +25,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
 import org.joda.money.CurrencyUnit;
 
 /**
- * This class represents a currency that will be associated
- * with monetary amounts.
+ * This class represents a currency that will be associated with monetary amounts.
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
@@ -52,8 +56,8 @@ public class Currency {
     private int endYear; // COMES FROM FACTIONS.XML
 
     public Currency(String code, int numericCurrencyCode, int decimalPlaces, String name,
-                    String symbol, int startYear, int endYear, boolean isDefault,
-                    boolean isBackup) {
+          String symbol, int startYear, int endYear, boolean isDefault,
+          boolean isBackup) {
         this.wrapped = CurrencyUnit.registerCurrency(code, numericCurrencyCode, decimalPlaces, true);
         this.name = name.trim();
         this.symbol = symbol.trim();

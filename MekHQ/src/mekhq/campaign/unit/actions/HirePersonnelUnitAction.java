@@ -51,8 +51,8 @@ public class HirePersonnelUnitAction implements IUnitAction {
 
     /**
      * Initializes a new instance of the HirePersonnelUnitAction class.
-     * @param isGM A boolean value indicating whether or not GM mode should be used
-     *             to complete the action.
+     *
+     * @param isGM A boolean value indicating whether or not GM mode should be used to complete the action.
      */
     public HirePersonnelUnitAction(boolean isGM) {
         this.isGM = isGM;
@@ -67,7 +67,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
             } else if (unit.getEntity() instanceof Mek) {
                 person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
-                    || unit.getEntity() instanceof Jumpship) {
+                             || unit.getEntity() instanceof Jumpship) {
                 person = campaign.newPerson(PersonnelRole.VESSEL_PILOT);
             } else if (unit.getEntity() instanceof ConvFighter) {
                 person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
@@ -113,7 +113,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
             if (unit.getEntity() instanceof Tank) {
                 person = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
             } else if (unit.getEntity() instanceof SmallCraft
-                    || unit.getEntity() instanceof Jumpship) {
+                             || unit.getEntity() instanceof Jumpship) {
                 person = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
             } else if (unit.getEntity() instanceof Mek) {
                 person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
@@ -129,7 +129,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
 
         while (unit.canTakeMoreVesselCrew()) {
             Person person = campaign.newPerson(unit.getEntity().isSupportVehicle()
-                    ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW);
+                                                     ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW);
             if (person == null) {
                 break;
             }
@@ -164,12 +164,16 @@ public class HirePersonnelUnitAction implements IUnitAction {
         // Ensure we generate at least one person with the artillery skill if using that skill and
         // the unit has an artillery weapon
         if (campaign.getCampaignOptions().isUseArtillery() && (unit.getEntity() != null)
-                && unit.getEntity().getWeaponList().stream()
-                        .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
-                                && (((WeaponType) weapon.getType()).getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
+                  && unit.getEntity().getWeaponList().stream()
+                           .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
+                                                     &&
+                                                     (((WeaponType) weapon.getType()).getDamage() ==
+                                                            WeaponType.DAMAGE_ARTILLERY))) {
             final Set<Person> gunners = unit.getGunners();
-            if (!gunners.isEmpty() && gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
-                new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(ObjectUtility.getRandomItem(gunners));
+            if (!gunners.isEmpty() &&
+                      gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
+                new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(ObjectUtility.getRandomItem(
+                      gunners));
             }
         }
 
