@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -33,10 +38,9 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
-
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -51,7 +55,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, double size,
-            int trooper, Campaign c, double etonnage) {
+          int trooper, Campaign c, double etonnage) {
         super(tonnage, et, equipNum, size, c, etonnage);
         this.trooper = trooper;
     }
@@ -114,8 +118,8 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         }
         for (Mounted<?> m : unit.getEntity().getEquipment()) {
             if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
-                    type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-                    && this.getBaMountLocation() == m.getBaMountLoc()) {
+                      type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+                      && this.getBaMountLocation() == m.getBaMountLoc()) {
                 return true;
             }
             // this is not quite right, they must be linked somehow
@@ -169,7 +173,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
             BattleArmorEquipmentPart eqpart = (BattleArmorEquipmentPart) part;
             EquipmentType et = eqpart.getType();
             return type.equals(et) && (getTonnage() == part.getTonnage())
-                    && (getSize() == ((BattleArmorEquipmentPart) part).getSize());
+                         && (getSize() == ((BattleArmorEquipmentPart) part).getSize());
         }
         return false;
     }

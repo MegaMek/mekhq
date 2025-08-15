@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -44,6 +49,7 @@ public class Skills {
 
     /**
      * Gets the number of skills.
+     *
      * @return The number of skills.
      */
     public int size() {
@@ -59,7 +65,9 @@ public class Skills {
 
     /**
      * Gets a value indicating if a certain skill is possessed.
+     *
      * @param name The name of the skill.
+     *
      * @return True if and only if the skill is active.
      */
     public boolean hasSkill(final @Nullable String name) {
@@ -68,7 +76,9 @@ public class Skills {
 
     /**
      * Gets a {@link Skill} by name.
+     *
      * @param name The name of the skill.
+     *
      * @return The {@link Skill}, if one exists, otherwise null.
      */
     @Nullable
@@ -78,7 +88,8 @@ public class Skills {
 
     /**
      * Adds a skill.
-     * @param name The name of the skill.
+     *
+     * @param name  The name of the skill.
      * @param skill The {@link Skill} to track.
      */
     public void addSkill(String name, Skill skill) {
@@ -87,7 +98,9 @@ public class Skills {
 
     /**
      * Removes a skill.
+     *
      * @param name The name of the skill to remove.
+     *
      * @return True if the skill was removed, otherwise false.
      */
     public boolean removeSkill(String name) {
@@ -96,6 +109,7 @@ public class Skills {
 
     /**
      * Gets a collection of skill names.
+     *
      * @return A collection of skill names.
      */
     public Collection<String> getSkillNames() {
@@ -104,6 +118,7 @@ public class Skills {
 
     /**
      * Gets a collection of {@link Skill} objects.
+     *
      * @return A collection of {@link Skill} objects.
      */
     public Collection<Skill> getSkills() {

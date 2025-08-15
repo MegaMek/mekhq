@@ -44,17 +44,17 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 /**
  * A specialized {@link JPanel} tailored for use in campaign options dialogs.
  * <p>
- * This panel offers configurable borders (titled or untitled) and applies a standardized
- * layout and styling for consistency across the UI. The panel's name can also be dynamically
- * assigned based on the provided {@code name} parameter.
+ * This panel offers configurable borders (titled or untitled) and applies a standardized layout and styling for
+ * consistency across the UI. The panel's name can also be dynamically assigned based on the provided {@code name}
+ * parameter.
  */
 public class CampaignOptionsStandardPanel extends JPanel {
 
     /**
      * Constructs a {@link CampaignOptionsStandardPanel} without a border.
      * <p>
-     * The name of the panel is set to {@code "pnl" + name}. The layout should
-     * be configured using {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
+     * The name of the panel is set to {@code "pnl" + name}. The layout should be configured using
+     * {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
      *
      * @param name the name of the panel, used to set its internal name
      */
@@ -65,12 +65,12 @@ public class CampaignOptionsStandardPanel extends JPanel {
     /**
      * Constructs a {@link CampaignOptionsStandardPanel} with an optional untitled border.
      * <p>
-     * If {@code includeBorder} is {@code true}, an etched border is applied to the panel. The name of
-     * the panel is set to {@code "pnl" + name}. The layout should be configured using
-     * {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
+     * If {@code includeBorder} is {@code true}, an etched border is applied to the panel. The name of the panel is set
+     * to {@code "pnl" + name}. The layout should be configured using {@code createGroupLayout} and assigned to the
+     * panel using {@code setLayout}.
      *
-     * @param name           the name of the panel, used to set its internal name
-     * @param includeBorder  {@code true} if the panel should include an untitled border
+     * @param name          the name of the panel, used to set its internal name
+     * @param includeBorder {@code true} if the panel should include an untitled border
      */
     public CampaignOptionsStandardPanel(String name, boolean includeBorder) {
         this(name, includeBorder, "");
@@ -79,10 +79,10 @@ public class CampaignOptionsStandardPanel extends JPanel {
     /**
      * Constructs a {@link CampaignOptionsStandardPanel} with an optional titled border.
      * <p>
-     * If {@code includeBorder} is {@code true}, a border is applied to the panel. If {@code borderTitle}
-     * is provided, it is used to fetch the localized string for the border's title from the resource bundle.
-     * The name of the panel is set to {@code "pnl" + name}. The layout should be configured using
-     * {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
+     * If {@code includeBorder} is {@code true}, a border is applied to the panel. If {@code borderTitle} is provided,
+     * it is used to fetch the localized string for the border's title from the resource bundle. The name of the panel
+     * is set to {@code "pnl" + name}. The layout should be configured using {@code createGroupLayout} and assigned to
+     * the panel using {@code setLayout}.
      *
      * @param name          the name of the panel, used to set its internal name
      * @param includeBorder {@code true} if the panel should include a border

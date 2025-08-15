@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
 public enum PlanetaryType {
     ASTEROID_BELT("Asteroid Belt"),
     DWARF_TERRESTRIAL("Dwarf Terrestrial"),
-    TERRESTRIAL ("Terrestrial"),
+    TERRESTRIAL("Terrestrial"),
     GIANT_TERRESTRIAL("Giant Terrestrial"),
     ICE_GIANT("Ice Giant"),
     GAS_GIANT("Gas Giant");

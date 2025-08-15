@@ -55,11 +55,11 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.util.ViewFormatting;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;

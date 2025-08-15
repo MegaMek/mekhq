@@ -63,8 +63,8 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDial
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.
  *
  * <p>This class orchestrates the campaign logic when a player chooses to go rogue, possibly changing their campaign's
- * faction, modifying personnel statuses, and updating inter-faction standings. It uses a dialog to confirm and
- * process the event and performs all necessary changes to campaign data.</p>
+ * faction, modifying personnel statuses, and updating inter-faction standings. It uses a dialog to confirm and process
+ * the event and performs all necessary changes to campaign data.</p>
  *
  * @author Illiani
  * @since 0.50.07
@@ -133,14 +133,14 @@ public class GoingRogue {
      * the nature of the event (defection or not). It delegates further handling and the consequences to other
      * specialized methods within the class.
      *
-     * @param campaign      the current campaign context
-     * @param chosenFaction the new faction the force is aligning with; may be the same or different from the old
-     *                      faction
-     * @param commander     the commanding officer of the force
-     * @param second        the second-in-command, may be {@code null}
+     * @param campaign                the current campaign context
+     * @param chosenFaction           the new faction the force is aligning with; may be the same or different from the
+     *                                old faction
+     * @param commander               the commanding officer of the force
+     * @param second                  the second-in-command, may be {@code null}
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
-     * @param isUltimatum   whether the 'going rogue' action was the result of an ultimatum (but not to the mercenary
-     *                      faction)
+     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum (but not to the
+     *                                mercenary faction)
      *
      * @author Illiani
      * @since 0.50.07
@@ -163,13 +163,13 @@ public class GoingRogue {
      *
      * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
      *
-     * @param campaign      the current campaign context
-     * @param chosenFaction the new faction may be the same or a new one
-     * @param commander     the force commander
-     * @param second        secondary command personnel
-     * @param isDefection   whether the 'going rogue' action counts as defection
-     * @param isUltimatum   whether the 'going rogue' action was the result of an ultimatum (but not to the mercenary
-     *                      faction)
+     * @param campaign                the current campaign context
+     * @param chosenFaction           the new faction may be the same or a new one
+     * @param commander               the force commander
+     * @param second                  secondary command personnel
+     * @param isDefection             whether the 'going rogue' action counts as defection
+     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum (but not to the
+     *                                mercenary faction)
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
@@ -344,7 +344,7 @@ public class GoingRogue {
      * Adjusts the campaign's standing with the old faction, if leaving, reducing regard to the minimum allowed for
      * {@link FactionStandingLevel#STANDING_LEVEL_1} if necessary.
      *
-     * @param campaign the current campaign context
+     * @param campaign   the current campaign context
      * @param oldFaction the faction the campaign is departing
      *
      * @author Illiani
@@ -433,7 +433,7 @@ public class GoingRogue {
      * Improves the campaign's standing with the new faction (if applicable), raising regard to at least the minimum
      * allowed for {@link FactionStandingLevel#STANDING_LEVEL_5}.
      *
-     * @param campaign the current campaign context
+     * @param campaign   the current campaign context
      * @param newFaction the faction now joined
      *
      * @author Illiani
@@ -453,7 +453,11 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(), factionCode, targetRegard, campaign.getGameYear(), true);
+        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(),
+              factionCode,
+              targetRegard,
+              campaign.getGameYear(),
+              true);
         campaign.addReport(report);
     }
 

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
@@ -31,9 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class splits a tooltip into multiple lines in order to wrap it.
- * It will enclose a string into HTML format
- *
+ * This class splits a tooltip into multiple lines in order to wrap it. It will enclose a string into HTML format
+ * <p>
  * https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java
  *
  * @author Paul Taylor (adapted by Miguel Azevedo)
@@ -43,11 +47,11 @@ public class MultiLineTooltip {
     private static final int SPACE_BUFFER = 10;
 
     /**
-     * Wraps a string with html tags and places breaks where it can split it,
-     * defaulting the size of a line to
-     * 85 characters.
+     * Wraps a string with html tags and places breaks where it can split it, defaulting the size of a line to 85
+     * characters.
      *
      * @param tip String to split
+     *
      * @return Split string in html format
      */
     public static String splitToolTip(String tip) {
@@ -59,6 +63,7 @@ public class MultiLineTooltip {
      *
      * @param tip    String to split
      * @param length Maximum characters that each line can have
+     *
      * @return Split string in html format
      */
     public static String splitToolTip(String tip, int length) {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -31,8 +36,7 @@ import java.util.Comparator;
 
 /**
  *
- * @author Dylan Myers
- *         Comparator for comparing details in the warehouse and parts store
+ * @author Dylan Myers Comparator for comparing details in the warehouse and parts store
  */
 public class PartsDetailSorter implements Comparator<String> {
 
@@ -41,9 +45,9 @@ public class PartsDetailSorter implements Comparator<String> {
         double l0 = -1;
         double l1 = -1;
         String[] ss0 = s0.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "")
-                .split(" ");
+                             .split(" ");
         String[] ss1 = s1.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "")
-                .split(" ");
+                             .split(" ");
         if (!ss0[0].isEmpty()) {
             try {
                 l0 = Double.parseDouble(ss0[0]);

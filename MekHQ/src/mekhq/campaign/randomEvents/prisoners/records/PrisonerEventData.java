@@ -24,23 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.records;
 
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
-
 import java.util.List;
 
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
+
 /**
- * Represents data relevant to a random prisoner event, including its type,
- * severity, and response map structure.
+ * Represents data relevant to a random prisoner event, including its type, severity, and response map structure.
  *
- * @param prisonerEvent The type of prisoner event as a {@link PrisonerEvent}.
- *                      This represents the name of the event.
- * @param responseEntries   A list of {@link PrisonerResponseEntry} defining the responses
- *                      and their associated qualities and effects.
+ * @param prisonerEvent   The type of prisoner event as a {@link PrisonerEvent}. This represents the name of the event.
+ * @param responseEntries A list of {@link PrisonerResponseEntry} defining the responses and their associated qualities
+ *                        and effects.
  */
 public record PrisonerEventData(
-    PrisonerEvent prisonerEvent,
-    List<PrisonerResponseEntry> responseEntries
-) { }
+      PrisonerEvent prisonerEvent,
+      List<PrisonerResponseEntry> responseEntries
+) {}
