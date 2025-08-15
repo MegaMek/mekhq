@@ -329,6 +329,7 @@ public enum Phenotype {
 
     // region File I/O
     // CHECKSTYLE IGNORE ForbiddenWords FOR 32 LINES
+
     /**
      * Converts a string representation to a corresponding {@link Phenotype} value.
      *

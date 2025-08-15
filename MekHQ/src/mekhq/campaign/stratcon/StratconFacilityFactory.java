@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -41,8 +46,7 @@ import mekhq.MHQConstants;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**
- * This class handles functionality related to loading and stratcon facility
- * definitions.
+ * This class handles functionality related to loading and stratcon facility definitions.
  *
  * @author NickAragua
  */
@@ -78,11 +82,11 @@ public class StratconFacilityFactory {
 
         // load dynamic scenarios
         StratconFacilityManifest facilityManifest = StratconFacilityManifest
-                .deserialize(MHQConstants.STRATCON_FACILITY_MANIFEST);
+                                                          .deserialize(MHQConstants.STRATCON_FACILITY_MANIFEST);
 
         // load user-specified scenario list
         StratconFacilityManifest userManifest = StratconFacilityManifest
-                .deserialize(MHQConstants.STRATCON_USER_FACILITY_MANIFEST);
+                                                      .deserialize(MHQConstants.STRATCON_USER_FACILITY_MANIFEST);
 
         if (facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
@@ -126,17 +130,15 @@ public class StratconFacilityFactory {
     }
 
     /**
-     * Gets a specific facility given an "ID" (the file name).
-     * This method does not clone the facility and should not be used to put one on
-     * the board
+     * Gets a specific facility given an "ID" (the file name). This method does not clone the facility and should not be
+     * used to put one on the board
      */
     public static StratconFacility getFacilityByName(String name) {
         return stratconFacilityMap.get(name);
     }
 
     /**
-     * Gets a clone of a specific facility given the "ID" (file name), null if it
-     * doesn't exist.
+     * Gets a clone of a specific facility given the "ID" (file name), null if it doesn't exist.
      */
     @Nullable
     public static StratconFacility getFacilityCloneByName(String name) {

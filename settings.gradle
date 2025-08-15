@@ -1,5 +1,6 @@
 rootProject.name = 'MekHQRoot'
 
+includeBuild('../mm-data')
 includeBuild('../megamek')
 includeBuild('../megameklab')
 

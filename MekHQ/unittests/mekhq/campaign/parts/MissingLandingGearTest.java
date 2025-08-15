@@ -24,18 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
-
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -43,6 +38,16 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
 
 public class MissingLandingGearTest {
     @Test

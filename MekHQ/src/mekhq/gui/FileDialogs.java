@@ -24,18 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-
 import javax.swing.JFrame;
 
 import mekhq.CampaignPreset;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -57,10 +61,10 @@ public class FileDialogs {
      */
     public static Optional<File> openPersonnel(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Personnel",
-                FileType.PRSX,
-                MekHQ.getPersonnelDirectory().getValue());
+              frame,
+              "Load Personnel",
+              FileType.PRSX,
+              MekHQ.getPersonnelDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getPersonnelDirectory().setValue(x.getParent()));
         return value;
@@ -74,17 +78,17 @@ public class FileDialogs {
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
         String fileName = String.format(
-                "%s%s_ExportedPersonnel.prsx",
-                campaign.getName(),
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())));
+              "%s%s_ExportedPersonnel.prsx",
+              campaign.getName(),
+              campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                                   .withLocale(MekHQ.getMHQOptions().getDateLocale())));
 
         Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save Personnel",
-                FileType.PRSX,
-                MekHQ.getPersonnelDirectory().getValue(),
-                fileName);
+              frame,
+              "Save Personnel",
+              FileType.PRSX,
+              MekHQ.getPersonnelDirectory().getValue(),
+              fileName);
 
         value.ifPresent(x -> MekHQ.getPersonnelDirectory().setValue(x.getParent()));
         return value;
@@ -97,7 +101,7 @@ public class FileDialogs {
      */
     public static Optional<File> openRankSystems(final JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(frame, "Load Rank Systems",
-                FileType.XML, MekHQ.getMHQOptions().getRankSystemsPath());
+              FileType.XML, MekHQ.getMHQOptions().getRankSystemsPath());
         value.ifPresent(x -> MekHQ.getMHQOptions().setRankSystemsPath(x.getParent()));
         return value;
     }
@@ -109,7 +113,7 @@ public class FileDialogs {
      */
     public static Optional<File> saveRankSystems(final JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(frame, "Save Rank Systems", FileType.XML,
-                MekHQ.getMHQOptions().getRankSystemsPath(), "rankSystem.xml");
+              MekHQ.getMHQOptions().getRankSystemsPath(), "rankSystem.xml");
         value.ifPresent(x -> MekHQ.getMHQOptions().setRankSystemsPath(x.getParent()));
         return value;
     }
@@ -121,7 +125,7 @@ public class FileDialogs {
      */
     public static Optional<File> openIndividualRankSystem(final JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(frame, "Load Individual Rank System",
-                FileType.XML, MekHQ.getMHQOptions().getIndividualRankSystemPath());
+              FileType.XML, MekHQ.getMHQOptions().getIndividualRankSystemPath());
         value.ifPresent(x -> MekHQ.getMHQOptions().setIndividualRankSystemPath(x.getParent()));
         return value;
     }
@@ -133,8 +137,8 @@ public class FileDialogs {
      */
     public static Optional<File> saveIndividualRankSystem(final JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(frame, "Save Individual Rank System",
-                FileType.XML, MekHQ.getMHQOptions().getIndividualRankSystemPath(),
-                "individualRankSystem.xml");
+              FileType.XML, MekHQ.getMHQOptions().getIndividualRankSystemPath(),
+              "individualRankSystem.xml");
         value.ifPresent(x -> MekHQ.getMHQOptions().setIndividualRankSystemPath(x.getParent()));
         return value;
     }
@@ -146,8 +150,8 @@ public class FileDialogs {
      */
     public static Optional<File> exportLayeredForceIcon(final JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(frame, "Export Layered Force Icon",
-                FileType.PNG, MekHQ.getMHQOptions().getLayeredForceIconPath(),
-                "layeredForceIcon.png");
+              FileType.PNG, MekHQ.getMHQOptions().getLayeredForceIconPath(),
+              "layeredForceIcon.png");
         value.ifPresent(x -> MekHQ.getMHQOptions().setLayeredForceIconPath(x.getParent()));
         return value;
     }
@@ -159,7 +163,7 @@ public class FileDialogs {
      */
     public static Optional<File> saveCampaignPreset(final JFrame frame, final CampaignPreset preset) {
         return GUI.fileDialogSave(frame, "Save Campaign Preset", FileType.XML,
-                MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY, preset + " Preset.xml");
+              MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY, preset + " Preset.xml");
     }
 
     /**
@@ -169,10 +173,10 @@ public class FileDialogs {
      */
     public static Optional<File> openParts(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Parts",
-                FileType.PARTS,
-                MekHQ.getPartsDirectory().getValue());
+              frame,
+              "Load Parts",
+              FileType.PARTS,
+              MekHQ.getPartsDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getPartsDirectory().setValue(x.getParent()));
         return value;
@@ -185,17 +189,17 @@ public class FileDialogs {
      */
     public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
         String fileName = String.format(
-                "%s%s_ExportedParts.parts",
-                campaign.getName(),
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())));
+              "%s%s_ExportedParts.parts",
+              campaign.getName(),
+              campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                                   .withLocale(MekHQ.getMHQOptions().getDateLocale())));
 
-        Optional<File> value =  GUI.fileDialogSave(
-                frame,
-                "Save Parts",
-                FileType.PARTS,
-                MekHQ.getPartsDirectory().getValue(),
-                fileName);
+        Optional<File> value = GUI.fileDialogSave(
+              frame,
+              "Save Parts",
+              FileType.PARTS,
+              MekHQ.getPartsDirectory().getValue(),
+              fileName);
 
         value.ifPresent(x -> MekHQ.getPartsDirectory().setValue(x.getParent()));
         return value;
@@ -208,10 +212,10 @@ public class FileDialogs {
      */
     public static Optional<File> openUnits(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Units",
-                FileType.MUL,
-                MekHQ.getUnitsDirectory().getValue());
+              frame,
+              "Load Units",
+              FileType.MUL,
+              MekHQ.getUnitsDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
         return value;
@@ -224,11 +228,11 @@ public class FileDialogs {
      */
     public static Optional<File> saveDeployUnits(JFrame frame, Scenario scenario, String name) {
         Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Deploy Units",
-                FileType.MUL,
-                MekHQ.getUnitsDirectory().getValue(),
-                scenario.getName() + " - " + name + ".mul");
+              frame,
+              "Deploy Units",
+              FileType.MUL,
+              MekHQ.getUnitsDirectory().getValue(),
+              scenario.getName() + " - " + name + ".mul");
 
         value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
         return value;
@@ -241,11 +245,11 @@ public class FileDialogs {
      */
     public static Optional<File> saveUnits(JFrame frame, String name) {
         Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save Units",
-                FileType.MUL,
-                MekHQ.getUnitsDirectory().getValue(),
-                name + ".mul");
+              frame,
+              "Save Units",
+              FileType.MUL,
+              MekHQ.getUnitsDirectory().getValue(),
+              name + ".mul");
 
         value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
         return value;
@@ -258,10 +262,10 @@ public class FileDialogs {
      */
     public static Optional<File> openCampaign(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Campaign",
-                FileType.CPNX,
-                MekHQ.getCampaignsDirectory().getValue());
+              frame,
+              "Load Campaign",
+              FileType.CPNX,
+              MekHQ.getCampaignsDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getCampaignsDirectory().setValue(x.getParent()));
         return value;
@@ -274,12 +278,12 @@ public class FileDialogs {
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
         String fileName = String.format("%s%s.%s", campaign.getName(),
-                campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())),
-                MekHQ.getMHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
+              campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                                   .withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              MekHQ.getMHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx");
 
         Optional<File> value = GUI.fileDialogSave(frame, "Save Campaign", FileType.CPNX,
-                MekHQ.getCampaignsDirectory().getValue(), fileName);
+              MekHQ.getCampaignsDirectory().getValue(), fileName);
 
         value.ifPresent(x -> MekHQ.getCampaignsDirectory().setValue(x.getParent()));
         return value;
@@ -292,10 +296,10 @@ public class FileDialogs {
      */
     public static Optional<File> openScenarioTemplate(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Scenario Template",
-                FileType.XML,
-                MekHQ.getScenarioTemplatesDirectory().getValue());
+              frame,
+              "Load Scenario Template",
+              FileType.XML,
+              MekHQ.getScenarioTemplatesDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
         return value;
@@ -308,15 +312,15 @@ public class FileDialogs {
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
         String fileName = String.format(
-                "%s.xml",
-                template.name);
+              "%s.xml",
+              template.name);
 
         Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save Scenario Template",
-                FileType.XML,
-                MekHQ.getScenarioTemplatesDirectory().getValue(),
-                fileName);
+              frame,
+              "Save Scenario Template",
+              FileType.XML,
+              MekHQ.getScenarioTemplatesDirectory().getValue(),
+              fileName);
 
         value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
         return value;
@@ -329,10 +333,10 @@ public class FileDialogs {
      */
     public static Optional<File> openPlanetsTsv(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
-                frame,
-                "Load Planets from SUCS format TSV file",
-                FileType.TSV,
-                MekHQ.getPlanetsDirectory().getValue());
+              frame,
+              "Load Planets from SUCS format TSV file",
+              FileType.TSV,
+              MekHQ.getPlanetsDirectory().getValue());
 
         value.ifPresent(x -> MekHQ.getPlanetsDirectory().setValue(x.getParent()));
         return value;
@@ -345,11 +349,11 @@ public class FileDialogs {
      */
     public static Optional<File> saveStarMap(JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(
-                frame,
-                "Save star map to PNG file",
-                FileType.PNG,
-                MekHQ.getStarMapsDirectory().getValue(),
-                "starmap.png");
+              frame,
+              "Save star map to PNG file",
+              FileType.PNG,
+              MekHQ.getStarMapsDirectory().getValue(),
+              "starmap.png");
 
         value.ifPresent(x -> MekHQ.getStarMapsDirectory().setValue(x.getParent()));
         return value;
@@ -362,7 +366,7 @@ public class FileDialogs {
      */
     public static Optional<File> openCompanyGenerationOptions(final JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(frame, "Load Company Generation Options",
-                FileType.XML, MekHQ.getMHQOptions().getCompanyGenerationDirectoryPath());
+              FileType.XML, MekHQ.getMHQOptions().getCompanyGenerationDirectoryPath());
 
         value.ifPresent(x -> MekHQ.getMHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
         return value;
@@ -375,8 +379,8 @@ public class FileDialogs {
      */
     public static Optional<File> saveCompanyGenerationOptions(final JFrame frame) {
         Optional<File> value = GUI.fileDialogSave(frame, "Save Company Generation Options",
-                FileType.XML, MekHQ.getMHQOptions().getCompanyGenerationDirectoryPath(),
-                "myoptions.xml");
+              FileType.XML, MekHQ.getMHQOptions().getCompanyGenerationDirectoryPath(),
+              "myoptions.xml");
 
         value.ifPresent(x -> MekHQ.getMHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
         return value;

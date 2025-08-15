@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -33,16 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class FamilialRelationshipDisplayLevelTest {
     // region Variable Declarations
     private static final FamilialRelationshipDisplayLevel[] levels = FamilialRelationshipDisplayLevel.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Boolean Comparison Methods
@@ -112,23 +116,23 @@ class FamilialRelationshipDisplayLevelTest {
     void testParseFromString() {
         // Normal Parsing
         assertEquals(FamilialRelationshipDisplayLevel.SPOUSE,
-                FamilialRelationshipDisplayLevel.parseFromString("SPOUSE"));
+              FamilialRelationshipDisplayLevel.parseFromString("SPOUSE"));
         assertEquals(FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS,
-                FamilialRelationshipDisplayLevel.parseFromString("AUNTS_UNCLES_COUSINS"));
+              FamilialRelationshipDisplayLevel.parseFromString("AUNTS_UNCLES_COUSINS"));
 
         // Error Case
         assertEquals(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS,
-                FamilialRelationshipDisplayLevel.parseFromString("3"));
+              FamilialRelationshipDisplayLevel.parseFromString("3"));
         assertEquals(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS,
-                FamilialRelationshipDisplayLevel.parseFromString("blah"));
+              FamilialRelationshipDisplayLevel.parseFromString("blah"));
     }
     // endregion File I/O
 
     @Test
     void testToStringOverride() {
         assertEquals(resources.getString("FamilialRelationshipDisplayLevel.SPOUSE.text"),
-                FamilialRelationshipDisplayLevel.SPOUSE.toString());
+              FamilialRelationshipDisplayLevel.SPOUSE.toString());
         assertEquals(resources.getString("FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS.text"),
-                FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS.toString());
+              FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS.toString());
     }
 }

@@ -25,13 +25,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.CriticalSlot;
 import megamek.common.IArmorState;
@@ -44,6 +46,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -98,8 +102,8 @@ public class Turret extends TankLocation {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Turret
-                && getLoc() == ((Turret) part).getLoc()
-                && getTonnage() == part.getTonnage();
+                     && getLoc() == ((Turret) part).getLoc()
+                     && getTonnage() == part.getTonnage();
     }
 
     @Override
@@ -199,7 +203,7 @@ public class Turret extends TankLocation {
                 }
                 if (slot.isRepairable()) {
                     return "Repairable parts in " + unit.getEntity().getLocationName(loc)
-                            + " must be salvaged or scrapped first.";
+                                 + " must be salvaged or scrapped first.";
                 }
             }
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,19 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.utilities;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
 
-import java.util.*;
-
 /**
- * We need to determine what units in game are transports, and what units they're transporting.
- * This map does most of the work and helps hold what transports are transporting what units
- * for a given campaign transport type.
+ * We need to determine what units in game are transports, and what units they're transporting. This map does most of
+ * the work and helps hold what transports are transporting what units for a given campaign transport type.
+ *
  * @see CampaignTransportType
  */
 public class PotentialTransportsMap {
@@ -50,11 +60,13 @@ public class PotentialTransportsMap {
     }
 
     /**
-     * For the provided campaign transport type, are there any
-     * transports in the map?
-     * @see CampaignTransportType
+     * For the provided campaign transport type, are there any transports in the map?
+     *
      * @param campaignTransportType type (enum) of campaign transport
+     *
      * @return true if there are any transports in the map for the corresponding CampaignTransportType
+     *
+     * @see CampaignTransportType
      */
     public boolean hasTransports(CampaignTransportType campaignTransportType) {
         return hashMap.containsKey(campaignTransportType) && !(hashMap.get(campaignTransportType).isEmpty());
@@ -62,9 +74,12 @@ public class PotentialTransportsMap {
 
     /**
      * For the provided campaign transport type, get the transports
-     * @see CampaignTransportType
+     *
      * @param campaignTransportType type (enum) of campaign transport
+     *
      * @return transports for the given campaign transport type
+     *
+     * @see CampaignTransportType
      */
     public Set<UUID> getTransports(CampaignTransportType campaignTransportType) {
         return hashMap.get(campaignTransportType).keySet();
@@ -72,9 +87,12 @@ public class PotentialTransportsMap {
 
     /**
      * For the provided campaign transport type and transport id, get the transported units
+     *
      * @param campaignTransportType type (enum) of campaign transport
-     * @param uuid transport id
+     * @param uuid                  transport id
+     *
      * @return list of uuids of units on that transport
+     *
      * @see CampaignTransportType
      */
     public List<UUID> getTransportedUnits(CampaignTransportType campaignTransportType, UUID uuid) {
@@ -83,27 +101,30 @@ public class PotentialTransportsMap {
 
     /**
      * For the provided campaign transport type, does the provided transport exist in the map?
+     *
      * @param campaignTransportType type (enum) of campaign transport
-     * @param key transport id
+     * @param key                   transport id
+     *
      * @return true if that transport exists, false if not
      */
     public boolean containsTransportKey(CampaignTransportType campaignTransportType, UUID key) {
-       return hashMap.containsKey(campaignTransportType) && hashMap.get(campaignTransportType).containsKey(key);
-   }
+        return hashMap.containsKey(campaignTransportType) && hashMap.get(campaignTransportType).containsKey(key);
+    }
 
     /**
      * For the provided campaign transport type, add a transport
+     *
      * @param campaignTransportType type (enum) of campaign transport
-     * @param key transport id
+     * @param key                   transport id
      */
     public void putNewTransport(CampaignTransportType campaignTransportType, UUID key) {
         hashMap.get(campaignTransportType).put(key, new ArrayList<>());
     }
 
     /**
-     * Look through the transport map for this unit's assigned transports
-     * in priority order (Ship then Tactical Transports). If the transport
-     * is in the map, add it to the Map for loading later.
+     * Look through the transport map for this unit's assigned transports in priority order (Ship then Tactical
+     * Transports). If the transport is in the map, add it to the Map for loading later.
+     *
      * @param unit the Unit we want to transport on its assigned transport, if it has one
      */
     public void tryToAddTransportedUnit(Unit unit) {
@@ -121,9 +142,10 @@ public class PotentialTransportsMap {
 
     /**
      * For the provided campaign transport type and transport, add a transported unit
+     *
      * @param campaignTransportType type (enum) of campaign transport
-     * @param key transport unit id
-     * @param value transported unit id
+     * @param key                   transport unit id
+     * @param value                 transported unit id
      */
     public void addTransportedUnit(CampaignTransportType campaignTransportType, UUID key, UUID value) {
         hashMap.get(campaignTransportType).get(key).add(value);

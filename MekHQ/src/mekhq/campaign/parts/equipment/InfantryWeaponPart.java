@@ -25,19 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -59,7 +63,7 @@ public class InfantryWeaponPart extends EquipmentPart {
     @Override
     public InfantryWeaponPart clone() {
         InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign,
-                primary);
+              primary);
         clone.copyBaseData(this);
         return clone;
     }
