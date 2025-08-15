@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.financialInstitutions;
 
-import mekhq.utilities.MHQXMLUtility;
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,10 +44,10 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class FinancialInstitutionTest {
 
@@ -58,8 +63,9 @@ public class FinancialInstitutionTest {
             financialInstitution.writeToXML(pw, 0);
 
             // Assert the written XML equals to the expected text, ignoring line ending differences
-            assertEquals("<institution>\t<name>Johnstone Banking Inc.</name>\t<foundationDate>3025-01-01</foundationDate>\t<shutterDate>3025-06-01</shutterDate></institution>",
-                    sw.toString().replaceAll("\\n|\\r\\n", ""));
+            assertEquals(
+                  "<institution>\t<name>Johnstone Banking Inc.</name>\t<foundationDate>3025-01-01</foundationDate>\t<shutterDate>3025-06-01</shutterDate></institution>",
+                  sw.toString().replaceAll("\\n|\\r\\n", ""));
         }
     }
 

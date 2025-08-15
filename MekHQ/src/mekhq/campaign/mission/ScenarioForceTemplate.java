@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -40,9 +54,6 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import org.w3c.dom.Node;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
     private static final MMLogger logger = MMLogger.create(ScenarioForceTemplate.class);
@@ -65,13 +76,14 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third", "Planet Owner" };
     public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled",
-            "Fixed Unit Count", "Player/Fixed Unit Count", "Fixed MUL" };
+                                                              "Fixed Unit Count", "Player/Fixed Unit Count",
+                                                              "Fixed MUL" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge",
-            "Opposite Arc" };
+                                                                 "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast",
-            "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
+                                                      "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "Nearest", "None",
-            "Opposite Deployment Edge", "Random" };
+                                                           "Opposite Deployment Edge", "Random" };
     public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
 
     /**
@@ -124,8 +136,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         Third,
 
         /**
-         * Dynamically either allied, opposing or third, depending on who owns the
-         * current planet
+         * Dynamically either allied, opposing or third, depending on who owns the current planet
          */
         PlanetOwner;
 
@@ -153,14 +164,13 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         PlayerSupplied,
 
         /**
-         * Scale using BV, based on the BV value of already generated units flagged as
-         * contributing towards BV
+         * Scale using BV, based on the BV value of already generated units flagged as contributing towards BV
          */
         BVScaled,
 
         /**
-         * Scale on the unit count, based on number of already generated units flagged
-         * as contributing towards unit count
+         * Scale on the unit count, based on number of already generated units flagged as contributing towards unit
+         * count
          */
         UnitCountScaled,
 
@@ -186,8 +196,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
 
     /**
-     * How to determine deployment edge of this force based on deployment edge of a
-     * designated force
+     * How to determine deployment edge of this force based on deployment edge of a designated force
      */
     public enum SynchronizedDeploymentType {
         /**
@@ -235,36 +244,29 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
 
     /**
-     * The alignment of the force.
-     * Player - the "force" will be added to whatever units the player deploys or
-     * *is* the player-controlled force
-     * Allied - a bot-controlled force on the same team as the player
-     * Opposing - a bot-controlled force on the opposite team from the player
-     * Third - a bot-controlled force hostile to both the player and opposing bot
+     * The alignment of the force. Player - the "force" will be added to whatever units the player deploys or *is* the
+     * player-controlled force Allied - a bot-controlled force on the same team as the player Opposing - a
+     * bot-controlled force on the opposite team from the player Third - a bot-controlled force hostile to both the
+     * player and opposing bot
      */
     private int forceAlignment;
 
     /**
-     * The mechanism used to generate the force.
-     * Player Deployed - the player will deploy this force.
-     * BV Scaled - the contents of this force are scaled based on the BV of player
-     * and allied forces
-     * Unit Count Scaled - the contents of this force are scaled based on the number
-     * of player and allied forces
-     * Fixed Unit Count - this force has a fixed number of units.
+     * The mechanism used to generate the force. Player Deployed - the player will deploy this force. BV Scaled - the
+     * contents of this force are scaled based on the BV of player and allied forces Unit Count Scaled - the contents of
+     * this force are scaled based on the number of player and allied forces Fixed Unit Count - this force has a fixed
+     * number of units.
      */
     private int generationMethod;
 
     /**
-     * This is used to multiply the BV budget or Unit count of the force if the
-     * generation method is scaled.
+     * This is used to multiply the BV budget or Unit count of the force if the generation method is scaled.
      */
     private double forceMultiplier;
 
     /**
-     * The possible deployment zones for this force. "Narrow Edge" examines the
-     * board and picks one of the edges with the
-     * lowest dimensions.
+     * The possible deployment zones for this force. "Narrow Edge" examines the board and picks one of the edges with
+     * the lowest dimensions.
      */
     private List<Integer> deploymentZones;
 
@@ -274,8 +276,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private int destinationZone;
 
     /**
-     * This force will attempt to retreat after losing the specified percentage of
-     * units (by count or BV?)
+     * This force will attempt to retreat after losing the specified percentage of units (by count or BV?)
      */
     private int retreatThreshold;
 
@@ -285,8 +286,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private int allowedUnitType;
 
     /**
-     * Whether this force is allowed to reinforce linked scenarios (as described in
-     * the AtB Stratcon rules)
+     * Whether this force is allowed to reinforce linked scenarios (as described in the AtB Stratcon rules)
      */
     private boolean canReinforceLinked;
 
@@ -296,8 +296,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private boolean contributesToBV;
 
     /**
-     * Whether this force contributes to the unit count if the generation method is
-     * Unit Count Scaled.
+     * Whether this force contributes to the unit count if the generation method is Unit Count Scaled.
      */
     private boolean contributesToUnitCount;
 
@@ -307,9 +306,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private String forceName;
 
     /**
-     * The identifier of a force with which this force is synchronized, for the
-     * purposes of sharing deployment zones
-     * and retreat thresholds.
+     * The identifier of a force with which this force is synchronized, for the purposes of sharing deployment zones and
+     * retreat thresholds.
      */
     private String syncedForceName;
 
@@ -319,8 +317,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private SynchronizedDeploymentType syncDeploymentType;
 
     /**
-     * Whether or not this force shares a retreat threshold with the synced force.
-     * If yes, then all synced forces will retreat once
+     * Whether or not this force shares a retreat threshold with the synced force. If yes, then all synced forces will
+     * retreat once
      */
     private boolean syncRetreatThreshold;
 
@@ -345,8 +343,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private boolean contributesToMapSize;
 
     /**
-     * The materialized deployment zone after this template has been applied to a
-     * force.
+     * The materialized deployment zone after this template has been applied to a force.
      */
     private int actualDeploymentZone = Board.START_NONE;
 
@@ -356,33 +353,27 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private int fixedUnitCount = 0;
 
     /**
-     * The "generation bucket" to which this force template is assigned.
-     * Forces within a particular "generation bucket" will be generated at the same
-     * time, taking into account
-     * forces previously generated.
+     * The "generation bucket" to which this force template is assigned. Forces within a particular "generation bucket"
+     * will be generated at the same time, taking into account forces previously generated.
      */
     private int generationOrder = 0;
 
     /**
-     * Whether or not to load any aerospace units generated by this force template
-     * with bombs.
-     * May not actually result in bombs.
+     * Whether or not to load any aerospace units generated by this force template with bombs. May not actually result
+     * in bombs.
      */
     private boolean allowAeroBombs = false;
 
     /**
-     * The altitude/elevation at which this unit starts.
-     * For normally ground units, this indicates a "hot drop" (is it possible?)
-     * For helos, it's the elevation
-     * For aircraft it's actual altitude, with 0 being grounded.
-     * Ignored in space.
+     * The altitude/elevation at which this unit starts. For normally ground units, this indicates a "hot drop" (is it
+     * possible?) For helos, it's the elevation For aircraft it's actual altitude, with 0 being grounded. Ignored in
+     * space.
      */
     private int startingAltitude;
 
     /**
-     * Whether or not this force will be composed of artillery units.
-     * For some unit types this may result in failure to generate a force, so use
-     * with caution.
+     * Whether or not this force will be composed of artillery units. For some unit types this may result in failure to
+     * generate a force, so use with caution.
      */
     private boolean useArtillery = false;
 
@@ -392,17 +383,13 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private boolean deployOffBoard = false;
 
     /**
-     * A list of force IDs with which this force will be linked for objective
-     * purposes.
-     * e.g. if there's an objective to destroy 50% of "Primary Opfor", this force
-     * will count towards that as well.
+     * A list of force IDs with which this force will be linked for objective purposes. e.g. if there's an objective to
+     * destroy 50% of "Primary Opfor", this force will count towards that as well.
      */
     private List<String> objectiveLinkedForces;
 
     /**
-     * Whether or not this force is subject to modifiers that cause random unit
-     * removal
-     * e.g. "Good Intel".
+     * Whether or not this force is subject to modifiers that cause random unit removal e.g. "Good Intel".
      */
     private boolean subjectToRandomRemoval = true;
 
@@ -431,12 +418,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
 
     /**
-     * Constructor given a set of individual parameters, useful for populating from
-     * individual UI elements
+     * Constructor given a set of individual parameters, useful for populating from individual UI elements
      */
     public ScenarioForceTemplate(int forceAlignment, int generationMethod, double forceMultiplier,
-            List<Integer> deploymentZones,
-            int destinationZone, int retreatThreshold, int allowedUnitType) {
+          List<Integer> deploymentZones,
+          int destinationZone, int retreatThreshold, int allowedUnitType) {
         this.forceAlignment = forceAlignment;
         this.generationMethod = generationMethod;
         this.forceMultiplier = forceMultiplier;
@@ -599,9 +585,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
 
     /**
-     * Randomly choose one of the sets of roles supplied from the force template. If
-     * no roles
-     * are provided, returns an empty set.
+     * Randomly choose one of the sets of roles supplied from the force template. If no roles are provided, returns an
+     * empty set.
      * FIXME: placeholder function. Needs to be properly tied into the UI and file
      * read/write.
      *
@@ -614,7 +599,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         }
         Collection<MissionRole> roleSet;
         roleSet = Arrays.stream(roleString.split(",")).map(MissionRole::parseRole).filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                        .collect(Collectors.toSet());
         return roleSet;
     }
 
@@ -760,7 +745,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     public boolean isPlayerForce() {
         return getForceAlignment() == ForceAlignment.Player.ordinal() &&
-                getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal();
+                     getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal();
     }
 
     /**
@@ -768,7 +753,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     public boolean isAlliedPlayerForce() {
         return getForceAlignment() == ForceAlignment.Player.ordinal() &&
-                getGenerationMethod() != ForceGenerationMethod.PlayerSupplied.ordinal();
+                     getGenerationMethod() != ForceGenerationMethod.PlayerSupplied.ordinal();
     }
 
     /**
@@ -778,7 +763,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     public boolean isAlliedBotForce() {
         return getForceAlignment() == ForceAlignment.Allied.ordinal() &&
-                getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal();
+                     getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal();
     }
 
     /**
@@ -786,12 +771,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     public boolean isEnemyBotForce() {
         return getForceAlignment() == ForceAlignment.Opposing.ordinal() ||
-                getForceAlignment() == ForceAlignment.Third.ordinal();
+                     getForceAlignment() == ForceAlignment.Third.ordinal();
     }
 
     /**
-     * Convenience function that returns the displayable name of the selected unit
-     * type.
+     * Convenience function that returns the displayable name of the selected unit type.
      *
      * @return
      */
@@ -804,10 +788,10 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioForceTemplate from the
-     * passed-in XML Node
+     * Attempt to deserialize an instance of a ScenarioForceTemplate from the passed-in XML Node
      *
      * @param xmlNode The source file
+     *
      * @return Possibly an instance of a ScenarioForceTemplate
      */
     public static ScenarioForceTemplate Deserialize(Node xmlNode) {
@@ -837,8 +821,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
 
     /**
-     * Convenient factory method to return a default "Reinforcements" force template
-     * generally useful if the scenario does not have one specified
+     * Convenient factory method to return a default "Reinforcements" force template generally useful if the scenario
+     * does not have one specified
      */
     public static ScenarioForceTemplate getDefaultReinforcementsTemplate() {
         final List<Integer> reinforcementDeploymentZones = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);

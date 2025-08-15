@@ -24,26 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module.api;
+
+import java.io.PrintWriter;
+import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.w3c.dom.Node;
 
-import java.io.PrintWriter;
-import java.util.List;
-
 /**
  * Interface to be implemented by methods for generating and removing personnel market entries.
- *
- * Implementations of this interface need to be registered by adding the fully qualified class name
- * to src/META-INF/services/mekhq.module.api.PersonnelMarketMethod.
+ * <p>
+ * Implementations of this interface need to be registered by adding the fully qualified class name to
+ * src/META-INF/services/mekhq.module.api.PersonnelMarketMethod.
  *
  * @author Neoancient
  */
 public interface PersonnelMarketMethod extends MekHQModule {
     List<Person> generatePersonnelForDay(Campaign c);
+
     List<Person> removePersonnelForDay(Campaign c, List<Person> current);
 
     @Override

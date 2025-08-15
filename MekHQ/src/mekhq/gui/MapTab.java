@@ -80,7 +80,7 @@ import mekhq.gui.view.PlanetViewPanel;
  */
 public final class MapTab extends CampaignGuiTab implements ActionListener {
     private static final int PADDING = UIUtil.scaleForGUI(10);
-    
+
     private JViewport mapView;
     private JPanel panMapView;
     private InterstellarMapPanel panMap;
@@ -136,6 +136,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             public void focusGained(FocusEvent e) {
                 suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));

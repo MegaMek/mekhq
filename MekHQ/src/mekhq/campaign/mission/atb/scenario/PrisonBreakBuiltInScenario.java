@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
@@ -41,9 +46,9 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
@@ -95,7 +100,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(Board.START_CENTER);
         int enemyStart = startPos[Compute.randomInt(4)];
 
@@ -103,7 +108,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
             enemyEntities = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                        getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+                      getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
             }
             getSpecialScenarioEnemies().add(enemyEntities);
         }
@@ -126,9 +131,9 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 1, true);
+              1, 1, true);
         ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID,
-                1, 1, true);
+              1, 1, true);
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(GUARD_FORCE_ID, 1, 100);
         destroyHostiles.getSuccessEffects().clear();
         destroyHostiles.addDetail(getResourceBundle().getString("commonObjectives.battlefieldControl"));
@@ -150,7 +155,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         keepPrisonersAlive.setTimeLimitType(TimeLimitType.Fixed);
         keepPrisonersAlive.addSuccessEffect(bonusEffect);
         keepPrisonersAlive.addDetail(String.format(getResourceBundle().getString("commonObjectives.bonusRolls.text"),
-                bonusEffect.howMuch));
+              bonusEffect.howMuch));
 
         getScenarioObjectives().add(keepFriendliesAlive);
         getScenarioObjectives().add(keepPrisonersAlive);

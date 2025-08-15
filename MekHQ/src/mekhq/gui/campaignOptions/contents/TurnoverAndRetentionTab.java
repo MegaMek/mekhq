@@ -57,8 +57,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * The {@code TurnoverAndRetentionTab} class represents a graphical user interface (GUI)
- * configuration tab in the campaign options for managing unit turnover, retention, and fatigue settings.
+ * The {@code TurnoverAndRetentionTab} class represents a graphical user interface (GUI) configuration tab in the
+ * campaign options for managing unit turnover, retention, and fatigue settings.
  * <p>
  * This class provides functionality to define and customize gameplay-related options such as:
  * </p>
@@ -158,12 +158,11 @@ public class TurnoverAndRetentionTab {
     //end Fatigue Tab
 
     /**
-     * Constructs a {@code TurnoverAndRetentionTab} and initializes the tab with the given
-     * {@link CampaignOptions}. This sets up necessary UI components and their default
-     * configurations.
+     * Constructs a {@code TurnoverAndRetentionTab} and initializes the tab with the given {@link CampaignOptions}. This
+     * sets up necessary UI components and their default configurations.
      *
-     * @param campaignOptions the {@code CampaignOptions} instance that holds the settings
-     *                        to be modified or displayed in this tab.
+     * @param campaignOptions the {@code CampaignOptions} instance that holds the settings to be modified or displayed
+     *                        in this tab.
      */
     public TurnoverAndRetentionTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -172,8 +171,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the content and configuration of the turnover and fatigue tabs.
-     * This method sets up their respective panels and components.
+     * Initializes the content and configuration of the turnover and fatigue tabs. This method sets up their respective
+     * panels and components.
      */
     private void initialize() {
         initializeTurnoverTab();
@@ -181,9 +180,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the content of the fatigue configuration tab.
-     * Includes settings such as fatigue rate, injury fatigue, field kitchen capacity,
-     * and fatigue leave thresholds.
+     * Initializes the content of the fatigue configuration tab. Includes settings such as fatigue rate, injury fatigue,
+     * field kitchen capacity, and fatigue leave thresholds.
      */
     private void initializeFatigueTab() {
         chkUseFatigue = new JCheckBox();
@@ -198,9 +196,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the content of the turnover configuration tab.
-     * Includes settings such as turnover frequencies, service contract details,
-     * and retirement/payout modifiers.
+     * Initializes the content of the turnover configuration tab. Includes settings such as turnover frequencies,
+     * service contract details, and retirement/payout modifiers.
      */
     private void initializeTurnoverTab() {
         chkUseRandomRetirement = new JCheckBox();
@@ -266,9 +263,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates and configures the "Fatigue" tab with its relevant components.
-     * These include options related to enabling fatigue, fatigue rates, injury fatigue,
-     * kitchen capacities, and leave thresholds.
+     * Creates and configures the "Fatigue" tab with its relevant components. These include options related to enabling
+     * fatigue, fatigue rates, injury fatigue, kitchen capacities, and leave thresholds.
      *
      * @return the {@link JPanel} representing the constructed Fatigue tab.
      */
@@ -285,7 +281,7 @@ public class TurnoverAndRetentionTab {
         lblFatigueRate = new CampaignOptionsLabel("FatigueRate");
         lblFatigueRate.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueRate"));
         spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
-            1, 1, 10, 1);
+              1, 1, 10, 1);
         spnFatigueRate.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueRate"));
 
         chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue");
@@ -294,7 +290,7 @@ public class TurnoverAndRetentionTab {
         lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
         lblFieldKitchenCapacity.addMouseListener(createTipPanelUpdater(fatigueHeader, "FieldKitchenCapacity"));
         spnFieldKitchenCapacity = new CampaignOptionsSpinner("FieldKitchenCapacity",
-            150, 0, 450, 1);
+              150, 0, 450, 1);
         spnFieldKitchenCapacity.addMouseListener(createTipPanelUpdater(fatigueHeader, "FieldKitchenCapacity"));
 
         chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
@@ -304,7 +300,7 @@ public class TurnoverAndRetentionTab {
         lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
         lblFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
         spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",
-            13, 0, 17, 1);
+              13, 0, 17, 1);
         spnFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
 
         // Layout the Panels
@@ -363,9 +359,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates and configures the "Turnover" tab with its relevant components.
-     * These include options for turnover control, random retirement, payout settings,
-     * and modifiers for HR Strain and cohesion.
+     * Creates and configures the "Turnover" tab with its relevant components. These include options for turnover
+     * control, random retirement, payout settings, and modifiers for HR Strain and cohesion.
      *
      * @return the {@link JPanel} representing the constructed Turnover tab.
      */
@@ -410,8 +405,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the settings panel for the "Turnover" tab, which organizes various
-     * settings like random retirement, contract durations, and bonuses into a layout.
+     * Creates the settings panel for the "Turnover" tab, which organizes various settings like random retirement,
+     * contract durations, and bonuses into a layout.
      *
      * @return the {@link JPanel} representing the turnover settings.
      */
@@ -421,7 +416,7 @@ public class TurnoverAndRetentionTab {
         lblTurnoverFixedTargetNumber.addMouseListener(createTipPanelUpdater(turnoverHeader,
               "TurnoverFixedTargetNumber"));
         spnTurnoverFixedTargetNumber = new CampaignOptionsSpinner("TurnoverFixedTargetNumber",
-            3, 0, 10, 1);
+              3, 0, 10, 1);
         spnTurnoverFixedTargetNumber.addMouseListener(createTipPanelUpdater(turnoverHeader,
               "TurnoverFixedTargetNumber"));
 
@@ -430,8 +425,8 @@ public class TurnoverAndRetentionTab {
         comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof TurnoverFrequency) {
                     list.setToolTipText(((TurnoverFrequency) value).getToolTipText());
@@ -442,7 +437,7 @@ public class TurnoverAndRetentionTab {
         comboTurnoverFrequency.addMouseListener(createTipPanelUpdater(turnoverHeader, "TurnoverFrequency"));
 
         chkUseContractCompletionRandomRetirement = new CampaignOptionsCheckBox(
-            "UseContractCompletionRandomRetirement");
+              "UseContractCompletionRandomRetirement");
         chkUseContractCompletionRandomRetirement.addMouseListener(createTipPanelUpdater(turnoverHeader,
               "UseContractCompletionRandomRetirement"));
 
@@ -461,13 +456,13 @@ public class TurnoverAndRetentionTab {
         lblServiceContractDuration = new CampaignOptionsLabel("ServiceContractDuration");
         lblServiceContractDuration.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractDuration"));
         spnServiceContractDuration = new CampaignOptionsSpinner("ServiceContractDuration",
-            36, 0, 120, 1);
+              36, 0, 120, 1);
         spnServiceContractDuration.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractDuration"));
 
         lblServiceContractModifier = new CampaignOptionsLabel("ServiceContractModifier");
         lblServiceContractModifier.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractModifier"));
         spnServiceContractModifier = new CampaignOptionsSpinner("ServiceContractModifier",
-            3, 0, 10, 1);
+              3, 0, 10, 1);
         spnServiceContractModifier.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractModifier"));
 
         chkPayBonusDefault = new CampaignOptionsCheckBox("PayBonusDefault");
@@ -476,12 +471,12 @@ public class TurnoverAndRetentionTab {
         lblPayBonusDefaultThreshold = new CampaignOptionsLabel("PayBonusDefaultThreshold");
         lblPayBonusDefaultThreshold.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefaultThreshold"));
         spnPayBonusDefaultThreshold = new CampaignOptionsSpinner("PayBonusDefaultThreshold",
-            3, 0, 12, 1);
+              3, 0, 12, 1);
         spnPayBonusDefaultThreshold.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefaultThreshold"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SettingsPanel", true,
-            "SettingsPanel");
+              "SettingsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -543,8 +538,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the modifiers panel for the "Turnover" tab, which contains gameplay
-     * modifiers such as age, skill, faction, and loyalty.
+     * Creates the modifiers panel for the "Turnover" tab, which contains gameplay modifiers such as age, skill,
+     * faction, and loyalty.
      *
      * @return the {@link JPanel} representing the turnover modifiers.
      */
@@ -578,7 +573,7 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TurnoverModifiersPanel", true,
-            "ModifiersPanel");
+              "ModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -620,8 +615,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the payouts panel for the "Turnover" tab. This panel holds settings related to
-     * payout rates for officers and enlisted personnel, service bonuses, and retirement multipliers.
+     * Creates the payouts panel for the "Turnover" tab. This panel holds settings related to payout rates for officers
+     * and enlisted personnel, service bonuses, and retirement multipliers.
      *
      * @return the {@link JPanel} representing the payout settings.
      */
@@ -630,20 +625,20 @@ public class TurnoverAndRetentionTab {
         lblPayoutRateOfficer = new CampaignOptionsLabel("PayoutRateOfficer");
         lblPayoutRateOfficer.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateOfficer"));
         spnPayoutRateOfficer = new CampaignOptionsSpinner("PayoutRateOfficer",
-            3, 0, 12, 1);
+              3, 0, 12, 1);
         spnPayoutRateOfficer.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateOfficer"));
 
         lblPayoutRateEnlisted = new CampaignOptionsLabel("PayoutRateEnlisted");
         lblPayoutRateEnlisted.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateEnlisted"));
         spnPayoutRateEnlisted = new CampaignOptionsSpinner("PayoutRateEnlisted",
-            3, 0, 12, 1);
+              3, 0, 12, 1);
         spnPayoutRateEnlisted.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateEnlisted"));
 
         lblPayoutRetirementMultiplier = new CampaignOptionsLabel("PayoutRetirementMultiplier");
         lblPayoutRetirementMultiplier.addMouseListener(createTipPanelUpdater(turnoverHeader,
               "PayoutRetirementMultiplier"));
         spnPayoutRetirementMultiplier = new CampaignOptionsSpinner("PayoutRetirementMultiplier",
-            24, 1, 120, 1);
+              24, 1, 120, 1);
         spnPayoutRetirementMultiplier.addMouseListener(createTipPanelUpdater(turnoverHeader,
               "PayoutRetirementMultiplier"));
 
@@ -653,12 +648,12 @@ public class TurnoverAndRetentionTab {
         lblPayoutServiceBonusRate = new CampaignOptionsLabel("PayoutServiceBonusRate");
         lblPayoutServiceBonusRate.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutServiceBonusRate"));
         spnPayoutServiceBonusRate = new CampaignOptionsSpinner("PayoutServiceBonusRate",
-            10, 1, 100, 1);
+              10, 1, 100, 1);
         spnPayoutServiceBonusRate.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutServiceBonusRate"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PayoutsPanel", true,
-            "PayoutsPanel");
+              "PayoutsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -696,8 +691,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the unit cohesion panel for the "Turnover" tab, which includes settings like
-     * HR strain and management skills.
+     * Creates the unit cohesion panel for the "Turnover" tab, which includes settings like HR strain and management
+     * skills.
      *
      * @return the {@link JPanel} containing unit cohesion settings.
      */
@@ -708,7 +703,7 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", true,
-            "UnitCohesionPanel");
+              "UnitCohesionPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -723,8 +718,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the HR strain wrapper panel. Includes a checkbox to enable
-     * HR strain and settings for related capacities and behaviors.
+     * Creates the HR strain wrapper panel. Includes a checkbox to enable HR strain and settings for related capacities
+     * and behaviors.
      *
      * @return the {@link JPanel} for managing HR strain settings.
      */
@@ -750,8 +745,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the panel for HR strain settings, which contains
-     * spinners to adjust HR capacity and multi-crew strain dividers.
+     * Creates the panel for HR strain settings, which contains spinners to adjust HR capacity and multi-crew strain
+     * dividers.
      *
      * @return the {@link JPanel} for HR strain adjustment.
      */
@@ -760,7 +755,7 @@ public class TurnoverAndRetentionTab {
         lblHRCapacity = new CampaignOptionsLabel("HRCapacity");
         lblHRCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "HRCapacity"));
         spnHRCapacity = new CampaignOptionsSpinner("HRCapacity",
-            10, 1, 30, 1);
+              10, 1, 30, 1);
         spnHRCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "HRCapacity"));
 
         // Layout the Panel
@@ -779,8 +774,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the management skill wrapper panel, which contains settings such as enabling
-     * management skill checks and adjusting penalties.
+     * Creates the management skill wrapper panel, which contains settings such as enabling management skill checks and
+     * adjusting penalties.
      *
      * @return the {@link JPanel} for managing skill configurations.
      */
@@ -807,8 +802,7 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the panel for management skill settings, including options for leadership adjustments
-     * and penalties.
+     * Creates the panel for management skill settings, including options for leadership adjustments and penalties.
      *
      * @return the {@link JPanel} for setting management and leadership skill penalties.
      */
@@ -821,12 +815,12 @@ public class TurnoverAndRetentionTab {
         lblManagementSkillPenalty = new CampaignOptionsLabel("ManagementSkillPenalty");
         lblManagementSkillPenalty.addMouseListener(createTipPanelUpdater(turnoverHeader, "ManagementSkillPenalty"));
         spnManagementSkillPenalty = new CampaignOptionsSpinner("ManagementSkillPenalty",
-            0, -10, 10, 1);
+              0, -10, 10, 1);
         spnManagementSkillPenalty.addMouseListener(createTipPanelUpdater(turnoverHeader, "ManagementSkillPenalty"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ManagementSkill", true,
-            "ManagementSkill");
+              "ManagementSkill");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -844,20 +838,20 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Overload of {@code loadValuesFromCampaignOptions} method.
-     * Loads values from the current {@link CampaignOptions} instance.
+     * Overload of {@code loadValuesFromCampaignOptions} method. Loads values from the current {@link CampaignOptions}
+     * instance.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
     /**
-     * Loads the current configuration values from the provided {@link CampaignOptions}
-     * object and updates the associated UI components in both the Turnover and Fatigue tabs.
-     * If no options are provided, the existing campaign options are used.
+     * Loads the current configuration values from the provided {@link CampaignOptions} object and updates the
+     * associated UI components in both the Turnover and Fatigue tabs. If no options are provided, the existing campaign
+     * options are used.
      *
-     * @param presetCampaignOptions the {@link CampaignOptions} instance to load settings from,
-     *                              or {@code null} to use the current campaign options.
+     * @param presetCampaignOptions the {@link CampaignOptions} instance to load settings from, or {@code null} to use
+     *                              the current campaign options.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -910,12 +904,11 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Applies the current campaign options based on the configurations in the UI
-     * to the given {@link CampaignOptions}. If no options are provided, the current
-     * campaign options are updated.
+     * Applies the current campaign options based on the configurations in the UI to the given {@link CampaignOptions}.
+     * If no options are provided, the current campaign options are updated.
      *
-     * @param presetCampaignOptions the {@link CampaignOptions} instance to save settings to,
-     *                              or {@code null} to update the current campaign options.
+     * @param presetCampaignOptions the {@link CampaignOptions} instance to save settings to, or {@code null} to update
+     *                              the current campaign options.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;

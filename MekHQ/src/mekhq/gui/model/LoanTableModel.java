@@ -24,31 +24,38 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.util.ArrayList;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Loan;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * A table model for displaying active loans
  */
 public class LoanTableModel extends DataTableModel {
-    public static final int COL_DESC      =    0;
-    public static final int COL_RATE       =   1;
-    public static final int COL_PRINCIPAL  =   2;
-    public static final int COL_COLLATERAL =   3;
-    public static final int COL_VALUE        = 4;
-    public static final int COL_PAYMENT     =  5;
-    public static final int COL_SCHEDULE   =   6;
-    public static final int COL_NLEFT      =   7;
-    public static final int COL_NEXT_PAY   =   8;
-    public static final int N_COL            = 9;
+    public static final int COL_DESC = 0;
+    public static final int COL_RATE = 1;
+    public static final int COL_PRINCIPAL = 2;
+    public static final int COL_COLLATERAL = 3;
+    public static final int COL_VALUE = 4;
+    public static final int COL_PAYMENT = 5;
+    public static final int COL_SCHEDULE = 6;
+    public static final int COL_NLEFT = 7;
+    public static final int COL_NEXT_PAY = 8;
+    public static final int N_COL = 9;
 
     public LoanTableModel() {
         data = new ArrayList<Loan>();
@@ -160,7 +167,7 @@ public class LoanTableModel extends DataTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             setHorizontalAlignment(getAlignment(column));

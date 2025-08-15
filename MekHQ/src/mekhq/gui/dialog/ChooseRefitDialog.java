@@ -50,13 +50,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
-import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

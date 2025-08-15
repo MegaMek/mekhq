@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.EquipmentType;
 import mekhq.TestUtilities;
@@ -37,8 +44,6 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StripUnitActionTest {
     @BeforeAll

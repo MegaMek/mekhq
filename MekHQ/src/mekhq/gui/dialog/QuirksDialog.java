@@ -45,11 +45,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.panels.DialogOptionComponentYPanel;
 import megamek.client.ui.clientGUI.DialogOptionListener;
 import megamek.client.ui.dialogs.customMek.QuirksPanel;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Entity;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
