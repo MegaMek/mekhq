@@ -61,15 +61,15 @@ public class ScenarioTableModel extends DataTableModel {
     //region Variable Declarations
     private final Campaign campaign;
 
-    public static final int COL_NAME       = 0;
-    public static final int COL_STATUS     = 1;
-    public static final int COL_DATE       = 2;
-    public static final int COL_ASSIGN     = 3;
-    public static final int COL_SECTOR     = 4;
-    public static final int N_COL          = 5;
+    public static final int COL_NAME = 0;
+    public static final int COL_STATUS = 1;
+    public static final int COL_DATE = 2;
+    public static final int COL_ASSIGN = 3;
+    public static final int COL_SECTOR = 4;
+    public static final int N_COL = 5;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -131,7 +131,8 @@ public class ScenarioTableModel extends DataTableModel {
         } else if (col == COL_STATUS) {
             if (campaign.getCampaignOptions().isUseStratCon() && scenario instanceof AtBScenario) {
                 AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract, (AtBScenario) scenario);
+                StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                      (AtBScenario) scenario);
 
                 if (stratconScenario != null) {
                     // Determine attributes of the scenario
@@ -148,10 +149,10 @@ public class ScenarioTableModel extends DataTableModel {
 
                     // Add appropriate label for Crisis or Turning Point
                     String turningPointText = isCrisis
-                          ? ' ' + resources.getString("col_status.crisis")
-                          : isTurningPoint
-                          ? ' ' + resources.getString("col_status.turningPoint")
-                          : "";
+                                                    ? ' ' + resources.getString("col_status.crisis")
+                                                    : isTurningPoint
+                                                            ? ' ' + resources.getString("col_status.turningPoint")
+                                                            : "";
 
                     // Add closing span tag if there is an opening span
                     String closingSpan = openingSpan.isEmpty() ? "" : CLOSING_SPAN_TAG;
@@ -180,7 +181,8 @@ public class ScenarioTableModel extends DataTableModel {
                 if (scenario instanceof AtBScenario) {
                     AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
                     StratconCampaignState campaignState = contract.getStratconCampaignState();
-                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract, ((AtBScenario) scenario));
+                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                          ((AtBScenario) scenario));
 
                     if (campaignState != null && stratconScenario != null) {
                         StratconTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
@@ -208,8 +210,8 @@ public class ScenarioTableModel extends DataTableModel {
     public static class Renderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                       final boolean isSelected, final boolean hasFocus,
-                                                       final int row, final int column) {
+              final boolean isSelected, final boolean hasFocus,
+              final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (value instanceof ScenarioStatus) {
                 setToolTipText(((ScenarioStatus) value).getToolTipText());

@@ -24,13 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.commonmark.node.*;
+import org.commonmark.node.BlockQuote;
+import org.commonmark.node.Heading;
+import org.commonmark.node.ListBlock;
+import org.commonmark.node.Node;
+import org.commonmark.node.ThematicBreak;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
@@ -49,7 +58,7 @@ public class MarkdownRenderer {
     private MarkdownRenderer() {
         // only enable certain block types
         parser = Parser.builder().enabledBlockTypes(new HashSet<>(
-                Arrays.asList(Heading.class, ListBlock.class, ThematicBreak.class, BlockQuote.class))).build();
+              Arrays.asList(Heading.class, ListBlock.class, ThematicBreak.class, BlockQuote.class))).build();
         htmlRenderer = HtmlRenderer.builder().build();
     }
 
@@ -62,7 +71,9 @@ public class MarkdownRenderer {
 
     /**
      * This method renders markdown-flavored text as HTML
+     *
      * @param input - a String possible containing markdown markup (and html) to be rendered
+     *
      * @return a string rendered to html
      */
     public static String getRenderedHtml(String input) {

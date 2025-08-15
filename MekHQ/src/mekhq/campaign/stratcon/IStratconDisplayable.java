@@ -24,13 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.stratcon;
 
 /**
- * This interface defines a stratcon element (a facility or a scenario currently)
- * that is able to provide various kinds of information for display in some UI elements.
+ * This interface defines a stratcon element (a facility or a scenario currently) that is able to provide various kinds
+ * of information for display in some UI elements.
+ *
  * @author NickAragua
  *
  */

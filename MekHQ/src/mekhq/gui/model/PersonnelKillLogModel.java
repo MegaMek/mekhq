@@ -24,21 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.awt.FontMetrics;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
+import javax.swing.UIManager;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class PersonnelKillLogModel extends DataTableModel {
     private static final String EMPTY_CELL = "";
@@ -46,13 +55,16 @@ public class PersonnelKillLogModel extends DataTableModel {
     public static final int COL_DATE = 0;
     public static final int COL_TEXT = 1;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel",
-            MekHQ.getMHQOptions().getLocale());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.PersonnelKillLogModel",
+          MekHQ.getMHQOptions().getLocale());
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions()
+                                                                .getDisplayFormattedDate(LocalDate.now())
+                                                                .concat("MM"));
     }
 
     @Override
@@ -84,7 +96,9 @@ public class PersonnelKillLogModel extends DataTableModel {
             case COL_DATE:
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_TEXT:
-                return String.format(resourceMap.getString("killDetail.format"), kill.getWhatKilled(), kill.getKilledByWhat());
+                return String.format(resourceMap.getString("killDetail.format"),
+                      kill.getWhatKilled(),
+                      kill.getKilledByWhat());
             default:
                 return EMPTY_CELL;
         }
@@ -143,7 +157,7 @@ public class PersonnelKillLogModel extends DataTableModel {
         return new PersonnelKillLogModel.Renderer();
     }
 
-    public static class Renderer extends JTextPane implements TableCellRenderer  {
+    public static class Renderer extends JTextPane implements TableCellRenderer {
         private final SimpleAttributeSet attribs = new SimpleAttributeSet();
         private final FontMetrics metrics;
 
@@ -157,7 +171,7 @@ public class PersonnelKillLogModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             setText((String) value);
             StyleConstants.setAlignment(attribs, ((PersonnelKillLogModel) table.getModel()).getAlignment(column));
             setParagraphAttributes(attribs, false);

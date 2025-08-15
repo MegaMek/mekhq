@@ -206,7 +206,12 @@ public class PersonnelTablePanel extends JPanel {
             TableCellRenderer cellRenderer = table.getDefaultRenderer(String.class);
             for (int row = 0; row < table.getRowCount(); row++) {
                 Object value = table.getValueAt(row, columnIndex);
-                Component comp = cellRenderer.getTableCellRendererComponent(table, value, false, false, row, columnIndex);
+                Component comp = cellRenderer.getTableCellRendererComponent(table,
+                      value,
+                      false,
+                      false,
+                      row,
+                      columnIndex);
                 int cellWidth = comp.getPreferredSize().width;
                 if (cellWidth > maxWidth) {
                     maxWidth = cellWidth;

@@ -24,20 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import org.junit.jupiter.api.Test;
-
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * A test class for validating the functionality of the {@code PrisonerCaptureStyle} enumeration.
  *
  * <p>This class contains unit tests to ensure that each {@code PrisonerCaptureStyle} has valid
- * resource keys for its labels and tooltips. The tests verify that no invalid labels or tooltips
- * are present, as determined by the {@code isResourceKeyValid} method.</p>
+ * resource keys for its labels and tooltips. The tests verify that no invalid labels or tooltips are present, as
+ * determined by the {@code isResourceKeyValid} method.</p>
  */
 public class PrisonerCaptureStyleTest {
     @Test

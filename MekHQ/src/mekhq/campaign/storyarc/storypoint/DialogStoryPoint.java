@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
@@ -32,9 +37,6 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -42,6 +44,8 @@ import mekhq.campaign.storyarc.Personality;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StorySplash;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public abstract class DialogStoryPoint extends StoryPoint {
     private static final MMLogger logger = MMLogger.create(DialogStoryPoint.class);
@@ -69,8 +73,7 @@ public abstract class DialogStoryPoint extends StoryPoint {
     /**
      * Get the {@link Personality Personality} associated with this StoryPoint.
      *
-     * @return A {@link Personality Personality} or null if no Personality is
-     *         associated with the StoryPoint.
+     * @return A {@link Personality Personality} or null if no Personality is associated with the StoryPoint.
      */
     public Personality getPersonality() {
         if (null == personalityId) {

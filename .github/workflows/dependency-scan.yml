@@ -3,29 +3,29 @@ name: Gradle Dependency Submission
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   dependency-submission:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out MekHQ"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: MekHQ
 
       - name: "Check out MegaMekLab"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megameklab
-          ref: master
+          ref: main
           path: megameklab
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megamek
-          ref: master
+          ref: main
           path: megamek
 
       - name: Set up Temurin JDK 17

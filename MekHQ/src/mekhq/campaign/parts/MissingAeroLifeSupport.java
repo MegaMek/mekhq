@@ -25,24 +25,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -55,37 +59,37 @@ public class MissingAeroLifeSupport extends MissingPart {
         this(0, Money.zero(), false, null);
     }
 
-     public MissingAeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
-         super(tonnage, c);
-         this.cost = cost;
-         this.name = "Fighter Life Support";
-         this.fighter = f;
-         if (!fighter) {
-             this.name = "Spacecraft Life Support";
-         }
-     }
+    public MissingAeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
+        super(tonnage, c);
+        this.cost = cost;
+        this.name = "Fighter Life Support";
+        this.fighter = f;
+        if (!fighter) {
+            this.name = "Spacecraft Life Support";
+        }
+    }
 
-     @Override
-     public int getBaseTime() {
-         int time = 0;
-         if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
-             // Test of proposed errata for repair times
-             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
-                 time = 1200;
-             } else {
-                 time = 180;
-             }
-             return time;
-         }
+    @Override
+    public int getBaseTime() {
+        int time = 0;
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+                time = 1200;
+            } else {
+                time = 180;
+            }
+            return time;
+        }
 
-         // Published errata for replacement times of small aero vs large craft
-         if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
-             time = 6720;
-         } else {
-             time = 180;
-         }
-         return time;
-     }
+        // Published errata for replacement times of small aero vs large craft
+        if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+            time = 6720;
+        } else {
+            time = 180;
+        }
+        return time;
+    }
 
     @Override
     public int getDifficulty() {
@@ -110,7 +114,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
-                && (cost.equals(part.getStickerPrice()));
+                     && (cost.equals(part.getStickerPrice()));
     }
 
     @Override

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.ranks;
 
@@ -33,14 +38,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A specific rank with information about officer status and payment multipliers
@@ -157,7 +161,7 @@ public class Rank {
 
     public String getNameWithLevels(final Profession profession) {
         return getRankNames().get(profession)
-                + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
+                     + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
     }
 
     public String getRankNamesAsString(final String delimiter) {
@@ -177,7 +181,7 @@ public class Rank {
     // region Boolean Comparison Methods
     public boolean isEmpty(final Profession profession) {
         return !getRankNames().containsKey(profession) || getRankNames().get(profession).isBlank()
-                || getRankNames().get(profession).equals("-");
+                     || getRankNames().get(profession).equals("-");
     }
 
     public boolean indicatesAlternativeSystem(final Profession profession) {
@@ -211,7 +215,7 @@ public class Rank {
     }
 
     public static @Nullable Rank generateInstanceFromXML(final Node wn, final Version version,
-            final boolean e0) {
+          final boolean e0) {
         final Rank rank = new Rank();
         try {
             final NodeList nl = wn.getChildNodes();
