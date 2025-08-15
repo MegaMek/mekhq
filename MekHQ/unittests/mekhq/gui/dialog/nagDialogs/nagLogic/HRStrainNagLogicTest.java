@@ -38,9 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test class verifies the functionality of the `hasAdminStrain` method
- * in the `AdminStrainNagLogic` class. The method checks if the given
- * admin strain value is positive.
+ * This test class verifies the functionality of the `hasAdminStrain` method in the `AdminStrainNagLogic` class. The
+ * method checks if the given admin strain value is positive.
  */
 public class HRStrainNagLogicTest {
     @Test

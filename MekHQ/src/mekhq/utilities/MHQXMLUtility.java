@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.utilities;
 
@@ -32,14 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
@@ -49,6 +49,9 @@ import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 public class MHQXMLUtility extends MMXMLUtility {
     private static final MMLogger logger = MMLogger.create(MHQXMLUtility.class);
@@ -56,9 +59,8 @@ public class MHQXMLUtility extends MMXMLUtility {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 
     /**
-     * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities
-     * attacks, but unsafe from
-     * XML entity expansion attacks.
+     * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities attacks, but unsafe from XML entity
+     * expansion attacks.
      *
      * @return A DocumentBuilder less safe to use to read untrusted XML.
      */
@@ -105,11 +107,12 @@ public class MHQXMLUtility extends MMXMLUtility {
      * TODO : Some of this may want to be back-ported into entity itself in MM and
      * then
      * TODO : re-factored out of EntityListFile.
-     *
+     * <p>
      * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ
      *
      * @param tgtEnt The entity to serialize to XML.
+     *
      * @return A string containing the XML representation of the entity.
      */
     public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, List<Entity> list) {
@@ -123,20 +126,20 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // Start writing this entity to the file.
         retVal.append(MHQXMLUtility.indentStr(indentLvl))
-                .append("<" + MULParser.ELE_ENTITY + " " + MULParser.ATTR_CHASSIS + "=\"")
-                .append(escape(tgtEnt.getFullChassis())).append("\" " + MULParser.ATTR_MODEL + "=\"")
-                .append(escape(tgtEnt.getModel()))
-                .append("\" " + MULParser.ATTR_TYPE + "=\"").append(escape(tgtEnt.getMovementModeAsString()))
-                .append("\" " + MULParser.ATTR_COMMANDER + "=\"")
-                .append(tgtEnt.isCommander()).append("\" " + MULParser.ATTR_EXT_ID + "=\"")
-                .append(tgtEnt.getExternalIdAsString());
+              .append("<" + MULParser.ELE_ENTITY + " " + MULParser.ATTR_CHASSIS + "=\"")
+              .append(escape(tgtEnt.getFullChassis())).append("\" " + MULParser.ATTR_MODEL + "=\"")
+              .append(escape(tgtEnt.getModel()))
+              .append("\" " + MULParser.ATTR_TYPE + "=\"").append(escape(tgtEnt.getMovementModeAsString()))
+              .append("\" " + MULParser.ATTR_COMMANDER + "=\"")
+              .append(tgtEnt.isCommander()).append("\" " + MULParser.ATTR_EXT_ID + "=\"")
+              .append(tgtEnt.getExternalIdAsString());
 
         if (tgtEnt.countQuirks() > 0) {
             retVal.append("\" " + MULParser.ATTR_QUIRKS + "=\"").append(escape(tgtEnt.getQuirkList("::")));
         }
         if (tgtEnt.getC3Master() != null) {
             retVal.append("\" " + MULParser.ATTR_C3MASTERIS + "=\"")
-                    .append(tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId()).getC3UUIDAsString());
+                  .append(tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId()).getC3UUIDAsString());
         }
         if (tgtEnt.hasC3() || tgtEnt.hasC3i() || tgtEnt.hasNavalC3()) {
             retVal.append("\" " + MULParser.ATTR_C3UUID + "=\"").append(tgtEnt.getC3UUIDAsString());
@@ -144,12 +147,12 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
             retVal.append("\" " + MULParser.ATTR_CAMO_CATEGORY + "=\"")
-                    .append(escape(tgtEnt.getCamouflage().getCategory()));
+                  .append(escape(tgtEnt.getCamouflage().getCategory()));
         }
 
         if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
             retVal.append("\" " + MULParser.ATTR_CAMO_FILENAME + "=\"")
-                    .append(escape(tgtEnt.getCamouflage().getFilename()));
+                  .append(escape(tgtEnt.getCamouflage().getFilename()));
         }
 
         if (tgtEnt.getDeployRound() > 0) {
@@ -158,7 +161,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         if (tgtEnt instanceof Infantry) {
             retVal.append(
-                    String.format("\" %s=\"%d", MULParser.ATTR_INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadCount()));
+                  String.format("\" %s=\"%d", MULParser.ATTR_INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadCount()));
         }
 
         retVal.append(String.format("\" %s=\"%d", MULParser.ATTR_ALTITUDE, tgtEnt.getAltitude()));
@@ -196,18 +199,18 @@ public class MHQXMLUtility extends MMXMLUtility {
 
             // SI
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
-                    .append("<" + MULParser.ELE_SI + " " + MULParser.ATTR_INTEGRITY + "=\"").append(a.getSI())
-                    .append("\"/>\n");
+                  .append("<" + MULParser.ELE_SI + " " + MULParser.ATTR_INTEGRITY + "=\"").append(a.getSI())
+                  .append("\"/>\n");
 
             // Heat sinks
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
-                    .append("<" + MULParser.ELE_HEAT + " " + MULParser.ATTR_SINK + "=\"").append(a.getHeatSinks())
-                    .append("\"/>\n");
+                  .append("<" + MULParser.ELE_HEAT + " " + MULParser.ATTR_SINK + "=\"").append(a.getHeatSinks())
+                  .append("\"/>\n");
 
             // Fuel
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
-                    .append("<" + MULParser.ELE_FUEL + " " + MULParser.ATTR_LEFT + "=\"").append(a.getFuel())
-                    .append("\"/>\n");
+                  .append("<" + MULParser.ELE_FUEL + " " + MULParser.ATTR_LEFT + "=\"").append(a.getFuel())
+                  .append("\"/>\n");
 
             // TODO: dropship docking collars, bays
 
@@ -217,13 +220,13 @@ public class MHQXMLUtility extends MMXMLUtility {
 
                 // KF integrity
                 retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
-                        .append("<" + MULParser.ELE_KF + " " + MULParser.ATTR_INTEGRITY + "=\"")
-                        .append(j.getKFIntegrity()).append("\"/>\n");
+                      .append("<" + MULParser.ELE_KF + " " + MULParser.ATTR_INTEGRITY + "=\"")
+                      .append(j.getKFIntegrity()).append("\"/>\n");
 
                 // KF sail integrity
                 retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
-                        .append("<" + MULParser.ELE_SAIL + " " + MULParser.ATTR_INTEGRITY + "=\"")
-                        .append(j.getSailIntegrity()).append("\"/>\n");
+                      .append("<" + MULParser.ELE_SAIL + " " + MULParser.ATTR_INTEGRITY + "=\"")
+                      .append(j.getSailIntegrity()).append("\"/>\n");
             }
 
             // Crits
@@ -251,7 +254,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                            .append("<" + MULParser.ELE_NC3LINK + " " + MULParser.ATTR_LINK + "=\"");
+                          .append("<" + MULParser.ELE_NC3LINK + " " + MULParser.ATTR_LINK + "=\"");
                     retVal.append(nc3Entity.getC3UUIDAsString());
                     retVal.append("\"/>\n");
                 }
@@ -269,9 +272,9 @@ public class MHQXMLUtility extends MMXMLUtility {
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                            .append("<" + MULParser.ELE_C3ILINK + " " + MULParser.ATTR_LINK + "=\"")
-                            .append(C3iEntity.getC3UUIDAsString())
-                            .append("\"/>\n");
+                          .append("<" + MULParser.ELE_C3ILINK + " " + MULParser.ATTR_LINK + "=\"")
+                          .append(C3iEntity.getC3UUIDAsString())
+                          .append("\"/>\n");
                 }
             }
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_C3I + ">\n");
@@ -284,7 +287,8 @@ public class MHQXMLUtility extends MMXMLUtility {
         return retVal.toString();
     }
 
-    private static void compileBombChoices(BombLoadout bombChoices, StringBuilder retVal, int indentLvl, boolean isInternal) {
+    private static void compileBombChoices(BombLoadout bombChoices, StringBuilder retVal, int indentLvl,
+          boolean isInternal) {
         if (bombChoices == null || bombChoices.isEmpty()) {
             return;
         }
@@ -292,16 +296,16 @@ public class MHQXMLUtility extends MMXMLUtility {
         for (Map.Entry<BombTypeEnum, Integer> entry : bombChoices.entrySet()) {
             BombTypeEnum bombType = entry.getKey();
             int count = entry.getValue();
-            
+
             if (count > 0) {
                 retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                        .append("<" + MULParser.ELE_BOMB + " " + MULParser.ATTR_TYPE + "=\"")
-                        .append(bombType.getInternalName())
-                        .append("\" " + MULParser.ATTR_LOAD + "=\"")
-                        .append(count)
-                        .append("\" " + MULParser.ATTR_INTERNAL + "=\"")
-                        .append(isInternal)
-                        .append("\"/>\n");
+                      .append("<" + MULParser.ELE_BOMB + " " + MULParser.ATTR_TYPE + "=\"")
+                      .append(bombType.getInternalName())
+                      .append("\" " + MULParser.ATTR_LOAD + "=\"")
+                      .append(count)
+                      .append("\" " + MULParser.ATTR_INTERNAL + "=\"")
+                      .append(isInternal)
+                      .append("\"/>\n");
             }
         }
         retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_BOMBS + ">\n");
@@ -319,11 +323,11 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...)
-     * Modified to support
-     * saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...) Modified to support saving to/from XML
+     * for our purposes in MekHQ
      *
      * @param a The Aero unit to generate a crit string for.
+     *
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
@@ -393,16 +397,16 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTurretLockedString(...)
-     * Modified to support
-     * saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getTurretLockedString(...) Modified to support saving to/from
+     * XML for our purposes in MekHQ
      *
      * @param e The tank to generate a turret-locked string for.
+     *
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
         String retval = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TURRETLOCK + " "
-                + MULParser.ATTR_DIRECTION + "=\"";
+                              + MULParser.ATTR_DIRECTION + "=\"";
         retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
         retval = retval.concat("\"/>\n");
 
@@ -410,11 +414,11 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getMovementString(...)
-     * Modified to support
-     * saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getMovementString(...) Modified to support saving to/from XML
+     * for our purposes in MekHQ
      *
      * @param e The tank to generate a movement string for.
+     *
      * @return The generated string.
      */
     private static String getMovementString(Tank e, int indentLvl) {
@@ -440,7 +444,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // save any motive hits
         retVal = retVal.concat(
-                MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_MDAMAGE + "=\"");
+              MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_MDAMAGE + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
         retVal = retVal.concat("\" " + MULParser.ATTR_MPENALTY + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
@@ -450,11 +454,11 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTankCritString(...)
-     * Modified to support
-     * saving to/from XML for our purposes in MekHQ
+     * Contents copied from megamek.common.EntityListFile.getTankCritString(...) Modified to support saving to/from XML
+     * for our purposes in MekHQ
      *
      * @param e The tank to generate a movement string for.
+     *
      * @return The generated string.
      */
     private static String getTankCritString(Tank e, int indentLvl) {
@@ -504,13 +508,13 @@ public class MHQXMLUtility extends MMXMLUtility {
      * which is also not added by the MHQXMLUtility method).
      */
     public static void writeEntityWithCrewToXML(PrintWriter pw, int indentLvl, Entity tgtEnt,
-            List<Entity> list) {
+          List<Entity> list) {
         String retVal = MHQXMLUtility.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
         StringBuilder crew = new StringBuilder(MHQXMLUtility.indentStr(indentLvl + 1));
         crew.append("<" + MULParser.ELE_CREW + " " + MULParser.ATTR_CREWTYPE + "=\"")
-                .append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
-                .append("\" " + MULParser.ATTR_SIZE + "=\"").append(tgtEnt.getCrew().getSize());
+              .append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
+              .append("\" " + MULParser.ATTR_SIZE + "=\"").append(tgtEnt.getCrew().getSize());
         if (tgtEnt.getCrew().getInitBonus() != 0) {
             crew.append("\" " + MULParser.ATTR_INITB + "=\"").append(tgtEnt.getCrew().getInitBonus());
         }
@@ -524,14 +528,14 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
             crew.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                    .append("<" + MULParser.ELE_CREWMEMBER + " " + MULParser.ATTR_SLOT + "=\"")
-                    .append(pos).append("\" " + MULParser.ATTR_NAME + "=\"")
-                    .append(MHQXMLUtility.escape(tgtEnt.getCrew().getName(pos)))
-                    .append("\" " + MULParser.ATTR_NICK + "=\"")
-                    .append(MHQXMLUtility.escape(tgtEnt.getCrew().getNickname(pos)))
-                    .append("\" " + MULParser.ATTR_GENDER + "=\"").append(tgtEnt.getCrew().getGender(pos).name())
-                    .append("\" " + MULParser.ATTR_GUNNERY + "=\"").append(tgtEnt.getCrew().getGunnery(pos))
-                    .append("\" " + MULParser.ATTR_PILOTING + "=\"").append(tgtEnt.getCrew().getPiloting(pos));
+                  .append("<" + MULParser.ELE_CREWMEMBER + " " + MULParser.ATTR_SLOT + "=\"")
+                  .append(pos).append("\" " + MULParser.ATTR_NAME + "=\"")
+                  .append(MHQXMLUtility.escape(tgtEnt.getCrew().getName(pos)))
+                  .append("\" " + MULParser.ATTR_NICK + "=\"")
+                  .append(MHQXMLUtility.escape(tgtEnt.getCrew().getNickname(pos)))
+                  .append("\" " + MULParser.ATTR_GENDER + "=\"").append(tgtEnt.getCrew().getGender(pos).name())
+                  .append("\" " + MULParser.ATTR_GUNNERY + "=\"").append(tgtEnt.getCrew().getGunnery(pos))
+                  .append("\" " + MULParser.ATTR_PILOTING + "=\"").append(tgtEnt.getCrew().getPiloting(pos));
 
             if (tgtEnt.getCrew().getToughness(pos) != 0) {
                 crew.append("\" " + MULParser.ATTR_TOUGH + "=\"").append(tgtEnt.getCrew().getToughness(pos));
@@ -562,30 +566,24 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Parses the given node as if it was a .mul file and returns the first entity
-     * it contains.
-     *
-     * In theme with {@link MULParser}, this method fails silently and returns
-     * {@code null} if the
-     * input can't be parsed; if it can be parsed and contains more than one entity,
-     * an
-     * {@linkplain IllegalArgumentException} is thrown.
+     * Parses the given node as if it was a .mul file and returns the first entity it contains.
+     * <p>
+     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the input can't be
+     * parsed; if it can be parsed and contains more than one entity, an {@linkplain IllegalArgumentException} is
+     * thrown.
      *
      * @param element  the xml tag to parse
-     * @param campaign the Campaign to parse using, which may be null to ignore the
-     *                 game and game
-     *                 options
-     * @return the first entity parsed from the given element, or {@code null} if
-     *         anything is wrong
-     *         with the input
-     * @throws IllegalArgumentException if the given element parses to multiple
-     *                                  entities
+     * @param campaign the Campaign to parse using, which may be null to ignore the game and game options
+     *
+     * @return the first entity parsed from the given element, or {@code null} if anything is wrong with the input
+     *
+     * @throws IllegalArgumentException if the given element parses to multiple entities
      */
     public static @Nullable Entity parseSingleEntityMul(final Element element,
-            final @Nullable Campaign campaign)
-            throws IllegalArgumentException {
+          final @Nullable Campaign campaign)
+          throws IllegalArgumentException {
         final List<Entity> entities = new MULParser(element, ((campaign == null) ? null : campaign.getGameOptions()))
-                .getEntities();
+                                            .getEntities();
 
         switch (entities.size()) {
             case 0:
@@ -599,7 +597,7 @@ public class MHQXMLUtility extends MMXMLUtility {
                 return entity;
             default:
                 throw new IllegalArgumentException(
-                        "More than one entity contained in XML string! Expecting a single entity.");
+                      "More than one entity contained in XML string! Expecting a single entity.");
         }
     }
 
@@ -611,6 +609,7 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     // region Simple XML Tag
+
     /**
      * This writes a Money or a Money array to file
      *
@@ -620,7 +619,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      * @param values the Money or Money[] to write to XML
      */
     public static void writeSimpleXMLTag(final PrintWriter pw, final int indent, final String name,
-            final Money... values) {
+          final Money... values) {
         if (values.length > 0) {
             final StringJoiner stringJoiner = new StringJoiner(",");
             for (final Money value : values) {

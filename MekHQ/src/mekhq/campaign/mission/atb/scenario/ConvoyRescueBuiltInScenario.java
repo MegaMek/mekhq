@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 import megamek.common.Board;
 import megamek.common.Entity;
@@ -33,13 +41,15 @@ import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 @AtBScenarioEnabled
 public class ConvoyRescueBuiltInScenario extends AtBScenario {
@@ -93,14 +103,14 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(Board.START_N);
         setDeploymentDelay(7);
 
         for (int i = 0; i < 4; i++) {
             getAlliesPlayer().add(getEntity(getContract(campaign).getEmployerCode(),
-                    getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), UnitType.MEK,
-                    EntityWeightClass.WEIGHT_LIGHT, campaign));
+                  getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), UnitType.MEK,
+                  EntityWeightClass.WEIGHT_LIGHT, campaign));
         }
 
         ArrayList<Entity> otherForce = new ArrayList<>();
@@ -114,9 +124,9 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 
         for (int i = 0; i < 12; i++) {
             enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                    getContract(campaign).getEnemyQuality(), UnitType.MEK,
-                    AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, getContract(campaign).getEnemy()),
-                    campaign));
+                  getContract(campaign).getEnemyQuality(), UnitType.MEK,
+                  AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, getContract(campaign).getEnemy()),
+                  campaign));
         }
 
         addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities), campaign);
@@ -128,9 +138,9 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 50, false);
+              1, 50, false);
         ScenarioObjective keepConvoyAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CONVOY_FORCE_ID, 1,
-                1, true);
+              1, true);
 
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
@@ -139,7 +149,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
         bonusEffect.howMuch = 1;
         keepConvoyAlive.addSuccessEffect(bonusEffect);
         keepConvoyAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
-                bonusEffect.howMuch));
+              bonusEffect.howMuch));
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

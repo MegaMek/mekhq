@@ -111,10 +111,13 @@ public class MRMSConfiguredOptions {
                 continue;
             }
 
-            MRMSOption mrmsOption = new MRMSOption(partRepairType, mrmsOptionControl.getActiveBox().isSelected(),
-                    mrmsOptionControl.getMinSkillCBox().getSelectedIndex(), mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
-                    (Integer) mrmsOptionControl.getTargetNumberPreferredSpn().getValue(), (Integer) mrmsOptionControl.getTargetNumberMaxSpn().getValue(),
-                    (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
+            MRMSOption mrmsOption = new MRMSOption(partRepairType,
+                  mrmsOptionControl.getActiveBox().isSelected(),
+                  mrmsOptionControl.getMinSkillCBox().getSelectedIndex(),
+                  mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
+                  (Integer) mrmsOptionControl.getTargetNumberPreferredSpn().getValue(),
+                  (Integer) mrmsOptionControl.getTargetNumberMaxSpn().getValue(),
+                  (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
 
             if (mrmsOption.isActive()) {
                 setHasActiveMRMSOption(true);
@@ -221,7 +224,7 @@ public class MRMSConfiguredOptions {
 
     public List<MRMSOption> getActiveMRMSOptions() {
         return isHActiveMRMSOption()
-                ? getMRMSOptions().stream().filter(MRMSOption::isActive).collect(Collectors.toList())
-                : Collections.emptyList();
+                     ? getMRMSOptions().stream().filter(MRMSOption::isActive).collect(Collectors.toList())
+                     : Collections.emptyList();
     }
 }

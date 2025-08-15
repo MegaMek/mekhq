@@ -176,7 +176,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
      * @return The JPanel containing the spinner, or {@code null} if the default value is invalid.
      */
     private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue, int maximumValue,
-                                                        int stepSize) {
+          int stepSize) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue, maximumValue, stepSize));
         JLabel label = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "spinner.label.auction"));
 

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -63,7 +68,7 @@ public enum ROMDesignation {
     // region Constructors
     ROMDesignation(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -151,7 +156,7 @@ public enum ROMDesignation {
     }
 
     private static String determineDesignationFromRole(final PersonnelRole role,
-            final Person person) {
+          final Person person) {
         switch (role) {
             case MEKWARRIOR:
             case LAM_PILOT:
@@ -210,7 +215,7 @@ public enum ROMDesignation {
             return valueOf(text);
         } catch (Exception ignored) {
             MMLogger.create(ROMDesignation.class)
-                    .error(ignored, "Unable to parse " + text + " into a ROMDesignation. Returning NONE");
+                  .error(ignored, "Unable to parse " + text + " into a ROMDesignation. Returning NONE");
             return ROMDesignation.NONE;
         }
     }

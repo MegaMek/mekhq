@@ -44,13 +44,11 @@ import mekhq.campaign.personnel.PronounData;
  * Represents various levels and traits of ambition in a personality.
  *
  * <p>This enumeration defines a wide range of traits that can be associated with a person's
- * personality. Traits are characterized as either "positive" or not and can optionally be "major"
- * traits. The enumeration also handles metadata such as retrieving localized labels and
- * descriptions.</p>
+ * personality. Traits are characterized as either "positive" or not and can optionally be "major" traits. The
+ * enumeration also handles metadata such as retrieving localized labels and descriptions.</p>
  *
  * <p>Some traits, referred to as "Major Traits," denote stronger personality attributes
- * and are to be handled distinctly. These traits are always listed at the end of the
- * enumeration.</p>
+ * and are to be handled distinctly. These traits are always listed at the end of the enumeration.</p>
  */
 public enum Ambition {
     // region Enum Declarations
@@ -138,8 +136,7 @@ public enum Ambition {
      * Retrieves the label associated with the current enumeration value.
      *
      * <p>The label is determined based on the resource bundle for the application,
-     * utilizing the enum name combined with a specific key suffix to fetch the
-     * relevant localized string.</p>
+     * utilizing the enum name combined with a specific key suffix to fetch the relevant localized string.</p>
      *
      * @return the localized label string corresponding to the enumeration value.
      */
@@ -152,23 +149,23 @@ public enum Ambition {
     /**
      * Generates a localized and personalized description for the current enumeration value.
      * <p>
-     * This method retrieves a description using the enumeration's name and a specific key suffix
-     * derived from the given ambition description index. The description is further customized
-     * using the provided gender-specific pronouns, the individual's given name, and other localized
-     * text from the resource bundle.
+     * This method retrieves a description using the enumeration's name and a specific key suffix derived from the given
+     * ambition description index. The description is further customized using the provided gender-specific pronouns,
+     * the individual's given name, and other localized text from the resource bundle.
      * </p>
      *
-     * @param ambitionDescriptionIndex   an index representing the type/variation of the description.
-     *                                   This value is clamped to ensure it falls within a valid range.
-     * @param gender                     the {@link Gender} of the individual, used to determine
-     *                                   appropriate pronouns for the description.
-     * @param givenName                  the given name of the person. This <b>MUST</b> use
-     *                                  'person.getGivenName()' and <b>NOT</b> 'person.getFirstName()'
-     * @return                           a formatted description string based on the enum,
-     *                                   the individual's gender, name, and aggression description index.
+     * @param ambitionDescriptionIndex an index representing the type/variation of the description. This value is
+     *                                 clamped to ensure it falls within a valid range.
+     * @param gender                   the {@link Gender} of the individual, used to determine appropriate pronouns for
+     *                                 the description.
+     * @param givenName                the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
+     *                                 <b>NOT</b> 'person.getFirstName()'
+     *
+     * @return a formatted description string based on the enum, the individual's gender, name, and aggression
+     *       description index.
      */
     public String getDescription(int ambitionDescriptionIndex, final Gender gender,
-                                 final String givenName) {
+          final String givenName) {
         ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = name() + ".description." + ambitionDescriptionIndex;
@@ -184,8 +181,8 @@ public enum Ambition {
         // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
-            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
-            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
+              pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+              pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
     }
 
     /**
@@ -195,6 +192,7 @@ public enum Ambition {
      * includes the commander's address as part of the message formatting.</p>
      *
      * @param commanderAddress the address or name of the commander to include in the message.
+     *
      * @return the formatted Ronin message as a {@link String}.
      */
     public String getRoninMessage(String commanderAddress) {
@@ -223,16 +221,14 @@ public enum Ambition {
     }
 
     /**
-     * @return {@code true} if the personality trait is considered positive,
-     *         {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
      */
     public boolean isTraitPositive() {
         return isPositive;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered a major trait,
-     *         {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
      */
     public boolean isTraitMajor() {
         return isMajor;
@@ -246,15 +242,15 @@ public enum Ambition {
     // endregion Boolean Comparison Methods
 
     /**
-     * Converts the specified string into its corresponding Ambition enum value.
-     * The method attempts to interpret the string as either the name of an enum constant
-     * or an ordinal value of the enum. If the conversion fails, the method logs an error
-     * and returns the default value {@code NONE}.
+     * Converts the specified string into its corresponding Ambition enum value. The method attempts to interpret the
+     * string as either the name of an enum constant or an ordinal value of the enum. If the conversion fails, the
+     * method logs an error and returns the default value {@code NONE}.
      *
-     * @param text the string to be converted into an Ambition enum value. It can be the name
-     *             of the enum constant or its ordinal value as a string.
-     * @return the corresponding Ambition enum constant if the string matches a name or
-     *         ordinal value, otherwise {@code NONE}.
+     * @param text the string to be converted into an Ambition enum value. It can be the name of the enum constant or
+     *             its ordinal value as a string.
+     *
+     * @return the corresponding Ambition enum constant if the string matches a name or ordinal value, otherwise
+     *       {@code NONE}.
      */
     // region File I/O
     public static Ambition fromString(String text) {

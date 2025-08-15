@@ -25,19 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-
 import megamek.common.CriticalSlot;
 import megamek.common.ProtoMek;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import org.w3c.dom.Node;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -83,7 +87,7 @@ public class MissingProtoMekSensor extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-              unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD, 1);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD, 1);
         }
     }
 
@@ -118,7 +122,7 @@ public class MissingProtoMekSensor extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof ProtoMekSensor
-                && getUnitTonnage() == part.getUnitTonnage();
+                     && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override

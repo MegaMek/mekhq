@@ -61,7 +61,8 @@ public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
     /**
      * Determines whether this censure has expired according to the specified date.
      *
-     * <p>A censure is considered expired if more than {@link #EXPIRY_PERIOD} months have elapsed since it was issued.</p>
+     * <p>A censure is considered expired if more than {@link #EXPIRY_PERIOD} months have elapsed since it was
+     * issued.</p>
      *
      * @param today the date to check expiration against
      *
@@ -78,10 +79,12 @@ public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
     /**
      * Determines whether the censure can be escalated based on its severity and issue date.
      *
-     * <p>Escalation is possible if the severity has not reached the maximum allowed and at least six months have passed
+     * <p>Escalation is possible if the severity has not reached the maximum allowed and at least six months have
+     * passed
      * since issuance.</p>
      *
      * @param today the current campaign date
+     *
      * @return {@code true} if the censure can be escalated, {@code false} otherwise
      *
      * @author Illiani
