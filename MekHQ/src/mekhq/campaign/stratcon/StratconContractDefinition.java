@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -34,7 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
@@ -51,8 +55,7 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
- * This class holds data relevant to the various types of contract
- * that can occur in the StratCon campaign system.
+ * This class holds data relevant to the various types of contract that can occur in the StratCon campaign system.
  *
  * @author NickAragua
  */
@@ -71,7 +74,7 @@ public class StratconContractDefinition {
 
             // load user-specified modifier list
             ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest
-                    .Deserialize(MHQConstants.STRATCON_USER_CONTRACT_MANIFEST);
+                                                                  .Deserialize(MHQConstants.STRATCON_USER_CONTRACT_MANIFEST);
             if (userDefinitionList != null) {
                 definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
             }
@@ -81,13 +84,12 @@ public class StratconContractDefinition {
     }
 
     /**
-     * Returns the StratCon contract definition for the given
-     * {@link AtBContractType}
+     * Returns the StratCon contract definition for the given {@link AtBContractType}
      */
     public static StratconContractDefinition getContractDefinition(final AtBContractType atbContractType) {
         if (!loadedDefinitions.containsKey(atbContractType)) {
             String filePath = Paths.get(MHQConstants.STRATCON_CONTRACT_PATH,
-                    getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
+                  getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
             StratconContractDefinition def = Deserialize(new File(filePath));
 
             if (def == null) {
@@ -102,8 +104,7 @@ public class StratconContractDefinition {
     }
 
     /**
-     * The kind of actions that the player needs to undertake to complete
-     * strategic objectives for this contract.
+     * The kind of actions that the player needs to undertake to complete strategic objectives for this contract.
      */
     public enum StrategicObjectiveType {
         /**
@@ -112,39 +113,34 @@ public class StratconContractDefinition {
         AnyScenarioVictory,
 
         /**
-         * Victory in scenarios - designated by the "objectiveScenarios" collection.
-         * These are one-off scenarios that stick around on tracks - when revealed,
-         * they get a deploy/action/return date as usual, and the player gets one shot
-         * to complete them
+         * Victory in scenarios - designated by the "objectiveScenarios" collection. These are one-off scenarios that
+         * stick around on tracks - when revealed, they get a deploy/action/return date as usual, and the player gets
+         * one shot to complete them
          */
         SpecificScenarioVictory,
 
         /**
-         * Victory in scenarios designated as "required" (usually per contract command
-         * clause)
+         * Victory in scenarios designated as "required" (usually per contract command clause)
          */
         RequiredScenarioVictory,
 
         /**
-         * Control of allied facilities generated at contract start time
-         * Each track will be seeded with some number of allied facilities
-         * They must not be destroyed and the player must have control of them at the
-         * end-of-contract date
+         * Control of allied facilities generated at contract start time Each track will be seeded with some number of
+         * allied facilities They must not be destroyed and the player must have control of them at the end-of-contract
+         * date
          */
         AlliedFacilityControl,
 
         /**
-         * Control of hostile facilities generated at contract start time
-         * Each track will be seeded with some number of hostile facilities
-         * They must not be destroyed and the player must have control of them at the
-         * end-of-contract date
+         * Control of hostile facilities generated at contract start time Each track will be seeded with some number of
+         * hostile facilities They must not be destroyed and the player must have control of them at the end-of-contract
+         * date
          */
         HostileFacilityControl,
 
         /**
-         * Destruction of hostile facilities generated at contract start time
-         * Each track will be seeded with some number of hostile facilities
-         * They may either be destroyed or the player must have control of them at the
+         * Destruction of hostile facilities generated at contract start time Each track will be seeded with some number
+         * of hostile facilities They may either be destroyed or the player must have control of them at the
          * end-of-contract date
          */
         FacilityDestruction
@@ -154,19 +150,16 @@ public class StratconContractDefinition {
     private String briefing;
 
     /**
-     * How many allied facilities to generate for the contract,
-     * in addition to any facilities placed by objectives.
-     * < 0 indicates that the number of facilities should be scaled to the number of
-     * lances required by the contract. 0 indicates no additional allied facilities.
+     * How many allied facilities to generate for the contract, in addition to any facilities placed by objectives. < 0
+     * indicates that the number of facilities should be scaled to the number of lances required by the contract. 0
+     * indicates no additional allied facilities.
      */
     private double alliedFacilityCount;
 
     /**
-     * How many hostile facilities to generate for the contract,
-     * in addition to any facilities placed by objectives.
-     * -1 indicates that the number of facilities should be scaled to the number of
-     * lances required by the contract. 0 indicates no additional hostile
-     * facilities.
+     * How many hostile facilities to generate for the contract, in addition to any facilities placed by objectives. -1
+     * indicates that the number of facilities should be scaled to the number of lances required by the contract. 0
+     * indicates no additional hostile facilities.
      */
     private double hostileFacilityCount;
 
@@ -188,8 +181,8 @@ public class StratconContractDefinition {
     private List<ObjectiveParameters> objectiveParameters;
 
     /**
-     * This is a list of scenario modifier names that apply to
-     * *every* scenario generated in this contract. Use very sparingly.
+     * This is a list of scenario modifier names that apply to *every* scenario generated in this contract. Use very
+     * sparingly.
      */
     private List<String> globalScenarioModifiers = new ArrayList<>();
 
@@ -320,8 +313,7 @@ public class StratconContractDefinition {
     }
 
     /**
-     * Data structure that deals with the characteristics that a StratCon scenario
-     * objective may have
+     * Data structure that deals with the characteristics that a StratCon scenario objective may have
      */
     public static class ObjectiveParameters {
         /**
@@ -331,27 +323,24 @@ public class StratconContractDefinition {
         StrategicObjectiveType objectiveType;
 
         /**
-         * How many strategic objectives will be placed for this contract.
-         * 0 means none. A number less than zero indicates that the number of strategic
-         * objectives
-         * should be scaled to the number of lances required by the contract, and
-         * multiplied by that factor.
+         * How many strategic objectives will be placed for this contract. 0 means none. A number less than zero
+         * indicates that the number of strategic objectives should be scaled to the number of lances required by the
+         * contract, and multiplied by that factor.
          */
         @XmlElement(name = "objectiveCount")
         double objectiveCount;
 
         /**
-         * List of IDs (file names) of specific scenarios to use for this objective.
-         * Ignored for AnyScenarioVictory or AlliedFacilityControl objective types
+         * List of IDs (file names) of specific scenarios to use for this objective. Ignored for AnyScenarioVictory or
+         * AlliedFacilityControl objective types
          */
         @XmlElementWrapper(name = "objectiveScenarios")
         @XmlElement(name = "objectiveScenario")
         List<String> objectiveScenarios = new ArrayList<>();
 
         /**
-         * If a particular scenario being generated is a strategic objective, it will
-         * have
-         * these modifiers applied to it
+         * If a particular scenario being generated is a strategic objective, it will have these modifiers applied to
+         * it
          */
         @XmlElementWrapper(name = "objectiveScenarioModifiers")
         @XmlElement(name = "objectiveScenarioModifier")
@@ -359,8 +348,7 @@ public class StratconContractDefinition {
     }
 
     /**
-     * Serialize this instance of a scenario template to a File
-     * Please pass in a non-null file.
+     * Serialize this instance of a scenario template to a File Please pass in a non-null file.
      *
      * @param outputFile The destination file.
      */
@@ -368,7 +356,7 @@ public class StratconContractDefinition {
         try {
             JAXBContext context = JAXBContext.newInstance(StratconContractDefinition.class);
             JAXBElement<StratconContractDefinition> templateElement = new JAXBElement<>(
-                    new QName(ROOT_XML_ELEMENT_NAME), StratconContractDefinition.class, this);
+                  new QName(ROOT_XML_ELEMENT_NAME), StratconContractDefinition.class, this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
@@ -378,10 +366,10 @@ public class StratconContractDefinition {
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in
-     * file
+     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in file
      *
      * @param inputFile The source file
+     *
      * @return Possibly an instance of a ScenarioTemplate
      */
     public static StratconContractDefinition Deserialize(File inputFile) {
@@ -393,7 +381,7 @@ public class StratconContractDefinition {
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<StratconContractDefinition> definitionElement = um.unmarshal(inputSource,
-                        StratconContractDefinition.class);
+                      StratconContractDefinition.class);
                 resultingDefinition = definitionElement.getValue();
             }
         } catch (Exception e) {
@@ -415,8 +403,7 @@ public class StratconContractDefinition {
         public Map<AtBContractType, String> definitionFileNames;
 
         /**
-         * Attempt to deserialize an instance of an contract definition manifest from
-         * the passed-in file path
+         * Attempt to deserialize an instance of an contract definition manifest from the passed-in file path
          *
          * @return Possibly an instance of a contract definition Manifest
          */
@@ -434,7 +421,7 @@ public class StratconContractDefinition {
                 try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                     Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                     JAXBElement<ContractDefinitionManifest> manifestElement = um.unmarshal(inputSource,
-                            ContractDefinitionManifest.class);
+                          ContractDefinitionManifest.class);
                     resultingManifest = manifestElement.getValue();
                 }
             } catch (Exception e) {

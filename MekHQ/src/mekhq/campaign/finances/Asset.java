@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
@@ -32,22 +37,18 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * An Asset is a non-core (i.e. not part of the core company) investment that a
- * user can use to
- * generate income on a schedule. It can also be used increase loan collateral
- * and thus get bigger
- * loans.
+ * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to generate income on a
+ * schedule. It can also be used increase loan collateral and thus get bigger loans.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen (modern version)
@@ -62,7 +63,7 @@ public class Asset {
     private Money income;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Constructors
@@ -109,12 +110,12 @@ public class Asset {
     // endregion Getters/Setters
 
     public void processNewDay(final Campaign campaign, final LocalDate yesterday,
-            final LocalDate today, final Finances finances) {
+          final LocalDate today, final Finances finances) {
         if (getFinancialTerm().endsToday(yesterday, today)) {
             finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
-                    String.format(resources.getString("AssetPayment.finances"), getName()));
+                  String.format(resources.getString("AssetPayment.finances"), getName()));
             campaign.addReport(String.format(resources.getString("AssetPayment.report"),
-                    getIncome().toAmountAndSymbolString(), getName()));
+                  getIncome().toAmountAndSymbolString(), getName()));
         }
     }
 

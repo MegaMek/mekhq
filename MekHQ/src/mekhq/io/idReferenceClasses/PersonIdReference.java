@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.io.idReferenceClasses;
 
@@ -56,8 +61,7 @@ public class PersonIdReference extends Person {
     }
 
     /**
-     * This fixes a person's Genealogy PersonIdReferences. It is public ONLY for
-     * unit testing
+     * This fixes a person's Genealogy PersonIdReferences. It is public ONLY for unit testing
      *
      * @param campaign the campaign the person is in
      * @param person   the person to fix genealogy for
@@ -72,7 +76,7 @@ public class PersonIdReference extends Person {
             final Person spouse = campaign.getPerson(person.getGenealogy().getSpouse().getId());
             if (spouse == null) {
                 logger.warn("Failed to find the spouse for " + person.getFullTitle()
-                        + " with id " + person.getGenealogy().getSpouse().getId());
+                                  + " with id " + person.getGenealogy().getSpouse().getId());
             }
             person.getGenealogy().setSpouse(spouse);
         }
@@ -117,8 +121,8 @@ public class PersonIdReference extends Person {
                     continue;
                 }
                 final Person familyMember = (familyMemberReference instanceof PersonIdReference)
-                        ? campaign.getPerson(familyMemberReference.getId())
-                        : familyMemberReference;
+                                                  ? campaign.getPerson(familyMemberReference.getId())
+                                                  : familyMemberReference;
                 if (familyMember == null) {
                     logger.warn("Failed to find a person with id " + familyMemberReference.getId());
                 } else {

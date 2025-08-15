@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
@@ -35,28 +40,27 @@ import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.Test;
 
 class BattleMekFactionGenerationMethodTest {
     // region Variable Declarations
     private static final BattleMekFactionGenerationMethod[] methods = BattleMekFactionGenerationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
-                BattleMekFactionGenerationMethod.ORIGIN_FACTION.getToolTipText());
+              BattleMekFactionGenerationMethod.ORIGIN_FACTION.getToolTipText());
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText"),
-                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.getToolTipText());
+              BattleMekFactionGenerationMethod.SPECIFIED_FACTION.getToolTipText());
     }
     // endregion Getters
 
@@ -108,24 +112,24 @@ class BattleMekFactionGenerationMethodTest {
         final Faction mockSpecifiedFaction = mock(Faction.class);
 
         assertEquals(
-                BattleMekFactionGenerationMethod.ORIGIN_FACTION.generateFaction(mockPerson, mockCampaign,
-                        mockSpecifiedFaction),
-                mockOriginFaction);
+              BattleMekFactionGenerationMethod.ORIGIN_FACTION.generateFaction(mockPerson, mockCampaign,
+                    mockSpecifiedFaction),
+              mockOriginFaction);
         assertEquals(
-                BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.generateFaction(mockPerson, mockCampaign,
-                        mockSpecifiedFaction),
-                mockCampaignFaction);
+              BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.generateFaction(mockPerson, mockCampaign,
+                    mockSpecifiedFaction),
+              mockCampaignFaction);
         assertEquals(
-                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.generateFaction(mockPerson, mockCampaign,
-                        mockSpecifiedFaction),
-                mockSpecifiedFaction);
+              BattleMekFactionGenerationMethod.SPECIFIED_FACTION.generateFaction(mockPerson, mockCampaign,
+                    mockSpecifiedFaction),
+              mockSpecifiedFaction);
     }
 
     @Test
     void testToStringOverride() {
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.text"),
-                BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toString());
+              BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toString());
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.text"),
-                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toString());
+              BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toString());
     }
 }

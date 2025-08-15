@@ -24,19 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.trees;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import megamek.client.ui.trees.AbstractIconChooserTree;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 /**
- * StandardForceIconChooserTree is an implementation of AbstractIconChooserTree that initializes the
- * tree using the Force Icon Directory.
+ * StandardForceIconChooserTree is an implementation of AbstractIconChooserTree that initializes the tree using the
+ * Force Icon Directory.
+ *
  * @see AbstractIconChooserTree
  */
 public class StandardForceIconChooserTree extends AbstractIconChooserTree {
@@ -50,7 +56,7 @@ public class StandardForceIconChooserTree extends AbstractIconChooserTree {
     @Override
     protected DefaultTreeModel createTreeModel() {
         return createTreeModel(new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY),
-                MHQStaticDirectoryManager.getForceIcons());
+              MHQStaticDirectoryManager.getForceIcons());
     }
     //endregion Initialization
 }

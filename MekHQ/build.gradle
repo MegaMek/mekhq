@@ -2,9 +2,9 @@ import java.time.LocalDateTime
 
 plugins {
     id 'application'
-    id 'com.palantir.git-version' version '3.3.0'
-    id 'edu.sc.seis.launch4j' version '3.0.6'
-    id "io.sentry.jvm.gradle" version '5.7.0'
+    id 'com.palantir.git-version' version '4.0.0'
+    id 'edu.sc.seis.launch4j' version '4.0.0'
+    id "io.sentry.jvm.gradle" version '5.8.0'
     id 'jacoco'
     id 'java'
     id 'checkstyle'
@@ -44,14 +44,9 @@ ext {
             'java.base/java.util.concurrent=ALL-UNNAMED',
             '-Dsun.awt.disablegrab=true'
     ]
-    campaigns = 'campaigns'
-    data = 'data'
-    docs = 'docs'
-    lib = 'lib'
-    log = 'logs'
-    mmconf = 'mmconf'
-    userdata = 'userdata'
+
     fileStagingDir = "${layout.buildDirectory.get()}/files"
+    atlasedImages = "${fileStagingDir}/atlasedImages.txt"
     scriptsDir = "${projectDir}/scripts"
 
     mmDir = "${rootDir}/../megamek"
@@ -76,29 +71,29 @@ dependencies {
     implementation 'joda-time:joda-time:2.14.0'
     implementation 'org.joda:joda-money:1.0.6' // Has a 2.0.2 Version
 
-    implementation 'org.apache.commons:commons-csv:1.14.0'
+    implementation 'org.apache.commons:commons-csv:1.14.1'
     implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'org.apache.commons:commons-text:1.13.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.24.3'
+    implementation 'org.apache.commons:commons-text:1.14.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.25.1'
 
     implementation 'org.apache.pdfbox:pdfbox:3.0.5'
 
-    implementation 'org.commonmark:commonmark:0.24.0'
+    implementation 'org.commonmark:commonmark:0.25.1'
 
     implementation 'org.jfree:jfreechart:1.5.6'
 
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2'
 
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
 
     // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatibility.
     runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testImplementation 'org.mockito:mockito-core:5.18.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
 }
@@ -115,9 +110,6 @@ application {
     ]
 }
 
-run {
-    jvmArgs = mhqJvmOptions
-}
 
 jar {
     archiveFileName = "MekHQ.jar"
@@ -126,7 +118,7 @@ jar {
         attributes "Main-Class": application.mainClass
         attributes "Class-Path": "MegaMek.jar MegaMekLab.jar " + (project.sourceSets.main.runtimeClasspath.files
                 .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
-                .collect { "${lib}/${it.name}" }.join(' '))
+                .collect { "lib/${it.name}" }.join(' '))
         attributes "Add-Opens": 'java.base/java.util java.base/java.util.concurrent'
         attributes "Build-Date": LocalDateTime.now()
         attributes "Sealed": true
@@ -148,6 +140,14 @@ tasks.withType(Checkstyle).configureEach {
     maxHeapSize = "4g"
 }
 
+tasks.register('stageDataFiles', Sync) {
+    dependsOn gradle.includedBuild('mm-data').task(':stageFiles')
+    description = "Syncs Data Files from MHQ Data"
+    group = 'build'
+    from "../../mm-data/build/staging/all"
+    into "${layout.projectDirectory.asFile}/data"
+}
+
 tasks.register('generateDynamicFiles') {
     def jvmOptions = project.ext.mhqJvmOptions.join('\n')
 
@@ -158,26 +158,6 @@ tasks.register('generateDynamicFiles') {
 ${jvmOptions}
 """
     }
-}
-
-tasks.register('canonSystemZip', Zip) {
-    description = 'Creates a zip archive of canon planetary systems.'
-    from "${data}/universe/planetary_systems/canon_systems/"
-
-    archiveFileName = "canon_systems.zip"
-    destinationDirectory = file("${fileStagingDir}/${data}/universe/planetary_systems")
-    inputs.dir "${data}/universe/planetary_systems/canon_systems/"
-    outputs.dir "${fileStagingDir}/${data}/universe/planetary_systems"
-}
-
-tasks.register('connectorSystemZip', Zip) {
-    description = 'Creates a zip archive of connector systems planetary systems.'
-    from "${data}/universe/planetary_systems/connector_systems/"
-
-    archiveFileName = "connector_systems.zip"
-    destinationDirectory = file("${fileStagingDir}/${data}/universe/planetary_systems")
-    inputs.dir "${data}/universe/planetary_systems/connector_systems/"
-    outputs.dir "${fileStagingDir}/${data}/universe/planetary_systems"
 }
 
 tasks.register("stageLicenseFiles", Sync) {
@@ -196,7 +176,7 @@ tasks.register("stageLicenseFiles", Sync) {
 }
 
 tasks.register("copyLicenseFiles", Copy) {
-    description "Copies from the build folder to the staging folder"
+    description = "Copies from the build folder to the staging folder"
     group = 'build'
 
     dependsOn stageLicenseFiles
@@ -205,66 +185,73 @@ tasks.register("copyLicenseFiles", Copy) {
     into fileStagingDir
 }
 
+tasks.register('createImageAtlases', JavaExec) {
+    mustRunAfter(stageDataFiles)
+    description = 'Combines individual image files into a set of image atlases.'
+    group = 'utility'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "megamek.utilities.CreateImageAtlases"
+    workingDir = file(fileStagingDir)
+}
+
+tasks.register('deleteAtlasedImages') {
+    dependsOn createImageAtlases
+    description = 'Removes images from the staging directory that have been incorporated into atlases.'
+    doLast {
+        if (file(atlasedImages).exists()) {
+            ant.delete dir: fileStagingDir, includesfile: atlasedImages
+            ant.delete file: atlasedImages
+        }
+    }
+}
+
+tasks.register('officialUnitList', JavaExec) {
+    dependsOn jar
+    mustRunAfter(stageDataFiles)
+    description = 'Compiles a list of all units that come from official sources and saves it in the docs folder.'
+    group = 'utility'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'megamek.MegaMek'
+    args = ['-oul', "${projectDir}/docs/OfficialUnitList.txt"]
+}
+
 tasks.register('stageFiles', Copy) {
     description = 'Stages files that are to be copied into the distribution.'
+
+    mustRunAfter(stageDataFiles)
+    dependsOn officialUnitList
+    dependsOn deleteAtlasedImages
 
     dependsOn gradle.includedBuild('megamek').task(':megamek:generateDynamicFiles')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:generateDynamicFiles')
     dependsOn generateDynamicFiles
     dependsOn copyLicenseFiles
 
-    dependsOn canonSystemZip
-    dependsOn connectorSystemZip
-
     from projectDir
-    include "${campaigns}/"
-    include "${data}/fonts/"
-    include "${data}/universe/"
-    include "${data}/mapgen/"
-    include "${data}/names/bloodnames/"
-    include "${data}/images/awards/"
-    include "${data}/images/force/"
-    include "${data}/images/portraits/"
-    include "${data}/images/fluff/Mek/*.png"
-    include "${data}/images/misc/"
-    include "${data}/images/stratcon/"
-    include "${data}/images/universe/"
-    include "${data}/images/storysplash/"
-    include "${data}/randomEvents/"
-    include "${data}/campaignPresets/"
-    include "${data}/scenariomodifiers/"
-    include "${data}/scenariotemplates/"
-    include "${data}/stratconbiomedefinitions/"
-    include "${data}/stratconcontractdefinitions/"
-    include "${data}/stratconfacilities/"
-    include "${data}/storyarcs/"
-    include "${data}/terrainconditionsodds/"
-    include "${docs}/**"
-    include "${mmconf}/**"
-    include "${userdata}"
-    include "${userdata}/data/universe/"
+    include "campaigns/"
+    include "data/**"
+    include "docs/**"
+    include "mmconf/**"
+    include "userdata"
+    include "userdata/data/universe/"
     include 'SubmitBug.html'
     include "sentry.properties"
     include "*.ini"
 
     // User Config Files
-    exclude "${mmconf}/clientsettings.xml"
-    exclude "${mmconf}/gameoptions.xml"
-    exclude "${mmconf}/megameklab.properties"
-    exclude "${mmconf}/megameklab.properties.bak"
-    exclude "${mmconf}/mhq.preferences"
-    exclude "${mmconf}/mm.preferences"
-    exclude "${mmconf}/mml.preferences"
-
-    // Planetary Systems
-    exclude "${data}/universe/planetary_systems/canon_systems/"
-    exclude "${data}/universe/planetary_systems/connector_systems/"
+    exclude "mmconf/clientsettings.xml"
+    exclude "mmconf/gameoptions.xml"
+    exclude "mmconf/megameklab.properties"
+    exclude "mmconf/megameklab.properties.bak"
+    exclude "mmconf/mhq.preferences"
+    exclude "mmconf/mm.preferences"
+    exclude "mmconf/mml.preferences"
 
     into fileStagingDir
 
     doLast {
-        mkdir "${fileStagingDir}/${log}"
-        mkdir "${fileStagingDir}/${userdata}/${data}/campaignPresets/"
+        mkdir "${fileStagingDir}/log"
+        mkdir "${fileStagingDir}/userdata/data/campaignPresets/"
     }
 }
 
@@ -283,66 +270,74 @@ distributions {
         distributionBaseName = 'MekHQ'
         contents {
             // MegaMek Includes
-            from("${mmDir}/megamek/build/files")
             from("${mmDir}/megamek/build/scripts") {
                 into "bin"
             }
+
             from("${mmDir}/megamek/scripts") {
                 include "shell.sh"
                 rename "shell.sh", "MegaMek.sh"
             }
+
             from("${mmDir}/megamek/docs") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
+
             from("${mmDir}/megamek/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
+
             from("${mmDir}/megamek/build/launch4j/lib") {
-                into "${lib}"
+                into "lib"
             }
+
             from("${mmDir}/megamek/build/launch4j") {
                 include '*.exe'
             }
+
             from("${mmDir}/megamek/build/libs/MegaMek.jar") {
-                into "${lib}"
+                into "lib"
             }
+
             from("${mmDir}/megamek/build/libs/MegaMek.jar")
             from("${mmDir}/megamek/") {
                 include '*.ini'
             }
 
             // MegaMekLab Includes
-            from("${mmlDir}/megameklab/build/files") {
-                exclude 'data/mekfiles'
-            }
             from("${mmlDir}/megameklab/build/launch4j/lib") {
-                into "${lib}"
+                into "lib"
             }
-            from("${mmlDir}/megameklab/build/files/${data}/images") {
-                into "${data}/images"
-            }
+
             from("${mmlDir}/megameklab/build/scripts") {
                 into "bin"
             }
+
             from("${mmlDir}/megameklab/scripts") {
                 include "shell.sh"
                 rename "shell.sh", "MegaMekLab.sh"
             }
+
             from("${mmlDir}/megameklab/docs") {
                 rename 'history.txt', 'mml-history.txt'
-                into "${docs}"
+                into "docs"
             }
+
             from("${mmlDir}/megameklab/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
+
             from("${mmlDir}/megameklab/build/launch4j") {
                 include '*.exe'
             }
+
             from("${mmlDir}/megameklab/build/libs/MegaMekLab.jar") {
-                into "${lib}"
+                into "lib"
             }
+
             from("${mmlDir}/megameklab/build/libs/MegaMekLab.jar")
+
             from("${mmlDir}/megameklab/") {
                 include '*.ini'
             }
@@ -352,24 +347,29 @@ distributions {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
             }
+
             from(fileStagingDir) {
                 exclude 'history.txt'
             }
+
             from("${projectDir}/scripts") {
                 include 'shell.sh'
                 rename 'shell.sh', 'MekHQ.sh'
             }
+
             from("${buildDir}/launch4j") {
                 include '*.exe'
             }
 
             from(project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
-                into "${lib}"
+                into "lib"
             }
+
             from(jar) {
-                into "${lib}"
+                into "lib"
             }
+
             from(jar)
 
             duplicatesStrategy = 'exclude'
@@ -396,6 +396,9 @@ launch4j {
     messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
 }
 
+project.tasks.createExe.dependsOn(stageDataFiles)
+project.tasks.createExe.mustRunAfter(stageDataFiles)
+
 tasks.register("packagePrepWork") {
     description = 'General Catch All for all distributions'
     dependsOn jar
@@ -403,9 +406,6 @@ tasks.register("packagePrepWork") {
     dependsOn startScripts
     dependsOn createStartScripts
     dependsOn createAllExecutables
-
-    dependsOn gradle.includedBuild('megamek').task(':megamek:stageFiles')
-    dependsOn gradle.includedBuild('megameklab').task(':megameklab:stageFiles')
 
     dependsOn gradle.includedBuild('megamek').task(':megamek:startScripts')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:startScripts')
@@ -474,6 +474,10 @@ tasks.register("testAll") {
     dependsOn test
 }
 
+run {
+    mustRunAfter(stageDataFiles)
+    jvmArgs = mhqJvmOptions
+}
 
 test {
     useJUnitPlatform()

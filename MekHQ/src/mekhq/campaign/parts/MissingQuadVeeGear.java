@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,16 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
-
-import megamek.common.annotations.Nullable;
-import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
 import megamek.common.QuadVee;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import org.w3c.dom.Node;
 
 /**
  * Missing part for QuadVee conversion gear
@@ -69,7 +73,7 @@ public class MissingQuadVeeGear extends MissingPart {
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
             if (unit.getEntity().locationIsLeg(i)
-                    && unit.isLocationDestroyed(i)) {
+                      && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
         }

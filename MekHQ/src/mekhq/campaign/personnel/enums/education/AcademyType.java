@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums.education;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum AcademyType {
     //region Enum Declarations
@@ -40,7 +45,8 @@ public enum AcademyType {
     MILITARY_ACADEMY("AcademyType.MILITARY_ACADEMY.text", "AcademyType.MILITARY_ACADEMY.toolTipText"),
     BASIC_TRAINING("AcademyType.BASIC_TRAINING.text", "AcademyType.BASIC_TRAINING.toolTipText"),
     NCO_ACADEMY("AcademyType.NCO_ACADEMY.text", "AcademyType.NCO_ACADEMY.toolTipText"),
-    WARRANT_OFFICER_ACADEMY("AcademyType.WARRANT_OFFICER_ACADEMY.text", "AcademyType.WARRANT_OFFICER_ACADEMY.toolTipText"),
+    WARRANT_OFFICER_ACADEMY("AcademyType.WARRANT_OFFICER_ACADEMY.text",
+          "AcademyType.WARRANT_OFFICER_ACADEMY.toolTipText"),
     OFFICER_ACADEMY("AcademyType.OFFICER_ACADEMY.text", "AcademyType.OFFICER_ACADEMY.toolTipText");
     //endregion Enum Declarations
 
@@ -52,7 +58,7 @@ public enum AcademyType {
     //region Constructors
     AcademyType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -102,15 +108,17 @@ public enum AcademyType {
     }
     //endregion Boolean Comparison Methods
 
-/**
- * Parses a given string and returns the corresponding AcademyType.
- * Accepts either the ENUM ordinal value, or its name
- *
- * @param academyType the string to be parsed
- * @return the AcademyType object that corresponds to the given string
- * @throws IllegalStateException if the given string does not match any valid AcademyType
- */
-//region File I/O
+    /**
+     * Parses a given string and returns the corresponding AcademyType. Accepts either the ENUM ordinal value, or its
+     * name
+     *
+     * @param academyType the string to be parsed
+     *
+     * @return the AcademyType object that corresponds to the given string
+     *
+     * @throws IllegalStateException if the given string does not match any valid AcademyType
+     */
+    //region File I/O
     public static AcademyType parseFromString(final String academyType) {
         switch (academyType) {
             case "0":
@@ -141,8 +149,9 @@ public enum AcademyType {
             case "Officer Academy":
                 return OFFICER_ACADEMY;
             default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/AcademyType.java/parseFromString: "
-                        + academyType);
+                throw new IllegalStateException(
+                      "Unexpected value in mekhq/campaign/personnel/enums/education/AcademyType.java/parseFromString: "
+                            + academyType);
         }
     }
     //endregion File I/O

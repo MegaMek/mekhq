@@ -24,25 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
-
-import megamek.common.enums.Gender;
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ResourceBundle;
+
+import megamek.common.enums.Gender;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 public class FamilialRelationshipTypeTest {
     //region Variable Declarations
     private static final FamilialRelationshipType[] types = FamilialRelationshipType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Boolean Comparison Methods
@@ -273,43 +278,43 @@ public class FamilialRelationshipTypeTest {
     @Test
     public void testGetTypename() {
         assertEquals(resources.getString("FamilialRelationshipType.PARENT.MALE.text"),
-                FamilialRelationshipType.PARENT.getTypeName(Gender.MALE));
+              FamilialRelationshipType.PARENT.getTypeName(Gender.MALE));
         assertEquals(resources.getString("FamilialRelationshipType.PARENT.FEMALE.text"),
-                FamilialRelationshipType.PARENT.getTypeName(Gender.FEMALE));
+              FamilialRelationshipType.PARENT.getTypeName(Gender.FEMALE));
         assertEquals(resources.getString("FamilialRelationshipType.PARENT.OTHER.text"),
-                FamilialRelationshipType.PARENT.getTypeName(Gender.RANDOMIZE));
+              FamilialRelationshipType.PARENT.getTypeName(Gender.RANDOMIZE));
 
         assertEquals(resources.getString("FamilialRelationshipType.great")
-                        + resources.getString("FamilialRelationshipType.GRANDPIBLING.MALE.text"),
-                FamilialRelationshipType.GRANDPIBLING.getTypeName(Gender.MALE, 1, false));
+                           + resources.getString("FamilialRelationshipType.GRANDPIBLING.MALE.text"),
+              FamilialRelationshipType.GRANDPIBLING.getTypeName(Gender.MALE, 1, false));
         assertEquals(resources.getString("FamilialRelationshipType.great")
-                        + resources.getString("FamilialRelationshipType.GRANDPIBLING.FEMALE.text"),
-                FamilialRelationshipType.GRANDPIBLING.getTypeName(Gender.FEMALE, 1, false));
+                           + resources.getString("FamilialRelationshipType.GRANDPIBLING.FEMALE.text"),
+              FamilialRelationshipType.GRANDPIBLING.getTypeName(Gender.FEMALE, 1, false));
         assertEquals(resources.getString("FamilialRelationshipType.great")
-                        + resources.getString("FamilialRelationshipType.GRANDPIBLING.OTHER.text"),
-                FamilialRelationshipType.GRANDPIBLING.getTypeName(Gender.RANDOMIZE, 1, false));
+                           + resources.getString("FamilialRelationshipType.GRANDPIBLING.OTHER.text"),
+              FamilialRelationshipType.GRANDPIBLING.getTypeName(Gender.RANDOMIZE, 1, false));
 
         assertEquals(resources.getString("FamilialRelationshipType.adopted")
-                        + ' ' + resources.getString("FamilialRelationshipType.CHILD.MALE.text"),
-                FamilialRelationshipType.CHILD.getTypeName(Gender.MALE, 0, true));
+                           + ' ' + resources.getString("FamilialRelationshipType.CHILD.MALE.text"),
+              FamilialRelationshipType.CHILD.getTypeName(Gender.MALE, 0, true));
         assertEquals(resources.getString("FamilialRelationshipType.adopted")
-                        + ' ' + resources.getString("FamilialRelationshipType.CHILD.FEMALE.text"),
-                FamilialRelationshipType.CHILD.getTypeName(Gender.FEMALE, 0, true));
+                           + ' ' + resources.getString("FamilialRelationshipType.CHILD.FEMALE.text"),
+              FamilialRelationshipType.CHILD.getTypeName(Gender.FEMALE, 0, true));
         assertEquals(resources.getString("FamilialRelationshipType.adopted")
-                        + ' ' + resources.getString("FamilialRelationshipType.CHILD.OTHER.text"),
-                FamilialRelationshipType.CHILD.getTypeName(Gender.RANDOMIZE, 0, true));
+                           + ' ' + resources.getString("FamilialRelationshipType.CHILD.OTHER.text"),
+              FamilialRelationshipType.CHILD.getTypeName(Gender.RANDOMIZE, 0, true));
 
         assertEquals(resources.getString("FamilialRelationshipType.adopted")
-                        + ' ' + resources.getString("FamilialRelationshipType.great")
-                        + resources.getString("FamilialRelationshipType.GRANDCHILD.MALE.text"),
-                FamilialRelationshipType.GRANDCHILD.getTypeName(Gender.MALE, 1, true));
+                           + ' ' + resources.getString("FamilialRelationshipType.great")
+                           + resources.getString("FamilialRelationshipType.GRANDCHILD.MALE.text"),
+              FamilialRelationshipType.GRANDCHILD.getTypeName(Gender.MALE, 1, true));
         assertEquals(resources.getString("FamilialRelationshipType.adopted")
-                        + ' ' + resources.getString("FamilialRelationshipType.great")
-                        + resources.getString("FamilialRelationshipType.GRANDCHILD.FEMALE.text"),
-                FamilialRelationshipType.GRANDCHILD.getTypeName(Gender.FEMALE, 1, true));
+                           + ' ' + resources.getString("FamilialRelationshipType.great")
+                           + resources.getString("FamilialRelationshipType.GRANDCHILD.FEMALE.text"),
+              FamilialRelationshipType.GRANDCHILD.getTypeName(Gender.FEMALE, 1, true));
         assertEquals(resources.getString("FamilialRelationshipType.adopted")
-                        + ' ' + resources.getString("FamilialRelationshipType.great")
-                        + resources.getString("FamilialRelationshipType.GRANDCHILD.OTHER.text"),
-                FamilialRelationshipType.GRANDCHILD.getTypeName(Gender.RANDOMIZE, 1, true));
+                           + ' ' + resources.getString("FamilialRelationshipType.great")
+                           + resources.getString("FamilialRelationshipType.GRANDCHILD.OTHER.text"),
+              FamilialRelationshipType.GRANDCHILD.getTypeName(Gender.RANDOMIZE, 1, true));
     }
 }
