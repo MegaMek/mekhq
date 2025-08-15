@@ -2,7 +2,7 @@ name: MekHQ CI with Code Coverage
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
@@ -18,18 +18,24 @@ jobs:
         java-version: [ 17, 21 ]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Data Repo
+        uses: actions/checkout@v5
+        with:
+          repository: megamek/mm-data
+          path: mm-data
+
+      - uses: actions/checkout@v5
         with:
           path: mekhq
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megamek
           path: megamek
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: MegaMek/megameklab
           path: megameklab

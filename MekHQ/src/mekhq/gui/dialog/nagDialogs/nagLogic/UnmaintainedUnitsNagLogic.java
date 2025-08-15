@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.unit.Unit;
-
 import java.util.Collection;
+
+import mekhq.campaign.unit.Unit;
 
 public class UnmaintainedUnitsNagLogic {
     /**
@@ -44,8 +49,8 @@ public class UnmaintainedUnitsNagLogic {
      * {@code false}.</p>
      *
      * @param units A {@link Collection} of {@link Unit} objects representing the campaign's hangar units.
-     * @return {@code true} if unmaintained, non-salvage units are found in the collection,
-     *         {@code false} otherwise.
+     *
+     * @return {@code true} if unmaintained, non-salvage units are found in the collection, {@code false} otherwise.
      */
     public static boolean campaignHasUnmaintainedUnits(Collection<Unit> units) {
         for (Unit unit : units) {

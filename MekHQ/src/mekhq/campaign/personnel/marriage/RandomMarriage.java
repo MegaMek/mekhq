@@ -37,9 +37,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 /**
- * {@link RandomMarriage} class represents a type of marriage where the result is determined by
- * rolling a die.
- * It extends the {@link AbstractMarriage} class.
+ * {@link RandomMarriage} class represents a type of marriage where the result is determined by rolling a die. It
+ * extends the {@link AbstractMarriage} class.
  */
 public class RandomMarriage extends AbstractMarriage {
     //region Variable Declarations
@@ -47,11 +46,11 @@ public class RandomMarriage extends AbstractMarriage {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
-     * Constructs a {@link RandomMarriage} object. This object is used to manage randomly determined
-     * marriages.
+     * Constructs a {@link RandomMarriage} object. This object is used to manage randomly determined marriages.
      *
-     * @param options  the {@link CampaignOptions} object that contains current game campaign settings.
+     * @param options the {@link CampaignOptions} object that contains current game campaign settings.
      */
     public RandomMarriage(final CampaignOptions options) {
         super(RandomMarriageMethod.DICE_ROLL, options);
@@ -61,6 +60,7 @@ public class RandomMarriage extends AbstractMarriage {
     //endregion Constructors
 
     //region Getters/Setters
+
     /**
      * Sets the size of the marriage dice used in a random marriage.
      *

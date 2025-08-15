@@ -24,13 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.unitMarket;
 
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.common.Entity;
@@ -43,6 +45,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class UnitMarketOffer {
     private static final MMLogger logger = MMLogger.create(UnitMarketOffer.class);
@@ -60,7 +64,7 @@ public class UnitMarketOffer {
     }
 
     public UnitMarketOffer(final UnitMarketType marketType, final int unitType,
-            final MekSummary unit, final int percent, final int transitDuration) {
+          final MekSummary unit, final int percent, final int transitDuration) {
         setMarketType(marketType);
         setUnitType(unitType);
         setUnit(unit);
@@ -119,7 +123,7 @@ public class UnitMarketOffer {
             return new MekFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
         } catch (Exception e) {
             logger.error("Unable to load entity: " + getUnit().getSourceFile()
-                    + ": " + getUnit().getEntryName() + ". Returning null.", e);
+                               + ": " + getUnit().getEntryName() + ". Returning null.", e);
             return null;
         }
     }
@@ -143,8 +147,8 @@ public class UnitMarketOffer {
     }
 
     public static @Nullable UnitMarketOffer generateInstanceFromXML(final Node wn,
-            final Campaign campaign,
-            final Version version) {
+          final Campaign campaign,
+          final Version version) {
         UnitMarketOffer retVal = new UnitMarketOffer();
         NodeList nl = wn.getChildNodes();
 
@@ -164,7 +168,7 @@ public class UnitMarketOffer {
                     retVal.setUnit(MekSummaryCache.getInstance().getMek(unitName));
                     if (retVal.getUnit() == null) {
                         logger.error(
-                                "Failed to find unit with name " + unitName + ", removing the offer from the market.");
+                              "Failed to find unit with name " + unitName + ", removing the offer from the market.");
                         return null;
                     }
                 } else if (wn3.getNodeName().equalsIgnoreCase("percent")) {

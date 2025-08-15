@@ -24,29 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 
 public class EndContractNagLogic {
     /**
      * Determines if any active contract in the current campaign ends today.
      *
      * <p>This method checks all active contracts in the campaign to determine whether any
-     * contract's end date matches the specified date. It iterates through the list of active
-     * contracts and compares each contract's ending date with the given date.</p>
+     * contract's end date matches the specified date. It iterates through the list of active contracts and compares
+     * each contract's ending date with the given date.</p>
      *
      * <p>
-     * Note that once a contract's end date has passed, it is removed from the list of active
-     * contracts. Therefore, this method only checks contracts currently considered active.
+     * Note that once a contract's end date has passed, it is removed from the list of active contracts. Therefore, this
+     * method only checks contracts currently considered active.
      * </p>
      *
-     * @param today The current local date to check against the contracts' ending dates.
+     * @param today           The current local date to check against the contracts' ending dates.
      * @param activeContracts A list of {@link AtBContract} objects representing the campaign's active contracts.
      *
      * @return {@code true} if any contract ends on the specified date; {@code false} otherwise.

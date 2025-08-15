@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.event;
@@ -32,10 +37,8 @@ import megamek.common.event.MMEvent;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- * Triggered when a unit or part is scheduled for delivery following a
- * successful acquisition role.
- * A failed acquisition role should trigger a ProcurementEvent.
- *
+ * Triggered when a unit or part is scheduled for delivery following a successful acquisition role. A failed acquisition
+ * role should trigger a ProcurementEvent.
  */
 public class AcquisitionEvent extends MMEvent {
 

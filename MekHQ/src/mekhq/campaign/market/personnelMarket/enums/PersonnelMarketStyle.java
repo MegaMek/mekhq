@@ -74,6 +74,7 @@ public enum PersonnelMarketStyle {
      * Gets the filename for the Clan market configuration.
      *
      * @return the Clan market configuration filename
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -85,6 +86,7 @@ public enum PersonnelMarketStyle {
      * Gets the filename for the Inner Sphere market configuration.
      *
      * @return the Inner Sphere market configuration filename
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -95,11 +97,14 @@ public enum PersonnelMarketStyle {
     /**
      * Returns the {@link PersonnelMarketStyle} corresponding to the provided text.
      *
-     * <p>Tries to match by enum name, string value, or ordinal/index. If resolution fails, {@link #PERSONNEL_MARKET_DISABLED}
+     * <p>Tries to match by enum name, string value, or ordinal/index. If resolution fails,
+     * {@link #PERSONNEL_MARKET_DISABLED}
      * is returned and an error is logged.</p>
      *
      * @param text the {@link String} representation or ordinal of the market style
+     *
      * @return the corresponding {@link PersonnelMarketStyle} or {@link #PERSONNEL_MARKET_DISABLED} if unknown
+     *
      * @author Illiani
      * @since 0.50.06
      */

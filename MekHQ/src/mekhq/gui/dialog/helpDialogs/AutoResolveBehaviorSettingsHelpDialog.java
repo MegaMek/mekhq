@@ -24,11 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.helpDialogs;
 
 import java.awt.Dimension;
-
 import javax.swing.JFrame;
 
 import megamek.client.ui.dialogs.helpDialogs.AbstractHelpDialog;
@@ -37,9 +41,10 @@ import mekhq.utilities.MHQInternationalization;
 public class AutoResolveBehaviorSettingsHelpDialog extends AbstractHelpDialog {
 
     /**
-     * Creates a new instance of AutoResolveBehaviorSettingsHelpDialog.
-     * This screen opens a help dialog, using the megamek help dialog, which open an HTML file
-     * @param frame  parent frame
+     * Creates a new instance of AutoResolveBehaviorSettingsHelpDialog. This screen opens a help dialog, using the
+     * megamek help dialog, which open an HTML file
+     *
+     * @param frame parent frame
      */
     public AutoResolveBehaviorSettingsHelpDialog(final JFrame frame) {
         super(frame, MHQInternationalization.getText("AutoResolveBehaviorSettingsDialog.title"),

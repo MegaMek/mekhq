@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
@@ -41,9 +46,10 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
-     * Creates a new DefaultFactionSelector class which uses {@link Campaign#getFaction()} to
-     * select the faction.
+     * Creates a new DefaultFactionSelector class which uses {@link Campaign#getFaction()} to select the faction.
+     *
      * @param options the {@link RandomOriginOptions} to use in faction selection
      */
     public DefaultFactionSelector(final RandomOriginOptions options) {
@@ -52,6 +58,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
 
     /**
      * Creates a new DefaultFactionSelector using the specified faction
+     *
      * @param options the {@link RandomOriginOptions} to use in faction selection
      * @param faction The {@link Faction}.
      */

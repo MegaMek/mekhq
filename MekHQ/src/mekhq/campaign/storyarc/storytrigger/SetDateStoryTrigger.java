@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storytrigger;
 
@@ -32,9 +37,6 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -42,15 +44,13 @@ import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This StoryTrigger will set the date in a
- * {@link CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by
- * its id.
- * This can be used to assign dates to events where the date might not be known
- * in advance. The date can be assigned
- * either by an actual date or by the number of days into the future from the
- * point of this trigger.
+ * This StoryTrigger will set the date in a {@link CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by
+ * its id. This can be used to assign dates to events where the date might not be known in advance. The date can be
+ * assigned either by an actual date or by the number of days into the future from the point of this trigger.
  */
 public class SetDateStoryTrigger extends StoryTrigger {
     private static final MMLogger logger = MMLogger.create(SetDateStoryTrigger.class);
@@ -60,8 +60,7 @@ public class SetDateStoryTrigger extends StoryTrigger {
     private UUID storyPointId;
 
     /**
-     * the date to be changed to. This can be null if this trigger uses number of
-     * days instead
+     * the date to be changed to. This can be null if this trigger uses number of days instead
      **/
     private LocalDate date;
 

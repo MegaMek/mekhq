@@ -60,8 +60,8 @@ import mekhq.campaign.Campaign;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *             TODO : Account for the de facto alliance of the invading Clans and the
- *             TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                   TODO : Account for the de facto alliance of the invading Clans and the
+ *                   TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger logger = MMLogger.create(RandomFactionGenerator.class);

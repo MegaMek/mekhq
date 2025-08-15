@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -33,17 +38,15 @@ import mekhq.campaign.finances.Money;
 
 public class UnableToAffordExpensesNagLogic {
     /**
-     * Determines whether the campaign's current funds are insufficient to cover
-     * the monthly expenses.
+     * Determines whether the campaign's current funds are insufficient to cover the monthly expenses.
      *
      * <p>
-     * This method compares the campaign's available funds with the {@code monthlyExpenses}
-     * amount. If the available funds are less than the monthly expenses, it returns {@code true},
-     * indicating that the campaign cannot afford its expenses; otherwise, it returns {@code false}.
+     * This method compares the campaign's available funds with the {@code monthlyExpenses} amount. If the available
+     * funds are less than the monthly expenses, it returns {@code true}, indicating that the campaign cannot afford its
+     * expenses; otherwise, it returns {@code false}.
      * </p>
      *
-     * @return {@code true} if the campaign's funds are less than the monthly expenses;
-     *         {@code false} otherwise.
+     * @return {@code true} if the campaign's funds are less than the monthly expenses; {@code false} otherwise.
      */
     public static boolean unableToAffordExpenses(Campaign campaign) {
         Money monthlyExpenses = getMonthlyExpenses(campaign);
@@ -54,9 +57,9 @@ public class UnableToAffordExpensesNagLogic {
      * Retrieves and calculates the campaign's total monthly expenses.
      *
      * <p>
-     * This method generates a {@link FinancialReport} for the campaign to compute the
-     * total monthly expenses, which are then stored in the {@code monthlyExpenses} field.
-     * The expenses include operational costs, unit upkeep, payroll, and other recurring items.
+     * This method generates a {@link FinancialReport} for the campaign to compute the total monthly expenses, which are
+     * then stored in the {@code monthlyExpenses} field. The expenses include operational costs, unit upkeep, payroll,
+     * and other recurring items.
      * </p>
      */
     public static Money getMonthlyExpenses(Campaign campaign) {

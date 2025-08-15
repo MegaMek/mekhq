@@ -70,12 +70,12 @@ import org.junit.jupiter.api.Test;
  * Unit tests for the {@link RandomDeath} class.
  *
  * <p>This class contains a suite of tests that validate the functionality of various methods
- * in the {@code RandomDeath} class, including determining if a person can die, simulating
- * random deaths, processing weekly death events, and evaluating campaign-specific configurations.</p>
+ * in the {@code RandomDeath} class, including determining if a person can die, simulating random deaths, processing
+ * weekly death events, and evaluating campaign-specific configurations.</p>
  *
  * <p>These tests use mocked dependencies, such as {@link Person}, {@link Campaign}, and
- * {@link CampaignOptions}, to isolate the functionality of individual methods and ensure
- * accurate testing without requiring an entire campaign environment.</p>
+ * {@link CampaignOptions}, to isolate the functionality of individual methods and ensure accurate testing without
+ * requiring an entire campaign environment.</p>
  *
  * <p>Key Testing Scenarios:</p>
  * <ul>
@@ -100,13 +100,13 @@ public class RandomDeathTest {
     public void beforeAll() {
         // Prep Age Groups
         ageGroups = Map.of(
-            ELDER, true,
-            ADULT, false,
-            TEENAGER, true,
-            PRETEEN, true,
-            CHILD, true,
-            TODDLER, true,
-            BABY, true
+              ELDER, true,
+              ADULT, false,
+              TEENAGER, true,
+              PRETEEN, true,
+              CHILD, true,
+              TODDLER, true,
+              BABY, true
         );
 
         mockedCampaign = mock(Campaign.class);

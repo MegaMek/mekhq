@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,9 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui.menus;
+
+import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
+
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.JOptionPane;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -37,15 +49,9 @@ import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.utilities.MHQInternationalization;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.Set;
-
-import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
-
 /**
  * Menu for assigning a force to a specific Tow transport
+ *
  * @see CampaignTransportType#TOW_TRANSPORT
  * @see mekhq.campaign.unit.TowTransportedUnitsSummary
  * @see mekhq.campaign.unit.TransportAssignment
@@ -54,8 +60,10 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
     /**
      * Constructor for a new tow transport Menu
+     *
      * @param campaign current campaign
-     * @param units selected units to try and assign
+     * @param units    selected units to try and assign
+     *
      * @see CampaignTransportType#TOW_TRANSPORT
      */
     public AssignForceToTowTransportMenu(Campaign campaign, Set<Unit> units) {
@@ -63,9 +71,10 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
     }
 
     /**
-     * Returns a Set of Transporters that the provided units could all be loaded into
-     * for Tow Transport.
+     * Returns a Set of Transporters that the provided units could all be loaded into for Tow Transport.
+     *
      * @param units filter the Transporter list based on what these units could use
+     *
      * @return most Transporter types except cargo and hitches
      */
     @Override
@@ -73,7 +82,8 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(TOW_TRANSPORT).keySet());
 
         for (Unit unit : units) {
-            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(TOW_TRANSPORT, unit.getEntity());
+            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(TOW_TRANSPORT,
+                  unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {
@@ -89,18 +99,22 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
     /**
      * Assign a unit to a Tow Transport.
+     *
      * @param evt             ActionEvent from the selection happening
      * @param transporterType transporter type selected in an earlier menu
      * @param transport       transport (Unit) that will load these units
      * @param units           units being assigned to the transport
      */
     @Override
-    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Set<Unit> units) {
+    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport,
+          Set<Unit> units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canTow(unit.getEntity().getId())) {
                 JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
-                    "mekhq.resources.AssignForceToTransport", "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
-                    unit.getName(), transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
+                      "mekhq.resources.AssignForceToTransport",
+                      "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
+                      unit.getName(),
+                      transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -124,7 +138,8 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
                 MekHQ.triggerEvent(new UnitChangedEvent(oldTransport));
             }
             if (!towingEnt.equals(transport)) {
-                transport.getTransportedUnitsSummary(TOW_TRANSPORT).recalculateTransportCapacity(transport.getEntity().getTransports());
+                transport.getTransportedUnitsSummary(TOW_TRANSPORT)
+                      .recalculateTransportCapacity(transport.getEntity().getTransports());
                 campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
                 MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
             }
