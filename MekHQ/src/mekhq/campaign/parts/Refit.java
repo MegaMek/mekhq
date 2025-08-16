@@ -2323,18 +2323,25 @@ public class Refit extends Part implements IAcquisitionWork {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "refit");
     }
 
+    public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version, final Campaign campaign,
+          final Unit unit) {
+        return generateInstanceFromXML(wn, version, campaign, unit, false);
+    }
+
     /**
      * Recreates a refit from the save data
      *
-     * @param wn       - our XML node
-     * @param version  - save file version ?
-     * @param campaign - campaign we're loading into
-     * @param unit     - unit this refit is attached to
+     * @param wn         - our XML node
+     * @param version    - save file version ?
+     * @param campaign   - campaign we're loading into
+     * @param unit       - unit this refit is attached to
+     * @param isUnitTest {@code true} if this is triggered by a unit test. Bypasses MUL parsing to prevent NPE, as Unit
+     *                   Tests do not have data access needed for this action.
      *
      * @return a brand-new Refit
      */
     public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version, final Campaign campaign,
-          final Unit unit) {
+          final Unit unit, boolean isUnitTest) {
         Refit retVal = new Refit();
         retVal.oldUnit = Objects.requireNonNull(unit);
 
@@ -2373,6 +2380,10 @@ public class Refit extends Part implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
                     retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
+                    if (isUnitTest) {
+                        continue;
+                    }
+
                     retVal.newEntity = Objects.requireNonNull(MHQXMLUtility.parseSingleEntityMul((Element) wn2,
                           campaign));
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
