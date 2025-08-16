@@ -44,49 +44,46 @@ import megamek.logging.MMLogger;
  * <p>This enum also provides a utility method to parse values from strings or integers.</p>
  */
 public enum SkillAttribute {
-    /**
-     * Represents no specific attribute.
-     */
-    NONE,
+    /** Represents no specific attribute. */
+    NONE("NONE"),
+    /** Represents physical strength or power. */
+    STRENGTH("STRENGTH"),
+    /** Represents overall physical condition and health. */
+    BODY("BODY"),
+    /** Represents coordination and fine motor skills. */
+    DEXTERITY("DEXTERITY"),
+    /** Represents reflexes or reaction time. */
+    REFLEXES("REFLEXES"),
+    /** Represents cognitive ability and problem-solving skills. */
+    INTELLIGENCE("INTELLIGENCE"),
+    /** Represents mental willpower and determination. */
+    WILLPOWER("WILLPOWER"),
+    /** Represents social skills and personal magnetism. */
+    CHARISMA("CHARISMA");
 
-    /**
-     * Represents physical strength or power.
-     */
-    STRENGTH,
-
-    /**
-     * Represents overall physical condition and health.
-     */
-    BODY,
-
-    /**
-     * Represents coordination and fine motor skills.
-     */
-    DEXTERITY,
-
-    /**
-     * Represents reflexes or reaction time.
-     */
-    REFLEXES,
-
-    /**
-     * Represents cognitive ability and problem-solving skills.
-     */
-    INTELLIGENCE,
-
-    /**
-     * Represents mental willpower and determination.
-     */
-    WILLPOWER,
-
-    /**
-     * Represents social skills and personal magnetism.
-     */
-    CHARISMA;
-
-    public static int NO_SKILL_ATTRIBUTE = -1;
+    public static final int NO_SKILL_ATTRIBUTE = -1;
 
     final private static String RESOURCE_BUNDLE = "mekhq.resources.SkillAttribute";
+
+    private final String lookupName;
+
+    /**
+     * Constructs a {@link SkillAttribute} with the specified lookup name.
+     *
+     * @param lookupName The localized or identifier name associated with this {@link SkillAttribute}.
+     */
+    SkillAttribute(String lookupName) {
+        this.lookupName = lookupName;
+    }
+
+    /**
+     * Retrieves the lookup name associated with this {@link SkillAttribute}.
+     *
+     * @return The lookup name as a {@link String}.
+     */
+    public String getLookupName() {
+        return lookupName;
+    }
 
     /**
      * Checks if the current instance is {@link #NONE}.
@@ -109,7 +106,7 @@ public enum SkillAttribute {
      * @since 0.50.05
      */
     public String getLabel() {
-        final String RESOURCE_KEY = name() + ".label";
+        final String RESOURCE_KEY = lookupName + ".label";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -128,7 +125,7 @@ public enum SkillAttribute {
      * @since 0.50.05
      */
     public static String getLabel(SkillAttribute attribute) {
-        final String RESOURCE_KEY = attribute.name() + ".label";
+        final String RESOURCE_KEY = attribute.lookupName + ".label";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -145,7 +142,7 @@ public enum SkillAttribute {
      * @since 0.50.05
      */
     public String getShortName() {
-        final String RESOURCE_KEY = name() + ".shortName";
+        final String RESOURCE_KEY = lookupName + ".shortName";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -164,7 +161,7 @@ public enum SkillAttribute {
      * @since 0.50.05
      */
     public static String getShortName(SkillAttribute attribute) {
-        final String RESOURCE_KEY = attribute.name() + ".shortName";
+        final String RESOURCE_KEY = attribute.lookupName + ".shortName";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -181,7 +178,7 @@ public enum SkillAttribute {
      * @since 0.50.05
      */
     public String getDescription() {
-        final String RESOURCE_KEY = name() + ".description";
+        final String RESOURCE_KEY = lookupName + ".description";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -200,7 +197,7 @@ public enum SkillAttribute {
      * @since 0.50.05
      */
     public static String getDescription(SkillAttribute attribute) {
-        final String RESOURCE_KEY = attribute.name() + ".description";
+        final String RESOURCE_KEY = attribute.lookupName + ".description";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }

@@ -239,6 +239,9 @@ public class Person {
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
+    private Attributes atowAttributes;
+
+    // If new Traits are added, make sure to also add them to LifePathDataTraitLookup
     private int connections;
     private int wealth;
     private boolean hasPerformedExtremeExpenditure;
@@ -246,7 +249,6 @@ public class Person {
     private int unlucky;
     private int bloodmark;
     private List<LocalDate> bloodhuntSchedule;
-    private Attributes atowAttributes;
 
     private PersonnelStatus status;
     private int xp;
