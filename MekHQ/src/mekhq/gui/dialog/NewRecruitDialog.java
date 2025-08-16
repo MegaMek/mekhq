@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -120,8 +121,9 @@ public class NewRecruitDialog extends JDialog {
 
         JPanel panBottomButtons = createButtonPanel(resourceMap);
 
-        scrollView.setMinimumSize(new Dimension(450, 180));
-        scrollView.setPreferredSize(new Dimension(450, 180));
+        Dimension dimension = scaleForGUI(700, 180);
+        scrollView.setMinimumSize(dimension);
+        scrollView.setPreferredSize(dimension);
         scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollView.setViewportView(null);
         refreshView();

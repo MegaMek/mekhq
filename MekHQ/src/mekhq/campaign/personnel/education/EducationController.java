@@ -33,13 +33,8 @@
 package mekhq.campaign.personnel.education;
 
 import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -69,7 +64,6 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -158,16 +152,11 @@ public class EducationController {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
-        if (campaignOptions.isUseRandomPersonalities()) {
-            roll += (person.getReasoning().getReasoningScore() / 4);
-        }
-
-        // Calculate target number based on base target number and faculty skill
+        // Calculate the target number based on base target number and faculty skill
         int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
 
-        // If roll meets the target number, the application is successful
+        // If the roll meets the target number, the application is successful
         if (roll >= targetNumber) {
             return true;
         } else {
@@ -1179,10 +1168,6 @@ public class EducationController {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += person.getReasoning().getReasoningScore();
-        }
-
         // qualification failed
         if (graduationRoll < 5) {
             if (academy.isHomeSchool()) {
@@ -1475,10 +1460,6 @@ public class EducationController {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += person.getReasoning().ordinal() - 12;
-        }
-
         // We don't process the granularity of graduation events for very young children.
         if (person.getAge(campaign.getLocalDate()) <= 6) {
             graduationRoll = 30;
@@ -1570,15 +1551,6 @@ public class EducationController {
         if (academy.isReeducationCamp()) {
             if (campaign.getCampaignOptions().isUseReeducationCamps()) {
                 person.setOriginFaction(campaign.getFaction());
-            }
-
-            // People coming out of re-education camps have a chance to become a little weird
-            if (person.getPersonalityQuirk().isNone()) {
-                if (randomInt(PERSONALITY_QUIRK_CHANCE / 2) == 0) {
-                    generateAndApplyPersonalityQuirk(person);
-                    writePersonalityDescription(person);
-                    writeInterviewersNotes(person);
-                }
             }
 
             // brainwashed personnel should have higher than average loyalty, so they roll
@@ -2045,11 +2017,7 @@ public class EducationController {
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
 
         // We base passRate on US averages
-        int passRate = 60 - (Reasoning.values().length / 2);
-        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
-                                            person.getReasoning().getReasoningScore() :
-                                            Reasoning.values().length / 2;
-        passRate += reasoningModifier;
+        int passRate = 60;
 
         final boolean flunked = Compute.randomInt(100) <= passRate;
 

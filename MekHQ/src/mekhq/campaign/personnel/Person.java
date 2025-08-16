@@ -59,7 +59,6 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -340,8 +339,6 @@ public class Person {
     private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
     private int personalityQuirkDescriptionIndex;
-    private Reasoning reasoning;
-    private int reasoningDescriptionIndex;
     private String personalityDescription;
     private String personalityInterviewNotes;
     // endregion Personality
@@ -361,8 +358,6 @@ public class Person {
     private int storedSocialDescriptionIndex;
     private PersonalityQuirk storedPersonalityQuirk;
     private int storedPersonalityQuirkDescriptionIndex;
-    private Reasoning storedReasoning;
-    private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
     private boolean darkSecretRevealed;
     private LocalDate burnedConnectionsEndDate;
@@ -557,8 +552,6 @@ public class Person {
         socialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
-        reasoning = Reasoning.AVERAGE;
-        reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
         personalityInterviewNotes = "";
         storedLoyalty = 0;
@@ -572,8 +565,6 @@ public class Person {
         storedSocialDescriptionIndex = 0;
         storedPersonalityQuirk = PersonalityQuirk.NONE;
         storedPersonalityQuirkDescriptionIndex = 0;
-        storedReasoning = Reasoning.AVERAGE;
-        storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
         darkSecretRevealed = false;
         burnedConnectionsEndDate = null;
@@ -2610,42 +2601,40 @@ public class Person {
         this.storedPersonalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public Reasoning getReasoning() {
-        return reasoning;
+        return Reasoning.AVERAGE;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setReasoning(final Reasoning reasoning) {
-        this.reasoning = reasoning;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getReasoningDescriptionIndex() {
-        return reasoningDescriptionIndex;
+        return 0;
     }
 
-    /**
-     * Sets the index value for the {@link Reasoning} description.
-     *
-     * @param reasoningDescriptionIndex The index value to set for the Reasoning description. It will be clamped to
-     *                                  ensure it remains within the valid range.
-     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setReasoningDescriptionIndex(final int reasoningDescriptionIndex) {
-        this.reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, Reasoning.MAXIMUM_VARIATIONS - 1);
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     Reasoning getStoredReasoning() {
-        return storedReasoning;
+        return Reasoning.AVERAGE;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     void setStoredReasoning(Reasoning storedReasoning) {
-        this.storedReasoning = storedReasoning;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     int getStoredReasoningDescriptionIndex() {
-        return storedReasoningDescriptionIndex;
+        return 0;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     void setStoredReasoningDescriptionIndex(int storedReasoningDescriptionIndex) {
-        this.storedReasoningDescriptionIndex = storedReasoningDescriptionIndex;
     }
 
     public String getPersonalityDescription() {
@@ -3164,12 +3153,6 @@ public class Person {
                   "personalityQuirkDescriptionIndex",
                   personalityQuirkDescriptionIndex);
 
-            if (reasoning != Reasoning.AVERAGE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
-            }
-
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoningDescriptionIndex", reasoningDescriptionIndex);
-
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -3244,17 +3227,6 @@ public class Person {
                       indent,
                       "storedPersonalityQuirkDescriptionIndex",
                       storedPersonalityQuirkDescriptionIndex);
-            }
-
-            if (storedReasoning != Reasoning.AVERAGE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedReasoning", storedReasoning.name());
-            }
-
-            if (storedReasoningDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedReasoningDescriptionIndex",
-                      storedReasoningDescriptionIndex);
             }
 
             if (sufferingFromClinicalParanoia) {
@@ -3774,10 +3746,6 @@ public class Person {
                     }
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
-                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
-                    person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
-                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
-                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
@@ -3810,10 +3778,6 @@ public class Person {
                     person.storedPersonalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirkDescriptionIndex")) {
                     person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
-                    person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedReasoningDescriptionIndex")) {
-                    person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
@@ -4844,6 +4808,11 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public int getCostToImprove(final String skillName, final boolean useReasoning) {
+        return getCostToImprove(skillName);
+    }
+
     /**
      * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
      *
@@ -4853,17 +4822,16 @@ public class Person {
      * level 0.</p>
      *
      * @param skillName    the name of the skill for which to calculate the improvement cost.
-     * @param useReasoning a boolean indicating whether to apply {@link Reasoning} cost multipliers.
      *
      * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
      *       0 if the specified skill does not currently exist.
      */
-    public int getCostToImprove(final String skillName, final boolean useReasoning) {
+    public int getCostToImprove(final String skillName) {
         final Skill skill = getSkill(skillName);
         final SkillType skillType = getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
-        double multiplier = getReasoningXpCostMultiplier(useReasoning);
+        double multiplier = 1.0;
 
         if (options.booleanOption(FLAW_SLOW_LEARNER)) {
             multiplier += 0.2;
@@ -5161,112 +5129,113 @@ public class Person {
     // endregion edge
 
     /**
-     * Determines whether the user possesses the necessary skills to operate the given entity.
+     * Determines if the user possesses the required skills and role to operate (pilot/drive) the given entity.
      *
-     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or
-     * gunnery skills relevant to the entity type, such as Meks, VTOLs, tanks, aerospace units, battle armor, and
-     * others.</p>
+     * <p>The method checks the type of the entity and validates whether the corresponding piloting skill and role
+     * are assigned. Supported types include Land-Air Mek, Mek, VTOL, tank (including variants for marine and ground
+     * modes), conventional fighter, small craft, jumpship, aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
-     * returns {@code false}.</p>
-     *
-     * @param entity the entity to be checked for driving capability
-     *
-     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false}
-     *       otherwise
+     * @param entity the entity to check for piloting/driving capability. If {@code null}, returns {@code false}.
+     * @return {@code true} if the user is qualified to pilot or drive the specified entity; {@code false} otherwise
      */
     public boolean canDrive(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_PILOT_MEK);
+            return hasSkill(S_PILOT_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof VTOL) {
-            return hasSkill(S_PILOT_VTOL);
+            return hasSkill(S_PILOT_VTOL) && isRole(PersonnelRole.VTOL_PILOT);
         } else if (entity instanceof Tank) {
-            return hasSkill(entity.getMovementMode().isMarine() ? S_PILOT_NVEE : S_PILOT_GVEE);
+            if (entity.getMovementMode().isMarine()) {
+                return hasSkill(S_PILOT_NVEE) && isRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+            } else {
+                return hasSkill(S_PILOT_GVEE) && isRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+            }
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_PILOT_JET) || hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_PILOT_SPACE);
+            return hasSkill(S_PILOT_SPACE) && isRole(PersonnelRole.VESSEL_PILOT);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA);
+            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS);
+            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
     }
 
     /**
-     * Determines whether the user possesses the necessary skills to operate weapons for the given entity.
+     * Determines if the user has the appropriate skills and role to operate the weapon systems (gun) of the given
+     * entity.
      *
-     * <p>The required gunnery skill is dependent on the type of entity provided. This method checks for the relevant
-     * gunnery or weapon skill associated with the entity type, such as Mek, tanks, aerospace units, battle armor,
-     * infantry, and others.</p>
+     * <p>This method evaluates the entity type and ensures that the required gunnery skill and role are present. It
+     * supports a range of unit types such as Land-Air Mek, Mek, tank, conventional fighter, small craft, jumpship,
+     * aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * <p>Returns {@code true} if the necessary skill(s) to use the entity's weapons are present; {@code false}
-     * otherwise.</p>
-     *
-     * @param entity the entity to check for gunnery capability
-     *
-     * @return {@code true} if the user is qualified to operate weapons for the given entity; {@code false} otherwise
+     * @param entity the entity to check for gunnery capability. If {@code null}, returns {@code false}.
+     * @return {@code true} if the user is qualified to operate the weapons of the specified entity; {@code false} otherwise
      */
     public boolean canGun(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO) && isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_GUN_MEK);
+            return hasSkill(S_GUN_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof Tank) {
-            return hasSkill(S_GUN_VEE);
+            return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_GUNNER);
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_GUN_JET) || hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_GUN_SPACE);
+            return hasSkill(S_GUN_SPACE) && isRole(PersonnelRole.VESSEL_GUNNER);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA);
+            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS);
+            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
     }
 
     /**
-     * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
+     * Determines if the user holds the necessary technical skills to service or repair the specified entity.
      *
-     * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
-     * skill based on whether the entity is a type of Mek, vessel, aerospace unit, battle armor, tank, or other
-     * supported classes.</p>
+     * <p>The method inspects the entity type and checks for the corresponding technical skills required to perform
+     * maintenance or repairs. Supported types include Mek, ProtoMek, dropship, jumpship, aerospace unit, battle
+     * armor, and tank.</p>
      *
-     * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise
-     * .</p>
-     *
-     * @param entity the entity to check for technical capability
-     *
+     * @param entity the entity to assess for technical capability. If {@code null}, returns {@code false}.
      * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
      */
     public boolean canTech(final Entity entity) {
         if (entity == null) {
             return false;
         }
+
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK);
+            return hasSkill(S_TECH_MEK) && isTechMek();
         } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(S_TECH_VESSEL);
+            return hasSkill(S_TECH_VESSEL) && isTechLargeVessel();
         } else if (entity instanceof Aero) {
-            return hasSkill(S_TECH_AERO);
+            return hasSkill(S_TECH_AERO) && isTechAero();
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA);
+            return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC);
+            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
         } else {
             return false;
         }
@@ -5594,6 +5563,43 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    /**
+     * Checks whether this character satisfies the requirements for a given personnel role.
+     *
+     * <p>This method verifies that the specified role matches either the character's primary or secondary role, and
+     * ensures the character possesses all the required skills for that profession. If any required skill is missing, a
+     * warning is logged and the method returns {@code false}.</p>
+     *
+     * @param role the {@link PersonnelRole} to check against this character
+     *
+     * @return {@code true} if the character matches the specified role and has all necessary skills; {@code false}
+     *       otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isRole(PersonnelRole role) {
+        // Does the character have the appropriate role?
+        if (!role.equals(getPrimaryRole()) && !role.equals(getSecondaryRole())) {
+            return false;
+        }
+
+        // Do they have the skills for that role? This should be assumed, we include the check here as a safety net.
+        for (String skillName : role.getSkillsForProfession()) {
+            Skill skill = getSkill(skillName);
+            if (skill == null) {
+                LOGGER.warn("Unable to find skill {} needed for {} profession for {}",
+                      skillName,
+                      role.getLabel(false),
+                      getFullTitle());
+                return false;
+            }
+        }
+
+        // If everything checks out, return true
+        return true;
     }
 
     /**
@@ -6682,6 +6688,7 @@ public class Person {
      * @return the experience cost multiplier: - `1` if reasoning adjustment is disabled or {@link Reasoning} is
      *       neutral. - A value adjusted by the formula `1 - (score * 0.025)` otherwise.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public double getReasoningXpCostMultiplier(final boolean useReasoningXpCostMultiplier) {
         Reasoning reasoning = getReasoning();
 
@@ -6959,92 +6966,56 @@ public class Person {
     /**
      * Generates alternative personality traits and applies them to the stored split personality profile.
      *
-     * <p>Traits are randomly selected from
-     * {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social}, with potential for up to four traits
-     * total. Additional characteristics such as a {@link PersonalityQuirk} trait and {@link Reasoning} characteristics
-     * are randomly determined and stored.</p>
+     * <p>Traits are randomly selected from {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social},
+     * with potential for up to four traits total. Additional characteristics such as a {@link PersonalityQuirk}
+     * traits are randomly determined and stored.</p>
      *
      * @author Illiani
-     * @see PersonalityController#generatePersonality(Person, boolean)
+     * @see PersonalityController#generatePersonality(Person)
      * @since 0.50.07
      */
     private void generateSplitPersonalityPersonalityCharacteristics() {
-        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(PersonalityTraitType.AGGRESSION,
-              PersonalityTraitType.AMBITION,
-              PersonalityTraitType.GREED,
-              PersonalityTraitType.SOCIAL));
+        setStoredAggression(Aggression.NONE);
+        setStoredAmbition(Ambition.NONE);
+        setStoredGreed(Greed.NONE);
+        setStoredSocial(Social.NONE);
+        setStoredPersonalityQuirk(PersonalityQuirk.NONE);
 
-        Collections.shuffle(possibleTraits);
+        // Then we generate a new personality
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>();
+        possibleTraits.add(PersonalityTraitType.AGGRESSION);
+        possibleTraits.add(PersonalityTraitType.AMBITION);
+        possibleTraits.add(PersonalityTraitType.GREED);
+        possibleTraits.add(PersonalityTraitType.SOCIAL);
+        possibleTraits.add(PersonalityTraitType.PERSONALITY_QUIRK);
 
-        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
-
-        PersonalityTraitType firstTrait = possibleTraits.get(0);
-        possibleTraits.remove(firstTrait);
-        chosenTraits.add(firstTrait);
-
-        PersonalityTraitType secondTrait = possibleTraits.get(0);
-        possibleTraits.remove(secondTrait);
-        chosenTraits.add(secondTrait);
-
-        if (randomInt(4) == 0) {
-            PersonalityTraitType thirdTrait = possibleTraits.get(0);
-            possibleTraits.remove(thirdTrait);
-            chosenTraits.add(thirdTrait);
-        }
-
-        if (randomInt(4) == 0) {
-            PersonalityTraitType forthTrait = possibleTraits.get(0);
-            chosenTraits.add(forthTrait);
-        }
-
-        for (PersonalityTraitType traitType : chosenTraits) {
-            storeSplitPersonality(traitType);
-        }
-
-        int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
-        String traitIndex = String.valueOf(traitRoll);
-        storedPersonalityQuirk = PersonalityQuirk.fromString(traitIndex);
-        storedPersonalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
-
-        int reasoningRoll = randomInt(8346);
-        storedReasoning = generateReasoning(reasoningRoll);
-        storedReasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
-    }
-
-    /**
-     * Stores the specified personality trait type in the split personality profile.
-     *
-     * <p>Based on the provided {@link PersonalityTraitType}, this method assigns a randomly chosen trait value and
-     * description index to the corresponding stored split personality fields (such as {@link Aggression},
-     * {@link Ambition}, {@link Greed}, or {@link Social}). If the trait type does not match any known category, no
-     * action is taken.</p>
-     *
-     * @param traitType the {@link PersonalityTraitType} to store for the split personality profile
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void storeSplitPersonality(PersonalityTraitType traitType) {
-        switch (traitType) {
+        PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
+        switch (pickedTrait) {
             case AGGRESSION -> {
                 String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
-                storedAggression = Aggression.fromString(traitIndex);
-                storedAggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
+                setStoredAggression(Aggression.fromString(traitIndex));
+                setStoredAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
             }
             case AMBITION -> {
                 String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
-                storedAmbition = Ambition.fromString(traitIndex);
-                storedAmbitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
+                setStoredAmbition(Ambition.fromString(traitIndex));
+                setStoredAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
             }
             case GREED -> {
                 String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
-                storedGreed = Greed.fromString(traitIndex);
-                storedGreedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
+                setStoredGreed(Greed.fromString(traitIndex));
+                setStoredGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
             }
             case SOCIAL -> {
                 String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
-                storedSocial = Social.fromString(traitIndex);
-                storedSocialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
+                setStoredSocial(Social.fromString(traitIndex));
+                setStoredSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
+            }
+            case PERSONALITY_QUIRK -> {
+                int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+                String traitIndex = String.valueOf(traitRoll);
+                setStoredPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
+                setStoredPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
             }
             default -> {}
         }
@@ -7164,14 +7135,6 @@ public class Person {
         int transitionaryPersonalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
         personalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
         storedPersonalityQuirkDescriptionIndex = transitionaryPersonalityQuirkDescriptionIndex;
-
-        Reasoning transitionaryReasoning = reasoning;
-        reasoning = storedReasoning;
-        storedReasoning = transitionaryReasoning;
-
-        int transitionaryReasoningDescriptionIndex = reasoningDescriptionIndex;
-        reasoningDescriptionIndex = storedReasoningDescriptionIndex;
-        storedReasoningDescriptionIndex = transitionaryReasoningDescriptionIndex;
     }
 
     /**

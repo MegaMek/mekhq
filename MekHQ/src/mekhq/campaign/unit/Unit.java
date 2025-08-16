@@ -6885,6 +6885,7 @@ public class Unit implements ITechnology {
                     }
                 } else {
                     logger.error("Unit {} ('{}') references missing gunner {}", getId(), getName(), gunner.getId());
+                    gunners.remove(gunner);
                 }
             }
         }

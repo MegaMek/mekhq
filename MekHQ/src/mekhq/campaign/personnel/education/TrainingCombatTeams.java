@@ -177,7 +177,7 @@ public class TrainingCombatTeams {
 
             for (Person trainee : unit.getActiveCrew()) {
                 if (campaign.getCampaignOptions().isUseFatigue()) {
-                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate() * 2;
+                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
 
                     boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
                     boolean hasToughness = trainee.getOptions().booleanOption(ATOW_TOUGHNESS);
@@ -189,7 +189,7 @@ public class TrainingCombatTeams {
                         fatigueChangeRate = (int) round(fatigueChangeRate * 0.5);
                     }
 
-                    trainee.changeFatigue(fatigueChangeRate * (hasGlassJaw ? 4 : 2));
+                    trainee.changeFatigue(fatigueChangeRate);
                 }
 
                 if (commander.getUnit().getActiveCrew().contains(trainee)) {
@@ -274,11 +274,9 @@ public class TrainingCombatTeams {
 
             int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
             double experienceMultiplier = campaignOptions.getXpCostMultiplier();
-            double reasoningCostMultiplier = trainee.getReasoningXpCostMultiplier(campaignOptions.isUseReasoningXpMultiplier());
 
             // Reasoning cost changes should always take place before global changes
             perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier);
-            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * reasoningCostMultiplier);
 
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {

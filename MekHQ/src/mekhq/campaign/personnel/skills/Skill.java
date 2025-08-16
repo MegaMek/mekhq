@@ -62,7 +62,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -659,7 +658,7 @@ public class Skill {
      * the cost for the next valid level if it exists.</p>
      *
      * <p><b>Usage:</b> For most use cases you probably want to call {@code getCostToImprove(String)} from a
-     * {@link Person} object, as that will factor in things like {@link Reasoning}.</p>
+     * {@link Person} object.</p>
      *
      * @return the cost to improve the skill, or 0 if no valid level with a positive cost is found.
      */

@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -126,8 +128,10 @@ public final class TOETab extends CampaignGuiTab {
 
         panForceView = new JPanel();
         panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");
-        panForceView.setMinimumSize(new Dimension(550, 600));
-        panForceView.setPreferredSize(new Dimension(550, 600));
+
+        Dimension dimension = scaleForGUI(700, 600);
+        panForceView.setMinimumSize(dimension);
+        panForceView.setPreferredSize(dimension);
         panForceView.setLayout(new BorderLayout());
 
         splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, panForceView);

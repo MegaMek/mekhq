@@ -129,10 +129,9 @@ public class MercenaryAuction {
               entity,
               minimumBid,
               maximumBid,
-              AUCTION_TIER_SUCCESS_PERCENT,
-              max(requiredCombatTeams, 1));
-        int bidSuccessChance = (mercenaryAuctionDialog.getSpinnerValue() / Math.max(1, minimumBid)) *
-                                     AUCTION_TIER_SUCCESS_PERCENT;
+              AUCTION_TIER_SUCCESS_PERCENT);
+        int bidSuccessChance = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) *
+                                          AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction, then check whether they were successful,
         // deliver the unit, and deduct funds.

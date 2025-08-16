@@ -298,7 +298,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit, true);
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -492,7 +492,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit, true);
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -710,7 +710,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit, true);
         assertNotNull(deserialized);
         deserialized.reCalc();
 

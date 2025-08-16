@@ -1105,12 +1105,12 @@ public class StratconRulesManager {
         // afterward
         StratconScenario revealedScenario = track.getScenario(coords);
         if (revealedScenario != null) {
+            revealedScenario.addPrimaryForce(forceID);
+            commitPrimaryForces(campaign, revealedScenario, track);
             if (!revealedScenario.getBackingScenario().isFinalized()) {
                 finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
                 setScenarioParametersFromBiome(track, revealedScenario);
             }
-            revealedScenario.addPrimaryForce(forceID);
-            commitPrimaryForces(campaign, revealedScenario, track);
             return;
         }
 

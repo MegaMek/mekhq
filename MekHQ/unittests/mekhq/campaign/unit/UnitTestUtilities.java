@@ -41,9 +41,9 @@ import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.*;
 import megamek.common.util.BuildingBlock;
-import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
+import testUtilities.MHQTestUtilities;
 
 public final class UnitTestUtilities {
 
@@ -58,7 +58,7 @@ public final class UnitTestUtilities {
     }
 
     public static @Nullable Entity ParseBase64MtfFile(String base64) {
-        try (InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64))) {
+        try (InputStream in = new ByteArrayInputStream(MHQTestUtilities.Decode(base64))) {
             MtfFile parser = new MtfFile(in);
 
             return parser.getEntity();
@@ -71,7 +71,7 @@ public final class UnitTestUtilities {
 
     public static Entity parseBase64BlkFile(String base64) {
         try {
-            InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64));
+            InputStream in = new ByteArrayInputStream(MHQTestUtilities.Decode(base64));
             IMekLoader loader;
 
             BuildingBlock bb = new BuildingBlock(in);

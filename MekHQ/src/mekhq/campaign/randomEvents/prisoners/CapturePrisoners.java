@@ -364,7 +364,7 @@ public class CapturePrisoners {
 
                         prisoner.setStatus(BONDSREF);
                     } else {
-                        prisoner.changeStatus(campaign, today, POW);
+                        prisoner.changeStatus(campaign, today, BONDSREF);
                     }
                     return;
                 }

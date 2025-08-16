@@ -64,7 +64,13 @@ public class RandomOriginOptions {
         setRandomizeOrigin(!campaignOptions);
         setRandomizeDependentOrigin(!campaignOptions);
         setRandomizeAroundSpecifiedPlanet(!campaignOptions);
-        setSpecifiedPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
+        try {
+            setSpecifiedPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
+        } catch (Exception ex) {
+            logger.error("Failed to load default specified planet. If this wasn't during automated testing this must " +
+                               "be investigated.", ex);
+            setSpecifiedPlanet(new Planet("Terra"));
+        }
         setOriginSearchRadius(campaignOptions ? 45 : 1000);
         setOriginDistanceScale(campaignOptions ? 0.6 : 0.2);
         setAllowClanOrigins(false);

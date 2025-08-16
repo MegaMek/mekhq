@@ -267,7 +267,7 @@ public class LanceAssignmentView extends JPanel {
         }
 
         // Find the closest common ancestor. They must be either from the same force or descend from
-        // different subforces of this one.
+        // different subForces of this one.
         Force f = f1;
         while (!f.isAncestorOf(f2)) {
             f = f.getParentForce();

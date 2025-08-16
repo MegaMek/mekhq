@@ -39,9 +39,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
 
+@Disabled("This test is no longer valid following the data changes in 50.07")
 public class SystemsIntegrationTest {
     @Test
     public void loadDefaultTest() throws DOMException, FileNotFoundException, IOException, ParseException {

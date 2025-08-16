@@ -125,7 +125,7 @@ public class PersonnelMarketDialog extends JDialog {
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
 
     private final int PADDING = scaleForGUI(5);
-    private final Dimension PERSON_VIEW_MINIMUM_SIZE = scaleForGUI(500, 500);
+    private final Dimension PERSON_VIEW_MINIMUM_SIZE = scaleForGUI(700, 500);
 
     private final NewPersonnelMarket market;
     private final JFrame parent;

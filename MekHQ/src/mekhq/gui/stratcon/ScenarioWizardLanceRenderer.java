@@ -121,7 +121,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
                 for (Person person : unit.getCrew()) {
                     if (person.getFatigue() > highestFatigue) {
                         highestFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-                              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+                              person.getSkillLevel(campaign, false));
                     }
                 }
             }

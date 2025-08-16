@@ -242,7 +242,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Left box for speaker details
         if (leftSpeaker != null) {
-            JPanel pnlLeftSpeaker = buildSpeakerPanel(leftSpeaker, campaign);
+            JPanel pnlLeftSpeaker = buildLeftSpeakerPanel(leftSpeaker, campaign);
             pnlLeftSpeaker.setBorder(new EmptyBorder(0, getPadding(), 0, 0));
 
             // Add pnlLeftSpeaker to mainPanel
@@ -265,7 +265,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Right box for speaker details
         if (rightSpeaker != null) {
-            JPanel pnlRightSpeaker = buildSpeakerPanel(rightSpeaker, campaign);
+            JPanel pnlRightSpeaker = buildRightSpeakerPanel(rightSpeaker, campaign);
             pnlRightSpeaker.setBorder(new EmptyBorder(0, 0, 0, getPadding()));
 
             // Add pnlRightSpeaker to mainPanel
@@ -690,19 +690,19 @@ public class ImmersiveDialogCore extends JDialog {
         }
     }
 
-
     /**
-     * Builds a panel for displaying a speaker's image, name, and role.
-     * <p>
-     * This method creates a vertically stacked panel that includes the person's icon, title, and any additional
-     * descriptive information (e.g., roles, forces, or campaign affiliations).
+     * Builds a panel containing a visual representation of the left-side speaker.
      *
-     * @param speaker  The character shown in the dialog, can be {@code null} for no speaker
-     * @param campaign The current campaign.
+     * <p>The panel includes the speaker's image (if available) and their descriptive information. The name and
+     * description are determined from the given {@link Campaign} and optional {@link Person}. The layout and sizing are
+     * set to align with user interface expectations.</p>
      *
-     * @return A {@link JPanel} forming the speaker's dialog box.
+     * @param speaker  the {@link Person} to be shown as the left speaker; may be {@code null}
+     * @param campaign the current {@link Campaign} providing context and fallback values
+     *
+     * @return a {@link JPanel} displaying the left speaker's image and description
      */
-    protected JPanel buildSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
+    protected JPanel buildLeftSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -736,6 +736,25 @@ public class ImmersiveDialogCore extends JDialog {
         speakerBox.add(leftDescription);
 
         return speakerBox;
+    }
+
+    /**
+     * Builds a panel for the right-side speaker.
+     *
+     * <p><b>Usage:</b> By default, this implementation delegates to {@link #buildLeftSpeakerPanel(Person, Campaign)}.
+     * However, it can be independently overridden to allow for customization of the panel. Such as when we want to have
+     * the left and right speaker panels visually distinctive.</p>
+     *
+     * @param speaker  the {@link Person} to be shown as the right speaker; may be {@code null}
+     * @param campaign the current {@link Campaign} providing context and fallback values
+     *
+     * @return a {@link JPanel} displaying the right speaker's image and description
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    protected JPanel buildRightSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
+        return buildLeftSpeakerPanel(speaker, campaign);
     }
 
     /**

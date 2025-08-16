@@ -97,7 +97,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -153,11 +152,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JTextField textLoyalty;
 
     private MMComboBox<Aggression> comboAggression;
+    private JSpinner spnAggression;
     private MMComboBox<Ambition> comboAmbition;
+    private JSpinner spnAmbition;
     private MMComboBox<Greed> comboGreed;
+    private JSpinner spnGreed;
     private MMComboBox<Social> comboSocial;
+    private JSpinner spnSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
-    private MMComboBox<Reasoning> comboReasoning;
+    private JSpinner spnPersonalityQuirk;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -832,11 +835,21 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             comboAggression.setSelectedItem(person.getAggression());
 
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(comboAggression, gridBagConstraints);
+
+            spnAggression = new JSpinner(new SpinnerNumberModel(person.getAggressionDescriptionIndex(),
+                  0, Ambition.MAXIMUM_VARIATIONS, 1));
+
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(spnAggression, gridBagConstraints);
 
             JLabel labelAmbition = new JLabel();
             labelAmbition.setText("Ambition:");
@@ -852,11 +865,21 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             comboAmbition.setSelectedItem(person.getAmbition());
 
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(comboAmbition, gridBagConstraints);
+
+            spnAmbition = new JSpinner(new SpinnerNumberModel(person.getAmbitionDescriptionIndex(),
+                  0, Ambition.MAXIMUM_VARIATIONS, 1));
+
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(spnAmbition, gridBagConstraints);
 
             JLabel labelGreed = new JLabel();
             labelGreed.setText("Greed:");
@@ -872,11 +895,21 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             comboGreed.setSelectedItem(person.getGreed());
 
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(comboGreed, gridBagConstraints);
+
+            spnGreed = new JSpinner(new SpinnerNumberModel(person.getGreedDescriptionIndex(),
+                  0, Greed.MAXIMUM_VARIATIONS, 1));
+
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(spnGreed, gridBagConstraints);
 
             JLabel labelSocial = new JLabel();
             labelSocial.setText("Social:");
@@ -892,11 +925,21 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             comboSocial.setSelectedItem(person.getSocial());
 
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(comboSocial, gridBagConstraints);
+
+            spnSocial = new JSpinner(new SpinnerNumberModel(person.getSocialDescriptionIndex(),
+                  0, Social.MAXIMUM_VARIATIONS, 1));
+
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(spnSocial, gridBagConstraints);
 
             JLabel labelPersonalityQuirk = new JLabel();
             labelPersonalityQuirk.setText("Quirk:");
@@ -918,25 +961,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(comboPersonalityQuirk, gridBagConstraints);
 
-            JLabel labelReasoning = new JLabel();
-            labelReasoning.setText("Reasoning:");
-            labelReasoning.setName("labelReasoning");
+            spnPersonalityQuirk = new JSpinner(new SpinnerNumberModel(person.getPersonalityQuirkDescriptionIndex(),
+                  0, PersonalityQuirk.MAXIMUM_VARIATIONS, 1));
 
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(labelReasoning, gridBagConstraints);
-
-            comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
-            comboReasoning.setSelectedItem(person.getReasoning());
-
-            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(comboReasoning, gridBagConstraints);
+            demogPanel.add(spnPersonalityQuirk, gridBagConstraints);
         }
 
         y++;
@@ -1412,6 +1445,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
             optionComp.setSelected(option.stringValue());
+        } else if (OptionsConstants.MISC_ENV_SPECIALIST.equals(option.getName())) {
+            optionComp.addValue(Crew.ENVSPC_NONE);
+            optionComp.addValue(Crew.ENVSPC_FOG);
+            optionComp.addValue(Crew.ENVSPC_LIGHT);
+            optionComp.addValue(Crew.ENVSPC_RAIN);
+            optionComp.addValue(Crew.ENVSPC_SNOW);
+            optionComp.addValue(Crew.ENVSPC_WIND);
+            optionComp.setSelected(option.stringValue());
         } else if (option.getType() == Option.CHOICE) {
             SpecialAbility spa = SpecialAbility.getOption(option.getName());
             if (null != spa) {
@@ -1699,11 +1740,20 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
             person.setAggression(comboAggression.getSelectedItem());
+            person.setAggressionDescriptionIndex((int) spnAggression.getValue());
+
             person.setAmbition(comboAmbition.getSelectedItem());
+            person.setAmbitionDescriptionIndex((int) spnAmbition.getValue());
+
             person.setGreed(comboGreed.getSelectedItem());
+            person.setGreedDescriptionIndex((int) spnGreed.getValue());
+
             person.setSocial(comboSocial.getSelectedItem());
+            person.setSocialDescriptionIndex((int) spnSocial.getValue());
+
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
-            person.setReasoning(comboReasoning.getSelectedItem());
+            person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
+
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
         }
