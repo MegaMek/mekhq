@@ -949,8 +949,7 @@ public enum PersonnelTableModelColumn {
             case FATIGUE:
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),
-                      person.getSkillLevel(campaign, false),
-                      campaign.getFieldKitchenWithinCapacity()));
+                      person.getSkillLevel(campaign, false)));
             case EDGE:
                 return Integer.toString(person.getEdge());
             case SPA_COUNT:
