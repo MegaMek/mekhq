@@ -126,11 +126,11 @@ public class ForceStub {
         }
 
         if (!subForces.isEmpty()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subforces");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subForces");
             for (ForceStub sub : subForces) {
                 sub.writeToXML(pw, indent);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subforces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subForces");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
@@ -163,7 +163,7 @@ public class ForceStub {
 
                         retVal.units.add(UnitStub.generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("subForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);

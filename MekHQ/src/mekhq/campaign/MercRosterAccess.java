@@ -528,7 +528,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         progressNote = "Uploading force data";
         determineProgress();
         // TODO: top level force gets written to ?WHERE?
-        // now iterate through subforces
+        // now iterate through subForces
         for (Force sub : campaign.getForces().getSubForces()) {
             writeForce(sub, 1);
         }
@@ -565,7 +565,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
 
         progressTicker += 2;
         determineProgress();
-        // loop through subforces and call again
+        // loop through subForces and call again
         for (Force sub : force.getSubForces()) {
             writeForce(sub, id);
         }
