@@ -6075,7 +6075,7 @@ public class Campaign implements ITechManager {
         processNewDayPersonnel();
 
         // Manage the Markets
-        refreshPersonnelMarkets();
+        refreshPersonnelMarkets(false);
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
@@ -6343,6 +6343,12 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /** Use {@link #refreshPersonnelMarkets(boolean)} instead */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void refreshPersonnelMarkets() {
+        refreshPersonnelMarkets(false);
+    }
+
     /**
      * Refreshes the personnel markets based on the current market style and the current date.
      *
@@ -6352,10 +6358,12 @@ public class Campaign implements ITechManager {
      * <p>If rare professions are present, presents a dialog with options regarding these rare personnel. Optionally,
      * allowing the user to view the new personnel market dialog immediately.</p>
      *
+     * @param isCampaignStart {@code true} if this method is being called at the start of the campaign
+     *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets() {
+    public void refreshPersonnelMarkets(boolean isCampaignStart) {
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
             personnelMarket.generatePersonnelForDay(this);
@@ -6370,13 +6378,20 @@ public class Campaign implements ITechManager {
                         oocReport.append("<p>- ").append(profession.getLabel(isClanCampaign())).append("</p>");
                     }
 
+                    List<String> buttons = new ArrayList<>();
+                    buttons.add(resources.getString("personnelMarket.rareProfession.button.later"));
+                    buttons.add(resources.getString("personnelMarket.rareProfession.button.decline"));
+                    // If the player attempts to jump to the personnel market, while the campaign is booting, they
+                    // will get an NPE as the Campaign GUI won't have finished launching.
+                    if (!isCampaignStart) {
+                        buttons.add(resources.getString("personnelMarket.rareProfession.button.immediate"));
+                    }
+
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
                           getSeniorAdminPerson(AdministratorSpecialization.HR),
                           null,
                           resources.getString("personnelMarket.rareProfession.inCharacter"),
-                          List.of(resources.getString("personnelMarket.rareProfession.button.later"),
-                                resources.getString("personnelMarket.rareProfession.button.decline"),
-                                resources.getString("personnelMarket.rareProfession.button.immediate")),
+                          buttons,
                           oocReport.toString(),
                           null,
                           true);
