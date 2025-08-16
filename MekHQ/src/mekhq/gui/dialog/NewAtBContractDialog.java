@@ -590,6 +590,11 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
+        contract.createEmployerLiaison(campaign);
+        if (contract.getEnemy().isClan()) {
+            contract.createClanOpponent(campaign);
+        }
+
         campaign.getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,
                     campaign.getLocalDate(),
