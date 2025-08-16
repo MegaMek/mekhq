@@ -99,7 +99,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
      * @return A {@link JPanel} containing the speaker's image and description.
      */
     @Override
-    protected JPanel buildSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
+    protected JPanel buildLeftSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
