@@ -47,7 +47,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * <p>It identifies deprecated skills from the person's current skill set and allows the user to remove them while
  * refunding the appropriate amount of XP. This process involves calculating XP refunds using the skill's cost and
- * reasoning multiplier, and providing a dialog for managing the refund.
+ * reasoning multiplier and providing a dialog for managing the refund.
  *
  * <p>The class is initialized with a {@link Campaign} and a {@link Person}, and directly modifies the person's
  * skills and XP as necessary.
@@ -119,17 +119,12 @@ public class SkillDeprecationTool {
 
         final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
 
-        final boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
-        final double reasoningXpMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
-
         final Skills skills = person.getSkills();
         for (SkillType skillType : DEPRECATED_SKILLS) {
             final String skillName = skillType.getName();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
 
-                // Reasoning cost changes should always take place before global changes
-                refundValue = (int) round(refundValue * reasoningXpMultiplier);
                 refundValue = (int) round(refundValue * xpCostMultiplier);
 
                 triggerDialog(skills, skillName, refundValue);
