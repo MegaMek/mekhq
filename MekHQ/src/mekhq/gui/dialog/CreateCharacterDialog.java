@@ -1412,6 +1412,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
             optionComp.setSelected(option.stringValue());
+        } else if (OptionsConstants.MISC_ENV_SPECIALIST.equals(option.getName())) {
+            optionComp.addValue(Crew.ENVSPC_NONE);
+            optionComp.addValue(Crew.ENVSPC_FOG);
+            optionComp.addValue(Crew.ENVSPC_LIGHT);
+            optionComp.addValue(Crew.ENVSPC_RAIN);
+            optionComp.addValue(Crew.ENVSPC_SNOW);
+            optionComp.addValue(Crew.ENVSPC_WIND);
+            optionComp.setSelected(option.stringValue());
         } else if (option.getType() == Option.CHOICE) {
             SpecialAbility spa = SpecialAbility.getOption(option.getName());
             if (null != spa) {
