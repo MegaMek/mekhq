@@ -149,6 +149,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textReputation;
     private JTextField textUnlucky;
     private JTextField textBloodmark;
+    private JTextField textExtraIncome;
     private JTextField textFatigue;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
@@ -257,6 +258,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblUnlucky = new JLabel();
         textBloodmark = new JTextField();
         JLabel lblBloodmark = new JLabel();
+        textExtraIncome = new JTextField();
+        JLabel lblExtraIncome = new JLabel();
         textFatigue = new JTextField();
         JLabel lblLoyalty = new JLabel();
         textLoyalty = new JTextField();
@@ -827,6 +830,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panDemog.add(textBloodmark, gridBagConstraints);
+
+        y++;
+
+        lblExtraIncome.setText(resourceMap.getString("lblExtraIncome.text"));
+        lblExtraIncome.setName("lblExtraIncome");
+
+        textExtraIncome.setText(Integer.toString(person.getBloodmark()));
+        textExtraIncome.setName("textExtraIncome");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        panDemog.add(lblExtraIncome, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        panDemog.add(textExtraIncome, gridBagConstraints);
 
         y++;
 
@@ -1489,6 +1513,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         currentValue = person.getBloodmark();
         newValue = MathUtility.parseInt(textBloodmark.getText(), currentValue);
         person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+
+        currentValue = person.getExtraIncomeTraitLevel();
+        newValue = MathUtility.parseInt(textExtraIncome.getText(), currentValue);
+        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
