@@ -1033,7 +1033,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemog.add(comboAggression, gridBagConstraints);
 
             spnAggression = new JSpinner(new SpinnerNumberModel(person.getAggressionDescriptionIndex(),
-                  0, Ambition.MAXIMUM_VARIATIONS, 1));
+                  0, Aggression.MAXIMUM_VARIATIONS, 1));
 
             gridBagConstraints.gridx = 3;
             gridBagConstraints.gridy = y++;
