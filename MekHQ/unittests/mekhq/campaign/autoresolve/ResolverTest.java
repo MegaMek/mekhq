@@ -34,11 +34,13 @@
 package mekhq.campaign.autoresolve;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,7 +55,6 @@ import megamek.common.CrewType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MapSettings;
-import megamek.common.MekSummary;
 import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulationOptions;
 import megamek.common.autoresolve.converter.FlattenForces;
@@ -328,9 +329,8 @@ public class ResolverTest {
         };
 
         for (var i = 0; i < unitFullNames.length; i++) {
-            var fullName = unitFullNames[i];
-            var entity = MekSummary.loadEntity(fullName);
-            assert entity != null;
+            Entity entity = getEntityForUnitTesting(unitFullNames[i], false);
+            assertNotNull(entity, unitFullNames[i] + " couldn't be found");
 
             var crew = switch (teamArrangement) {
                 case BALANCED, UNBALANCED, SAME_BV_SAME_SKILL -> createCrew(4, 5);
@@ -355,11 +355,11 @@ public class ResolverTest {
         };
 
         for (var i = 0; i < unitFullNames.length; i++) {
-            var fullName = unitFullNames[i];
+            Entity entity = getEntityForUnitTesting(unitFullNames[i], false);
+            assertNotNull(entity, unitFullNames[i] + " couldn't be found");
+
             var unit = new Unit();
             unit.setCampaign(campaign);
-            var entity = MekSummary.loadEntity(fullName);
-            assert entity != null;
             entity.setOwner(campaign.getPlayer());
             entity.setForceString("Valkiries|1||Third Support Company|31||9th Scout Lance|544||");
             entity.calculateBattleValue();

@@ -478,10 +478,23 @@ public class Campaign implements ITechManager {
         currentDay = LocalDate.ofYearDay(3067, 1);
         campaignStartDate = null;
         campaignOptions = new CampaignOptions();
-        setFaction(Factions.getInstance().getDefaultFaction());
+        try {
+            setFaction(Factions.getInstance().getDefaultFaction());
+        } catch (Exception ex) {
+            logger.error("Unable to set faction to default faction. If this wasn't during automated testing this must" +
+                               " be investigated.", ex);
+            setFaction(new Faction());
+        }
         techFaction = ITechnology.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
-        location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
+        try {
+            location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
+        } catch (Exception ex) {
+            logger.error("Unable to set location to default galatea system. If this wasn't during automated testing " +
+                               "this must be investigated.", ex);
+            PlanetarySystem fallbackSystem = new PlanetarySystem("Galatea");
+            location = new CurrentLocation(fallbackSystem, 0);
+        }
         isAvoidingEmptySystems = true;
         isOverridingCommandCircuitRequirements = false;
         currentReport = new ArrayList<>();
@@ -540,8 +553,19 @@ public class Campaign implements ITechManager {
         ignoreSparesUnderQuality = QUALITY_A;
 
         // Library initialization
-        randomEventLibraries = new RandomEventLibraries();
-        factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
+        try {
+            randomEventLibraries = new RandomEventLibraries();
+        } catch (Exception ex) {
+            logger.error("Unable to initialize RandomEventLibraries. If this wasn't during automated testing this " +
+                               "must be investigated.", ex);
+        }
+
+        try {
+            factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
+        } catch (Exception ex) {
+            logger.error("Unable to initialize FactionStandingUltimatumsLibrary. If this wasn't during automated " +
+                               "testing this must be investigated.", ex);
+        }
     }
 
     /**
