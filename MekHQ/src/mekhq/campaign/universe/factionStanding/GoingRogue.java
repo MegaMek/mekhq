@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.MAXIMUM_STANDING_LEVEL;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.calculateFactionStandingLevel;
@@ -163,13 +164,12 @@ public class GoingRogue {
      *
      * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
      *
-     * @param campaign                the current campaign context
-     * @param chosenFaction           the new faction may be the same or a new one
-     * @param commander               the force commander
-     * @param second                  secondary command personnel
-     * @param isDefection             whether the 'going rogue' action counts as defection
-     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum (but not to the
-     *                                mercenary faction)
+     * @param campaign      the current campaign context
+     * @param chosenFaction the new faction may be the same or a new one
+     * @param commander     the force commander
+     * @param second        secondary command personnel
+     * @param isDefection   whether the 'going rogue' action counts as defection
+     * @param isUltimatum   whether the 'going rogue' action was the result of an ultimatum
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani
@@ -178,6 +178,7 @@ public class GoingRogue {
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings) {
         Faction currentFaction = campaign.getFaction();
+        String chosenFactionCode = chosenFaction.getShortName();
 
         if (isUsingFactionStandings) {
             processPersonnel(campaign, isDefection, commander, second);
@@ -192,21 +193,22 @@ public class GoingRogue {
 
         processMassLoyaltyChange(campaign, true, true);
 
-        if (isDefection) {
+        if (!isUltimatum) {
             new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
                   FactionStandingJudgmentType.WELCOME, false, chosenFaction);
+        }
 
+        boolean isMercenaryFaction = MERCENARY_FACTION_CODE.equals(chosenFactionCode);
+        Faction newFaction = chosenFaction;
+        if (isMercenaryFaction) {
+            newFaction = Faction.getActiveMercenaryOrganization(campaign.getGameYear());
+        }
+
+        if (!currentFaction.equals(chosenFaction)) {
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MEKWARRIOR : PersonnelRole.MILITARY_LIAISON;
-            Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
-            new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
+            Person speaker = campaign.newPerson(role, chosenFactionCode, Gender.RANDOMIZE);
+            new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, newFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-        } else if (!isUltimatum) {
-            if (chosenFaction.isMercenaryOrganization()) {
-                PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
-                Person speaker = campaign.newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
-                new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, chosenFaction,
-                      FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-            }
         }
 
         campaign.setFaction(chosenFaction);
