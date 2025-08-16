@@ -33,6 +33,7 @@
 package mekhq.service.mrms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,8 +178,8 @@ public class MRMSServiceTest {
         int targetNumberMax = 6;
         int dailyTimeMin = 0;
 
-        Unit unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
-
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
         addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred, targetNumberMax, dailyTimeMin);
 
         when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
@@ -196,10 +198,7 @@ public class MRMSServiceTest {
         unit.getEntity().setArmor(1, Mek.LOC_HEAD);
         unit.initializeParts(true);
         unit.getEntity().setArmor(0, Mek.LOC_HEAD);
-        unit.getParts().stream().filter(p -> p instanceof Armor).map(p -> (Armor) p).forEach(armor -> {
-            breakArmor(armor);
-
-        });
+        unit.getParts().stream().filter(p -> p instanceof Armor).map(p -> (Armor) p).forEach(this::breakArmor);
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(6);
@@ -208,6 +207,13 @@ public class MRMSServiceTest {
 
 
         verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+    }
+
+    private static Entity getUrbanMek() {
+        String unitName = "UrbanMech UM-R69";
+        Entity entity = getEntityForUnitTesting(unitName, false);
+        assertNotNull(entity, "Entity not found for " + unitName);
+        return entity;
     }
 
     @Nested
@@ -223,7 +229,9 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            Entity entity = getUrbanMek();
+            assert entity != null;
+            unit = new Unit(entity, mockCampaign);
             unit.initializeParts(true);
         }
 
@@ -307,7 +315,8 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            Entity entity = getUrbanMek();
+            unit = new Unit(entity, mockCampaign);
             unit.initializeParts(true);
         }
 
