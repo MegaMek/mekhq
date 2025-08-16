@@ -79,10 +79,9 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
      * @param minimumBid     The minimum allowable bid percentage.
      * @param maximumBid     The maximum allowable bid percentage.
      * @param percentPerStep The percentage increment for the bid adjustments.
-     * @param stepSize       The step size for each spinner adjustment.
      */
-    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid, int percentPerStep,
-          int stepSize) {
+    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid,
+          int percentPerStep) {
         super(campaign,
               campaign.getSeniorAdminPerson(TRANSPORT),
               null,
@@ -91,7 +90,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(minimumBid, maximumBid, percentPerStep),
               null,
               false,
-              createJSpinnerPanel(minimumBid, minimumBid, maximumBid, stepSize),
+              createJSpinnerPanel(minimumBid, minimumBid, maximumBid, minimumBid),
               null,
               false);
 
