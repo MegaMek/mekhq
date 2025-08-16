@@ -5159,112 +5159,113 @@ public class Person {
     // endregion edge
 
     /**
-     * Determines whether the user possesses the necessary skills to operate the given entity.
+     * Determines if the user possesses the required skills and role to operate (pilot/drive) the given entity.
      *
-     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or
-     * gunnery skills relevant to the entity type, such as Meks, VTOLs, tanks, aerospace units, battle armor, and
-     * others.</p>
+     * <p>The method checks the type of the entity and validates whether the corresponding piloting skill and role
+     * are assigned. Supported types include Land-Air Mek, Mek, VTOL, tank (including variants for marine and ground
+     * modes), conventional fighter, small craft, jumpship, aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
-     * returns {@code false}.</p>
-     *
-     * @param entity the entity to be checked for driving capability
-     *
-     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false}
-     *       otherwise
+     * @param entity the entity to check for piloting/driving capability. If {@code null}, returns {@code false}.
+     * @return {@code true} if the user is qualified to pilot or drive the specified entity; {@code false} otherwise
      */
     public boolean canDrive(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_PILOT_MEK);
+            return hasSkill(S_PILOT_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof VTOL) {
-            return hasSkill(S_PILOT_VTOL);
+            return hasSkill(S_PILOT_VTOL) && isRole(PersonnelRole.VTOL_PILOT);
         } else if (entity instanceof Tank) {
-            return hasSkill(entity.getMovementMode().isMarine() ? S_PILOT_NVEE : S_PILOT_GVEE);
+            if (entity.getMovementMode().isMarine()) {
+                return hasSkill(S_PILOT_NVEE) && isRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+            } else {
+                return hasSkill(S_PILOT_GVEE) && isRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+            }
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_PILOT_JET) || hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_PILOT_SPACE);
+            return hasSkill(S_PILOT_SPACE) && isRole(PersonnelRole.VESSEL_PILOT);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA);
+            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS);
+            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
     }
 
     /**
-     * Determines whether the user possesses the necessary skills to operate weapons for the given entity.
+     * Determines if the user has the appropriate skills and role to operate the weapon systems (gun) of the given
+     * entity.
      *
-     * <p>The required gunnery skill is dependent on the type of entity provided. This method checks for the relevant
-     * gunnery or weapon skill associated with the entity type, such as Mek, tanks, aerospace units, battle armor,
-     * infantry, and others.</p>
+     * <p>This method evaluates the entity type and ensures that the required gunnery skill and role are present. It
+     * supports a range of unit types such as Land-Air Mek, Mek, tank, conventional fighter, small craft, jumpship,
+     * aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * <p>Returns {@code true} if the necessary skill(s) to use the entity's weapons are present; {@code false}
-     * otherwise.</p>
-     *
-     * @param entity the entity to check for gunnery capability
-     *
-     * @return {@code true} if the user is qualified to operate weapons for the given entity; {@code false} otherwise
+     * @param entity the entity to check for gunnery capability. If {@code null}, returns {@code false}.
+     * @return {@code true} if the user is qualified to operate the weapons of the specified entity; {@code false} otherwise
      */
     public boolean canGun(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO) && isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_GUN_MEK);
+            return hasSkill(S_GUN_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof Tank) {
-            return hasSkill(S_GUN_VEE);
+            return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_GUNNER);
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_GUN_JET) || hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_GUN_SPACE);
+            return hasSkill(S_GUN_SPACE) && isRole(PersonnelRole.VESSEL_GUNNER);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA);
+            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS);
+            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
     }
 
     /**
-     * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
+     * Determines if the user holds the necessary technical skills to service or repair the specified entity.
      *
-     * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
-     * skill based on whether the entity is a type of Mek, vessel, aerospace unit, battle armor, tank, or other
-     * supported classes.</p>
+     * <p>The method inspects the entity type and checks for the corresponding technical skills required to perform
+     * maintenance or repairs. Supported types include Mek, ProtoMek, dropship, jumpship, aerospace unit, battle
+     * armor, and tank.</p>
      *
-     * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise
-     * .</p>
-     *
-     * @param entity the entity to check for technical capability
-     *
+     * @param entity the entity to assess for technical capability. If {@code null}, returns {@code false}.
      * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
      */
     public boolean canTech(final Entity entity) {
         if (entity == null) {
             return false;
         }
+
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK);
+            return hasSkill(S_TECH_MEK) && isTechMek();
         } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(S_TECH_VESSEL);
+            return hasSkill(S_TECH_VESSEL) && isTechLargeVessel();
         } else if (entity instanceof Aero) {
-            return hasSkill(S_TECH_AERO);
+            return hasSkill(S_TECH_AERO) && isTechAero();
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA);
+            return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC);
+            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
         } else {
             return false;
         }
@@ -5592,6 +5593,43 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    /**
+     * Checks whether this character satisfies the requirements for a given personnel role.
+     *
+     * <p>This method verifies that the specified role matches either the character's primary or secondary role, and
+     * ensures the character possesses all the required skills for that profession. If any required skill is missing, a
+     * warning is logged and the method returns {@code false}.</p>
+     *
+     * @param role the {@link PersonnelRole} to check against this character
+     *
+     * @return {@code true} if the character matches the specified role and has all necessary skills; {@code false}
+     *       otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isRole(PersonnelRole role) {
+        // Does the character have the appropriate role?
+        if (!role.equals(getPrimaryRole()) && !role.equals(getSecondaryRole())) {
+            return false;
+        }
+
+        // Do they have the skills for that role? This should be assumed, we include the check here as a safety net.
+        for (String skillName : role.getSkillsForProfession()) {
+            Skill skill = getSkill(skillName);
+            if (skill == null) {
+                LOGGER.warn("Unable to find skill {} needed for {} profession for {}",
+                      skillName,
+                      role.getLabel(false),
+                      getFullTitle());
+                return false;
+            }
+        }
+
+        // If everything checks out, return true
+        return true;
     }
 
     /**
