@@ -70,6 +70,8 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class CampaignSummary {
 
+    private static final String WARNING_ICON = "\u26A0";
+
     Campaign campaign;
 
     // unit totals
@@ -394,7 +396,8 @@ public class CampaignSummary {
                   .append(getHRStrainModifier(campaign))
                   .append("</b>)")
                   .append(CLOSING_SPAN_TAG)
-                  .append(" \u26A0");
+                  .append(" ")
+                  .append(WARNING_ICON);
         }
 
         hrCapacityReport.append("</html>");
@@ -408,7 +411,7 @@ public class CampaignSummary {
      * @return A summary of fatigue related facilities.
      */
     public String getFacilityReport() {
-        final String WARNING = " \u26A0";
+        final String WARNING = " " + WARNING_ICON;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         boolean exceedsCapacity;
