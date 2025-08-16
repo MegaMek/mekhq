@@ -40,14 +40,15 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.codeUtilities.StringUtility;
+import megamek.utilities.FastJScrollPane;
 import mekhq.Utilities;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into its own panel so that we can
@@ -58,6 +59,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class DailyReportLogPanel extends JPanel {
     //region Variable Declarations
     private final CampaignGUI gui;
+    final JScrollPane logPanel = new FastJScrollPane();
     private JTextPane txtLog;
     private String logText = "";
     //endregion Variable Declarations
@@ -105,8 +107,9 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().getAccessibleContext().setAccessibleName("Daily Log");
         getTxtLog().addHyperlinkListener(gui.getReportHLL());
 
-        final JScrollPane logPanel = new JScrollPaneWithSpeed(getTxtLog());
-        logPanel.setBorder(new EmptyBorder(2, 5, 2, 2));
+        logPanel.setViewportView(getTxtLog());
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
+        logPanel.setBorder(new EmptyBorder(2,5,2,2));
         add(logPanel, BorderLayout.CENTER);
     }
     //endregion Initialization
@@ -114,6 +117,7 @@ public class DailyReportLogPanel extends JPanel {
     public void clearLogPanel() {
         setLogText("");
         getTxtLog().setText("");
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
     public void refreshLog(final String text) {
@@ -132,7 +136,9 @@ public class DailyReportLogPanel extends JPanel {
         }
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
+
         getGUI().checkDailyLogNag();
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
     public void appendLog(final List<String> newReports) {
@@ -156,5 +162,6 @@ public class DailyReportLogPanel extends JPanel {
         }
         getTxtLog().setCaretPosition(doc.getLength());
         getGUI().checkDailyLogNag();
+        SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 }
