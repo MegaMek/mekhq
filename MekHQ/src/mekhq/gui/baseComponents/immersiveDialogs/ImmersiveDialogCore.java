@@ -694,11 +694,12 @@ public class ImmersiveDialogCore extends JDialog {
      * Builds a panel containing a visual representation of the left-side speaker.
      *
      * <p>The panel includes the speaker's image (if available) and their descriptive information. The name and
-     * description are determined from the given {@link Campaign} and optional {@link Person}. The layout and sizing
-     * are set to align with user interface expectations.</p>
+     * description are determined from the given {@link Campaign} and optional {@link Person}. The layout and sizing are
+     * set to align with user interface expectations.</p>
      *
      * @param speaker  the {@link Person} to be shown as the left speaker; may be {@code null}
      * @param campaign the current {@link Campaign} providing context and fallback values
+     *
      * @return a {@link JPanel} displaying the left speaker's image and description
      */
     protected JPanel buildLeftSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
@@ -742,7 +743,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * <p><b>Usage:</b> By default, this implementation delegates to {@link #buildLeftSpeakerPanel(Person, Campaign)}.
      * However, it can be independently overridden to allow for customization of the panel. Such as when we want to have
-     * the left and right speaker panels visually distinctive./p>
+     * the left and right speaker panels visually distinctive.</p>
      *
      * @param speaker  the {@link Person} to be shown as the right speaker; may be {@code null}
      * @param campaign the current {@link Campaign} providing context and fallback values
