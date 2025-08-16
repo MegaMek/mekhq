@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.math.BigDecimal;
@@ -68,6 +69,8 @@ import mekhq.utilities.ReportingUtilities;
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
  */
 public class CampaignSummary {
+
+    private static final String WARNING_ICON = "\u26A0";
 
     Campaign campaign;
 
@@ -380,16 +383,24 @@ public class CampaignSummary {
     public String getHRCapacityReport(Campaign campaign) {
         int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
-        StringBuilder hrCapacityReport = new StringBuilder().append(getHRStrain(campaign))
+        StringBuilder hrCapacityReport = new StringBuilder().append("<html>")
+                                               .append(getHRStrain(campaign))
                                                .append(" / ")
-                                               .append(campaign.getCampaignOptions()
-                                                             .getHRCapacity() *
+                                               .append(campaign.getCampaignOptions().getHRCapacity() *
                                                              combinedSkillValues)
                                                .append(" personnel");
 
         if (getHRStrainModifier(campaign) > 0) {
-            hrCapacityReport.append(" (+").append(getHRStrainModifier(campaign)).append(')');
+            hrCapacityReport.append(spanOpeningWithCustomColor(getNegativeColor()))
+                  .append(" (<b>+")
+                  .append(getHRStrainModifier(campaign))
+                  .append("</b>)")
+                  .append(CLOSING_SPAN_TAG)
+                  .append(" ")
+                  .append(WARNING_ICON);
         }
+
+        hrCapacityReport.append("</html>");
 
         return hrCapacityReport.toString();
     }
@@ -400,7 +411,7 @@ public class CampaignSummary {
      * @return A summary of fatigue related facilities.
      */
     public String getFacilityReport() {
-        final String WARNING = " \u26A0";
+        final String WARNING = " " + WARNING_ICON;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         boolean exceedsCapacity;
