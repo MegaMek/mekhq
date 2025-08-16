@@ -1135,7 +1135,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         String fontStyle = "font-family: Noto Sans;";
         editorPane.setText(String.format("<div style='width: %s; %s padding:%spx;'>%s</div>",
-              scaleForGUI(800),
+              scaleForGUI(590),
               fontStyle,
               scaleForGUI(5),
               resourceMap.getString("txtStratConTutorial.text")));
@@ -1151,7 +1151,8 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlTutorial = new JPanel(new BorderLayout());
 
         pnlTutorial.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        pnlTutorial.setPreferredSize(new Dimension(800, 0));
+        pnlTutorial.setPreferredSize(new Dimension(600, 0));
+        pnlTutorial.setMinimumSize(new Dimension(600, 0));
         pnlTutorial.add(scrollPane, BorderLayout.CENTER);
     }
 }
