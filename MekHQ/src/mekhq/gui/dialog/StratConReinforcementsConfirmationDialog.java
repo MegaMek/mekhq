@@ -143,7 +143,8 @@ public class StratConReinforcementsConfirmationDialog {
               getSpeaker(campaign),
               null,
               getInCharacterMessage(commanderAddress),
-              getButtons(campaign.isGM()),
+              // +1 is to account for the 1 SP needed for the actual attempt
+              getButtons(campaign.isGM(), maximumSupportPoints + 1),
               getOutOfCharacterMessage(),
               null,
               false,
@@ -153,15 +154,13 @@ public class StratConReinforcementsConfirmationDialog {
 
         reinforcementDialogResponseType = switch (dialog.getDialogChoice()) {
             case 0 -> ReinforcementDialogResponseType.CANCEL;
-            case 1 -> ReinforcementDialogResponseType.REINFORCE;
-            case 2 -> ReinforcementDialogResponseType.REINFORCE_INSTANTLY;
-            case 3 -> ReinforcementDialogResponseType.REINFORCE_GM;
-            case 4 -> ReinforcementDialogResponseType.REINFORCE_GM_INSTANTLY;
-            default -> throw new IllegalStateException("Unexpected dialog choice value: "
-                                                             +
-                                                             dialog.getDialogChoice()
-                                                             +
-                                                             ". Valid choices are 0-4 (or 0-2 for non-GM users). This may occur if an invalid dialog choice is returned.");
+            case 1 -> ReinforcementDialogResponseType.REINFORCE_GM;
+            case 2 -> ReinforcementDialogResponseType.REINFORCE_GM_INSTANTLY;
+            case 3 -> ReinforcementDialogResponseType.REINFORCE;
+            case 4 -> ReinforcementDialogResponseType.REINFORCE_INSTANTLY;
+            default -> throw new IllegalStateException("Unexpected dialog choice value: " 
+                    + dialog.getDialogChoice() 
+                    + ". Valid choices are 0-4 (or 0-2 for non-GM users). This may occur if an invalid dialog choice is returned.");
         };
     }
 
@@ -229,25 +228,18 @@ public class StratConReinforcementsConfirmationDialog {
      * Builds the list of button definitions for the dialog, including any GM-specific options.
      *
      * @param isGM true if the player is a GM, showing more buttons
+     * @param maximumSupportPoints the max allowed support points
      *
      * @return list of button/tooltip pairs to show in the dialog
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons(boolean isGM) {
+    private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons(boolean isGM, int maximumSupportPoints) {
         List<ImmersiveDialogCore.ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         String label = getTextAt(RESOURCE_BUNDLE,
               "StratConReinforcementsConfirmationDialog.button.cancel");
-        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
-
-        label = getTextAt(RESOURCE_BUNDLE,
-              "StratConReinforcementsConfirmationDialog.button.reinforce");
-        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
-
-        label = getTextAt(RESOURCE_BUNDLE,
-              "StratConReinforcementsConfirmationDialog.button.reinforce.instantly");
         buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
 
         if (isGM) {
@@ -257,6 +249,16 @@ public class StratConReinforcementsConfirmationDialog {
 
             label = getTextAt(RESOURCE_BUNDLE,
                   "StratConReinforcementsConfirmationDialog.button.reinforce.gm.instantly");
+            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
+        }
+
+        if (maximumSupportPoints > 0) {
+            label = getTextAt(RESOURCE_BUNDLE,
+                  "StratConReinforcementsConfirmationDialog.button.reinforce");
+            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
+
+            label = getTextAt(RESOURCE_BUNDLE,
+                  "StratConReinforcementsConfirmationDialog.button.reinforce.instantly");
             buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
         }
 
@@ -294,32 +296,36 @@ public class StratConReinforcementsConfirmationDialog {
 
         lblBreakdown = new JLabel("<html>" + getTargetNumberBreakdown(targetNumber) + "</html>");
 
-        JLabel lblSupportPoints = new JLabel(getTextAt(RESOURCE_BUNDLE,
-              "StratConReinforcementsConfirmationDialog.inCharacter.supportPoints"));
-        spnSupportPoints = new JSpinner(new SpinnerNumberModel(0, 0, maximumSupportPoints, 1));
-        spnSupportPoints.addChangeListener(e -> {
-            supportPoints = (int) spnSupportPoints.getValue();
-            lblBreakdown.setText("<html>" + getTargetNumberBreakdown(targetNumber) + "</html>");
-        });
+        if (maximumSupportPoints >= 0) { // This prevents an illegal state
+            JLabel lblSupportPoints = new JLabel(getTextAt(RESOURCE_BUNDLE,
+                  "StratConReinforcementsConfirmationDialog.inCharacter.supportPoints"));
+            spnSupportPoints = new JSpinner(new SpinnerNumberModel(0, 0, maximumSupportPoints, 1));
+            spnSupportPoints.addChangeListener(e -> {
+                supportPoints = (int) spnSupportPoints.getValue();
+                lblBreakdown.setText("<html>" + getTargetNumberBreakdown(targetNumber) + "</html>");
+            });
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+            JPanel panel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2; // The label takes up two spaces horizontally
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(PADDING, 0, PADDING, 0);
-        panel.add(lblBreakdown, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2; // The label takes up two spaces horizontally
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(PADDING, 0, PADDING, 0);
+            panel.add(lblBreakdown, gbc);
 
-        gbc.gridwidth = 1;
-        gbc.gridy = 1;
-        panel.add(lblSupportPoints, gbc);
+            gbc.gridwidth = 1;
+            gbc.gridy = 1;
+            panel.add(lblSupportPoints, gbc);
 
-        gbc.gridx = 1;
-        panel.add(spnSupportPoints, gbc);
+            gbc.gridx = 1;
+            panel.add(spnSupportPoints, gbc);
 
-        return panel;
+            return panel;
+        } else {
+            return new JPanel();
+        }
     }
 
     /**
