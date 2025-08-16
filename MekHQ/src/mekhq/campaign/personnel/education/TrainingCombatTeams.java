@@ -177,7 +177,7 @@ public class TrainingCombatTeams {
 
             for (Person trainee : unit.getActiveCrew()) {
                 if (campaign.getCampaignOptions().isUseFatigue()) {
-                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate() * 2;
+                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
 
                     boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
                     boolean hasToughness = trainee.getOptions().booleanOption(ATOW_TOUGHNESS);
@@ -189,7 +189,7 @@ public class TrainingCombatTeams {
                         fatigueChangeRate = (int) round(fatigueChangeRate * 0.5);
                     }
 
-                    trainee.changeFatigue(fatigueChangeRate * (hasGlassJaw ? 4 : 2));
+                    trainee.changeFatigue(fatigueChangeRate);
                 }
 
                 if (commander.getUnit().getActiveCrew().contains(trainee)) {
