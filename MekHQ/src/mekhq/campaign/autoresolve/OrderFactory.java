@@ -35,12 +35,12 @@ package mekhq.campaign.autoresolve;
 
 import java.util.Set;
 
-import megamek.common.units.Entity;
 import megamek.common.OffBoardDirection;
-import megamek.common.autoresolve.acar.order.Condition;
-import megamek.common.autoresolve.acar.order.Order;
-import megamek.common.autoresolve.acar.order.OrderType;
-import megamek.common.autoresolve.acar.order.Orders;
+import megamek.common.autoResolve.acar.order.Condition;
+import megamek.common.autoResolve.acar.order.Order;
+import megamek.common.autoResolve.acar.order.OrderType;
+import megamek.common.autoResolve.acar.order.Orders;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
