@@ -48,19 +48,19 @@ class FactionStandingUtilitiesTest {
         return Stream.of(
               // In-range for all standing levels
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard(),
-                    FactionStandingLevel.STANDING_LEVEL_1),
+                    FactionStandingLevel.STANDING_LEVEL_0),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMaximumRegard(),
                     FactionStandingLevel.STANDING_LEVEL_1),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard(),
-                    FactionStandingLevel.STANDING_LEVEL_2),
+                    FactionStandingLevel.STANDING_LEVEL_1),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard(),
                     FactionStandingLevel.STANDING_LEVEL_2),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard(),
-                    FactionStandingLevel.STANDING_LEVEL_3),
+                    FactionStandingLevel.STANDING_LEVEL_2),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMaximumRegard(),
                     FactionStandingLevel.STANDING_LEVEL_3),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMinimumRegard(),
-                    FactionStandingLevel.STANDING_LEVEL_4),
+                    FactionStandingLevel.STANDING_LEVEL_3),
               Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMaximumRegard(),
                     FactionStandingLevel.STANDING_LEVEL_4),
               // Typical mid-range values
