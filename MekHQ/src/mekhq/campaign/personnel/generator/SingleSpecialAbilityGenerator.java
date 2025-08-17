@@ -37,8 +37,8 @@ import java.util.Enumeration;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
+import megamek.common.compute.Compute;
+import megamek.common.units.Crew;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;

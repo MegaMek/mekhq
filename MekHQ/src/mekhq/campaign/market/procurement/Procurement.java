@@ -32,18 +32,18 @@
  */
 package mekhq.campaign.market.procurement;
 
-import static megamek.common.ITechnology.AvailabilityValue;
-import static megamek.common.ITechnology.getTechEra;
+import static megamek.common.interfaces.ITechnology.AvailabilityValue;
+import static megamek.common.interfaces.ITechnology.getTechEra;
 import static megamek.common.SimpleTechLevel.INTRO;
 import static megamek.common.SimpleTechLevel.STANDARD;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Compute;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.Era;
-import megamek.common.ITechnology.TechBase;
+import megamek.common.compute.Compute;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.interfaces.ITechnology.Era;
+import megamek.common.interfaces.ITechnology.TechBase;
 import megamek.common.SimpleTechLevel;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;

@@ -49,12 +49,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.EntityWeightClass;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

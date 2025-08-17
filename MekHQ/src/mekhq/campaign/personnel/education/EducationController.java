@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.education;
 
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

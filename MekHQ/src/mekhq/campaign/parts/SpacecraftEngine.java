@@ -37,6 +37,13 @@ import java.io.PrintWriter;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;

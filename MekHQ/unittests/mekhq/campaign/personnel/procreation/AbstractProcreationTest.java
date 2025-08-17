@@ -46,7 +46,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;

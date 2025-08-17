@@ -53,7 +53,7 @@ import javax.swing.JSpinner.NumberEditor;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

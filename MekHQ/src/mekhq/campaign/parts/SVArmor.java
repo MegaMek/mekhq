@@ -32,13 +32,13 @@
  */
 package mekhq.campaign.parts;
 
-import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
+import static megamek.common.equipment.EquipmentType.T_ARMOR_SV_BAR_2;
 
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;

@@ -36,12 +36,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.UnitType;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;

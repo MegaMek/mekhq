@@ -55,10 +55,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Game;
+import megamek.common.board.Board;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.game.Game;
 import megamek.common.Player;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;

@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import megamek.common.*;
+import megamek.common.units.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;

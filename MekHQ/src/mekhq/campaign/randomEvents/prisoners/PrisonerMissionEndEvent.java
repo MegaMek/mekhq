@@ -34,7 +34,7 @@ package mekhq.campaign.randomEvents.prisoners;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.finances.enums.TransactionType.RANSOM;

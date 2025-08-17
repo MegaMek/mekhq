@@ -54,11 +54,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
-import megamek.common.WeaponType;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Mek;
+import megamek.common.equipment.WeaponType;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;

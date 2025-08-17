@@ -46,9 +46,9 @@ import java.util.List;
 
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;

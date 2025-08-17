@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.ITechnology.TechRating;
+import megamek.common.interfaces.ITechnology.TechRating;
 import mekhq.utilities.ReportingUtilities;
 
 /**

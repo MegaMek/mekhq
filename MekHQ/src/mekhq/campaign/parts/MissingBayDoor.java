@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;

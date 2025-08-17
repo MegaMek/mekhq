@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;

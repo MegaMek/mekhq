@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.report;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;

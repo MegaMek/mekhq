@@ -36,9 +36,9 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.AmmoType;
-import megamek.common.ITechnology;
-import megamek.common.TargetRoll;
+import megamek.common.equipment.AmmoType;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

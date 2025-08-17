@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 
 /**
  * A game effect consists for two parts: A (human-readable) description of what it does, and a function (consumer) to be

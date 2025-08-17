@@ -34,10 +34,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

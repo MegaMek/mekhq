@@ -40,7 +40,9 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.*;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;

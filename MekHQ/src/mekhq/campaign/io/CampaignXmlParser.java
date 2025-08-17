@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.io;
 
-import static megamek.common.UnitType.DROPSHIP;
+import static megamek.common.units.UnitType.DROPSHIP;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
@@ -63,15 +63,15 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.MekSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;

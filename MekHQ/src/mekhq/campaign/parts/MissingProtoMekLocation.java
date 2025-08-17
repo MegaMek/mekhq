@@ -36,8 +36,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.ProtoMek;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.ProtoMek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;

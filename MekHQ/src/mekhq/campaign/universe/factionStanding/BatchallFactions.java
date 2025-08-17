@@ -35,7 +35,7 @@ package mekhq.campaign.universe.factionStanding;
 import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 
 /**

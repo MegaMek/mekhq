@@ -34,7 +34,7 @@ package mekhq.campaign.icons.enums;
 
 import static megamek.codeUtilities.MathUtility.clamp;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.unit.Unit;
 

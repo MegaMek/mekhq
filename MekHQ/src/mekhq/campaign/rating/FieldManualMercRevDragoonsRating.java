@@ -38,8 +38,10 @@ import java.math.RoundingMode;
 import java.util.stream.Collectors;
 
 import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;

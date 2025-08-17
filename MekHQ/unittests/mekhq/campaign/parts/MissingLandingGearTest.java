@@ -43,8 +43,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;

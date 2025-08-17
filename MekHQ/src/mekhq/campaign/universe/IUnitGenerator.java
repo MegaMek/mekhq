@@ -40,9 +40,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 

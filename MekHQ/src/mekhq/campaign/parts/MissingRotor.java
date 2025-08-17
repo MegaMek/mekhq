@@ -34,10 +34,10 @@
 
 package mekhq.campaign.parts;
 
-import megamek.common.Entity;
-import megamek.common.IArmorState;
+import megamek.common.units.Entity;
+import megamek.common.equipment.IArmorState;
 import megamek.common.TechAdvancement;
-import megamek.common.VTOL;
+import megamek.common.units.VTOL;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.Node;

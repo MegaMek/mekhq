@@ -35,8 +35,8 @@ package mekhq.campaign;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.campaignOptions.CampaignOptions.S_AUTO;
 import static mekhq.campaign.campaignOptions.CampaignOptions.S_TECH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
@@ -117,21 +117,35 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
-import megamek.common.ITechnology.AvailabilityValue;
+import megamek.common.interfaces.ITechManager;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.interfaces.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryConditions.PlanetaryConditions;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.*;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -8418,7 +8432,7 @@ public class Campaign implements ITechManager {
             if (getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
                 Planet planet = getLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
-                megamek.common.planetaryconditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
+                megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
                 if (planet.getGravity() < 0.8) {

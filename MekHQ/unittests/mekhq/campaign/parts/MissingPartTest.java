@@ -43,8 +43,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;

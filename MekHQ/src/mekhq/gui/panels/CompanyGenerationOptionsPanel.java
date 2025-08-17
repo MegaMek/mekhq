@@ -48,7 +48,7 @@ import javax.swing.JSpinner.NumberEditor;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.panels.JDisableablePanel;
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

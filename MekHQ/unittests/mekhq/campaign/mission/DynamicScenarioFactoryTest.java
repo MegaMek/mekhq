@@ -34,7 +34,7 @@ package mekhq.campaign.mission;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import megamek.common.Board;
+import megamek.common.board.Board;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -32,15 +32,15 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
-import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
-import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
-import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
-import static megamek.common.Mek.LOC_CT;
-import static megamek.common.UnitType.AEROSPACEFIGHTER;
-import static megamek.common.UnitType.INFANTRY;
-import static megamek.common.UnitType.MEK;
-import static megamek.common.UnitType.TANK;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
+import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
+import static megamek.common.units.Mek.LOC_CT;
+import static megamek.common.units.UnitType.AEROSPACEFIGHTER;
+import static megamek.common.units.UnitType.INFANTRY;
+import static megamek.common.units.UnitType.MEK;
+import static megamek.common.units.UnitType.TANK;
 import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
@@ -67,10 +67,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

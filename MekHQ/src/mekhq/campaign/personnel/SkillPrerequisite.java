@@ -38,7 +38,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;

@@ -40,7 +40,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;

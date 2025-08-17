@@ -35,8 +35,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
-import megamek.common.Tank;
+import megamek.common.compute.Compute;
+import megamek.common.units.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

@@ -42,9 +42,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
-import megamek.common.BombType.BombTypeEnum;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.BombLoadout;
+import megamek.common.equipment.BombType.BombTypeEnum;
+import megamek.common.loaders.MULParser;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.Campaign;
@@ -108,7 +110,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      * then
      * TODO : re-factored out of EntityListFile.
      * <p>
-     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
+     * Contents copied from megamek.common.units.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ
      *
      * @param tgtEnt The entity to serialize to XML.
@@ -323,8 +325,8 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...) Modified to support saving to/from XML
-     * for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getAeroCritString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param a The Aero unit to generate a crit string for.
      *
@@ -397,8 +399,8 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTurretLockedString(...) Modified to support saving to/from
-     * XML for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getTurretLockedString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param e The tank to generate a turret-locked string for.
      *
@@ -414,8 +416,8 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getMovementString(...) Modified to support saving to/from XML
-     * for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getMovementString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param e The tank to generate a movement string for.
      *
@@ -454,8 +456,8 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTankCritString(...) Modified to support saving to/from XML
-     * for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getTankCritString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param e The tank to generate a movement string for.
      *

@@ -34,7 +34,7 @@ package mekhq.gui.dialog.markets.personnelMarket;
 
 import static java.lang.Math.min;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;

@@ -39,11 +39,11 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
-import megamek.common.MiscType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
+import megamek.common.equipment.MiscType;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

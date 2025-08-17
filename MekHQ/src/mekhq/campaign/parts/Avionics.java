@@ -35,14 +35,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
+import megamek.common.units.Aero;
+import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMek;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.IAero;
+import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;

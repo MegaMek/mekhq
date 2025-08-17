@@ -34,10 +34,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
-import megamek.common.DockingCollar;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
+import megamek.common.compute.Compute;
+import megamek.common.equipment.DockingCollar;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;

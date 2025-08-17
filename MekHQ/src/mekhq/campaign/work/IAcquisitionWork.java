@@ -33,10 +33,10 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.ITechnology.TechBase;
-import megamek.common.TargetRoll;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.interfaces.ITechnology.AvailabilityValue;
+import megamek.common.interfaces.ITechnology.TechBase;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;

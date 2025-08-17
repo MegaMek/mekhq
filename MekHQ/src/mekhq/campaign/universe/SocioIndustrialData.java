@@ -39,7 +39,7 @@ import java.util.Locale;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.interfaces.ITechnology.TechRating;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;

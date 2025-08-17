@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -50,7 +50,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;

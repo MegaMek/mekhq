@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.Mek;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
+import megamek.common.units.Tank;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

@@ -35,7 +35,7 @@ package mekhq.campaign.autoresolve;
 
 import java.util.Set;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.OffBoardDirection;
 import megamek.common.autoresolve.acar.order.Condition;
 import megamek.common.autoresolve.acar.order.Order;

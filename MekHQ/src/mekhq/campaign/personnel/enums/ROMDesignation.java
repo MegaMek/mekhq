@@ -34,9 +34,9 @@ package mekhq.campaign.personnel.enums;
 
 import java.util.ResourceBundle;
 
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;

@@ -34,8 +34,8 @@
 
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import mekhq.campaign.Campaign;
 
 /**

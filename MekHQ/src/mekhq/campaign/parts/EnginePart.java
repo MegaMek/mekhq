@@ -37,6 +37,14 @@ import java.io.PrintWriter;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import megamek.common.verifier.TestEntity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

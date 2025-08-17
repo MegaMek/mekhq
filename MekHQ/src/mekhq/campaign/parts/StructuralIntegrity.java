@@ -35,12 +35,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.ConvFighter;
-import megamek.common.Dropship;
-import megamek.common.Entity;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
 import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
+import megamek.common.units.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

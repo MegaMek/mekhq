@@ -35,14 +35,14 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
+import megamek.common.equipment.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -474,7 +474,7 @@ public class EquipmentPart extends Part {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     * Copied from megamek.common.units.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      */
     @Override
     public Money getStickerPrice() {

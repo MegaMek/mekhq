@@ -35,8 +35,14 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;

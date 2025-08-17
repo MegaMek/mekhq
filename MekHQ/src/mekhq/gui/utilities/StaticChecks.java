@@ -41,7 +41,7 @@ import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.stream.Stream;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;

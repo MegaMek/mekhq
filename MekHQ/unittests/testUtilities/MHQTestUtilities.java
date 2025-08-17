@@ -37,9 +37,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Base64;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MekSummary;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 

@@ -36,12 +36,12 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.Mounted;
+import megamek.common.equipment.IArmorState;
+import megamek.common.interfaces.ILocationExposureStatus;
+import megamek.common.equipment.Mounted;
 import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.units.Tank;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

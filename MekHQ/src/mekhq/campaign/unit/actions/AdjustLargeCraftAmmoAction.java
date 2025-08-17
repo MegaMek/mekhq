@@ -35,7 +35,7 @@ package mekhq.campaign.unit.actions;
 import java.util.HashMap;
 import java.util.Map;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;

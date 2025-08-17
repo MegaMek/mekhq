@@ -35,7 +35,9 @@ package mekhq.campaign.unit;
 
 import java.util.HashMap;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.*;
 import mekhq.campaign.Hangar;
 
 /**

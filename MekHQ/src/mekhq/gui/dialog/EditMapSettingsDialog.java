@@ -59,10 +59,10 @@ import javax.swing.*;
 
 import megamek.client.ui.dialogs.minimap.MinimapPanel;
 import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
-import megamek.common.Board;
-import megamek.common.BoardDimensions;
+import megamek.common.board.Board;
+import megamek.common.board.BoardDimensions;
 import megamek.common.Configuration;
-import megamek.common.MapSettings;
+import megamek.common.loaders.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;

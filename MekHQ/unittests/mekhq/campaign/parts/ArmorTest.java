@@ -39,9 +39,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.interfaces.ITechnology.TechRating;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;

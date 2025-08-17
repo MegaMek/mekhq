@@ -46,14 +46,14 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import megamek.Version;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.TechConstants;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.util.weightedMaps.WeightedIntMap;
-import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.autocannons.LBXACWeapon;
 import megamek.common.weapons.autocannons.UACWeapon;

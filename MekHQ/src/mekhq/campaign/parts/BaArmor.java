@@ -35,7 +35,7 @@ package mekhq.campaign.parts;
 
 import java.util.Objects;
 
-import megamek.common.EquipmentType;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.ArmorType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

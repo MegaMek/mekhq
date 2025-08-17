@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import megamek.common.Transporter;
+import megamek.common.equipment.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

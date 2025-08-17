@@ -32,17 +32,17 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static megamek.common.Compute.d6;
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createCLImprovedSensors;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createCLImprovedSensors;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.TargetRoll;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.interfaces.ITechnology.AvailabilityValue;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;

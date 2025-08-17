@@ -34,7 +34,7 @@ package mekhq.campaign.handler;
 
 import java.time.DayOfWeek;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.event.Subscribe;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;

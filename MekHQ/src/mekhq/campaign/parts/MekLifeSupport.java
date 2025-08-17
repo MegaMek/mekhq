@@ -35,21 +35,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.Mek;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.skills.SkillType;
-import org.w3c.dom.Node;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**

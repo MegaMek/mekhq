@@ -55,7 +55,7 @@ import javax.swing.SwingConstants;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 

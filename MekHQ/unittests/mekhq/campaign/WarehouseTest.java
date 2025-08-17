@@ -53,10 +53,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Mek;
 import mekhq.EventSpy;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;

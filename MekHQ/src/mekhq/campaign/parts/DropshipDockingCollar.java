@@ -35,9 +35,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
+import megamek.common.compute.Compute;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;

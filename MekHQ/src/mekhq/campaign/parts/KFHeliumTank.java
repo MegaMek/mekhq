@@ -35,8 +35,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
-import megamek.common.Compute;
-import megamek.common.Jumpship;
+import megamek.common.compute.Compute;
+import megamek.common.units.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;

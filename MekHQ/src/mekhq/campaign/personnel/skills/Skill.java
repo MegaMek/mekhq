@@ -55,8 +55,8 @@ import java.util.List;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.TargetRoll;
+import megamek.common.compute.Compute;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;

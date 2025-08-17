@@ -40,7 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;

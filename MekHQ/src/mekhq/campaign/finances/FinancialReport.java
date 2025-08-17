@@ -34,14 +34,14 @@ package mekhq.campaign.finances;
 
 import java.util.stream.Collectors;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Dropship;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.ProtoMek;
-import megamek.common.Tank;
+import megamek.common.units.Aero;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.Dropship;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Contract;

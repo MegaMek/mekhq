@@ -46,8 +46,8 @@ import static org.mockito.Mockito.when;
 import java.util.function.Predicate;
 
 import megamek.common.CriticalSlot;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;

@@ -36,10 +36,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.Mounted;
-import megamek.common.Tank;
-import megamek.common.WeaponType;
+import megamek.common.equipment.IArmorState;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Tank;
+import megamek.common.equipment.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

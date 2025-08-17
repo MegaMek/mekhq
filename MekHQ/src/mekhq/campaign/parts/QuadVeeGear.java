@@ -35,8 +35,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.QuadVee;
+import megamek.common.units.Entity;
+import megamek.common.units.QuadVee;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;

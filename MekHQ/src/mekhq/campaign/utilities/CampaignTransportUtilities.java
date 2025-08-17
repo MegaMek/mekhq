@@ -40,7 +40,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.InfantryBay;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.QuadVee;
+import megamek.common.units.Tank;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.utilities.MHQInternationalization;

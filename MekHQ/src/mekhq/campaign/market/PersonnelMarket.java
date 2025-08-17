@@ -46,11 +46,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;

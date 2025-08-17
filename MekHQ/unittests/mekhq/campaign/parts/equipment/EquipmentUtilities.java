@@ -34,7 +34,7 @@ package mekhq.campaign.parts.equipment;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import megamek.common.EquipmentType;
+import megamek.common.equipment.EquipmentType;
 
 public class EquipmentUtilities {
     /**

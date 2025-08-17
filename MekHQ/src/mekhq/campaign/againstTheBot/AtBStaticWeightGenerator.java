@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 

@@ -44,8 +44,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.Game;
+import megamek.common.units.Entity;
+import megamek.common.game.Game;
 import megamek.common.Player;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;

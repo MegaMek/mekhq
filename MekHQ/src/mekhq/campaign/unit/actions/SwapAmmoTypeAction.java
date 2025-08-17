@@ -34,7 +34,7 @@ package mekhq.campaign.unit.actions;
 
 import java.util.Objects;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;

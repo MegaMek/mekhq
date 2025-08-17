@@ -34,7 +34,7 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 
 /**
  * A comparator for unit weight classes

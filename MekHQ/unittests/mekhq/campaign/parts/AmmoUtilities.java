@@ -35,9 +35,9 @@ package mekhq.campaign.parts;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import megamek.common.AmmoType;
-import megamek.common.BombType;
-import megamek.common.EquipmentType;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.BombType;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
 
 public class AmmoUtilities {

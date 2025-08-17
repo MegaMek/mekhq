@@ -35,9 +35,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.ProtoMek;
+import megamek.common.units.ProtoMek;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;

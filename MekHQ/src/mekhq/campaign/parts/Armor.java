@@ -37,15 +37,15 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.ITechnology;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.units.Tank;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.TechAdvancement;
-import megamek.common.Warship;
+import megamek.common.units.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -290,7 +290,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public double getArmorWeight(int points) {
-        // from megamek.common.Entity.getArmorWeight()
+        // from megamek.common.units.Entity.getArmorWeight()
 
         // this roundabout method is actually necessary to avoid rounding
         // weirdness. Yeah, it's dumb.

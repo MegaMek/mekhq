@@ -50,7 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.TargetRollModifier;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;

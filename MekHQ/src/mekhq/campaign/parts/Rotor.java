@@ -33,10 +33,10 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.IArmorState;
+import megamek.common.equipment.IArmorState;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import megamek.common.VTOL;
+import megamek.common.units.VTOL;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

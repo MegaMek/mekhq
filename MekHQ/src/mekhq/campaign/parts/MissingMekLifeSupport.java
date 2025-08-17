@@ -34,8 +34,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.Mek;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;

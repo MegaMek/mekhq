@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
@@ -46,7 +46,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 import java.util.List;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

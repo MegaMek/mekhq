@@ -36,8 +36,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 
-import megamek.common.ITechnology;
-import megamek.common.TargetRoll;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

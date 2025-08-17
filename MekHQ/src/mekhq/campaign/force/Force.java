@@ -50,7 +50,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 import megamek.Version;
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;

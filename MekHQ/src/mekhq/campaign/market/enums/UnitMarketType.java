@@ -34,7 +34,7 @@ package mekhq.campaign.market.enums;
 
 import java.util.ResourceBundle;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

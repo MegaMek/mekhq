@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.resupplyAndCaches;
 
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.loadPlayerConvoys;

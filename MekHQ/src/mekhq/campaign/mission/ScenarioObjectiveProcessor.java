@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;

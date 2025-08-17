@@ -33,8 +33,8 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import static java.lang.Math.round;
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.randomEvents.prisoners.CapturePrisoners.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
@@ -50,9 +50,9 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Set;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.MapSettings;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.interfaces.ITechnology.AvailabilityValue;
+import megamek.common.loaders.MapSettings;
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;

@@ -35,9 +35,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.BipedMek;
+import megamek.common.units.BipedMek;
 import megamek.common.CriticalSlot;
-import megamek.common.Mek;
+import megamek.common.units.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

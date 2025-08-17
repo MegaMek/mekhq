@@ -41,11 +41,11 @@ import javax.xml.parsers.DocumentBuilder;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;

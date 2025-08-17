@@ -33,11 +33,11 @@
  */
 package mekhq.campaign.force;
 
-import static megamek.common.Entity.ETYPE_AEROSPACEFIGHTER;
-import static megamek.common.Entity.ETYPE_MEK;
-import static megamek.common.Entity.ETYPE_PROTOMEK;
-import static megamek.common.Entity.ETYPE_TANK;
-import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.common.units.Entity.ETYPE_AEROSPACEFIGHTER;
+import static megamek.common.units.Entity.ETYPE_MEK;
+import static megamek.common.units.Entity.ETYPE_PROTOMEK;
+import static megamek.common.units.Entity.ETYPE_TANK;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 import static mekhq.campaign.force.ForceType.STANDARD;
@@ -50,11 +50,11 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
