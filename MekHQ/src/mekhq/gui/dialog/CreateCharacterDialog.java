@@ -148,6 +148,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JTextField textReputation;
     private JTextField textUnlucky;
     private JTextField textBloodmark;
+    private JTextField textExtraIncome;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
 
@@ -264,6 +265,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         JLabel lblUnlucky = new JLabel();
         textBloodmark = new JTextField();
         JLabel lblBloodmark = new JLabel();
+        textExtraIncome = new JTextField();
+        JLabel lblExtraIncome = new JLabel();
         textEducationLevel = new JComboBox<>();
         textLoyalty = new JTextField();
         JLabel lblLoyalty = new JLabel();
@@ -766,6 +769,27 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         demogPanel.add(textBloodmark, gridBagConstraints);
+
+        y++;
+
+        lblExtraIncome.setText(resourceMap.getString("lblExtraIncome.text"));
+        lblExtraIncome.setName("lblExtraIncome");
+
+        textExtraIncome.setText(Integer.toString(person.getExtraIncomeTraitLevel()));
+        textExtraIncome.setName("textExtraIncome");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demogPanel.add(lblExtraIncome, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demogPanel.add(textExtraIncome, gridBagConstraints);
 
         y++;
 
@@ -1731,6 +1755,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
         person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+
+        newValue = MathUtility.parseInt(textExtraIncome.getText(), person.getExtraIncomeTraitLevel());
+        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
