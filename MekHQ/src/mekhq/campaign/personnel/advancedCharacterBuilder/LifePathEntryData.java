@@ -299,7 +299,7 @@ public record LifePathEntryData(
      * @since 0.50.07
      */
     public @Nullable IOption getSPA(String lookupName) {
-        if (SPA.getLookupName().equalsIgnoreCase(classLookupName)) {
+        if (!SPA.getLookupName().equalsIgnoreCase(classLookupName)) {
             return null;
         }
 
