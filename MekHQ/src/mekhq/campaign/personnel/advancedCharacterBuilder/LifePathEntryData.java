@@ -137,11 +137,7 @@ public record LifePathEntryData(
             return getTraitValue(trait, true);
         }
 
-        if (trait.getLookupName().equalsIgnoreCase(objectLookupName)) {
-            return getTraitValue(trait, false);
-        }
-
-        return 0;
+        return getTraitValue(trait, false);
     }
 
     /**
