@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage.REAL_LIFE;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory.DARK_CASTE;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord.fromRawEntry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
@@ -77,7 +78,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -96,7 +98,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -115,7 +118,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -134,7 +138,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -153,7 +158,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -172,7 +178,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -191,7 +198,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -210,7 +218,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -229,7 +238,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -248,7 +258,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -267,7 +278,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -286,7 +298,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -305,7 +318,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -324,7 +338,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -343,7 +358,8 @@ class LifePathRecordTest {
                   null,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -362,7 +378,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   null,
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -381,7 +398,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   null,
-                  entryDataMap);
+                  entryDataMap,
+                  "1");
         }
 
         @Test
@@ -400,7 +418,69 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
+                  null,
+                  "0");
+        }
+
+        @Test
+        void testFromRawEntry_missingPickCount() {
+            fromRawEntry(
+                  "00000000-0000-0000-0000-000000000000",
+                  "ATOW",
+                  "0.50.07",
+                  "Test Life Path",
+                  "Once upon a time...",
+                  "6",
+                  "5",
+                  "24",
+                  List.of(REAL_LIFE.getLookupName()),
+                  List.of(DARK_CASTE.getLookupName()),
+                  entryDataMap,
+                  List.of(entry),
+                  List.of(entry),
+                  entryDataMap,
                   null);
+        }
+
+        @Test
+        void testFromRawEntry_negativePickCount() {
+            fromRawEntry(
+                  "00000000-0000-0000-0000-000000000000",
+                  "ATOW",
+                  "0.50.07",
+                  "Test Life Path",
+                  "Once upon a time...",
+                  "6",
+                  "5",
+                  "24",
+                  List.of(REAL_LIFE.getLookupName()),
+                  List.of(DARK_CASTE.getLookupName()),
+                  entryDataMap,
+                  List.of(entry),
+                  List.of(entry),
+                  entryDataMap,
+                  "-1");
+        }
+
+        @Test
+        void testFromRawEntry_impossiblePickCount() {
+            LifePathRecord record = fromRawEntry(
+                  "00000000-0000-0000-0000-000000000000",
+                  "ATOW",
+                  "0.50.07",
+                  "Test Life Path",
+                  "Once upon a time...",
+                  "6",
+                  "5",
+                  "24",
+                  List.of(REAL_LIFE.getLookupName()),
+                  List.of(DARK_CASTE.getLookupName()),
+                  entryDataMap,
+                  List.of(entry),
+                  List.of(entry),
+                  entryDataMap,
+                  String.valueOf(entryDataMap.size() + 1));
+            assertEquals(record.pickCount(), entryDataMap.size());
         }
     }
 
@@ -433,7 +513,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap);
+                  entryDataMap,
+                  1);
         }
 
         @Test
@@ -452,7 +533,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -471,7 +553,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -490,7 +573,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -509,7 +593,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -528,7 +613,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -547,7 +633,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -566,7 +653,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -585,7 +673,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -604,7 +693,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -623,7 +713,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -642,7 +733,8 @@ class LifePathRecordTest {
                   null,
                   List.of(entry),
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -661,7 +753,8 @@ class LifePathRecordTest {
                   entryDataMap,
                   null,
                   List.of(entry),
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
@@ -680,11 +773,12 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   null,
-                  entryDataMap));
+                  entryDataMap,
+                  1));
         }
 
         @Test
-        void testCanonConstructor_missingSelectableXPAwards() {
+        void testCanonConstructor_negativePickCount() {
             assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
@@ -699,7 +793,28 @@ class LifePathRecordTest {
                   entryDataMap,
                   List.of(entry),
                   List.of(entry),
-                  null));
+                  entryDataMap,
+                  -1));
+        }
+
+        @Test
+        void testCanonConstructor_impossiblePickCount() {
+            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+                  UUID.fromString("00000000-0000-0000-0000-000000000000"),
+                  "ATOW",
+                  new Version("0.50.07"),
+                  "Test Life Path",
+                  "Once upon a time...",
+                  6,
+                  5,
+                  24,
+                  List.of(REAL_LIFE),
+                  List.of(DARK_CASTE),
+                  entryDataMap,
+                  List.of(entry),
+                  List.of(entry),
+                  entryDataMap,
+                  entryDataMap.size() + 1));
         }
     }
 }

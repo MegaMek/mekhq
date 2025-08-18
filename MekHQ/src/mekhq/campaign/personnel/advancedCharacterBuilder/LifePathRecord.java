@@ -54,7 +54,7 @@ import mekhq.MHQConstants;
 public record LifePathRecord(UUID id, String source, Version version, String name, String flavorText, int age,
       int xpDiscount, int xpCost, List<ATOWLifeStage> lifeStages, List<LifePathCategory> categories,
       Map<Integer, List<LifePathEntryData>> requirements, List<LifePathEntryData> exclusions,
-      List<LifePathEntryData> fixedXpAwards, Map<Integer, List<LifePathEntryData>> selectableXPAwards
+      List<LifePathEntryData> fixedXpAwards, Map<Integer, List<LifePathEntryData>> selectableXPAwards, int pickCount
 ) {
     private static final MMLogger LOGGER = MMLogger.create(LifePathRecord.class);
 
@@ -79,6 +79,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
      * @param rawExclusions         List of exclusion entry strings.
      * @param rawFixedXpAwards      List of fixed XP award entry strings.
      * @param rawSelectableXPAwards Map of integer keys to lists of selectable XP award strings.
+     * @param rawPickCount          How many times flexible XP awards can be selected.
      *
      * @return a new {@link LifePathRecord} parsed and validated from the provided inputs.
      *
@@ -91,7 +92,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
           @Nullable String rawXPDiscount, @Nullable String rawXPCost, @Nullable List<String> rawLifeStages,
           @Nullable List<String> rawCategories, @Nullable Map<Integer, List<String>> rawRequirements,
           @Nullable List<String> rawExclusions, @Nullable List<String> rawFixedXpAwards,
-          @Nullable Map<Integer, List<String>> rawSelectableXPAwards) {
+          @Nullable Map<Integer, List<String>> rawSelectableXPAwards, @Nullable String rawPickCount) {
         // ID
         UUID id;
         if (rawID != null) {
@@ -119,23 +120,23 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 version = new Version(rawVersion);
             } catch (IllegalArgumentException e) {
                 version = MHQConstants.VERSION;
-                LOGGER.warn("Invalid version provided for LifePathRecord, using default version: {}", version);
+                LOGGER.warn("Invalid version provided for {}, using default version: {}", id.toString(), version);
             }
         } else {
             version = MHQConstants.VERSION;
-            LOGGER.info("No version provided for LifePathRecord, using default version: {}", version);
+            LOGGER.info("No version provided for {}, using default version: {}", id.toString(), version);
         }
 
         // Name
         if (name == null) {
             name = "";
-            LOGGER.info("No name provided for LifePathRecord, using empty string");
+            LOGGER.info("No name provided for {}, using empty string", id.toString());
         }
 
         // Flavor Text
         if (flavorText == null) {
             flavorText = "";
-            LOGGER.info("No flavor text provided for LifePathRecord, using empty string");
+            LOGGER.info("No flavor text provided for {}, using empty string", id.toString());
         }
 
         // Age
@@ -143,11 +144,11 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (rawAge != null) {
             age = MathUtility.parseInt(rawAge);
             if (age < 0) {
-                LOGGER.warn("Age provided for LifePathRecord is negative, using 0");
+                LOGGER.warn("Age provided for {} is negative, using 0", id.toString());
                 age = 0;
             }
         } else {
-            LOGGER.info("No age provided for LifePathRecord, using 0");
+            LOGGER.info("No age provided for {}, using 0", id.toString());
             age = 0;
         }
 
@@ -156,11 +157,11 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (rawXPDiscount != null) {
             xpDiscount = MathUtility.parseInt(rawXPDiscount);
             if (xpDiscount < 0) {
-                LOGGER.warn("XP discount provided for LifePathRecord is negative, using 0");
+                LOGGER.warn("XP discount provided for {} is negative, using 0", id.toString());
                 xpDiscount = 0;
             }
         } else {
-            LOGGER.info("No XP discount provided for LifePathRecord, using 0");
+            LOGGER.info("No XP discount provided for {}, using 0", id.toString());
             xpDiscount = 0;
         }
 
@@ -169,11 +170,11 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (rawXPCost != null) {
             xpCost = MathUtility.parseInt(rawXPCost);
             if (xpCost < 0) {
-                LOGGER.warn("XP cost provided for LifePathRecord is negative, using 0");
+                LOGGER.warn("XP cost provided for {} is negative, using 0", id.toString());
                 xpCost = 0;
             }
         } else {
-            LOGGER.info("No XP cost provided for LifePathRecord, using 0");
+            LOGGER.info("No XP cost provided for {}, using 0", id.toString());
             xpCost = 0;
         }
 
@@ -190,7 +191,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 lifeStages.add(stage);
             }
         } else {
-            LOGGER.info("No life stages provided for LifePathRecord");
+            LOGGER.info("No life stages provided for {}", id.toString());
         }
 
         // Categories
@@ -206,7 +207,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 }
             }
         } else {
-            LOGGER.info("No life path categories provided for LifePathRecord");
+            LOGGER.info("No life path categories provided for {}", id.toString());
         }
 
         // Requirements
@@ -214,7 +215,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (rawRequirements != null) {
             requirements = translateLifePathEntryMap(rawRequirements);
         } else {
-            LOGGER.info("No requirements provided for LifePathRecord");
+            LOGGER.info("No requirements provided for {}", id.toString());
         }
 
         // Exclusions
@@ -224,7 +225,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 exclusions.add(LifePathEntryData.fromRawEntry(exclusion));
             }
         } else {
-            LOGGER.info("No exclusions provided for LifePathRecord");
+            LOGGER.info("No exclusions provided for {}", id.toString());
         }
 
         // Fixed XP Awards
@@ -234,7 +235,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 fixedXPAwards.add(LifePathEntryData.fromRawEntry(xpAward));
             }
         } else {
-            LOGGER.info("No fixed XP awards provided for LifePathRecord");
+            LOGGER.info("No fixed XP awards provided for {}", id.toString());
         }
 
         // Selectable XP Awards
@@ -242,11 +243,31 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (rawSelectableXPAwards != null) {
             selectableXPAwards = translateLifePathEntryMap(rawSelectableXPAwards);
         } else {
-            LOGGER.info("No selectable XP awards provided for LifePathRecord");
+            LOGGER.info("No selectable XP awards provided for {}", id.toString());
+        }
+
+        // Pick Count
+        int pickCount;
+        if (rawPickCount != null) {
+            pickCount = MathUtility.parseInt(rawPickCount);
+            if (pickCount < 0) {
+                LOGGER.warn("Pick count provided for {} is negative, using 0", id.toString());
+                pickCount = 0;
+            }
+
+            int selectableXPAwardSize = selectableXPAwards.size();
+            if (pickCount > selectableXPAwardSize) {
+                LOGGER.warn("Pick count provided for {} is greater than the number of selectable XP awards, using {}",
+                      id.toString(), selectableXPAwardSize);
+                pickCount = selectableXPAwardSize;
+            }
+        } else {
+            LOGGER.info("No pick count provided for {}, using 0", id.toString());
+            pickCount = 0;
         }
 
         return new LifePathRecord(id, source, version, name, flavorText, age, xpDiscount, xpCost, lifeStages,
-              categories, requirements, exclusions, fixedXPAwards, selectableXPAwards);
+              categories, requirements, exclusions, fixedXPAwards, selectableXPAwards, pickCount);
     }
 
     /**
@@ -341,6 +362,13 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         }
         if (xpCost < 0) {
             throw new IllegalArgumentException("xpCost must be a non-negative integer");
+        }
+        if (pickCount < 0) {
+            throw new IllegalArgumentException("pickCount must be a non-negative integer");
+        }
+        if (pickCount > selectableXPAwards.size()) {
+            throw new IllegalArgumentException(
+                  "pickCount must be less than or equal to the number of selectable XP awards");
         }
     }
 }
