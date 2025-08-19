@@ -35,16 +35,16 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.units.Entity;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
-import megamek.common.TechAdvancement;
-import megamek.common.equipment.WeaponType;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Entity;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -558,7 +558,7 @@ public class EquipmentPart extends Part {
                 // varCost = entity.getEngine().getRating() * 10000;
             } else if (type.hasFlag(MiscType.F_DRONE_OPERATING_SYSTEM)) {
                 varCost = Money.of((getTonnage() * 10000) + 5000);
-            } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+            } else if (type.hasFlag(MiscType.F_TARGETING_COMPUTER)) {
                 varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) &&
                              (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
@@ -606,7 +606,7 @@ public class EquipmentPart extends Part {
      */
     public static boolean hasVariableTonnage(EquipmentType type) {
         return (type instanceof MiscType) &&
-                     (type.hasFlag(MiscType.F_TARGCOMP) ||
+                     (type.hasFlag(MiscType.F_TARGETING_COMPUTER) ||
                             type.hasFlag(MiscType.F_CLUB) ||
                             type.hasFlag(MiscType.F_TALON));
     }
@@ -627,7 +627,7 @@ public class EquipmentPart extends Part {
             return 10;
         } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
             return 5.5;
-        } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+        } else if (type.hasFlag(MiscType.F_TARGETING_COMPUTER)) {
             // direct fire weapon weight divided by 4 - what is reasonably the highest - 15
             // tons?
             return 15;

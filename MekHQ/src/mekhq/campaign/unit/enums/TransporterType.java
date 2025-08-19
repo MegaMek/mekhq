@@ -33,19 +33,10 @@
 
 package mekhq.campaign.unit.enums;
 
-import megamek.common.equipment.ProtoMekClampMount;
-import megamek.common.bays.SuperHeavyVehicleBay;
 import megamek.common.battleArmor.BattleArmorHandles;
 import megamek.common.battleArmor.BattleArmorHandlesTank;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.BattleArmorBay;
-import megamek.common.bays.CargoBay;
-import megamek.common.bays.HeavyVehicleBay;
-import megamek.common.bays.InfantryBay;
-import megamek.common.bays.LightVehicleBay;
-import megamek.common.bays.MekBay;
-import megamek.common.bays.ProtoMekBay;
-import megamek.common.bays.SmallCraftBay;
+import megamek.common.battleArmor.ProtoMekClampMount;
+import megamek.common.bays.*;
 import megamek.common.equipment.ClampMountMek;
 import megamek.common.equipment.ClampMountTank;
 import megamek.common.equipment.DockingCollar;

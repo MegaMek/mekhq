@@ -62,13 +62,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
 import megamek.common.CriticalSlot;
-import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import megamek.common.interfaces.ILocationExposureStatus;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
-import megamek.common.equipment.Mounted;
-import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -1221,7 +1221,7 @@ class MekLocationTest {
         // Blow off the right arm
         doReturn(true).when(entity).isLocationBad(Mek.LOC_RARM);
 
-        // 2 criticals
+        // 2 criticalSlots
         doReturn(2).when(entity).getNumberOfCriticals((location));
         CriticalSlot mockLandingGear = mock(CriticalSlot.class);
         when(mockLandingGear.isEverHittable()).thenReturn(true);

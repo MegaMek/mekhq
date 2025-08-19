@@ -566,7 +566,7 @@ public class SpecialAbility {
         if (wt.isCapital() ||
                   wt.isSubCapital() ||
                   wt.hasFlag(WeaponType.F_INFANTRY) ||
-                  wt.hasFlag(WeaponType.F_ONESHOT) ||
+                  wt.hasFlag(WeaponType.F_ONE_SHOT) ||
                   wt.hasFlag(WeaponType.F_PROTOTYPE)) {
             return false;
         }
@@ -589,7 +589,7 @@ public class SpecialAbility {
         }
 
         if (clusterOnly &&
-                  !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
+                  !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTER_TABLE) ||
                           (wt instanceof ACWeapon) ||
                           (wt instanceof UACWeapon) ||
                           (wt instanceof LBXACWeapon))) {

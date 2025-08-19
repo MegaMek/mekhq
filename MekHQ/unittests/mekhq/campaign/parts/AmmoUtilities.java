@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import megamek.common.equipment.AmmoType;
-import megamek.common.equipment.BombType;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.enums.BombType;
 import megamek.common.weapons.infantry.InfantryWeapon;
 
 public class AmmoUtilities {

@@ -41,7 +41,8 @@ import java.util.StringJoiner;
 import java.util.stream.IntStream;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
@@ -763,9 +764,9 @@ public class MekLocation extends Part {
             if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
                 if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
                     EquipmentType equipmentType = slot.getMount().getType();
-                    if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
+                    if (equipmentType.hasFlag(MiscType.F_NULL_SIG)) {
                         partsToSalvageOrScrap.add("Null-Signature System");
-                    } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
+                    } else if (equipmentType.hasFlag(MiscType.F_VOID_SIG)) {
                         partsToSalvageOrScrap.add("Void-Signature System");
                     } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
                         partsToSalvageOrScrap.add("Chameleon Shield");

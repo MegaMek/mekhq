@@ -34,14 +34,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.units.Aero;
-import megamek.common.equipment.Engine;
-import megamek.common.units.Entity;
-import megamek.common.equipment.FuelType;
-import megamek.common.units.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.enums.FuelType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

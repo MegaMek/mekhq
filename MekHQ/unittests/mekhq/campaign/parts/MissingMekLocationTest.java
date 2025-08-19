@@ -66,7 +66,7 @@ public class MissingMekLocationTest {
         MissingMekLocation missing = new MissingMekLocation(location, 30, 0, false, false, false, mockCampaign);
         missing.setUnit(unit);
 
-        // 2 criticals
+        // 2 criticalSlots
         doReturn(2).when(entity).getNumberOfCriticals(eq(location));
         CriticalSlot mockLandingGear = mock(CriticalSlot.class);
         when(mockLandingGear.isEverHittable()).thenReturn(true);

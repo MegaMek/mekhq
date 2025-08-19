@@ -48,7 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import megamek.common.*;
+import megamek.common.MPCalculationSetting;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Engine;
@@ -490,7 +490,8 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // one shot weapons count 1/4
-            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) || wtype.hasFlag(WeaponType.F_ONESHOT)) {
+            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) ||
+                      wtype.hasFlag(WeaponType.F_ONE_SHOT)) {
                 weaponHeat *= 0.25;
             }
 

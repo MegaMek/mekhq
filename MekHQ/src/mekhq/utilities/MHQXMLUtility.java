@@ -44,7 +44,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.BombLoadout;
-import megamek.common.equipment.BombType.BombTypeEnum;
+import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.loaders.MULParser;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;

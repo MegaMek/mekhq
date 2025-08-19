@@ -42,11 +42,6 @@ import java.util.*;
 
 import megamek.Version;
 import megamek.common.CriticalSlot;
-import megamek.common.interfaces.ITechnology;
-import megamek.common.loaders.MekFileParser;
-import megamek.common.loaders.MekSummary;
-import megamek.common.loaders.MekSummaryCache;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
@@ -59,8 +54,13 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.common.util.C3Util;
 import megamek.common.verifier.EntityVerifier;
@@ -727,7 +727,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         size = ((AmmoBin) newPart).getSize();
                     }
 
-                    int criticalSlots = type.getCriticals(newUnit.getEntity(), size);
+                    int criticalSlots = type.getNumCriticalSlots(newUnit.getEntity(), size);
                     newPart.setUnit(oldUnit);
                     int index = -1;
                     boolean matchFound = false;
@@ -741,13 +741,13 @@ public class Refit extends Part implements IAcquisitionWork {
                         if (oldPart instanceof MissingEquipmentPart) {
                             oldLoc = oldPart.getLocation();
                             oldType = ((MissingEquipmentPart) oldPart).getType();
-                            oldCriticalSlots = oldType.getCriticals(oldUnit.getEntity(),
+                            oldCriticalSlots = oldType.getNumCriticalSlots(oldUnit.getEntity(),
                                   ((MissingEquipmentPart) oldPart).getSize());
 
                         } else if (oldPart instanceof EquipmentPart) {
                             oldLoc = oldPart.getLocation();
                             oldType = ((EquipmentPart) oldPart).getType();
-                            oldCriticalSlots = oldType.getCriticals(oldUnit.getEntity(),
+                            oldCriticalSlots = oldType.getNumCriticalSlots(oldUnit.getEntity(),
                                   ((EquipmentPart) oldPart).getSize());
                         }
 

@@ -55,7 +55,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
 import megamek.common.equipment.AmmoType;
-import megamek.common.equipment.BombType;
+import megamek.common.equipment.enums.BombType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
