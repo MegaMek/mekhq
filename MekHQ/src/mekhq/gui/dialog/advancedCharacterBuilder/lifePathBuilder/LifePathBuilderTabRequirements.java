@@ -161,7 +161,7 @@ public class LifePathBuilderTabRequirements {
             int tabCount = tabbedPane.getTabCount();
             for (int i = 0; i < tabCount; i++) {
                 String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "LifePathBuilderDialog.tab.labelFormat.formated", i);
+                      "LifePathBuilderDialog.tab." + (i == 0 ? "compulsory" : "optional") + ".formattedLabel", i);
                 tabbedPane.setTitleAt(i, titleTab);
             }
 
@@ -309,7 +309,9 @@ public class LifePathBuilderTabRequirements {
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
-            // TODO launch a dialog that lists the Traits and allows the user to set levels needed
+            LifePathTraitPicker picker = new LifePathTraitPicker(traits);
+            traits.clear();
+            traits.putAll(picker.getSelectedTraitScores());
 
             RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
                   attributes, traits, skills, spas);
@@ -403,7 +405,7 @@ public class LifePathBuilderTabRequirements {
 
         int count = tabbedPane.getComponentCount();
         String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.tab.labelFormat.formated", count);
+              "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel", count);
         tabbedPane.addTab(titleTab, requirementGroupPanel);
     }
 
@@ -421,8 +423,6 @@ public class LifePathBuilderTabRequirements {
         List<Faction> factions = storage.factions();
         int gameYear = storage.gameYear();
         if (!factions.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.factions");
-            progressText.append(title);
             for (int i = 0; i < factions.size(); i++) {
                 Faction faction = factions.get(i);
                 progressText.append(faction.getFullName(gameYear));
@@ -435,8 +435,8 @@ public class LifePathBuilderTabRequirements {
         // Life Paths
         List<LifePathRecord> lifePaths = storage.lifePaths();
         if (!lifePaths.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.lifePaths");
-            progressText.append(title);
+            appendLineBreak(progressText);
+
             for (int i = 0; i < lifePaths.size(); i++) {
                 LifePathRecord lifePath = lifePaths.get(i);
                 progressText.append(lifePath.name());
@@ -449,20 +449,18 @@ public class LifePathBuilderTabRequirements {
         // Categories
         Map<LifePathCategory, Integer> categories = storage.categories();
         if (!categories.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.categories");
-            progressText.append(title);
+            appendLineBreak(progressText);
 
             int counter = 0;
             int length = categories.size();
             for (Map.Entry<LifePathCategory, Integer> entry : categories.entrySet()) {
-                progressText.append("<b>");
                 progressText.append(entry.getKey().getDisplayName());
-                progressText.append(":</b> ");
+                progressText.append(" ");
                 progressText.append(entry.getValue());
-                progressText.append('+');
+                progressText.append("+");
                 counter++;
                 if (counter != length) {
-                    progressText.append("<br>");
+                    progressText.append(", ");
                 }
             }
         }
@@ -470,20 +468,18 @@ public class LifePathBuilderTabRequirements {
         // Attributes
         Map<SkillAttribute, Integer> attributes = storage.attributes();
         if (!attributes.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.attributes");
-            progressText.append(title);
+            appendLineBreak(progressText);
 
             int counter = 0;
             int length = attributes.size();
             for (Map.Entry<SkillAttribute, Integer> entry : attributes.entrySet()) {
-                progressText.append("<b>");
                 progressText.append(entry.getKey().getLabel());
-                progressText.append(":</b> ");
+                progressText.append(" ");
                 progressText.append(entry.getValue());
-                progressText.append('+');
+                progressText.append("+");
                 counter++;
                 if (counter != length) {
-                    progressText.append("<br>");
+                    progressText.append(", ");
                 }
             }
         }
@@ -491,20 +487,18 @@ public class LifePathBuilderTabRequirements {
         // Traits
         Map<LifePathEntryDataTraitLookup, Integer> traits = storage.traits();
         if (!traits.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.traits");
-            progressText.append(title);
+            appendLineBreak(progressText);
 
             int counter = 0;
             int length = traits.size();
             for (Map.Entry<LifePathEntryDataTraitLookup, Integer> entry : traits.entrySet()) {
-                progressText.append("<b>");
                 progressText.append(entry.getKey().getDisplayName());
-                progressText.append(":</b> ");
+                progressText.append(" ");
                 progressText.append(entry.getValue());
-                progressText.append('+');
+                progressText.append("+");
                 counter++;
                 if (counter != length) {
-                    progressText.append("<br>");
+                    progressText.append(", ");
                 }
             }
         }
@@ -512,20 +506,18 @@ public class LifePathBuilderTabRequirements {
         // Skills
         Map<String, Integer> skills = storage.skills();
         if (!skills.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.skills");
-            progressText.append(title);
+            appendLineBreak(progressText);
 
             int counter = 0;
             int length = traits.size();
             for (Map.Entry<String, Integer> entry : skills.entrySet()) {
-                progressText.append("<b>");
                 progressText.append(entry.getKey());
-                progressText.append(":</b> ");
+                progressText.append(" ");
                 progressText.append(entry.getValue());
-                progressText.append('+');
+                progressText.append("+");
                 counter++;
                 if (counter != length) {
-                    progressText.append("<br>");
+                    progressText.append(", ");
                 }
             }
         }
@@ -533,8 +525,7 @@ public class LifePathBuilderTabRequirements {
         // SPAs
         List<String> selectedSPAs = getSelectedSPAs(storage.spas());
         if (!selectedSPAs.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.spas");
-            progressText.append(title);
+            appendLineBreak(progressText);
 
             for (int i = 0; i < selectedSPAs.size(); i++) {
                 String spa = selectedSPAs.get(i);
@@ -546,6 +537,12 @@ public class LifePathBuilderTabRequirements {
         }
 
         return progressText.toString();
+    }
+
+    private static void appendLineBreak(StringBuilder progressText) {
+        if (!progressText.isEmpty()) {
+            progressText.append("<br>");
+        }
     }
 
     private static List<String> getSelectedSPAs(PersonnelOptions spas) {

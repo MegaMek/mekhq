@@ -144,13 +144,21 @@ public class LifePathBuilderDialog extends JDialog {
     private String getNewRequirementsText() {
         StringBuilder newRequirementsText = new StringBuilder();
 
+        boolean isEmpty = true;
         Map<Integer, String> unorderedRequirements = requirementsTab.getRequirementsTabTextMap();
-        if (unorderedRequirements.isEmpty()) {
+        for (int i = 0; i < unorderedRequirements.size(); i++) {
+            String requirements = unorderedRequirements.get(i);
+            if (!requirements.isBlank()) {
+                isEmpty = false;
+                break;
+            }
+        }
+        if (isEmpty) {
             return "";
         }
 
         String requirementsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
-        newRequirementsText.append("<h2 style='text-align:center;'><u>").append(requirementsTitle).append("</u></h2>");
+        newRequirementsText.append("<h2 style='text-align:center;'>").append(requirementsTitle).append("</h2>");
 
         List<String> orderedRequirements = unorderedRequirements.entrySet().stream()
                                                  .sorted(Map.Entry.comparingByKey())
@@ -159,15 +167,30 @@ public class LifePathBuilderDialog extends JDialog {
 
         for (int i = 0; i < orderedRequirements.size(); i++) {
             String requirements = orderedRequirements.get(i);
-
-            // We don't show the group number for the default group
-            if (i != 0) {
-                String requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "LifePathBuilderDialog.tab.labelFormat.group", i);
-                newRequirementsText.append("<h2>").append(requirementTitle).append("</h2>");
+            if (requirements.isBlank()) {
+                continue;
             }
 
-            requirements = requirements.replaceAll("h2", "h3");
+            String requirementTitle;
+            if (i == 0) {
+                requirementTitle = getTextAt(RESOURCE_BUNDLE,
+                      "LifePathBuilderDialog.tab.compulsory.label");
+            } else {
+                requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "LifePathBuilderDialog.tab.optional.label", i);
+
+                boolean isFirstEntry = orderedRequirements.get(0).isBlank();
+                if (!isFirstEntry) {
+                    newRequirementsText.append("<br>");
+                }
+            }
+
+            newRequirementsText.append("&#9654; <b>").append(requirementTitle).append(": </b>");
+
+            // A tweak to make the text more readable in the progress panel without compromising the formatting of
+            // the Requirements tab
+            requirements = requirements.replaceAll("<br>", ", ");
+
             newRequirementsText.append(requirements);
         }
 

@@ -35,8 +35,7 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.Person.*;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -60,13 +59,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import megamek.utilities.FastJScrollPane;
-import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathAttributePicker extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathAttributePicker";
+public class LifePathTraitPicker extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathTraitPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(200);
@@ -79,21 +77,21 @@ public class LifePathAttributePicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private JLabel lblTooltipDisplay;
-    private final Map<SkillAttribute, Integer> storedAttributeScores;
-    private Map<SkillAttribute, Integer> selectedAttributeScores;
+    private final Map<LifePathEntryDataTraitLookup, Integer> storedTraitScores;
+    private Map<LifePathEntryDataTraitLookup, Integer> selectedTraitScores;
 
-    public Map<SkillAttribute, Integer> getSelectedAttributeScores() {
-        return selectedAttributeScores;
+    public Map<LifePathEntryDataTraitLookup, Integer> getSelectedTraitScores() {
+        return selectedTraitScores;
     }
 
-    public LifePathAttributePicker(Map<SkillAttribute, Integer> selectedAttributeScores) {
+    public LifePathTraitPicker(Map<LifePathEntryDataTraitLookup, Integer> selectedTraitScores) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedAttributeScores = new HashMap<>(selectedAttributeScores);
-        storedAttributeScores = new HashMap<>(selectedAttributeScores);
+        this.selectedTraitScores = new HashMap<>(selectedTraitScores);
+        storedTraitScores = new HashMap<>(selectedTraitScores);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel();
         JPanel pnlOptions = buildOptionsPanel();
@@ -131,7 +129,7 @@ public class LifePathAttributePicker extends JDialog {
     private JPanel buildControlPanel() {
         JPanel pnlControls = new JPanel();
         pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        pnlControls.setBorder(createRoundedLineBorder());
 
         lblTooltipDisplay = new JLabel();
         lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
@@ -142,14 +140,14 @@ public class LifePathAttributePicker extends JDialog {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.button.cancel");
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
-            selectedAttributeScores = storedAttributeScores;
+            selectedTraitScores = storedTraitScores;
             dispose();
         });
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.button.confirm");
+        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.button.confirm");
         RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
         btnConfirm.addActionListener(e -> dispose());
 
@@ -170,43 +168,71 @@ public class LifePathAttributePicker extends JDialog {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.options.label");
-        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
+        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.options.label");
+        pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
 
-        for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute == SkillAttribute.NONE) {
-                continue;
+        for (LifePathEntryDataTraitLookup trait : LifePathEntryDataTraitLookup.values()) {
+            String label = trait.getDisplayName();
+            String tooltip = trait.getDescription();
+
+            int traitMinimumValue;
+            int traitMaximumValue;
+            switch (trait) {
+                case BLOODMARK -> {
+                    traitMinimumValue = MINIMUM_BLOODMARK;
+                    traitMaximumValue = MAXIMUM_BLOODMARK;
+                }
+                //                case ENEMY -> 0; // TODO IMPLEMENT
+                //                case EXTRA_INCOME -> 0; // TODO IMPLEMENT
+                //                case PROPERTY -> 0; // TODO IMPLEMENT
+                case CONNECTIONS -> {
+                    traitMinimumValue = MINIMUM_CONNECTIONS;
+                    traitMaximumValue = MAXIMUM_CONNECTIONS;
+                }
+                case REPUTATION -> {
+                    traitMinimumValue = MINIMUM_REPUTATION;
+                    traitMaximumValue = MAXIMUM_REPUTATION;
+                }
+                //                case TITLE -> 0; // TODO IMPLEMENT
+                case UNLUCKY -> {
+                    traitMinimumValue = MINIMUM_UNLUCKY;
+                    traitMaximumValue = MAXIMUM_UNLUCKY;
+                }
+                case WEALTH -> {
+                    traitMinimumValue = MINIMUM_WEALTH;
+                    traitMaximumValue = MAXIMUM_WEALTH;
+                }
+                default -> {
+                    traitMinimumValue = 0;
+                    traitMaximumValue = 0;
+                }
             }
 
-            String label = attribute.getLabel();
-            String tooltip = attribute.getDescription();
+            JLabel lblTrait = new JLabel(label);
+            JSpinner spnTraitScore = new JSpinner(new SpinnerNumberModel(traitMinimumValue, traitMinimumValue,
+                  traitMaximumValue, 1));
 
-            JLabel lblAttribute = new JLabel(label);
-            JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(MINIMUM_ATTRIBUTE_SCORE,
-                  MINIMUM_ATTRIBUTE_SCORE,
-                  MAXIMUM_ATTRIBUTE_SCORE,
-                  1));
-
-            if (selectedAttributeScores.containsKey(attribute)) {
-                int currentValue = selectedAttributeScores.get(attribute);
-                currentValue = clamp(currentValue, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            if (selectedTraitScores.containsKey(trait)) {
+                int currentValue = selectedTraitScores.get(trait);
+                currentValue = clamp(currentValue, traitMinimumValue, traitMaximumValue);
+                spnTraitScore.setValue(currentValue);
             }
 
-            spnAttributeScore.addChangeListener(evt -> {
-                int value = (int) spnAttributeScore.getValue();
-                if (value > MINIMUM_ATTRIBUTE_SCORE) {
-                    selectedAttributeScores.put(attribute, value);
+            spnTraitScore.addChangeListener(evt -> {
+                int value = (int) spnTraitScore.getValue();
+                if (value > traitMinimumValue) {
+                    selectedTraitScores.put(trait, value);
                 }
             });
-            spnAttributeScore.addMouseListener(
+            spnTraitScore.addMouseListener(
                   TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip)
             );
 
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(lblAttribute);
+            pnlRows.add(lblTrait);
             pnlRows.add(Box.createHorizontalStrut(PADDING));
-            pnlRows.add(spnAttributeScore);
+            pnlRows.add(spnTraitScore);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             pnlOptions.add(pnlRows);
@@ -222,14 +248,14 @@ public class LifePathAttributePicker extends JDialog {
     private JPanel initializeInstructionsPanel() {
         JPanel pnlInstructions = new JPanel();
 
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.label");
+        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.instructions.label");
         pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
 
         JEditorPane txtInstructions = new JEditorPane();
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.instructions.text"));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
