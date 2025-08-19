@@ -112,7 +112,7 @@ public enum LifePathCategory {
     SCHOOL_OFFICER_CANDIDATE("SCHOOL_OFFICER_CANDIDATE"),
     SCHOOL_POLICE("SCHOOL_POLICE");
 
-    final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategory";
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategory";
     private static final MMLogger LOGGER = MMLogger.create(LifePathCategory.class);
 
     private final String lookupName;
