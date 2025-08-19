@@ -45,6 +45,8 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -83,7 +85,7 @@ public class LifePathBuilderDialog extends JDialog {
     private JLabel lblTooltipDisplay;
 
     private FastJScrollPane scrollProgress;
-    private JEditorPane txtProgressBasic;
+    private JEditorPane txtProgress;
 
     private LifePathBuilderTabBasicInformation basicInfoTab;
     private LifePathBuilderTabRequirements requirementsTab;
@@ -120,17 +122,59 @@ public class LifePathBuilderDialog extends JDialog {
         SwingUtilities.invokeLater(() -> scrollInstructions.getVerticalScrollBar().setValue(0));
     }
 
-    private void setTxtProgressBasic(String newText) {
-        txtProgressBasic.setText(newText);
-        SwingUtilities.invokeLater(() -> scrollProgress.getVerticalScrollBar().setValue(0));
-    }
-
     void setLblTooltipDisplay(String newText) {
         String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    void updateTxtProgressBasic() {
+    void updateTxtProgress() {
+        StringBuilder newProgressText = new StringBuilder();
+
+        String newBasicText = getNewBasicText();
+        newProgressText.append(newBasicText);
+
+        String newRequirementsText = getNewRequirementsText();
+        newProgressText.append(newRequirementsText);
+
+        System.out.println(newRequirementsText);
+
+        txtProgress.setText(newProgressText.toString());
+    }
+
+    private String getNewRequirementsText() {
+        StringBuilder newRequirementsText = new StringBuilder();
+
+        Map<Integer, String> unorderedRequirements = requirementsTab.getRequirementsTabTextMap();
+        if (unorderedRequirements.isEmpty()) {
+            return "";
+        }
+
+        String requirementsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
+        newRequirementsText.append("<h2 style='text-align:center;'><u>").append(requirementsTitle).append("</u></h2>");
+
+        List<String> orderedRequirements = unorderedRequirements.entrySet().stream()
+                                                 .sorted(Map.Entry.comparingByKey())
+                                                 .map(Map.Entry::getValue)
+                                                 .toList();
+
+        for (int i = 0; i < orderedRequirements.size(); i++) {
+            String requirements = orderedRequirements.get(i);
+
+            // We don't show the group number for the default group
+            if (i != 0) {
+                String requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "LifePathBuilderDialog.tab.labelFormat.group", i);
+                newRequirementsText.append("<h2>").append(requirementTitle).append("</h2>");
+            }
+
+            requirements = requirements.replaceAll("h2", "h3");
+            newRequirementsText.append(requirements);
+        }
+
+        return newRequirementsText.toString();
+    }
+
+    private String getNewBasicText() {
         String name = basicInfoTab.getName();
         String flavorText = basicInfoTab.getFlavorText();
         int age = basicInfoTab.getAge();
@@ -157,10 +201,7 @@ public class LifePathBuilderDialog extends JDialog {
         String newText = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic", name,
               flavorText, age, discount, lifeStageText.toString(), categoriesText.toString());
 
-        String newProgressText = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH, newText);
-        setTxtProgressBasic(newProgressText);
-
-        SwingUtilities.invokeLater(() -> scrollProgress.getVerticalScrollBar().setValue(0));
+        return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
     }
 
     private JPanel initialize(int gameYear) {
@@ -292,12 +333,12 @@ public class LifePathBuilderDialog extends JDialog {
         String titleProgress = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.progress");
         pnlProgress.setBorder(createRoundedLineBorder(titleProgress));
 
-        txtProgressBasic = new JEditorPane();
-        txtProgressBasic.setContentType("text/html");
-        txtProgressBasic.setEditable(false);
-        updateTxtProgressBasic();
+        txtProgress = new JEditorPane();
+        txtProgress.setContentType("text/html");
+        txtProgress.setEditable(false);
+        updateTxtProgress();
 
-        scrollProgress = new FastJScrollPane(txtProgressBasic);
+        scrollProgress = new FastJScrollPane(txtProgress);
         scrollProgress.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollProgress.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollProgress.setBorder(null);

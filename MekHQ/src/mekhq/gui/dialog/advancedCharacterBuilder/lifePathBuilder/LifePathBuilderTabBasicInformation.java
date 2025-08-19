@@ -127,7 +127,7 @@ public class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
-              parent::updateTxtProgressBasic
+              parent::updateTxtProgress
         );
 
         // Flavor Text
@@ -154,7 +154,7 @@ public class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtFlavorText.getDocument(),
-              parent::updateTxtProgressBasic
+              parent::updateTxtProgress
         );
 
         // Age Modifier
@@ -175,7 +175,7 @@ public class LifePathBuilderTabBasicInformation {
         spnAge.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAge)
         );
-        spnAge.addChangeListener(e -> parent.updateTxtProgressBasic());
+        spnAge.addChangeListener(e -> parent.updateTxtProgress());
 
         // XP Discount
         final String titleDiscount = getTextAt(RESOURCE_BUNDLE,
@@ -195,7 +195,7 @@ public class LifePathBuilderTabBasicInformation {
         spnDiscount.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
         );
-        spnDiscount.addChangeListener(e -> parent.updateTxtProgressBasic());
+        spnDiscount.addChangeListener(e -> parent.updateTxtProgress());
 
         // Manage Life Stages
         final String titleManageLifeStages = getTextAt(RESOURCE_BUNDLE,
@@ -208,7 +208,7 @@ public class LifePathBuilderTabBasicInformation {
             parent.setVisible(false);
             LifePathStagePicker picker = new LifePathStagePicker(lifeStages);
             lifeStages = picker.getSelectedLifeStages();
-            parent.updateTxtProgressBasic();
+            parent.updateTxtProgress();
             parent.setVisible(true);
         });
 
@@ -223,7 +223,7 @@ public class LifePathBuilderTabBasicInformation {
             parent.setVisible(false);
             LifePathCategoryPicker picker = new LifePathCategoryPicker(categories);
             categories = picker.getSelectedCategories();
-            parent.updateTxtProgressBasic();
+            parent.updateTxtProgress();
             parent.setVisible(true);
         });
 

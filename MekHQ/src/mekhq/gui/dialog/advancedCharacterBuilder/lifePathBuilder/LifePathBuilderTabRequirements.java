@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
@@ -36,6 +68,16 @@ public class LifePathBuilderTabRequirements {
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final LifePathBuilderDialog parent;
+    private final Map<Integer, RequirementsTabStorage> requirementsTabStorageMap = new HashMap<>();
+    private final Map<Integer, String> requirementsTabTextMap = new HashMap<>();
+
+    public Map<Integer, RequirementsTabStorage> getRequirementsTabStorageMap() {
+        return requirementsTabStorageMap;
+    }
+
+    public Map<Integer, String> getRequirementsTabTextMap() {
+        return requirementsTabTextMap;
+    }
 
     public LifePathBuilderTabRequirements(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear) {
         this.parent = parent;
@@ -67,28 +109,12 @@ public class LifePathBuilderTabRequirements {
         );
         buttonPanel.add(btnRemoveRequirementGroup);
 
-        // The actual tabbed pane and any action listeners (we add them here to avoid a situation where they're
-        // called before the pane has been initialized)
+        // The actual tabbed pane and any button action listeners (we add them here to avoid a situation where they
+        // can be called before the pane has been initialized)
         EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
         tabbedPane.addChangeListener(e -> btnRemoveRequirementGroup.setEnabled(tabbedPane.getSelectedIndex() != 0));
         btnAddRequirementGroup.addActionListener(e -> createRequirementsTab(tabbedPane, gameYear));
-        btnRemoveRequirementGroup.addActionListener(e -> {
-            int selectedIndex = tabbedPane.getSelectedIndex();
-
-            // Remove the current tab, unless it's Group 0
-            if (selectedIndex > 0) {
-                tabbedPane.removeTabAt(selectedIndex);
-            } else {
-                return;
-            }
-
-            // Update the names of the remaining tabs
-            int tabCount = tabbedPane.getTabCount();
-            for (int i = 0; i < tabCount; i++) {
-                String titleTab = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.labelFormat", i);
-                tabbedPane.setTitleAt(i, titleTab);
-            }
-        });
+        btnRemoveRequirementGroup.addActionListener(e -> removeRequirementGroup(tabbedPane));
 
         // Add 'Group 0' - this group is required
         createRequirementsTab(tabbedPane, gameYear);
@@ -97,7 +123,56 @@ public class LifePathBuilderTabRequirements {
         tabRequirements.add(tabbedPane, BorderLayout.CENTER);
     }
 
+    private void removeRequirementGroup(EnhancedTabbedPane tabbedPane) {
+        int selectedIndex = tabbedPane.getSelectedIndex();
+
+        // Remove the current tab, unless it's Group 0
+        if (selectedIndex > 0) {
+            // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
+            // correct order (since we're removing a tab, the indexes will shift)
+            Map<Integer, RequirementsTabStorage> tempStorageMap = new HashMap<>();
+            for (Map.Entry<Integer, RequirementsTabStorage> entry : requirementsTabStorageMap.entrySet()) {
+                if (entry.getKey() < selectedIndex) {
+                    tempStorageMap.put(entry.getKey(), entry.getValue());
+                } else if (entry.getKey() > selectedIndex) {
+                    tempStorageMap.put(entry.getKey() - 1, entry.getValue());
+                }
+            }
+
+            requirementsTabStorageMap.clear();
+            requirementsTabStorageMap.putAll(tempStorageMap);
+
+            Map<Integer, String> tempTextMap = new HashMap<>();
+            for (Map.Entry<Integer, String> entry : requirementsTabTextMap.entrySet()) {
+                if (entry.getKey() < selectedIndex) {
+                    tempTextMap.put(entry.getKey(), entry.getValue());
+                } else if (entry.getKey() > selectedIndex) {
+                    tempTextMap.put(entry.getKey() - 1, entry.getValue());
+                }
+            }
+
+            requirementsTabTextMap.clear();
+            requirementsTabTextMap.putAll(tempTextMap);
+
+            // Remove the desired tab
+            tabbedPane.remove(selectedIndex);
+
+            // Update the names of the remaining tabs
+            int tabCount = tabbedPane.getTabCount();
+            for (int i = 0; i < tabCount; i++) {
+                String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "LifePathBuilderDialog.tab.labelFormat.formated", i);
+                tabbedPane.setTitleAt(i, titleTab);
+            }
+
+            // Update the progress panel
+            parent.updateTxtProgress();
+        }
+    }
+
     private void createRequirementsTab(EnhancedTabbedPane tabbedPane, int gameYear) {
+        int index = tabbedPane.getTabCount();
+
         // Create the panel to be used in the tab
         JPanel requirementGroupPanel = new JPanel();
         requirementGroupPanel.setLayout(new BorderLayout());
@@ -199,9 +274,13 @@ public class LifePathBuilderTabRequirements {
         JEditorPane txtRequirements = new JEditorPane();
         txtRequirements.setContentType("text/html");
         txtRequirements.setEditable(false);
-        String progressText = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits,
-              skills, spas);
-        txtRequirements.setText(progressText);
+        RequirementsTabStorage initialStorage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+              attributes, traits, skills, spas);
+        String initialRequirementsText = buildRequirementText(initialStorage);
+        requirementsTabStorageMap.put(index, initialStorage);
+        requirementsTabTextMap.put(index, initialRequirementsText);
+
+        txtRequirements.setText(initialRequirementsText);
 
         FastJScrollPane scrollRequirements = new FastJScrollPane(txtRequirements);
         scrollRequirements.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -213,60 +292,108 @@ public class LifePathBuilderTabRequirements {
         // Action Listeners
         btnAddAttribute.addActionListener(e -> {
             parent.setVisible(false);
+
             LifePathAttributePicker picker = new LifePathAttributePicker(attributes);
             attributes.clear();
             attributes.putAll(picker.getSelectedAttributeScores());
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+            txtRequirements.setText(requirementsText);
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
             parent.setVisible(true);
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
             // TODO launch a dialog that lists the Traits and allows the user to set levels needed
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+            txtRequirements.setText(requirementsText);
+
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
             parent.setVisible(true);
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
             // TODO launch a dialog that lists the Skills and allows the user to specify levels for each
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+            txtRequirements.setText(requirementsText);
+
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
             parent.setVisible(true);
         });
         btnAddSPA.addActionListener(e -> {
             parent.setVisible(false);
             // TODO launch a dialog that lists the currently enabled SPAs and allows the user to pick x
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
             parent.setVisible(true);
         });
         btnAddFaction.addActionListener(e -> {
             parent.setVisible(false);
             // TODO launch a dialog that allows the player to add and remove factions from the list of playable factions
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
+            txtRequirements.setText(requirementsText);
             parent.setVisible(true);
         });
         btnAddLifePath.addActionListener(e -> {
             parent.setVisible(false);
-            // TODO launch a dialog that lists the curreent requirements and allows the user to remove one
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+            // TODO launch a dialog that lists the current requirements and allows the user to remove one
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+            txtRequirements.setText(requirementsText);
+
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
             parent.setVisible(true);
         });
         btnAddCategory.addActionListener(e -> {
             parent.setVisible(false);
             // TODO launch a dialog that lists the categories and allows the user to pick x
-            String text = buildRequirementText(gameYear, factions, lifePaths, categories, attributes, traits, skills,
-                  spas);
-            txtRequirements.setText(text);
+
+            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+                  attributes, traits, skills, spas);
+            String requirementsText = buildRequirementText(storage);
+            txtRequirements.setText(requirementsText);
+
+            requirementsTabStorageMap.put(index, initialStorage);
+            requirementsTabTextMap.put(index, requirementsText);
+            parent.updateTxtProgress();
+
             parent.setVisible(true);
         });
 
@@ -275,16 +402,24 @@ public class LifePathBuilderTabRequirements {
         requirementGroupPanel.add(pnlDisplay, BorderLayout.CENTER);
 
         int count = tabbedPane.getComponentCount();
-        String titleTab = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.labelFormat", count);
+        String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.tab.labelFormat.formated", count);
         tabbedPane.addTab(titleTab, requirementGroupPanel);
     }
 
-    private static String buildRequirementText(int gameYear, List<Faction> factions, List<LifePathRecord> lifePaths,
-          Map<LifePathCategory, Integer> categories, Map<SkillAttribute, Integer> attributes,
-          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills, PersonnelOptions spas) {
+    private static RequirementsTabStorage getRequirementsTabStorage(int gameYear, List<Faction> factions,
+          List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
+          Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
+          Map<String, Integer> skills, PersonnelOptions spas) {
+        return new RequirementsTabStorage(gameYear, factions, lifePaths, categories, attributes, traits, skills, spas);
+    }
+
+    private static String buildRequirementText(RequirementsTabStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Factions
+        List<Faction> factions = storage.factions();
+        int gameYear = storage.gameYear();
         if (!factions.isEmpty()) {
             String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.factions");
             progressText.append(title);
@@ -298,6 +433,7 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Life Paths
+        List<LifePathRecord> lifePaths = storage.lifePaths();
         if (!lifePaths.isEmpty()) {
             String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.lifePaths");
             progressText.append(title);
@@ -311,6 +447,7 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Categories
+        Map<LifePathCategory, Integer> categories = storage.categories();
         if (!categories.isEmpty()) {
             String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.categories");
             progressText.append(title);
@@ -331,6 +468,7 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Attributes
+        Map<SkillAttribute, Integer> attributes = storage.attributes();
         if (!attributes.isEmpty()) {
             String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.attributes");
             progressText.append(title);
@@ -351,6 +489,7 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Traits
+        Map<LifePathEntryDataTraitLookup, Integer> traits = storage.traits();
         if (!traits.isEmpty()) {
             String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.traits");
             progressText.append(title);
@@ -371,6 +510,7 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Skills
+        Map<String, Integer> skills = storage.skills();
         if (!skills.isEmpty()) {
             String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.skills");
             progressText.append(title);
@@ -391,6 +531,24 @@ public class LifePathBuilderTabRequirements {
         }
 
         // SPAs
+        List<String> selectedSPAs = getSelectedSPAs(storage.spas());
+        if (!selectedSPAs.isEmpty()) {
+            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.spas");
+            progressText.append(title);
+
+            for (int i = 0; i < selectedSPAs.size(); i++) {
+                String spa = selectedSPAs.get(i);
+                progressText.append(spa);
+                if (i != selectedSPAs.size() - 1) {
+                    progressText.append(", ");
+                }
+            }
+        }
+
+        return progressText.toString();
+    }
+
+    private static List<String> getSelectedSPAs(PersonnelOptions spas) {
         List<String> selectedSPAs = new ArrayList<>();
         for (final Enumeration<IOptionGroup> i = spas.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
@@ -408,19 +566,6 @@ public class LifePathBuilderTabRequirements {
             }
         }
 
-        if (!selectedSPAs.isEmpty()) {
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.panel.spas");
-            progressText.append(title);
-
-            for (int i = 0; i < selectedSPAs.size(); i++) {
-                String spa = selectedSPAs.get(i);
-                progressText.append(spa);
-                if (i != selectedSPAs.size() - 1) {
-                    progressText.append(", ");
-                }
-            }
-        }
-
-        return progressText.toString();
+        return selectedSPAs;
     }
 }
