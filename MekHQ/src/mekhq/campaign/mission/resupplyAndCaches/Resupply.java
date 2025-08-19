@@ -35,8 +35,8 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
+import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
@@ -55,7 +55,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.units.Entity;
-import megamek.common.interfaces.ITechnology;
 import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -95,7 +94,7 @@ public class Resupply {
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
-    private final ITechnology.Faction employerTechCode;
+    private final megamek.common.enums.Faction employerTechCode;
     private final boolean employerIsClan;
     private List<Part> ammoBinPool;
     private double focusAmmo;

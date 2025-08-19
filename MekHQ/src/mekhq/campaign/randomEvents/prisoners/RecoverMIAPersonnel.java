@@ -40,8 +40,8 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 
+import megamek.common.enums.AvailabilityValue;
 import megamek.common.interfaces.ITechnology;
-import megamek.common.interfaces.ITechnology.AvailabilityValue;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -84,7 +84,7 @@ public class RecoverMIAPersonnel {
         int today = campaign.getLocalDate().getYear();
         boolean isClan = searchingFaction != null && searchingFaction.isClan();
 
-        ITechnology.Faction techFaction = isClan ?
+        megamek.common.enums.Faction techFaction = isClan ?
                                                 ITechnology.getFactionFromMMAbbr("CLAN") :
                                                 ITechnology.getFactionFromMMAbbr("IS");
         try {

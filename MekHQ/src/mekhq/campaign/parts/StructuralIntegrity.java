@@ -35,14 +35,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
 import megamek.common.units.Aero;
 import megamek.common.units.ConvFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
-import megamek.common.SimpleTechLevel;
 import megamek.common.units.SmallCraft;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

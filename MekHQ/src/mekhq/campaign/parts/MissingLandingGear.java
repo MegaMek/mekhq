@@ -35,15 +35,16 @@ package mekhq.campaign.parts;
 
 import java.util.StringJoiner;
 
-import megamek.common.units.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.Node;
 

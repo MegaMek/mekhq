@@ -33,11 +33,15 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.equipment.IArmorState;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import megamek.common.units.VTOL;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.VTOL;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 

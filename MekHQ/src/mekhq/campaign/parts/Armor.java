@@ -37,17 +37,18 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-import megamek.common.units.Aero;
-import megamek.common.units.Entity;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
-import megamek.common.interfaces.ITechnology;
-import megamek.common.units.Tank;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.TechAdvancement;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.common.units.Warship;
-import megamek.common.annotations.Nullable;
-import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -729,12 +730,12 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

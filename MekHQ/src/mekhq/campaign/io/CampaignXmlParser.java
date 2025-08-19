@@ -63,17 +63,18 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechBase;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.icons.Camouflage;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
-import megamek.common.loaders.MekSummaryCache;
-import megamek.common.equipment.MiscType;
-import megamek.common.equipment.Mounted;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
-import megamek.common.annotations.Nullable;
-import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -1693,7 +1694,7 @@ public class CampaignXmlParser {
             // clan flag might not have been properly set in early versions
             if ((prt instanceof EnginePart) &&
                       prt.getName().contains("(Clan") &&
-                      (prt.getTechBase() != Part.TechBase.CLAN)) {
+                      (prt.getTechBase() != TechBase.CLAN)) {
                 ((EnginePart) prt).fixClanFlag();
             }
             if ((prt instanceof MissingEnginePart) && (null != u) && (u.getEntity() instanceof Tank)) {
@@ -1702,7 +1703,7 @@ public class CampaignXmlParser {
             }
             if ((prt instanceof MissingEnginePart) &&
                       prt.getName().contains("(Clan") &&
-                      (prt.getTechBase() != Part.TechBase.CLAN)) {
+                      (prt.getTechBase() != TechBase.CLAN)) {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 

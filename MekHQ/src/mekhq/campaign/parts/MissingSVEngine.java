@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.Engine;
 import megamek.common.equipment.enums.FuelType;
 import megamek.common.units.Aero;

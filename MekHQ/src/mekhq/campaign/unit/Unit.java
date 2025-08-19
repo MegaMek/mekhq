@@ -74,6 +74,11 @@ import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.*;
 import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Era;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.*;
 import megamek.common.equipment.enums.FuelType;
 import megamek.common.icons.Camouflage;
@@ -6712,9 +6717,9 @@ public class Unit implements ITechnology {
         return getTechProgression(getCampaign().getTechFaction());
     }
 
-    private ITechnology getTechProgression(ITechnology.Faction techFaction) {
+    private ITechnology getTechProgression(Faction techFaction) {
         // If useFactionIntroDate is false, use the base data that was calculated for the Entity when it was loaded.
-        if (techFaction.equals(ITechnology.Faction.NONE)) {
+        if (techFaction.equals(Faction.NONE)) {
             return getEntity();
         }
         // First check whether it has already been calculated for this faction, but don't wait if it hasn't.
@@ -6782,27 +6787,27 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int getIntroductionDate(boolean clan, ITechnology.Faction faction) {
+    public int getIntroductionDate(boolean clan, Faction faction) {
         return getTechProgression(faction).getIntroductionDate(clan, faction);
     }
 
     @Override
-    public int getPrototypeDate(boolean clan, ITechnology.Faction faction) {
+    public int getPrototypeDate(boolean clan, Faction faction) {
         return getTechProgression(faction).getPrototypeDate(clan, faction);
     }
 
     @Override
-    public int getProductionDate(boolean clan, ITechnology.Faction faction) {
+    public int getProductionDate(boolean clan, Faction faction) {
         return getTechProgression(faction).getProductionDate(clan, faction);
     }
 
     @Override
-    public int getExtinctionDate(boolean clan, ITechnology.Faction faction) {
+    public int getExtinctionDate(boolean clan, Faction faction) {
         return getTechProgression(faction).getExtinctionDate(clan, faction);
     }
 
     @Override
-    public int getReintroductionDate(boolean clan, ITechnology.Faction faction) {
+    public int getReintroductionDate(boolean clan, Faction faction) {
         return getTechProgression(faction).getReintroductionDate(clan, faction);
     }
 
@@ -6822,7 +6827,7 @@ public class Unit implements ITechnology {
         }
     }
 
-    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, ITechnology.Faction faction) {
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, Faction faction) {
         if (getCampaign().useVariableTechLevel()) {
             return getSimpleLevel(year, clan, faction);
         } else {
@@ -6836,7 +6841,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public AvailabilityValue calcYearAvailability(int year, boolean clan, ITechnology.Faction faction) {
+    public AvailabilityValue calcYearAvailability(int year, boolean clan, Faction faction) {
         return getTechProgression(faction).calcYearAvailability(year, clan);
     }
 

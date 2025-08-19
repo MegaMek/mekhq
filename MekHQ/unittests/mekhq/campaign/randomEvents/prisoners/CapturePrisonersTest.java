@@ -50,8 +50,8 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Set;
 
+import megamek.common.enums.AvailabilityValue;
 import megamek.common.interfaces.ITechnology;
-import megamek.common.interfaces.ITechnology.AvailabilityValue;
 import megamek.common.loaders.MapSettings;
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
@@ -606,7 +606,7 @@ class CapturePrisonersTest {
      */
     private AvailabilityValue getPartAvailability(LocalDate today, boolean isActiveProbe) {
         int year = today.getYear();
-        ITechnology.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
+        megamek.common.enums.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
 
         if (isActiveProbe) {
             return createBeagleActiveProbe().calcYearAvailability(year, false, techFaction);

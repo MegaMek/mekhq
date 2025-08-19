@@ -33,9 +33,9 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.interfaces.ITechnology;
-import megamek.common.interfaces.ITechnology.AvailabilityValue;
-import megamek.common.interfaces.ITechnology.TechBase;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -88,9 +88,9 @@ public interface IAcquisitionWork extends IWork {
         return getBuyCost().multipliedBy(getQuantity());
     }
 
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction);
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction);
 
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction);
 
     public AvailabilityValue getAvailability();
 

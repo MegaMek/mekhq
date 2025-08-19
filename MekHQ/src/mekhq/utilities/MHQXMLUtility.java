@@ -140,7 +140,7 @@ public class MHQXMLUtility extends MMXMLUtility {
             retVal.append("\" " + MULParser.ATTR_QUIRKS + "=\"").append(escape(tgtEnt.getQuirkList("::")));
         }
         if (tgtEnt.getC3Master() != null) {
-            retVal.append("\" " + MULParser.ATTR_C3MASTERIS + "=\"")
+            retVal.append("\" " + MULParser.ATTR_C3_MASTER_IS + "=\"")
                   .append(tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId()).getC3UUIDAsString());
         }
         if (tgtEnt.hasC3() || tgtEnt.hasC3i() || tgtEnt.hasNavalC3()) {
@@ -274,7 +274,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                          .append("<" + MULParser.ELE_C3ILINK + " " + MULParser.ATTR_LINK + "=\"")
+                          .append("<" + MULParser.ELE_C3I_LINK + " " + MULParser.ATTR_LINK + "=\"")
                           .append(C3iEntity.getC3UUIDAsString())
                           .append("\"/>\n");
                 }
@@ -333,7 +333,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
-        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_AEROCRIT + "";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_AERO_CRIT + "";
         String critVal = "";
 
         // crits
@@ -407,7 +407,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
-        String retval = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TURRETLOCK + " "
+        String retval = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TURRET_LOCK + " "
                               + MULParser.ATTR_DIRECTION + "=\"";
         retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
         retval = retval.concat("\"/>\n");
@@ -446,9 +446,9 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // save any motive hits
         retVal = retVal.concat(
-              MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_MDAMAGE + "=\"");
+              MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_DAMAGE + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
-        retVal = retVal.concat("\" " + MULParser.ATTR_MPENALTY + "=\"");
+        retVal = retVal.concat("\" " + MULParser.ATTR_PENALTY + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
         retVal = retVal.concat("\"/>\n");
 
@@ -465,7 +465,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      */
     private static String getTankCritString(Tank e, int indentLvl) {
 
-        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TANKCRIT + "";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TANK_CRIT + "";
         String critVal = "";
 
         // crits
@@ -514,17 +514,17 @@ public class MHQXMLUtility extends MMXMLUtility {
         String retVal = MHQXMLUtility.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
         StringBuilder crew = new StringBuilder(MHQXMLUtility.indentStr(indentLvl + 1));
-        crew.append("<" + MULParser.ELE_CREW + " " + MULParser.ATTR_CREWTYPE + "=\"")
+        crew.append("<" + MULParser.ELE_CREW + " " + MULParser.ATTR_CREW_TYPE + "=\"")
               .append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
               .append("\" " + MULParser.ATTR_SIZE + "=\"").append(tgtEnt.getCrew().getSize());
         if (tgtEnt.getCrew().getInitBonus() != 0) {
-            crew.append("\" " + MULParser.ATTR_INITB + "=\"").append(tgtEnt.getCrew().getInitBonus());
+            crew.append("\" " + MULParser.ATTR_INIT_B + "=\"").append(tgtEnt.getCrew().getInitBonus());
         }
         if (tgtEnt.getCrew().getCommandBonus() != 0) {
-            crew.append("\" " + MULParser.ATTR_COMMANDB + "=\"").append(tgtEnt.getCrew().getCommandBonus());
+            crew.append("\" " + MULParser.ATTR_COMMAND_B + "=\"").append(tgtEnt.getCrew().getCommandBonus());
         }
         if (tgtEnt instanceof Mek) {
-            crew.append("\" " + MULParser.ATTR_AUTOEJECT + "=\"").append(((Mek) tgtEnt).isAutoEject());
+            crew.append("\" " + MULParser.ATTR_AUTO_EJECT + "=\"").append(((Mek) tgtEnt).isAutoEject());
         }
         crew.append("\" " + MULParser.ATTR_EJECTED + "=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
 

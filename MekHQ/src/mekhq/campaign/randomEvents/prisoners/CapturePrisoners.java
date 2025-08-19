@@ -56,12 +56,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
 import megamek.common.interfaces.ITechnology;
-import megamek.common.interfaces.ITechnology.AvailabilityValue;
 import megamek.common.loaders.MapSettings;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.annotations.Nullable;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -144,7 +144,7 @@ public class CapturePrisoners {
         int today = campaign.getLocalDate().getYear();
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        ITechnology.Faction techFaction = searchingFactionIsClan ?
+        megamek.common.enums.Faction techFaction = searchingFactionIsClan ?
                                                 ITechnology.getFactionFromMMAbbr("CLAN") :
                                                 ITechnology.getFactionFromMMAbbr("IS");
         try {

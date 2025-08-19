@@ -47,6 +47,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.Bay;
 import megamek.common.bays.BayType;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Engine;
 import megamek.common.equipment.EquipmentType;
@@ -2709,7 +2713,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public TechBase getTechBase() {
-        return Part.TechBase.ALL;
+        return TechBase.ALL;
     }
 
     /**
@@ -3087,7 +3091,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be true
      */
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
@@ -3097,7 +3101,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be false
      */
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

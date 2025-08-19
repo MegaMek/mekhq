@@ -38,12 +38,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import megamek.common.units.Entity;
+import megamek.common.enums.Faction;
 import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
-import megamek.common.loaders.EntityLoadingException;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 
 /**
@@ -61,12 +62,12 @@ public class UnitTechProgression {
 
     private static final UnitTechProgression instance = new UnitTechProgression();
 
-    private Map<ITechnology.Faction, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
+    private Map<Faction, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
 
     /**
      * Initializes the data for a particular faction
      */
-    public static void loadFaction(ITechnology.Faction techFaction) {
+    public static void loadFaction(Faction techFaction) {
         instance.getTask(techFaction);
     }
 
@@ -78,7 +79,7 @@ public class UnitTechProgression {
      *
      * @return The task responsible for calculating the data for the faction.
      */
-    private FutureTask<Map<MekSummary, ITechnology>> getTask(ITechnology.Faction techFaction) {
+    private FutureTask<Map<MekSummary, ITechnology>> getTask(Faction techFaction) {
         FutureTask<Map<MekSummary, ITechnology>> task = instance.techMap.get(techFaction);
         if (null == task) {
             task = new FutureTask<>(new BuildMapTask(techFaction));
@@ -102,7 +103,7 @@ public class UnitTechProgression {
      *       there was an exception processing the task, null is returned.
      */
     public static ITechnology getProgression(final Unit unit,
-          final ITechnology.Faction techFaction, final boolean block) {
+          final Faction techFaction, final boolean block) {
         MekSummary ms = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
         if (null != ms) {
             return getProgression(ms, techFaction, block);
@@ -124,7 +125,7 @@ public class UnitTechProgression {
      * @return An ITechnology object for the unit and faction. If the task has not completed and block is false, or
      *       there was an exception processing the task, null is returned.
      */
-    public static ITechnology getProgression(final MekSummary ms, final ITechnology.Faction techFaction,
+    public static ITechnology getProgression(final MekSummary ms, final Faction techFaction,
           final boolean block) {
         FutureTask<Map<MekSummary, ITechnology>> task = instance.getTask(techFaction);
         if (!block && !task.isDone()) {
@@ -144,7 +145,7 @@ public class UnitTechProgression {
         return null;
     }
 
-    private static ITechnology calcTechProgression(MekSummary ms, ITechnology.Faction techFaction) {
+    private static ITechnology calcTechProgression(MekSummary ms, Faction techFaction) {
         try {
             Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
@@ -163,9 +164,9 @@ public class UnitTechProgression {
      * equipment and construction options for a specific faction.
      */
     private static class BuildMapTask implements Callable<Map<MekSummary, ITechnology>> {
-        private ITechnology.Faction techFaction;
+        private Faction techFaction;
 
-        BuildMapTask(ITechnology.Faction techFaction) {
+        BuildMapTask(Faction techFaction) {
             this.techFaction = techFaction;
         }
 

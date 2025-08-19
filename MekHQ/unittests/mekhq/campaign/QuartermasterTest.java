@@ -45,10 +45,10 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.common.enums.TechBase;
 import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentTypeLookup;
-import megamek.common.interfaces.ITechnology.TechBase;
+import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.EventSpy;

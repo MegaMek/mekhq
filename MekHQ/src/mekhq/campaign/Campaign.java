@@ -116,12 +116,12 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
-import megamek.common.interfaces.ITechManager;
-import megamek.common.interfaces.ITechnology;
-import megamek.common.interfaces.ITechnology.AvailabilityValue;
+import megamek.common.Player;
+import megamek.common.SimpleTechLevel;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Gender;
+import megamek.common.enums.TechBase;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentType;
@@ -132,6 +132,7 @@ import megamek.common.equipment.WeaponType;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
+import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
@@ -359,7 +360,7 @@ public class Campaign implements ITechManager {
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
-    private ITechnology.Faction techFaction;
+    private megamek.common.enums.Faction techFaction;
     private String retainerEmployerCode; // AtB
     private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
@@ -499,7 +500,7 @@ public class Campaign implements ITechManager {
                                " be investigated.", ex);
             setFaction(new Faction());
         }
-        techFaction = ITechnology.Faction.MERC;
+        techFaction = megamek.common.enums.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
         try {
             location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
@@ -4229,7 +4230,7 @@ public class Campaign implements ITechManager {
                              getLocalDate(),
                              getCampaignOptions(),
                              getFaction(),
-                             acquisition.getTechBase() == Part.TechBase.CLAN);
+                             acquisition.getTechBase() == TechBase.CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -4354,7 +4355,7 @@ public class Campaign implements ITechManager {
                                  getLocalDate(),
                                  getCampaignOptions(),
                                  getFaction(),
-                                 acquisition.getTechBase() == Part.TechBase.CLAN);
+                                 acquisition.getTechBase() == TechBase.CLAN);
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
@@ -8564,10 +8565,10 @@ public class Campaign implements ITechManager {
                   "You must wait until the new cycle to check for this part. Further" +
                         " attempts will be added to the shopping list.");
         }
-        if (acquisition.getTechBase() == Part.TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
+        if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
         }
-        if (acquisition.getTechBase() == Part.TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
+        if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
         }
         if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
@@ -10437,14 +10438,14 @@ public class Campaign implements ITechManager {
     }
 
     @Override
-    public ITechnology.Faction getTechFaction() {
+    public megamek.common.enums.Faction getTechFaction() {
         return techFaction;
     }
 
     public void updateTechFactionCode() {
         if (campaignOptions.isFactionIntroDate()) {
-            for (ITechnology.Faction f : ITechnology.Faction.values()) {
-                if (f.equals(ITechnology.Faction.NONE)) {
+            for (megamek.common.enums.Faction f : megamek.common.enums.Faction.values()) {
+                if (f.equals(megamek.common.enums.Faction.NONE)) {
                     continue;
                 }
                 if (f.getCodeMM().equals(getFaction().getShortName())) {
@@ -10456,14 +10457,14 @@ public class Campaign implements ITechManager {
             // If the tech progression data does not include the current faction,
             // use a generic.
             if (getFaction().isClan()) {
-                techFaction = ITechnology.Faction.CLAN;
+                techFaction = megamek.common.enums.Faction.CLAN;
             } else if (getFaction().isPeriphery()) {
-                techFaction = ITechnology.Faction.PER;
+                techFaction = megamek.common.enums.Faction.PER;
             } else {
-                techFaction = ITechnology.Faction.IS;
+                techFaction = megamek.common.enums.Faction.IS;
             }
         } else {
-            techFaction = ITechnology.Faction.NONE;
+            techFaction = megamek.common.enums.Faction.NONE;
         }
         // Unit tech level will be calculated if the code has changed.
         UnitTechProgression.loadFaction(techFaction);

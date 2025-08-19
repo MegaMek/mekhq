@@ -67,12 +67,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.CriticalSlot;
-import megamek.common.interfaces.IStartingPositions;
-import megamek.common.interfaces.ITechnology;
-import megamek.common.loaders.MekSummary;
-import megamek.common.loaders.MekSummaryCache;
 import megamek.common.Player;
-import megamek.common.bays.SuperHeavyVehicleBay;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
@@ -82,12 +77,17 @@ import megamek.common.bays.HeavyVehicleBay;
 import megamek.common.bays.InfantryBay;
 import megamek.common.bays.LightVehicleBay;
 import megamek.common.bays.SmallCraftBay;
+import megamek.common.bays.SuperHeavyVehicleBay;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.DockingCollar;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.interfaces.IStartingPositions;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.*;
@@ -282,7 +282,7 @@ public class Utilities {
             // Weight of the two units must match or we continue, but BA weight gets checked
             // differently
             if (en instanceof BattleArmor battleArmor) {
-                if (battleArmor.getTroopers() != (int) summary.getTWweight()) {
+                if (battleArmor.getTroopers() != (int) summary.getTWWeight()) {
                     continue;
                 }
             } else {
