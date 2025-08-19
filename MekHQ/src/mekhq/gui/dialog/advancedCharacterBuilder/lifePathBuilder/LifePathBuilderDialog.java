@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder;
+package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
@@ -47,23 +47,21 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
-import megamek.client.ui.util.JTextAreaWithCharacterLimit;
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -77,6 +75,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
 public class LifePathBuilderDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
@@ -101,13 +100,19 @@ public class LifePathBuilderDialog extends JDialog {
     private FastJScrollPane scrollProgress;
     private JEditorPane txtProgressBasic;
 
-    private JTextArea txtName;
-    private JTextArea txtFlavorText;
-    private JSpinner spnAge;
-    private JSpinner spnDiscount;
-    private Set<ATOWLifeStage> lifeStages = new HashSet<>();
-    private Set<LifePathCategory> categories = new HashSet<>();
+    private LifePathBuilderTabBasicInformation basicInfoTab;
 
+    static String getLifePathBuilderResourceBundle() {
+        return RESOURCE_BUNDLE;
+    }
+
+    static int getLifePathBuilderMinimumComponentWidth() {
+        return MINIMUM_COMPONENT_WIDTH;
+    }
+
+    static int getLifePathBuilderPadding() {
+        return PADDING;
+    }
 
     public LifePathBuilderDialog(Frame owner, int gameYear) {
         super(owner, getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.title"), true);
@@ -134,19 +139,19 @@ public class LifePathBuilderDialog extends JDialog {
         SwingUtilities.invokeLater(() -> scrollProgress.getVerticalScrollBar().setValue(0));
     }
 
-    private void setLblTooltipDisplay(String newText) {
+    void setLblTooltipDisplay(String newText) {
         String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    private void updateTxtProgressBasic() {
-        String name = txtName.getText();
-        String flavorText = txtFlavorText.getText();
-        int age = (int) spnAge.getValue();
-        int discount = (int) spnDiscount.getValue();
+    void updateTxtProgressBasic() {
+        String name = basicInfoTab.getName();
+        String flavorText = basicInfoTab.getFlavorText();
+        int age = basicInfoTab.getAge();
+        int discount = basicInfoTab.getDiscount();
 
         StringBuilder lifeStageText = new StringBuilder();
-        for (ATOWLifeStage lifeStage : lifeStages) {
+        for (ATOWLifeStage lifeStage : basicInfoTab.getLifeStages()) {
             if (lifeStageText.toString().isBlank()) {
                 lifeStageText = new StringBuilder(lifeStage.getDisplayName());
             } else {
@@ -155,7 +160,7 @@ public class LifePathBuilderDialog extends JDialog {
         }
 
         StringBuilder categoriesText = new StringBuilder();
-        for (LifePathCategory category : categories) {
+        for (LifePathCategory category : basicInfoTab.getCategories()) {
             if (categoriesText.toString().isBlank()) {
                 categoriesText = new StringBuilder(category.getDisplayName());
             } else {
@@ -245,7 +250,7 @@ public class LifePathBuilderDialog extends JDialog {
         String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.lifePath");
         tabMain.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
 
-        buildBasicInformationTab(tabMain);
+        basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
 
         // Requirements
         buildRequirementsTab(tabMain, gameYear);
@@ -682,209 +687,6 @@ public class LifePathBuilderDialog extends JDialog {
         return progressText.toString();
     }
 
-    private void buildBasicInformationTab(EnhancedTabbedPane tabMain) {
-        JPanel tabBasicInformation = new JPanel();
-        tabBasicInformation.setName("basic");
-        String titleBasic = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.tab.title.basic");
-
-        final int DERIVED_WIDTH = (int) round(MINIMUM_COMPONENT_WIDTH * 2 * 0.9);
-
-        // Name
-        final String titleName = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.name.label");
-        final String tooltipName = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.name.tooltip");
-        JLabel lblName = new JLabel(titleName);
-        txtName = JTextAreaWithCharacterLimit.createLimitedTextArea(50, 1);
-        FastJScrollPane nameScroll = new FastJScrollPane(txtName);
-        nameScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        nameScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        int rowHeight = txtName.getFontMetrics(txtName.getFont()).getHeight();
-        Dimension nameSize = new Dimension(DERIVED_WIDTH - lblName.getWidth(),
-              scaleForGUI(rowHeight + 12));
-        nameScroll.setPreferredSize(nameSize);
-        nameScroll.setMaximumSize(nameSize);
-
-        lblName.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipName)
-        );
-        txtName.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipName)
-        );
-        DocumentChangeListenerUtil.addChangeListener(
-              txtName.getDocument(),
-              this::updateTxtProgressBasic
-        );
-
-        // Flavor Text
-        final String titleFlavorText = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.flavorText.label");
-        final String tooltipFlavorText = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.flavorText.tooltip");
-        JLabel lblFlavorText = new JLabel(titleFlavorText);
-        txtFlavorText = JTextAreaWithCharacterLimit.createLimitedTextArea(500, 1);
-        FastJScrollPane flavorScroll = new FastJScrollPane(txtFlavorText);
-        flavorScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        flavorScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        rowHeight = txtFlavorText.getFontMetrics(txtFlavorText.getFont()).getHeight();
-        Dimension flavorSize = new Dimension(DERIVED_WIDTH - lblFlavorText.getWidth(),
-              scaleForGUI(rowHeight * 10 + 12));
-        flavorScroll.setPreferredSize(flavorSize);
-        flavorScroll.setMaximumSize(flavorSize);
-
-        lblFlavorText.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipFlavorText)
-        );
-        flavorScroll.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipFlavorText)
-        );
-        DocumentChangeListenerUtil.addChangeListener(
-              txtFlavorText.getDocument(),
-              this::updateTxtProgressBasic
-        );
-
-        // Age Modifier
-        final String titleAge = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.age.label");
-        final String tooltipAge = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.age.tooltip");
-        JLabel lblAge = new JLabel(titleAge);
-        spnAge = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        Dimension ageSize = new Dimension(DERIVED_WIDTH - lblAge.getWidth(),
-              spnAge.getPreferredSize().height);
-        spnAge.setPreferredSize(ageSize);
-        spnAge.setMaximumSize(ageSize);
-
-        lblAge.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipAge)
-        );
-        spnAge.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipAge)
-        );
-        spnAge.addChangeListener(e -> this.updateTxtProgressBasic());
-
-        // XP Discount
-        final String titleDiscount = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.discount.label");
-        final String tooltipDiscount = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.discount.tooltip");
-        JLabel lblDiscount = new JLabel(titleDiscount);
-        spnDiscount = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-        Dimension discountSize = new Dimension(DERIVED_WIDTH - lblDiscount.getWidth(),
-              spnAge.getPreferredSize().height);
-        spnDiscount.setPreferredSize(discountSize);
-        spnDiscount.setMaximumSize(discountSize);
-
-        lblDiscount.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipDiscount)
-        );
-        spnDiscount.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltipDiscount)
-        );
-        spnDiscount.addChangeListener(e -> this.updateTxtProgressBasic());
-
-        // Manage Life Stages
-        final String titleManageLifeStages = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.manageLifeStages.label");
-        final String tooltipManageLifeStages = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.manageLifeStages.tooltip");
-        RoundedJButton btnManageLifeStages = createButton(this, titleManageLifeStages,
-              tooltipManageLifeStages);
-        btnManageLifeStages.addActionListener(e -> {
-            this.setVisible(false);
-            LifePathStagePicker picker = new LifePathStagePicker(lifeStages);
-            lifeStages = picker.getSelectedLifeStages();
-            this.updateTxtProgressBasic();
-            this.setVisible(true);
-        });
-
-        // Manage Categories
-        final String titleManageCategories = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.manageCategories.label");
-        final String tooltipManageCategories = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.basic.manageCategories.tooltip");
-        RoundedJButton btnManageCategories = createButton(this, titleManageCategories,
-              tooltipManageCategories);
-        btnManageCategories.addActionListener(e -> {
-            this.setVisible(false);
-            LifePathCategoryPicker picker = new LifePathCategoryPicker(categories);
-            categories = picker.getSelectedCategories();
-            this.updateTxtProgressBasic();
-            this.setVisible(true);
-        });
-
-        // Layout
-        GroupLayout layout = new GroupLayout(tabBasicInformation);
-        tabBasicInformation.setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setHorizontalGroup(
-              layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblName)
-                                    .addComponent(lblFlavorText)
-                                    .addComponent(lblAge)
-                                    .addComponent(lblDiscount)
-                    )
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                    .addComponent(nameScroll)
-                                    .addComponent(flavorScroll)
-                                    .addGroup(layout.createSequentialGroup()
-                                                    .addComponent(spnAge)
-                                    )
-                                    .addGroup(layout.createSequentialGroup()
-                                                    .addComponent(spnDiscount)
-                                    )
-                                    .addGroup(layout.createSequentialGroup()
-                                                    .addComponent(btnManageLifeStages)
-                                                    .addGap(PADDING)
-                                                    .addComponent(btnManageCategories)
-                                    )
-                    )
-        );
-
-        layout.setVerticalGroup(
-              layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblName)
-                                    .addComponent(nameScroll)
-                    )
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblFlavorText)
-                                    .addComponent(flavorScroll)
-                    )
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblAge)
-                                    .addComponent(spnAge)
-                    )
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblDiscount)
-                                    .addComponent(spnDiscount)
-                    )
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnManageLifeStages)
-                                    .addGap(PADDING)
-                                    .addComponent(btnManageCategories)
-                    )
-        );
-
-        tabMain.addTab(titleBasic, tabBasicInformation);
-    }
-
-    private static RoundedJButton createButton(LifePathBuilderDialog dialogInstance, String label, String tooltip) {
-        RoundedJButton button = new RoundedJButton(label);
-
-        button.setMinimumSize(button.getPreferredSize());
-        button.setMaximumSize(button.getPreferredSize());
-        button.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(dialogInstance::setLblTooltipDisplay, tooltip)
-        );
-
-        return button;
-    }
-
     private JPanel initializeProgressPanel() {
         JPanel pnlProgress = new JPanel(new BorderLayout());
 
@@ -965,51 +767,5 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
-    }
-
-    static class TooltipMouseListenerUtil {
-        /**
-         * Returns a {@link MouseAdapter} that calls the given setter with the provided text when the mouse enters.
-         *
-         * @param setter The consumer to call (e.g., dialog::setLblTooltips)
-         * @param text   The text to set
-         *
-         * @return a {@link MouseAdapter} for use with any {@link JComponent}
-         */
-        public static MouseAdapter forTooltip(Consumer<String> setter, String text) {
-            return new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    setter.accept(text);
-                }
-            };
-        }
-    }
-
-    private static class DocumentChangeListenerUtil {
-        /**
-         * Adds a change callback to the given {@link Document}.
-         *
-         * @param document the {@link Document} to listen to
-         * @param onChange a consumer or runnable callback, called when the document changes
-         */
-        public static void addChangeListener(Document document, Runnable onChange) {
-            document.addDocumentListener(new DocumentListener() {
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-                    onChange.run();
-                }
-
-                @Override
-                public void removeUpdate(DocumentEvent e) {
-                    onChange.run();
-                }
-
-                @Override
-                public void changedUpdate(DocumentEvent e) {
-                    onChange.run();
-                }
-            });
-        }
     }
 }
