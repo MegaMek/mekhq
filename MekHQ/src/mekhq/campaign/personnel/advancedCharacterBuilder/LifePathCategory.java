@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
@@ -44,8 +46,6 @@ import megamek.logging.MMLogger;
  * @since 0.50.07
  */
 public enum LifePathCategory {
-    CLAN("CLAN"),
-    DARK_CASTE("DARK_CASTE"),
     FIELD_ANALYSIS("FIELD_ANALYSIS"),
     FIELD_ANTHROPOLOGIST("FIELD_ANTHROPOLOGIST"),
     FIELD_ARCHAEOLOGIST("FIELD_ARCHAEOLOGIST"),
@@ -102,13 +102,17 @@ public enum LifePathCategory {
     FIELD_TECHNICIAN_MEK("FIELD_TECHNICIAN_MEK"),
     FIELD_TECHNICIAN_MILITARY("FIELD_TECHNICIAN_MILITARY"),
     FIELD_TECHNICIAN_VEHICLE("FIELD_TECHNICIAN_VEHICLE"),
-    GENERAL("GENERAL"),
+    GENERAL_CLAN("GENERAL_CLAN"),
+    GENERAL_CRIMINAL("GENERAL_CRIMINAL"),
+    GENERAL_DARK_CASTE("GENERAL_DARK_CASTE"),
+    GENERAL_INNER_SPHERE("GENERAL_INNER_SPHERE"),
     SCHOOL_CIVILIAN("SCHOOL_CIVILIAN"),
     SCHOOL_INTELLIGENCE("SCHOOL_INTELLIGENCE"),
     SCHOOL_MILITARY("SCHOOL_MILITARY"),
     SCHOOL_OFFICER_CANDIDATE("SCHOOL_OFFICER_CANDIDATE"),
     SCHOOL_POLICE("SCHOOL_POLICE");
 
+    final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategory";
     private static final MMLogger LOGGER = MMLogger.create(LifePathCategory.class);
 
     private final String lookupName;
@@ -138,6 +142,32 @@ public enum LifePathCategory {
     }
 
     /**
+     * Returns the display name for this object by looking up the ".label" key in the resource bundle associated with
+     * this class.
+     *
+     * @return the localized display name for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
+    }
+
+    /**
+     * Returns the description for this object by looking up the ".description" key in the resource bundle associated
+     * with this class.
+     *
+     * @return the localized description for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
+    }
+
+    /**
      * Gets the {@link LifePathCategory} associated with a lookup name (case-insensitive).
      *
      * @param lookup the name to match
@@ -161,5 +191,10 @@ public enum LifePathCategory {
 
         LOGGER.warn("Unknown lookup name: {}", lookup);
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getLookupName();
     }
 }

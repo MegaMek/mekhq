@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -54,6 +56,8 @@ public enum ATOWLifeStage {
     LATE_CHILDHOOD(2, "LATE_CHILDHOOD"),
     HIGHER_EDUCATION(3, "HIGHER_EDUCATION"),
     REAL_LIFE(4, "REAL_LIFE");
+
+    final static String RESOURCE_BUNDLE = "mekhq.resources.ATOWLifeStage";
 
     private static final MMLogger LOGGER = MMLogger.create(ATOWLifeStage.class);
 
@@ -96,6 +100,32 @@ public enum ATOWLifeStage {
      */
     public String getLookupName() {
         return lookupName;
+    }
+
+    /**
+     * Returns the display name for this object by looking up the ".label" key in the resource bundle associated with
+     * this class.
+     *
+     * @return the localized display name for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
+    }
+
+    /**
+     * Returns the description for this object by looking up the ".description" key in the resource bundle associated
+     * with this class.
+     *
+     * @return the localized description for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
     }
 
     /**
@@ -174,5 +204,10 @@ public enum ATOWLifeStage {
 
         LOGGER.warn("Unknown ATOWLifeStage: {}", text);
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getLookupName();
     }
 }
