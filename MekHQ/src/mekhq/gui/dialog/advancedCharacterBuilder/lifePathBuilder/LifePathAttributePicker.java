@@ -86,7 +86,8 @@ public class LifePathAttributePicker extends JDialog {
         return selectedAttributeScores;
     }
 
-    public LifePathAttributePicker(Map<SkillAttribute, Integer> selectedAttributeScores) {
+    public LifePathAttributePicker(Map<SkillAttribute, Integer> selectedAttributeScores,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -95,8 +96,8 @@ public class LifePathAttributePicker extends JDialog {
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.title"));
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
-        JPanel pnlOptions = buildOptionsPanel();
+        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -166,7 +167,7 @@ public class LifePathAttributePicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel() {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -182,10 +183,20 @@ public class LifePathAttributePicker extends JDialog {
             String tooltip = attribute.getDescription();
 
             JLabel lblAttribute = new JLabel(label);
-            JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(MINIMUM_ATTRIBUTE_SCORE,
-                  MINIMUM_ATTRIBUTE_SCORE,
-                  MAXIMUM_ATTRIBUTE_SCORE,
-                  1));
+
+            int traitMinimumValue = switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+                case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
+            };
+            int traitMaximumValue = switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> MAXIMUM_ATTRIBUTE_SCORE;
+                case REQUIREMENTS, EXCLUSIONS -> 1000;
+            };
+
+            lblAttribute.setToolTipText(tooltip);
+
+            JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(traitMinimumValue, traitMinimumValue,
+                  traitMaximumValue, 1));
 
             if (selectedAttributeScores.containsKey(attribute)) {
                 int currentValue = selectedAttributeScores.get(attribute);
@@ -219,7 +230,7 @@ public class LifePathAttributePicker extends JDialog {
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    private JPanel initializeInstructionsPanel() {
+    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
         String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.label");
@@ -229,7 +240,7 @@ public class LifePathAttributePicker extends JDialog {
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

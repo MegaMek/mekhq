@@ -34,6 +34,7 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabType.REQUIREMENTS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -221,7 +222,7 @@ public class LifePathBuilderTabRequirements {
         buttonsPanel.add(btnAddSkill);
 
         // SPAs
-        List<CampaignOptionsAbilityInfo> abilities = new ArrayList<>();
+        Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
         String titleAddSPA = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.requirements.button.addSPA.label");
         String tooltipAddSPA = getTextAt(RESOURCE_BUNDLE,
@@ -298,120 +299,64 @@ public class LifePathBuilderTabRequirements {
         btnAddAttribute.addActionListener(e -> {
             parent.setVisible(false);
 
-            LifePathAttributePicker picker = new LifePathAttributePicker(attributes);
+            LifePathAttributePicker picker = new LifePathAttributePicker(attributes, REQUIREMENTS);
             attributes.clear();
             attributes.putAll(picker.getSelectedAttributeScores());
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathTraitPicker picker = new LifePathTraitPicker(traits);
+            LifePathTraitPicker picker = new LifePathTraitPicker(traits, REQUIREMENTS);
             traits.clear();
             traits.putAll(picker.getSelectedTraitScores());
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathSkillPicker picker = new LifePathSkillPicker(skills);
+            LifePathSkillPicker picker = new LifePathSkillPicker(skills, REQUIREMENTS);
             skills.clear();
             skills.putAll(picker.getSelectedSkillLevels());
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
         btnAddSPA.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathSPAPicker picker = new LifePathSPAPicker(abilities, allAbilityInfo);
+            LifePathSPAPicker picker = new LifePathSPAPicker(abilities, allAbilityInfo, REQUIREMENTS);
             abilities.clear();
-            abilities.addAll(picker.getSelectedAbilities());
+            abilities.putAll(picker.getSelectedAbilities());
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
         btnAddFaction.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathFactionPicker picker = new LifePathFactionPicker(factions, gameYear);
+            LifePathFactionPicker picker = new LifePathFactionPicker(factions, gameYear, REQUIREMENTS);
             factions.clear();
             factions.addAll(picker.getSelectedFactions());
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            txtRequirements.setText(requirementsText);
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
         btnAddLifePath.addActionListener(e -> {
             parent.setVisible(false);
             // TODO launch a dialog that lists the current requirements and allows the user to remove one
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
         btnAddCategory.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(categories);
+            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(categories, REQUIREMENTS);
             categories.clear();
             categories.putAll(picker.getSelectedCategoryCounts());
 
-            RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
-                  attributes, traits, skills, abilities);
-            String requirementsText = buildRequirementText(storage);
-            txtRequirements.setText(requirementsText);
-
-            requirementsTabStorageMap.put(index, initialStorage);
-            requirementsTabTextMap.put(index, requirementsText);
-            parent.updateTxtProgress();
-
-            parent.setVisible(true);
+            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtRequirements, initialStorage);
         });
 
         // Add panels and then add Tab
@@ -422,6 +367,23 @@ public class LifePathBuilderTabRequirements {
         String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel");
         tabbedPane.addTab(titleTab, requirementGroupPanel);
+    }
+
+    private void standardizedActions(int gameYear, int index, Map<SkillAttribute, Integer> attributes,
+          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
+          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<LifePathRecord> lifePaths,
+          Map<LifePathCategory, Integer> categories, JEditorPane txtRequirements,
+          RequirementsTabStorage initialStorage) {
+        RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
+              attributes, traits, skills, abilities);
+        String requirementsText = buildRequirementText(storage);
+        txtRequirements.setText(requirementsText);
+
+        requirementsTabStorageMap.put(index, initialStorage);
+        requirementsTabTextMap.put(index, requirementsText);
+        parent.updateTxtProgress();
+
+        parent.setVisible(true);
     }
 
     public void buildAllAbilityInfo() {
@@ -480,7 +442,7 @@ public class LifePathBuilderTabRequirements {
     private static RequirementsTabStorage getRequirementsTabStorage(int gameYear, List<Faction> factions,
           List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
-          Map<SkillType, Integer> skills, List<CampaignOptionsAbilityInfo> abilities) {
+          Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
         return new RequirementsTabStorage(gameYear,
               factions,
               lifePaths,
@@ -598,15 +560,17 @@ public class LifePathBuilderTabRequirements {
         }
 
         // SPAs
-        List<CampaignOptionsAbilityInfo> selectedSPAs = storage.abilities();
+        Map<CampaignOptionsAbilityInfo, Integer> selectedSPAs = storage.abilities();
         if (!selectedSPAs.isEmpty()) {
             appendComma(progressText);
 
-            for (int i = 0; i < selectedSPAs.size(); i++) {
-                SpecialAbility ability = selectedSPAs.get(i).getAbility();
+            List<CampaignOptionsAbilityInfo> spas = selectedSPAs.keySet().stream().toList();
+
+            for (int i = 0; i < spas.size(); i++) {
+                SpecialAbility ability = spas.get(i).getAbility();
                 String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
                 progressText.append(label);
-                if (i != selectedSPAs.size() - 1) {
+                if (i != spas.size() - 1) {
                     progressText.append(", ");
                 }
             }

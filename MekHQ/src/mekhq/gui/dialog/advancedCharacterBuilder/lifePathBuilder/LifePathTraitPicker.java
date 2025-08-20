@@ -84,7 +84,8 @@ public class LifePathTraitPicker extends JDialog {
         return selectedTraitScores;
     }
 
-    public LifePathTraitPicker(Map<LifePathEntryDataTraitLookup, Integer> selectedTraitScores) {
+    public LifePathTraitPicker(Map<LifePathEntryDataTraitLookup, Integer> selectedTraitScores,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -93,8 +94,8 @@ public class LifePathTraitPicker extends JDialog {
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.title"));
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
-        JPanel pnlOptions = buildOptionsPanel();
+        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -164,7 +165,7 @@ public class LifePathTraitPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel() {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -175,36 +176,39 @@ public class LifePathTraitPicker extends JDialog {
             String label = trait.getDisplayName();
             String tooltip = trait.getDescription();
 
-            int traitMinimumValue;
-            int traitMaximumValue;
-            switch (trait) {
-                case BLOODMARK -> {
-                    traitMinimumValue = MINIMUM_BLOODMARK;
-                    traitMaximumValue = MAXIMUM_BLOODMARK;
-                }
-                //                case ENEMY -> 0; // TODO IMPLEMENT
-                //                case EXTRA_INCOME -> 0; // TODO IMPLEMENT
-                //                case PROPERTY -> 0; // TODO IMPLEMENT
-                case CONNECTIONS -> {
-                    traitMinimumValue = MINIMUM_CONNECTIONS;
-                    traitMaximumValue = MAXIMUM_CONNECTIONS;
-                }
-                case REPUTATION -> {
-                    traitMinimumValue = MINIMUM_REPUTATION;
-                    traitMaximumValue = MAXIMUM_REPUTATION;
-                }
-                //                case TITLE -> 0; // TODO IMPLEMENT
-                case UNLUCKY -> {
-                    traitMinimumValue = MINIMUM_UNLUCKY;
-                    traitMaximumValue = MAXIMUM_UNLUCKY;
-                }
-                case WEALTH -> {
-                    traitMinimumValue = MINIMUM_WEALTH;
-                    traitMaximumValue = MAXIMUM_WEALTH;
-                }
-                default -> {
-                    traitMinimumValue = 0;
-                    traitMaximumValue = 0;
+            int traitMinimumValue = 0;
+            int traitMaximumValue = 1;
+
+            switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> traitMaximumValue = 1000;
+                case REQUIREMENTS, EXCLUSIONS -> {
+                    switch (trait) {
+                        case BLOODMARK -> {
+                            traitMinimumValue = MINIMUM_BLOODMARK;
+                            traitMaximumValue = MAXIMUM_BLOODMARK;
+                        }
+                        //                case ENEMY -> 0; // TODO IMPLEMENT
+                        //                case EXTRA_INCOME -> 0; // TODO IMPLEMENT
+                        //                case PROPERTY -> 0; // TODO IMPLEMENT
+                        case CONNECTIONS -> {
+                            traitMinimumValue = MINIMUM_CONNECTIONS;
+                            traitMaximumValue = MAXIMUM_CONNECTIONS;
+                        }
+                        case REPUTATION -> {
+                            traitMinimumValue = MINIMUM_REPUTATION;
+                            traitMaximumValue = MAXIMUM_REPUTATION;
+                        }
+                        //                case TITLE -> 0; // TODO IMPLEMENT
+                        case UNLUCKY -> {
+                            traitMinimumValue = MINIMUM_UNLUCKY;
+                            traitMaximumValue = MAXIMUM_UNLUCKY;
+                        }
+                        case WEALTH -> {
+                            traitMinimumValue = MINIMUM_WEALTH;
+                            traitMaximumValue = MAXIMUM_WEALTH;
+                        }
+                        default -> {}
+                    }
                 }
             }
 
@@ -218,9 +222,10 @@ public class LifePathTraitPicker extends JDialog {
                 spnTraitScore.setValue(currentValue);
             }
 
+            final int finalTraitMinimumValue = traitMinimumValue;
             spnTraitScore.addChangeListener(evt -> {
                 int value = (int) spnTraitScore.getValue();
-                if (value > traitMinimumValue) {
+                if (value > finalTraitMinimumValue) {
                     selectedTraitScores.put(trait, value);
                 }
             });
@@ -245,7 +250,7 @@ public class LifePathTraitPicker extends JDialog {
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    private JPanel initializeInstructionsPanel() {
+    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
         String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.instructions.label");
@@ -255,7 +260,7 @@ public class LifePathTraitPicker extends JDialog {
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

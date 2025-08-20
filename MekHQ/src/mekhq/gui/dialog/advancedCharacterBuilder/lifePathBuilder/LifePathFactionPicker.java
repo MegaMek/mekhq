@@ -81,7 +81,7 @@ public class LifePathFactionPicker extends JDialog {
         return selectedFactions;
     }
 
-    public LifePathFactionPicker(List<Faction> selectedFactions, int gameYear) {
+    public LifePathFactionPicker(List<Faction> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -90,7 +90,7 @@ public class LifePathFactionPicker extends JDialog {
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.title"));
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
+        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
         JPanel pnlOptions = buildOptionsPanel(gameYear);
         JPanel pnlControls = buildControlPanel();
 
@@ -318,7 +318,7 @@ public class LifePathFactionPicker extends JDialog {
         return scrollSkills;
     }
 
-    private JPanel initializeInstructionsPanel() {
+    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
         String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.label");
@@ -328,7 +328,7 @@ public class LifePathFactionPicker extends JDialog {
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

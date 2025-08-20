@@ -84,7 +84,7 @@ public class LifePathSkillPicker extends JDialog {
         return selectedSkillLevels;
     }
 
-    public LifePathSkillPicker(Map<SkillType, Integer> selectedSkillLevels) {
+    public LifePathSkillPicker(Map<SkillType, Integer> selectedSkillLevels, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -93,8 +93,8 @@ public class LifePathSkillPicker extends JDialog {
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
-        JPanel pnlOptions = buildOptionsPanel();
+        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -158,7 +158,7 @@ public class LifePathSkillPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel() {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -204,31 +204,31 @@ public class LifePathSkillPicker extends JDialog {
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
         if (!combatSkills.isEmpty()) {
-            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills);
+            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills, tabType);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.combat.label"),
                   pnlCombatSkills);
         }
 
         if (!supportSkills.isEmpty()) {
-            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills);
+            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills, tabType);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"),
                   pnlSupportSkills);
         }
 
         if (!roleplaySkills1.isEmpty()) {
-            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1));
+            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1, tabType));
         }
 
         if (!roleplaySkills2.isEmpty()) {
-            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2));
+            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2, tabType));
         }
 
         if (!roleplaySkills3.isEmpty()) {
-            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3));
+            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3, tabType));
         }
 
         if (!roleplaySkills4.isEmpty()) {
-            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4));
+            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4, tabType));
         }
 
         pnlOptions.add(optionPane);
@@ -247,7 +247,7 @@ public class LifePathSkillPicker extends JDialog {
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getSkillOptions(List<SkillType> skills) {
+    private FastJScrollPane getSkillOptions(List<SkillType> skills, LifePathBuilderTabType tabType) {
         JPanel pnlSkills = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -262,7 +262,10 @@ public class LifePathSkillPicker extends JDialog {
             label = label.replace(SkillType.RP_ONLY_TAG, "");
 
             int minimumSkillLevel = 0;
-            int maximumSkillLevel = type.getMaxLevel();
+            int maximumSkillLevel = switch (tabType) {
+                case REQUIREMENTS, EXCLUSIONS -> type.getMaxLevel();
+                case FIXED_XP, FLEXIBLE_XP -> 1000;
+            };
 
             JLabel lblSkill = new JLabel(label);
             JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(minimumSkillLevel, minimumSkillLevel,
@@ -302,7 +305,7 @@ public class LifePathSkillPicker extends JDialog {
         return scrollSkills;
     }
 
-    private JPanel initializeInstructionsPanel() {
+    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
         String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.label");
@@ -312,7 +315,7 @@ public class LifePathSkillPicker extends JDialog {
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

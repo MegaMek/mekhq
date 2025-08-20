@@ -32,19 +32,24 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import java.util.List;
-import java.util.Map;
+public enum LifePathBuilderTabType {
+    REQUIREMENTS("requirements"),
+    EXCLUSIONS("exclusions"),
+    FIXED_XP("fixed_xp"),
+    FLEXIBLE_XP("flexible_xp");
 
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.universe.Faction;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
+    private final String lookupName;
 
-public record RequirementsTabStorage(int gameYear, List<Faction> factions, List<LifePathRecord> lifePaths,
-      Map<LifePathCategory, Integer> categories, Map<SkillAttribute, Integer> attributes,
-      Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-      Map<CampaignOptionsAbilityInfo, Integer> abilities) {
+    LifePathBuilderTabType(String lookupName) {
+        this.lookupName = lookupName;
+    }
+
+    /**
+     * Returns the {@link String} lookup name for this tab type.
+     *
+     * @return the lookup name
+     */
+    public String getLookupName() {
+        return lookupName;
+    }
 }

@@ -88,7 +88,8 @@ public class LifePathCategoryCountPicker extends JDialog {
         return selectedCategoryCounts;
     }
 
-    public LifePathCategoryCountPicker(Map<LifePathCategory, Integer> selectedCategoryCounts) {
+    public LifePathCategoryCountPicker(Map<LifePathCategory, Integer> selectedCategoryCounts,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -97,7 +98,7 @@ public class LifePathCategoryCountPicker extends JDialog {
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.title"));
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
+        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
         JPanel pnlOptions = buildOptionsPanel();
         JPanel pnlControls = buildControlPanel();
 
@@ -305,7 +306,7 @@ public class LifePathCategoryCountPicker extends JDialog {
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    private JPanel initializeInstructionsPanel() {
+    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
         String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.label");
@@ -315,7 +316,7 @@ public class LifePathCategoryCountPicker extends JDialog {
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
