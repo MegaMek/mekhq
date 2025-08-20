@@ -259,11 +259,6 @@ public class LifePathBuilderDialog extends JDialog {
             }
 
             newRequirementsText.append("&#9654; <b>").append(requirementTitle).append(": </b>");
-
-            // A tweak to make the text more readable in the progress panel without compromising the formatting of
-            // the Requirements tab
-            requirements = requirements.replaceAll("<br>", ", ");
-
             newRequirementsText.append(requirements);
         }
 
