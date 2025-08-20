@@ -447,9 +447,9 @@ public class LifePathBuilderDialog extends JDialog {
         pnlButtons.add(Box.createHorizontalGlue());
         pnlButtons.add(btnCancel);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
-        pnlButtons.add(btnLoad);
-        pnlButtons.add(Box.createHorizontalStrut(PADDING));
         pnlButtons.add(btnSave);
+        pnlButtons.add(Box.createHorizontalStrut(PADDING));
+        pnlButtons.add(btnLoad);
         pnlButtons.add(Box.createHorizontalGlue());
 
         pnlContents.add(Box.createVerticalGlue());

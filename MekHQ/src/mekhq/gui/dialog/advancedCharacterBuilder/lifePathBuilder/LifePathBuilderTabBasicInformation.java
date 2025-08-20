@@ -221,7 +221,7 @@ public class LifePathBuilderTabBasicInformation {
               tooltipManageCategories);
         btnManageCategories.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathCategoryPicker picker = new LifePathCategoryPicker(categories);
+            LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(categories);
             categories = picker.getSelectedCategories();
             parent.updateTxtProgress();
             parent.setVisible(true);

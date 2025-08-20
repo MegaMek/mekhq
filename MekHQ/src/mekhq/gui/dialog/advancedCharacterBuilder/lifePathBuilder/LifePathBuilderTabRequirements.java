@@ -406,6 +406,9 @@ public class LifePathBuilderTabRequirements {
         });
         btnAddCategory.addActionListener(e -> {
             parent.setVisible(false);
+            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(categories);
+            categories.clear();
+            categories.putAll(picker.getSelectedCategoryCounts());
 
             RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
                   attributes, traits, skills, abilities);

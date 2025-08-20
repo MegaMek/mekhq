@@ -61,8 +61,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathCategoryPicker extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategoryPicker";
+public class LifePathCategorySingletonPicker extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategorySingletonPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(500);
@@ -82,14 +82,14 @@ public class LifePathCategoryPicker extends JDialog {
         return selectedCategories;
     }
 
-    public LifePathCategoryPicker(Set<LifePathCategory> selectedCategories) {
+    public LifePathCategorySingletonPicker(Set<LifePathCategory> selectedCategories) {
         super();
 
         // Defensive copies to avoid external modification
         this.selectedCategories = new HashSet<>(selectedCategories);
         storedCategories = new HashSet<>(selectedCategories);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategoryPicker.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel();
         JPanel pnlOptions = buildOptionsPanel();
@@ -138,14 +138,14 @@ public class LifePathCategoryPicker extends JDialog {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryPicker.button.cancel");
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
             selectedCategories = storedCategories;
             dispose();
         });
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryPicker.button.confirm");
+        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.button.confirm");
         RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
         btnConfirm.addActionListener(e -> dispose());
 
@@ -166,7 +166,7 @@ public class LifePathCategoryPicker extends JDialog {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryPicker.options.label");
+        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.options.label");
         pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
 
         java.util.List<LifePathCategory> categories = new java.util.ArrayList<>(java.util.List.of(LifePathCategory.values()));
@@ -234,14 +234,14 @@ public class LifePathCategoryPicker extends JDialog {
     private JPanel initializeInstructionsPanel() {
         JPanel pnlInstructions = new JPanel();
 
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryPicker.instructions.label");
+        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.instructions.label");
         pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
 
         JEditorPane txtInstructions = new JEditorPane();
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathCategoryPicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.instructions.text"));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
