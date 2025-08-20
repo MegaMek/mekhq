@@ -47,6 +47,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -141,6 +142,78 @@ public class LifePathBuilderDialog extends JDialog {
         txtProgress.setText(newProgressText.toString());
     }
 
+    private String getNewBasicText() {
+        StringBuilder newText = new StringBuilder();
+
+        String name = basicInfoTab.getName();
+        if (!name.isBlank()) {
+            newText.append("<h1 style='text-align:center;'>").append(name).append("</h1>");
+        }
+
+        String flavorText = basicInfoTab.getFlavorText();
+        if (!flavorText.isBlank()) {
+            newText.append("<i>").append(flavorText).append("</i>");
+        }
+
+        int age = basicInfoTab.getAge();
+        if (age > 0) {
+            if (!newText.isEmpty()) {
+                newText.append("<br>");
+            }
+            newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.age", age));
+        }
+
+        int cost = Math.max(basicInfoTab.getDiscount(), 0);
+        if (cost > 0) {
+            if (!newText.isEmpty()) {
+                newText.append("<br>");
+            }
+            newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.cost", cost));
+        }
+
+        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
+        if (!lifeStages.isEmpty()) {
+            StringBuilder lifeStageText = new StringBuilder();
+            lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
+
+            List<ATOWLifeStage> orderedLifeStages = lifeStages.stream()
+                                                          .sorted(ATOWLifeStage::compareTo)
+                                                          .toList();
+
+            for (int i = 0; i < orderedLifeStages.size(); i++) {
+                ATOWLifeStage lifeStage = orderedLifeStages.get(i);
+                if (i == 0) {
+                    lifeStageText.append(lifeStage.getDisplayName());
+                } else {
+                    lifeStageText.append(", ").append(lifeStage.getDisplayName());
+                }
+            }
+            newText.append("<br>").append(lifeStageText);
+        }
+
+        Set<LifePathCategory> categories = basicInfoTab.getCategories();
+        if (!categories.isEmpty()) {
+            StringBuilder categoriesText = new StringBuilder();
+            categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));
+
+            List<LifePathCategory> orderedCategories = categories.stream()
+                                                             .sorted(LifePathCategory::compareTo)
+                                                             .toList();
+
+            for (int i = 0; i < orderedCategories.size(); i++) {
+                LifePathCategory category = orderedCategories.get(i);
+                if (i == 0) {
+                    categoriesText.append(category.getDisplayName());
+                } else {
+                    categoriesText.append(", ").append(category.getDisplayName());
+                }
+            }
+            newText.append("<br>").append(categoriesText);
+        }
+
+        return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
+    }
+
     private String getNewRequirementsText() {
         StringBuilder newRequirementsText = new StringBuilder();
 
@@ -195,36 +268,6 @@ public class LifePathBuilderDialog extends JDialog {
         }
 
         return newRequirementsText.toString();
-    }
-
-    private String getNewBasicText() {
-        String name = basicInfoTab.getName();
-        String flavorText = basicInfoTab.getFlavorText();
-        int age = basicInfoTab.getAge();
-        int discount = basicInfoTab.getDiscount();
-
-        StringBuilder lifeStageText = new StringBuilder();
-        for (ATOWLifeStage lifeStage : basicInfoTab.getLifeStages()) {
-            if (lifeStageText.toString().isBlank()) {
-                lifeStageText = new StringBuilder(lifeStage.getDisplayName());
-            } else {
-                lifeStageText.append(", ").append(lifeStage.getDisplayName());
-            }
-        }
-
-        StringBuilder categoriesText = new StringBuilder();
-        for (LifePathCategory category : basicInfoTab.getCategories()) {
-            if (categoriesText.toString().isBlank()) {
-                categoriesText = new StringBuilder(category.getDisplayName());
-            } else {
-                categoriesText.append(", ").append(category.getDisplayName());
-            }
-        }
-
-        String newText = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic", name,
-              flavorText, age, discount, lifeStageText.toString(), categoriesText.toString());
-
-        return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
     }
 
     private JPanel initialize(int gameYear) {
