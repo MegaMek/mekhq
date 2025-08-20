@@ -169,14 +169,6 @@ public class LifePathBuilderTabRequirements {
             // Remove the desired tab
             tabbedPane.remove(selectedIndex);
 
-            // Update the names of the remaining tabs
-            int tabCount = tabbedPane.getTabCount();
-            for (int i = 0; i < tabCount; i++) {
-                String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "LifePathBuilderDialog.tab." + (i == 0 ? "compulsory" : "optional") + ".formattedLabel", i);
-                tabbedPane.setTitleAt(i, titleTab);
-            }
-
             // Update the progress panel
             parent.updateTxtProgress();
         }
@@ -428,7 +420,7 @@ public class LifePathBuilderTabRequirements {
 
         int count = tabbedPane.getComponentCount();
         String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel", count);
+              "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel");
         tabbedPane.addTab(titleTab, requirementGroupPanel);
     }
 

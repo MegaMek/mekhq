@@ -147,7 +147,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         String name = basicInfoTab.getName();
         if (!name.isBlank()) {
-            newText.append("<h1 style='text-align:center;'>").append(name).append("</h1>");
+            newText.append("<h1 style='text-align:center; margin:0'>").append(name).append("</h1>");
         }
 
         String flavorText = basicInfoTab.getFlavorText();
@@ -231,33 +231,28 @@ public class LifePathBuilderDialog extends JDialog {
         }
 
         String requirementsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
-        newRequirementsText.append("<h2 style='text-align:center;'>").append(requirementsTitle).append("</h2>");
+        newRequirementsText.append("<h2 style='text-align:center; margin:0;'>").append(requirementsTitle).append(
+              "</h2>");
 
         List<String> orderedRequirements = unorderedRequirements.entrySet().stream()
                                                  .sorted(Map.Entry.comparingByKey())
                                                  .map(Map.Entry::getValue)
                                                  .toList();
 
+        boolean firstRequirement = true;
         for (int i = 0; i < orderedRequirements.size(); i++) {
             String requirements = orderedRequirements.get(i);
             if (requirements.isBlank()) {
                 continue;
             }
 
-            String requirementTitle;
-            if (i == 0) {
-                requirementTitle = getTextAt(RESOURCE_BUNDLE,
-                      "LifePathBuilderDialog.tab.compulsory.label");
-            } else {
-                requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "LifePathBuilderDialog.tab.optional.label", i);
-
-                boolean isFirstEntry = orderedRequirements.get(0).isBlank();
-                if (!isFirstEntry) {
-                    newRequirementsText.append("<br>");
-                }
+            if (!firstRequirement) {
+                newRequirementsText.append("<br>");
             }
+            firstRequirement = false;
 
+            String requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "LifePathBuilderDialog.tab." + (i == 0 ? "compulsory" : "optional") + ".label");
             newRequirementsText.append("&#9654; <b>").append(requirementTitle).append(": </b>");
             newRequirementsText.append(requirements);
         }
