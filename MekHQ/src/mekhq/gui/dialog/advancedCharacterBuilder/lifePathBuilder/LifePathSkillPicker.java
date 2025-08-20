@@ -209,19 +209,19 @@ public class LifePathSkillPicker extends JDialog {
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"), pnlSupportSkills);
 
         FastJScrollPane pnlRoleplaySkills1 = getSkillOptions(roleplaySkills1);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label"),
+        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.1"),
               pnlRoleplaySkills1);
 
         FastJScrollPane pnlRoleplaySkills2 = getSkillOptions(roleplaySkills2);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label"),
+        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.2"),
               pnlRoleplaySkills2);
 
         FastJScrollPane pnlRoleplaySkills3 = getSkillOptions(roleplaySkills3);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label"),
+        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.3"),
               pnlRoleplaySkills3);
 
         FastJScrollPane pnlRoleplaySkills4 = getSkillOptions(roleplaySkills4);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label"),
+        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.4"),
               pnlRoleplaySkills4);
 
         pnlOptions.add(optionPane);
