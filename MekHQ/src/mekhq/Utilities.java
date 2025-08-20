@@ -170,7 +170,7 @@ public class Utilities {
             if ((entity instanceof Aero) &&
                       !ammoType.canAeroUse(entity.getGame()
                                                  .getOptions()
-                                                 .booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
+                                                 .booleanOption(OptionsConstants.ADVANCED_AERO_RULES_AERO_ARTILLERY_MUNITIONS))) {
                 continue;
             }
 
@@ -200,7 +200,7 @@ public class Utilities {
 
             if (ammoType.hasFlag(AmmoType.F_NUCLEAR) &&
                       ammoType.hasFlag(AmmoType.F_CAP_MISSILE) &&
-                      !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
+                      !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVANCED_AERO_RULES_AT2_NUKES)) {
                 continue;
             }
 

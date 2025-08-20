@@ -1029,7 +1029,7 @@ public class ResolveScenarioTracker {
                       null != entity.getCrew() &&
                       (entity.getCrew().isEjected() &&
                              !campaign.getGameOptions()
-                                    .booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE))) {
+                                    .booleanOption(OptionsConstants.ADVANCED_GROUND_MOVEMENT_EJECTED_PILOTS_FLEE))) {
                 continue;
             }
             // shuffling the crew ensures that casualties are randomly assigned in
