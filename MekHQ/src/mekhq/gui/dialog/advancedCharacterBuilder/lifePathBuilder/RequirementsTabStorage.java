@@ -39,10 +39,11 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 
 public record RequirementsTabStorage(int gameYear, List<Faction> factions, List<LifePathRecord> lifePaths,
       Map<LifePathCategory, Integer> categories, Map<SkillAttribute, Integer> attributes,
-      Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills, PersonnelOptions spas) {
+      Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills, PersonnelOptions spas) {
 }

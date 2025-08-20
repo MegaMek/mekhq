@@ -57,6 +57,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -113,7 +114,10 @@ public class LifePathBuilderTabRequirements {
         // can be called before the pane has been initialized)
         EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
         tabbedPane.addChangeListener(e -> btnRemoveRequirementGroup.setEnabled(tabbedPane.getSelectedIndex() != 0));
-        btnAddRequirementGroup.addActionListener(e -> createRequirementsTab(tabbedPane, gameYear));
+        btnAddRequirementGroup.addActionListener(e -> {
+            createRequirementsTab(tabbedPane, gameYear);
+            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        });
         btnRemoveRequirementGroup.addActionListener(e -> removeRequirementGroup(tabbedPane));
 
         // Add 'Group 0' - this group is required
@@ -205,7 +209,7 @@ public class LifePathBuilderTabRequirements {
         buttonsPanel.add(btnAddTrait);
 
         // Skills
-        Map<String, Integer> skills = new HashMap<>();
+        Map<SkillType, Integer> skills = new HashMap<>();
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.requirements.button.addSkill.label");
         String tooltipAddSkill = getTextAt(RESOURCE_BUNDLE,
@@ -326,7 +330,9 @@ public class LifePathBuilderTabRequirements {
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
-            // TODO launch a dialog that lists the Skills and allows the user to specify levels for each
+            LifePathSkillPicker picker = new LifePathSkillPicker(skills);
+            skills.clear();
+            skills.putAll(picker.getSelectedSkillLevels());
 
             RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
                   attributes, traits, skills, spas);
@@ -412,7 +418,7 @@ public class LifePathBuilderTabRequirements {
     private static RequirementsTabStorage getRequirementsTabStorage(int gameYear, List<Faction> factions,
           List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
-          Map<String, Integer> skills, PersonnelOptions spas) {
+          Map<SkillType, Integer> skills, PersonnelOptions spas) {
         return new RequirementsTabStorage(gameYear, factions, lifePaths, categories, attributes, traits, skills, spas);
     }
 
@@ -504,14 +510,14 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Skills
-        Map<String, Integer> skills = storage.skills();
+        Map<SkillType, Integer> skills = storage.skills();
         if (!skills.isEmpty()) {
             appendLineBreak(progressText);
 
             int counter = 0;
             int length = traits.size();
-            for (Map.Entry<String, Integer> entry : skills.entrySet()) {
-                progressText.append(entry.getKey());
+            for (Map.Entry<SkillType, Integer> entry : skills.entrySet()) {
+                progressText.append(entry.getKey().getName());
                 progressText.append(" ");
                 progressText.append(entry.getValue());
                 progressText.append("+");
