@@ -75,7 +75,7 @@ public class LifePathBuilderTabRequirements {
     private final LifePathBuilderDialog parent;
     private final Map<Integer, RequirementsTabStorage> requirementsTabStorageMap = new HashMap<>();
     private final Map<Integer, String> requirementsTabTextMap = new HashMap<>();
-    private ArrayList<String> level3Abilities = new ArrayList<>();
+    private final ArrayList<String> level3Abilities = new ArrayList<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
     public Map<Integer, RequirementsTabStorage> getRequirementsTabStorageMap() {
@@ -262,6 +262,7 @@ public class LifePathBuilderTabRequirements {
         btnAddLifePath.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddLifePath)
         );
+        btnAddLifePath.setEnabled(false); // TODO Implement
         buttonsPanel.add(btnAddLifePath);
 
         // Categories
@@ -372,7 +373,9 @@ public class LifePathBuilderTabRequirements {
         });
         btnAddFaction.addActionListener(e -> {
             parent.setVisible(false);
-            // TODO launch a dialog that allows the player to add and remove factions from the list of playable factions
+            LifePathFactionPicker picker = new LifePathFactionPicker(factions, gameYear);
+            factions.clear();
+            factions.addAll(picker.getSelectedFactions());
 
             RequirementsTabStorage storage = getRequirementsTabStorage(gameYear, factions, lifePaths, categories,
                   attributes, traits, skills, abilities);
