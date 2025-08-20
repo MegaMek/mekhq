@@ -33,6 +33,7 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
+import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
@@ -52,6 +53,10 @@ import mekhq.campaign.work.IAcquisitionWork;
  * and so we have to be more careful in its design
  */
 public class ProcurementTableModel extends DataTableModel {
+    private static final DecimalFormat FORMATTER = new DecimalFormat();
+    static {
+        FORMATTER.setMaximumFractionDigits(3);
+    }
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -135,7 +140,7 @@ public class ProcurementTableModel extends DataTableModel {
                 final int days = shoppingItem.getDaysToWait();
                 return String.format("%d %s", days, resources.getString((days == 1) ? "Day.text" : "Days.text"));
             case COL_QUEUE:
-                return shoppingItem.getQuantity();
+                return String.format("%s [+%s]", FORMATTER.format(shoppingItem.getQuantity()), FORMATTER.format(shoppingItem.getTotalQuantity()));
             default:
                 return "?";
 

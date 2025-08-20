@@ -3152,10 +3152,10 @@ public class Campaign implements ITechManager {
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
-                partInUse.setPlannedCount(partInUse.getPlannedCount() +
-                                                getQuantity((maybePart instanceof MissingPart) ?
-                                                                  ((MissingPart) maybePart).getNewPart() :
-                                                                  (Part) maybePart) * maybePart.getQuantity());
+                Part newPart = (maybePart instanceof MissingPart) ?
+                                        (((MissingPart) maybePart).getNewPart())
+                                        : (Part) maybePart;
+                partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
             }
         }
     }
@@ -3249,11 +3249,10 @@ public class Campaign implements ITechManager {
                 }
                 inUse.put(partInUse, partInUse);
             }
-            partInUse.setPlannedCount(partInUse.getPlannedCount() +
-                                            getQuantity((maybePart instanceof MissingPart) ?
-                                                              ((MissingPart) maybePart).getNewPart() :
-                                                              (Part) maybePart) * maybePart.getQuantity());
-
+            Part newPart = (maybePart instanceof MissingPart) ?
+                    (((MissingPart) maybePart).getNewPart())
+                    : (Part) maybePart;
+            partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
         }
         return inUse.keySet()
                      .stream()
@@ -9686,21 +9685,9 @@ public class Campaign implements ITechManager {
             }
             if (part.isSamePartType(p)) {
                 if (p.isPresent()) {
-                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
-                        nSupply += ((Armor) p).getAmount();
-                    } else if (p instanceof AmmoStorage) {
-                        nSupply += ((AmmoStorage) p).getShots();
-                    } else {
-                        nSupply += p.getQuantity();
-                    }
+                    nSupply += p.getTotalQuantity();
                 } else {
-                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
-                        nTransit += ((Armor) p).getAmount();
-                    } else if (p instanceof AmmoStorage) {
-                        nTransit += ((AmmoStorage) p).getShots();
-                    } else {
-                        nTransit += p.getQuantity();
-                    }
+                    nTransit += p.getTotalQuantity();
                 }
             }
         }
@@ -9711,13 +9698,7 @@ public class Campaign implements ITechManager {
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
-            if (onOrder instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
-                nOrdered += ((Armor) onOrder).getAmount() * ((Armor) onOrder).getQuantity();
-            } else if (onOrder instanceof AmmoStorage) {
-                nOrdered += ((AmmoStorage) onOrder).getShots();
-            } else {
-                nOrdered += onOrder.getQuantity();
-            }
+            nOrdered += onOrder.getTotalQuantity();
         }
 
         inventory.setOrdered(nOrdered);

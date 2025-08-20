@@ -443,5 +443,4 @@ public class PartsInUseTableModel extends DataTableModel {
             super.setValueAt(value, rowIndex, columnIndex);
         }
     }
-
 }
