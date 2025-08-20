@@ -36,6 +36,7 @@ import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -202,30 +203,48 @@ public class LifePathSkillPicker extends JDialog {
 
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
-        FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.combat.label"), pnlCombatSkills);
+        if (!combatSkills.isEmpty()) {
+            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills);
+            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.combat.label"),
+                  pnlCombatSkills);
+        }
 
-        FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"), pnlSupportSkills);
+        if (!supportSkills.isEmpty()) {
+            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills);
+            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"),
+                  pnlSupportSkills);
+        }
 
-        FastJScrollPane pnlRoleplaySkills1 = getSkillOptions(roleplaySkills1);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.1"),
-              pnlRoleplaySkills1);
+        if (!roleplaySkills1.isEmpty()) {
+            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1));
+        }
 
-        FastJScrollPane pnlRoleplaySkills2 = getSkillOptions(roleplaySkills2);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.2"),
-              pnlRoleplaySkills2);
+        if (!roleplaySkills2.isEmpty()) {
+            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2));
+        }
 
-        FastJScrollPane pnlRoleplaySkills3 = getSkillOptions(roleplaySkills3);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.3"),
-              pnlRoleplaySkills3);
+        if (!roleplaySkills3.isEmpty()) {
+            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3));
+        }
 
-        FastJScrollPane pnlRoleplaySkills4 = getSkillOptions(roleplaySkills4);
-        optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label.4"),
-              pnlRoleplaySkills4);
+        if (!roleplaySkills4.isEmpty()) {
+            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4));
+        }
 
         pnlOptions.add(optionPane);
         return pnlOptions;
+    }
+
+    private static void buildTab(List<SkillType> skills, EnhancedTabbedPane optionPane,
+          FastJScrollPane pnlOptions) {
+        String firstName = skills.get(0).getName();
+        String lastName = skills.get(skills.size() - 1).getName();
+
+        char firstLetter = firstName.isEmpty() ? '\0' : firstName.charAt(0);
+        char lastLetter = lastName.isEmpty() ? '\0' : lastName.charAt(0);
+
+        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label", firstLetter,
+              lastLetter), pnlOptions);
     }
 
     private FastJScrollPane getSkillOptions(List<SkillType> skills) {
