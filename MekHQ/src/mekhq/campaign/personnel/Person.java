@@ -79,7 +79,8 @@ import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.TargetRollModifier;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
@@ -4824,7 +4825,7 @@ public class Person {
      * <p>If the skill does not exist, the method calculates the cost using the default cost for the skill type at
      * level 0.</p>
      *
-     * @param skillName    the name of the skill for which to calculate the improvement cost.
+     * @param skillName the name of the skill for which to calculate the improvement cost.
      *
      * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
      *       0 if the specified skill does not currently exist.
@@ -5139,6 +5140,7 @@ public class Person {
      * modes), conventional fighter, small craft, jumpship, aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
      * @param entity the entity to check for piloting/driving capability. If {@code null}, returns {@code false}.
+     *
      * @return {@code true} if the user is qualified to pilot or drive the specified entity; {@code false} otherwise
      */
     public boolean canDrive(final Entity entity) {
@@ -5184,7 +5186,9 @@ public class Person {
      * aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
      * @param entity the entity to check for gunnery capability. If {@code null}, returns {@code false}.
-     * @return {@code true} if the user is qualified to operate the weapons of the specified entity; {@code false} otherwise
+     *
+     * @return {@code true} if the user is qualified to operate the weapons of the specified entity; {@code false}
+     *       otherwise
      */
     public boolean canGun(final Entity entity) {
         if (entity == null) {
@@ -5218,10 +5222,11 @@ public class Person {
      * Determines if the user holds the necessary technical skills to service or repair the specified entity.
      *
      * <p>The method inspects the entity type and checks for the corresponding technical skills required to perform
-     * maintenance or repairs. Supported types include Mek, ProtoMek, dropship, jumpship, aerospace unit, battle
-     * armor, and tank.</p>
+     * maintenance or repairs. Supported types include Mek, ProtoMek, dropship, jumpship, aerospace unit, battle armor,
+     * and tank.</p>
      *
      * @param entity the entity to assess for technical capability. If {@code null}, returns {@code false}.
+     *
      * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
      */
     public boolean canTech(final Entity entity) {
@@ -6552,7 +6557,7 @@ public class Person {
 
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
-        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
+        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOX_SET) {
             originalUnitTech = TECH_IS2;
         } else {
             originalUnitTech = TECH_IS1;
@@ -6970,8 +6975,8 @@ public class Person {
      * Generates alternative personality traits and applies them to the stored split personality profile.
      *
      * <p>Traits are randomly selected from {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social},
-     * with potential for up to four traits total. Additional characteristics such as a {@link PersonalityQuirk}
-     * traits are randomly determined and stored.</p>
+     * with potential for up to four traits total. Additional characteristics such as a {@link PersonalityQuirk} traits
+     * are randomly determined and stored.</p>
      *
      * @author Illiani
      * @see PersonalityController#generatePersonality(Person)

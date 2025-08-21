@@ -679,7 +679,7 @@ public class RetirementDefectionDialog extends JDialog {
             retVal++;
         }
 
-        if ((u.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
+        if ((u.getEntity().getTechLevel() > TechConstants.T_INTRO_BOX_SET)) {
             retVal++;
         }
 

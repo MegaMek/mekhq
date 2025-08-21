@@ -180,7 +180,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Entity mockWaspE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockWaspE).getMovementMode();
         doReturn(mockWaspE).when(mockWasp).getEntity();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockWaspE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockWaspE).getTechLevel();
         doReturn(20.0).when(mockWaspE).getWeight();
         Person waspPilot = mock(Person.class);
         mockPersonnelList.add(waspPilot);
@@ -193,7 +193,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockStinger = mock(Unit.class);
         Entity mockStingerE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockStingerE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockStingerE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockStingerE).getTechLevel();
         doReturn(20.0).when(mockStingerE).getWeight();
         doReturn(mockStingerE).when(mockStinger).getEntity();
         Person stingerPilot = mock(Person.class);
@@ -225,7 +225,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Entity mockShrekE = mock(Tank.class);
         doReturn(EntityMovementMode.TRACKED).when(mockShrekE).getMovementMode();
         doReturn(80.0).when(mockShrekE).getWeight();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockShrekE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockShrekE).getTechLevel();
         doReturn(mockShrekE).when(mockShrek).getEntity();
         Person shrekCommander = mock(Person.class);
         mockPersonnelList.add(shrekCommander);
@@ -239,7 +239,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Entity mockShrek2E = mock(Tank.class);
         doReturn(EntityMovementMode.TRACKED).when(mockShrek2E).getMovementMode();
         doReturn(80.0).when(mockShrek2E).getWeight();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockShrek2E).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockShrek2E).getTechLevel();
         doReturn(mockShrek2E).when(mockShrek2).getEntity();
         Person shrek2Commander = mock(Person.class);
         mockPersonnelList.add(shrek2Commander);
@@ -280,7 +280,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockLightning = mock(Unit.class);
         Entity mockLightingE = mock(Aero.class);
         doReturn(EntityMovementMode.AEROSPACE).when(mockLightingE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockLightingE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockLightingE).getTechLevel();
         doReturn(50.0).when(mockLightingE).getWeight();
         doReturn(mockLightingE).when(mockLightning).getEntity();
         Person lightningPilot = mock(Person.class);
@@ -294,7 +294,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockLightning2 = mock(Unit.class);
         Entity mockLighting2E = mock(Aero.class);
         doReturn(EntityMovementMode.AEROSPACE).when(mockLighting2E).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockLighting2E).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockLighting2E).getTechLevel();
         doReturn(50.0).when(mockLighting2E).getWeight();
         doReturn(mockLighting2E).when(mockLightning2).getEntity();
         Person lightning2Pilot = mock(Person.class);
@@ -308,7 +308,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockUnion = mock(Unit.class);
         Entity mockUnionE = mock(Dropship.class);
         doReturn(EntityMovementMode.SPHEROID).when(mockUnionE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockUnionE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockUnionE).getTechLevel();
         doReturn(3600.0).when(mockUnionE).getWeight();
         doReturn(mockUnionE).when(mockUnion).getEntity();
         Person unionCommander = mock(Person.class);
@@ -326,7 +326,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockInvader = mock(Unit.class);
         Entity mockInvaderE = mock(Jumpship.class);
         doReturn(EntityMovementMode.AEROSPACE).when(mockLightingE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockInvaderE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockInvaderE).getTechLevel();
         doReturn(152000.0).when(mockInvaderE).getWeight();
         doReturn(mockInvaderE).when(mockInvader).getEntity();
         Person invaderCommander = mock(Person.class);

@@ -47,10 +47,10 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import megamek.common.TechConstants;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
@@ -154,7 +154,7 @@ public class PersonTest {
 
         Entity is1Entity = mock(Entity.class);
         when(is1Entity.isClan()).thenReturn(false);
-        when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOXSET);
+        when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOX_SET);
         when(is1Entity.getWeightClass()).thenReturn(is1WeightClass);
         when(is1.getEntity()).thenReturn(is1Entity);
 

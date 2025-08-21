@@ -953,7 +953,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
                 if (unit.getEntity().isClan()) {
                     choiceUnitTech.setSelectedIndex(2);
-                } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
+                } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOX_SET) {
                     choiceUnitTech.setSelectedIndex(1);
                 } else {
                     choiceUnitTech.setSelectedIndex(0);

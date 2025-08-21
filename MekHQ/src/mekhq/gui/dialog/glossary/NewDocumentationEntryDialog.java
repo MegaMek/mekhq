@@ -54,7 +54,7 @@ import javax.swing.event.HyperlinkEvent;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.EnhancedTabbedPane;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
