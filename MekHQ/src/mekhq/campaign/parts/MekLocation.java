@@ -54,8 +54,8 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.Structure;
-import megamek.common.verifier.TestEntity.Ceil;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -200,7 +200,7 @@ public class MekLocation extends Part {
 
         double tonnage = Structure.getWeightStructure(structureType,
               getUnitTonnage(),
-              Ceil.HALFTON,
+              Ceil.HALF_TON,
               (getUnitTonnage() > 100),
               movementMode);
 

@@ -56,6 +56,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.attacks.InfantryAttack;
@@ -205,10 +206,10 @@ public class PartsStore {
                             double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
                             double minweight = weight * 0.5;
                             minweight = Math.ceil(
-                                  (TestEntity.ceilMaxHalf(minweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
+                                  (TestEntity.ceilMaxHalf(minweight, Ceil.HALF_TON) / 10.0) * 2.0) / 2.0;
                             double maxweight = weight * 2.0;
                             maxweight = Math.ceil(
-                                  (TestEntity.ceilMaxHalf(maxweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
+                                  (TestEntity.ceilMaxHalf(maxweight, Ceil.HALF_TON) / 10.0) * 2.0) / 2.0;
                             if (eton < minweight || eton > maxweight) {
                                 continue;
                             }
@@ -333,11 +334,11 @@ public class PartsStore {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        return TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        return TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
     }
 
     private void stockEngines(Campaign c) {

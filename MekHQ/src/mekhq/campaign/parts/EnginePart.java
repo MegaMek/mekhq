@@ -46,6 +46,7 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -121,15 +122,15 @@ public class EnginePart extends Part {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
 
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5;
         }
-        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         // hover have a minimum weight of 20%
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, Ceil.HALF_TON), toReturn);
         }
         return toReturn;
     }
