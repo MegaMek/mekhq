@@ -60,7 +60,7 @@ import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.attacks.InfantryAttack;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

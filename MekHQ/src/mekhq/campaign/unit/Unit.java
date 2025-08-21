@@ -93,7 +93,7 @@ import megamek.common.units.*;
 import megamek.common.units.CrewType;
 import megamek.common.util.C3Util;
 import megamek.common.weapons.attacks.InfantryAttack;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;

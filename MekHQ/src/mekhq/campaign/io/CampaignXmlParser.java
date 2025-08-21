@@ -75,7 +75,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
