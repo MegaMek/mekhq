@@ -161,23 +161,23 @@ public class SocioIndustrialData {
         switch (rawMaterials) {
             case A:
                 sb.append(
-                      "A: Fully self-sufficient. System produces all needed raw materials and may export in large quantities.<br>");
+                      "A: Fully self-sufficient. SystemFluff produces all needed raw materials and may export in large quantities.<br>");
                 break;
             case B:
                 sb.append(
-                      "B: Mostly self-sufficient. System produces all needed raw materials and may export a small surplus.<br>");
+                      "B: Mostly self-sufficient. SystemFluff produces all needed raw materials and may export a small surplus.<br>");
                 break;
             case C:
                 sb.append(
-                      "C: Self-sustaining. System produces some of its needed raw materials and imports the rest.<br>");
+                      "C: Self-sustaining. SystemFluff produces some of its needed raw materials and imports the rest.<br>");
                 break;
             case D:
                 sb.append(
-                      "D: Dependent. System is poor in raw materials and must import most of its material needs.<br>");
+                      "D: Dependent. SystemFluff is poor in raw materials and must import most of its material needs.<br>");
                 break;
             case F:
                 sb.append(
-                      "F: Heavy dependent. System utterly reliant on imported materials to maintain industry and population.<br>");
+                      "F: Heavy dependent. SystemFluff utterly reliant on imported materials to maintain industry and population.<br>");
                 break;
         }
 

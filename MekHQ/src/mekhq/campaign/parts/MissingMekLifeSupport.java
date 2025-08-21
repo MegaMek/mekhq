@@ -52,7 +52,7 @@ public class MissingMekLifeSupport extends MissingPart {
 
     public MissingMekLifeSupport(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Mek Life Support System";
+        this.name = "Mek Life Support SystemFluff";
     }
 
     @Override

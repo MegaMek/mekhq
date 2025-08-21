@@ -35,12 +35,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.utilities.MHQXMLUtility;
@@ -60,7 +60,7 @@ public class MissingFireControlSystem extends MissingPart {
     public MissingFireControlSystem(int tonnage, Money cost, Campaign c) {
         super(0, c);
         this.cost = cost;
-        this.name = "Fire Control System";
+        this.name = "Fire Control SystemFluff";
     }
 
     @Override

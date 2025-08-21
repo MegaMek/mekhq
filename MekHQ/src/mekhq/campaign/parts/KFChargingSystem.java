@@ -91,7 +91,7 @@ public class KFChargingSystem extends Part {
         super(tonnage, c);
         this.coreType = coreType;
         this.docks = docks;
-        this.name = "K-F Charging System";
+        this.name = "K-F Charging SystemFluff";
         this.unitTonnageMatters = true;
     }
 
@@ -199,7 +199,7 @@ public class KFChargingSystem extends Part {
     public @Nullable String checkFixable() {
         if (isSalvaging()) {
             // Can't salvage this part of the K-F Drive.
-            return "You cannot salvage a K-F Charging System. You must scrap it instead.";
+            return "You cannot salvage a K-F Charging SystemFluff. You must scrap it instead.";
         }
         return null;
     }

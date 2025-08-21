@@ -188,7 +188,7 @@ public class CombatInformationCenter extends Part {
     public void calculateCost() {
         if (null != unit) {
             // There's more to CIC than just Fire Control
-            // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
+            // Use Bridge + Computer + FC Computer + Gunnery Control SystemFluff costs, p158 SO.
             cost = Money.of(200000 +
                                   (10 * unit.getEntity().getWeight()) +
                                   200000 +

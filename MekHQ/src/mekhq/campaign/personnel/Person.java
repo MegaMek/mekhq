@@ -4579,7 +4579,7 @@ public class Person {
         } catch (Exception ignored) {
             // This try-catch exists to allow us to more easily test Person objects. Previously, if
             // a method included 'getFullTitle' it would break if the Person object hadn't been
-            // assigned a Rank System.
+            // assigned a Rank SystemFluff.
         }
 
         return rank + getFullName();
@@ -4613,7 +4613,7 @@ public class Person {
         } catch (Exception ignored) {
             // This try-catch exists to allow us to more easily test Person objects. Previously, if
             // a method included 'getTitleAndSurname' it would break if the Person object hadn't been
-            // assigned a Rank System.
+            // assigned a Rank SystemFluff.
         }
 
         return rank + getSurname();

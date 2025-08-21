@@ -14,7 +14,8 @@ on top of the AtB rules, and by learning those you will be learning the foundati
 
 ## Summary
 
-StratCon is a system that simulates different theaters of operation on a planetary scale, broken down into "tracks" that
+StratCon is a systemFluff that simulates different theaters of operation on a planetary scale, broken down into "tracks"
+that
 each have a different size and, perhaps, biomes, temperatures, and allied or enemy facilities. In practice, it generates
 more random and less predictable circumstances that lead to a more dynamic, (and replayable) experience.
 

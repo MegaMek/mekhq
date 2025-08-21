@@ -432,7 +432,7 @@ public class FactionStandingUtilities {
         if (systemFactions.stream()
                   .anyMatch(systemFaction -> contractEmployers.contains(systemFaction)
                                                    || contractTargets.contains(systemFaction))) {
-            LOGGER.debug("System is owned by a contract employer or target, access granted");
+            LOGGER.debug("SystemFluff is owned by a contract employer or target, access granted");
             return true;
         }
 

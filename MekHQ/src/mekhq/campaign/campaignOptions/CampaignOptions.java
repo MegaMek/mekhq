@@ -546,8 +546,8 @@ public class CampaignOptions {
     private final int[] phenotypeProbabilities;
     // endregion Skill Randomization Tab
 
-    // region Rank System Tab
-    // endregion Rank System Tab
+    // region Rank SystemFluff Tab
+    // endregion Rank SystemFluff Tab
 
     // region Name and Portrait Generation
     private boolean useOriginFactionForNames;
@@ -1177,8 +1177,8 @@ public class CampaignOptions {
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
         // endregion Skill Randomization Tab
 
-        // region Rank System Tab
-        // endregion Rank System Tab
+        // region Rank SystemFluff Tab
+        // endregion Rank SystemFluff Tab
 
         // region Name and Portrait Generation Tab
         useOriginFactionForNames = true;

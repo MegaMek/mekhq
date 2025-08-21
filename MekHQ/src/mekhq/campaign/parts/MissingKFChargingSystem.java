@@ -34,9 +34,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.units.Jumpship;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -68,7 +68,7 @@ public class MissingKFChargingSystem extends MissingPart {
         super(0, c);
         this.coreType = coreType;
         this.docks = docks;
-        this.name = "K-F Charging System";
+        this.name = "K-F Charging SystemFluff";
         this.unitTonnageMatters = true;
     }
 

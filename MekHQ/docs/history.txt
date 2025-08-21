@@ -498,7 +498,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 + PR #6013: Refactored Random Dependents Removal-Addition into a Seperate Class
 + PR #6028: Cache finances balance
 + PR #6029: Linked scenario unit selection
-+ PR #6031: Convert planetary system data to yaml + general planetary system overhaul
++ PR #6031: Convert planetary systemFluff data to yaml + general planetary systemFluff overhaul
 + Fix #6025: Young Wolves Storyarc doesn't correctly assign main character or Tobias to the Mechwarrior Trueborn Caste
 + PR #6051: Read user force icons data from user directory
 + Fix #6033: RFE - MekHQ to MM trailer support
@@ -1046,7 +1046,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 + FIX #4784: Refactored Personnel Filtering and Added Last Mission Date Check
 + FIX #4787: Updated Prisoner Defection Base TN
 + PR #4792: Sell Parts from Parts in Use Dialog
-+ FIX #4765: Fix error in camlann system faction ownership
++ FIX #4765: Fix error in camlann systemFluff faction ownership
 + FIX #4789: Remove untreated personnel nag for prisoner-defectors and add unit tests
 + FIX #4790: Fix Mission XP Reward Setting
 + FIX #4803, #4802: Corrected Experience Rating Calculation in Reputation
@@ -1258,7 +1258,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 + PR #4409: Refactored Kill Count and Personnel Filtering Methods
 + PR #4418: Added SuperStucco's Basic Force Generator Role Functionality to Scenario Random Unit Generation
 + PR #4411: Education tool tip no longer references "weeks" to avoid confusion
-+ PR #4414: Detailed medical system properly marked as unofficial
++ PR #4414: Detailed medical systemFluff properly marked as unofficial
 + PR #4419: Multiple typo fixes in news and "canned" campaigns
 + PR #4413: Decoupled Prisoner Capture & Defection from AtB, Updated Mechanics, & Added Supporting Documentation
 + PR #4415: Refactored Award Tier Count Calculation in PersonViewPanel
@@ -2105,7 +2105,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 + PR #2284: MHQ Options: Adding Colours Customizability
 + Issue #2491: Allow extra time for maintenance per StratOps/New CamOps repair/maintenance rules.
 + Issue #2661: Can no longer select the same unit across multiple selectors in StratCon scenario management UI.
-+ Issue #2548: Making ROM Designation and Manei Domini Class and Rank part of the rank system data
++ Issue #2548: Making ROM Designation and Manei Domini Class and Rank part of the rank systemFluff data
 + Issue #2529: Fixing refit display so it no longer includes the pilot's BV
 + PR #2678: Adding Personnel Tab Grouping and Filter Tool Tips
 + PR #2540: Factions Data Customizability Expansion and Cleanup
@@ -2450,7 +2450,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 + PR #1850: Phenotype Rework Implementing Vehicle, ProtoMech, and Naval Phenotypes
 + PR #1669: Implementing the MegaMek Unit Selector in MekHQ
 + Issue #198: Adding Ransom Mech and Ransom Prisoner Options for Scenario Resolution
-+ Issue #1881: Outer planets in Weldry system can now be clicked
++ Issue #1881: Outer planets in Weldry systemFluff can now be clicked
 + Issues #1569 and #1570 Phase 1: Genealogy
 + PR #1857: Personnel biographical view and last name simplification
 
@@ -2472,7 +2472,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 + Issue #1740: Adding Unit::isPresent check for FMMR Unit Rating
 + PR #1750: Fixing LogEntryController Typo
 + Issues #1735, #1736, #1737: Fixing how units are edited in Scenario Resolution Wizard
-+ Issue #1753: Fixed advance day NPE related to contract start date extension when player is in-system but still in transit
++ Issue #1753: Fixed advance day NPE related to contract start date extension when player is in-systemFluff but still in transit
 + Issue #1733: Adding Scenario Resolution Wizard and MUL Selection Dialog Mnemonics
 + PR #1762: Advance Days: Increasing Day Count Limit and Adding Advance to Next Year
 + Issue #1662 and 2/3rds of Issue #347: Remember Layered Force Icon Setup
@@ -2533,7 +2533,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
-+ Issue #1261: RFE: In Contract Market, hyperlink the system/location to the Interstellar Map
++ Issue #1261: RFE: In Contract Market, hyperlink the systemFluff/location to the Interstellar Map
 + Issue #1090: Feature Request: Add Origin Faction to Fluff Information display of Personnel
 + Issue #1476: Settings in portrait generation is not saved.
 + Issue #1385: Add dark themes to MekHQ.
@@ -2595,7 +2595,7 @@ v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1306: Commander skill level bonuses are now applied in rating calculations
 + Issue #1370: Unit Rating FM:M(r): 0 dividends now produce 100% fulfilled need instead of 0% fulfilled need
 + Issue #1374: Unit Rating: Small Craft Bay can now store Fighters
-+ PR #1379: Feature: Adds hyperlink from origin system on personnel panel to the map panel
++ PR #1379: Feature: Adds hyperlink from origin systemFluff on personnel panel to the map panel
 + PR #1382: Speed up Advance Day using profiling data
 + PR #1387: Include Super Heavy Vehicle Bays in Unit Rating/Reputation
 + Issue #1390: Bug: fix XML parsing failure when putting customs in .cnpx that have ampersands (etc)
@@ -2645,14 +2645,14 @@ v0.47.1 (2019-11-05 0300 UTC)
 + PR #1294: Improve ammo swaps and refits of Large Craft ammo bins
 + PR #1298: Restructuring of person view panel, double scroll issue, and other scrolling issues
 + PR #1300: Markdown for descriptions
-+ PR #1280: planetary system refactor
++ PR #1280: planetary systemFluff refactor
 + PR #1305: Mac OSX key bindings on non-standard look and feel
 + PR #1304: Markdown Editor
 + PR #1303: Various GUI fixes
 + Issue #1290: Fixes for issues with campaign subset export.
 + PR #1309: Planetary System Map
 + PR #1314: a few map fixes
-+ PR #1286,1307: Scenario Objectives - explicit objective management system for legacy AtB scenarios;
++ PR #1286,1307: Scenario Objectives - explicit objective management systemFluff for legacy AtB scenarios;
     Ability to define objectives for scenario templates.
 + PR #1317: fix NPE that halts new day processing while applying training XP
 + PR #1318: player units given to other players now properly return to the campaign during scenario resolution.
@@ -2760,7 +2760,7 @@ v0.45.3 (2019-02-12 0500 UTC)
 + Issue #361: Adds assigned Force to the columns on the hangar tab
 
 v0.45.2 (2018-11-18 0200 UTC)
-+ Switched build system from ant to gradle.
++ Switched build systemFluff from ant to gradle.
 + Issue #917: Hire Full Compliment Regularly Hires Bondsmen
 + Issue #919: Dropship Crewmembers/techs displayed as "Nobody" In Repair Bay
 + Issue #860, #911: Remove unusable units after multi-day or mass repairs.
@@ -2771,7 +2771,7 @@ v0.45.2 (2018-11-18 0200 UTC)
 + Issue #946: Some personnel (techs and admins) no longer able to be right clicked.
 + Issue #856: Invalid AtB required lances number no longer prevents user from editing contract
 + Planets: Added additional data to planets.xml
-+ PR #956: System-wide equipment [Aerospace system equipment not associated with weapons shows in a fuselage
++ PR #956: System-wide equipment [Aerospace systemFluff equipment not associated with weapons shows in a fuselage
            or hull location when filtering by location in repair tab].
 + Issue #852: Support for Award clusters if an award is given multiple times to a person.
 + Issue #905: Fixes NPE when a spouse is missing on campaign load or personnel menu click.
@@ -2828,9 +2828,9 @@ v0.45.0 (2018-08-02 0200 UTC)
 + PR #762: Help -> About popup now contains link to MegaMek github home page.
 + PR #777: Addresses issue #776, by allowing the user to order up to a 1000 of some part or personnel class at a time, up from 100 previously.
 + PR #787: Adds total value for parts and fixes issue with net worth calculation for parts
-+ Show java version and system info in log file.
++ Show java version and systemFluff info in log file.
 + PR #640: [Feature] Experimental aerospace equipment damage and repair times errata (aerospace equipment is damaged based on how many hits it has taken and repairs don't take an order of magnitude longer than mech equipment repairs)
-+ PR #758: Start of MekHQ plugin system
++ PR #758: Start of MekHQ plugin systemFluff
         Currently includes support for external plugin for alternate personnel market methods.
         See documentation in docs/plugins.txt.
 + PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
@@ -3087,7 +3087,7 @@ v0.43.2 (2017-05-1 22:00 UTC)
     purchased to give the bearer the same skill level with clan technology ad a
     freeborn clan tech. This required implementing 99% of the code to
     support custom SPAs that affect MHQ rather than MM. The rest will
-    come in once a plugin system is implemented.
+    come in once a plugin systemFluff is implemented.
 + Updated MegaMek.jar to 0.43.2
 + Updated MegaMekLab.jar to 0.43.2
 
@@ -3467,7 +3467,7 @@ v0.3.16 (2015-08-15 19:40 UTC)
 + Bug: quad protos getting arm parts
 + Bug: engine-less protos still have running MP
 + Bug: updateConditions in ProtomekLocation not critting/uncritting things correctly
-+ Bug [#902]: Tank and Aero system parts not getting check for destruction
++ Bug [#902]: Tank and Aero systemFluff parts not getting check for destruction
 + Moved all equipment checks for destruction into Part.updateConditionFromEntity
 + removed time and difficulty variables from Part, now tracked by specific methods in each part,
     no need to always updateConditionFromEntity to switch
@@ -3745,7 +3745,7 @@ v0.3.6 (2014-12-02)
 + Bug [#380]: Aerospace Fuel Refueling
 + Bug [#488]: Activation of mothballed unit...
 + Data: Updated all campaigns to be fully compatible with 0.3.6
-+ Bug: By person rank system option not showing up on the menu for campaigns with WoB as the default system
++ Bug: By person rank systemFluff option not showing up on the menu for campaigns with WoB as the default systemFluff
 + Feature: Added in ComStar/WoB Branch Designations (WIP)
 + Data: Updated the WoB campaign file with more information
 + Fix infinite loop in AbstractUnitRating that prevents launching MHQ when loading a campaign file.
@@ -3948,7 +3948,7 @@ v0.3.4 (2014-04-26)
   This is a very basic implementation for now. Only contains a dice roller.
   Dialog is non-modal, so you can open it and continue to interact with the
   main GUI.
-+ Bug: No revision detection in Version.java meaning no revision check for new rank system
++ Bug: No revision detection in Version.java meaning no revision check for new rank systemFluff
   to be compatible with revision based releases
 + Bug: Personnel Market always empty after TableModel change
 + Bug [#412]: Support Ratings - Field Manual Mercs (rev) fixed.  Interstellar Ops Reputation coming soon.
@@ -3979,7 +3979,7 @@ v0.3.4 (2014-04-26)
 + Pulled MegaMek and MegaMekLab versions into MekHQ's About Box
 + Started a new doc file containing a full MekHQ Tutorial (Tutorial is still a work in progress)
 + Bug: Callsign not showing
-+ Bug: Prisoner/Bondsman not working correctly since new rank system introduced
++ Bug: Prisoner/Bondsman not working correctly since new rank systemFluff introduced
 + New MM.jar
 + Compatibility with new MM.jar
 + New MM.jar - again (for XMLStreamParser fix)
@@ -4077,7 +4077,7 @@ v0.3.4 (2014-04-26)
     complete them. No longer will you need to manually start the repairs.
 + Feature: Adjusted the campaign.newDay() repair code again from bug #464 in order to allow manual prioritization of the repairs
     When you first resolve you can manually start a repair. That repair will be prioritized as first. Each time a component completes,
-    you can manually start another to have it be the next, or let the rest be handled by the auto-system
+    you can manually start another to have it be the next, or let the rest be handled by the auto-systemFluff
 + Updated MegaMek.jar and MegaMekLab.jar and the mechfiles zip files
 + Bug [#465]: Salary: Set salary no reversible
 + Bug [#461]: Using Heavy Vehicle Bays for Light Vehicles
@@ -4107,24 +4107,24 @@ v0.3.4 (2014-04-26)
     planets.xml file, and also an in game editor from the maps tab to allow for campaign level editing
     of the controlling factions and such as well.
 + RFE [#118]: Sub Rank Fields & Ranks by Profession - pt2
-    Completed the rank system overhaul. The rank levels (For ComStar/WoB to get Precentor IV and such)
+    Completed the rank systemFluff overhaul. The rank levels (For ComStar/WoB to get Precentor IV and such)
     will be implemented separately once I decide how I want to add them.
 + Bug: NPE in CampaignGUI.refreshPatients() if patient is null and/or doctor ID is null
 + New MegaMek.jar r10732 & new MegaMekLab.jar 1406
-+ Bug: New rank system not translating due to static defines used as constants changing order
++ Bug: New rank systemFluff not translating due to static defines used as constants changing order
 + Implemented new Version.versionCompare() method, with several overloads including both static and non-static versions
-+ Bug: New rank system was still writing out ranks for the stock systems. As these systems are no longer editable, we don't need to do this
++ Bug: New rank systemFluff was still writing out ranks for the stock systems. As these systems are no longer editable, we don't need to do this
 + Bug: When editing ranks, it should automatically change the ranks dropdown to Custom and the canon ranks should not be editable
 + Data: Added more canon rank systems (Several periphery realms and the FRR)
 + RFE: Added rank levels
-+ RFE: Added the ability for a person to have a personal rank system
++ RFE: Added the ability for a person to have a personal rank systemFluff
 + RFE: Manei Domini classes
 + Refactored the included campaigns & saved the Fox's Teeth from the current version since it was very out of date
 + Bug [#482]: Crash in loading salvage mul file with Tank pilots
 + New MegaMek.jar 0.37.10-dev-r10759 & new MegaMekLab.jar 0.1.27-dev-r1408 (Both updated for bug below)
 + Bug: All units receiving an "empty" (default Blue) individual camo - This was due to a bug in MegaMek actually
 + Bug: Rank type choice not loading correctly from the campaign file
-+ Bug: Dialog for choosing proper rank system is displaying twice
++ Bug: Dialog for choosing proper rank systemFluff is displaying twice
     This was due to processInfoNode() being called twice when loading the campaign file;
     which is not necessary. This was probably an oversight. The second loading is now commented out
 + Bug: Most professions could not change their rank due to a missing ranks.isEmptyProfession() check
@@ -4304,7 +4304,7 @@ v0.3.1 (2013-09-5)
 + Bug: Windows version won't work when using "Start Game" from inside MekHQ
 + Bug: ProtoMech and Battle Armor "Armor" fixes for missing "instance of ..." in a lot of places.
 + Bug: Import Personnel adds twice & NPE when importing Personnel
-+ Bug: Ghost Patients (doctor ID not correctly set to NULL when healed using injury system)
++ Bug: Ghost Patients (doctor ID not correctly set to NULL when healed using injury systemFluff)
 + Bug: Edit Injury dialog not sized correctly for the column widths
 + Bug: Random Xp Option not visible
 + Bug: Resolution IndexOutOfBoundsException error
@@ -4531,7 +4531,7 @@ v0.1.21 (2013-02-07)
 + Bug 296: Targeting Computer's weight tracked incorrectly
 + Planetary update 34
 + Bug 289: NPE on invalid location of Artemis IV FCS
-+ Bug 287: Campaigns not saving tank motive system and engine hits
++ Bug 287: Campaigns not saving tank motive systemFluff and engine hits
 + Bug 285: File not loading; Error refers back to Log file. (xml character escaping for equipment names)
 + Bug: NPE for contract dates
 + Bug 295: Mech Salvage selection bug after battle
@@ -4835,7 +4835,7 @@ v0.1.13 (2012-01-11)
 + simplified gui code for tech task targets
 + large crafts fix themselves (sort of)
 + Bug 3470457: Negative time destroys Astech mins
-+ Bug 3470662: Actuators listed in system components in warehouse
++ Bug 3470662: Actuators listed in systemFluff components in warehouse
 + Bug 3469248: Mech sensors in warehouse - No Tonnage
 + Bug: aero sensors must be matched to unit tonnage since cost is variable by tonnage
 + Bug 3468357: Setting Edge to Multiple People
@@ -4978,7 +4978,7 @@ v0.1.10 (2011-12-05)
 + improvements to refit/customization process
 + xml load/save for Refit object
 + armor refits processed properly
-+ added system position to planet data
++ added systemFluff position to planet data
 + custom unit info is saved within xml so that cpnx are transportable without accompanying custom data
 + dont remove unit from lab when tech is missing on refit
 + add detail column to parts store
@@ -5092,7 +5092,7 @@ v0.1.9 (2011-07-17)
 + updated unit and image files to current MegaMek status
 + better checking in Person#isTech
 + remove personnel from unit when removed from game
-+ removed repair system option from CampaignOptionDialog (outdated)
++ removed repair systemFluff option from CampaignOptionDialog (outdated)
 + astech overtime
 + Bug: skill min not updating correctly when repairs fail
 + customizable XP cost for skills and abilities campaign options
@@ -5161,7 +5161,7 @@ v0.1.8 (2011-06-13)
 + scenarioXP field in SkillCosts and option in CampaignOptionsDialog
 + apply scenarioXP when resolving scenario
 + BLC for lost units (duh)
-+ better default theming of look and feel by system
++ better default theming of look and feel by systemFluff
 + Bug 3308725: All SPA's broken
 + new MM.jar
 + Bug 3309501: Campaign Loading
@@ -5173,7 +5173,7 @@ v0.1.8 (2011-06-13)
 + avionics part
 + fcs part
 + engine repair/replacement for aeros and vees
-+ motive system part
++ motive systemFluff part
 + vee sensor part
 + vee stabilizer part
 + rotor part
@@ -5183,7 +5183,7 @@ v0.1.8 (2011-06-13)
 + don't allow scrapping of locations that still have stuff on them
 + Bug: no vee stabiliser in the body
 + turret lock "part"
-+ vtol motive system repairs
++ vtol motive systemFluff repairs
 + functional and repairable conditions for aeros
 + aero sensors part
 + landing gear part
@@ -5311,13 +5311,13 @@ v0.1.6 (2011-05-17)
 + removed PersonnelWorkItem, implemented IWork and IMedicalWork interface to handle pilot healing
 + Bug 3299547: Problems w/ loading campagin files (removed dateFormat and simpleDateFormat from XML load and save)
 + star type, recharge time, life form, climate, temperature, and percent water added to Planet
-+ beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
++ beginning of BIG change to repair systemFluff - no more tasks, repairs are performed directly on parts
    don't use this yet, salvage and replacement are not implemented
-+ Mech repairs complete under new system (still need salvage and replacement)
-+ `Mek salvage complete under new system
++ Mech repairs complete under new systemFluff (still need salvage and replacement)
++ `Mek salvage complete under new systemFluff
 + tasktablemouseadapter
-+ MissingPart and MissingMekGyro (beginning of replacements under new system)
-+ Mech replacements complete under new system
++ MissingPart and MissingMekGyro (beginning of replacements under new systemFluff)
++ Mech replacements complete under new systemFluff
 + Bug: repair destroyed `Mek locations
 + added conditional checks for whether repairs, replacements, and salvages can be done
 + when techs are short on time, repairs are made the following day
@@ -5516,7 +5516,7 @@ v0.1.4 (2011-04-28)
 + Bug: not able to hire all types of personnel
 + personnel filter
 + personnel rankings
-+ rank system added to Campaign Options
++ rank systemFluff added to Campaign Options
 + added rank information to XML save and load
 + added ranks for five main factions and clans
 + assigned unit column in personnel tab

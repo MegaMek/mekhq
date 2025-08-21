@@ -37,7 +37,7 @@ Serious previous trauma:
 ### 2.4 Critical Impact (+15% to base mortality)
 Most severe previous trauma:
 - Multiple near-death experiences
-- History of complete system failure
+- History of complete systemFluff failure
 - Multiple major organ repairs
 - Extensive reconstructive surgery
 - Extended life support periods

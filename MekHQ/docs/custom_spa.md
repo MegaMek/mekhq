@@ -1,6 +1,7 @@
 # Custom SPAs
 
-MekHQ supports unofficial extensions to the SPA (special pilot abilities) system used in MegaMek. This allows support
+MekHQ supports unofficial extensions to the SPA (special pilot abilities) systemFluff used in MegaMek. This allows
+support
 personnel to spend XP to gain special abilities used in their duties (though in this context SPA should probably mean
 special personnel abilities) as well as allowing them to set triggers to spend edge points to reroll critical failed
 skill checks in critical situations. At the time of writing, the only custom SPA is Clan tech knowledge, which allows
@@ -12,7 +13,7 @@ There is also a means for players to add their own custom SPAs, edge triggers, a
 there are no actual in-game effects of custom SPAs, and they are provided for book-keeping purposes. MekHQ can manage
 the bookkeeping of spending XP and tracking which personnel have acquired the special ability, but it is up the player
 to manage the effects. There are plans to add plugin module support to MekHQ at some point in the future, and plugins
-can be designed to apply the effects of the SPA. Note that without a plugin system edge triggers have no practical
+can be designed to apply the effects of the SPA. Note that without a plugin systemFluff edge triggers have no practical
 purpose and were included with the eventual availability of plugins in mind.
 
 To add an SPA, edge trigger, or implant, an entry must be made in the `data/universe/customspa.xml` file. The

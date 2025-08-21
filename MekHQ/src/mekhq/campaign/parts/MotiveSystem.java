@@ -63,7 +63,7 @@ public class MotiveSystem extends Part {
 
     public MotiveSystem(int ton, Campaign c) {
         super(ton, c);
-        this.name = "Motive System";
+        this.name = "Motive SystemFluff";
         this.damage = 0;
         this.penalty = 0;
     }

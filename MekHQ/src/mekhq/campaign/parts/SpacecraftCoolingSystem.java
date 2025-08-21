@@ -34,12 +34,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
 import megamek.logging.MMLogger;
@@ -77,7 +77,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     public SpacecraftCoolingSystem(int tonnage, int totalSinks, int sinkType, Campaign c) {
         super(tonnage, c);
-        this.name = "Spacecraft Cooling System";
+        this.name = "Spacecraft Cooling SystemFluff";
         this.totalSinks = totalSinks;
         this.sinkType = sinkType;
         if (sinkType == Aero.HEAT_DOUBLE && unit != null && unit.isClan()) {
@@ -264,7 +264,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public String checkScrappable() {
-        return "Spacecraft Cooling System cannot be scrapped";
+        return "Spacecraft Cooling SystemFluff cannot be scrapped";
     }
 
     @Override
