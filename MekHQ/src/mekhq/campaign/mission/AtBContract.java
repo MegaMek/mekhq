@@ -43,13 +43,13 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static megamek.common.units.UnitType.AEROSPACEFIGHTER;
-import static megamek.common.units.UnitType.MEK;
-import static megamek.common.units.UnitType.TANK;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
+import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
+import static megamek.common.units.UnitType.MEK;
+import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
@@ -103,12 +103,12 @@ import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.units.Entity;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -390,7 +390,7 @@ public class AtBContract extends Contract {
      *       auxiliary role. For each valid combat team, it retrieves the associated force and evaluates all units
      *       within that force. The unit contribution to the total is determined based on its type:
      *       <ul>
-     *       <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for
+     *       <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACE_FIGHTER:</b> Adds 1 for
      *       non-clan factions,
      *       and 0.5 for clan factions.</li>
      *       <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
@@ -809,7 +809,7 @@ public class AtBContract extends Contract {
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACE_FIGHTER);
                 yield false;
             }
             case 6 -> {

@@ -63,9 +63,9 @@ import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.units.Entity;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.TechConstants;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -573,7 +573,7 @@ public class RetirementDefectionDialog extends JDialog {
             //         unassignedMeks.add(u.getId());
             //     }
             // }
-            // if (UnitType.AEROSPACEFIGHTER == u.getEntity().getUnitType()) {
+            // if (UnitType.AEROSPACE_FIGHTER == u.getEntity().getUnitType()) {
             //     if (null == u.getCommander()) {
             //         unassignedASF.add(u.getId());
             //     }
@@ -922,7 +922,7 @@ public class RetirementDefectionDialog extends JDialog {
                     cbUnitCategory.setSelectedIndex(UnitType.VTOL + 1);
                     break;
                 case AEROSPACE_PILOT:
-                    cbUnitCategory.setSelectedIndex(UnitType.AEROSPACEFIGHTER + 1);
+                    cbUnitCategory.setSelectedIndex(UnitType.AEROSPACE_FIGHTER + 1);
                     break;
                 case CONVENTIONAL_AIRCRAFT_PILOT:
                     cbUnitCategory.setSelectedIndex(UnitType.CONV_FIGHTER + 1);

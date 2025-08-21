@@ -61,8 +61,8 @@ public class TransportReport extends AbstractReport {
         int noCF = Math
                          .max(stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) -
                                     stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) -
-                                   stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
+        int noASF = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
+                                   stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int nolv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
                                   stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - stats.getOccupiedBays(Entity.ETYPE_TANK),
@@ -115,7 +115,7 @@ public class TransportReport extends AbstractReport {
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n",
               "ASF Bays (Occupied):",
               stats.getTotalASFBays(),
-              stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER),
+              stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER),
               "ASF Not Transported:",
               noASF,
               asfAppend));

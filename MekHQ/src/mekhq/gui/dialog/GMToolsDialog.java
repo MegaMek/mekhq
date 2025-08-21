@@ -63,15 +63,15 @@ import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTextFieldPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.Messages;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
-import megamek.common.units.EntityWeightClass;
+import megamek.common.enums.Gender;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
-import megamek.common.Messages;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -742,7 +742,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             final int unitType = getComboUnitType().getSelectedIndex();
             getComboUnitWeight().setEnabled((unitType == UnitType.MEK) ||
                                                   (unitType == UnitType.TANK) ||
-                                                  (unitType == UnitType.AEROSPACEFIGHTER));
+                                                  (unitType == UnitType.AEROSPACE_FIGHTER));
         });
         gbc.gridx++;
         panel.add(getComboUnitType(), gbc);
@@ -1471,7 +1471,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
     private boolean doesPersonPrimarilyDriveUnitType(final int unitType) {
         switch (unitType) {
             case UnitType.AERO:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
                 return getPerson().getPrimaryRole().isAerospacePilot();
             case UnitType.BATTLE_ARMOR:
                 return getPerson().getPrimaryRole().isBattleArmour();

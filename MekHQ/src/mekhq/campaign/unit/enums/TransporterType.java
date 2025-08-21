@@ -42,7 +42,7 @@ import megamek.common.equipment.ClampMountTank;
 import megamek.common.equipment.DockingCollar;
 import megamek.common.equipment.TankTrailerHitch;
 import megamek.common.equipment.Transporter;
-import megamek.common.units.DropshuttleBay;
+import megamek.common.units.DropShuttleBay;
 import megamek.common.units.InfantryCompartment;
 import megamek.common.units.NavalRepairFacility;
 import megamek.common.units.ReinforcedRepairFacility;
@@ -63,7 +63,7 @@ public enum TransporterType {
     HEAVY_VEHICLE_BAY(HeavyVehicleBay.class),
     NAVAL_REPAIR_FACILITY(NavalRepairFacility.class),
     REINFORCED_REPAIR_FACILITY(ReinforcedRepairFacility.class),
-    DROPSHUTTLE_BAY(DropshuttleBay.class),
+    DROPSHUTTLE_BAY(DropShuttleBay.class),
     LIGHT_VEHICLE_BAY(LightVehicleBay.class),
     SUPER_HEAVY_VEHICLE_BAY(SuperHeavyVehicleBay.class),
     MEK_BAY(MekBay.class),

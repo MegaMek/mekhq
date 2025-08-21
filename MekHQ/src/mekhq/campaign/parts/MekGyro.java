@@ -35,11 +35,11 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.units.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -168,7 +168,7 @@ public class MekGyro extends Part {
     public void fix() {
         super.fix();
         if (null != unit) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CENTER_TORSO);
         }
 
     }
@@ -181,7 +181,7 @@ public class MekGyro extends Part {
     @Override
     public void remove(boolean salvage) {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CENTER_TORSO);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -202,7 +202,8 @@ public class MekGyro extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             int priorHits = hits;
-            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
+            hits = unit.getEntity()
+                         .getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CENTER_TORSO);
             if (checkForDestruction && hits > priorHits && hits >= 3
                       && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -241,7 +242,7 @@ public class MekGyro extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             if (hits == 0) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CENTER_TORSO);
             } else {
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, hits);
             }
@@ -253,8 +254,8 @@ public class MekGyro extends Part {
         if (null == unit) {
             return null;
         }
-        if (!isSalvaging() && unit.isLocationBreached(Mek.LOC_CT)) {
-            return unit.getEntity().getLocationName(Mek.LOC_CT) + " is breached.";
+        if (!isSalvaging() && unit.isLocationBreached(Mek.LOC_CENTER_TORSO)) {
+            return unit.getEntity().getLocationName(Mek.LOC_CENTER_TORSO) + " is breached.";
         }
         return null;
     }
@@ -285,7 +286,7 @@ public class MekGyro extends Part {
 
     @Override
     public int getLocation() {
-        return Mek.LOC_CT;
+        return Mek.LOC_CENTER_TORSO;
     }
 
     @Override

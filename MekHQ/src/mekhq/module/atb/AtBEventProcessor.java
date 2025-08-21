@@ -43,15 +43,15 @@ import java.util.Collection;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
-import megamek.common.units.EntityMovementMode;
-import megamek.common.units.EntityWeightClass;
+import megamek.common.event.Subscribe;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import megamek.common.event.Subscribe;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -191,7 +191,7 @@ public class AtBEventProcessor {
                 if (!campaign.getCampaignOptions().isAeroRecruitsHaveUnits()) {
                     return;
                 }
-                unitType = UnitType.AEROSPACEFIGHTER;
+                unitType = UnitType.AEROSPACE_FIGHTER;
                 break;
             case PROTOMEK_PILOT:
                 unitType = UnitType.PROTOMEK;
@@ -212,7 +212,7 @@ public class AtBEventProcessor {
         }
 
         int weight = -1;
-        if (unitType == UnitType.MEK || unitType == UnitType.TANK || unitType == UnitType.AEROSPACEFIGHTER) {
+        if (unitType == UnitType.MEK || unitType == UnitType.TANK || unitType == UnitType.AEROSPACE_FIGHTER) {
             int roll = Compute.d6(2);
             if (roll < 8) {
                 return;

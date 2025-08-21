@@ -38,9 +38,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import megamek.common.loaders.MekFileParser;
-import megamek.common.loaders.MekSummary;
-import megamek.common.loaders.MekSummaryCache;
 import megamek.common.TechConstants;
 import megamek.common.bays.BayType;
 import megamek.common.equipment.AmmoType;
@@ -50,6 +47,9 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -478,7 +478,7 @@ public class PartsStore {
     }
 
     private void stockMekLocations(Campaign c) {
-        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CLEG; loc++) {
+        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CENTER_LEG; loc++) {
             for (int ton = 20; ton <= 100; ton = ton + 5) {
                 for (int type = 0; type < EquipmentType.structureNames.length; type++) {
                     addMekLocation(c, loc, ton, type, false);
@@ -500,7 +500,7 @@ public class PartsStore {
         } else {
             parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
             parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
-            if (loc > Mek.LOC_LT) {
+            if (loc > Mek.LOC_LEFT_TORSO) {
                 parts.add(new MekLocation(loc, ton, type, clan, false, true, false, false, c));
                 parts.add(new MekLocation(loc, ton, type, clan, true, true, false, false, c));
             }
@@ -508,7 +508,7 @@ public class PartsStore {
     }
 
     private void stockProtomekLocations(Campaign c) {
-        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAINGUN; loc++) {
+        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAIN_GUN; loc++) {
             for (int ton = 2; ton <= 15; ton++) {
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, false, c));

@@ -36,10 +36,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.equipment.IArmorState;
-import megamek.common.units.ProtoMek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.utilities.MHQXMLUtility;
@@ -78,10 +78,10 @@ public class MissingProtoMekLocation extends MissingPart {
             case ProtoMek.LOC_TORSO:
                 this.name = "ProtoMek Torso";
                 break;
-            case ProtoMek.LOC_LARM:
+            case ProtoMek.LOC_LEFT_ARM:
                 this.name = "ProtoMek Left Arm";
                 break;
-            case ProtoMek.LOC_RARM:
+            case ProtoMek.LOC_RIGHT_ARM:
                 this.name = "ProtoMek Right Arm";
                 break;
             case ProtoMek.LOC_LEG:
@@ -90,7 +90,7 @@ public class MissingProtoMekLocation extends MissingPart {
                     this.name = "ProtoMek Legs (Quad)";
                 }
                 break;
-            case ProtoMek.LOC_MAINGUN:
+            case ProtoMek.LOC_MAIN_GUN:
                 this.name = "ProtoMek Main Gun";
                 break;
             default:
@@ -214,14 +214,14 @@ public class MissingProtoMekLocation extends MissingPart {
     private int getAppropriateSystemIndex() {
         switch (loc) {
             case ProtoMek.LOC_LEG:
-                return ProtoMek.SYSTEM_LEGCRIT;
-            case ProtoMek.LOC_LARM:
-            case ProtoMek.LOC_RARM:
-                return ProtoMek.SYSTEM_ARMCRIT;
+                return ProtoMek.SYSTEM_LEG_CRIT;
+            case ProtoMek.LOC_LEFT_ARM:
+            case ProtoMek.LOC_RIGHT_ARM:
+                return ProtoMek.SYSTEM_ARM_CRIT;
             case ProtoMek.LOC_HEAD:
-                return ProtoMek.SYSTEM_HEADCRIT;
+                return ProtoMek.SYSTEM_HEAD_CRIT;
             case ProtoMek.LOC_TORSO:
-                return ProtoMek.SYSTEM_TORSOCRIT;
+                return ProtoMek.SYSTEM_TORSO_CRIT;
             default:
                 return -1;
         }

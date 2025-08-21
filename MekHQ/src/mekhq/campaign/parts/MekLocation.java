@@ -148,28 +148,28 @@ public class MekLocation extends Part {
             case Mek.LOC_HEAD:
                 this.name = "Mek Head";
                 break;
-            case Mek.LOC_CT:
+            case Mek.LOC_CENTER_TORSO:
                 this.name = "Mek Center Torso";
                 break;
-            case Mek.LOC_LT:
+            case Mek.LOC_LEFT_TORSO:
                 this.name = "Mek Left Torso";
                 break;
-            case Mek.LOC_RT:
+            case Mek.LOC_RIGHT_TORSO:
                 this.name = "Mek Right Torso";
                 break;
-            case Mek.LOC_LARM:
+            case Mek.LOC_LEFT_ARM:
                 this.name = forQuad ? "Mek Front Left Leg" : "Mek Left Arm";
                 break;
-            case Mek.LOC_RARM:
+            case Mek.LOC_RIGHT_ARM:
                 this.name = forQuad ? "Mek Front Right Leg" : "Mek Right Arm";
                 break;
-            case Mek.LOC_LLEG:
+            case Mek.LOC_LEFT_LEG:
                 this.name = forQuad ? "Mek Rear Left Leg" : "Mek Left Leg";
                 break;
-            case Mek.LOC_RLEG:
+            case Mek.LOC_RIGHT_LEG:
                 this.name = forQuad ? "Mek Rear Right Leg" : "Mek Right Leg";
                 break;
-            case Mek.LOC_CLEG:
+            case Mek.LOC_CENTER_LEG:
                 this.name = "Mek Center Leg";
                 break;
         }
@@ -194,7 +194,7 @@ public class MekLocation extends Part {
         // movement modes but
         // that doesn't affect structure weight); currently impossible to tell whether a
         // "loose" left leg is for a biped or tripod.
-        EntityMovementMode movementMode = (getLoc() == Mek.LOC_CLEG) ?
+        EntityMovementMode movementMode = (getLoc() == Mek.LOC_CENTER_LEG) ?
                                                 EntityMovementMode.TRIPOD :
                                                 EntityMovementMode.BIPED;
 
@@ -210,18 +210,18 @@ public class MekLocation extends Part {
             case Mek.LOC_HEAD:
                 tonnage *= 0.05;
                 break;
-            case Mek.LOC_CT:
+            case Mek.LOC_CENTER_TORSO:
                 tonnage *= 0.25;
                 break;
-            case Mek.LOC_LT:
-            case Mek.LOC_RT:
+            case Mek.LOC_LEFT_TORSO:
+            case Mek.LOC_RIGHT_TORSO:
                 tonnage *= 0.15;
                 break;
-            case Mek.LOC_LARM:
-            case Mek.LOC_RARM:
-            case Mek.LOC_LLEG:
-            case Mek.LOC_RLEG:
-            case Mek.LOC_CLEG:
+            case Mek.LOC_LEFT_ARM:
+            case Mek.LOC_RIGHT_ARM:
+            case Mek.LOC_LEFT_LEG:
+            case Mek.LOC_RIGHT_LEG:
+            case Mek.LOC_CENTER_LEG:
                 tonnage *= 0.1;
                 break;
             default:
@@ -251,7 +251,7 @@ public class MekLocation extends Part {
     }
 
     private boolean isArm() {
-        return (loc == Mek.LOC_RARM) || (loc == Mek.LOC_LARM);
+        return (loc == Mek.LOC_RIGHT_ARM) || (loc == Mek.LOC_LEFT_ARM);
     }
 
     public boolean forQuad() {
@@ -353,7 +353,7 @@ public class MekLocation extends Part {
             setBlownOff(false);
 
             unit.getEntity().setLocationBlownOff(loc, false);
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty slots
                 if (slot == null) {
@@ -370,7 +370,7 @@ public class MekLocation extends Part {
             setBreached(false);
 
             unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty slots
                 if (slot == null) {
@@ -423,7 +423,7 @@ public class MekLocation extends Part {
                 getCampaign().getWarehouse().removePart(this);
             }
 
-            if (getLoc() != Mek.LOC_CT) {
+            if (getLoc() != Mek.LOC_CENTER_TORSO) {
                 Part missing = Objects.requireNonNull(getMissingPart());
 
                 unit.addPart(missing);
@@ -650,7 +650,7 @@ public class MekLocation extends Part {
             unit.getEntity().setInternal((int) Math.round(getPercent() * unit.getEntity().getOInternal(loc)), loc);
             // TODO : we need to cycle through slots and remove crits on non-hittable ones
             // We shouldn't have to do this, these slots should not be hit in MM
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 if ((slot != null) && !slot.isEverHittable()) {
                     slot.setDestroyed(false);
@@ -676,11 +676,11 @@ public class MekLocation extends Part {
         }
 
         if (isBlownOff() && !isSalvaging()) {
-            if ((loc == Mek.LOC_LARM) && unit.isLocationDestroyed(Mek.LOC_LT)) {
+            if ((loc == Mek.LOC_LEFT_ARM) && unit.isLocationDestroyed(Mek.LOC_LEFT_TORSO)) {
                 return "must replace left torso first";
-            } else if ((loc == Mek.LOC_RARM) && unit.isLocationDestroyed(Mek.LOC_RT)) {
+            } else if ((loc == Mek.LOC_RIGHT_ARM) && unit.isLocationDestroyed(Mek.LOC_RIGHT_TORSO)) {
                 return "must replace right torso first";
-            } else if (unit.isLocationDestroyed(Mek.LOC_CT)) {
+            } else if (unit.isLocationDestroyed(Mek.LOC_CENTER_TORSO)) {
                 // we shouldn't get here
                 return "cannot repair part on destroyed unit";
             }
@@ -710,11 +710,13 @@ public class MekLocation extends Part {
         }
         // Can't salvage torsos until arms and legs are gone
         String limbName = forQuad ? " front leg " : " arm ";
-        if ((unit.getEntity() instanceof Mek) && (loc == Mek.LOC_RT) && !unit.getEntity().isLocationBad(Mek.LOC_RARM)) {
+        if ((unit.getEntity() instanceof Mek) &&
+                  (loc == Mek.LOC_RIGHT_TORSO) &&
+                  !unit.getEntity().isLocationBad(Mek.LOC_RIGHT_ARM)) {
             return "must salvage/scrap right" + limbName + "first";
         } else if ((unit.getEntity() instanceof Mek) &&
-                         (loc == Mek.LOC_LT) &&
-                         !unit.getEntity().isLocationBad(Mek.LOC_LARM)) {
+                         (loc == Mek.LOC_LEFT_TORSO) &&
+                         !unit.getEntity().isLocationBad(Mek.LOC_LEFT_ARM)) {
             return "must salvage/scrap left" + limbName + "first";
         }
         // Check for armor
@@ -726,7 +728,7 @@ public class MekLocation extends Part {
         // You can only salvage a location that has nothing left on it
         Set<Integer> equipmentSeen = new HashSet<>();
         StringJoiner partsToSalvageOrScrap = new StringJoiner(", ");
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // Ignore empty & non-hittable slots
             if ((slot == null) || !slot.isEverHittable()) {
@@ -807,13 +809,13 @@ public class MekLocation extends Part {
     @Override
     public boolean isSalvaging() {
         // Can't salvage a center torso
-        return (loc != Mek.LOC_CT) && super.isSalvaging();
+        return (loc != Mek.LOC_CENTER_TORSO) && super.isSalvaging();
     }
 
     @Override
     public String checkScrappable() {
         // Can't scrap a center torso
-        if (loc == Mek.LOC_CT) {
+        if (loc == Mek.LOC_CENTER_TORSO) {
             return "Mek Center Torso's cannot be scrapped";
         }
         // Only allow scrapping of locations with nothing on them, otherwise you will
@@ -822,11 +824,13 @@ public class MekLocation extends Part {
         // You can't salvage torsos until arms and legs are gone
         String limbName = forQuad ? " front leg " : " arm ";
 
-        if ((unit.getEntity() instanceof Mek) && (loc == Mek.LOC_RT) && !unit.getEntity().isLocationBad(Mek.LOC_RARM)) {
+        if ((unit.getEntity() instanceof Mek) &&
+                  (loc == Mek.LOC_RIGHT_TORSO) &&
+                  !unit.getEntity().isLocationBad(Mek.LOC_RIGHT_ARM)) {
             return "You must first remove the right " + limbName + " before you scrap the right torso";
         } else if ((unit.getEntity() instanceof Mek) &&
-                         (loc == Mek.LOC_LT) &&
-                         !unit.getEntity().isLocationBad(Mek.LOC_LARM)) {
+                         (loc == Mek.LOC_LEFT_TORSO) &&
+                         !unit.getEntity().isLocationBad(Mek.LOC_LEFT_ARM)) {
             return "You must first remove the left " + limbName + " before you scrap the left torso";
         }
         // Check for armor
@@ -835,7 +839,7 @@ public class MekLocation extends Part {
             return "You must first remove the armor from this location before you scrap it";
         }
         // You can only salvage a location that has nothing left on it
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // Ignore empty & non-hittable slots
             if ((slot == null) || !slot.isEverHittable()) {

@@ -52,7 +52,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.MMRandom;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentFlag;
 import megamek.common.equipment.EquipmentType;
@@ -221,7 +222,7 @@ public class EquipmentPartTest {
         equipmentPart.setUnit(unit);
 
         assertTrue(equipmentPart.isPartForEquipmentNum(equipmentNum, location));
-        assertFalse(equipmentPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RWING));
+        assertFalse(equipmentPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RIGHT_WING));
         assertFalse(equipmentPart.isPartForEquipmentNum(equipmentNum - 1, location));
     }
 
@@ -355,7 +356,7 @@ public class EquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -391,7 +392,7 @@ public class EquipmentPartTest {
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
         String locationName = "Mek Right Torso";
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -432,7 +433,7 @@ public class EquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -446,7 +447,7 @@ public class EquipmentPartTest {
         assertFalse(equipmentPart.isInLocation(locationName));
 
         // Split the mount and have the second location be the one we want
-        when(mounted.getLocation()).thenReturn(Mek.LOC_RLEG);
+        when(mounted.getLocation()).thenReturn(Mek.LOC_RIGHT_LEG);
         when(mounted.isSplit()).thenReturn(true);
         when(mounted.getSecondLocation()).thenReturn(location);
 
@@ -711,7 +712,7 @@ public class EquipmentPartTest {
 
         // add the equipment
         Mounted mounted = mock(Mounted.class);
-        int location = Aero.LOC_LWING;
+        int location = Aero.LOC_LEFT_WING;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -760,7 +761,7 @@ public class EquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_LARM;
+        int location = Mek.LOC_LEFT_ARM;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -774,7 +775,7 @@ public class EquipmentPartTest {
 
         // Swap over to the secondary location
         doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
-        int secondLocation = Mek.LOC_LT;
+        int secondLocation = Mek.LOC_LEFT_TORSO;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(secondLocation));
@@ -820,7 +821,7 @@ public class EquipmentPartTest {
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
         String locationName = "Mek Left Torso";
-        int location = Mek.LOC_LT;
+        int location = Mek.LOC_LEFT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -843,7 +844,7 @@ public class EquipmentPartTest {
         assertNull(equipmentPart.checkFixable());
 
         String secondaryLocationName = "Mek Left Arm";
-        int secondaryLocation = Mek.LOC_LARM;
+        int secondaryLocation = Mek.LOC_LEFT_ARM;
         when(mounted.getSecondLocation()).thenReturn(secondaryLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(secondaryLocationName).when(entity).getLocationName(secondaryLocation);
@@ -1037,11 +1038,12 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(false);
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
-        doReturn(1).when(entity).getDamagedCriticals(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
-        doReturn(0).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+        doReturn(1).when(entity).getDamagedCriticalSlots(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
+        doReturn(0).when(entity)
+              .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
 
         EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, size, true, mockCampaign);
         equipmentPart.setUnit(unit);
@@ -1059,10 +1061,10 @@ public class EquipmentPartTest {
 
         // If the part is split it should also take those hits into account
         when(mounted.isSplit()).thenReturn(true);
-        int secondLocation = Mek.LOC_LT;
+        int secondLocation = Mek.LOC_LEFT_TORSO;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         doReturn(0).when(entity)
-              .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+              .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
         // Break the part again
         equipmentPart.setHits(hits);
@@ -1088,11 +1090,12 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(false);
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
-        doReturn(0).when(entity).getDamagedCriticals(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
-        doReturn(1).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+        doReturn(0).when(entity).getDamagedCriticalSlots(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
+        doReturn(1).when(entity)
+              .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
 
         EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, size, true, mockCampaign);
         equipmentPart.setUnit(unit);
@@ -1104,10 +1107,10 @@ public class EquipmentPartTest {
 
         // If the part is split it should also take those hits into account
         when(mounted.isSplit()).thenReturn(true);
-        int secondLocation = Mek.LOC_LT;
+        int secondLocation = Mek.LOC_LEFT_TORSO;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         doReturn(2).when(entity)
-              .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+              .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
         // Fix the part from our side
         equipmentPart.setHits(0);
@@ -1149,11 +1152,12 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(false);
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
-        doReturn(0).when(entity).getDamagedCriticals(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
-        doReturn(1).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+        doReturn(0).when(entity).getDamagedCriticalSlots(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
+        doReturn(1).when(entity)
+              .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
 
         EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, size, true, mockCampaign);
         equipmentPart.setId(16);
@@ -1180,14 +1184,14 @@ public class EquipmentPartTest {
 
             // Restore thte first location
             doReturn(0).when(entity)
-                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+                  .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
 
             // Split the mount and bust the second location ...
             when(mounted.isSplit()).thenReturn(true);
-            int secondLocation = Mek.LOC_LT;
+            int secondLocation = Mek.LOC_LEFT_TORSO;
             when(mounted.getSecondLocation()).thenReturn(secondLocation);
             doReturn(1).when(entity)
-                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+                  .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
             // The underlying equipment has a hit so this should hit the part
             equipmentPart.updateConditionFromEntity(true);
@@ -1198,9 +1202,9 @@ public class EquipmentPartTest {
 
             // Now, hit both locations hard, triggering a roll we'll fail
             doReturn(2).when(entity)
-                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+                  .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
             doReturn(3).when(entity)
-                  .getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
+                  .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
             // The underlying equipment has a hit so this should hit the part
             equipmentPart.updateConditionFromEntity(true);
@@ -1243,7 +1247,7 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(true);
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -1430,7 +1434,7 @@ public class EquipmentPartTest {
 
         // Put the variable cost part back on a unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_CT;
+        int location = Mek.LOC_CENTER_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(cost * 10.0).when(type).getCost(eq(entity), anyBoolean(), eq(location), eq(size));

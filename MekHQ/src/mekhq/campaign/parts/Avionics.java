@@ -75,7 +75,7 @@ public class Avionics extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit &&
-                  (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACEFIGHTER | Entity.ETYPE_LAND_AIR_MEK)) !=
+                  (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACE_FIGHTER | Entity.ETYPE_LAND_AIR_MEK)) !=
                         0) {
             hits = ((IAero) unit.getEntity()).getAvionicsHits();
             if (checkForDestruction &&

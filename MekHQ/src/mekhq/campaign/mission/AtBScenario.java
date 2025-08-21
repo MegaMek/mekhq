@@ -45,16 +45,11 @@ import java.util.Map.Entry;
 import megamek.Version;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.WeatherRestriction;
+import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.board.BoardDimensions;
 import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
-import megamek.common.units.EntityWeightClass;
-import megamek.common.units.Infantry;
-import megamek.common.rolls.TargetRoll;
-import megamek.common.units.UnitType;
-import megamek.common.WeatherRestriction;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
@@ -66,6 +61,11 @@ import megamek.common.planetaryConditions.Light;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.utilities.BoardClassifier;
@@ -1443,7 +1443,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int unitsPerPoint;
         switch (unitType) {
             case UnitType.TANK:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
                 unitsPerPoint = 2;
                 break;
             case UnitType.PROTOMEK:
@@ -1652,7 +1652,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 aero = getEntity(contract.getEnemyCode(),
                       contract.getEnemySkill(),
                       contract.getEnemyQuality(),
-                      UnitType.AEROSPACEFIGHTER,
+                      UnitType.AEROSPACE_FIGHTER,
                       weightClass,
                       campaign);
                 if (aero != null) {

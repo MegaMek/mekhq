@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.force;
 
-import static megamek.common.units.Entity.ETYPE_AEROSPACEFIGHTER;
+import static megamek.common.units.Entity.ETYPE_AEROSPACE_FIGHTER;
 import static megamek.common.units.Entity.ETYPE_MEK;
 import static megamek.common.units.Entity.ETYPE_PROTOMEK;
 import static megamek.common.units.Entity.ETYPE_TANK;
@@ -50,12 +50,12 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -197,7 +197,7 @@ public class CombatTeam {
      * role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
      * The unit contribution to the total is determined based on its type: </p>
      * <ul>
-     *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACE_FIGHTER:</b> Adds 1 for non-clan factions, and 0.5
      *     for clan factions.</li>
      *     <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
      *     <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total, unless no other units).</li>
@@ -225,7 +225,7 @@ public class CombatTeam {
      * Retrieves the associated force and evaluates all units within that force. The unit contribution to the total is
      * determined based on its type: </p>
      * <ul>
-     *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACE_FIGHTER:</b> Adds 1 for non-clan factions, and 0.5
      *     for clan factions.</li>
      *     <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
      *     <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 1. Infantry squads add 1/3. (excluded from the total if count
@@ -263,7 +263,7 @@ public class CombatTeam {
                      UnitType.VTOL,
                      UnitType.NAVAL,
                      UnitType.CONV_FIGHTER,
-                     UnitType.AEROSPACEFIGHTER,
+                     UnitType.AEROSPACE_FIGHTER,
                      UnitType.MEK -> numUnits += 1;
                 case UnitType.PROTOMEK -> numUnits += 0.2;
                 case UnitType.BATTLE_ARMOR -> numInfantry += 1;
@@ -297,7 +297,7 @@ public class CombatTeam {
                 if (null != entity) {
                     if ((entity.getEntityType() & ETYPE_MEK) != 0) {
                         armor += 1;
-                    } else if ((entity.getEntityType() & ETYPE_AEROSPACEFIGHTER) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_AEROSPACE_FIGHTER) != 0) {
                         other += 0.5;
                     } else if ((entity.getEntityType() & ETYPE_TANK) != 0) {
                         armor += 0.5;
@@ -773,7 +773,7 @@ public class CombatTeam {
                         } else {
                             weight += entity.getWeight();
                         }
-                    } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
+                    } else if (entityType == ETYPE_AEROSPACE_FIGHTER) {
                         if (isClan) {
                             weight += entity.getWeight() * 0.5;
                         } else {

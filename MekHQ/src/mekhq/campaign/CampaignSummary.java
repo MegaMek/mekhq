@@ -158,7 +158,7 @@ public class CampaignSummary {
                 case UnitType.TANK:
                     veeCount++;
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
                     break;
@@ -215,8 +215,8 @@ public class CampaignSummary {
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
         int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) -
-                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
+        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
@@ -239,7 +239,7 @@ public class CampaignSummary {
         unitsOver = noMek + noASF + nolv + nohv + noinf + noBA + noProto;
         unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MEK) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +

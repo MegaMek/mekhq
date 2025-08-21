@@ -34,12 +34,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.units.Aero;
-import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
-import megamek.common.units.Jumpship;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -193,7 +193,7 @@ public class CombatInformationCenter extends Part {
                                   (10 * unit.getEntity().getWeight()) +
                                   200000 +
                                   100000 +
-                                  (10000 * ((Jumpship) unit.getEntity()).getArcswGuns()));
+                                  (10000 * ((Jumpship) unit.getEntity()).getArcsWithGuns()));
         }
     }
 

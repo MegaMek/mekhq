@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
+import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -131,7 +131,7 @@ public class JumpJet extends EquipmentPart {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
                       mounted.getLocation());
             }
             if (checkForDestruction

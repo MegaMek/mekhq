@@ -360,7 +360,7 @@ public class Utilities {
             }
             // Go through the base entity and make a list of all fixed equipment in this
             // location.
-            for (int slot = 0; slot < entity1.getNumberOfCriticals(loc); slot++) {
+            for (int slot = 0; slot < entity1.getNumberOfCriticalSlots(loc); slot++) {
                 CriticalSlot crit = entity1.getCritical(loc, slot);
                 if ((null != crit) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (null != crit.getMount())) {
                     if (!crit.getMount().isOmniPodMounted()) {
@@ -376,7 +376,7 @@ public class Utilities {
             // fixed equipment from the list. If not found or something is left over, there
             // is a
             // fixed equipment difference.
-            for (int slot = 0; slot < entity2.getNumberOfCriticals(loc); slot++) {
+            for (int slot = 0; slot < entity2.getNumberOfCriticalSlots(loc); slot++) {
                 CriticalSlot crit = entity1.getCritical(loc, slot);
                 if ((crit != null) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (crit.getMount() != null)) {
                     if (!crit.getMount().isOmniPodMounted()) {
@@ -854,7 +854,7 @@ public class Utilities {
                     person.setPhenotype(Phenotype.fromString(phenotype));
                 }
 
-                String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
+                String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOOD_NAME);
                 person.setBloodname(bloodname == null ? "" : bloodname);
             }
 

@@ -136,7 +136,7 @@ public class ProtoMekArmActuator extends Part {
     public void fix() {
         super.fix();
         if (null != unit) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARMCRIT, location);
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARM_CRIT, location);
         }
     }
 
@@ -159,7 +159,7 @@ public class ProtoMekArmActuator extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             int h = Math.max(1, hits);
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARMCRIT, location, h);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARM_CRIT, location, h);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -181,7 +181,8 @@ public class ProtoMekArmActuator extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             int priorHits = hits;
-            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARMCRIT, location);
+            hits = unit.getEntity()
+                         .getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARM_CRIT, location);
             if (checkForDestruction
                       && hits > priorHits
                       && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -238,9 +239,9 @@ public class ProtoMekArmActuator extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             if (hits > 0) {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARMCRIT, location, 1);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARM_CRIT, location, 1);
             } else {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARMCRIT, location);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_ARM_CRIT, location);
             }
         }
     }

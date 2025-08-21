@@ -97,7 +97,7 @@ public class ProtoMekSensor extends Part {
     public void fix() {
         super.fix();
         if (null != unit) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD);
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEAD_CRIT, ProtoMek.LOC_HEAD);
         }
     }
 
@@ -120,7 +120,7 @@ public class ProtoMekSensor extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             int h = Math.max(1, hits);
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD, h);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEAD_CRIT, ProtoMek.LOC_HEAD, h);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -142,7 +142,9 @@ public class ProtoMekSensor extends Part {
         if (null != unit) {
             int priorHits = hits;
             hits = unit.getEntity()
-                         .getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD);
+                         .getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM,
+                               ProtoMek.SYSTEM_HEAD_CRIT,
+                               ProtoMek.LOC_HEAD);
             if (checkForDestruction
                       && hits > priorHits
                       && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -199,9 +201,9 @@ public class ProtoMekSensor extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             if (hits > 0) {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD, hits);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEAD_CRIT, ProtoMek.LOC_HEAD, hits);
             } else {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEADCRIT, ProtoMek.LOC_HEAD);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_HEAD_CRIT, ProtoMek.LOC_HEAD);
             }
         }
     }

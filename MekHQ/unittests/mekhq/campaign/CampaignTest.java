@@ -54,12 +54,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.WeaponType;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
-import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Mek;
-import megamek.common.equipment.WeaponType;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.parts.*;
@@ -565,7 +565,7 @@ public class CampaignTest {
             @Test
             public void testGetDefaultStockPercentCT() {
                 // Arrange
-                part = new MekLocation(Mek.LOC_CT, 1, 0, false, false, false, false, false, campaign);
+                part = new MekLocation(Mek.LOC_CENTER_TORSO, 1, 0, false, false, false, false, false, campaign);
 
                 // Act
                 try {
@@ -593,7 +593,7 @@ public class CampaignTest {
             }
 
             @ParameterizedTest
-            @ValueSource(ints = { Mek.LOC_LARM, Mek.LOC_RARM, Mek.LOC_LT, Mek.LOC_RT })
+            @ValueSource(ints = { Mek.LOC_LEFT_ARM, Mek.LOC_RIGHT_ARM, Mek.LOC_LEFT_TORSO, Mek.LOC_RIGHT_TORSO })
             public void testGetDefaultStockPercentOtherLocation(int location) {
                 // Arrange
                 part = new MekLocation(location, 1, 0, false, false, false, false, false, campaign);

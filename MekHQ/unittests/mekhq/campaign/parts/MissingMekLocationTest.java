@@ -62,12 +62,12 @@ public class MissingMekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MissingMekLocation missing = new MissingMekLocation(location, 30, 0, false, false, false, mockCampaign);
         missing.setUnit(unit);
 
         // 2 criticalSlots
-        doReturn(2).when(entity).getNumberOfCriticals(eq(location));
+        doReturn(2).when(entity).getNumberOfCriticalSlots(eq(location));
         CriticalSlot mockLandingGear = mock(CriticalSlot.class);
         when(mockLandingGear.isEverHittable()).thenReturn(true);
         when(mockLandingGear.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
@@ -142,7 +142,7 @@ public class MissingMekLocationTest {
         missing.setUnit(unit);
 
         // 1 critical
-        doReturn(1).when(entity).getNumberOfCriticals(eq(location));
+        doReturn(1).when(entity).getNumberOfCriticalSlots(eq(location));
         CriticalSlot mockAvionics = mock(CriticalSlot.class);
         when(mockAvionics.isEverHittable()).thenReturn(true);
         when(mockAvionics.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);

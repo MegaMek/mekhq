@@ -631,7 +631,7 @@ public class Resupply {
      * @return {@code true} if the part is ineligible due to its location or extinction, {@code false} otherwise.
      */
     private boolean checkMekLocation(Part part) {
-        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CT);
+        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CENTER_TORSO);
     }
 
     /**
@@ -670,6 +670,7 @@ public class Resupply {
      * <p>When not performing a loot or smuggler resupply, all processed parts are marked as brand new.</p>
      *
      * @param partsInUse a set of {@link PartInUse} representing the parts currently needed
+     *
      * @return a map of {@link Part} to its {@link PartDetails}, with adjusted weights
      */
     private Map<Part, PartDetails> applyWarehouseWeightModifiers(Set<PartInUse> partsInUse) {

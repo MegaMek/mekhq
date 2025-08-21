@@ -95,8 +95,8 @@ public class MissingAvionics extends MissingPart {
                 if (part instanceof MissingMekLocation) {
                     switch (part.getLocation()) {
                         case Mek.LOC_HEAD:
-                        case Mek.LOC_LT:
-                        case Mek.LOC_RT:
+                        case Mek.LOC_LEFT_TORSO:
+                        case Mek.LOC_RIGHT_TORSO:
                             missingLocs.add(unit.getEntity().getLocationName(part.getLocation()));
                             break;
                         default:

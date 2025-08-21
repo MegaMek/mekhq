@@ -100,28 +100,28 @@ public class MissingMekLocation extends MissingPart {
             case Mek.LOC_HEAD:
                 this.name = "Mek Head";
                 break;
-            case Mek.LOC_CT:
+            case Mek.LOC_CENTER_TORSO:
                 this.name = "Mek Center Torso";
                 break;
-            case Mek.LOC_LT:
+            case Mek.LOC_LEFT_TORSO:
                 this.name = "Mek Left Torso";
                 break;
-            case Mek.LOC_RT:
+            case Mek.LOC_RIGHT_TORSO:
                 this.name = "Mek Right Torso";
                 break;
-            case Mek.LOC_LARM:
+            case Mek.LOC_LEFT_ARM:
                 this.name = forQuad ? "Mek Front Left Leg" : "Mek Left Arm";
                 break;
-            case Mek.LOC_RARM:
+            case Mek.LOC_RIGHT_ARM:
                 this.name = forQuad ? "Mek Front Left Leg" : "Mek Right Arm";
                 break;
-            case Mek.LOC_LLEG:
+            case Mek.LOC_LEFT_LEG:
                 this.name = forQuad ? "Mek Rear Left Leg" : "Mek Left Leg";
                 break;
-            case Mek.LOC_RLEG:
+            case Mek.LOC_RIGHT_LEG:
                 this.name = forQuad ? "Mek Rear Right Leg" : "Mek Right Leg";
                 break;
-            case Mek.LOC_CLEG:
+            case Mek.LOC_CENTER_LEG:
                 this.name = "Mek Center Leg";
                 break;
         }
@@ -193,7 +193,7 @@ public class MissingMekLocation extends MissingPart {
     }
 
     private boolean isArm() {
-        return loc == Mek.LOC_RARM || loc == Mek.LOC_LARM;
+        return loc == Mek.LOC_RIGHT_ARM || loc == Mek.LOC_LEFT_ARM;
     }
 
     public boolean forQuad() {
@@ -202,7 +202,7 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if ((loc == Mek.LOC_CT) && !refit) {
+        if ((loc == Mek.LOC_CENTER_TORSO) && !refit) {
             // you can't replace a center torso
             return false;
         } else if (part instanceof MekLocation) {
@@ -225,11 +225,11 @@ public class MissingMekLocation extends MissingPart {
         }
         if (unit.getEntity() instanceof Mek) {
             // Can't replace appendages when corresponding torso is gone
-            if (loc == Mek.LOC_LARM
-                      && unit.getEntity().isLocationBad(Mek.LOC_LT)) {
+            if (loc == Mek.LOC_LEFT_ARM
+                      && unit.getEntity().isLocationBad(Mek.LOC_LEFT_TORSO)) {
                 return "must replace left torso first";
-            } else if (loc == Mek.LOC_RARM
-                             && unit.getEntity().isLocationBad(Mek.LOC_RT)) {
+            } else if (loc == Mek.LOC_RIGHT_ARM
+                             && unit.getEntity().isLocationBad(Mek.LOC_RIGHT_TORSO)) {
                 return "must replace right torso first";
             }
         }
@@ -238,7 +238,7 @@ public class MissingMekLocation extends MissingPart {
         // You can only salvage a location that has nothing left on it
         Set<Integer> equipmentSeen = new HashSet<>();
         StringJoiner partsToSalvageOrScrap = new StringJoiner(", ");
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // ignore empty & non-hittable slots
             if ((slot == null) || !slot.isEverHittable()) {
@@ -352,13 +352,13 @@ public class MissingMekLocation extends MissingPart {
                 ((MekLocation) actualReplacement).setLifeSupport(false);
             }
             // fix shoulders and hips
-            if (loc == Mek.LOC_RARM || loc == Mek.LOC_LARM) {
+            if (loc == Mek.LOC_RIGHT_ARM || loc == Mek.LOC_LEFT_ARM) {
                 if (forQuad) {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
                 } else {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc);
                 }
-            } else if ((loc == Mek.LOC_RLEG) || (loc == Mek.LOC_LLEG) || (loc == Mek.LOC_CLEG)) {
+            } else if ((loc == Mek.LOC_RIGHT_LEG) || (loc == Mek.LOC_LEFT_LEG) || (loc == Mek.LOC_CENTER_LEG)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
             }
             remove(false);

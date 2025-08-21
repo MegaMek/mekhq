@@ -35,16 +35,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.units.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Engine;
+import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestEntity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -210,7 +210,7 @@ public class MissingEnginePart extends MissingPart {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
                       && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
@@ -267,7 +267,7 @@ public class MissingEnginePart extends MissingPart {
         if (null == unit || null == unit.getEntity()) {
             return false;
         }
-        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CENTER_TORSO) {
             return true;
         }
         boolean needsSideTorso = false;
@@ -281,8 +281,8 @@ public class MissingEnginePart extends MissingPart {
                 break;
         }
         return needsSideTorso
-                     && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT)
-                               || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
+                     && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO)
+                               || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO));
     }
 
     @Override

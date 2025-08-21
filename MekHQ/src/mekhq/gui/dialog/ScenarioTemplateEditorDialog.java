@@ -1400,7 +1400,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                                selectedItem == UnitType.CONV_FIGHTER ||
-                               selectedItem == UnitType.AEROSPACEFIGHTER;
+                               selectedItem == UnitType.AEROSPACE_FIGHTER;
 
         chkAllowAeroBombs.setEnabled(isAero);
     }

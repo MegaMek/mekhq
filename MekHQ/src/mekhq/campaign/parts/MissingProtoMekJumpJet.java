@@ -36,10 +36,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.units.Entity;
-import megamek.common.units.ProtoMek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.Node;
 
@@ -92,11 +92,11 @@ public class MissingProtoMekJumpJet extends MissingPart {
         if (null != unit) {
             int damageJJ = getOtherDamagedJumpJets() + 1;
             if (damageJJ < (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, 1);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, 1);
             } else {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, 2);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, 2);
             }
         }
     }

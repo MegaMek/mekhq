@@ -37,7 +37,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.stream.Collectors;
 
-import megamek.common.*;
+import megamek.common.TechConstants;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
@@ -1010,7 +1010,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             case UnitType.PROTOMEK:
             case UnitType.CONV_FIGHTER:
             case UnitType.AERO:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
             case UnitType.TANK:
             case UnitType.VTOL:
             case UnitType.BATTLE_ARMOR:

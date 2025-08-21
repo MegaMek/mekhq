@@ -177,7 +177,7 @@ public class TankLocation extends Part {
             breached = false;
             if (null != unit) {
                 unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                     // ignore empty & non-hittable slots
                     if (slot == null) {

@@ -529,7 +529,7 @@ public class ResolveScenarioTracker {
                 en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
             }
             // Check for mounted and critical slot missingness as well
-            for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < en.getNumberOfCriticalSlots(loc); i++) {
                 final CriticalSlot cs = en.getCritical(loc, i);
                 if (null == cs || !cs.isEverHittable()) {
                     continue;

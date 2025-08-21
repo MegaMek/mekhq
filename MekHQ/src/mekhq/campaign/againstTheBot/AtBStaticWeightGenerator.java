@@ -60,7 +60,7 @@ public class AtBStaticWeightGenerator {
      */
     private static int getRandomWeight(final int unitType, final Faction faction,
           final boolean regionVariations) {
-        if (unitType == UnitType.AEROSPACEFIGHTER) {
+        if (unitType == UnitType.AEROSPACE_FIGHTER) {
             return getRandomAerospaceWeight();
         } else if ((unitType == UnitType.MEK) && regionVariations) {
             return getRegionalMekWeight(faction);

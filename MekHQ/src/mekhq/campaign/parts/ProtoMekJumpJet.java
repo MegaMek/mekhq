@@ -120,13 +120,13 @@ public class ProtoMekJumpJet extends Part {
             // repair depending upon how many others are still damaged
             int damageJJ = getOtherDamagedJumpJets();
             if (damageJJ == 0) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
             } else if (damageJJ < (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, 1);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, 1);
             } else {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, 2);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, 2);
             }
         }
     }
@@ -154,7 +154,7 @@ public class ProtoMekJumpJet extends Part {
             if (damageJJ >= (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 h = 2;
             }
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, h);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, h);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -176,7 +176,9 @@ public class ProtoMekJumpJet extends Part {
         //FIXME: implement check for destruction
         if (null != unit) {
             hits = unit.getEntity()
-                         .getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
+                         .getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM,
+                               ProtoMek.SYSTEM_TORSO_CRIT,
+                               ProtoMek.LOC_TORSO);
             if (hits > 2) {
                 remove(false);
                 return;
@@ -233,13 +235,13 @@ public class ProtoMekJumpJet extends Part {
         if (null != unit) {
             int damageJJ = getOtherDamagedJumpJets() + hits;
             if (damageJJ == 0) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
             } else if (damageJJ < (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, 1);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, 1);
             } else {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO);
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSOCRIT, ProtoMek.LOC_TORSO, 2);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_TORSO_CRIT, ProtoMek.LOC_TORSO, 2);
             }
         }
     }

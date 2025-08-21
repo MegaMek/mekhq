@@ -73,14 +73,14 @@ import megamek.client.ui.panels.DialogOptionComponentYPanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.units.Crew;
-import megamek.common.equipment.EquipmentType;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Crew;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -1439,19 +1439,19 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
-            optionComp.addValue(Crew.HUMANTRO_NONE);
-            optionComp.addValue(Crew.HUMANTRO_MEK);
-            optionComp.addValue(Crew.HUMANTRO_AERO);
-            optionComp.addValue(Crew.HUMANTRO_VEE);
-            optionComp.addValue(Crew.HUMANTRO_BA);
+            optionComp.addValue(Crew.HUMAN_TRO_NONE);
+            optionComp.addValue(Crew.HUMAN_TRO_MEK);
+            optionComp.addValue(Crew.HUMAN_TRO_AERO);
+            optionComp.addValue(Crew.HUMAN_TRO_VEE);
+            optionComp.addValue(Crew.HUMAN_TRO_BA);
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_ENV_SPECIALIST.equals(option.getName())) {
-            optionComp.addValue(Crew.ENVSPC_NONE);
-            optionComp.addValue(Crew.ENVSPC_FOG);
-            optionComp.addValue(Crew.ENVSPC_LIGHT);
-            optionComp.addValue(Crew.ENVSPC_RAIN);
-            optionComp.addValue(Crew.ENVSPC_SNOW);
-            optionComp.addValue(Crew.ENVSPC_WIND);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_NONE);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_FOG);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_LIGHT);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_RAIN);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_SNOW);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_WIND);
             optionComp.setSelected(option.stringValue());
         } else if (option.getType() == Option.CHOICE) {
             SpecialAbility spa = SpecialAbility.getOption(option.getName());

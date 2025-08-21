@@ -35,16 +35,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.compute.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.units.Entity;
-import megamek.common.units.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**
@@ -134,9 +134,9 @@ public class MekLifeSupport extends Part {
             int priorHits = hits;
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
-                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
+                if (entity.getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
                     if (!unit.isSystemMissing(Mek.SYSTEM_LIFE_SUPPORT, i)) {
-                        hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i);
+                        hits = entity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i);
                         break;
                     } else {
                         remove(false);
@@ -196,7 +196,7 @@ public class MekLifeSupport extends Part {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 } else if (unit.isLocationDestroyed(i)) {
@@ -214,7 +214,7 @@ public class MekLifeSupport extends Part {
         }
 
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if ((unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0)
+            if ((unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0)
                       && unit.isLocationDestroyed(i)) {
                 return true;
             }
@@ -243,7 +243,7 @@ public class MekLifeSupport extends Part {
         if (null != unit) {
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
-                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
+                if (entity.getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
                     return i;
                 }
             }
@@ -262,8 +262,8 @@ public class MekLifeSupport extends Part {
             return false;
         }
         if (((Mek) unit.getEntity()).getCockpitType() == Mek.COCKPIT_TORSO_MOUNTED) {
-            if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
-                      || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT) {
+            if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO
+                      || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO) {
                 return true;
             }
         } else if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_HEAD) {

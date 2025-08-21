@@ -288,10 +288,12 @@ public class EquipmentPart extends Part {
         int priorHits = getHits();
 
         int newHits = unit.getEntity()
-                            .getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(), mounted.getLocation());
+                            .getDamagedCriticalSlots(CriticalSlot.TYPE_EQUIPMENT,
+                                  getEquipmentNum(),
+                                  mounted.getLocation());
         if (mounted.isSplit()) {
             newHits += unit.getEntity()
-                             .getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT,
+                             .getDamagedCriticalSlots(CriticalSlot.TYPE_EQUIPMENT,
                                    getEquipmentNum(),
                                    mounted.getSecondLocation());
         }

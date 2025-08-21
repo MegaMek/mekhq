@@ -37,11 +37,11 @@ import java.util.Enumeration;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.compute.Compute;
-import megamek.common.units.Crew;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Crew;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -114,20 +114,20 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 final String special;
                 switch (Compute.randomInt(4)) {
                     case 0:
-                        special = Crew.ENVSPC_FOG;
+                        special = Crew.ENVIRONMENT_SPECIALIST_FOG;
                         break;
                     case 1:
-                        special = Crew.ENVSPC_LIGHT;
+                        special = Crew.ENVIRONMENT_SPECIALIST_LIGHT;
                         break;
                     case 2:
-                        special = Crew.ENVSPC_RAIN;
+                        special = Crew.ENVIRONMENT_SPECIALIST_RAIN;
                         break;
                     case 3:
-                        special = Crew.ENVSPC_SNOW;
+                        special = Crew.ENVIRONMENT_SPECIALIST_SNOW;
                         break;
                     case 4:
                     default:
-                        special = Crew.ENVSPC_WIND;
+                        special = Crew.ENVIRONMENT_SPECIALIST_WIND;
                         break;
                 }
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
@@ -138,17 +138,17 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 final String special;
                 switch (Compute.randomInt(3)) {
                     case 0:
-                        special = Crew.HUMANTRO_MEK;
+                        special = Crew.HUMAN_TRO_MEK;
                         break;
                     case 1:
-                        special = Crew.HUMANTRO_AERO;
+                        special = Crew.HUMAN_TRO_AERO;
                         break;
                     case 2:
-                        special = Crew.HUMANTRO_VEE;
+                        special = Crew.HUMAN_TRO_VEE;
                         break;
                     case 3:
                     default:
-                        special = Crew.HUMANTRO_BA;
+                        special = Crew.HUMAN_TRO_BA;
                         break;
                 }
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);

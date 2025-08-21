@@ -40,12 +40,12 @@ import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.compute.Compute;
+import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
-import megamek.common.equipment.WeaponType;
-import megamek.common.equipment.WeaponMounted;
-import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -335,17 +335,17 @@ public class CrewSkillUpgrader {
     }
 
     private String pickRandomHumanTRO() {
-        return ObjectUtility.getRandomItem(Arrays.asList(Crew.HUMANTRO_MEK,
-              Crew.HUMANTRO_AERO,
-              Crew.HUMANTRO_VEE,
-              Crew.HUMANTRO_BA));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.HUMAN_TRO_MEK,
+              Crew.HUMAN_TRO_AERO,
+              Crew.HUMAN_TRO_VEE,
+              Crew.HUMAN_TRO_BA));
     }
 
     private String pickRandomEnvSpec() {
-        return ObjectUtility.getRandomItem(Arrays.asList(Crew.ENVSPC_FOG,
-              Crew.ENVSPC_LIGHT,
-              Crew.ENVSPC_RAIN,
-              Crew.ENVSPC_SNOW,
-              Crew.ENVSPC_WIND));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.ENVIRONMENT_SPECIALIST_FOG,
+              Crew.ENVIRONMENT_SPECIALIST_LIGHT,
+              Crew.ENVIRONMENT_SPECIALIST_RAIN,
+              Crew.ENVIRONMENT_SPECIALIST_SNOW,
+              Crew.ENVIRONMENT_SPECIALIST_WIND));
     }
 }

@@ -36,15 +36,15 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
+import static megamek.common.board.Coords.ALL_DIRECTIONS;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static megamek.common.board.Coords.ALL_DIRECTIONS;
-import static megamek.common.units.UnitType.AEROSPACEFIGHTER;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
 import static megamek.common.units.UnitType.DROPSHIP;
 import static megamek.common.units.UnitType.JUMPSHIP;
 import static megamek.common.units.UnitType.MEK;
-import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -75,11 +75,11 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.units.Entity;
-import megamek.common.equipment.Minefield;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Minefield;
 import megamek.common.event.Subscribe;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -2262,7 +2262,7 @@ public class StratconRulesManager {
     private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
         int unitType = template.getAllowedUnitType();
 
-        return ((unitType == AEROSPACEFIGHTER) ||
+        return ((unitType == AEROSPACE_FIGHTER) ||
                       (unitType == CONV_FIGHTER) ||
                       (unitType == DROPSHIP) ||
                       (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) &&

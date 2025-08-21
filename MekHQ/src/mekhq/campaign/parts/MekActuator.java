@@ -220,7 +220,7 @@ public class MekActuator extends Part {
                 remove(false);
                 return;
             }
-            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);
+            hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, type, location);
             if (checkForDestruction && hits > priorHits
                       && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);

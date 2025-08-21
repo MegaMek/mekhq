@@ -36,11 +36,11 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.Mounted;
-import megamek.common.units.Tank;
 import megamek.common.equipment.WeaponType;
-import megamek.common.annotations.Nullable;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -195,7 +195,7 @@ public class Turret extends TankLocation {
                 return "must salvage armor in this location first";
             }
             // you can only salvage a location that has nothing left on it
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty & non-hittable slots
                 if ((slot == null) || !slot.isEverHittable()) {
@@ -217,7 +217,7 @@ public class Turret extends TankLocation {
             return "You must scrap armor in the turret first";
         }
         // you can only scrap a location that has nothing left on it
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // ignore empty & non-hittable slots
             if ((slot == null) || !slot.isEverHittable()) {

@@ -3066,7 +3066,7 @@ public class Campaign implements ITechManager {
                 return campaignOptions.getAutoLogisticsMekHead();
             }
 
-            if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
+            if (((MekLocation) part).getLoc() == Mek.LOC_CENTER_TORSO) {
                 return campaignOptions.getAutoLogisticsNonRepairableLocation();
             }
 
@@ -7940,7 +7940,7 @@ public class Campaign implements ITechManager {
         int nMek = stats.getNumberOfUnitsByType(Entity.ETYPE_MEK);
         int nLVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
         int nHVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
+        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER);
         int nSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int nCF = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
         int nBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
@@ -7960,7 +7960,7 @@ public class Campaign implements ITechManager {
         int noDS = max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCF = max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
+        int noASF = max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int nolv = max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         //TODO: Do capacity calculations for Infantry, too.

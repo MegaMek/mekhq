@@ -46,13 +46,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.units.Entity;
+import megamek.common.event.Subscribe;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.event.Subscribe;
-import megamek.common.loaders.EntityLoadingException;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -461,8 +461,8 @@ public class PersonnelMarket {
             return Entity.ETYPE_MEK;
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             return Entity.ETYPE_TANK;
-        } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
-            return Entity.ETYPE_AEROSPACEFIGHTER;
+        } else if ((mostTypes & Entity.ETYPE_AEROSPACE_FIGHTER) != 0) {
+            return Entity.ETYPE_AEROSPACE_FIGHTER;
         } else if ((mostTypes & Entity.ETYPE_BATTLEARMOR) != 0) {
             return Entity.ETYPE_BATTLEARMOR;
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
@@ -486,7 +486,7 @@ public class PersonnelMarket {
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
+        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER);
         int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) +
                         hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
@@ -531,7 +531,7 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_CONV_FIGHTER;
         }
         if (most == asf) {
-            retval = retval | Entity.ETYPE_AEROSPACEFIGHTER;
+            retval = retval | Entity.ETYPE_AEROSPACE_FIGHTER;
         }
         if (most == vee) {
             retval = retval | Entity.ETYPE_TANK;

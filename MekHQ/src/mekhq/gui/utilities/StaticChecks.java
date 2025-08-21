@@ -124,7 +124,7 @@ public class StaticChecks {
                 return "    Selection of Units includes a large spacecraft. \n";
             } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
                 numberSC++;
-            } else if (unit.getEntity().getUnitType() == UnitType.AEROSPACEFIGHTER
+            } else if (unit.getEntity().getUnitType() == UnitType.AEROSPACE_FIGHTER
                              || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
                 // Includes conventional fighters
                 numberASF++;

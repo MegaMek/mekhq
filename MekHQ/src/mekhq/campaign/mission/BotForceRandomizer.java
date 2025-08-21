@@ -46,16 +46,16 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
+import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.loaders.MekFileParser;
-import megamek.common.loaders.MekSummary;
 import megamek.common.units.UnitType;
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
-import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -340,7 +340,7 @@ public class BotForceRandomizer {
                 if ((unitType == UnitType.MEK) && (percentConventional > 0)
                           && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.TANK;
-                } else if ((unitType == UnitType.AEROSPACEFIGHTER) && (percentConventional > 0)
+                } else if ((unitType == UnitType.AEROSPACE_FIGHTER) && (percentConventional > 0)
                                  && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.CONV_FIGHTER;
                 }
@@ -519,7 +519,7 @@ public class BotForceRandomizer {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -541,7 +541,7 @@ public class BotForceRandomizer {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                       campaign.getGameYear()).getName();
                 crewName += ' ' + bloodname;
-                innerMap.put(Crew.MAP_BLOODNAME, bloodname);
+                innerMap.put(Crew.MAP_BLOOD_NAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
         }
@@ -638,7 +638,7 @@ public class BotForceRandomizer {
         double multiplier;
         switch (e.getUnitType()) {
             case UnitType.MEK:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
             case UnitType.PROTOMEK:
                 multiplier = 1.0;
                 break;

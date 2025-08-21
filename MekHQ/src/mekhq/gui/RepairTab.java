@@ -61,9 +61,9 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
@@ -851,7 +851,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             int selected = choiceLocation.getSelectedIndex();
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
-            for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
+            for (String s : getSelectedServicedUnit().getEntity().getLocationAbbreviations()) {
                 if (!s.equals("WNG")) {
                     choiceLocation.addItem(s);
                 }

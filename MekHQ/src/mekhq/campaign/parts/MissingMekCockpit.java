@@ -36,9 +36,9 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.units.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -152,7 +152,7 @@ public class MissingMekCockpit extends MissingPart {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 } else if (unit.isLocationDestroyed(i)) {
@@ -183,7 +183,7 @@ public class MissingMekCockpit extends MissingPart {
     @Override
     public int getLocation() {
         if (type == Mek.COCKPIT_TORSO_MOUNTED) {
-            return Mek.LOC_CT;
+            return Mek.LOC_CENTER_TORSO;
         } else {
             return Mek.LOC_HEAD;
         }
