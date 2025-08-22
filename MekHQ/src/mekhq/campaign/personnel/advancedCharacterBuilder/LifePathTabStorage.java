@@ -30,20 +30,17 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
+package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import java.util.List;
 import java.util.Map;
 
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 
-public record RequirementsTabStorage(int gameYear, List<Faction> factions, List<LifePathRecord> lifePaths,
+public record LifePathTabStorage(int gameYear, List<Faction> factions, List<LifePathRecord> lifePaths,
       Map<LifePathCategory, Integer> categories, Map<SkillAttribute, Integer> attributes,
       Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
       Map<CampaignOptionsAbilityInfo, Integer> abilities) {

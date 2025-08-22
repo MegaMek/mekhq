@@ -34,7 +34,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -59,6 +58,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import megamek.utilities.FastJScrollPane;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
@@ -212,20 +212,18 @@ public class LifePathTraitPicker extends JDialog {
                 }
             }
 
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = selectedTraitScores.getOrDefault(trait,
+                  (isDefaultMaximum ? traitMaximumValue : traitMinimumValue));
+
             JLabel lblTrait = new JLabel(label);
-            JSpinner spnTraitScore = new JSpinner(new SpinnerNumberModel(traitMinimumValue, traitMinimumValue,
+            JSpinner spnTraitScore = new JSpinner(new SpinnerNumberModel(defaultValue, traitMinimumValue,
                   traitMaximumValue, 1));
 
-            if (selectedTraitScores.containsKey(trait)) {
-                int currentValue = selectedTraitScores.get(trait);
-                currentValue = clamp(currentValue, traitMinimumValue, traitMaximumValue);
-                spnTraitScore.setValue(currentValue);
-            }
-
-            final int finalTraitMinimumValue = traitMinimumValue;
+            final int finalTraitKeyValue = isDefaultMaximum ? traitMaximumValue : traitMinimumValue;
             spnTraitScore.addChangeListener(evt -> {
                 int value = (int) spnTraitScore.getValue();
-                if (value > finalTraitMinimumValue) {
+                if (value != finalTraitKeyValue) {
                     selectedTraitScores.put(trait, value);
                 }
             });

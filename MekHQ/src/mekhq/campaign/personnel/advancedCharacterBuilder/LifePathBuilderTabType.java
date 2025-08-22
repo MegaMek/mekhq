@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
+package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 public enum LifePathBuilderTabType {
     REQUIREMENTS("requirements"),

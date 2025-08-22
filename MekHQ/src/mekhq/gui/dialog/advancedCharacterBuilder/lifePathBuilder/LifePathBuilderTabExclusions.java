@@ -32,17 +32,13 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType.REQUIREMENTS;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType.EXCLUSIONS;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -54,10 +50,8 @@ import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.EnhancedTabbedPane;
-import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -74,188 +68,51 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
-public class LifePathBuilderTabRequirements {
-    private final static MMLogger LOGGER = MMLogger.create(LifePathBuilderTabRequirements.class);
-
+public class LifePathBuilderTabExclusions {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final LifePathBuilderDialog parent;
-    private final Map<Integer, LifePathTabStorage> requirementsTabStorageMap = new HashMap<>();
-    private final Map<Integer, String> requirementsTabTextMap = new HashMap<>();
+    private LifePathTabStorage exclusionsTabStorage;
+    private String exclusionsTabTextStorage;
     private final List<String> level3Abilities = new ArrayList<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    public Map<Integer, LifePathTabStorage> getRequirementsTabStorageMap() {
-        return requirementsTabStorageMap;
+    public LifePathTabStorage getExclusionsTabStorage() {
+        return exclusionsTabStorage;
     }
 
-    public Map<Integer, String> getRequirementsTabTextMap() {
-        return requirementsTabTextMap;
+    public String getExclusionsTabTextStorage() {
+        return exclusionsTabTextStorage;
     }
 
-    public LifePathBuilderTabRequirements(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear) {
+    public LifePathBuilderTabExclusions(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear) {
         this.parent = parent;
 
         buildAllAbilityInfo();
 
-        JPanel tabRequirements = new JPanel(new BorderLayout());
-        tabRequirements.setName("requirements");
-        String titleRequirements = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.requirements");
-        tabMain.addTab(titleRequirements, tabRequirements);
+        JPanel tabExclusions = new JPanel(new BorderLayout());
+        tabExclusions.setName("exclusions");
+        String titleExclusions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.exclusions");
+        tabMain.addTab(titleExclusions, tabExclusions);
 
-        // Panel for the two buttons at the top
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        String titleAddGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addGroup.label");
-        String tooltipAddGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addGroup.tooltip");
-        RoundedJButton btnAddRequirementGroup = new RoundedJButton(titleAddGroup);
-        btnAddRequirementGroup.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddGroup)
-        );
-        buttonPanel.add(btnAddRequirementGroup);
-
-        String titleRemoveGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.removeGroup.label");
-        String tooltipRemoveGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.removeGroup.tooltip");
-        RoundedJButton btnRemoveRequirementGroup = new RoundedJButton(titleRemoveGroup);
-        btnRemoveRequirementGroup.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipRemoveGroup)
-        );
-        buttonPanel.add(btnRemoveRequirementGroup);
-
-        String titleDuplicateGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.duplicateGroup.label");
-        String tooltipDuplicateGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.duplicateGroup.tooltip");
-        RoundedJButton btnDuplicateGroup = new RoundedJButton(titleDuplicateGroup);
-        btnDuplicateGroup.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDuplicateGroup)
-        );
-        buttonPanel.add(btnDuplicateGroup);
-
-        // The actual tabbed pane and any button action listeners (we add them here to avoid a situation where they
-        // can be called before the pane has been initialized)
-        EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
-        tabbedPane.addChangeListener(e -> btnRemoveRequirementGroup.setEnabled(tabbedPane.getSelectedIndex() != 0));
-        btnAddRequirementGroup.addActionListener(e -> {
-            addRequirementsTab(tabbedPane, gameYear, null);
-            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-        });
-        btnRemoveRequirementGroup.addActionListener(e -> removeRequirementGroup(tabbedPane));
-        btnDuplicateGroup.addActionListener(e -> duplicateGroup(tabbedPane, gameYear));
-
-        // Add 'Group 0' - this group is required
-        addRequirementsTab(tabbedPane, gameYear, null);
-
-        tabRequirements.add(buttonPanel, BorderLayout.NORTH);
-        tabRequirements.add(tabbedPane, BorderLayout.CENTER);
+        JPanel pnlExclusions = buildExclusionsPanel(gameYear);
+        tabExclusions.add(pnlExclusions, BorderLayout.CENTER);
     }
 
-    private void removeRequirementGroup(EnhancedTabbedPane tabbedPane) {
-        int selectedIndex = tabbedPane.getSelectedIndex();
-
-        // Remove the current tab, unless it's Group 0
-        if (selectedIndex > 0) {
-            // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
-            // correct order (since we're removing a tab, the indexes will shift)
-            Map<Integer, LifePathTabStorage> tempStorageMap = new HashMap<>();
-            for (Map.Entry<Integer, LifePathTabStorage> entry : requirementsTabStorageMap.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempStorageMap.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempStorageMap.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-
-            requirementsTabStorageMap.clear();
-            requirementsTabStorageMap.putAll(tempStorageMap);
-
-            Map<Integer, String> tempTextMap = new HashMap<>();
-            for (Map.Entry<Integer, String> entry : requirementsTabTextMap.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempTextMap.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempTextMap.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-
-            requirementsTabTextMap.clear();
-            requirementsTabTextMap.putAll(tempTextMap);
-
-            // Remove the desired tab
-            tabbedPane.remove(selectedIndex);
-
-            // Update the progress panel
-            parent.updateTxtProgress();
-        }
-    }
-
-    private void duplicateGroup(EnhancedTabbedPane tabbedPane, int gameYear) {
-        int selectedIndex = tabbedPane.getSelectedIndex();
-        if (selectedIndex < 0) {
-            return; // nothing selected, do nothing
-        }
-
-        LifePathTabStorage currentValues = requirementsTabStorageMap.get(selectedIndex);
-        String currentText = requirementsTabTextMap.get(selectedIndex);
-
-        addRequirementsTab(tabbedPane, gameYear, currentValues);
-        int newIndex = tabbedPane.getTabCount() - 1;
-
-        requirementsTabStorageMap.put(newIndex, currentValues);
-        requirementsTabTextMap.put(newIndex, currentText);
-
-        JPanel newTabPanel = (JPanel) tabbedPane.getComponentAt(newIndex);
-        JPanel pnlRequirements = (JPanel) newTabPanel.getComponent(1);
-        JEditorPane txtRequirements = findEditorPaneByName(pnlRequirements, "txtRequirements");
-        if (txtRequirements != null) {
-            txtRequirements.setText(currentText);
-        } else {
-            LOGGER.warn("Could not find txtRequirements in duplicateGroup");
-        }
-
-        parent.updateTxtProgress();
-
-        tabbedPane.setSelectedIndex(newIndex);
-    }
-
-    private JEditorPane findEditorPaneByName(Container container, String name) {
-        for (Component component : container.getComponents()) {
-            if (component instanceof JEditorPane && name.equals(component.getName())) {
-                return (JEditorPane) component;
-            } else if (component instanceof Container) {
-                JEditorPane result = findEditorPaneByName((Container) component, name);
-                if (result != null) {return result;}
-            }
-        }
-        return null;
-    }
-
-    private void addRequirementsTab(EnhancedTabbedPane tabbedPane, int gameYear, @Nullable LifePathTabStorage storage) {
-        boolean hasStorage = storage != null;
-
-        int index = tabbedPane.getTabCount();
-
-        // Create the panel to be used in the tab
-        JPanel requirementGroupPanel = new JPanel();
-        requirementGroupPanel.setLayout(new BorderLayout());
+    private JPanel buildExclusionsPanel(int gameYear) {
+        JPanel pnlExclusions = new JPanel();
+        pnlExclusions.setLayout(new BorderLayout());
 
         // Panel for the 8 buttons (using GridLayout: 2 rows, 4 columns)
         JPanel buttonsPanel = new JPanel(new GridLayout(2, 4, PADDING, PADDING));
 
         // Attributes
         Map<SkillAttribute, Integer> attributes = new HashMap<>();
-        if (hasStorage) {
-            attributes.putAll(storage.attributes());
-        }
-
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addAttribute.label");
+              "LifePathBuilderDialog.exclusions.button.addAttribute.label");
         String tooltipAddAttribute = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addAttribute.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addAttribute.tooltip");
         RoundedJButton btnAddAttribute = new RoundedJButton(titleAddAttribute);
         btnAddAttribute.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddAttribute)
@@ -264,14 +121,10 @@ public class LifePathBuilderTabRequirements {
 
         // Traits
         Map<LifePathEntryDataTraitLookup, Integer> traits = new HashMap<>();
-        if (hasStorage) {
-            traits.putAll(storage.traits());
-        }
-
         String titleAddTrait = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addTrait.label");
+              "LifePathBuilderDialog.exclusions.button.addTrait.label");
         String tooltipAddTrait = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addTrait.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addTrait.tooltip");
         RoundedJButton btnAddTrait = new RoundedJButton(titleAddTrait);
         btnAddTrait.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddTrait)
@@ -280,14 +133,10 @@ public class LifePathBuilderTabRequirements {
 
         // Skills
         Map<SkillType, Integer> skills = new HashMap<>();
-        if (hasStorage) {
-            skills.putAll(storage.skills());
-        }
-
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSkill.label");
+              "LifePathBuilderDialog.exclusions.button.addSkill.label");
         String tooltipAddSkill = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSkill.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addSkill.tooltip");
         RoundedJButton btnAddSkill = new RoundedJButton(titleAddSkill);
         btnAddSkill.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddSkill)
@@ -296,14 +145,10 @@ public class LifePathBuilderTabRequirements {
 
         // SPAs
         Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
-        if (hasStorage) {
-            abilities.putAll(storage.abilities());
-        }
-
         String titleAddSPA = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSPA.label");
+              "LifePathBuilderDialog.exclusions.button.addSPA.label");
         String tooltipAddSPA = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSPA.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addSPA.tooltip");
         RoundedJButton btnAddSPA = new RoundedJButton(titleAddSPA);
         btnAddSPA.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddSPA)
@@ -312,14 +157,10 @@ public class LifePathBuilderTabRequirements {
 
         // Factions
         List<Faction> factions = new ArrayList<>();
-        if (hasStorage) {
-            factions.addAll(storage.factions());
-        }
-
         String titleAddFaction = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addFaction.label");
+              "LifePathBuilderDialog.exclusions.button.addFaction.label");
         String tooltipAddFaction = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addFaction.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addFaction.tooltip");
         RoundedJButton btnAddFaction = new RoundedJButton(titleAddFaction);
         btnAddFaction.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddFaction)
@@ -328,14 +169,10 @@ public class LifePathBuilderTabRequirements {
 
         // Life Paths
         List<LifePathRecord> lifePaths = new ArrayList<>();
-        if (hasStorage) {
-            lifePaths.addAll(storage.lifePaths());
-        }
-
         String titleAddLifePath = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addLifePath.label");
+              "LifePathBuilderDialog.exclusions.button.addLifePath.label");
         String tooltipAddLifePath = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addLifePath.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addLifePath.tooltip");
         RoundedJButton btnAddLifePath = new RoundedJButton(titleAddLifePath);
         btnAddLifePath.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddLifePath)
@@ -345,14 +182,10 @@ public class LifePathBuilderTabRequirements {
 
         // Categories
         Map<LifePathCategory, Integer> categories = new HashMap<>();
-        if (hasStorage) {
-            categories.putAll(storage.categories());
-        }
-
         String titleAddCategory = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addCategory.label");
+              "LifePathBuilderDialog.exclusions.button.addCategory.label");
         String tooltipAddCategory = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addCategory.tooltip");
+              "LifePathBuilderDialog.exclusions.button.addCategory.tooltip");
         RoundedJButton btnAddCategory = new RoundedJButton(titleAddCategory);
         btnAddCategory.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddCategory)
@@ -363,130 +196,113 @@ public class LifePathBuilderTabRequirements {
         JPanel pnlDisplay = new JPanel();
         pnlDisplay.setLayout(new BorderLayout());
 
-        String titleBorder = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
+        String titleBorder = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.exclusions.tab.title");
         pnlDisplay.setBorder(RoundedLineBorder.createRoundedLineBorder(titleBorder));
 
-        JEditorPane txtRequirements = new JEditorPane();
-        txtRequirements.setName("txtRequirements");
-        txtRequirements.setContentType("text/html");
-        txtRequirements.setEditable(false);
-        LifePathTabStorage initialStorage = getRequirementsTabStorage(
-              gameYear,
-              factions,
-              lifePaths,
-              categories,
-              attributes,
-              traits,
-              skills,
-              abilities);
-        String initialRequirementsText = buildRequirementText(initialStorage);
-        requirementsTabStorageMap.put(index, initialStorage);
-        requirementsTabTextMap.put(index, initialRequirementsText);
+        JEditorPane txtExclusions = new JEditorPane();
+        txtExclusions.setName("txtExclusions");
+        txtExclusions.setContentType("text/html");
+        txtExclusions.setEditable(false);
+        LifePathTabStorage initialStorage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
+              attributes, traits, skills, abilities);
+        String initialExclusionsText = buildExclusionsText(initialStorage);
+        exclusionsTabStorage = initialStorage;
+        exclusionsTabTextStorage = initialExclusionsText;
 
-        txtRequirements.setText(initialRequirementsText);
+        txtExclusions.setText(initialExclusionsText);
 
-        FastJScrollPane scrollRequirements = new FastJScrollPane(txtRequirements);
-        scrollRequirements.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollRequirements.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollRequirements.setBorder(null);
+        FastJScrollPane scrollExclusions = new FastJScrollPane(txtExclusions);
+        scrollExclusions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollExclusions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollExclusions.setBorder(null);
 
-        pnlDisplay.add(scrollRequirements, BorderLayout.CENTER);
+        pnlDisplay.add(scrollExclusions, BorderLayout.CENTER);
 
         // Action Listeners
         btnAddAttribute.addActionListener(e -> {
             parent.setVisible(false);
 
-            LifePathAttributePicker picker = new LifePathAttributePicker(attributes, REQUIREMENTS);
+            LifePathAttributePicker picker = new LifePathAttributePicker(attributes, EXCLUSIONS);
             attributes.clear();
             attributes.putAll(picker.getSelectedAttributeScores());
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathTraitPicker picker = new LifePathTraitPicker(traits, REQUIREMENTS);
+            LifePathTraitPicker picker = new LifePathTraitPicker(traits, EXCLUSIONS);
             traits.clear();
             traits.putAll(picker.getSelectedTraitScores());
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathSkillPicker picker = new LifePathSkillPicker(skills, REQUIREMENTS);
+            LifePathSkillPicker picker = new LifePathSkillPicker(skills, EXCLUSIONS);
             skills.clear();
             skills.putAll(picker.getSelectedSkillLevels());
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
         btnAddSPA.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathSPAPicker picker = new LifePathSPAPicker(abilities, allAbilityInfo, REQUIREMENTS);
+            LifePathSPAPicker picker = new LifePathSPAPicker(abilities, allAbilityInfo, EXCLUSIONS);
             abilities.clear();
             abilities.putAll(picker.getSelectedAbilities());
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
         btnAddFaction.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathFactionPicker picker = new LifePathFactionPicker(factions, gameYear, REQUIREMENTS);
+            LifePathFactionPicker picker = new LifePathFactionPicker(factions, gameYear, EXCLUSIONS);
             factions.clear();
             factions.addAll(picker.getSelectedFactions());
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
         btnAddLifePath.addActionListener(e -> {
             parent.setVisible(false);
-            // TODO launch a dialog that lists the current requirements and allows the user to remove one
+            // TODO launch a dialog that lists the current exclusions and allows the user to remove one
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
         btnAddCategory.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(categories, REQUIREMENTS);
+            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(categories, EXCLUSIONS);
             categories.clear();
             categories.putAll(picker.getSelectedCategoryCounts());
 
-            standardizedActions(gameYear, index, attributes, traits, skills, abilities, factions, lifePaths,
-                  categories, txtRequirements, initialStorage);
+            standardizedActions(gameYear, attributes, traits, skills, abilities, factions, lifePaths,
+                  categories, txtExclusions, initialStorage);
         });
 
         // Add panels and then add Tab
-        requirementGroupPanel.add(buttonsPanel, BorderLayout.NORTH);
-        requirementGroupPanel.add(pnlDisplay, BorderLayout.CENTER);
+        pnlExclusions.add(buttonsPanel, BorderLayout.NORTH);
+        pnlExclusions.add(pnlDisplay, BorderLayout.CENTER);
 
-        int count = tabbedPane.getComponentCount();
-        String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel");
-        tabbedPane.addTab(titleTab, requirementGroupPanel);
+        return pnlExclusions;
     }
 
-    private void standardizedActions(int gameYear, int index, Map<SkillAttribute, Integer> attributes,
+    private void standardizedActions(int gameYear, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
           Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<LifePathRecord> lifePaths,
-          Map<LifePathCategory, Integer> categories, JEditorPane txtRequirements,
+          Map<LifePathCategory, Integer> categories, JEditorPane txtExclusions,
           LifePathTabStorage initialStorage) {
-        LifePathTabStorage storage = getRequirementsTabStorage(
-              gameYear,
-              factions,
-              lifePaths,
-              categories,
-              attributes,
-              traits,
-              skills,
-              abilities);
-        String requirementsText = buildRequirementText(storage);
-        txtRequirements.setText(requirementsText);
+        LifePathTabStorage storage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
+              attributes, traits, skills, abilities);
+        String exclusionsText = buildExclusionsText(storage);
+        txtExclusions.setText(exclusionsText);
 
-        requirementsTabStorageMap.put(index, initialStorage);
-        requirementsTabTextMap.put(index, requirementsText);
+        exclusionsTabStorage = initialStorage;
+        exclusionsTabTextStorage = exclusionsText;
+
         parent.updateTxtProgress();
-
         parent.setVisible(true);
     }
 
@@ -543,8 +359,7 @@ public class LifePathBuilderTabRequirements {
         }
     }
 
-    private static LifePathTabStorage getRequirementsTabStorage(
-          int gameYear, List<Faction> factions,
+    private static LifePathTabStorage getExclusionsTabStorage(int gameYear, List<Faction> factions,
           List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
           Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
@@ -558,8 +373,7 @@ public class LifePathBuilderTabRequirements {
               abilities);
     }
 
-    private static String buildRequirementText(
-          LifePathTabStorage storage) {
+    private static String buildExclusionsText(LifePathTabStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Factions

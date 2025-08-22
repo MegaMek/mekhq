@@ -90,6 +90,7 @@ public class LifePathBuilderDialog extends JDialog {
 
     private LifePathBuilderTabBasicInformation basicInfoTab;
     private LifePathBuilderTabRequirements requirementsTab;
+    private LifePathBuilderTabExclusions exclusionsTab;
 
     static String getLifePathBuilderResourceBundle() {
         return RESOURCE_BUNDLE;
@@ -137,7 +138,8 @@ public class LifePathBuilderDialog extends JDialog {
         String newRequirementsText = getNewRequirementsText();
         newProgressText.append(newRequirementsText);
 
-        System.out.println(newRequirementsText);
+        String newExclusionsText = getNewExclusionsText();
+        newProgressText.append(newExclusionsText);
 
         txtProgress.setText(newProgressText.toString());
     }
@@ -260,6 +262,23 @@ public class LifePathBuilderDialog extends JDialog {
         return newRequirementsText.toString();
     }
 
+    private String getNewExclusionsText() {
+        StringBuilder newExclusionsText = new StringBuilder();
+
+        String exclusions = exclusionsTab.getExclusionsTabTextStorage();
+        if (exclusions.isBlank()) {
+            return "";
+        }
+
+        String exclusionsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.exclusions.tab.title");
+        newExclusionsText.append("<h2 style='text-align:center; margin:0;'>").append(exclusionsTitle).append(
+              "</h2>");
+
+        newExclusionsText.append(exclusions);
+
+        return newExclusionsText.toString();
+    }
+
     private JPanel initialize(int gameYear) {
         JPanel pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
@@ -335,16 +354,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
         requirementsTab = new LifePathBuilderTabRequirements(this, tabMain, gameYear);
-
-        // Exclusions
-        JPanel tabExclusions = new JPanel();
-        tabExclusions.setName("exclusions");
-        String titleExclusions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.exclusions");
-        tabMain.addTab(titleExclusions, tabExclusions);
-        tabExclusions.add(new JLabel("First Tab Content"));
-
-        // TODO Add Exclusion
-        // TODO Remove Exclusion
+        exclusionsTab = new LifePathBuilderTabExclusions(this, tabMain, gameYear);
 
         // Fixed XP
         JPanel tabFixedXP = new JPanel();

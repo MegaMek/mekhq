@@ -34,7 +34,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -55,6 +54,7 @@ import javax.swing.border.EmptyBorder;
 import megamek.common.EnhancedTabbedPane;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
@@ -203,27 +203,27 @@ public class LifePathSPAPicker extends JDialog {
                                          tabType == LifePathBuilderTabType.EXCLUSIONS;
 
         FastJScrollPane pnlCombatSkills = useBinaryOptions ? getAbilityOptionsBinary(combatAbilities) :
-                                                getAbilityOptionsVariable(combatAbilities);
+                                                getAbilityOptionsVariable(combatAbilities, tabType);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.combat.label"),
               pnlCombatSkills);
 
         FastJScrollPane pnlManeuveringAbilities = useBinaryOptions ? getAbilityOptionsBinary(maneuveringAbilities) :
-                                                        getAbilityOptionsVariable(maneuveringAbilities);
+                                                        getAbilityOptionsVariable(maneuveringAbilities, tabType);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.maneuvering.label"),
               pnlManeuveringAbilities);
 
         FastJScrollPane pnlUtilityAbilities = useBinaryOptions ? getAbilityOptionsBinary(utilityAbilities) :
-                                                    getAbilityOptionsVariable(utilityAbilities);
+                                                    getAbilityOptionsVariable(utilityAbilities, tabType);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.utility.label"),
               pnlUtilityAbilities);
 
         FastJScrollPane pnlFlawsAbilities = useBinaryOptions ? getAbilityOptionsBinary(flawsAbilities) :
-                                                  getAbilityOptionsVariable(flawsAbilities);
+                                                  getAbilityOptionsVariable(flawsAbilities, tabType);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.flaws.label"),
               pnlFlawsAbilities);
 
         FastJScrollPane pnlOriginsAbilities = useBinaryOptions ? getAbilityOptionsBinary(originsAbilities) :
-                                                    getAbilityOptionsVariable(originsAbilities);
+                                                    getAbilityOptionsVariable(originsAbilities, tabType);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.origins.label"),
               pnlOriginsAbilities);
 
@@ -279,7 +279,8 @@ public class LifePathSPAPicker extends JDialog {
         return scrollSkills;
     }
 
-    private FastJScrollPane getAbilityOptionsVariable(List<CampaignOptionsAbilityInfo> allAbilityInfo) {
+    private FastJScrollPane getAbilityOptionsVariable(List<CampaignOptionsAbilityInfo> allAbilityInfo,
+          LifePathBuilderTabType tabType) {
         JPanel pnlAbilityOptions = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -295,19 +296,18 @@ public class LifePathSPAPicker extends JDialog {
             int minimumValue = 0;
             int maximumValue = 1000;
 
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = selectedAbilities.getOrDefault(abilityInfo,
+                  (isDefaultMaximum ? maximumValue : minimumValue));
+
             JLabel lblAbility = new JLabel(label);
-            JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(minimumValue, minimumValue,
+            JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
                   maximumValue, 1));
 
-            if (selectedAbilities.containsKey(abilityInfo)) {
-                int currentValue = selectedAbilities.get(abilityInfo);
-                currentValue = clamp(currentValue, minimumValue, maximumValue);
-                spnAbilityValue.setValue(currentValue);
-            }
-
+            final int finalTraitKeyValue = isDefaultMaximum ? maximumValue : minimumValue;
             spnAbilityValue.addChangeListener(evt -> {
                 int value = (int) spnAbilityValue.getValue();
-                if (value > minimumValue) {
+                if (value != finalTraitKeyValue) {
                     selectedAbilities.put(abilityInfo, value);
                 }
             });

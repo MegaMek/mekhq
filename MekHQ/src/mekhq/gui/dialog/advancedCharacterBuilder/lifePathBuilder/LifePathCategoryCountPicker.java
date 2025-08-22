@@ -63,6 +63,7 @@ import javax.swing.border.EmptyBorder;
 
 import megamek.common.EnhancedTabbedPane;
 import megamek.utilities.FastJScrollPane;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
@@ -99,7 +100,7 @@ public class LifePathCategoryCountPicker extends JDialog {
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel();
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -170,7 +171,7 @@ public class LifePathCategoryCountPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel() {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -204,23 +205,23 @@ public class LifePathCategoryCountPicker extends JDialog {
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
         if (!categories0.isEmpty()) {
-            buildTab(categories0, optionPane, getCategoryOptions(categories0));
+            buildTab(categories0, optionPane, getCategoryOptions(categories0, tabType));
         }
 
         if (!categories1.isEmpty()) {
-            buildTab(categories1, optionPane, getCategoryOptions(categories1));
+            buildTab(categories1, optionPane, getCategoryOptions(categories1, tabType));
         }
 
         if (!categories2.isEmpty()) {
-            buildTab(categories2, optionPane, getCategoryOptions(categories2));
+            buildTab(categories2, optionPane, getCategoryOptions(categories2, tabType));
         }
 
         if (!categories3.isEmpty()) {
-            buildTab(categories3, optionPane, getCategoryOptions(categories3));
+            buildTab(categories3, optionPane, getCategoryOptions(categories3, tabType));
         }
 
         if (!categories4.isEmpty()) {
-            buildTab(categories4, optionPane, getCategoryOptions(categories4));
+            buildTab(categories4, optionPane, getCategoryOptions(categories4, tabType));
         }
 
         pnlOptions.add(optionPane);
@@ -240,7 +241,7 @@ public class LifePathCategoryCountPicker extends JDialog {
     }
 
 
-    private FastJScrollPane getCategoryOptions(List<LifePathCategory> categories) {
+    private FastJScrollPane getCategoryOptions(List<LifePathCategory> categories, LifePathBuilderTabType tabType) {
         JPanel pnlSkills = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -257,26 +258,32 @@ public class LifePathCategoryCountPicker extends JDialog {
             int minimumSkillLevel = 0;
             int maximumSkillLevel = 10;
 
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = selectedCategoryCounts.getOrDefault(category,
+                  (isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel));
+
             JLabel lblCategory = new JLabel(label);
-            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(minimumSkillLevel, minimumSkillLevel,
+            JSpinner spnCategoryCount = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
                   maximumSkillLevel, 1));
 
             if (selectedCategoryCounts.containsKey(category)) {
                 int currentValue = selectedCategoryCounts.get(category);
                 currentValue = clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
-                spnSkillLevel.setValue(currentValue);
+                spnCategoryCount.setValue(currentValue);
             }
 
-            spnSkillLevel.addChangeListener(evt -> {
-                int value = (int) spnSkillLevel.getValue();
-                if (value > minimumSkillLevel) {
+            final int finalTraitKeyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
+            spnCategoryCount.addChangeListener(evt -> {
+                int value = (int) spnCategoryCount.getValue();
+                if (value != finalTraitKeyValue) {
                     selectedCategoryCounts.put(category, value);
                 }
             });
+
             lblCategory.addMouseListener(
                   TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
-            spnSkillLevel.addMouseListener(
+            spnCategoryCount.addMouseListener(
                   TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
 
@@ -287,7 +294,7 @@ public class LifePathCategoryCountPicker extends JDialog {
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
             pnlRows.add(lblCategory);
             pnlRows.add(Box.createHorizontalStrut(PADDING));
-            pnlRows.add(spnSkillLevel);
+            pnlRows.add(spnCategoryCount);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             pnlSkills.add(pnlRows, gbc);

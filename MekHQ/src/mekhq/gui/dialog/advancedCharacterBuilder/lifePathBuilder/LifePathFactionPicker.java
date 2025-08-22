@@ -58,6 +58,7 @@ import javax.swing.ScrollPaneConstants;
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.universe.FactionTag;
 import megamek.utilities.FastJScrollPane;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;

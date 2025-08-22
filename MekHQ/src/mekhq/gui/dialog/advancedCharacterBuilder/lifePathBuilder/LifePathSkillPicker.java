@@ -34,7 +34,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -62,6 +61,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.common.EnhancedTabbedPane;
 import megamek.utilities.FastJScrollPane;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
@@ -267,19 +267,18 @@ public class LifePathSkillPicker extends JDialog {
                 case FIXED_XP, FLEXIBLE_XP -> 1000;
             };
 
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = selectedSkillLevels.getOrDefault(type,
+                  (isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel));
+
             JLabel lblSkill = new JLabel(label);
-            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(minimumSkillLevel, minimumSkillLevel,
+            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
                   maximumSkillLevel, 1));
 
-            if (selectedSkillLevels.containsKey(type)) {
-                int currentValue = selectedSkillLevels.get(type);
-                currentValue = clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
-                spnSkillLevel.setValue(currentValue);
-            }
-
+            final int finalTraitKeyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
             spnSkillLevel.addChangeListener(evt -> {
                 int value = (int) spnSkillLevel.getValue();
-                if (value > minimumSkillLevel) {
+                if (value != finalTraitKeyValue) {
                     selectedSkillLevels.put(type, value);
                 }
             });

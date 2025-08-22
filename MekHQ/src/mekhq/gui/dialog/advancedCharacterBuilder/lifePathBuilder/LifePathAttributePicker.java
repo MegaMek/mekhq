@@ -34,7 +34,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
@@ -60,6 +59,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import megamek.utilities.FastJScrollPane;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -184,28 +184,28 @@ public class LifePathAttributePicker extends JDialog {
 
             JLabel lblAttribute = new JLabel(label);
 
-            int traitMinimumValue = switch (tabType) {
+            int categoryMinimumValue = switch (tabType) {
                 case FIXED_XP, FLEXIBLE_XP -> 0;
                 case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
             };
-            int traitMaximumValue = switch (tabType) {
-                case FIXED_XP, FLEXIBLE_XP -> MAXIMUM_ATTRIBUTE_SCORE;
-                case REQUIREMENTS, EXCLUSIONS -> 1000;
+            int categoryMaximumValue = switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> 1000;
+                case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
             };
 
             lblAttribute.setToolTipText(tooltip);
 
-            JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(traitMinimumValue, traitMinimumValue,
-                  traitMaximumValue, 1));
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = storedAttributeScores.getOrDefault(attribute,
+                  (isDefaultMaximum ? categoryMaximumValue : categoryMinimumValue));
 
-            if (selectedAttributeScores.containsKey(attribute)) {
-                int currentValue = selectedAttributeScores.get(attribute);
-                currentValue = clamp(currentValue, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            }
+            JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, categoryMinimumValue,
+                  categoryMaximumValue, 1));
 
+            final int finalTraitKeyValue = isDefaultMaximum ? categoryMaximumValue : categoryMinimumValue;
             spnAttributeScore.addChangeListener(evt -> {
                 int value = (int) spnAttributeScore.getValue();
-                if (value > MINIMUM_ATTRIBUTE_SCORE) {
+                if (value != finalTraitKeyValue) {
                     selectedAttributeScores.put(attribute, value);
                 }
             });
