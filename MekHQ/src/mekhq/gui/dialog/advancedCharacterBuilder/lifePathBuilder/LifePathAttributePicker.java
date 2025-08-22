@@ -58,7 +58,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -66,6 +70,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
 class LifePathAttributePicker extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathAttributePicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathAttributePicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
@@ -126,6 +131,7 @@ class LifePathAttributePicker extends JDialog {
               MINIMUM_COMPONENT_HEIGHT));
         setLocationRelativeTo(null);
         setModal(true);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -256,5 +262,18 @@ class LifePathAttributePicker extends JDialog {
         pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
 
         return pnlInstructions;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathAttributePicker.class);
+            this.setName("LifePathAttributePicker");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }

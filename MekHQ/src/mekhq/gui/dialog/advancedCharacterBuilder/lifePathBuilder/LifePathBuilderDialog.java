@@ -60,10 +60,14 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -72,6 +76,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class LifePathBuilderDialog extends JDialog {
+    private static MMLogger LOGGER = MMLogger.create(LifePathBuilderDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
 
     private static final int MINIMUM_SIDE_COMPONENT_WIDTH = scaleForGUI(250);
@@ -137,6 +142,7 @@ public class LifePathBuilderDialog extends JDialog {
         setPreferredSize(PREFERRED_SIZE);
         setSize(PREFERRED_SIZE);
         setLocationRelativeTo(owner);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -402,5 +408,18 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathBuilderDialog.class);
+            this.setName("LifePathBuilderDialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }

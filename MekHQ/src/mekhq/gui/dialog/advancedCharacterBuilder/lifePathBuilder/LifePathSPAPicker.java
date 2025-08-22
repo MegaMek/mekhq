@@ -51,8 +51,12 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -60,6 +64,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
 class LifePathSPAPicker extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathSPAPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSPAPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
@@ -123,6 +128,7 @@ class LifePathSPAPicker extends JDialog {
               MINIMUM_COMPONENT_HEIGHT));
         setLocationRelativeTo(null);
         setModal(true);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -388,5 +394,18 @@ class LifePathSPAPicker extends JDialog {
         pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
 
         return pnlInstructions;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathSPAPicker.class);
+            this.setName("LifePathSPAPicker");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }

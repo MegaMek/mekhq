@@ -59,13 +59,18 @@ import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 class LifePathSkillPicker extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathSkillPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSkillPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
@@ -123,6 +128,7 @@ class LifePathSkillPicker extends JDialog {
               MINIMUM_COMPONENT_HEIGHT));
         setLocationRelativeTo(null);
         setModal(true);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -339,5 +345,18 @@ class LifePathSkillPicker extends JDialog {
         pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
 
         return pnlInstructions;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathSkillPicker.class);
+            this.setName("LifePathSkillPicker");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }

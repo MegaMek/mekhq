@@ -65,6 +65,7 @@ class LifePathBuilderTabBasicInformation {
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final JTextArea txtName;
+    private final JTextArea txtSource;
     private final JTextArea txtFlavorText;
     private final JSpinner spnAge;
     private final JSpinner spnDiscount;
@@ -72,7 +73,7 @@ class LifePathBuilderTabBasicInformation {
     private Set<LifePathCategory> categories = new HashSet<>();
 
     String getName() {
-        return txtName.getText();
+        return txtSource.getText();
     }
 
     String getFlavorText() {
@@ -127,6 +128,29 @@ class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
+              parent::updateTxtProgress
+        );
+
+        // Source
+        final String titleSource = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.source.label");
+        final String tooltipSource = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.source.tooltip");
+        JLabel lblSource = new JLabel(titleSource);
+        txtSource = JTextAreaWithCharacterLimit.createLimitedTextArea(50, 1);
+        FastJScrollPane sourceScroll = new FastJScrollPane(txtSource);
+        sourceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        sourceScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        sourceScroll.setPreferredSize(nameSize);
+        sourceScroll.setMaximumSize(nameSize);
+        lblSource.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipSource)
+        );
+        txtSource.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipSource)
+        );
+        DocumentChangeListenerUtil.addChangeListener(
+              txtSource.getDocument(),
               parent::updateTxtProgress
         );
 
@@ -240,12 +264,14 @@ class LifePathBuilderTabBasicInformation {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                     .addComponent(lblName)
                                     .addComponent(lblFlavorText)
+                                    .addComponent(lblSource)
                                     .addComponent(lblAge)
                                     .addComponent(lblDiscount)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                     .addComponent(nameScroll)
                                     .addComponent(flavorScroll)
+                                    .addComponent(sourceScroll)
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(spnAge)
                                     )
@@ -269,6 +295,10 @@ class LifePathBuilderTabBasicInformation {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(lblFlavorText)
                                     .addComponent(flavorScroll)
+                    )
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblSource)
+                                    .addComponent(sourceScroll)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(lblAge)

@@ -55,15 +55,20 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.universe.FactionTag;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 class LifePathFactionPicker extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathFactionPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathFactionPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
@@ -121,6 +126,7 @@ class LifePathFactionPicker extends JDialog {
               MINIMUM_COMPONENT_HEIGHT));
         setLocationRelativeTo(null);
         setModal(true);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -341,5 +347,18 @@ class LifePathFactionPicker extends JDialog {
         pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
 
         return pnlInstructions;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathFactionPicker.class);
+            this.setName("LifePathFactionPicker");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }
