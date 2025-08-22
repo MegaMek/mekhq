@@ -74,11 +74,11 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 public class LifePathBuilderDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
 
-    private static final int MINIMUM_SIDE_COMPONENT_WIDTH = scaleForGUI(225);
+    private static final int MINIMUM_SIDE_COMPONENT_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(550);
     private static final Dimension SIDE_PANEL_MINIMUM_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH,
           MINIMUM_COMPONENT_HEIGHT);
-    private static final Dimension MINIMUM_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH * 6,
+    private static final Dimension MINIMUM_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH * 3,
           MINIMUM_COMPONENT_HEIGHT);
     private static final int PADDING = scaleForGUI(10);
 
@@ -93,7 +93,8 @@ public class LifePathBuilderDialog extends JDialog {
 
     private FastJScrollPane scrollProgress;
     private JEditorPane txtProgress;
-
+    private JPanel pnlInstructions;
+    private JPanel pnlProgress;
     private LifePathBuilderTabBasicInformation basicInfoTab;
     private LifePathBuilderTabRequirements requirementsTab;
     private LifePathBuilderTabExclusions exclusionsTab;
@@ -155,9 +156,9 @@ public class LifePathBuilderDialog extends JDialog {
     private JPanel initialize(int gameYear) {
         buildAllAbilityInfo();
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
+        pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
-        JPanel pnlProgress = initializeProgressPanel();
+        pnlProgress = initializeProgressPanel();
 
         // Layout using GridBagLayout for a width ratio of 1:2:1
         JPanel container = new JPanel(new GridBagLayout());
@@ -167,17 +168,17 @@ public class LifePathBuilderDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
 
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.weightx = 1.0; // Instructions panel (1x width)
+        gridBagConstraints.weightx = 0.25; // Instructions panel (1x width)
         gridBagConstraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         container.add(pnlInstructions, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.weightx = 2.0; // Main panel (2x width)
+        gridBagConstraints.weightx = 0.5; // Main panel (2x width)
         gridBagConstraints.insets = new Insets(PADDING, 0, PADDING, 0);
         container.add(tabMain, gridBagConstraints);
 
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.weightx = 1.0; // Progress panel (1x width)
+        gridBagConstraints.weightx = 0.25; // Progress panel (1x width)
         gridBagConstraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         container.add(pnlProgress, gridBagConstraints);
 
@@ -335,7 +336,7 @@ public class LifePathBuilderDialog extends JDialog {
         lblTooltipDisplay = new JLabel();
         lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
         setLblTooltipDisplay("");
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTooltipDisplay.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JPanel pnlButtons = new JPanel();
         pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.X_AXIS));
@@ -357,12 +358,28 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
 
+        String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
+        RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
+        btnToggleInstructions.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnToggleInstructions.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnToggleInstructions.addActionListener(e -> pnlInstructions.setVisible(!pnlInstructions.isVisible()));
+
+        String titleToggleProgress = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleProgress");
+        RoundedJButton btnToggleProgress = new RoundedJButton(titleToggleProgress);
+        btnToggleProgress.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnToggleProgress.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnToggleProgress.addActionListener(e -> pnlProgress.setVisible(!pnlProgress.isVisible()));
+
         pnlButtons.add(Box.createHorizontalGlue());
+        pnlButtons.add(btnToggleInstructions);
+        pnlButtons.add(Box.createHorizontalStrut(PADDING));
         pnlButtons.add(btnCancel);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
         pnlButtons.add(btnSave);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
         pnlButtons.add(btnLoad);
+        pnlButtons.add(Box.createHorizontalStrut(PADDING));
+        pnlButtons.add(btnToggleProgress);
         pnlButtons.add(Box.createHorizontalGlue());
 
         pnlContents.add(Box.createVerticalGlue());
