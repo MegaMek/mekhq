@@ -80,10 +80,12 @@ public class LifePathBuilderDialog extends JDialog {
           MINIMUM_COMPONENT_HEIGHT);
     private static final Dimension MINIMUM_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH * 3,
           MINIMUM_COMPONENT_HEIGHT);
+    private static final Dimension PREFERRED_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH * 5,
+          MINIMUM_COMPONENT_HEIGHT);
     private static final int PADDING = scaleForGUI(10);
 
     private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_SIZE.width * 0.95);
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_SIDE_COMPONENT_WIDTH * 0.95);
+    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_SIDE_COMPONENT_WIDTH * 0.85);
     private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
 
     private FastJScrollPane scrollInstructions;
@@ -132,6 +134,8 @@ public class LifePathBuilderDialog extends JDialog {
 
         setContentPane(contents);
         setMinimumSize(MINIMUM_SIZE);
+        setPreferredSize(PREFERRED_SIZE);
+        setSize(PREFERRED_SIZE);
         setLocationRelativeTo(owner);
         setVisible(true);
     }
@@ -314,7 +318,7 @@ public class LifePathBuilderDialog extends JDialog {
         updateTxtProgress();
 
         scrollProgress = new FastJScrollPane(txtProgress);
-        scrollProgress.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollProgress.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollProgress.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollProgress.setBorder(null);
 
