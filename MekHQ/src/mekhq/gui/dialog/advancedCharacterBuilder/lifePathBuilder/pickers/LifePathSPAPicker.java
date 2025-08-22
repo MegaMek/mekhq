@@ -313,17 +313,19 @@ public class LifePathSPAPicker extends JDialog {
                 }
             }
 
-            int defaultValue = switch (tabType) {
+            int keyValue = switch (tabType) {
                 case REQUIREMENTS -> minimumValue;
                 case EXCLUSIONS -> maximumValue;
                 case FIXED_XP, FLEXIBLE_XP -> 0;
             };
 
+            int defaultValue = selectedAbilities.getOrDefault(abilityInfo, keyValue);
+
             JLabel lblAbility = new JLabel(label);
             JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
                   maximumValue, 1));
 
-            final int finalTraitKeyValue = defaultValue;
+            final int finalTraitKeyValue = keyValue;
             spnAbilityValue.addChangeListener(evt -> {
                 int value = (int) spnAbilityValue.getValue();
                 if (value != finalTraitKeyValue) {

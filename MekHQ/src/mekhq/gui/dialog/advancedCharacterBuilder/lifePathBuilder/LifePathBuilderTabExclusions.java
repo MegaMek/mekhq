@@ -472,7 +472,7 @@ public class LifePathBuilderTabExclusions {
             appendComma(progressText);
 
             int counter = 0;
-            int length = traits.size();
+            int length = skills.size();
             for (Map.Entry<SkillType, Integer> entry : skills.entrySet()) {
                 progressText.append(entry.getKey().getName());
                 progressText.append(" ");

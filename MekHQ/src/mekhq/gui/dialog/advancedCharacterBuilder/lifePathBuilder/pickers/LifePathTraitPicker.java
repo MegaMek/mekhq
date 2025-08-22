@@ -215,17 +215,19 @@ public class LifePathTraitPicker extends JDialog {
                 }
             }
 
-            int defaultValue = switch (tabType) {
+            int keyValue = switch (tabType) {
                 case REQUIREMENTS -> traitMinimumValue;
                 case EXCLUSIONS -> traitMaximumValue;
                 case FIXED_XP, FLEXIBLE_XP -> 0;
             };
 
+            int defaultValue = selectedTraitScores.getOrDefault(trait, keyValue);
+
             JLabel lblTrait = new JLabel(label);
             JSpinner spnTraitScore = new JSpinner(new SpinnerNumberModel(defaultValue, traitMinimumValue,
                   traitMaximumValue, 1));
 
-            final int finalTraitKeyValue = defaultValue;
+            final int finalTraitKeyValue = keyValue;
             spnTraitScore.addChangeListener(evt -> {
                 int value = (int) spnTraitScore.getValue();
                 if (value != finalTraitKeyValue) {

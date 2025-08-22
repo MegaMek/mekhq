@@ -355,7 +355,7 @@ public class LifePathBuilderTabFixedXP {
             appendComma(progressText);
 
             int counter = 0;
-            int length = traits.size();
+            int length = skills.size();
             for (Map.Entry<SkillType, Integer> entry : skills.entrySet()) {
                 int value = entry.getValue();
 

@@ -195,16 +195,18 @@ public class LifePathAttributePicker extends JDialog {
                 case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
             };
 
-            int defaultValue = switch (tabType) {
+            int keyValue = switch (tabType) {
                 case REQUIREMENTS -> categoryMinimumValue;
                 case EXCLUSIONS -> categoryMaximumValue;
                 case FIXED_XP, FLEXIBLE_XP -> 0;
             };
 
+            int defaultValue = selectedAttributeScores.getOrDefault(attribute, keyValue);
+
             JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, categoryMinimumValue,
                   categoryMaximumValue, 1));
 
-            final int finalTraitKeyValue = defaultValue;
+            final int finalTraitKeyValue = keyValue;
             spnAttributeScore.addChangeListener(evt -> {
                 int value = (int) spnAttributeScore.getValue();
                 if (value != finalTraitKeyValue) {
