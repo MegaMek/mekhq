@@ -35,8 +35,8 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -45,9 +45,11 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -59,25 +61,29 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import megamek.common.EnhancedTabbedPane;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
 import megamek.utilities.FastJScrollPane;
-import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
+import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class LifePathBuilderDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
 
-    private static final int MINIMUM_COMPONENT_WIDTH = scaleForGUI(200);
-    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(600);
-    private static final Dimension SIDE_PANEL_MINIMUM_SIZE = new Dimension(MINIMUM_COMPONENT_WIDTH,
+    private static final int MINIMUM_SIDE_COMPONENT_WIDTH = scaleForGUI(225);
+    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(550);
+    private static final Dimension SIDE_PANEL_MINIMUM_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH,
           MINIMUM_COMPONENT_HEIGHT);
-    private static final Dimension MINIMUM_SIZE = new Dimension(MINIMUM_COMPONENT_WIDTH * 6,
+    private static final Dimension MINIMUM_SIZE = new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH * 6,
           MINIMUM_COMPONENT_HEIGHT);
     private static final int PADDING = scaleForGUI(10);
 
     private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_SIZE.width * 0.95);
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_COMPONENT_WIDTH * 0.95);
+    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_SIDE_COMPONENT_WIDTH * 0.95);
     private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
 
     private FastJScrollPane scrollInstructions;
@@ -93,13 +99,23 @@ public class LifePathBuilderDialog extends JDialog {
     private LifePathBuilderTabExclusions exclusionsTab;
     private LifePathBuilderTabFixedXP fixedXPTab;
     private LifePathBuilderTabFlexibleXP flexibleXPTab;
+    private final List<String> level3Abilities = new ArrayList<>();
+    private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
+
+    static String getResourceBundle() {
+        return RESOURCE_BUNDLE;
+    }
+
+    static int getTextPanelWidth() {
+        return TEXT_PANEL_WIDTH;
+    }
 
     static String getLifePathBuilderResourceBundle() {
         return RESOURCE_BUNDLE;
     }
 
     static int getLifePathBuilderMinimumComponentWidth() {
-        return MINIMUM_COMPONENT_WIDTH;
+        return MINIMUM_SIDE_COMPONENT_WIDTH;
     }
 
     static int getLifePathBuilderPadding() {
@@ -132,222 +148,13 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     void updateTxtProgress() {
-        StringBuilder newProgressText = new StringBuilder();
-
-        String newBasicText = getNewBasicText();
-        newProgressText.append(newBasicText);
-
-        String newFixedXPText = getFixedXPText();
-        newProgressText.append(newFixedXPText);
-
-        String newFlexibleXPText = getFlexibleXPText();
-        newProgressText.append(newFlexibleXPText);
-
-        String newRequirementsText = getNewRequirementsText();
-        newProgressText.append(newRequirementsText);
-
-        String newExclusionsText = getNewExclusionsText();
-        newProgressText.append(newExclusionsText);
-
-        txtProgress.setText(newProgressText.toString());
-    }
-
-    private String getNewBasicText() {
-        StringBuilder newText = new StringBuilder();
-
-        String name = basicInfoTab.getName();
-        if (!name.isBlank()) {
-            newText.append("<h1 style='text-align:center; margin:0'>").append(name).append("</h1>");
-        }
-
-        String flavorText = basicInfoTab.getFlavorText();
-        if (!flavorText.isBlank()) {
-            newText.append("<i>").append(flavorText).append("</i>");
-        }
-
-        int age = basicInfoTab.getAge();
-        if (age > 0) {
-            if (!newText.isEmpty()) {
-                newText.append("<br>");
-            }
-            newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.age", age));
-        }
-
-        int cost = Math.max(basicInfoTab.getDiscount(), 0);
-        if (cost > 0) {
-            if (!newText.isEmpty()) {
-                newText.append("<br>");
-            }
-            newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.cost", cost));
-        }
-
-        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
-        if (!lifeStages.isEmpty()) {
-            StringBuilder lifeStageText = new StringBuilder();
-            lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
-
-            List<ATOWLifeStage> orderedLifeStages = lifeStages.stream()
-                                                          .sorted(ATOWLifeStage::compareTo)
-                                                          .toList();
-
-            for (int i = 0; i < orderedLifeStages.size(); i++) {
-                ATOWLifeStage lifeStage = orderedLifeStages.get(i);
-                if (i == 0) {
-                    lifeStageText.append(lifeStage.getDisplayName());
-                } else {
-                    lifeStageText.append(", ").append(lifeStage.getDisplayName());
-                }
-            }
-            newText.append("<br>").append(lifeStageText);
-        }
-
-        Set<LifePathCategory> categories = basicInfoTab.getCategories();
-        if (!categories.isEmpty()) {
-            StringBuilder categoriesText = new StringBuilder();
-            categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));
-
-            List<LifePathCategory> orderedCategories = categories.stream()
-                                                             .sorted(LifePathCategory::compareTo)
-                                                             .toList();
-
-            for (int i = 0; i < orderedCategories.size(); i++) {
-                LifePathCategory category = orderedCategories.get(i);
-                if (i == 0) {
-                    categoriesText.append(category.getDisplayName());
-                } else {
-                    categoriesText.append(", ").append(category.getDisplayName());
-                }
-            }
-            newText.append("<br>").append(categoriesText);
-        }
-
-        return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
-    }
-
-    private String getNewRequirementsText() {
-        StringBuilder newRequirementsText = new StringBuilder();
-
-        boolean isEmpty = true;
-        Map<Integer, String> unorderedRequirements = requirementsTab.getRequirementsTabTextMap();
-        for (int i = 0; i < unorderedRequirements.size(); i++) {
-            String requirements = unorderedRequirements.get(i);
-            if (!requirements.isBlank()) {
-                isEmpty = false;
-                break;
-            }
-        }
-        if (isEmpty) {
-            return "";
-        }
-
-        String requirementsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
-        newRequirementsText.append("<h2 style='text-align:center; margin:0;'>").append(requirementsTitle).append(
-              "</h2>");
-
-        List<String> orderedRequirements = unorderedRequirements.entrySet().stream()
-                                                 .sorted(Map.Entry.comparingByKey())
-                                                 .map(Map.Entry::getValue)
-                                                 .toList();
-
-        boolean firstRequirement = true;
-        for (int i = 0; i < orderedRequirements.size(); i++) {
-            String requirements = orderedRequirements.get(i);
-            if (requirements.isBlank()) {
-                continue;
-            }
-
-            if (!firstRequirement) {
-                newRequirementsText.append("<br>");
-            }
-            firstRequirement = false;
-
-            String requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
-                  "LifePathBuilderDialog.tab." + (i == 0 ? "compulsory" : "optional") + ".label");
-            newRequirementsText.append("&#9654; <b>").append(requirementTitle).append(": </b>");
-            newRequirementsText.append(requirements);
-        }
-
-        return newRequirementsText.toString();
-    }
-
-    private String getNewExclusionsText() {
-        StringBuilder newExclusionsText = new StringBuilder();
-
-        String exclusions = exclusionsTab.getExclusionsTabTextStorage();
-        if (exclusions.isBlank()) {
-            return "";
-        }
-
-        String exclusionsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.exclusions.tab.title");
-        newExclusionsText.append("<h2 style='text-align:center; margin:0;'>").append(exclusionsTitle).append(
-              "</h2>");
-
-        newExclusionsText.append(exclusions);
-
-        return newExclusionsText.toString();
-    }
-
-    private String getFixedXPText() {
-        StringBuilder newFixedXPText = new StringBuilder();
-
-        String awards = fixedXPTab.getFixedXPTabTextStorage();
-        if (awards.isBlank()) {
-            return "";
-        }
-
-        String exclusionsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.fixedXP.tab.title");
-        newFixedXPText.append("<h2 style='text-align:center; margin:0;'>").append(exclusionsTitle).append(
-              "</h2>");
-
-        newFixedXPText.append(awards);
-
-        return newFixedXPText.toString();
-    }
-
-    private String getFlexibleXPText() {
-        StringBuilder newFlexibleXPText = new StringBuilder();
-
-        boolean isEmpty = true;
-        Map<Integer, String> unorderedFlexibleAwards = flexibleXPTab.getFlexibleXPTabTextMap();
-        for (int i = 0; i < unorderedFlexibleAwards.size(); i++) {
-            String awards = unorderedFlexibleAwards.get(i);
-            if (!awards.isBlank()) {
-                isEmpty = false;
-                break;
-            }
-        }
-        if (isEmpty) {
-            return "";
-        }
-
-        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleXP.tab.title");
-        newFlexibleXPText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
-              "</h2>");
-
-        List<String> orderedAwards = unorderedFlexibleAwards.entrySet().stream()
-                                           .sorted(Map.Entry.comparingByKey())
-                                           .map(Map.Entry::getValue)
-                                           .toList();
-
-        boolean firstAwardSet = true;
-        for (String awards : orderedAwards) {
-            if (awards.isBlank()) {
-                continue;
-            }
-
-            if (!firstAwardSet) {
-                newFlexibleXPText.append("<br>");
-            }
-            firstAwardSet = false;
-
-            newFlexibleXPText.append("&#9654; ");
-            newFlexibleXPText.append(awards);
-        }
-
-        return newFlexibleXPText.toString();
+        txtProgress.setText(LifePathProgressTextBuilder.getProgressText(basicInfoTab, requirementsTab, exclusionsTab,
+              fixedXPTab, flexibleXPTab));
     }
 
     private JPanel initialize(int gameYear) {
+        buildAllAbilityInfo();
+
         JPanel pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
         JPanel pnlProgress = initializeProgressPanel();
@@ -387,6 +194,59 @@ public class LifePathBuilderDialog extends JDialog {
         return container;
     }
 
+    private void buildAllAbilityInfo() {
+        // Remove old data
+        allAbilityInfo.clear();
+        level3Abilities.clear();
+
+        // Build list of Level 3 abilities
+        PersonnelOptions personnelOptions = new PersonnelOptions();
+        for (final Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
+            IOptionGroup group = i.nextElement();
+
+            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
+                continue;
+            }
+
+            for (final Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
+                IOption option = j.nextElement();
+                level3Abilities.add(option.getName());
+            }
+        }
+
+        // Build abilities
+        buildAbilityInfo(SpecialAbility.getSpecialAbilities(), true);
+
+        Map<String, SpecialAbility> allSpecialAbilities = SpecialAbility.getDefaultSpecialAbilities();
+        Map<String, SpecialAbility> missingAbilities = new HashMap<>();
+
+        for (SpecialAbility ability : allSpecialAbilities.values()) {
+            if (!allAbilityInfo.containsKey(ability.getName())) {
+                missingAbilities.put(ability.getName(), ability);
+            }
+        }
+
+        if (!missingAbilities.isEmpty()) {
+            buildAbilityInfo(missingAbilities, false);
+        }
+    }
+
+    private void buildAbilityInfo(Map<String, SpecialAbility> abilities, boolean isEnabled) {
+        for (Map.Entry<String, SpecialAbility> entry : abilities.entrySet()) {
+            SpecialAbility clonedAbility = entry.getValue().clone();
+            String abilityName = clonedAbility.getName();
+            AbilityCategory category = getSpaCategory(clonedAbility);
+
+            if (!level3Abilities.contains(abilityName)) {
+                continue;
+            }
+
+            // Mark the ability as active
+            allAbilityInfo.put(abilityName,
+                  new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
+        }
+    }
+
     private JPanel initializeInstructionsPanel() {
         JPanel pnlInstructions = new JPanel();
 
@@ -421,10 +281,10 @@ public class LifePathBuilderDialog extends JDialog {
         tabMain.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
 
         basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
-        fixedXPTab = new LifePathBuilderTabFixedXP(this, tabMain);
-        flexibleXPTab = new LifePathBuilderTabFlexibleXP(this, tabMain);
-        requirementsTab = new LifePathBuilderTabRequirements(this, tabMain, gameYear);
-        exclusionsTab = new LifePathBuilderTabExclusions(this, tabMain, gameYear);
+        fixedXPTab = new LifePathBuilderTabFixedXP(this, tabMain, allAbilityInfo);
+        flexibleXPTab = new LifePathBuilderTabFlexibleXP(this, tabMain, allAbilityInfo);
+        requirementsTab = new LifePathBuilderTabRequirements(this, tabMain, gameYear, allAbilityInfo);
+        exclusionsTab = new LifePathBuilderTabExclusions(this, tabMain, gameYear, allAbilityInfo);
 
         // Add a listener to handle tab selection changes
         tabMain.addChangeListener(e -> {

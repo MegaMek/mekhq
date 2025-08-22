@@ -40,8 +40,15 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 
-public record LifePathTabStorage(int gameYear, List<Faction> factions, List<LifePathRecord> lifePaths,
-      Map<LifePathCategory, Integer> categories, Map<SkillAttribute, Integer> attributes,
-      Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
+public record LifePathTabStorage(
+      // Excluded from cost calculations
+      int gameYear, List<Faction> factions,
+      List<LifePathRecord> lifePaths,
+      Map<LifePathCategory, Integer> categories,
+
+      // Included in cost calculations
+      Map<SkillAttribute, Integer> attributes,
+      Map<LifePathEntryDataTraitLookup, Integer> traits,
+      Map<SkillType, Integer> skills,
       Map<CampaignOptionsAbilityInfo, Integer> abilities) {
 }

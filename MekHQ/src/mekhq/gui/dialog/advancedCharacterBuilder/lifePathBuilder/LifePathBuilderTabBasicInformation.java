@@ -59,7 +59,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.advancedCharacterBuilder.DocumentChangeListenerUtil;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathBuilderTabBasicInformation {
+class LifePathBuilderTabBasicInformation {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int MINIMUM_COMPONENT_WIDTH = getLifePathBuilderMinimumComponentWidth();
     private final static int PADDING = getLifePathBuilderPadding();
@@ -71,31 +71,31 @@ public class LifePathBuilderTabBasicInformation {
     private Set<ATOWLifeStage> lifeStages = new HashSet<>();
     private Set<LifePathCategory> categories = new HashSet<>();
 
-    public String getName() {
+    String getName() {
         return txtName.getText();
     }
 
-    public String getFlavorText() {
+    String getFlavorText() {
         return txtFlavorText.getText();
     }
 
-    public int getAge() {
+    int getAge() {
         return (int) spnAge.getValue();
     }
 
-    public int getDiscount() {
+    int getDiscount() {
         return (int) spnDiscount.getValue();
     }
 
-    public Set<ATOWLifeStage> getLifeStages() {
+    Set<ATOWLifeStage> getLifeStages() {
         return lifeStages;
     }
 
-    public Set<LifePathCategory> getCategories() {
+    Set<LifePathCategory> getCategories() {
         return categories;
     }
 
-    public LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
+    LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
         JPanel tabBasicInformation = new JPanel();
         tabBasicInformation.setName("basic");
         String titleBasic = getTextAt(RESOURCE_BUNDLE,
@@ -206,7 +206,7 @@ public class LifePathBuilderTabBasicInformation {
               tooltipManageLifeStages);
         btnManageLifeStages.addActionListener(e -> {
             parent.setVisible(false);
-            mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathStagePicker picker = new mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathStagePicker(
+            LifePathStagePicker picker = new LifePathStagePicker(
                   lifeStages);
             lifeStages = picker.getSelectedLifeStages();
             parent.updateTxtProgress();
@@ -222,7 +222,7 @@ public class LifePathBuilderTabBasicInformation {
               tooltipManageCategories);
         btnManageCategories.addActionListener(e -> {
             parent.setVisible(false);
-            mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathCategorySingletonPicker picker = new mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathCategorySingletonPicker(
+            LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(
                   categories);
             categories = picker.getSelectedCategories();
             parent.updateTxtProgress();

@@ -37,7 +37,6 @@ import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePath
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -45,7 +44,6 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +53,8 @@ import javax.swing.ScrollPaneConstants;
 
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.annotations.Nullable;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
-import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
@@ -72,15 +67,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathAttributePicker;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathCategoryCountPicker;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathFactionPicker;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathSPAPicker;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathSkillPicker;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathTraitPicker;
-import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
-public class LifePathBuilderTabRequirements {
+class LifePathBuilderTabRequirements {
     private final static MMLogger LOGGER = MMLogger.create(LifePathBuilderTabRequirements.class);
 
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
@@ -89,21 +77,20 @@ public class LifePathBuilderTabRequirements {
     private final LifePathBuilderDialog parent;
     private final Map<Integer, LifePathTabStorage> requirementsTabStorageMap = new HashMap<>();
     private final Map<Integer, String> requirementsTabTextMap = new HashMap<>();
-    private final List<String> level3Abilities = new ArrayList<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    public Map<Integer, LifePathTabStorage> getRequirementsTabStorageMap() {
+    Map<Integer, LifePathTabStorage> getRequirementsTabStorageMap() {
         return requirementsTabStorageMap;
     }
 
-    public Map<Integer, String> getRequirementsTabTextMap() {
+    Map<Integer, String> getRequirementsTabTextMap() {
         return requirementsTabTextMap;
     }
 
-    public LifePathBuilderTabRequirements(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear) {
+    LifePathBuilderTabRequirements(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear,
+          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo) {
         this.parent = parent;
-
-        buildAllAbilityInfo();
+        this.allAbilityInfo.putAll(allAbilityInfo);
 
         JPanel tabRequirements = new JPanel(new BorderLayout());
         tabRequirements.setName("requirements");
@@ -496,59 +483,6 @@ public class LifePathBuilderTabRequirements {
         parent.setVisible(true);
     }
 
-    public void buildAllAbilityInfo() {
-        // Remove old data
-        allAbilityInfo.clear();
-        level3Abilities.clear();
-
-        // Build list of Level 3 abilities
-        PersonnelOptions personnelOptions = new PersonnelOptions();
-        for (final Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
-
-            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
-                continue;
-            }
-
-            for (final Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                IOption option = j.nextElement();
-                level3Abilities.add(option.getName());
-            }
-        }
-
-        // Build abilities
-        buildAbilityInfo(SpecialAbility.getSpecialAbilities(), true);
-
-        Map<String, SpecialAbility> allSpecialAbilities = SpecialAbility.getDefaultSpecialAbilities();
-        Map<String, SpecialAbility> missingAbilities = new HashMap<>();
-
-        for (SpecialAbility ability : allSpecialAbilities.values()) {
-            if (!allAbilityInfo.containsKey(ability.getName())) {
-                missingAbilities.put(ability.getName(), ability);
-            }
-        }
-
-        if (!missingAbilities.isEmpty()) {
-            buildAbilityInfo(missingAbilities, false);
-        }
-    }
-
-    private void buildAbilityInfo(Map<String, SpecialAbility> abilities, boolean isEnabled) {
-        for (Map.Entry<String, SpecialAbility> entry : abilities.entrySet()) {
-            SpecialAbility clonedAbility = entry.getValue().clone();
-            String abilityName = clonedAbility.getName();
-            AbilityCategory category = getSpaCategory(clonedAbility);
-
-            if (!level3Abilities.contains(abilityName)) {
-                continue;
-            }
-
-            // Mark the ability as active
-            allAbilityInfo.put(abilityName,
-                  new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
-        }
-    }
-
     private static LifePathTabStorage getRequirementsTabStorage(
           int gameYear, List<Faction> factions,
           List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
@@ -660,7 +594,9 @@ public class LifePathBuilderTabRequirements {
             int counter = 0;
             int length = skills.size();
             for (Map.Entry<SkillType, Integer> entry : skills.entrySet()) {
-                progressText.append(entry.getKey().getName());
+                String label = entry.getKey().getName().replace(SkillType.RP_ONLY_TAG, "");
+
+                progressText.append(label);
                 progressText.append(" ");
                 progressText.append(entry.getValue());
                 progressText.append("+");

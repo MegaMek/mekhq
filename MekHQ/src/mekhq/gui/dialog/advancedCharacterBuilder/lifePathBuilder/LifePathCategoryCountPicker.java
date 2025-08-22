@@ -30,10 +30,11 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers;
+package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -46,53 +47,60 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 
 import megamek.common.EnhancedTabbedPane;
-import megamek.common.universe.FactionTag;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathFactionPicker extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathFactionPicker";
+class LifePathCategoryCountPicker extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategoryCountPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
-    private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
-    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(525);
+    private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(600);
+    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(450);
 
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
+    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.95);
+    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.7);
     private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
 
     private static final int PADDING = scaleForGUI(10);
 
-    private final List<Faction> storedFactions;
-    private List<Faction> selectedFactions;
+    private JLabel lblTooltipDisplay;
+    private final Map<LifePathCategory, Integer> storedCategoryCounts;
+    private Map<LifePathCategory, Integer> selectedCategoryCounts;
 
-    public List<Faction> getSelectedFactions() {
-        return selectedFactions;
+    Map<LifePathCategory, Integer> getSelectedCategoryCounts() {
+        return selectedCategoryCounts;
     }
 
-    public LifePathFactionPicker(List<Faction> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
+    LifePathCategoryCountPicker(Map<LifePathCategory, Integer> selectedCategoryCounts,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedFactions = new ArrayList<>(selectedFactions);
-        storedFactions = new ArrayList<>(selectedFactions);
+        this.selectedCategoryCounts = new HashMap<>(selectedCategoryCounts);
+        storedCategoryCounts = new HashMap<>(selectedCategoryCounts);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(gameYear);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -109,7 +117,7 @@ public class LifePathFactionPicker extends JDialog {
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new BorderLayout());
 
-        pnlMain.add(pnlOptions, BorderLayout.NORTH);
+        pnlMain.add(pnlOptions, BorderLayout.CENTER);
         pnlMain.add(pnlControls, BorderLayout.SOUTH);
 
         gbc.gridx = 1;
@@ -128,19 +136,25 @@ public class LifePathFactionPicker extends JDialog {
         JPanel pnlControls = new JPanel();
         pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
         pnlControls.setBorder(createRoundedLineBorder());
+        pnlControls.setPreferredSize(scaleForGUI(0, 75));
+
+        lblTooltipDisplay = new JLabel();
+        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
+        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        setLblTooltipDisplay("");
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.button.cancel");
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
-            selectedFactions = storedFactions;
+            selectedCategoryCounts = storedCategoryCounts;
             dispose();
         });
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.button.confirm");
+        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.button.confirm");
         RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
         btnConfirm.addActionListener(e -> dispose());
 
@@ -150,136 +164,85 @@ public class LifePathFactionPicker extends JDialog {
         buttonPanel.add(btnConfirm);
         buttonPanel.add(Box.createHorizontalGlue());
 
+        pnlControls.add(lblTooltipDisplay);
         pnlControls.add(Box.createVerticalStrut(PADDING));
         pnlControls.add(buttonPanel);
 
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel(int gameYear) {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.label");
+        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.options.label");
         pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
 
-        List<Faction> superFactions = new ArrayList<>();
-        List<Faction> factions0 = new ArrayList<>();
-        List<Faction> factions1 = new ArrayList<>();
-        List<Faction> factions2 = new ArrayList<>();
-        List<Faction> factions3 = new ArrayList<>();
-        List<Faction> factions4 = new ArrayList<>();
-        List<Faction> factions5 = new ArrayList<>();
-        List<Faction> factions6 = new ArrayList<>();
-        List<Faction> factions7 = new ArrayList<>();
-        List<Faction> factions8 = new ArrayList<>();
-        List<Faction> factions9 = new ArrayList<>();
+        List<LifePathCategory> categories0 = new ArrayList<>();
+        List<LifePathCategory> categories1 = new ArrayList<>();
+        List<LifePathCategory> categories2 = new ArrayList<>();
+        List<LifePathCategory> categories3 = new ArrayList<>();
+        List<LifePathCategory> categories4 = new ArrayList<>();
 
-        Factions factions = Factions.getInstance();
-        List<Faction> allFactions = new ArrayList<>(factions.getFactions(false));
-        List<Faction> allFactionsCopy = new ArrayList<>(allFactions);
+        List<LifePathCategory> allCategories = new ArrayList<>(List.of(LifePathCategory.values()));
+        allCategories.sort(Comparator.comparing(LifePathCategory::getDisplayName));
 
-        List<String> superFactionsNames = List.of("IS", "CLAN", "Periphery");
-        for (Faction faction : allFactionsCopy) {
-            if (superFactionsNames.contains(faction.getShortName())) {
-                allFactions.remove(faction);
-                superFactions.add(faction);
-                continue;
-            }
-
-            if (faction.is(FactionTag.SPECIAL)) {
-                allFactions.remove(faction);
-            }
-        }
-
-        allFactions.sort(Comparator.comparing(f -> f.getFullName(gameYear)));
-        // Change 'groups' if the number of factions per tab gets too much.
-        // The code supports up to 'groups = 10' before additional changes will be needed.
-        int groups = 4;
-        int n = allFactions.size();
+        // Roleplay Skills
+        int groups = 3;
+        int n = allCategories.size();
         for (int i = 0; i < n; i++) {
-            Faction faction = allFactions.get(i);
+            LifePathCategory category = allCategories.get(i);
             int groupIdx = (int) Math.floor(i * groups / (double) n);
             switch (groupIdx) {
-                case 0 -> factions0.add(faction);
-                case 1 -> factions1.add(faction);
-                case 2 -> factions2.add(faction);
-                case 3 -> factions3.add(faction);
-                case 4 -> factions4.add(faction);
-                case 5 -> factions5.add(faction);
-                case 6 -> factions6.add(faction);
-                case 7 -> factions7.add(faction);
-                case 8 -> factions8.add(faction);
-                default -> factions9.add(faction);
+                case 0 -> categories0.add(category);
+                case 1 -> categories1.add(category);
+                case 2 -> categories2.add(category);
+                case 3 -> categories3.add(category);
+                default -> categories4.add(category);
             }
         }
 
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
-        if (!factions0.isEmpty()) {
-            buildTab(gameYear, factions0, optionPane, getFactionOptions(factions0, gameYear));
+        if (!categories0.isEmpty()) {
+            buildTab(categories0, optionPane, getCategoryOptions(categories0, tabType));
         }
 
-        if (!factions1.isEmpty()) {
-            buildTab(gameYear, factions1, optionPane, getFactionOptions(factions1, gameYear));
+        if (!categories1.isEmpty()) {
+            buildTab(categories1, optionPane, getCategoryOptions(categories1, tabType));
         }
 
-        if (!factions2.isEmpty()) {
-            buildTab(gameYear, factions2, optionPane, getFactionOptions(factions2, gameYear));
+        if (!categories2.isEmpty()) {
+            buildTab(categories2, optionPane, getCategoryOptions(categories2, tabType));
         }
 
-        if (!factions3.isEmpty()) {
-            buildTab(gameYear, factions3, optionPane, getFactionOptions(factions3, gameYear));
+        if (!categories3.isEmpty()) {
+            buildTab(categories3, optionPane, getCategoryOptions(categories3, tabType));
         }
 
-        if (!factions4.isEmpty()) {
-            buildTab(gameYear, factions4, optionPane, getFactionOptions(factions4, gameYear));
-        }
-
-        if (!factions5.isEmpty()) {
-            buildTab(gameYear, factions5, optionPane, getFactionOptions(factions5, gameYear));
-        }
-
-        if (!factions6.isEmpty()) {
-            buildTab(gameYear, factions6, optionPane, getFactionOptions(factions6, gameYear));
-        }
-
-        if (!factions7.isEmpty()) {
-            buildTab(gameYear, factions7, optionPane, getFactionOptions(factions7, gameYear));
-        }
-
-        if (!factions8.isEmpty()) {
-            buildTab(gameYear, factions8, optionPane, getFactionOptions(factions8, gameYear));
-        }
-
-        if (!factions9.isEmpty()) {
-            buildTab(gameYear, factions9, optionPane, getFactionOptions(factions9, gameYear));
-        }
-
-        if (!superFactions.isEmpty()) {
-            FastJScrollPane pnlSuperFactions = getFactionOptions(superFactions, gameYear);
-            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.tab.special"),
-                  pnlSuperFactions);
+        if (!categories4.isEmpty()) {
+            buildTab(categories4, optionPane, getCategoryOptions(categories4, tabType));
         }
 
         pnlOptions.add(optionPane);
         return pnlOptions;
     }
 
-    private static void buildTab(int gameYear, List<Faction> factions, EnhancedTabbedPane optionPane,
+    private static void buildTab(List<LifePathCategory> categories, EnhancedTabbedPane optionPane,
           FastJScrollPane pnlOptions) {
-        String firstName = factions.get(0).getFullName(gameYear);
-        String lastName = factions.get(factions.size() - 1).getFullName(gameYear);
+        String firstName = categories.get(0).getDisplayName();
+        String lastName = categories.get(categories.size() - 1).getDisplayName();
 
         char firstLetter = firstName.isEmpty() ? '\0' : firstName.charAt(0);
         char lastLetter = lastName.isEmpty() ? '\0' : lastName.charAt(0);
 
-        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.tab", firstLetter,
+        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.options.tab", firstLetter,
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getFactionOptions(List<Faction> factions, int gameYear) {
-        JPanel pnlFactions = new JPanel(new GridBagLayout());
+
+    private FastJScrollPane getCategoryOptions(List<LifePathCategory> categories, LifePathBuilderTabType tabType) {
+        JPanel pnlSkills = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -287,31 +250,57 @@ public class LifePathFactionPicker extends JDialog {
         gbc.weightx = 1.0;
 
         int columns = 3;
-        for (int i = 0; i < factions.size(); i++) {
-            Faction faction = factions.get(i);
-            String label = faction.getFullName(gameYear);
-            JCheckBox chkFaction = new JCheckBox(label);
-            chkFaction.setSelected(selectedFactions.contains(faction));
-            chkFaction.addActionListener(evt -> {
-                if (chkFaction.isSelected()) {
-                    selectedFactions.add(faction);
-                } else {
-                    selectedFactions.remove(faction);
+        for (int i = 0; i < categories.size(); i++) {
+            LifePathCategory category = categories.get(i);
+            String label = category.getDisplayName();
+            String description = category.getDescription();
+
+            int minimumSkillLevel = 0;
+            int maximumSkillLevel = 10;
+
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = selectedCategoryCounts.getOrDefault(category,
+                  (isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel));
+
+            JLabel lblCategory = new JLabel(label);
+            JSpinner spnCategoryCount = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
+                  maximumSkillLevel, 1));
+
+            if (selectedCategoryCounts.containsKey(category)) {
+                int currentValue = selectedCategoryCounts.get(category);
+                currentValue = clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
+                spnCategoryCount.setValue(currentValue);
+            }
+
+            final int finalTraitKeyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
+            spnCategoryCount.addChangeListener(evt -> {
+                int value = (int) spnCategoryCount.getValue();
+                if (value != finalTraitKeyValue) {
+                    selectedCategoryCounts.put(category, value);
                 }
             });
+
+            lblCategory.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+            );
+            spnCategoryCount.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+            );
 
             gbc.gridx = i % columns;
             gbc.gridy = i / columns;
 
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(chkFaction);
+            pnlRows.add(lblCategory);
+            pnlRows.add(Box.createHorizontalStrut(PADDING));
+            pnlRows.add(spnCategoryCount);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            pnlFactions.add(pnlRows, gbc);
+            pnlSkills.add(pnlRows, gbc);
         }
 
-        FastJScrollPane scrollSkills = new FastJScrollPane(pnlFactions);
+        FastJScrollPane scrollSkills = new FastJScrollPane(pnlSkills);
         scrollSkills.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollSkills.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollSkills.setBorder(null);
@@ -319,17 +308,22 @@ public class LifePathFactionPicker extends JDialog {
         return scrollSkills;
     }
 
+    private void setLblTooltipDisplay(String newText) {
+        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
+        lblTooltipDisplay.setText(newTooltipText);
+    }
+
     private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.label");
+        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.label");
         pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
 
         JEditorPane txtInstructions = new JEditorPane();
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.text." + tabType.getLookupName()));
+              getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

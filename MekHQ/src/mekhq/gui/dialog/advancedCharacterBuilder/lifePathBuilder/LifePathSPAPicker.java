@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers;
+package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
@@ -59,7 +59,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathSPAPicker extends JDialog {
+class LifePathSPAPicker extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSPAPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
@@ -77,11 +77,11 @@ public class LifePathSPAPicker extends JDialog {
     private final Map<CampaignOptionsAbilityInfo, Integer> storedAbilities;
     private Map<CampaignOptionsAbilityInfo, Integer> selectedAbilities;
 
-    public Map<CampaignOptionsAbilityInfo, Integer> getSelectedAbilities() {
+    Map<CampaignOptionsAbilityInfo, Integer> getSelectedAbilities() {
         return selectedAbilities;
     }
 
-    public LifePathSPAPicker(Map<CampaignOptionsAbilityInfo, Integer> selectedAbilities,
+    LifePathSPAPicker(Map<CampaignOptionsAbilityInfo, Integer> selectedAbilities,
           Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType) {
         super();
 
@@ -292,7 +292,8 @@ public class LifePathSPAPicker extends JDialog {
         for (int i = 0; i < allAbilityInfo.size(); i++) {
             CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(i);
             SpecialAbility ability = abilityInfo.getAbility();
-            String label = abilityInfo.getAbility().getDisplayName();
+            String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
+            String description = ability.getDescription() + " (" + ability.getCost() + " XP)";
 
             int minimumValue = 0;
             int maximumValue = ability.getCost();
@@ -324,6 +325,12 @@ public class LifePathSPAPicker extends JDialog {
             JLabel lblAbility = new JLabel(label);
             JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
                   maximumValue, 1));
+            lblAbility.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+            );
+            spnAbilityValue.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+            );
 
             final int finalTraitKeyValue = keyValue;
             spnAbilityValue.addChangeListener(evt -> {
