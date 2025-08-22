@@ -245,7 +245,7 @@ public class LifePathSPAPicker extends JDialog {
 
             SpecialAbility ability = info.getAbility();
             String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
-            String description = ability.getDescription();
+            String description = ability.getDescription() + " (" + ability.getCost() + " XP)";
 
             JCheckBox chkAbilityOption = new JCheckBox(label);
             chkAbilityOption.setSelected(selectedAbilities.containsKey(info));
@@ -291,20 +291,39 @@ public class LifePathSPAPicker extends JDialog {
         int columns = 3;
         for (int i = 0; i < allAbilityInfo.size(); i++) {
             CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(i);
+            SpecialAbility ability = abilityInfo.getAbility();
             String label = abilityInfo.getAbility().getDisplayName();
 
             int minimumValue = 0;
-            int maximumValue = 1000;
+            int maximumValue = ability.getCost();
+            if (maximumValue == 0) {
+                minimumValue = -1;
+            }
 
-            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int defaultValue = selectedAbilities.getOrDefault(abilityInfo,
-                  (isDefaultMaximum ? maximumValue : minimumValue));
+            switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> {
+                    minimumValue = -1000;
+                    maximumValue = 1000;
+                }
+                case REQUIREMENTS, EXCLUSIONS -> {
+                    maximumValue = ability.getCost();
+                    if (maximumValue == 0) {
+                        minimumValue = -1;
+                    }
+                }
+            }
+
+            int defaultValue = switch (tabType) {
+                case REQUIREMENTS -> minimumValue;
+                case EXCLUSIONS -> maximumValue;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
 
             JLabel lblAbility = new JLabel(label);
             JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
                   maximumValue, 1));
 
-            final int finalTraitKeyValue = isDefaultMaximum ? maximumValue : minimumValue;
+            final int finalTraitKeyValue = defaultValue;
             spnAbilityValue.addChangeListener(evt -> {
                 int value = (int) spnAbilityValue.getValue();
                 if (value != finalTraitKeyValue) {

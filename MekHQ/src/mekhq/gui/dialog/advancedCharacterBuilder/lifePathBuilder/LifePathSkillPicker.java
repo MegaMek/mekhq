@@ -261,21 +261,26 @@ public class LifePathSkillPicker extends JDialog {
             String label = type.getName();
             label = label.replace(SkillType.RP_ONLY_TAG, "");
 
-            int minimumSkillLevel = 0;
+            int minimumSkillLevel = switch (tabType) {
+                case REQUIREMENTS, EXCLUSIONS -> 0;
+                case FIXED_XP, FLEXIBLE_XP -> -1000;
+            };
             int maximumSkillLevel = switch (tabType) {
                 case REQUIREMENTS, EXCLUSIONS -> type.getMaxLevel();
                 case FIXED_XP, FLEXIBLE_XP -> 1000;
             };
 
-            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int defaultValue = selectedSkillLevels.getOrDefault(type,
-                  (isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel));
+            int defaultValue = switch (tabType) {
+                case REQUIREMENTS -> minimumSkillLevel;
+                case EXCLUSIONS -> maximumSkillLevel;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
 
             JLabel lblSkill = new JLabel(label);
             JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
                   maximumSkillLevel, 1));
 
-            final int finalTraitKeyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
+            final int finalTraitKeyValue = defaultValue;
             spnSkillLevel.addChangeListener(evt -> {
                 int value = (int) spnSkillLevel.getValue();
                 if (value != finalTraitKeyValue) {

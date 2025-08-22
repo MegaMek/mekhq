@@ -184,8 +184,10 @@ public class LifePathAttributePicker extends JDialog {
 
             JLabel lblAttribute = new JLabel(label);
 
+            lblAttribute.setToolTipText(tooltip);
+
             int categoryMinimumValue = switch (tabType) {
-                case FIXED_XP, FLEXIBLE_XP -> 0;
+                case FIXED_XP, FLEXIBLE_XP -> -1000;
                 case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
             };
             int categoryMaximumValue = switch (tabType) {
@@ -193,16 +195,16 @@ public class LifePathAttributePicker extends JDialog {
                 case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
             };
 
-            lblAttribute.setToolTipText(tooltip);
-
-            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int defaultValue = storedAttributeScores.getOrDefault(attribute,
-                  (isDefaultMaximum ? categoryMaximumValue : categoryMinimumValue));
+            int defaultValue = switch (tabType) {
+                case REQUIREMENTS -> categoryMinimumValue;
+                case EXCLUSIONS -> categoryMaximumValue;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
 
             JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, categoryMinimumValue,
                   categoryMaximumValue, 1));
 
-            final int finalTraitKeyValue = isDefaultMaximum ? categoryMaximumValue : categoryMinimumValue;
+            final int finalTraitKeyValue = defaultValue;
             spnAttributeScore.addChangeListener(evt -> {
                 int value = (int) spnAttributeScore.getValue();
                 if (value != finalTraitKeyValue) {

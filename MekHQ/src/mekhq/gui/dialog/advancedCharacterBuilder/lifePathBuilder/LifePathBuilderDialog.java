@@ -91,6 +91,7 @@ public class LifePathBuilderDialog extends JDialog {
     private LifePathBuilderTabBasicInformation basicInfoTab;
     private LifePathBuilderTabRequirements requirementsTab;
     private LifePathBuilderTabExclusions exclusionsTab;
+    private LifePathBuilderTabFixedXP fixedXPTab;
 
     static String getLifePathBuilderResourceBundle() {
         return RESOURCE_BUNDLE;
@@ -134,6 +135,9 @@ public class LifePathBuilderDialog extends JDialog {
 
         String newBasicText = getNewBasicText();
         newProgressText.append(newBasicText);
+
+        String newFixedXPText = getFixedXPText();
+        newProgressText.append(newFixedXPText);
 
         String newRequirementsText = getNewRequirementsText();
         newProgressText.append(newRequirementsText);
@@ -279,6 +283,23 @@ public class LifePathBuilderDialog extends JDialog {
         return newExclusionsText.toString();
     }
 
+    private String getFixedXPText() {
+        StringBuilder newFixedXPText = new StringBuilder();
+
+        String awards = fixedXPTab.getFixedXPTabTextStorage();
+        if (awards.isBlank()) {
+            return "";
+        }
+
+        String exclusionsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.fixedXP.tab.title");
+        newFixedXPText.append("<h2 style='text-align:center; margin:0;'>").append(exclusionsTitle).append(
+              "</h2>");
+
+        newFixedXPText.append(awards);
+
+        return newFixedXPText.toString();
+    }
+
     private JPanel initialize(int gameYear) {
         JPanel pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
@@ -353,18 +374,9 @@ public class LifePathBuilderDialog extends JDialog {
         tabMain.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
 
         basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
+        fixedXPTab = new LifePathBuilderTabFixedXP(this, tabMain);
         requirementsTab = new LifePathBuilderTabRequirements(this, tabMain, gameYear);
         exclusionsTab = new LifePathBuilderTabExclusions(this, tabMain, gameYear);
-
-        // Fixed XP
-        JPanel tabFixedXP = new JPanel();
-        tabFixedXP.setName("fixedXP");
-        String titleFixedXP = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.fixedXP");
-        tabMain.addTab(titleFixedXP, tabFixedXP);
-        tabFixedXP.add(new JLabel("First Tab Content"));
-
-        // TODO Add Award
-        // TODO Remove Award
 
         // Flexible XP
         JPanel tabFlexibleXP = new JPanel();

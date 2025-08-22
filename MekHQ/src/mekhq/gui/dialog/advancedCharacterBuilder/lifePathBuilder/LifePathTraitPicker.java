@@ -180,7 +180,10 @@ public class LifePathTraitPicker extends JDialog {
             int traitMaximumValue = 1;
 
             switch (tabType) {
-                case FIXED_XP, FLEXIBLE_XP -> traitMaximumValue = 1000;
+                case FIXED_XP, FLEXIBLE_XP -> {
+                    traitMinimumValue = -1000;
+                    traitMaximumValue = 1000;
+                }
                 case REQUIREMENTS, EXCLUSIONS -> {
                     switch (trait) {
                         case BLOODMARK -> {
@@ -212,15 +215,17 @@ public class LifePathTraitPicker extends JDialog {
                 }
             }
 
-            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int defaultValue = selectedTraitScores.getOrDefault(trait,
-                  (isDefaultMaximum ? traitMaximumValue : traitMinimumValue));
+            int defaultValue = switch (tabType) {
+                case REQUIREMENTS -> traitMinimumValue;
+                case EXCLUSIONS -> traitMaximumValue;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
 
             JLabel lblTrait = new JLabel(label);
             JSpinner spnTraitScore = new JSpinner(new SpinnerNumberModel(defaultValue, traitMinimumValue,
                   traitMaximumValue, 1));
 
-            final int finalTraitKeyValue = isDefaultMaximum ? traitMaximumValue : traitMinimumValue;
+            final int finalTraitKeyValue = defaultValue;
             spnTraitScore.addChangeListener(evt -> {
                 int value = (int) spnTraitScore.getValue();
                 if (value != finalTraitKeyValue) {
