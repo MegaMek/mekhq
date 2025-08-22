@@ -111,7 +111,7 @@ class LifePathSkillPicker extends JDialog {
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new BorderLayout());
 
-        pnlMain.add(pnlOptions, BorderLayout.NORTH);
+        pnlMain.add(pnlOptions, BorderLayout.CENTER);
         pnlMain.add(pnlControls, BorderLayout.SOUTH);
 
         gbc.gridx = 1;
@@ -171,6 +171,7 @@ class LifePathSkillPicker extends JDialog {
         List<SkillType> roleplaySkills2 = new ArrayList<>();
         List<SkillType> roleplaySkills3 = new ArrayList<>();
         List<SkillType> roleplaySkills4 = new ArrayList<>();
+        List<SkillType> roleplaySkills5 = new ArrayList<>();
         List<String> allSkills = new ArrayList<>(List.of(SkillType.getSkillList()));
         Collections.sort(allSkills);
 
@@ -187,7 +188,7 @@ class LifePathSkillPicker extends JDialog {
         }
 
         // Roleplay Skills
-        int groups = 4;
+        int groups = 3; // Can go up to 5 without additional code changes
         int n = allSkills.size();
         for (int i = 0; i < n; i++) {
             String skillName = allSkills.get(i);
@@ -197,7 +198,8 @@ class LifePathSkillPicker extends JDialog {
                 case 0 -> roleplaySkills1.add(skill);
                 case 1 -> roleplaySkills2.add(skill);
                 case 2 -> roleplaySkills3.add(skill);
-                default -> roleplaySkills4.add(skill);
+                case 3 -> roleplaySkills4.add(skill);
+                case 4 -> roleplaySkills5.add(skill);
             }
         }
 
@@ -229,6 +231,10 @@ class LifePathSkillPicker extends JDialog {
 
         if (!roleplaySkills4.isEmpty()) {
             buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4, tabType));
+        }
+
+        if (!roleplaySkills5.isEmpty()) {
+            buildTab(roleplaySkills5, optionPane, getSkillOptions(roleplaySkills5, tabType));
         }
 
         pnlOptions.add(optionPane);
