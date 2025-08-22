@@ -30,10 +30,12 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
+package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -43,30 +45,32 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import megamek.utilities.FastJScrollPane;
-import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathStagePicker extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathStagePicker";
+public class LifePathAttributePicker extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathAttributePicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(200);
-    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(375);
+    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(400);
 
     private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.75);
     private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
@@ -75,24 +79,25 @@ public class LifePathStagePicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private JLabel lblTooltipDisplay;
-    private final Set<ATOWLifeStage> storedLifeStages;
-    private Set<ATOWLifeStage> selectedLifeStages;
+    private final Map<SkillAttribute, Integer> storedAttributeScores;
+    private Map<SkillAttribute, Integer> selectedAttributeScores;
 
-    public Set<ATOWLifeStage> getSelectedLifeStages() {
-        return selectedLifeStages;
+    public Map<SkillAttribute, Integer> getSelectedAttributeScores() {
+        return selectedAttributeScores;
     }
 
-    public LifePathStagePicker(Set<ATOWLifeStage> selectedLifeStages) {
+    public LifePathAttributePicker(Map<SkillAttribute, Integer> selectedAttributeScores,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedLifeStages = new HashSet<>(selectedLifeStages);
-        storedLifeStages = new HashSet<>(selectedLifeStages);
+        this.selectedAttributeScores = new HashMap<>(selectedAttributeScores);
+        storedAttributeScores = new HashMap<>(selectedAttributeScores);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.title"));
 
-        JPanel pnlInstructions = initializeInstructionsPanel();
-        JPanel pnlOptions = buildOptionsPanel();
+        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -138,14 +143,14 @@ public class LifePathStagePicker extends JDialog {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.button.cancel");
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
-            selectedLifeStages = storedLifeStages;
+            selectedAttributeScores = storedAttributeScores;
             dispose();
         });
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.button.confirm");
+        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.button.confirm");
         RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
         btnConfirm.addActionListener(e -> dispose());
 
@@ -162,34 +167,62 @@ public class LifePathStagePicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel() {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.options.label");
+        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.options.label");
         pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
 
-        for (ATOWLifeStage lifeStage : ATOWLifeStage.values()) {
-            String label = lifeStage.getDisplayName();
-            String tooltip = lifeStage.getDescription();
-            JCheckBox chkLifeStage = new JCheckBox(label);
-
-            if (selectedLifeStages.contains(lifeStage)) {
-                chkLifeStage.setSelected(true);
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
             }
 
-            chkLifeStage.addActionListener(evt -> {
-                if (chkLifeStage.isSelected()) {
-                    selectedLifeStages.add(lifeStage);
-                } else {
-                    selectedLifeStages.remove(lifeStage);
+            String label = attribute.getLabel();
+            String tooltip = attribute.getDescription();
+
+            JLabel lblAttribute = new JLabel(label);
+
+            lblAttribute.setToolTipText(tooltip);
+
+            int categoryMinimumValue = switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> -1000;
+                case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
+            };
+            int categoryMaximumValue = switch (tabType) {
+                case FIXED_XP, FLEXIBLE_XP -> 1000;
+                case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
+            };
+
+            int defaultValue = switch (tabType) {
+                case REQUIREMENTS -> categoryMinimumValue;
+                case EXCLUSIONS -> categoryMaximumValue;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
+
+            JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, categoryMinimumValue,
+                  categoryMaximumValue, 1));
+
+            final int finalTraitKeyValue = defaultValue;
+            spnAttributeScore.addChangeListener(evt -> {
+                int value = (int) spnAttributeScore.getValue();
+                if (value != finalTraitKeyValue) {
+                    selectedAttributeScores.put(attribute, value);
                 }
             });
-            chkLifeStage.addMouseListener(
+            spnAttributeScore.addMouseListener(
                   TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip)
             );
 
-            pnlOptions.add(chkLifeStage);
+            JPanel pnlRows = new JPanel();
+            pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
+            pnlRows.add(lblAttribute);
+            pnlRows.add(Box.createHorizontalStrut(PADDING));
+            pnlRows.add(spnAttributeScore);
+            pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            pnlOptions.add(pnlRows);
         }
         return pnlOptions;
     }
@@ -199,17 +232,17 @@ public class LifePathStagePicker extends JDialog {
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    private JPanel initializeInstructionsPanel() {
+    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.instructions.label");
+        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.label");
         pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
 
         JEditorPane txtInstructions = new JEditorPane();
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.instructions.text"));
+              getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

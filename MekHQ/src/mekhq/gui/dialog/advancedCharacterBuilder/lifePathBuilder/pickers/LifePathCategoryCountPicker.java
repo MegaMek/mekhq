@@ -30,10 +30,11 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
+package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -45,7 +46,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,40 +59,45 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 
 import megamek.common.EnhancedTabbedPane;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathSkillPicker extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSkillPicker";
+public class LifePathCategoryCountPicker extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategoryCountPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
-    private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
-    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(525);
+    private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(600);
+    private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(450);
 
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
+    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.95);
+    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.7);
     private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
 
     private static final int PADDING = scaleForGUI(10);
 
-    private final Map<SkillType, Integer> storedSkillLevels;
-    private Map<SkillType, Integer> selectedSkillLevels;
+    private JLabel lblTooltipDisplay;
+    private final Map<LifePathCategory, Integer> storedCategoryCounts;
+    private Map<LifePathCategory, Integer> selectedCategoryCounts;
 
-    public Map<SkillType, Integer> getSelectedSkillLevels() {
-        return selectedSkillLevels;
+    public Map<LifePathCategory, Integer> getSelectedCategoryCounts() {
+        return selectedCategoryCounts;
     }
 
-    public LifePathSkillPicker(Map<SkillType, Integer> selectedSkillLevels, LifePathBuilderTabType tabType) {
+    public LifePathCategoryCountPicker(Map<LifePathCategory, Integer> selectedCategoryCounts,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedSkillLevels = new HashMap<>(selectedSkillLevels);
-        storedSkillLevels = new HashMap<>(selectedSkillLevels);
+        this.selectedCategoryCounts = new HashMap<>(selectedCategoryCounts);
+        storedCategoryCounts = new HashMap<>(selectedCategoryCounts);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
         JPanel pnlOptions = buildOptionsPanel(tabType);
@@ -111,7 +117,7 @@ public class LifePathSkillPicker extends JDialog {
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new BorderLayout());
 
-        pnlMain.add(pnlOptions, BorderLayout.NORTH);
+        pnlMain.add(pnlOptions, BorderLayout.CENTER);
         pnlMain.add(pnlControls, BorderLayout.SOUTH);
 
         gbc.gridx = 1;
@@ -130,19 +136,25 @@ public class LifePathSkillPicker extends JDialog {
         JPanel pnlControls = new JPanel();
         pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
         pnlControls.setBorder(createRoundedLineBorder());
+        pnlControls.setPreferredSize(scaleForGUI(0, 75));
+
+        lblTooltipDisplay = new JLabel();
+        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
+        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        setLblTooltipDisplay("");
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.button.cancel");
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
-            selectedSkillLevels = storedSkillLevels;
+            selectedCategoryCounts = storedCategoryCounts;
             dispose();
         });
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.button.confirm");
+        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.button.confirm");
         RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
         btnConfirm.addActionListener(e -> dispose());
 
@@ -152,6 +164,7 @@ public class LifePathSkillPicker extends JDialog {
         buttonPanel.add(btnConfirm);
         buttonPanel.add(Box.createHorizontalGlue());
 
+        pnlControls.add(lblTooltipDisplay);
         pnlControls.add(Box.createVerticalStrut(PADDING));
         pnlControls.add(buttonPanel);
 
@@ -162,92 +175,73 @@ public class LifePathSkillPicker extends JDialog {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.label");
+        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.options.label");
         pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
 
-        List<SkillType> combatSkills = new ArrayList<>();
-        List<SkillType> supportSkills = new ArrayList<>();
-        List<SkillType> roleplaySkills1 = new ArrayList<>();
-        List<SkillType> roleplaySkills2 = new ArrayList<>();
-        List<SkillType> roleplaySkills3 = new ArrayList<>();
-        List<SkillType> roleplaySkills4 = new ArrayList<>();
-        List<String> allSkills = new ArrayList<>(List.of(SkillType.getSkillList()));
-        Collections.sort(allSkills);
+        List<LifePathCategory> categories0 = new ArrayList<>();
+        List<LifePathCategory> categories1 = new ArrayList<>();
+        List<LifePathCategory> categories2 = new ArrayList<>();
+        List<LifePathCategory> categories3 = new ArrayList<>();
+        List<LifePathCategory> categories4 = new ArrayList<>();
 
-        // Normal Skills
-        for (String skillName : new ArrayList<>(allSkills)) {
-            SkillType type = SkillType.getType(skillName);
-            if (type.isCombatSkill()) {
-                combatSkills.add(type);
-                allSkills.remove(skillName);
-            } else if (type.isSupportSkill()) {
-                supportSkills.add(type);
-                allSkills.remove(skillName);
-            }
-        }
+        List<LifePathCategory> allCategories = new ArrayList<>(List.of(LifePathCategory.values()));
+        allCategories.sort(Comparator.comparing(LifePathCategory::getDisplayName));
 
         // Roleplay Skills
-        int groups = 4;
-        int n = allSkills.size();
+        int groups = 3;
+        int n = allCategories.size();
         for (int i = 0; i < n; i++) {
-            String skillName = allSkills.get(i);
-            SkillType skill = SkillType.getType(skillName);
+            LifePathCategory category = allCategories.get(i);
             int groupIdx = (int) Math.floor(i * groups / (double) n);
             switch (groupIdx) {
-                case 0 -> roleplaySkills1.add(skill);
-                case 1 -> roleplaySkills2.add(skill);
-                case 2 -> roleplaySkills3.add(skill);
-                default -> roleplaySkills4.add(skill);
+                case 0 -> categories0.add(category);
+                case 1 -> categories1.add(category);
+                case 2 -> categories2.add(category);
+                case 3 -> categories3.add(category);
+                default -> categories4.add(category);
             }
         }
 
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
-        if (!combatSkills.isEmpty()) {
-            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills, tabType);
-            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.combat.label"),
-                  pnlCombatSkills);
+        if (!categories0.isEmpty()) {
+            buildTab(categories0, optionPane, getCategoryOptions(categories0, tabType));
         }
 
-        if (!supportSkills.isEmpty()) {
-            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills, tabType);
-            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"),
-                  pnlSupportSkills);
+        if (!categories1.isEmpty()) {
+            buildTab(categories1, optionPane, getCategoryOptions(categories1, tabType));
         }
 
-        if (!roleplaySkills1.isEmpty()) {
-            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1, tabType));
+        if (!categories2.isEmpty()) {
+            buildTab(categories2, optionPane, getCategoryOptions(categories2, tabType));
         }
 
-        if (!roleplaySkills2.isEmpty()) {
-            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2, tabType));
+        if (!categories3.isEmpty()) {
+            buildTab(categories3, optionPane, getCategoryOptions(categories3, tabType));
         }
 
-        if (!roleplaySkills3.isEmpty()) {
-            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3, tabType));
-        }
-
-        if (!roleplaySkills4.isEmpty()) {
-            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4, tabType));
+        if (!categories4.isEmpty()) {
+            buildTab(categories4, optionPane, getCategoryOptions(categories4, tabType));
         }
 
         pnlOptions.add(optionPane);
         return pnlOptions;
     }
 
-    private static void buildTab(List<SkillType> skills, EnhancedTabbedPane optionPane,
+    private static void buildTab(List<LifePathCategory> categories, EnhancedTabbedPane optionPane,
           FastJScrollPane pnlOptions) {
-        String firstName = skills.get(0).getName();
-        String lastName = skills.get(skills.size() - 1).getName();
+        String firstName = categories.get(0).getDisplayName();
+        String lastName = categories.get(categories.size() - 1).getDisplayName();
 
         char firstLetter = firstName.isEmpty() ? '\0' : firstName.charAt(0);
         char lastLetter = lastName.isEmpty() ? '\0' : lastName.charAt(0);
 
-        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label", firstLetter,
+        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.options.tab", firstLetter,
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getSkillOptions(List<SkillType> skills, LifePathBuilderTabType tabType) {
+
+    private FastJScrollPane getCategoryOptions(List<LifePathCategory> categories, LifePathBuilderTabType tabType) {
         JPanel pnlSkills = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -256,46 +250,51 @@ public class LifePathSkillPicker extends JDialog {
         gbc.weightx = 1.0;
 
         int columns = 3;
-        for (int i = 0; i < skills.size(); i++) {
-            SkillType type = skills.get(i);
-            String label = type.getName();
-            label = label.replace(SkillType.RP_ONLY_TAG, "");
+        for (int i = 0; i < categories.size(); i++) {
+            LifePathCategory category = categories.get(i);
+            String label = category.getDisplayName();
+            String description = category.getDescription();
 
-            int minimumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> 0;
-                case FIXED_XP, FLEXIBLE_XP -> -1000;
-            };
-            int maximumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> type.getMaxLevel();
-                case FIXED_XP, FLEXIBLE_XP -> 1000;
-            };
+            int minimumSkillLevel = 0;
+            int maximumSkillLevel = 10;
 
-            int defaultValue = switch (tabType) {
-                case REQUIREMENTS -> minimumSkillLevel;
-                case EXCLUSIONS -> maximumSkillLevel;
-                case FIXED_XP, FLEXIBLE_XP -> 0;
-            };
+            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
+            int defaultValue = selectedCategoryCounts.getOrDefault(category,
+                  (isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel));
 
-            JLabel lblSkill = new JLabel(label);
-            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
+            JLabel lblCategory = new JLabel(label);
+            JSpinner spnCategoryCount = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
                   maximumSkillLevel, 1));
 
-            final int finalTraitKeyValue = defaultValue;
-            spnSkillLevel.addChangeListener(evt -> {
-                int value = (int) spnSkillLevel.getValue();
+            if (selectedCategoryCounts.containsKey(category)) {
+                int currentValue = selectedCategoryCounts.get(category);
+                currentValue = clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
+                spnCategoryCount.setValue(currentValue);
+            }
+
+            final int finalTraitKeyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
+            spnCategoryCount.addChangeListener(evt -> {
+                int value = (int) spnCategoryCount.getValue();
                 if (value != finalTraitKeyValue) {
-                    selectedSkillLevels.put(type, value);
+                    selectedCategoryCounts.put(category, value);
                 }
             });
+
+            lblCategory.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+            );
+            spnCategoryCount.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+            );
 
             gbc.gridx = i % columns;
             gbc.gridy = i / columns;
 
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(lblSkill);
+            pnlRows.add(lblCategory);
             pnlRows.add(Box.createHorizontalStrut(PADDING));
-            pnlRows.add(spnSkillLevel);
+            pnlRows.add(spnCategoryCount);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             pnlSkills.add(pnlRows, gbc);
@@ -309,17 +308,22 @@ public class LifePathSkillPicker extends JDialog {
         return scrollSkills;
     }
 
+    private void setLblTooltipDisplay(String newText) {
+        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
+        lblTooltipDisplay.setText(newTooltipText);
+    }
+
     private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.label");
+        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.label");
         pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
 
         JEditorPane txtInstructions = new JEditorPane();
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.text." + tabType.getLookupName()));
+              getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

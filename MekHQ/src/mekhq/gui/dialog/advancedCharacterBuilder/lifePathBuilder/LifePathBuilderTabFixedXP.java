@@ -63,6 +63,10 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathAttributePicker;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathSPAPicker;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathSkillPicker;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathTraitPicker;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class LifePathBuilderTabFixedXP {

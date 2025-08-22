@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
+package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
@@ -45,26 +45,28 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
 
 import megamek.common.EnhancedTabbedPane;
-import megamek.common.universe.FactionTag;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
-public class LifePathFactionPicker extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathFactionPicker";
+public class LifePathSkillPicker extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSkillPicker";
 
     private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
@@ -75,24 +77,24 @@ public class LifePathFactionPicker extends JDialog {
 
     private static final int PADDING = scaleForGUI(10);
 
-    private final List<Faction> storedFactions;
-    private List<Faction> selectedFactions;
+    private final Map<SkillType, Integer> storedSkillLevels;
+    private Map<SkillType, Integer> selectedSkillLevels;
 
-    public List<Faction> getSelectedFactions() {
-        return selectedFactions;
+    public Map<SkillType, Integer> getSelectedSkillLevels() {
+        return selectedSkillLevels;
     }
 
-    public LifePathFactionPicker(List<Faction> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
+    public LifePathSkillPicker(Map<SkillType, Integer> selectedSkillLevels, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedFactions = new ArrayList<>(selectedFactions);
-        storedFactions = new ArrayList<>(selectedFactions);
+        this.selectedSkillLevels = new HashMap<>(selectedSkillLevels);
+        storedSkillLevels = new HashMap<>(selectedSkillLevels);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(gameYear);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -133,14 +135,14 @@ public class LifePathFactionPicker extends JDialog {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.button.cancel");
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
-            selectedFactions = storedFactions;
+            selectedSkillLevels = storedSkillLevels;
             dispose();
         });
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.button.confirm");
+        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.button.confirm");
         RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
         btnConfirm.addActionListener(e -> dispose());
 
@@ -156,130 +158,97 @@ public class LifePathFactionPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel(int gameYear) {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.label");
+        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.label");
         pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
 
-        List<Faction> superFactions = new ArrayList<>();
-        List<Faction> factions0 = new ArrayList<>();
-        List<Faction> factions1 = new ArrayList<>();
-        List<Faction> factions2 = new ArrayList<>();
-        List<Faction> factions3 = new ArrayList<>();
-        List<Faction> factions4 = new ArrayList<>();
-        List<Faction> factions5 = new ArrayList<>();
-        List<Faction> factions6 = new ArrayList<>();
-        List<Faction> factions7 = new ArrayList<>();
-        List<Faction> factions8 = new ArrayList<>();
-        List<Faction> factions9 = new ArrayList<>();
+        List<SkillType> combatSkills = new ArrayList<>();
+        List<SkillType> supportSkills = new ArrayList<>();
+        List<SkillType> roleplaySkills1 = new ArrayList<>();
+        List<SkillType> roleplaySkills2 = new ArrayList<>();
+        List<SkillType> roleplaySkills3 = new ArrayList<>();
+        List<SkillType> roleplaySkills4 = new ArrayList<>();
+        List<String> allSkills = new ArrayList<>(List.of(SkillType.getSkillList()));
+        Collections.sort(allSkills);
 
-        Factions factions = Factions.getInstance();
-        List<Faction> allFactions = new ArrayList<>(factions.getFactions(false));
-        List<Faction> allFactionsCopy = new ArrayList<>(allFactions);
-
-        List<String> superFactionsNames = List.of("IS", "CLAN", "Periphery");
-        for (Faction faction : allFactionsCopy) {
-            if (superFactionsNames.contains(faction.getShortName())) {
-                allFactions.remove(faction);
-                superFactions.add(faction);
-                continue;
-            }
-
-            if (faction.is(FactionTag.SPECIAL)) {
-                allFactions.remove(faction);
+        // Normal Skills
+        for (String skillName : new ArrayList<>(allSkills)) {
+            SkillType type = SkillType.getType(skillName);
+            if (type.isCombatSkill()) {
+                combatSkills.add(type);
+                allSkills.remove(skillName);
+            } else if (type.isSupportSkill()) {
+                supportSkills.add(type);
+                allSkills.remove(skillName);
             }
         }
 
-        allFactions.sort(Comparator.comparing(f -> f.getFullName(gameYear)));
-        // Change 'groups' if the number of factions per tab gets too much.
-        // The code supports up to 'groups = 10' before additional changes will be needed.
+        // Roleplay Skills
         int groups = 4;
-        int n = allFactions.size();
+        int n = allSkills.size();
         for (int i = 0; i < n; i++) {
-            Faction faction = allFactions.get(i);
+            String skillName = allSkills.get(i);
+            SkillType skill = SkillType.getType(skillName);
             int groupIdx = (int) Math.floor(i * groups / (double) n);
             switch (groupIdx) {
-                case 0 -> factions0.add(faction);
-                case 1 -> factions1.add(faction);
-                case 2 -> factions2.add(faction);
-                case 3 -> factions3.add(faction);
-                case 4 -> factions4.add(faction);
-                case 5 -> factions5.add(faction);
-                case 6 -> factions6.add(faction);
-                case 7 -> factions7.add(faction);
-                case 8 -> factions8.add(faction);
-                default -> factions9.add(faction);
+                case 0 -> roleplaySkills1.add(skill);
+                case 1 -> roleplaySkills2.add(skill);
+                case 2 -> roleplaySkills3.add(skill);
+                default -> roleplaySkills4.add(skill);
             }
         }
 
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
-        if (!factions0.isEmpty()) {
-            buildTab(gameYear, factions0, optionPane, getFactionOptions(factions0, gameYear));
+        if (!combatSkills.isEmpty()) {
+            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills, tabType);
+            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.combat.label"),
+                  pnlCombatSkills);
         }
 
-        if (!factions1.isEmpty()) {
-            buildTab(gameYear, factions1, optionPane, getFactionOptions(factions1, gameYear));
+        if (!supportSkills.isEmpty()) {
+            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills, tabType);
+            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"),
+                  pnlSupportSkills);
         }
 
-        if (!factions2.isEmpty()) {
-            buildTab(gameYear, factions2, optionPane, getFactionOptions(factions2, gameYear));
+        if (!roleplaySkills1.isEmpty()) {
+            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1, tabType));
         }
 
-        if (!factions3.isEmpty()) {
-            buildTab(gameYear, factions3, optionPane, getFactionOptions(factions3, gameYear));
+        if (!roleplaySkills2.isEmpty()) {
+            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2, tabType));
         }
 
-        if (!factions4.isEmpty()) {
-            buildTab(gameYear, factions4, optionPane, getFactionOptions(factions4, gameYear));
+        if (!roleplaySkills3.isEmpty()) {
+            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3, tabType));
         }
 
-        if (!factions5.isEmpty()) {
-            buildTab(gameYear, factions5, optionPane, getFactionOptions(factions5, gameYear));
-        }
-
-        if (!factions6.isEmpty()) {
-            buildTab(gameYear, factions6, optionPane, getFactionOptions(factions6, gameYear));
-        }
-
-        if (!factions7.isEmpty()) {
-            buildTab(gameYear, factions7, optionPane, getFactionOptions(factions7, gameYear));
-        }
-
-        if (!factions8.isEmpty()) {
-            buildTab(gameYear, factions8, optionPane, getFactionOptions(factions8, gameYear));
-        }
-
-        if (!factions9.isEmpty()) {
-            buildTab(gameYear, factions9, optionPane, getFactionOptions(factions9, gameYear));
-        }
-
-        if (!superFactions.isEmpty()) {
-            FastJScrollPane pnlSuperFactions = getFactionOptions(superFactions, gameYear);
-            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.tab.special"),
-                  pnlSuperFactions);
+        if (!roleplaySkills4.isEmpty()) {
+            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4, tabType));
         }
 
         pnlOptions.add(optionPane);
         return pnlOptions;
     }
 
-    private static void buildTab(int gameYear, List<Faction> factions, EnhancedTabbedPane optionPane,
+    private static void buildTab(List<SkillType> skills, EnhancedTabbedPane optionPane,
           FastJScrollPane pnlOptions) {
-        String firstName = factions.get(0).getFullName(gameYear);
-        String lastName = factions.get(factions.size() - 1).getFullName(gameYear);
+        String firstName = skills.get(0).getName();
+        String lastName = skills.get(skills.size() - 1).getName();
 
         char firstLetter = firstName.isEmpty() ? '\0' : firstName.charAt(0);
         char lastLetter = lastName.isEmpty() ? '\0' : lastName.charAt(0);
 
-        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.tab", firstLetter,
+        optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.roleplay.label", firstLetter,
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getFactionOptions(List<Faction> factions, int gameYear) {
-        JPanel pnlFactions = new JPanel(new GridBagLayout());
+    private FastJScrollPane getSkillOptions(List<SkillType> skills, LifePathBuilderTabType tabType) {
+        JPanel pnlSkills = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -287,16 +256,35 @@ public class LifePathFactionPicker extends JDialog {
         gbc.weightx = 1.0;
 
         int columns = 3;
-        for (int i = 0; i < factions.size(); i++) {
-            Faction faction = factions.get(i);
-            String label = faction.getFullName(gameYear);
-            JCheckBox chkFaction = new JCheckBox(label);
-            chkFaction.setSelected(selectedFactions.contains(faction));
-            chkFaction.addActionListener(evt -> {
-                if (chkFaction.isSelected()) {
-                    selectedFactions.add(faction);
-                } else {
-                    selectedFactions.remove(faction);
+        for (int i = 0; i < skills.size(); i++) {
+            SkillType type = skills.get(i);
+            String label = type.getName();
+            label = label.replace(SkillType.RP_ONLY_TAG, "");
+
+            int minimumSkillLevel = switch (tabType) {
+                case REQUIREMENTS, EXCLUSIONS -> 0;
+                case FIXED_XP, FLEXIBLE_XP -> -1000;
+            };
+            int maximumSkillLevel = switch (tabType) {
+                case REQUIREMENTS, EXCLUSIONS -> type.getMaxLevel();
+                case FIXED_XP, FLEXIBLE_XP -> 1000;
+            };
+
+            int defaultValue = switch (tabType) {
+                case REQUIREMENTS -> minimumSkillLevel;
+                case EXCLUSIONS -> maximumSkillLevel;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
+
+            JLabel lblSkill = new JLabel(label);
+            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
+                  maximumSkillLevel, 1));
+
+            final int finalTraitKeyValue = defaultValue;
+            spnSkillLevel.addChangeListener(evt -> {
+                int value = (int) spnSkillLevel.getValue();
+                if (value != finalTraitKeyValue) {
+                    selectedSkillLevels.put(type, value);
                 }
             });
 
@@ -305,13 +293,15 @@ public class LifePathFactionPicker extends JDialog {
 
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(chkFaction);
+            pnlRows.add(lblSkill);
+            pnlRows.add(Box.createHorizontalStrut(PADDING));
+            pnlRows.add(spnSkillLevel);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            pnlFactions.add(pnlRows, gbc);
+            pnlSkills.add(pnlRows, gbc);
         }
 
-        FastJScrollPane scrollSkills = new FastJScrollPane(pnlFactions);
+        FastJScrollPane scrollSkills = new FastJScrollPane(pnlSkills);
         scrollSkills.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollSkills.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollSkills.setBorder(null);
@@ -322,14 +312,14 @@ public class LifePathFactionPicker extends JDialog {
     private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlInstructions = new JPanel();
 
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.label");
+        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.label");
         pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
 
         JEditorPane txtInstructions = new JEditorPane();
         txtInstructions.setContentType("text/html");
         txtInstructions.setEditable(false);
         String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.instructions.text." + tabType.getLookupName()));
+              getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.text." + tabType.getLookupName()));
         txtInstructions.setText(instructions);
 
         FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);

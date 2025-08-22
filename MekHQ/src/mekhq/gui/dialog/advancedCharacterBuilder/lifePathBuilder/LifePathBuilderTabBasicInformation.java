@@ -206,7 +206,8 @@ public class LifePathBuilderTabBasicInformation {
               tooltipManageLifeStages);
         btnManageLifeStages.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathStagePicker picker = new LifePathStagePicker(lifeStages);
+            mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathStagePicker picker = new mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathStagePicker(
+                  lifeStages);
             lifeStages = picker.getSelectedLifeStages();
             parent.updateTxtProgress();
             parent.setVisible(true);
@@ -221,7 +222,8 @@ public class LifePathBuilderTabBasicInformation {
               tooltipManageCategories);
         btnManageCategories.addActionListener(e -> {
             parent.setVisible(false);
-            LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(categories);
+            mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathCategorySingletonPicker picker = new mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.pickers.LifePathCategorySingletonPicker(
+                  categories);
             categories = picker.getSelectedCategories();
             parent.updateTxtProgress();
             parent.setVisible(true);
