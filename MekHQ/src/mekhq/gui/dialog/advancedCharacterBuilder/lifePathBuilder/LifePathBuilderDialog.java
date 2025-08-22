@@ -92,6 +92,7 @@ public class LifePathBuilderDialog extends JDialog {
     private LifePathBuilderTabRequirements requirementsTab;
     private LifePathBuilderTabExclusions exclusionsTab;
     private LifePathBuilderTabFixedXP fixedXPTab;
+    private LifePathBuilderTabFlexibleXP flexibleXPTab;
 
     static String getLifePathBuilderResourceBundle() {
         return RESOURCE_BUNDLE;
@@ -138,6 +139,9 @@ public class LifePathBuilderDialog extends JDialog {
 
         String newFixedXPText = getFixedXPText();
         newProgressText.append(newFixedXPText);
+
+        String newFlexibleXPText = getFlexibleXPText();
+        newProgressText.append(newFlexibleXPText);
 
         String newRequirementsText = getNewRequirementsText();
         newProgressText.append(newRequirementsText);
@@ -300,6 +304,49 @@ public class LifePathBuilderDialog extends JDialog {
         return newFixedXPText.toString();
     }
 
+    private String getFlexibleXPText() {
+        StringBuilder newFlexibleXPText = new StringBuilder();
+
+        boolean isEmpty = true;
+        Map<Integer, String> unorderedFlexibleAwards = flexibleXPTab.getFlexibleXPTabTextMap();
+        for (int i = 0; i < unorderedFlexibleAwards.size(); i++) {
+            String awards = unorderedFlexibleAwards.get(i);
+            if (!awards.isBlank()) {
+                isEmpty = false;
+                break;
+            }
+        }
+        if (isEmpty) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleXP.tab.title");
+        newFlexibleXPText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        List<String> orderedAwards = unorderedFlexibleAwards.entrySet().stream()
+                                           .sorted(Map.Entry.comparingByKey())
+                                           .map(Map.Entry::getValue)
+                                           .toList();
+
+        boolean firstAwardSet = true;
+        for (String awards : orderedAwards) {
+            if (awards.isBlank()) {
+                continue;
+            }
+
+            if (!firstAwardSet) {
+                newFlexibleXPText.append("<br>");
+            }
+            firstAwardSet = false;
+
+            newFlexibleXPText.append("&#9654; ");
+            newFlexibleXPText.append(awards);
+        }
+
+        return newFlexibleXPText.toString();
+    }
+
     private JPanel initialize(int gameYear) {
         JPanel pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
@@ -375,20 +422,9 @@ public class LifePathBuilderDialog extends JDialog {
 
         basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
         fixedXPTab = new LifePathBuilderTabFixedXP(this, tabMain);
+        flexibleXPTab = new LifePathBuilderTabFlexibleXP(this, tabMain);
         requirementsTab = new LifePathBuilderTabRequirements(this, tabMain, gameYear);
         exclusionsTab = new LifePathBuilderTabExclusions(this, tabMain, gameYear);
-
-        // Flexible XP
-        JPanel tabFlexibleXP = new JPanel();
-        tabFlexibleXP.setName("flexibleXP");
-        String titleFlexibleXP = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.flexibleXP");
-        tabMain.addTab(titleFlexibleXP, tabFlexibleXP);
-        tabFlexibleXP.add(new JLabel("First Tab Content"));
-
-        // TODO Add Award Group
-        // TODO Remove Award Group
-        // TODO Add Award
-        // TODO Remove Award
 
         // Add a listener to handle tab selection changes
         tabMain.addChangeListener(e -> {
