@@ -63,6 +63,7 @@ import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitL
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
@@ -73,6 +74,8 @@ public class LifePathBuilderTabRequirements {
 
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
+
+    private final Factions factions = Factions.getInstance();
 
     private final LifePathBuilderDialog parent;
     private final Map<Integer, LifePathComponentStorage> requirementsTabStorageMap = new HashMap<>();
@@ -310,7 +313,7 @@ public class LifePathBuilderTabRequirements {
         buttonsPanel.add(btnAddSPA);
 
         // Factions
-        List<Faction> factions = new ArrayList<>();
+        List<String> factions = new ArrayList<>();
         if (hasStorage) {
             factions.addAll(storage.factions());
         }
@@ -467,7 +470,7 @@ public class LifePathBuilderTabRequirements {
 
     private void standardizedActions(int gameYear, int index, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills,
-          Map<String, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
+          Map<String, Integer> abilities, List<String> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtRequirements,
           LifePathComponentStorage initialStorage) {
         LifePathComponentStorage storage = getRequirementsTabStorage(
@@ -490,8 +493,7 @@ public class LifePathBuilderTabRequirements {
     }
 
     private static LifePathComponentStorage getRequirementsTabStorage(
-          int gameYear, List<Faction> factions,
-          List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
+          int gameYear, List<String> factions, List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
           Map<String, Integer> skills, Map<String, Integer> abilities) {
         return new LifePathComponentStorage(gameYear,
@@ -508,13 +510,18 @@ public class LifePathBuilderTabRequirements {
         StringBuilder progressText = new StringBuilder();
 
         // Factions
-        List<Faction> factions = storage.factions();
+        List<String> storedFactions = storage.factions();
         int gameYear = storage.gameYear();
-        if (!factions.isEmpty()) {
-            for (int i = 0; i < factions.size(); i++) {
-                Faction faction = factions.get(i);
+        if (!storedFactions.isEmpty()) {
+            for (int i = 0; i < storedFactions.size(); i++) {
+                String factionCode = storedFactions.get(i);
+                Faction faction = factions.getFaction(factionCode);
+                if (faction == null) {
+                    LOGGER.error("Faction not found: {}", factionCode);
+                    continue;
+                }
                 progressText.append(faction.getFullName(gameYear));
-                if (i != factions.size() - 1) {
+                if (i != storedFactions.size() - 1) {
                     progressText.append(", ");
                 }
             }

@@ -80,14 +80,15 @@ class LifePathFactionPicker extends JDialog {
 
     private static final int PADDING = scaleForGUI(10);
 
-    private final List<Faction> storedFactions;
-    private List<Faction> selectedFactions;
+    private final Factions factions = Factions.getInstance();
+    private final List<String> storedFactions;
+    private List<String> selectedFactions;
 
-    List<Faction> getSelectedFactions() {
+    List<String> getSelectedFactions() {
         return selectedFactions;
     }
 
-    LifePathFactionPicker(List<Faction> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
+    LifePathFactionPicker(List<String> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -169,19 +170,18 @@ class LifePathFactionPicker extends JDialog {
         String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.options.label");
         pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
 
-        List<Faction> superFactions = new ArrayList<>();
-        List<Faction> factions0 = new ArrayList<>();
-        List<Faction> factions1 = new ArrayList<>();
-        List<Faction> factions2 = new ArrayList<>();
-        List<Faction> factions3 = new ArrayList<>();
-        List<Faction> factions4 = new ArrayList<>();
-        List<Faction> factions5 = new ArrayList<>();
-        List<Faction> factions6 = new ArrayList<>();
-        List<Faction> factions7 = new ArrayList<>();
-        List<Faction> factions8 = new ArrayList<>();
-        List<Faction> factions9 = new ArrayList<>();
+        List<String> superFactions = new ArrayList<>();
+        List<String> factions0 = new ArrayList<>();
+        List<String> factions1 = new ArrayList<>();
+        List<String> factions2 = new ArrayList<>();
+        List<String> factions3 = new ArrayList<>();
+        List<String> factions4 = new ArrayList<>();
+        List<String> factions5 = new ArrayList<>();
+        List<String> factions6 = new ArrayList<>();
+        List<String> factions7 = new ArrayList<>();
+        List<String> factions8 = new ArrayList<>();
+        List<String> factions9 = new ArrayList<>();
 
-        Factions factions = Factions.getInstance();
         List<Faction> allFactions = new ArrayList<>(factions.getFactions(false));
         List<Faction> allFactionsCopy = new ArrayList<>(allFactions);
 
@@ -189,7 +189,7 @@ class LifePathFactionPicker extends JDialog {
         for (Faction faction : allFactionsCopy) {
             if (superFactionsNames.contains(faction.getShortName())) {
                 allFactions.remove(faction);
-                superFactions.add(faction);
+                superFactions.add(faction.getShortName());
                 continue;
             }
 
@@ -206,17 +206,18 @@ class LifePathFactionPicker extends JDialog {
         for (int i = 0; i < n; i++) {
             Faction faction = allFactions.get(i);
             int groupIdx = (int) Math.floor(i * groups / (double) n);
+            String factionCode = faction.getShortName();
             switch (groupIdx) {
-                case 0 -> factions0.add(faction);
-                case 1 -> factions1.add(faction);
-                case 2 -> factions2.add(faction);
-                case 3 -> factions3.add(faction);
-                case 4 -> factions4.add(faction);
-                case 5 -> factions5.add(faction);
-                case 6 -> factions6.add(faction);
-                case 7 -> factions7.add(faction);
-                case 8 -> factions8.add(faction);
-                default -> factions9.add(faction);
+                case 0 -> factions0.add(factionCode);
+                case 1 -> factions1.add(factionCode);
+                case 2 -> factions2.add(factionCode);
+                case 3 -> factions3.add(factionCode);
+                case 4 -> factions4.add(factionCode);
+                case 5 -> factions5.add(factionCode);
+                case 6 -> factions6.add(factionCode);
+                case 7 -> factions7.add(factionCode);
+                case 8 -> factions8.add(factionCode);
+                default -> factions9.add(factionCode);
             }
         }
 
@@ -272,10 +273,20 @@ class LifePathFactionPicker extends JDialog {
         return pnlOptions;
     }
 
-    private static void buildTab(int gameYear, List<Faction> factions, EnhancedTabbedPane optionPane,
+    private void buildTab(int gameYear, List<String> relevantFactions, EnhancedTabbedPane optionPane,
           FastJScrollPane pnlOptions) {
-        String firstName = factions.get(0).getFullName(gameYear);
-        String lastName = factions.get(factions.size() - 1).getFullName(gameYear);
+        Faction firstFaction = factions.getFaction(relevantFactions.get(0));
+        if (firstFaction == null) {
+            LOGGER.error("First Faction not found (build tab): {}", relevantFactions.get(0));
+            return;
+        }
+        Faction lastFaction = factions.getFaction(relevantFactions.get(relevantFactions.size() - 1));
+        if (lastFaction == null) {
+            LOGGER.error("Last Faction not found (build tab): {}", relevantFactions.get(0));
+            return;
+        }
+        String firstName = firstFaction.getFullName(gameYear);
+        String lastName = lastFaction.getFullName(gameYear);
 
         char firstLetter = firstName.isEmpty() ? '\0' : firstName.charAt(0);
         char lastLetter = lastName.isEmpty() ? '\0' : lastName.charAt(0);
@@ -284,7 +295,7 @@ class LifePathFactionPicker extends JDialog {
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getFactionOptions(List<Faction> factions, int gameYear) {
+    private FastJScrollPane getFactionOptions(List<String> factionOptions, int gameYear) {
         JPanel pnlFactions = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -293,16 +304,21 @@ class LifePathFactionPicker extends JDialog {
         gbc.weightx = 1.0;
 
         int columns = 3;
-        for (int i = 0; i < factions.size(); i++) {
-            Faction faction = factions.get(i);
+        for (int i = 0; i < factionOptions.size(); i++) {
+            String factionCode = factionOptions.get(i);
+            Faction faction = factions.getFaction(factionCode);
+            if (faction == null) {
+                LOGGER.error("Faction not found: {}", factionCode);
+                continue;
+            }
             String label = faction.getFullName(gameYear);
             JCheckBox chkFaction = new JCheckBox(label);
-            chkFaction.setSelected(selectedFactions.contains(faction));
+            chkFaction.setSelected(selectedFactions.contains(factionCode));
             chkFaction.addActionListener(evt -> {
                 if (chkFaction.isSelected()) {
-                    selectedFactions.add(faction);
+                    selectedFactions.add(factionCode);
                 } else {
-                    selectedFactions.remove(faction);
+                    selectedFactions.remove(factionCode);
                 }
             });
 

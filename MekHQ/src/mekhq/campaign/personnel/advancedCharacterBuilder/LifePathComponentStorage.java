@@ -41,11 +41,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.universe.Faction;
 
 public record LifePathComponentStorage(
       // Excluded from cost calculations
-      int gameYear, List<Faction> factions,
+      int gameYear, List<String> factions,
       List<UUID> lifePaths,
       Map<LifePathCategory, Integer> categories,
 
