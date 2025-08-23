@@ -62,8 +62,8 @@ public record LifePath(UUID id,
       List<ATOWLifeStage> lifeStages,
       List<LifePathCategory> categories,
       Map<Integer, LifePathComponentStorage> requirements,
-      LifePathComponentStorage exclusions,
-      LifePathComponentStorage fixedXpAwards,
+      Map<Integer, LifePathComponentStorage> exclusions,
+      Map<Integer, LifePathComponentStorage> fixedXpAwards,
       Map<Integer, LifePathComponentStorage> flexibleXpAwards,
       int pickCount
 ) {

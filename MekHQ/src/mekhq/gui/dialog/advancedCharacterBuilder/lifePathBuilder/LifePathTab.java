@@ -1,6 +1,6 @@
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType.REQUIREMENTS;
+import static java.lang.Math.min;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -16,14 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.swing.BoxLayout;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
 
 import megamek.common.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
@@ -45,61 +50,154 @@ public class LifePathTab {
     private final Factions factions = Factions.getInstance();
 
     private final LifePathBuilderDialog parent;
-    private final EnhancedTabbedPane tabMain;
+    private final EnhancedTabbedPane tabGlobal;
+    private final EnhancedTabbedPane tabLocal = new EnhancedTabbedPane();
     private final int gameYear;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
+    private final LifePathBuilderTabType tabType;
+    private final String tabName;
 
-    private final Map<Integer, List<String>> storedFactions = new HashMap<>();
-    private final Map<Integer, List<UUID>> storedLifePaths = new HashMap<>();
-    private final Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
-    private final Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
-    private final Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
-    private final Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
-    private final Map<Integer, Map<String, Integer>> storedAbilities = new HashMap<>();
+    private Map<Integer, List<String>> storedFactions = new HashMap<>();
+    private Map<Integer, List<UUID>> storedLifePaths = new HashMap<>();
+    private Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
+    private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
+    private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
+    private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
+    private Map<Integer, Map<String, Integer>> storedAbilities = new HashMap<>();
+    private final JSpinner spnFlexibleXPPicks = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
-    LifePathTab(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear,
-          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo) {
-        this.parent = parent;
-        this.tabMain = tabMain;
-        this.gameYear = gameYear;
-        this.allAbilityInfo.putAll(allAbilityInfo);
+    public Map<Integer, List<String>> getStoredFactions() {
+        return storedFactions;
     }
 
-    protected void buildTab(boolean enableGroupControls) {
-        JPanel tabRequirements = new JPanel(new BorderLayout());
-        tabRequirements.setName("requirements");
-        String titleRequirements = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.requirements");
-        tabMain.addTab(titleRequirements, tabRequirements);
+    public void setStoredFactions(Map<Integer, List<String>> storedFactions) {
+        this.storedFactions = storedFactions;
+    }
+
+    public Map<Integer, List<UUID>> getStoredLifePaths() {
+        return storedLifePaths;
+    }
+
+    public void setStoredLifePaths(Map<Integer, List<UUID>> storedLifePaths) {
+        this.storedLifePaths = storedLifePaths;
+    }
+
+    public Map<Integer, Map<LifePathCategory, Integer>> getStoredCategories() {
+        return storedCategories;
+    }
+
+    public void setStoredCategories(Map<Integer, Map<LifePathCategory, Integer>> storedCategories) {
+        this.storedCategories = storedCategories;
+    }
+
+    public Map<Integer, Map<SkillAttribute, Integer>> getStoredAttributes() {
+        return storedAttributes;
+    }
+
+    public void setStoredAttributes(Map<Integer, Map<SkillAttribute, Integer>> storedAttributes) {
+        this.storedAttributes = storedAttributes;
+    }
+
+    public Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> getStoredTraits() {
+        return storedTraits;
+    }
+
+    public void setStoredTraits(Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits) {
+        this.storedTraits = storedTraits;
+    }
+
+    public Map<Integer, Map<String, Integer>> getStoredSkills() {
+        return storedSkills;
+    }
+
+    public void setStoredSkills(Map<Integer, Map<String, Integer>> storedSkills) {
+        this.storedSkills = storedSkills;
+    }
+
+    public Map<Integer, Map<String, Integer>> getStoredAbilities() {
+        return storedAbilities;
+    }
+
+    public void setStoredAbilities(Map<Integer, Map<String, Integer>> storedAbilities) {
+        this.storedAbilities = storedAbilities;
+    }
+
+    public int getPickCount() {
+        return min((int) spnFlexibleXPPicks.getValue(), getTabCount());
+    }
+
+    public int getTabCount() {
+        return tabLocal.getTabCount();
+    }
+
+    LifePathTab(LifePathBuilderDialog parent, EnhancedTabbedPane tabGlobal, int gameYear,
+          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType) {
+        this.parent = parent;
+        this.tabGlobal = tabGlobal;
+        this.gameYear = gameYear;
+        this.allAbilityInfo.putAll(allAbilityInfo);
+        this.tabType = tabType;
+        this.tabName = tabType.getLookupName();
+    }
+
+    protected void buildTab() {
+        final boolean enableGroupControls = tabType == LifePathBuilderTabType.REQUIREMENTS ||
+                                                  tabType == LifePathBuilderTabType.FLEXIBLE_XP;
+
+        JPanel pnlLocal = new JPanel(new BorderLayout());
+        pnlLocal.setName(tabName);
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title." + tabName);
+        tabGlobal.addTab(title, pnlLocal);
 
         // Panel for the two buttons at the top
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
-        RoundedJButton btnAddRequirementGroup = getAddGroup(buttonPanel);
-        btnAddRequirementGroup.setVisible(enableGroupControls);
-
-        RoundedJButton btnRemoveRequirementGroup = getRemoveGroup(buttonPanel);
-        btnRemoveRequirementGroup.setVisible(enableGroupControls);
-
-        RoundedJButton btnDuplicateGroup = getDuplicateGroup(buttonPanel);
-        btnDuplicateGroup.setVisible(enableGroupControls);
-
-        // The actual tabbed pane and any button action listeners (we add them here to avoid a situation where they
-        // can be called before the pane has been initialized)
-        EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
-        tabbedPane.addChangeListener(e -> btnRemoveRequirementGroup.setEnabled(tabbedPane.getSelectedIndex() != 0));
-        btnAddRequirementGroup.addActionListener(e -> {
-            addTab(tabbedPane);
-            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        JPanel panelButtonsRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        RoundedJButton btnAddGroup = getAddGroup(panelButtonsRow);
+        btnAddGroup.setVisible(enableGroupControls);
+        btnAddGroup.addActionListener(e -> {
+            addTab();
+            tabLocal.setSelectedIndex(getTabCount() - 1);
         });
-        btnRemoveRequirementGroup.addActionListener(e -> removeRequirementGroup(tabbedPane));
-        btnDuplicateGroup.addActionListener(e -> duplicateGroup(tabbedPane));
+
+        RoundedJButton btnRemoveGroup = getRemoveGroup(panelButtonsRow);
+        btnRemoveGroup.setVisible(enableGroupControls);
+        btnRemoveGroup.addActionListener(e -> removeGroup(tabLocal));
+
+        RoundedJButton btnDuplicateGroup = getDuplicateGroup(panelButtonsRow);
+        btnDuplicateGroup.setVisible(enableGroupControls);
+        btnDuplicateGroup.addActionListener(e -> duplicateGroup());
+
+        JPanel panelPicksRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buildFlexiblePicksPanel(panelPicksRow);
+        spnFlexibleXPPicks.setVisible(tabType == LifePathBuilderTabType.FLEXIBLE_XP);
+
+        buttonPanel.add(panelButtonsRow);
+        buttonPanel.add(panelPicksRow);
 
         if (!enableGroupControls) {
-            addTab(tabbedPane);
+            addTab();
         }
 
-        tabRequirements.add(buttonPanel, BorderLayout.NORTH);
-        tabRequirements.add(tabbedPane, BorderLayout.CENTER);
+        pnlLocal.add(buttonPanel, BorderLayout.NORTH);
+        pnlLocal.add(tabLocal, BorderLayout.CENTER);
+    }
+
+    private void buildFlexiblePicksPanel(JPanel panelPicksRow) {
+        String titlePicks = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.flexibleXP.button.pickCount.label");
+        String tooltipPicks = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.flexibleXP.button.pickCount.tooltip");
+        JLabel lblPicks = new JLabel(titlePicks);
+        lblPicks.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
+        );
+        spnFlexibleXPPicks.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
+        );
+        panelPicksRow.add(lblPicks);
+        panelPicksRow.add(spnFlexibleXPPicks);
     }
 
     private RoundedJButton getDuplicateGroup(JPanel buttonPanel) {
@@ -120,12 +218,12 @@ public class LifePathTab {
               "LifePathBuilderDialog.button.removeGroup.label");
         String tooltipRemoveGroup = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.removeGroup.tooltip");
-        RoundedJButton btnRemoveRequirementGroup = new RoundedJButton(titleRemoveGroup);
-        btnRemoveRequirementGroup.addMouseListener(
+        RoundedJButton btnRemoveGroup = new RoundedJButton(titleRemoveGroup);
+        btnRemoveGroup.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipRemoveGroup)
         );
-        buttonPanel.add(btnRemoveRequirementGroup);
-        return btnRemoveRequirementGroup;
+        buttonPanel.add(btnRemoveGroup);
+        return btnRemoveGroup;
     }
 
     private RoundedJButton getAddGroup(JPanel buttonPanel) {
@@ -133,16 +231,16 @@ public class LifePathTab {
               "LifePathBuilderDialog.button.addGroup.label");
         String tooltipAddGroup = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addGroup.tooltip");
-        RoundedJButton btnAddRequirementGroup = new RoundedJButton(titleAddGroup);
-        btnAddRequirementGroup.addMouseListener(
+        RoundedJButton btnAddGroup = new RoundedJButton(titleAddGroup);
+        btnAddGroup.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddGroup)
         );
-        buttonPanel.add(btnAddRequirementGroup);
+        buttonPanel.add(btnAddGroup);
 
-        return btnAddRequirementGroup;
+        return btnAddGroup;
     }
 
-    private void removeRequirementGroup(EnhancedTabbedPane tabbedPane) {
+    private void removeGroup(EnhancedTabbedPane tabbedPane) {
         int selectedIndex = tabbedPane.getSelectedIndex();
 
         // Remove the current tab, unless it's Group 0
@@ -237,19 +335,19 @@ public class LifePathTab {
             tabbedPane.remove(selectedIndex);
 
             // Update the progress panel
-            parent.updateTxtProgress(gameYear);
+            parent.updateTxtProgress();
         }
     }
 
-    private void duplicateGroup(EnhancedTabbedPane tabbedPane) {
-        int selectedIndex = tabbedPane.getSelectedIndex();
+    private void duplicateGroup() {
+        int selectedIndex = tabLocal.getSelectedIndex();
         if (selectedIndex < 0) {
             return; // nothing selected, do nothing
         }
 
-        addTab(tabbedPane);
+        addTab();
 
-        int newIndex = tabbedPane.getTabCount() - 1;
+        int newIndex = getTabCount() - 1;
 
         List<String> currentFactions = new ArrayList<>(storedFactions.get(selectedIndex));
         storedFactions.put(newIndex, currentFactions);
@@ -272,18 +370,18 @@ public class LifePathTab {
         Map<String, Integer> currentAbilities = new HashMap<>(storedAbilities.get(selectedIndex));
         storedAbilities.put(newIndex, currentAbilities);
 
-        JPanel newTabPanel = (JPanel) tabbedPane.getComponentAt(newIndex);
-        JPanel pnlRequirements = (JPanel) newTabPanel.getComponent(1);
-        JEditorPane txtRequirements = findEditorPaneByName(pnlRequirements, "txtRequirements");
-        if (txtRequirements != null) {
-            txtRequirements.setText(buildIndividualProgressText(selectedIndex).toString());
+        JPanel pnlNewTab = (JPanel) tabLocal.getComponentAt(newIndex);
+        JPanel pnlMain = (JPanel) pnlNewTab.getComponent(1);
+        JEditorPane editorProgress = findEditorPaneByName(pnlMain, "editorProgress");
+        if (editorProgress != null) {
+            editorProgress.setText(buildIndividualProgressText(selectedIndex).toString());
         } else {
-            LOGGER.warn("Could not find txtRequirements in duplicateGroup");
+            LOGGER.warn("Could not find editorProgress in duplicateGroup");
         }
 
-        parent.updateTxtProgress(gameYear);
+        parent.updateTxtProgress();
 
-        tabbedPane.setSelectedIndex(newIndex);
+        tabLocal.setSelectedIndex(newIndex);
     }
 
     private JEditorPane findEditorPaneByName(Container container, String name) {
@@ -292,18 +390,23 @@ public class LifePathTab {
                 return (JEditorPane) component;
             } else if (component instanceof Container) {
                 JEditorPane result = findEditorPaneByName((Container) component, name);
-                if (result != null) {return result;}
+                if (result != null) {
+                    return result;
+                }
             }
         }
         return null;
     }
 
-    private void addTab(EnhancedTabbedPane tabbedPane) {
-        int index = tabbedPane.getTabCount();
+    private void addTab() {
+        final boolean includeSupplementaryButtons = tabType == LifePathBuilderTabType.REQUIREMENTS ||
+                                                          tabType == LifePathBuilderTabType.EXCLUSIONS;
+
+        int index = getTabCount();
 
         // Create the panel to be used in the tab
-        JPanel requirementGroupPanel = new JPanel();
-        requirementGroupPanel.setLayout(new BorderLayout());
+        JPanel groupPanel = new JPanel();
+        groupPanel.setLayout(new BorderLayout());
 
         // Panel for the 8 buttons (using GridLayout: 2 rows, 4 columns)
         JPanel buttonsPanel = new JPanel(new GridLayout(2, 4, PADDING, PADDING));
@@ -312,9 +415,9 @@ public class LifePathTab {
         storedAttributes.put(index, new HashMap<>());
 
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addAttribute.label");
+              "LifePathBuilderDialog.button.addAttribute.label");
         String tooltipAddAttribute = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addAttribute.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addAttribute.tooltip");
         RoundedJButton btnAddAttribute = new RoundedJButton(titleAddAttribute);
         btnAddAttribute.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddAttribute)
@@ -325,9 +428,9 @@ public class LifePathTab {
         storedTraits.put(index, new HashMap<>());
 
         String titleAddTrait = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addTrait.label");
+              "LifePathBuilderDialog.button.addTrait.label");
         String tooltipAddTrait = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addTrait.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addTrait.tooltip");
         RoundedJButton btnAddTrait = new RoundedJButton(titleAddTrait);
         btnAddTrait.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddTrait)
@@ -338,9 +441,9 @@ public class LifePathTab {
         storedSkills.put(index, new HashMap<>());
 
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSkill.label");
+              "LifePathBuilderDialog.button.addSkill.label");
         String tooltipAddSkill = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSkill.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addSkill.tooltip");
         RoundedJButton btnAddSkill = new RoundedJButton(titleAddSkill);
         btnAddSkill.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddSkill)
@@ -351,9 +454,9 @@ public class LifePathTab {
         storedAbilities.put(index, new HashMap<>());
 
         String titleAddSPA = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSPA.label");
+              "LifePathBuilderDialog.button.addSPA.label");
         String tooltipAddSPA = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addSPA.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addSPA.tooltip");
         RoundedJButton btnAddSPA = new RoundedJButton(titleAddSPA);
         btnAddSPA.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddSPA)
@@ -364,163 +467,172 @@ public class LifePathTab {
         storedFactions.put(index, new ArrayList<>());
 
         String titleAddFaction = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addFaction.label");
+              "LifePathBuilderDialog.button.addFaction.label");
         String tooltipAddFaction = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addFaction.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addFaction.tooltip");
         RoundedJButton btnAddFaction = new RoundedJButton(titleAddFaction);
         btnAddFaction.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddFaction)
         );
+        btnAddFaction.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddFaction);
 
         // Life Paths
         storedLifePaths.put(index, new ArrayList<>());
 
         String titleAddLifePath = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addLifePath.label");
+              "LifePathBuilderDialog.button.addLifePath.label");
         String tooltipAddLifePath = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addLifePath.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addLifePath.tooltip");
         RoundedJButton btnAddLifePath = new RoundedJButton(titleAddLifePath);
         btnAddLifePath.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddLifePath)
         );
         btnAddLifePath.setEnabled(false); // TODO Implement
+        btnAddLifePath.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddLifePath);
 
         // Categories
         storedCategories.put(index, new HashMap<>());
 
         String titleAddCategory = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addCategory.label");
+              "LifePathBuilderDialog.button.addCategory.label");
         String tooltipAddCategory = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.requirements.button.addCategory.tooltip");
+              "LifePathBuilderDialog." + tabName + ".button.addCategory.tooltip");
         RoundedJButton btnAddCategory = new RoundedJButton(titleAddCategory);
         btnAddCategory.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddCategory)
         );
+        btnAddCategory.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddCategory);
 
         // Panel below the buttons
         JPanel pnlDisplay = new JPanel();
         pnlDisplay.setLayout(new BorderLayout());
 
-        String titleBorder = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
+        String titleBorder = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog." + tabName + ".tab.title");
         pnlDisplay.setBorder(RoundedLineBorder.createRoundedLineBorder(titleBorder));
 
-        JEditorPane txtRequirements = new JEditorPane();
-        txtRequirements.setName("txtRequirements");
-        txtRequirements.setContentType("text/html");
-        txtRequirements.setEditable(false);
+        JEditorPane editorProgress = new JEditorPane();
+        editorProgress.setName("editorProgress");
+        editorProgress.setContentType("text/html");
+        editorProgress.setEditable(false);
         String progressText = buildIndividualProgressText(gameYear).toString();
-        txtRequirements.setText(progressText);
+        editorProgress.setText(progressText);
 
-        FastJScrollPane scrollRequirements = new FastJScrollPane(txtRequirements);
-        scrollRequirements.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollRequirements.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollRequirements.setBorder(null);
+        FastJScrollPane scrollMain = new FastJScrollPane(editorProgress);
+        scrollMain.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollMain.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollMain.setBorder(null);
 
-        pnlDisplay.add(scrollRequirements, BorderLayout.CENTER);
+        pnlDisplay.add(scrollMain, BorderLayout.CENTER);
 
         // Add panels and then add Tab
-        requirementGroupPanel.add(buttonsPanel, BorderLayout.NORTH);
-        requirementGroupPanel.add(pnlDisplay, BorderLayout.CENTER);
+        groupPanel.add(buttonsPanel, BorderLayout.NORTH);
+        groupPanel.add(pnlDisplay, BorderLayout.CENTER);
 
-        int count = tabbedPane.getComponentCount();
-        String titleTab = getFormattedTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel");
-        tabbedPane.addTab(titleTab, requirementGroupPanel);
+        String title = switch (tabType) {
+            case FIXED_XP, EXCLUSIONS -> "";
+            case FLEXIBLE_XP -> getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.group.formattedLabel");
+            case REQUIREMENTS -> {
+                int count = tabLocal.getComponentCount();
+                yield getFormattedTextAt(RESOURCE_BUNDLE,
+                      "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel");
+            }
+        };
+        tabLocal.addTab(title, groupPanel);
 
         // Action Listeners
         btnAddAttribute.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathAttributePicker picker = new LifePathAttributePicker(storedAttributes.get(currentIndex),
-                  REQUIREMENTS);
+                  tabType);
             storedAttributes.put(currentIndex, picker.getSelectedAttributeScores());
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
-            LifePathTraitPicker picker = new LifePathTraitPicker(storedTraits.get(currentIndex), REQUIREMENTS);
+            LifePathTraitPicker picker = new LifePathTraitPicker(storedTraits.get(currentIndex), tabType);
             storedTraits.put(currentIndex, picker.getSelectedTraitScores());
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
-            LifePathSkillPicker picker = new LifePathSkillPicker(storedSkills.get(currentIndex), REQUIREMENTS);
+            LifePathSkillPicker picker = new LifePathSkillPicker(storedSkills.get(currentIndex), tabType);
             storedSkills.put(currentIndex, picker.getSelectedSkillLevels());
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
         btnAddSPA.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathSPAPicker picker = new LifePathSPAPicker(storedAbilities.get(currentIndex), allAbilityInfo,
-                  REQUIREMENTS);
+                  tabType);
             storedAbilities.put(currentIndex, picker.getSelectedAbilities());
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
         btnAddFaction.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathFactionPicker picker = new LifePathFactionPicker(storedFactions.get(currentIndex),
                   gameYear,
-                  REQUIREMENTS);
+                  tabType);
             storedFactions.put(currentIndex, picker.getSelectedFactions());
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
         btnAddLifePath.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
             // TODO launch a dialog that lists the current requirements and allows the user to remove one
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
         btnAddCategory.addActionListener(e -> {
             parent.setVisible(false);
 
-            int currentIndex = tabbedPane.getSelectedIndex();
+            int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(storedCategories.get(currentIndex),
-                  REQUIREMENTS);
+                  tabType);
             storedCategories.put(currentIndex, picker.getSelectedCategoryCounts());
-            standardizedActions(currentIndex, txtRequirements);
+            standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
     }
 
-    private void standardizedActions(int index, JEditorPane txtRequirements) {
-        List<String> requirementsText = buildRequirementText();
-        txtRequirements.setText(requirementsText.get(index));
-        parent.updateTxtProgress(gameYear);
+    private void standardizedActions(int index, JEditorPane newText) {
+        List<String> textArray = buildProgressText();
+        newText.setText(textArray.get(index));
+        parent.updateTxtProgress();
     }
 
-    private List<String> buildRequirementText() {
+    public List<String> buildProgressText() {
         List<String> progressText = new ArrayList<>();
 
         for (int index : storedAbilities.keySet()) {
@@ -697,9 +809,5 @@ public class LifePathTab {
             storedSkills.put(entry.getKey(), value.skills());
             storedAbilities.put(entry.getKey(), value.abilities());
         }
-    }
-
-    public List<String> getTabProgress() {
-        return buildRequirementText();
     }
 }

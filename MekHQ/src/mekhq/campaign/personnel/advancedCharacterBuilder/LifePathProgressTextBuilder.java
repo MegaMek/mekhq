@@ -36,26 +36,23 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
-import java.util.Map;
 
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabBasicInformation;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabExclusions;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabFixedXP;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabFlexibleXP;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
 
 public class LifePathProgressTextBuilder {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
     private static final int TEXT_PANEL_WIDTH = LifePathBuilderDialog.getTextPanelWidth();
 
-    public static String getProgressText(int gameYear, LifePathBuilderTabBasicInformation basicInfoTab,
-          LifePathTab requirementsTab, LifePathBuilderTabExclusions exclusionsTab,
-          LifePathBuilderTabFixedXP fixedXPTab, LifePathBuilderTabFlexibleXP flexibleXPTab) {
+    public static String getProgressText(LifePathBuilderTabBasicInformation basicInfoTab, LifePathTab requirementsTab,
+          LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
         int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
-              fixedXPTab.getFixedXPTabStorage(), flexibleXPTab.getFlexibleXPTabStorageMap());
+              fixedXPTab.getStoredAttributes(), fixedXPTab.getStoredTraits(), fixedXPTab.getStoredSkills(),
+              fixedXPTab.getStoredAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getStoredAttributes(),
+              flexibleXPTab.getStoredTraits(), flexibleXPTab.getStoredSkills(), flexibleXPTab.getStoredAbilities());
 
         String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);
         newProgressText.append(newBasicText);
@@ -66,7 +63,7 @@ public class LifePathProgressTextBuilder {
         String newFlexibleXPText = getFlexibleXPText(flexibleXPTab);
         newProgressText.append(newFlexibleXPText);
 
-        String newRequirementsText = getNewRequirementsText(requirementsTab, gameYear);
+        String newRequirementsText = getNewRequirementsText(requirementsTab);
         newProgressText.append(newRequirementsText);
 
         String newExclusionsText = getNewExclusionsText(exclusionsTab);
@@ -147,114 +144,118 @@ public class LifePathProgressTextBuilder {
         return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
     }
 
-    private static String getNewRequirementsText(LifePathTab requirementsTab, int gameYear) {
-        StringBuilder newRequirementsText = new StringBuilder();
+    private static String getNewRequirementsText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
 
-        boolean isEmpty = true;
-        List<String> progress = requirementsTab.getTabProgress();
-        if (progress.isEmpty()) {
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
             return "";
         }
 
-        String requirementsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
-        newRequirementsText.append("<h2 style='text-align:center; margin:0;'>").append(requirementsTitle).append(
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.requirements.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
               "</h2>");
 
-        boolean firstRequirement = true;
         for (int i = 0; i < progress.size(); i++) {
-            String requirements = progress.get(i);
-            if (requirements.isBlank()) {
+            String group = progress.get(i);
+            if (group.isBlank()) {
                 continue;
             }
 
-            if (!firstRequirement) {
-                newRequirementsText.append("<br>");
+            if (i != 0) {
+                newText.append("<br>");
             }
-            firstRequirement = false;
 
-            String requirementTitle = getFormattedTextAt(RESOURCE_BUNDLE,
+            String header = getFormattedTextAt(RESOURCE_BUNDLE,
                   "LifePathBuilderDialog.tab." + (i == 0 ? "compulsory" : "optional") + ".label");
-            newRequirementsText.append("&#9654; <b>").append(requirementTitle).append(": </b>");
-            newRequirementsText.append(requirements);
+            newText.append("&#9654; <b>").append(header).append(": </b>");
+            newText.append(group);
         }
 
-        return newRequirementsText.toString();
+        return newText.toString();
     }
 
-    private static String getNewExclusionsText(LifePathBuilderTabExclusions exclusionsTab) {
-        StringBuilder newExclusionsText = new StringBuilder();
-
-        String exclusions = exclusionsTab.getExclusionsTabTextStorage();
-        if (exclusions.isBlank()) {
-            return "";
-        }
-
-        String exclusionsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.exclusions.tab.title");
-        newExclusionsText.append("<h2 style='text-align:center; margin:0;'>").append(exclusionsTitle).append(
-              "</h2>");
-
-        newExclusionsText.append(exclusions);
-
-        return newExclusionsText.toString();
-    }
-
-    private static String getFixedXPText(LifePathBuilderTabFixedXP fixedXPTab) {
-        StringBuilder newFixedXPText = new StringBuilder();
-
-        String awards = fixedXPTab.getFixedXPTabTextStorage();
-        if (awards.isBlank()) {
-            return "";
-        }
-
-        String exclusionsTitle = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.fixedXP.tab.title");
-        newFixedXPText.append("<h2 style='text-align:center; margin:0;'>").append(exclusionsTitle).append(
-              "</h2>");
-
-        newFixedXPText.append(awards);
-
-        return newFixedXPText.toString();
-    }
-
-    private static String getFlexibleXPText(LifePathBuilderTabFlexibleXP flexibleXPTab) {
-        StringBuilder newFlexibleXPText = new StringBuilder();
-
-        boolean isEmpty = true;
-        Map<Integer, String> unorderedFlexibleAwards = flexibleXPTab.getFlexibleXPTabTextMap();
-        for (int i = 0; i < unorderedFlexibleAwards.size(); i++) {
-            String awards = unorderedFlexibleAwards.get(i);
-            if (!awards.isBlank()) {
-                isEmpty = false;
-                break;
+    private static boolean isEmpty(List<String> progress) {
+        for (String group : progress) {
+            if (!group.isBlank()) {
+                return false;
             }
         }
-        if (isEmpty) {
+        return true;
+    }
+
+    private static String getNewExclusionsText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
             return "";
         }
 
-        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleXP.tab.title");
-        newFlexibleXPText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.exclusions.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
               "</h2>");
 
-        List<String> orderedAwards = unorderedFlexibleAwards.entrySet().stream()
-                                           .sorted(Map.Entry.comparingByKey())
-                                           .map(Map.Entry::getValue)
-                                           .toList();
+        for (int i = 0; i < progress.size(); i++) {
+            if (i != 0) {
+                newText.append(", ");
+            }
 
-        boolean firstAwardSet = true;
-        for (String awards : orderedAwards) {
-            if (awards.isBlank()) {
+            newText.append(progress.get(i));
+        }
+
+        return newText.toString();
+    }
+
+    private static String getFixedXPText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.fixed_xp.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        for (int i = 0; i < progress.size(); i++) {
+            if (i != 0) {
+                newText.append(", ");
+            }
+
+            newText.append(progress.get(i));
+        }
+
+        return newText.toString();
+    }
+
+    private static String getFlexibleXPText(LifePathTab lifePathTab) {
+        StringBuilder newText = new StringBuilder();
+
+        List<String> progress = lifePathTab.buildProgressText();
+        if (isEmpty(progress)) {
+            return "";
+        }
+
+        String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.tab.title");
+        newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
+              "</h2>");
+
+        for (int i = 0; i < progress.size(); i++) {
+            String group = progress.get(i);
+            if (group.isBlank()) {
                 continue;
             }
 
-            if (!firstAwardSet) {
-                newFlexibleXPText.append("<br>");
+            if (i != 0) {
+                newText.append("<br>");
             }
-            firstAwardSet = false;
 
-            newFlexibleXPText.append("&#9654; ");
-            newFlexibleXPText.append(awards);
+            newText.append("&#9654; ");
+            newText.append(group);
         }
 
-        return newFlexibleXPText.toString();
+        return newText.toString();
     }
 }

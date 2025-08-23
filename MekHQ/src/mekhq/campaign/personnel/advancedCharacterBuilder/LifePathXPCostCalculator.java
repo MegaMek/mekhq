@@ -34,47 +34,69 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static java.lang.Math.max;
 
-import java.util.Collection;
 import java.util.Map;
 
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+
 public class LifePathXPCostCalculator {
-    public static int calculateXPCost(int discount, LifePathComponentStorage fixedXPStorage,
-          Map<Integer, LifePathComponentStorage> flexibleXPStorage) {
+    public static int calculateXPCost(int discount,
+          Map<Integer, Map<SkillAttribute, Integer>> fixedAttributes,
+          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedTraits,
+          Map<Integer, Map<String, Integer>> fixedSkills,
+          Map<Integer, Map<String, Integer>> fixedAbilities,
+          int flexibleTabCount,
+          Map<Integer, Map<SkillAttribute, Integer>> flexibleAttributes,
+          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleTraits,
+          Map<Integer, Map<String, Integer>> flexibleSkills,
+          Map<Integer, Map<String, Integer>> flexibleAbilities) {
         // Basic Info
         int globalCost = -discount;
 
         // Fixed XP
-        globalCost = getCost(fixedXPStorage, globalCost);
+        globalCost += getCost(fixedAttributes, fixedTraits, fixedSkills, fixedAbilities);
 
         // Flexible XP
-        int runningCost = 0;
-        int length = flexibleXPStorage.size();
-        for (Map.Entry<Integer, LifePathComponentStorage> entry : flexibleXPStorage.entrySet()) {
-            LifePathComponentStorage storage = entry.getValue();
-
-            runningCost = getCost(storage, runningCost);
-        }
-        int meanCost = runningCost / length;
-
-        // Total and return
-        globalCost += meanCost;
+        int divisor = max(1, flexibleTabCount);
+        int baseCost = getCost(flexibleAttributes, flexibleTraits, flexibleSkills, flexibleAbilities);
+        globalCost += baseCost / divisor;
 
         // We can have 0 cost Life Paths, but not negative
         return max(0, globalCost);
     }
 
-    private static int getCost(LifePathComponentStorage fixedXPStorage, int globalCost) {
-        Collection<Integer> fixedAttributes = fixedXPStorage.attributes().values();
-        globalCost += fixedAttributes.stream().mapToInt(Integer::intValue).sum();
+    private static int getCost(Map<Integer, Map<SkillAttribute, Integer>> fixedAttributes,
+          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedTraits,
+          Map<Integer, Map<String, Integer>> fixedSkills, Map<Integer, Map<String, Integer>> fixedAbilities) {
+        int cost = 0;
 
-        Collection<Integer> fixedTraits = fixedXPStorage.traits().values();
-        globalCost += fixedTraits.stream().mapToInt(Integer::intValue).sum();
+        for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : fixedAttributes.entrySet()) {
+            Map<SkillAttribute, Integer> storage = entry.getValue();
+            for (Map.Entry<SkillAttribute, Integer> attributeEntry : storage.entrySet()) {
+                cost += attributeEntry.getValue();
+            }
+        }
 
-        Collection<Integer> fixedSkills = fixedXPStorage.skills().values();
-        globalCost += fixedSkills.stream().mapToInt(Integer::intValue).sum();
+        for (Map.Entry<Integer, Map<LifePathEntryDataTraitLookup, Integer>> entry : fixedTraits.entrySet()) {
+            Map<LifePathEntryDataTraitLookup, Integer> storage = entry.getValue();
+            for (Map.Entry<LifePathEntryDataTraitLookup, Integer> traitEntry : storage.entrySet()) {
+                cost += traitEntry.getValue();
+            }
+        }
 
-        Collection<Integer> fixedAbilities = fixedXPStorage.abilities().values();
-        globalCost += fixedAbilities.stream().mapToInt(Integer::intValue).sum();
-        return globalCost;
+        for (Map.Entry<Integer, Map<String, Integer>> entry : fixedSkills.entrySet()) {
+            Map<String, Integer> storage = entry.getValue();
+            for (Map.Entry<String, Integer> traitEntry : storage.entrySet()) {
+                cost += traitEntry.getValue();
+            }
+        }
+
+        for (Map.Entry<Integer, Map<String, Integer>> entry : fixedAbilities.entrySet()) {
+            Map<String, Integer> storage = entry.getValue();
+            for (Map.Entry<String, Integer> traitEntry : storage.entrySet()) {
+                cost += traitEntry.getValue();
+            }
+        }
+
+        return cost;
     }
 }

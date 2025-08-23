@@ -160,7 +160,7 @@ public class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
-              () -> parent.updateTxtProgress(gameYear)
+              parent::updateTxtProgress
         );
 
         // Source
@@ -183,7 +183,7 @@ public class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
-              () -> parent.updateTxtProgress(gameYear)
+              parent::updateTxtProgress
         );
 
         // Flavor Text
@@ -210,7 +210,7 @@ public class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
-              () -> parent.updateTxtProgress(gameYear)
+              parent::updateTxtProgress
         );
 
         // Age Modifier
@@ -231,7 +231,7 @@ public class LifePathBuilderTabBasicInformation {
         spnAge.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAge)
         );
-        spnAge.addChangeListener(e -> parent.updateTxtProgress(gameYear));
+        spnAge.addChangeListener(e -> parent.updateTxtProgress());
 
         // XP Discount
         final String titleDiscount = getTextAt(RESOURCE_BUNDLE,
@@ -251,7 +251,7 @@ public class LifePathBuilderTabBasicInformation {
         spnDiscount.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
         );
-        spnDiscount.addChangeListener(e -> parent.updateTxtProgress(gameYear));
+        spnDiscount.addChangeListener(e -> parent.updateTxtProgress());
 
         // Manage Life Stages
         final String titleManageLifeStages = getTextAt(RESOURCE_BUNDLE,
@@ -265,7 +265,7 @@ public class LifePathBuilderTabBasicInformation {
             LifePathStagePicker picker = new LifePathStagePicker(
                   lifeStages);
             lifeStages = picker.getSelectedLifeStages();
-            parent.updateTxtProgress(gameYear);
+            parent.updateTxtProgress();
             parent.setVisible(true);
         });
 
@@ -281,7 +281,7 @@ public class LifePathBuilderTabBasicInformation {
             LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(
                   categories);
             categories = picker.getSelectedCategories();
-            parent.updateTxtProgress(gameYear);
+            parent.updateTxtProgress();
             parent.setVisible(true);
         });
 
