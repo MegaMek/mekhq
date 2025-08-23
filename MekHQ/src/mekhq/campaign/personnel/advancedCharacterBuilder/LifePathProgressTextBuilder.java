@@ -1,22 +1,55 @@
-package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getResourceBundle;
-import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getTextPanelWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabBasicInformation;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabExclusions;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabFixedXP;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabFlexibleXP;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabRequirements;
 
 public class LifePathProgressTextBuilder {
-    private static final String RESOURCE_BUNDLE = getResourceBundle();
-    private static final int TEXT_PANEL_WIDTH = getTextPanelWidth();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
+    private static final int TEXT_PANEL_WIDTH = LifePathBuilderDialog.getTextPanelWidth();
 
-    static String getProgressText(LifePathBuilderTabBasicInformation basicInfoTab,
+    public static String getProgressText(LifePathBuilderTabBasicInformation basicInfoTab,
           LifePathBuilderTabRequirements requirementsTab, LifePathBuilderTabExclusions exclusionsTab,
           LifePathBuilderTabFixedXP fixedXPTab, LifePathBuilderTabFlexibleXP flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
@@ -71,7 +104,7 @@ public class LifePathProgressTextBuilder {
             newText.append("</h2>");
         }
 
-        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
+        List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
         if (!lifeStages.isEmpty()) {
             StringBuilder lifeStageText = new StringBuilder();
             lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
@@ -91,7 +124,7 @@ public class LifePathProgressTextBuilder {
             newText.append("<br>").append(lifeStageText);
         }
 
-        Set<LifePathCategory> categories = basicInfoTab.getCategories();
+        List<LifePathCategory> categories = basicInfoTab.getCategories();
         if (!categories.isEmpty()) {
             StringBuilder categoriesText = new StringBuilder();
             categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));

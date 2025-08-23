@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
+import static java.lang.Math.min;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType.FLEXIBLE_XP;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
@@ -68,7 +69,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-class LifePathBuilderTabFlexibleXP {
+public class LifePathBuilderTabFlexibleXP {
     private final static MMLogger LOGGER = MMLogger.create(LifePathBuilderTabFlexibleXP.class);
 
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
@@ -78,13 +79,18 @@ class LifePathBuilderTabFlexibleXP {
     private final Map<Integer, LifePathTabStorage> flexibleXPTabStorageMap = new HashMap<>();
     private final Map<Integer, String> flexibleXPTabTextMap = new HashMap<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
+    JSpinner spnPicks;
 
-    Map<Integer, LifePathTabStorage> getFlexibleXPTabStorageMap() {
+    public Map<Integer, LifePathTabStorage> getFlexibleXPTabStorageMap() {
         return flexibleXPTabStorageMap;
     }
 
-    Map<Integer, String> getFlexibleXPTabTextMap() {
+    public Map<Integer, String> getFlexibleXPTabTextMap() {
         return flexibleXPTabTextMap;
+    }
+
+    public int getPickCount() {
+        return min((int) spnPicks.getValue(), flexibleXPTabStorageMap.size());
     }
 
     LifePathBuilderTabFlexibleXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain,
@@ -138,7 +144,7 @@ class LifePathBuilderTabFlexibleXP {
         String tooltipPicks = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.flexibleXP.button.pickCount.tooltip");
         JLabel lblPicks = new JLabel(titlePicks);
-        JSpinner spnPicks = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
+        spnPicks = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
         lblPicks.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
         );

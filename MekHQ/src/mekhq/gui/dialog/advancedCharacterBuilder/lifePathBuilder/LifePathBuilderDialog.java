@@ -50,6 +50,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -70,6 +71,7 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
@@ -95,26 +97,23 @@ public class LifePathBuilderDialog extends JDialog {
 
     private FastJScrollPane scrollInstructions;
     private JEditorPane txtInstructions;
-
     private JLabel lblTooltipDisplay;
-
     private FastJScrollPane scrollProgress;
     private JEditorPane txtProgress;
     private JPanel pnlInstructions;
     private JPanel pnlProgress;
+
     private LifePathBuilderTabBasicInformation basicInfoTab;
     private LifePathBuilderTabRequirements requirementsTab;
     private LifePathBuilderTabExclusions exclusionsTab;
     private LifePathBuilderTabFixedXP fixedXPTab;
     private LifePathBuilderTabFlexibleXP flexibleXPTab;
+
+    private UUID lifePathId = UUID.randomUUID();
     private final List<String> level3Abilities = new ArrayList<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    static String getResourceBundle() {
-        return RESOURCE_BUNDLE;
-    }
-
-    static int getTextPanelWidth() {
+    public static int getTextPanelWidth() {
         return TEXT_PANEL_WIDTH;
     }
 
@@ -422,4 +421,6 @@ public class LifePathBuilderDialog extends JDialog {
             LOGGER.error("Failed to set user preferences", ex);
         }
     }
+
+
 }

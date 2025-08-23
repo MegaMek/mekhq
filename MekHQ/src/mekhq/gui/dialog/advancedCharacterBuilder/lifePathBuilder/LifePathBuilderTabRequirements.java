@@ -68,7 +68,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-class LifePathBuilderTabRequirements {
+public class LifePathBuilderTabRequirements {
     private final static MMLogger LOGGER = MMLogger.create(LifePathBuilderTabRequirements.class);
 
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
@@ -79,11 +79,11 @@ class LifePathBuilderTabRequirements {
     private final Map<Integer, String> requirementsTabTextMap = new HashMap<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    Map<Integer, LifePathTabStorage> getRequirementsTabStorageMap() {
+    public Map<Integer, LifePathTabStorage> getRequirementsTabStorageMap() {
         return requirementsTabStorageMap;
     }
 
-    Map<Integer, String> getRequirementsTabTextMap() {
+    public Map<Integer, String> getRequirementsTabTextMap() {
         return requirementsTabTextMap;
     }
 

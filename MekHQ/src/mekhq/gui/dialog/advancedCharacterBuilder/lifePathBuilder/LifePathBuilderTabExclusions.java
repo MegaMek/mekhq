@@ -62,7 +62,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-class LifePathBuilderTabExclusions {
+public class LifePathBuilderTabExclusions {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
 
@@ -71,11 +71,11 @@ class LifePathBuilderTabExclusions {
     private String exclusionsTabTextStorage;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    LifePathTabStorage getExclusionsTabStorage() {
+    public LifePathTabStorage getExclusionsTabStorage() {
         return exclusionsTabStorage;
     }
 
-    String getExclusionsTabTextStorage() {
+    public String getExclusionsTabTextStorage() {
         return exclusionsTabTextStorage;
     }
 

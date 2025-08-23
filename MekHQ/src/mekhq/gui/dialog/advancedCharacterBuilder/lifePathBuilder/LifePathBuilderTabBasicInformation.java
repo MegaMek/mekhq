@@ -40,8 +40,8 @@ import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePath
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -59,7 +59,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.advancedCharacterBuilder.DocumentChangeListenerUtil;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-class LifePathBuilderTabBasicInformation {
+public class LifePathBuilderTabBasicInformation {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int MINIMUM_COMPONENT_WIDTH = getLifePathBuilderMinimumComponentWidth();
     private final static int PADDING = getLifePathBuilderPadding();
@@ -69,30 +69,34 @@ class LifePathBuilderTabBasicInformation {
     private final JTextArea txtFlavorText;
     private final JSpinner spnAge;
     private final JSpinner spnDiscount;
-    private Set<ATOWLifeStage> lifeStages = new HashSet<>();
-    private Set<LifePathCategory> categories = new HashSet<>();
+    private List<ATOWLifeStage> lifeStages = new ArrayList<>();
+    private List<LifePathCategory> categories = new ArrayList<>();
 
-    String getName() {
-        return txtSource.getText();
+    public String getName() {
+        return txtName.getText();
     }
 
-    String getFlavorText() {
+    public String getFlavorText() {
         return txtFlavorText.getText();
     }
 
-    int getAge() {
+    public String getSource() {
+        return txtSource.getText();
+    }
+
+    public int getAge() {
         return (int) spnAge.getValue();
     }
 
-    int getDiscount() {
+    public int getDiscount() {
         return (int) spnDiscount.getValue();
     }
 
-    Set<ATOWLifeStage> getLifeStages() {
+    public List<ATOWLifeStage> getLifeStages() {
         return lifeStages;
     }
 
-    Set<LifePathCategory> getCategories() {
+    public List<LifePathCategory> getCategories() {
         return categories;
     }
 

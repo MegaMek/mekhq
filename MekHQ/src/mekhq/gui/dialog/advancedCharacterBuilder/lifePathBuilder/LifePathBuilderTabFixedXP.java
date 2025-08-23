@@ -58,7 +58,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-class LifePathBuilderTabFixedXP {
+public class LifePathBuilderTabFixedXP {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
 
@@ -67,15 +67,15 @@ class LifePathBuilderTabFixedXP {
     private String fixedXPTabTextStorage;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
 
-    LifePathTabStorage getFixedXPTabStorage() {
+    public LifePathTabStorage getFixedXPTabStorage() {
         return fixedXPTabStorage;
     }
 
-    String getFixedXPTabTextStorage() {
+    public String getFixedXPTabTextStorage() {
         return fixedXPTabTextStorage;
     }
 
-    LifePathBuilderTabFixedXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain,
+    public LifePathBuilderTabFixedXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain,
           Map<String, CampaignOptionsAbilityInfo> allAbilityInfo) {
         this.parent = parent;
         this.allAbilityInfo = allAbilityInfo;

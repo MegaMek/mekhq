@@ -43,8 +43,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -80,19 +80,19 @@ class LifePathCategorySingletonPicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private JLabel lblTooltipDisplay;
-    private final Set<LifePathCategory> storedCategories;
-    private Set<LifePathCategory> selectedCategories;
+    private final List<LifePathCategory> storedCategories;
+    private List<LifePathCategory> selectedCategories;
 
-    Set<LifePathCategory> getSelectedCategories() {
+    List<LifePathCategory> getSelectedCategories() {
         return selectedCategories;
     }
 
-    LifePathCategorySingletonPicker(Set<LifePathCategory> selectedCategories) {
+    LifePathCategorySingletonPicker(List<LifePathCategory> selectedCategories) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedCategories = new HashSet<>(selectedCategories);
-        storedCategories = new HashSet<>(selectedCategories);
+        this.selectedCategories = new ArrayList<>(selectedCategories);
+        storedCategories = new ArrayList<>(selectedCategories);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.title"));
 
@@ -179,7 +179,6 @@ class LifePathCategorySingletonPicker extends JDialog {
         categories.sort(java.util.Comparator.comparing(LifePathCategory::getDisplayName));
 
         int numColumns = 3;
-        int numRows = (int) Math.ceil(categories.size() / (double) numColumns);
 
         JPanel columnsPanel = new JPanel(new GridBagLayout());
 
@@ -188,6 +187,7 @@ class LifePathCategorySingletonPicker extends JDialog {
         for (int col = 0; col < numColumns; col++) {
             columns.add(new java.util.ArrayList<>());
         }
+
         for (int i = 0; i < categories.size(); i++) {
             int col = i % numColumns;
             columns.get(col).add(categories.get(i));

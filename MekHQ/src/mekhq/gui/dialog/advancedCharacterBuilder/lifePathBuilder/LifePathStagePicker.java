@@ -43,8 +43,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -80,19 +80,19 @@ class LifePathStagePicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private JLabel lblTooltipDisplay;
-    private final Set<ATOWLifeStage> storedLifeStages;
-    private Set<ATOWLifeStage> selectedLifeStages;
+    private final List<ATOWLifeStage> storedLifeStages;
+    private List<ATOWLifeStage> selectedLifeStages;
 
-    Set<ATOWLifeStage> getSelectedLifeStages() {
+    List<ATOWLifeStage> getSelectedLifeStages() {
         return selectedLifeStages;
     }
 
-    LifePathStagePicker(Set<ATOWLifeStage> selectedLifeStages) {
+    LifePathStagePicker(List<ATOWLifeStage> selectedLifeStages) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedLifeStages = new HashSet<>(selectedLifeStages);
-        storedLifeStages = new HashSet<>(selectedLifeStages);
+        this.selectedLifeStages = new ArrayList<>(selectedLifeStages);
+        storedLifeStages = new ArrayList<>(selectedLifeStages);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.title"));
 

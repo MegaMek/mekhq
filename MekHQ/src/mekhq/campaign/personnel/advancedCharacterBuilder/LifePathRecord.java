@@ -51,10 +51,21 @@ import mekhq.MHQConstants;
  * @author Illiani
  * @since 0.50.07
  */
-public record LifePathRecord(UUID id, String source, Version version, String name, String flavorText, int age,
-      int xpDiscount, int xpCost, List<ATOWLifeStage> lifeStages, List<LifePathCategory> categories,
-      Map<Integer, List<LifePathEntryData>> requirements, List<LifePathEntryData> exclusions,
-      List<LifePathEntryData> fixedXpAwards, Map<Integer, List<LifePathEntryData>> selectableXPAwards, int pickCount
+public record LifePathRecord(UUID id,
+      String source,
+      Version version,
+      String name,
+      String flavorText,
+      int age,
+      int xpDiscount,
+      int xpCost,
+      List<ATOWLifeStage> lifeStages,
+      List<LifePathCategory> categories,
+      Map<Integer, List<LifePathEntryData>> requirements,
+      List<LifePathEntryData> exclusions,
+      List<LifePathEntryData> fixedXpAwards,
+      Map<Integer, List<LifePathEntryData>> flexibleXpAwards,
+      int pickCount
 ) {
     private static final MMLogger LOGGER = MMLogger.create(LifePathRecord.class);
 
@@ -201,7 +212,6 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 LifePathCategory category = LifePathCategory.fromLookupName(rawCategory);
                 if (category == null) {
                     LOGGER.warn("Unknown life path category: {}", rawCategory);
-                    continue;
                 } else {
                     categories.add(category);
                 }
@@ -301,20 +311,20 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
      * <p>Validates that no reference field is {@code null} when constructing this record; throws an
      * {@link IllegalArgumentException} if any are null.</p>
      *
-     * @param id                 Unique identifier for this Life Path.
-     * @param source             Source/manual reference.
-     * @param version            Last updated version.
-     * @param name               User-visible name.
-     * @param flavorText         Description/fluff text.
-     * @param age                Number of years added by this path.
-     * @param xpDiscount         XP discount value.
-     * @param xpCost             XP cost value.
-     * @param lifeStages         List of valid life stages.
-     * @param categories         Life path categories.
-     * @param requirements       Requirements map.
-     * @param exclusions         Exclusions list.
-     * @param fixedXpAwards      Fixed XP awards.
-     * @param selectableXPAwards Selectable XP award options.
+     * @param id               Unique identifier for this Life Path.
+     * @param source           Source/manual reference.
+     * @param version          Last updated version.
+     * @param name             User-visible name.
+     * @param flavorText       Description/fluff text.
+     * @param age              Number of years added by this path.
+     * @param xpDiscount       XP discount value.
+     * @param xpCost           XP cost value.
+     * @param lifeStages       List of valid life stages.
+     * @param categories       Life path categories.
+     * @param requirements     Requirements map.
+     * @param exclusions       Exclusions list.
+     * @param fixedXpAwards    Fixed XP awards.
+     * @param flexibleXpAwards Selectable XP award options.
      *
      * @throws IllegalArgumentException if any argument except primitives is null
      * @author Illiani
@@ -351,8 +361,8 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (fixedXpAwards == null) {
             throw new IllegalArgumentException("fixedXpAwards cannot be null");
         }
-        if (selectableXPAwards == null) {
-            throw new IllegalArgumentException("selectableXPAwards cannot be null");
+        if (flexibleXpAwards == null) {
+            throw new IllegalArgumentException("flexibleXpAwards cannot be null");
         }
         if (age < 0) {
             throw new IllegalArgumentException("age must be a non-negative integer");
@@ -366,7 +376,7 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
         if (pickCount < 0) {
             throw new IllegalArgumentException("pickCount must be a non-negative integer");
         }
-        if (pickCount > selectableXPAwards.size()) {
+        if (pickCount > flexibleXpAwards.size()) {
             throw new IllegalArgumentException(
                   "pickCount must be less than or equal to the number of selectable XP awards");
         }

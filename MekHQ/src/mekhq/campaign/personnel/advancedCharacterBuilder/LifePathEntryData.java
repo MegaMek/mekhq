@@ -95,6 +95,22 @@ public record LifePathEntryData(
     }
 
     /**
+     * Converts the provided class lookup, object lookup, and value into a raw string entry.
+     *
+     * @param classLookupName  the class lookup name representing the category of the data
+     * @param objectLookupName the specific lookup name for the object
+     * @param value            the {@link Integer} value associated with this entry
+     *
+     * @return a raw {@link String} entry in the format {@code classLookupName::objectLookupName::value}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String toRawEntry(LifePathDataClassLookup classLookupName, String objectLookupName, int value) {
+        return classLookupName.getLookupName() + "::" + objectLookupName + "::" + value;
+    }
+
+    /**
      * Canonical constructor for {@link LifePathEntryData} with null checks.
      *
      * <p>Ensures that {@code classLookupName} and {@code objectLookupName} are not null when creating a record
