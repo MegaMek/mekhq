@@ -33,8 +33,8 @@
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage.REAL_LIFE;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePath.fromRawEntry;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory.GENERAL_DARK_CASTE;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord.fromRawEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -464,7 +464,7 @@ class LifePathRecordTest {
 
         @Test
         void testFromRawEntry_impossiblePickCount() {
-            LifePathRecord record = fromRawEntry(
+            LifePath record = fromRawEntry(
                   "00000000-0000-0000-0000-000000000000",
                   "ATOW",
                   "0.50.07",
@@ -499,7 +499,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_allValid() {
-            new LifePathRecord(
+            new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -519,7 +519,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingID() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   null,
                   "ATOW",
                   new Version("0.50.07"),
@@ -539,7 +539,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingSource() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   null,
                   new Version("0.50.07"),
@@ -559,7 +559,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingVersion() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   null,
@@ -579,7 +579,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingName() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -599,7 +599,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingFlavorText() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -619,7 +619,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_negativeAge() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -639,7 +639,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_negativeXPDiscount() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -659,7 +659,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_negativeXPCost() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -679,7 +679,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingLifeStage() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -699,7 +699,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingCategories() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -719,7 +719,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingRequirements() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -739,7 +739,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingExclusions() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -759,7 +759,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_missingFixedXPAwards() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -779,7 +779,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_negativePickCount() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),
@@ -799,7 +799,7 @@ class LifePathRecordTest {
 
         @Test
         void testCanonConstructor_impossiblePickCount() {
-            assertThrows(IllegalArgumentException.class, () -> new LifePathRecord(
+            assertThrows(IllegalArgumentException.class, () -> new LifePath(
                   UUID.fromString("00000000-0000-0000-0000-000000000000"),
                   "ATOW",
                   new Version("0.50.07"),

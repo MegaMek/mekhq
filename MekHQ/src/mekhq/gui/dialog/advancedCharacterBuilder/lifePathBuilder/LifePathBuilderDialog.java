@@ -77,9 +77,8 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataProcessor;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
 import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -88,7 +87,7 @@ import mekhq.io.FileType;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class LifePathBuilderDialog extends JDialog {
-    private static MMLogger LOGGER = MMLogger.create(LifePathBuilderDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(LifePathBuilderDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
 
     private static final int MINIMUM_SIDE_COMPONENT_WIDTH = scaleForGUI(250);
@@ -372,8 +371,6 @@ public class LifePathBuilderDialog extends JDialog {
         btnSave.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
         btnSave.addActionListener(e -> {
-            LifePathRecord record = processCurrentLifePath();
-            writeToJSONWithDialog(record);
         });
 
         String titleLoad = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.load");
@@ -381,11 +378,8 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            LifePathRecord record = loadFromJSONWithDialog().orElse(null);
+            LifePath record = loadFromJSONWithDialog().orElse(null);
             if (record != null) {
-                LifePathDataProcessor processor = new LifePathDataProcessor(basicInfoTab, requirementsTab,
-                      exclusionsTab, fixedXPTab, flexibleXPTab);
-                lifePathId = processor.updateExistingTabsFromNewLifePath(record);
                 updateTxtProgress();
                 invalidate();
                 repaint();
@@ -434,13 +428,7 @@ public class LifePathBuilderDialog extends JDialog {
         return pnlControls;
     }
 
-    private LifePathRecord processCurrentLifePath() {
-        LifePathDataProcessor dataProcessor = new LifePathDataProcessor(basicInfoTab, requirementsTab, exclusionsTab,
-              fixedXPTab, flexibleXPTab);
-        return dataProcessor.buildLifePathFromLifePathBuilder(lifePathId);
-    }
-
-    public static void writeToJSONWithDialog(LifePathRecord record) {
+    public static void writeToJSONWithDialog(LifePath record) {
         String baseName = record.name().replace(" ", "_");
         if (baseName.isBlank()) {
             baseName = "unnamed_life_path";
@@ -481,7 +469,7 @@ public class LifePathBuilderDialog extends JDialog {
         }
     }
 
-    public static Optional<LifePathRecord> loadFromJSONWithDialog() {
+    public static Optional<LifePath> loadFromJSONWithDialog() {
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
         if (userDirectory == null || userDirectory.isBlank()) {
             userDirectory = LIFE_PATHS_DIRECTORY_PATH;
@@ -498,7 +486,7 @@ public class LifePathBuilderDialog extends JDialog {
             File file = fileOpt.get();
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                LifePathRecord record = objectMapper.readValue(file, LifePathRecord.class);
+                LifePath record = objectMapper.readValue(file, LifePath.class);
                 LOGGER.info("Loaded LifePathRecord from: {}", file.getAbsolutePath());
                 return Optional.of(record);
             } catch (Exception e) {

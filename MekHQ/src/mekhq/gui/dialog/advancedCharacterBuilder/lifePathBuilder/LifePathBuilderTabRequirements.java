@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
@@ -57,9 +58,8 @@ import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTabStorage;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
@@ -75,15 +75,15 @@ public class LifePathBuilderTabRequirements {
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final LifePathBuilderDialog parent;
-    private final Map<Integer, LifePathTabStorage> requirementsTabStorageMap = new HashMap<>();
+    private final Map<Integer, LifePathComponentStorage> requirementsTabStorageMap = new HashMap<>();
     private final Map<Integer, String> requirementsTabTextMap = new HashMap<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    public Map<Integer, LifePathTabStorage> getRequirementsTabStorageMap() {
+    public Map<Integer, LifePathComponentStorage> getRequirementsTabStorageMap() {
         return requirementsTabStorageMap;
     }
 
-    public void setRequirementsTabStorageMap(Map<Integer, LifePathTabStorage> requirementsTabStorageMap) {
+    public void setRequirementsTabStorageMap(Map<Integer, LifePathComponentStorage> requirementsTabStorageMap) {
         this.requirementsTabStorageMap.clear();
         this.requirementsTabStorageMap.putAll(requirementsTabStorageMap);
     }
@@ -159,8 +159,8 @@ public class LifePathBuilderTabRequirements {
         if (selectedIndex > 0) {
             // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
             // correct order (since we're removing a tab, the indexes will shift)
-            Map<Integer, LifePathTabStorage> tempStorageMap = new HashMap<>();
-            for (Map.Entry<Integer, LifePathTabStorage> entry : requirementsTabStorageMap.entrySet()) {
+            Map<Integer, LifePathComponentStorage> tempStorageMap = new HashMap<>();
+            for (Map.Entry<Integer, LifePathComponentStorage> entry : requirementsTabStorageMap.entrySet()) {
                 if (entry.getKey() < selectedIndex) {
                     tempStorageMap.put(entry.getKey(), entry.getValue());
                 } else if (entry.getKey() > selectedIndex) {
@@ -197,7 +197,7 @@ public class LifePathBuilderTabRequirements {
             return; // nothing selected, do nothing
         }
 
-        LifePathTabStorage currentValues = requirementsTabStorageMap.get(selectedIndex);
+        LifePathComponentStorage currentValues = requirementsTabStorageMap.get(selectedIndex);
         String currentText = requirementsTabTextMap.get(selectedIndex);
 
         addRequirementsTab(tabbedPane, gameYear, currentValues);
@@ -232,7 +232,8 @@ public class LifePathBuilderTabRequirements {
         return null;
     }
 
-    private void addRequirementsTab(EnhancedTabbedPane tabbedPane, int gameYear, @Nullable LifePathTabStorage storage) {
+    private void addRequirementsTab(EnhancedTabbedPane tabbedPane, int gameYear,
+          @Nullable LifePathComponentStorage storage) {
         boolean hasStorage = storage != null;
 
         int index = tabbedPane.getTabCount();
@@ -325,7 +326,7 @@ public class LifePathBuilderTabRequirements {
         buttonsPanel.add(btnAddFaction);
 
         // Life Paths
-        List<LifePathRecord> lifePaths = new ArrayList<>();
+        List<UUID> lifePaths = new ArrayList<>();
         if (hasStorage) {
             lifePaths.addAll(storage.lifePaths());
         }
@@ -368,7 +369,7 @@ public class LifePathBuilderTabRequirements {
         txtRequirements.setName("txtRequirements");
         txtRequirements.setContentType("text/html");
         txtRequirements.setEditable(false);
-        LifePathTabStorage initialStorage = getRequirementsTabStorage(
+        LifePathComponentStorage initialStorage = getRequirementsTabStorage(
               gameYear,
               factions,
               lifePaths,
@@ -466,10 +467,10 @@ public class LifePathBuilderTabRequirements {
 
     private void standardizedActions(int gameYear, int index, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<LifePathRecord> lifePaths,
+          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtRequirements,
-          LifePathTabStorage initialStorage) {
-        LifePathTabStorage storage = getRequirementsTabStorage(
+          LifePathComponentStorage initialStorage) {
+        LifePathComponentStorage storage = getRequirementsTabStorage(
               gameYear,
               factions,
               lifePaths,
@@ -488,12 +489,12 @@ public class LifePathBuilderTabRequirements {
         parent.setVisible(true);
     }
 
-    private static LifePathTabStorage getRequirementsTabStorage(
+    private static LifePathComponentStorage getRequirementsTabStorage(
           int gameYear, List<Faction> factions,
-          List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
+          List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
           Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
-        return new LifePathTabStorage(gameYear,
+        return new LifePathComponentStorage(gameYear,
               factions,
               lifePaths,
               categories,
@@ -504,7 +505,7 @@ public class LifePathBuilderTabRequirements {
     }
 
     private static String buildRequirementText(
-          LifePathTabStorage storage) {
+          LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Factions
@@ -521,13 +522,13 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Life Paths
-        List<LifePathRecord> lifePaths = storage.lifePaths();
+        List<UUID> lifePaths = storage.lifePaths();
         if (!lifePaths.isEmpty()) {
             appendComma(progressText);
 
             for (int i = 0; i < lifePaths.size(); i++) {
-                LifePathRecord lifePath = lifePaths.get(i);
-                progressText.append(lifePath.name());
+                // TODO fetch life path from dictionary using ID
+                progressText.append("Life Path Name");
                 if (i != lifePaths.size() - 1) {
                     progressText.append(", ");
                 }

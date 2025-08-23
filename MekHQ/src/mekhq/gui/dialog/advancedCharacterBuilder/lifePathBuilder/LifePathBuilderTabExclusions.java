@@ -52,8 +52,8 @@ import megamek.common.EnhancedTabbedPane;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTabStorage;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
@@ -67,11 +67,11 @@ public class LifePathBuilderTabExclusions {
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final LifePathBuilderDialog parent;
-    private LifePathTabStorage exclusionsTabStorage;
+    private LifePathComponentStorage exclusionsTabStorage;
     private String exclusionsTabTextStorage;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
-    public LifePathTabStorage getExclusionsTabStorage() {
+    public LifePathComponentStorage getExclusionsTabStorage() {
         return exclusionsTabStorage;
     }
 
@@ -196,7 +196,7 @@ public class LifePathBuilderTabExclusions {
         txtExclusions.setName("txtExclusions");
         txtExclusions.setContentType("text/html");
         txtExclusions.setEditable(false);
-        LifePathTabStorage initialStorage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
+        LifePathComponentStorage initialStorage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
               attributes, traits, skills, abilities);
         String initialExclusionsText = buildExclusionsText(initialStorage);
         exclusionsTabStorage = initialStorage;
@@ -286,8 +286,8 @@ public class LifePathBuilderTabExclusions {
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
           Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtExclusions,
-          LifePathTabStorage initialStorage) {
-        LifePathTabStorage storage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
+          LifePathComponentStorage initialStorage) {
+        LifePathComponentStorage storage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
               attributes, traits, skills, abilities);
         String exclusionsText = buildExclusionsText(storage);
         txtExclusions.setText(exclusionsText);
@@ -299,11 +299,11 @@ public class LifePathBuilderTabExclusions {
         parent.setVisible(true);
     }
 
-    private static LifePathTabStorage getExclusionsTabStorage(int gameYear, List<Faction> factions,
+    private static LifePathComponentStorage getExclusionsTabStorage(int gameYear, List<Faction> factions,
           List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
           Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
-        return new LifePathTabStorage(gameYear,
+        return new LifePathComponentStorage(gameYear,
               factions,
               lifePaths,
               categories,
@@ -313,7 +313,7 @@ public class LifePathBuilderTabExclusions {
               abilities);
     }
 
-    private static String buildExclusionsText(LifePathTabStorage storage) {
+    private static String buildExclusionsText(LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Factions

@@ -51,7 +51,7 @@ import mekhq.MHQConstants;
  * @author Illiani
  * @since 0.50.07
  */
-public record LifePathRecord(UUID id,
+public record LifePath(UUID id,
       String source,
       Version version,
       String name,
@@ -67,11 +67,11 @@ public record LifePathRecord(UUID id,
       Map<Integer, List<LifePathEntryData>> flexibleXpAwards,
       int pickCount
 ) {
-    private static final MMLogger LOGGER = MMLogger.create(LifePathRecord.class);
+    private static final MMLogger LOGGER = MMLogger.create(LifePath.class);
 
     /**
-     * Constructs a {@link LifePathRecord} from raw string and list inputs, translating all fields into their strong
-     * typed representations.
+     * Constructs a {@link LifePath} from raw string and list inputs, translating all fields into their strong typed
+     * representations.
      *
      * <p>This factory method validates all inputs and converts string-based data into the proper types required by
      * the record, throwing exceptions on error.</p>
@@ -92,13 +92,13 @@ public record LifePathRecord(UUID id,
      * @param rawSelectableXPAwards Map of integer keys to lists of selectable XP award strings.
      * @param rawPickCount          How many times flexible XP awards can be selected.
      *
-     * @return a new {@link LifePathRecord} parsed and validated from the provided inputs.
+     * @return a new {@link LifePath} parsed and validated from the provided inputs.
      *
      * @throws IllegalArgumentException if any input is invalid or cannot be converted.
      * @author Illiani
      * @since 0.50.07
      */
-    public static LifePathRecord fromRawEntry(@Nullable String rawID, @Nullable String source,
+    public static LifePath fromRawEntry(@Nullable String rawID, @Nullable String source,
           @Nullable String rawVersion, @Nullable String name, @Nullable String flavorText, @Nullable String rawAge,
           @Nullable String rawXPDiscount, @Nullable String rawXPCost, @Nullable List<String> rawLifeStages,
           @Nullable List<String> rawCategories, @Nullable Map<Integer, List<String>> rawRequirements,
@@ -276,7 +276,7 @@ public record LifePathRecord(UUID id,
             pickCount = 0;
         }
 
-        return new LifePathRecord(id, source, version, name, flavorText, age, xpDiscount, xpCost, lifeStages,
+        return new LifePath(id, source, version, name, flavorText, age, xpDiscount, xpCost, lifeStages,
               categories, requirements, exclusions, fixedXPAwards, selectableXPAwards, pickCount);
     }
 
@@ -306,7 +306,7 @@ public record LifePathRecord(UUID id,
     }
 
     /**
-     * Canonical constructor for {@link LifePathRecord}.
+     * Canonical constructor for {@link LifePath}.
      *
      * <p>Validates that no reference field is {@code null} when constructing this record; throws an
      * {@link IllegalArgumentException} if any are null.</p>
@@ -330,7 +330,7 @@ public record LifePathRecord(UUID id,
      * @author Illiani
      * @since 0.50.07
      */
-    public LifePathRecord {
+    public LifePath {
         if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
         }

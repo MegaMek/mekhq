@@ -60,8 +60,8 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTabStorage;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -76,12 +76,12 @@ public class LifePathBuilderTabFlexibleXP {
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final LifePathBuilderDialog parent;
-    private final Map<Integer, LifePathTabStorage> flexibleXPTabStorageMap = new HashMap<>();
+    private final Map<Integer, LifePathComponentStorage> flexibleXPTabStorageMap = new HashMap<>();
     private final Map<Integer, String> flexibleXPTabTextMap = new HashMap<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     JSpinner spnPicks;
 
-    public Map<Integer, LifePathTabStorage> getFlexibleXPTabStorageMap() {
+    public Map<Integer, LifePathComponentStorage> getFlexibleXPTabStorageMap() {
         return flexibleXPTabStorageMap;
     }
 
@@ -182,8 +182,8 @@ public class LifePathBuilderTabFlexibleXP {
         if (selectedIndex > 0) {
             // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
             // correct order (since we're removing a tab, the indexes will shift)
-            Map<Integer, LifePathTabStorage> tempStorageMap = new HashMap<>();
-            for (Map.Entry<Integer, LifePathTabStorage> entry : flexibleXPTabStorageMap.entrySet()) {
+            Map<Integer, LifePathComponentStorage> tempStorageMap = new HashMap<>();
+            for (Map.Entry<Integer, LifePathComponentStorage> entry : flexibleXPTabStorageMap.entrySet()) {
                 if (entry.getKey() < selectedIndex) {
                     tempStorageMap.put(entry.getKey(), entry.getValue());
                 } else if (entry.getKey() > selectedIndex) {
@@ -220,7 +220,7 @@ public class LifePathBuilderTabFlexibleXP {
             return; // nothing selected, do nothing
         }
 
-        LifePathTabStorage currentValues = flexibleXPTabStorageMap.get(selectedIndex);
+        LifePathComponentStorage currentValues = flexibleXPTabStorageMap.get(selectedIndex);
         String currentText = flexibleXPTabTextMap.get(selectedIndex);
 
         addFlexibleXPTab(tabbedPane, currentValues);
@@ -255,7 +255,7 @@ public class LifePathBuilderTabFlexibleXP {
         return null;
     }
 
-    private void addFlexibleXPTab(EnhancedTabbedPane tabbedPane, @Nullable LifePathTabStorage storage) {
+    private void addFlexibleXPTab(EnhancedTabbedPane tabbedPane, @Nullable LifePathComponentStorage storage) {
         boolean hasStorage = storage != null;
 
         int index = tabbedPane.getTabCount();
@@ -342,7 +342,7 @@ public class LifePathBuilderTabFlexibleXP {
         txtFlexibleXP.setName("txtFlexibleXP");
         txtFlexibleXP.setContentType("text/html");
         txtFlexibleXP.setEditable(false);
-        LifePathTabStorage initialStorage = getFlexibleXPStorage(
+        LifePathComponentStorage initialStorage = getFlexibleXPStorage(
               attributes,
               traits,
               skills,
@@ -407,8 +407,8 @@ public class LifePathBuilderTabFlexibleXP {
     private void standardizedActions(int index, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
           Map<CampaignOptionsAbilityInfo, Integer> abilities, JEditorPane txtFlexibleXP,
-          LifePathTabStorage initialStorage) {
-        LifePathTabStorage storage = getFlexibleXPStorage(
+          LifePathComponentStorage initialStorage) {
+        LifePathComponentStorage storage = getFlexibleXPStorage(
               attributes,
               traits,
               skills,
@@ -423,10 +423,10 @@ public class LifePathBuilderTabFlexibleXP {
         parent.setVisible(true);
     }
 
-    private static LifePathTabStorage getFlexibleXPStorage(Map<SkillAttribute, Integer> attributes,
+    private static LifePathComponentStorage getFlexibleXPStorage(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
           Map<CampaignOptionsAbilityInfo, Integer> abilities) {
-        return new LifePathTabStorage(0,
+        return new LifePathComponentStorage(0,
               new ArrayList<>(),
               new ArrayList<>(),
               new HashMap<>(),
@@ -437,7 +437,7 @@ public class LifePathBuilderTabFlexibleXP {
     }
 
     private static String buildFlexibleXPText(
-          LifePathTabStorage storage) {
+          LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Attributes

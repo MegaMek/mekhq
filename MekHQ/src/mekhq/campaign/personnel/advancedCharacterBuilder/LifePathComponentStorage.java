@@ -41,7 +41,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 
-public record LifePathTabStorage(
+public record LifePathComponentStorage(
       // Excluded from cost calculations
       int gameYear, List<Faction> factions,
       List<UUID> lifePaths,

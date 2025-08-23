@@ -49,8 +49,8 @@ import javax.swing.ScrollPaneConstants;
 import megamek.common.EnhancedTabbedPane;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTabStorage;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -63,11 +63,11 @@ public class LifePathBuilderTabFixedXP {
     private final static int PADDING = getLifePathBuilderPadding();
 
     private final LifePathBuilderDialog parent;
-    private LifePathTabStorage fixedXPTabStorage;
+    private LifePathComponentStorage fixedXPTabStorage;
     private String fixedXPTabTextStorage;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
 
-    public LifePathTabStorage getFixedXPTabStorage() {
+    public LifePathComponentStorage getFixedXPTabStorage() {
         return fixedXPTabStorage;
     }
 
@@ -155,7 +155,7 @@ public class LifePathBuilderTabFixedXP {
         txtFixedXP.setName("txtFixedXP");
         txtFixedXP.setContentType("text/html");
         txtFixedXP.setEditable(false);
-        LifePathTabStorage initialStorage = getFixedXPTabStorage(attributes, traits, skills, abilities);
+        LifePathComponentStorage initialStorage = getFixedXPTabStorage(attributes, traits, skills, abilities);
         String initialFixedXPText = buildFixedXPText(initialStorage);
         fixedXPTabStorage = initialStorage;
         fixedXPTabTextStorage = initialFixedXPText;
@@ -214,8 +214,8 @@ public class LifePathBuilderTabFixedXP {
     private void standardizedActions(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
           Map<CampaignOptionsAbilityInfo, Integer> abilities, JEditorPane txtFixedXP,
-          LifePathTabStorage initialStorage) {
-        LifePathTabStorage storage = getFixedXPTabStorage(attributes, traits, skills, abilities);
+          LifePathComponentStorage initialStorage) {
+        LifePathComponentStorage storage = getFixedXPTabStorage(attributes, traits, skills, abilities);
         String fixedXPText = buildFixedXPText(storage);
         txtFixedXP.setText(fixedXPText);
 
@@ -226,10 +226,10 @@ public class LifePathBuilderTabFixedXP {
         parent.setVisible(true);
     }
 
-    private static LifePathTabStorage getFixedXPTabStorage(Map<SkillAttribute, Integer> attributes,
+    private static LifePathComponentStorage getFixedXPTabStorage(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
           Map<CampaignOptionsAbilityInfo, Integer> abilities) {
-        return new LifePathTabStorage(0,
+        return new LifePathComponentStorage(0,
               new ArrayList<>(),
               new ArrayList<>(),
               new HashMap<>(),
@@ -239,7 +239,7 @@ public class LifePathBuilderTabFixedXP {
               abilities);
     }
 
-    private static String buildFixedXPText(LifePathTabStorage storage) {
+    private static String buildFixedXPText(LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Attributes

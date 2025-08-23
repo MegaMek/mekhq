@@ -38,8 +38,8 @@ import java.util.Collection;
 import java.util.Map;
 
 public class LifePathXPCostCalculator {
-    public static int calculateXPCost(int discount, LifePathTabStorage fixedXPStorage,
-          Map<Integer, LifePathTabStorage> flexibleXPStorage) {
+    public static int calculateXPCost(int discount, LifePathComponentStorage fixedXPStorage,
+          Map<Integer, LifePathComponentStorage> flexibleXPStorage) {
         // Basic Info
         int globalCost = -discount;
 
@@ -49,8 +49,8 @@ public class LifePathXPCostCalculator {
         // Flexible XP
         int runningCost = 0;
         int length = flexibleXPStorage.size();
-        for (Map.Entry<Integer, LifePathTabStorage> entry : flexibleXPStorage.entrySet()) {
-            LifePathTabStorage storage = entry.getValue();
+        for (Map.Entry<Integer, LifePathComponentStorage> entry : flexibleXPStorage.entrySet()) {
+            LifePathComponentStorage storage = entry.getValue();
 
             runningCost = getCost(storage, runningCost);
         }
@@ -63,7 +63,7 @@ public class LifePathXPCostCalculator {
         return max(0, globalCost);
     }
 
-    private static int getCost(LifePathTabStorage fixedXPStorage, int globalCost) {
+    private static int getCost(LifePathComponentStorage fixedXPStorage, int globalCost) {
         Collection<Integer> fixedAttributes = fixedXPStorage.attributes().values();
         globalCost += fixedAttributes.stream().mapToInt(Integer::intValue).sum();
 
