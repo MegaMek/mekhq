@@ -79,15 +79,15 @@ class LifePathSPAPicker extends JDialog {
 
     private JLabel lblTooltipDisplay;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
-    private final Map<CampaignOptionsAbilityInfo, Integer> storedAbilities;
-    private Map<CampaignOptionsAbilityInfo, Integer> selectedAbilities;
+    private final Map<String, Integer> storedAbilities;
+    private Map<String, Integer> selectedAbilities;
 
-    Map<CampaignOptionsAbilityInfo, Integer> getSelectedAbilities() {
+    Map<String, Integer> getSelectedAbilities() {
         return selectedAbilities;
     }
 
-    LifePathSPAPicker(Map<CampaignOptionsAbilityInfo, Integer> selectedAbilities,
-          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType) {
+    LifePathSPAPicker(Map<String, Integer> selectedAbilities, Map<String, CampaignOptionsAbilityInfo> allAbilityInfo,
+          LifePathBuilderTabType tabType) {
         super();
 
         this.allAbilityInfo = allAbilityInfo;
@@ -252,14 +252,15 @@ class LifePathSPAPicker extends JDialog {
             SpecialAbility ability = info.getAbility();
             String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
             String description = ability.getDescription() + " (" + ability.getCost() + " XP)";
+            String abilityName = ability.getName();
 
             JCheckBox chkAbilityOption = new JCheckBox(label);
-            chkAbilityOption.setSelected(selectedAbilities.containsKey(info));
+            chkAbilityOption.setSelected(selectedAbilities.containsKey(abilityName));
             chkAbilityOption.addActionListener(evt -> {
                 if (chkAbilityOption.isSelected()) {
-                    selectedAbilities.put(info, 0);
+                    selectedAbilities.put(abilityName, 0);
                 } else {
-                    selectedAbilities.remove(info);
+                    selectedAbilities.remove(abilityName);
                 }
             });
             chkAbilityOption.addMouseListener(
@@ -326,7 +327,7 @@ class LifePathSPAPicker extends JDialog {
                 case FIXED_XP, FLEXIBLE_XP -> 0;
             };
 
-            int defaultValue = selectedAbilities.getOrDefault(abilityInfo, keyValue);
+            int defaultValue = selectedAbilities.getOrDefault(ability.getName(), keyValue);
 
             JLabel lblAbility = new JLabel(label);
             JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
@@ -342,7 +343,7 @@ class LifePathSPAPicker extends JDialog {
             spnAbilityValue.addChangeListener(evt -> {
                 int value = (int) spnAbilityValue.getValue();
                 if (value != finalTraitKeyValue) {
-                    selectedAbilities.put(abilityInfo, value);
+                    selectedAbilities.put(ability.getName(), value);
                 }
             });
 

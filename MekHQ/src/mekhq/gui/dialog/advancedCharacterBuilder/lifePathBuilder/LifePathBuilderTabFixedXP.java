@@ -47,6 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.EnhancedTabbedPane;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
@@ -59,6 +60,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
 public class LifePathBuilderTabFixedXP {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathBuilderTabFixedXP.class);
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
 
@@ -69,6 +71,10 @@ public class LifePathBuilderTabFixedXP {
 
     public LifePathComponentStorage getFixedXPTabStorage() {
         return fixedXPTabStorage;
+    }
+
+    public void setFixedXPTabStorage(LifePathComponentStorage fixedXPTabStorage) {
+        this.fixedXPTabStorage = fixedXPTabStorage;
     }
 
     public String getFixedXPTabTextStorage() {
@@ -133,7 +139,7 @@ public class LifePathBuilderTabFixedXP {
         buttonsPanel.add(btnAddSkill);
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
+        Map<String, Integer> abilities = new HashMap<>();
         String titleAddSPA = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.fixedXP.button.addSPA.label");
         String tooltipAddSPA = getTextAt(RESOURCE_BUNDLE,
@@ -213,8 +219,7 @@ public class LifePathBuilderTabFixedXP {
 
     private void standardizedActions(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities, JEditorPane txtFixedXP,
-          LifePathComponentStorage initialStorage) {
+          Map<String, Integer> abilities, JEditorPane txtFixedXP, LifePathComponentStorage initialStorage) {
         LifePathComponentStorage storage = getFixedXPTabStorage(attributes, traits, skills, abilities);
         String fixedXPText = buildFixedXPText(storage);
         txtFixedXP.setText(fixedXPText);
@@ -228,7 +233,7 @@ public class LifePathBuilderTabFixedXP {
 
     private static LifePathComponentStorage getFixedXPTabStorage(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities) {
+          Map<String, Integer> abilities) {
         return new LifePathComponentStorage(0,
               new ArrayList<>(),
               new ArrayList<>(),
@@ -239,7 +244,7 @@ public class LifePathBuilderTabFixedXP {
               abilities);
     }
 
-    private static String buildFixedXPText(LifePathComponentStorage storage) {
+    private String buildFixedXPText(LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Attributes
@@ -308,14 +313,21 @@ public class LifePathBuilderTabFixedXP {
         }
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> selectedSPAs = storage.abilities();
+        Map<String, Integer> selectedSPAs = storage.abilities();
         if (!selectedSPAs.isEmpty()) {
             appendComma(progressText);
 
             int counter = 0;
             int length = selectedSPAs.size();
-            for (Map.Entry<CampaignOptionsAbilityInfo, Integer> entry : selectedSPAs.entrySet()) {
-                SpecialAbility ability = entry.getKey().getAbility();
+            for (Map.Entry<String, Integer> entry : selectedSPAs.entrySet()) {
+                String abilityName = entry.getKey();
+                CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
+                if (abilityInfo == null) {
+                    LOGGER.warn("Could not find AbilityInfo for abilityName: {}", abilityName);
+                    continue;
+                }
+
+                SpecialAbility ability = abilityInfo.getAbility();
                 String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
 
                 int value = entry.getValue();

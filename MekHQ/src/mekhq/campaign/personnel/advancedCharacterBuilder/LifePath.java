@@ -61,10 +61,10 @@ public record LifePath(UUID id,
       int xpCost,
       List<ATOWLifeStage> lifeStages,
       List<LifePathCategory> categories,
-      Map<Integer, List<LifePathEntryData>> requirements,
-      List<LifePathEntryData> exclusions,
-      List<LifePathEntryData> fixedXpAwards,
-      Map<Integer, List<LifePathEntryData>> flexibleXpAwards,
+      Map<Integer, LifePathComponentStorage> requirements,
+      LifePathComponentStorage exclusions,
+      LifePathComponentStorage fixedXpAwards,
+      Map<Integer, LifePathComponentStorage> flexibleXpAwards,
       int pickCount
 ) {
     private static final MMLogger LOGGER = MMLogger.create(LifePath.class);
@@ -277,7 +277,7 @@ public record LifePath(UUID id,
         }
 
         return new LifePath(id, source, version, name, flavorText, age, xpDiscount, xpCost, lifeStages,
-              categories, requirements, exclusions, fixedXPAwards, selectableXPAwards, pickCount);
+              new ArrayList<>(), new HashMap<>(), null, null, new HashMap<>(), 0);
     }
 
     /**

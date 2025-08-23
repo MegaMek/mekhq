@@ -39,7 +39,6 @@ import java.util.UUID;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 
 public record LifePathComponentStorage(
       // Excluded from cost calculations
@@ -51,5 +50,5 @@ public record LifePathComponentStorage(
       Map<SkillAttribute, Integer> attributes,
       Map<LifePathEntryDataTraitLookup, Integer> traits,
       Map<SkillType, Integer> skills,
-      Map<CampaignOptionsAbilityInfo, Integer> abilities) {
+      Map<String, Integer> abilities) {
 }

@@ -294,7 +294,7 @@ public class LifePathBuilderTabRequirements {
         buttonsPanel.add(btnAddSkill);
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
+        Map<String, Integer> abilities = new HashMap<>();
         if (hasStorage) {
             abilities.putAll(storage.abilities());
         }
@@ -467,7 +467,7 @@ public class LifePathBuilderTabRequirements {
 
     private void standardizedActions(int gameYear, int index, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
+          Map<String, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtRequirements,
           LifePathComponentStorage initialStorage) {
         LifePathComponentStorage storage = getRequirementsTabStorage(
@@ -493,7 +493,7 @@ public class LifePathBuilderTabRequirements {
           int gameYear, List<Faction> factions,
           List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
-          Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
+          Map<SkillType, Integer> skills, Map<String, Integer> abilities) {
         return new LifePathComponentStorage(gameYear,
               factions,
               lifePaths,
@@ -504,8 +504,7 @@ public class LifePathBuilderTabRequirements {
               abilities);
     }
 
-    private static String buildRequirementText(
-          LifePathComponentStorage storage) {
+    private String buildRequirementText(LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Factions
@@ -614,14 +613,21 @@ public class LifePathBuilderTabRequirements {
         }
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> selectedSPAs = storage.abilities();
+        Map<String, Integer> selectedSPAs = storage.abilities();
         if (!selectedSPAs.isEmpty()) {
             appendComma(progressText);
 
-            List<CampaignOptionsAbilityInfo> spas = selectedSPAs.keySet().stream().toList();
+            List<String> spas = selectedSPAs.keySet().stream().toList();
 
             for (int i = 0; i < spas.size(); i++) {
-                SpecialAbility ability = spas.get(i).getAbility();
+                String abilityName = spas.get(i);
+                CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
+                if (abilityInfo == null) {
+                    LOGGER.warn("Could not find AbilityInfo for abilityName: {}", abilityName);
+                    continue;
+                }
+
+                SpecialAbility ability = abilityInfo.getAbility();
                 String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
                 progressText.append(label);
                 if (i != spas.size() - 1) {

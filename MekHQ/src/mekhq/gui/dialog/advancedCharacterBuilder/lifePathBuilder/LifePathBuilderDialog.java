@@ -74,11 +74,14 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathXPCostCalculator;
 import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -371,6 +374,8 @@ public class LifePathBuilderDialog extends JDialog {
         btnSave.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
         btnSave.addActionListener(e -> {
+            LifePath record = buildLifePathFromBuilderWizard();
+            writeToJSONWithDialog(record);
         });
 
         String titleLoad = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.load");
@@ -380,6 +385,19 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.addActionListener(e -> {
             LifePath record = loadFromJSONWithDialog().orElse(null);
             if (record != null) {
+                lifePathId = record.id();
+                basicInfoTab.setSource(record.source());
+                basicInfoTab.setName(record.name());
+                basicInfoTab.setFlavorText(record.flavorText());
+                basicInfoTab.setAge(record.age());
+                basicInfoTab.setDiscount(record.xpDiscount());
+                basicInfoTab.setLifeStages(record.lifeStages());
+                basicInfoTab.setCategories(record.categories());
+                requirementsTab.setRequirementsTabStorageMap(record.requirements());
+                exclusionsTab.setExclusionsTabStorage(record.exclusions());
+                fixedXPTab.setFixedXPTabStorage(record.fixedXpAwards());
+                flexibleXPTab.setFlexibleXPTabStorageMap(record.flexibleXpAwards());
+
                 updateTxtProgress();
                 invalidate();
                 repaint();
@@ -510,5 +528,19 @@ public class LifePathBuilderDialog extends JDialog {
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);
         }
+    }
+
+    private LifePath buildLifePathFromBuilderWizard() {
+        int discount = basicInfoTab.getDiscount();
+        LifePathComponentStorage fixedXPTabStorage = fixedXPTab.getFixedXPTabStorage();
+        Map<Integer, LifePathComponentStorage> flexibleXPTabStorage = flexibleXPTab.getFlexibleXPTabStorageMap();
+
+        int xpCost = LifePathXPCostCalculator.calculateXPCost(discount, fixedXPTabStorage, flexibleXPTabStorage);
+
+        return new LifePath(lifePathId, basicInfoTab.getSource(), MHQConstants.VERSION, basicInfoTab.getName(),
+              basicInfoTab.getFlavorText(), basicInfoTab.getAge(), basicInfoTab.getDiscount(), xpCost,
+              basicInfoTab.getLifeStages(), basicInfoTab.getCategories(),
+              requirementsTab.getRequirementsTabStorageMap(), exclusionsTab.getExclusionsTabStorage(),
+              fixedXPTabStorage, flexibleXPTabStorage, flexibleXPTab.getPickCount());
     }
 }

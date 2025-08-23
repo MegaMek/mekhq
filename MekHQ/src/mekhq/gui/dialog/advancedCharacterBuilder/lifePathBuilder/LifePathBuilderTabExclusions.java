@@ -49,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.EnhancedTabbedPane;
+import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
@@ -63,6 +64,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
 public class LifePathBuilderTabExclusions {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathBuilderTabExclusions.class);
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
 
@@ -73,6 +75,10 @@ public class LifePathBuilderTabExclusions {
 
     public LifePathComponentStorage getExclusionsTabStorage() {
         return exclusionsTabStorage;
+    }
+
+    public void setExclusionsTabStorage(LifePathComponentStorage exclusionsTabStorage) {
+        this.exclusionsTabStorage = exclusionsTabStorage;
     }
 
     public String getExclusionsTabTextStorage() {
@@ -137,7 +143,7 @@ public class LifePathBuilderTabExclusions {
         buttonsPanel.add(btnAddSkill);
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
+        Map<String, Integer> abilities = new HashMap<>();
         String titleAddSPA = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.exclusions.button.addSPA.label");
         String tooltipAddSPA = getTextAt(RESOURCE_BUNDLE,
@@ -284,7 +290,7 @@ public class LifePathBuilderTabExclusions {
 
     private void standardizedActions(int gameYear, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
+          Map<String, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtExclusions,
           LifePathComponentStorage initialStorage) {
         LifePathComponentStorage storage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
@@ -302,7 +308,7 @@ public class LifePathBuilderTabExclusions {
     private static LifePathComponentStorage getExclusionsTabStorage(int gameYear, List<Faction> factions,
           List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
-          Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
+          Map<SkillType, Integer> skills, Map<String, Integer> abilities) {
         return new LifePathComponentStorage(gameYear,
               factions,
               lifePaths,
@@ -313,7 +319,7 @@ public class LifePathBuilderTabExclusions {
               abilities);
     }
 
-    private static String buildExclusionsText(LifePathComponentStorage storage) {
+    private String buildExclusionsText(LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Factions
@@ -423,14 +429,21 @@ public class LifePathBuilderTabExclusions {
         }
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> selectedSPAs = storage.abilities();
+        Map<String, Integer> selectedSPAs = storage.abilities();
         if (!selectedSPAs.isEmpty()) {
             appendComma(progressText);
 
-            List<CampaignOptionsAbilityInfo> spas = selectedSPAs.keySet().stream().toList();
+            List<String> spas = selectedSPAs.keySet().stream().toList();
 
             for (int i = 0; i < spas.size(); i++) {
-                SpecialAbility ability = spas.get(i).getAbility();
+                String abilityName = spas.get(i);
+                CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
+                if (abilityInfo == null) {
+                    LOGGER.warn("Could not find AbilityInfo for abilityName: {}", abilityName);
+                    continue;
+                }
+
+                SpecialAbility ability = abilityInfo.getAbility();
                 String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
                 progressText.append(label);
                 if (i != spas.size() - 1) {

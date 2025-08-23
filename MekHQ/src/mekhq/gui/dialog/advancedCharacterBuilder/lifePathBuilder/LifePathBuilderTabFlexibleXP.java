@@ -85,6 +85,11 @@ public class LifePathBuilderTabFlexibleXP {
         return flexibleXPTabStorageMap;
     }
 
+    public void setFlexibleXPTabStorageMap(Map<Integer, LifePathComponentStorage> flexibleXPTabStorageMap) {
+        this.flexibleXPTabStorageMap.clear();
+        this.flexibleXPTabStorageMap.putAll(flexibleXPTabStorageMap);
+    }
+
     public Map<Integer, String> getFlexibleXPTabTextMap() {
         return flexibleXPTabTextMap;
     }
@@ -316,7 +321,7 @@ public class LifePathBuilderTabFlexibleXP {
         buttonsPanel.add(btnAddSkill);
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
+        Map<String, Integer> abilities = new HashMap<>();
         if (hasStorage) {
             abilities.putAll(storage.abilities());
         }
@@ -406,8 +411,7 @@ public class LifePathBuilderTabFlexibleXP {
 
     private void standardizedActions(int index, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities, JEditorPane txtFlexibleXP,
-          LifePathComponentStorage initialStorage) {
+          Map<String, Integer> abilities, JEditorPane txtFlexibleXP, LifePathComponentStorage initialStorage) {
         LifePathComponentStorage storage = getFlexibleXPStorage(
               attributes,
               traits,
@@ -425,7 +429,7 @@ public class LifePathBuilderTabFlexibleXP {
 
     private static LifePathComponentStorage getFlexibleXPStorage(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities) {
+          Map<String, Integer> abilities) {
         return new LifePathComponentStorage(0,
               new ArrayList<>(),
               new ArrayList<>(),
@@ -436,8 +440,7 @@ public class LifePathBuilderTabFlexibleXP {
               abilities);
     }
 
-    private static String buildFlexibleXPText(
-          LifePathComponentStorage storage) {
+    private String buildFlexibleXPText(LifePathComponentStorage storage) {
         StringBuilder progressText = new StringBuilder();
 
         // Attributes
@@ -506,14 +509,21 @@ public class LifePathBuilderTabFlexibleXP {
         }
 
         // SPAs
-        Map<CampaignOptionsAbilityInfo, Integer> selectedSPAs = storage.abilities();
+        Map<String, Integer> selectedSPAs = storage.abilities();
         if (!selectedSPAs.isEmpty()) {
             appendComma(progressText);
 
             int counter = 0;
             int length = selectedSPAs.size();
-            for (Map.Entry<CampaignOptionsAbilityInfo, Integer> entry : selectedSPAs.entrySet()) {
-                SpecialAbility ability = entry.getKey().getAbility();
+            for (Map.Entry<String, Integer> entry : selectedSPAs.entrySet()) {
+                String abilityName = entry.getKey();
+                CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
+                if (abilityInfo == null) {
+                    LOGGER.warn("Could not find AbilityInfo for abilityName: {}", abilityName);
+                    continue;
+                }
+
+                SpecialAbility ability = abilityInfo.getAbility();
                 String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
 
                 int value = entry.getValue();
