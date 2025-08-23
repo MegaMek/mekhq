@@ -34,6 +34,7 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.MHQConstants.LIFE_PATHS_DIRECTORY_PATH;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -379,6 +380,12 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnLoad.addActionListener(e -> {
+            LifePathRecord record = loadFromJSONWithDialog().orElse(null);
+            if (record != null) {
+                // TODO load in new values
+            }
+        });
 
         String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
         RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
@@ -437,7 +444,7 @@ public class LifePathBuilderDialog extends JDialog {
         // Pick an initial directory (preferably the user directory or fallback)
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
         if (userDirectory == null || userDirectory.isBlank()) {
-            userDirectory = System.getProperty("user.home");
+            userDirectory = LIFE_PATHS_DIRECTORY_PATH;
         }
 
         Optional<File> dialogFile = GUI.fileDialogSave(
@@ -467,6 +474,36 @@ public class LifePathBuilderDialog extends JDialog {
         } else {
             LOGGER.info("Save operation cancelled by user.");
         }
+    }
+
+    public static Optional<LifePathRecord> loadFromJSONWithDialog() {
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if (userDirectory == null || userDirectory.isBlank()) {
+            userDirectory = LIFE_PATHS_DIRECTORY_PATH;
+        }
+
+        Optional<File> fileOpt = GUI.fileDialogOpen(
+              null,
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.load"),
+              FileType.JSON,
+              userDirectory
+        );
+
+        if (fileOpt.isPresent()) {
+            File file = fileOpt.get();
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                LifePathRecord record = objectMapper.readValue(file, LifePathRecord.class);
+                LOGGER.info("Loaded LifePathRecord from: {}", file.getAbsolutePath());
+                return Optional.of(record);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
+            }
+        } else {
+            LOGGER.info("Load operation cancelled by user.");
+        }
+
+        return Optional.empty();
     }
 
     /**
