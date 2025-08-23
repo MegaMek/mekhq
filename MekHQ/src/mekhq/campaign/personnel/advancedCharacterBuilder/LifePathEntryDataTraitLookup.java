@@ -38,7 +38,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
 /**
- * Enumerates the supported trait types for {@link LifePathEntryData}, providing lookup functionality by name for use in
+ * Enumerates the supported trait types for {@link LifePath} objects, providing lookup functionality by name for use in
  * the advanced character builder.
  *
  * <p>Each trait is identified by a unique string, which is used for matching and data serialization.</p>

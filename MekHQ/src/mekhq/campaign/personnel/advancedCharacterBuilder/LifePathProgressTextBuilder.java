@@ -50,9 +50,9 @@ public class LifePathProgressTextBuilder {
         StringBuilder newProgressText = new StringBuilder();
 
         int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
-              fixedXPTab.getStoredAttributes(), fixedXPTab.getStoredTraits(), fixedXPTab.getStoredSkills(),
-              fixedXPTab.getStoredAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getStoredAttributes(),
-              flexibleXPTab.getStoredTraits(), flexibleXPTab.getStoredSkills(), flexibleXPTab.getStoredAbilities());
+              fixedXPTab.getAttributes(), fixedXPTab.getTraits(), fixedXPTab.getSkills(),
+              fixedXPTab.getAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getAttributes(),
+              flexibleXPTab.getTraits(), flexibleXPTab.getSkills(), flexibleXPTab.getAbilities());
 
         String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);
         newProgressText.append(newBasicText);

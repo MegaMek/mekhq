@@ -30,7 +30,6 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathComponentStorage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -64,61 +63,63 @@ public class LifePathTab {
     private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedAbilities = new HashMap<>();
+
+    private final JLabel lblFlexibleXPPicks = new JLabel();
     private final JSpinner spnFlexibleXPPicks = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
-    public Map<Integer, List<String>> getStoredFactions() {
+    public Map<Integer, List<String>> getFactions() {
         return storedFactions;
     }
 
-    public void setStoredFactions(Map<Integer, List<String>> storedFactions) {
+    public void setFactions(Map<Integer, List<String>> storedFactions) {
         this.storedFactions = storedFactions;
     }
 
-    public Map<Integer, List<UUID>> getStoredLifePaths() {
+    public Map<Integer, List<UUID>> getLifePaths() {
         return storedLifePaths;
     }
 
-    public void setStoredLifePaths(Map<Integer, List<UUID>> storedLifePaths) {
+    public void setLifePaths(Map<Integer, List<UUID>> storedLifePaths) {
         this.storedLifePaths = storedLifePaths;
     }
 
-    public Map<Integer, Map<LifePathCategory, Integer>> getStoredCategories() {
+    public Map<Integer, Map<LifePathCategory, Integer>> getCategories() {
         return storedCategories;
     }
 
-    public void setStoredCategories(Map<Integer, Map<LifePathCategory, Integer>> storedCategories) {
+    public void setCategories(Map<Integer, Map<LifePathCategory, Integer>> storedCategories) {
         this.storedCategories = storedCategories;
     }
 
-    public Map<Integer, Map<SkillAttribute, Integer>> getStoredAttributes() {
+    public Map<Integer, Map<SkillAttribute, Integer>> getAttributes() {
         return storedAttributes;
     }
 
-    public void setStoredAttributes(Map<Integer, Map<SkillAttribute, Integer>> storedAttributes) {
+    public void setAttributes(Map<Integer, Map<SkillAttribute, Integer>> storedAttributes) {
         this.storedAttributes = storedAttributes;
     }
 
-    public Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> getStoredTraits() {
+    public Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> getTraits() {
         return storedTraits;
     }
 
-    public void setStoredTraits(Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits) {
+    public void setTraits(Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits) {
         this.storedTraits = storedTraits;
     }
 
-    public Map<Integer, Map<String, Integer>> getStoredSkills() {
+    public Map<Integer, Map<String, Integer>> getSkills() {
         return storedSkills;
     }
 
-    public void setStoredSkills(Map<Integer, Map<String, Integer>> storedSkills) {
+    public void setSkills(Map<Integer, Map<String, Integer>> storedSkills) {
         this.storedSkills = storedSkills;
     }
 
-    public Map<Integer, Map<String, Integer>> getStoredAbilities() {
+    public Map<Integer, Map<String, Integer>> getAbilities() {
         return storedAbilities;
     }
 
-    public void setStoredAbilities(Map<Integer, Map<String, Integer>> storedAbilities) {
+    public void setAbilities(Map<Integer, Map<String, Integer>> storedAbilities) {
         this.storedAbilities = storedAbilities;
     }
 
@@ -126,8 +127,16 @@ public class LifePathTab {
         return min((int) spnFlexibleXPPicks.getValue(), getTabCount());
     }
 
+    public void setPickCount(int pickCount) {
+        spnFlexibleXPPicks.setValue(pickCount);
+    }
+
     public int getTabCount() {
         return tabLocal.getTabCount();
+    }
+
+    EnhancedTabbedPane getLocalTab() {
+        return tabLocal;
     }
 
     LifePathTab(LifePathBuilderDialog parent, EnhancedTabbedPane tabGlobal, int gameYear,
@@ -163,7 +172,7 @@ public class LifePathTab {
 
         RoundedJButton btnRemoveGroup = getRemoveGroup(panelButtonsRow);
         btnRemoveGroup.setVisible(enableGroupControls);
-        btnRemoveGroup.addActionListener(e -> removeGroup(tabLocal));
+        btnRemoveGroup.addActionListener(e -> removeGroup());
 
         RoundedJButton btnDuplicateGroup = getDuplicateGroup(panelButtonsRow);
         btnDuplicateGroup.setVisible(enableGroupControls);
@@ -172,6 +181,7 @@ public class LifePathTab {
         JPanel panelPicksRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buildFlexiblePicksPanel(panelPicksRow);
         spnFlexibleXPPicks.setVisible(tabType == LifePathBuilderTabType.FLEXIBLE_XP);
+        lblFlexibleXPPicks.setVisible(tabType == LifePathBuilderTabType.FLEXIBLE_XP);
 
         buttonPanel.add(panelButtonsRow);
         buttonPanel.add(panelPicksRow);
@@ -186,17 +196,17 @@ public class LifePathTab {
 
     private void buildFlexiblePicksPanel(JPanel panelPicksRow) {
         String titlePicks = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.flexibleXP.button.pickCount.label");
+              "LifePathBuilderDialog.flexible_xp.button.pickCount.label");
         String tooltipPicks = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.flexibleXP.button.pickCount.tooltip");
-        JLabel lblPicks = new JLabel(titlePicks);
-        lblPicks.addMouseListener(
+              "LifePathBuilderDialog.flexible_xp.button.pickCount.tooltip");
+        lblFlexibleXPPicks.setText(titlePicks);
+        lblFlexibleXPPicks.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
         );
         spnFlexibleXPPicks.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
         );
-        panelPicksRow.add(lblPicks);
+        panelPicksRow.add(lblFlexibleXPPicks);
         panelPicksRow.add(spnFlexibleXPPicks);
     }
 
@@ -240,103 +250,104 @@ public class LifePathTab {
         return btnAddGroup;
     }
 
-    private void removeGroup(EnhancedTabbedPane tabbedPane) {
-        int selectedIndex = tabbedPane.getSelectedIndex();
-
-        // Remove the current tab, unless it's Group 0
-        if (selectedIndex > 0) {
-            // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
-            // correct order (since we're removing a tab, the indexes will shift)
-            storedFactions.remove(selectedIndex);
-            Map<Integer, List<String>> tempFactions = new HashMap<>();
-            for (Map.Entry<Integer, List<String>> entry : storedFactions.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempFactions.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempFactions.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedFactions.clear();
-            storedFactions.putAll(tempFactions);
-
-            storedLifePaths.remove(selectedIndex);
-            Map<Integer, List<UUID>> tempLifePaths = new HashMap<>();
-            for (Map.Entry<Integer, List<UUID>> entry : storedLifePaths.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempLifePaths.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempLifePaths.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedLifePaths.clear();
-            storedLifePaths.putAll(tempLifePaths);
-
-            storedCategories.remove(selectedIndex);
-            Map<Integer, Map<LifePathCategory, Integer>> tempCategories = new HashMap<>();
-            for (Map.Entry<Integer, Map<LifePathCategory, Integer>> entry : storedCategories.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempCategories.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempCategories.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedCategories.clear();
-            storedCategories.putAll(tempCategories);
-
-            storedAttributes.remove(selectedIndex);
-            Map<Integer, Map<SkillAttribute, Integer>> tempAttributes = new HashMap<>();
-            for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : storedAttributes.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempAttributes.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempAttributes.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedAttributes.clear();
-            storedAttributes.putAll(tempAttributes);
-
-            storedTraits.remove(selectedIndex);
-            Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> tempTraits = new HashMap<>();
-            for (Map.Entry<Integer, Map<LifePathEntryDataTraitLookup, Integer>> entry : storedTraits.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempTraits.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempTraits.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedTraits.clear();
-            storedTraits.putAll(tempTraits);
-
-            storedSkills.remove(selectedIndex);
-            Map<Integer, Map<String, Integer>> tempSkills = new HashMap<>();
-            for (Map.Entry<Integer, Map<String, Integer>> entry : storedSkills.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempSkills.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempSkills.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedSkills.clear();
-            storedSkills.putAll(tempSkills);
-
-            storedAbilities.remove(selectedIndex);
-            Map<Integer, Map<String, Integer>> tempAbilities = new HashMap<>();
-            for (Map.Entry<Integer, Map<String, Integer>> entry : storedAbilities.entrySet()) {
-                if (entry.getKey() < selectedIndex) {
-                    tempAbilities.put(entry.getKey(), entry.getValue());
-                } else if (entry.getKey() > selectedIndex) {
-                    tempAbilities.put(entry.getKey() - 1, entry.getValue());
-                }
-            }
-            storedAbilities.clear();
-            storedAbilities.putAll(tempAbilities);
-
-            // Remove the desired tab
-            tabbedPane.remove(selectedIndex);
-
-            // Update the progress panel
-            parent.updateTxtProgress();
+    private void removeGroup() {
+        if (tabLocal.getTabCount() == 0) {
+            return;
         }
+
+        int selectedIndex = tabLocal.getSelectedIndex();
+
+        // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
+        // correct order (since we're removing a tab, the indexes will shift)
+        storedFactions.remove(selectedIndex);
+        Map<Integer, List<String>> tempFactions = new HashMap<>();
+        for (Map.Entry<Integer, List<String>> entry : storedFactions.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempFactions.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempFactions.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedFactions.clear();
+        storedFactions.putAll(tempFactions);
+
+        storedLifePaths.remove(selectedIndex);
+        Map<Integer, List<UUID>> tempLifePaths = new HashMap<>();
+        for (Map.Entry<Integer, List<UUID>> entry : storedLifePaths.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempLifePaths.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempLifePaths.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedLifePaths.clear();
+        storedLifePaths.putAll(tempLifePaths);
+
+        storedCategories.remove(selectedIndex);
+        Map<Integer, Map<LifePathCategory, Integer>> tempCategories = new HashMap<>();
+        for (Map.Entry<Integer, Map<LifePathCategory, Integer>> entry : storedCategories.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempCategories.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempCategories.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedCategories.clear();
+        storedCategories.putAll(tempCategories);
+
+        storedAttributes.remove(selectedIndex);
+        Map<Integer, Map<SkillAttribute, Integer>> tempAttributes = new HashMap<>();
+        for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : storedAttributes.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempAttributes.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempAttributes.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedAttributes.clear();
+        storedAttributes.putAll(tempAttributes);
+
+        storedTraits.remove(selectedIndex);
+        Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> tempTraits = new HashMap<>();
+        for (Map.Entry<Integer, Map<LifePathEntryDataTraitLookup, Integer>> entry : storedTraits.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempTraits.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempTraits.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedTraits.clear();
+        storedTraits.putAll(tempTraits);
+
+        storedSkills.remove(selectedIndex);
+        Map<Integer, Map<String, Integer>> tempSkills = new HashMap<>();
+        for (Map.Entry<Integer, Map<String, Integer>> entry : storedSkills.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempSkills.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempSkills.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedSkills.clear();
+        storedSkills.putAll(tempSkills);
+
+        storedAbilities.remove(selectedIndex);
+        Map<Integer, Map<String, Integer>> tempAbilities = new HashMap<>();
+        for (Map.Entry<Integer, Map<String, Integer>> entry : storedAbilities.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempAbilities.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempAbilities.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedAbilities.clear();
+        storedAbilities.putAll(tempAbilities);
+
+        // Remove the desired tab
+        tabLocal.remove(selectedIndex);
+
+        // Update the progress panel
+        parent.updateTxtProgress();
     }
 
     private void duplicateGroup() {
@@ -384,7 +395,7 @@ public class LifePathTab {
         tabLocal.setSelectedIndex(newIndex);
     }
 
-    private JEditorPane findEditorPaneByName(Container container, String name) {
+    JEditorPane findEditorPaneByName(Container container, String name) {
         for (Component component : container.getComponents()) {
             if (component instanceof JEditorPane && name.equals(component.getName())) {
                 return (JEditorPane) component;
@@ -398,7 +409,7 @@ public class LifePathTab {
         return null;
     }
 
-    private void addTab() {
+    void addTab() {
         final boolean includeSupplementaryButtons = tabType == LifePathBuilderTabType.REQUIREMENTS ||
                                                           tabType == LifePathBuilderTabType.EXCLUSIONS;
 
@@ -643,7 +654,7 @@ public class LifePathTab {
         return progressText;
     }
 
-    private StringBuilder buildIndividualProgressText(int index) {
+    StringBuilder buildIndividualProgressText(int index) {
         StringBuilder individualProgressText = new StringBuilder();
 
         // Factions
@@ -784,30 +795,6 @@ public class LifePathTab {
     private static void appendComma(StringBuilder progressText) {
         if (!progressText.isEmpty()) {
             progressText.append(", ");
-        }
-    }
-
-    public void updateTabStorage(Map<Integer, LifePathComponentStorage> newData) {
-        // Remove old Data
-        storedFactions.clear();
-        storedLifePaths.clear();
-        storedCategories.clear();
-        storedAttributes.clear();
-        storedTraits.clear();
-        storedSkills.clear();
-        storedAbilities.clear();
-
-        // Add new Data
-        for (Map.Entry<Integer, LifePathComponentStorage> entry : newData.entrySet()) {
-            LifePathComponentStorage value = entry.getValue();
-
-            storedFactions.put(entry.getKey(), value.factions());
-            storedLifePaths.put(entry.getKey(), value.lifePaths());
-            storedCategories.put(entry.getKey(), value.categories());
-            storedAttributes.put(entry.getKey(), value.attributes());
-            storedTraits.put(entry.getKey(), value.traits());
-            storedSkills.put(entry.getKey(), value.skills());
-            storedAbilities.put(entry.getKey(), value.abilities());
         }
     }
 }

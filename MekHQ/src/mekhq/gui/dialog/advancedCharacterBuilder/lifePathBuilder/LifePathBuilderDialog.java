@@ -48,6 +48,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import megamek.Version;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
@@ -74,12 +76,18 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathXPCostCalculator;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -388,50 +396,7 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnLoad.addActionListener(e -> {
-            LifePath record = loadFromJSONWithDialog().orElse(null);
-            if (record != null) {
-                lifePathId = record.id();
-                LOGGER.debug("Loaded lifePathId from: {}", record.id());
-
-                basicInfoTab.setSource(record.source());
-                LOGGER.debug("Loaded source from: {}", record.source());
-
-                basicInfoTab.setName(record.name());
-                LOGGER.debug("Loaded name from: {}", record.name());
-
-                basicInfoTab.setFlavorText(record.flavorText());
-                LOGGER.debug("Loaded flavorText from: {}", record.flavorText());
-
-                basicInfoTab.setAge(record.age());
-                LOGGER.debug("Loaded age from: {}", record.age());
-
-                basicInfoTab.setDiscount(record.xpDiscount());
-                LOGGER.debug("Loaded xpDiscount from: {}", record.xpDiscount());
-
-                basicInfoTab.setLifeStages(record.lifeStages());
-                LOGGER.debug("Loaded lifeStages from: {}", record.lifeStages());
-
-                basicInfoTab.setCategories(record.categories());
-                LOGGER.debug("Loaded categories from: {}", record.categories());
-
-                requirementsTab.updateTabStorage(record.requirements());
-                LOGGER.debug("Loaded requirements from: {}", record.requirements());
-
-                exclusionsTab.updateTabStorage(record.exclusions());
-                LOGGER.debug("Loaded exclusions from: {}", record.exclusions());
-
-                fixedXPTab.updateTabStorage(record.fixedXpAwards());
-                LOGGER.debug("Loaded fixedXpAwards from: {}", record.fixedXpAwards());
-
-                flexibleXPTab.updateTabStorage(record.flexibleXpAwards());
-                LOGGER.debug("Loaded flexibleXpAwards from: {}", record.flexibleXpAwards());
-
-                updateTxtProgress();
-                invalidate();
-                repaint();
-            }
-        });
+        btnLoad.addActionListener(e -> loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord));
 
         String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
         RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
@@ -473,6 +438,150 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    private void updateBuilderFromExistingLifePathRecord(LifePath record) {
+        // Dynamic
+        lifePathId = record.id();
+
+        // Basic Info
+        basicInfoTab.setSource(record.source());
+        basicInfoTab.setName(record.name());
+        basicInfoTab.setFlavorText(record.flavorText());
+        basicInfoTab.setAge(record.age());
+        basicInfoTab.setDiscount(record.xpDiscount());
+        basicInfoTab.setLifeStages(record.lifeStages());
+        basicInfoTab.setCategories(record.categories());
+
+        // Requirements
+        int requirementsMaxKey = -1;
+
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsFactions()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsLifePath()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsCategories()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsAttributes()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsTraits()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsSkills()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsAbilities()));
+
+        // This must be before we set the values below, otherwise the values will be overwritten
+        addAdditionalTabsAsNecessary(requirementsMaxKey, requirementsTab);
+
+        if (requirementsMaxKey > -1) {
+            requirementsTab.setFactions(record.requirementsFactions());
+            requirementsTab.setLifePaths(record.requirementsLifePath());
+            requirementsTab.setCategories(record.requirementsCategories());
+            requirementsTab.setAttributes(record.requirementsAttributes());
+            requirementsTab.setTraits(record.requirementsTraits());
+            requirementsTab.setSkills(record.requirementsSkills());
+            requirementsTab.setAbilities(record.requirementsAbilities());
+        }
+
+        // Conversely, this must be after we set the values above, so the text can be current
+        updateProgressTextPerTab(requirementsMaxKey, requirementsTab);
+
+        // Exclusions
+        int exclusionsMaxKey = -1;
+
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsFactions()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsLifePath()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsCategories()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsAttributes()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsTraits()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsSkills()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsAbilities()));
+
+        // This must be before we set the values below, otherwise the values will be overwritten
+        addAdditionalTabsAsNecessary(exclusionsMaxKey, exclusionsTab);
+
+        if (exclusionsMaxKey > -1) {
+            exclusionsTab.setFactions(record.exclusionsFactions());
+            exclusionsTab.setLifePaths(record.exclusionsLifePath());
+            exclusionsTab.setCategories(record.exclusionsCategories());
+            exclusionsTab.setAttributes(record.exclusionsAttributes());
+            exclusionsTab.setTraits(record.exclusionsTraits());
+            exclusionsTab.setSkills(record.exclusionsSkills());
+            exclusionsTab.setAbilities(record.exclusionsAbilities());
+        }
+
+        // Conversely, this must be after we set the values above, so the text can be current
+        updateProgressTextPerTab(exclusionsMaxKey, exclusionsTab);
+
+        // Fixed XP
+        int fixedXPMaxKey = -1;
+
+        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPAttributes()));
+        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPTraits()));
+        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPSkills()));
+        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPAbilities()));
+
+        // This must be before we set the values below, otherwise the values will be overwritten
+        addAdditionalTabsAsNecessary(fixedXPMaxKey, fixedXPTab);
+
+        if (fixedXPMaxKey > -1) {
+            fixedXPTab.setAttributes(record.fixedXPAttributes());
+            fixedXPTab.setTraits(record.fixedXPTraits());
+            fixedXPTab.setSkills(record.fixedXPSkills());
+            fixedXPTab.setAbilities(record.fixedXPAbilities());
+        }
+
+        // Conversely, this must be after we set the values above, so the text can be current
+        updateProgressTextPerTab(fixedXPMaxKey, fixedXPTab);
+
+        // Flexible XP
+        int flexibleXPMaxKey = -1;
+
+        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPAttributes()));
+        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPTraits()));
+        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPSkills()));
+        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPAbilities()));
+
+        // This must be before we set the values below, otherwise the values will be overwritten
+        addAdditionalTabsAsNecessary(flexibleXPMaxKey, flexibleXPTab);
+
+        if (flexibleXPMaxKey > -1) {
+            flexibleXPTab.setAttributes(record.flexibleXPAttributes());
+            flexibleXPTab.setTraits(record.flexibleXPTraits());
+            flexibleXPTab.setSkills(record.flexibleXPSkills());
+            flexibleXPTab.setAbilities(record.flexibleXPAbilities());
+        }
+
+        flexibleXPTab.setPickCount(record.flexibleXPPickCount());
+
+        // Conversely, this must be after we set the values above, so the text can be current
+        updateProgressTextPerTab(flexibleXPMaxKey, flexibleXPTab);
+
+        updateTxtProgress();
+        invalidate();
+        repaint();
+    }
+
+    private void addAdditionalTabsAsNecessary(int requirementsMaxKey, LifePathTab requirementsTab) {
+        for (int i = -1; i < requirementsMaxKey; i++) {
+            requirementsTab.addTab();
+        }
+    }
+
+    private void updateProgressTextPerTab(int maxKey, LifePathTab lifePathTab) {
+        for (int i = 0; i <= maxKey; i++) {
+            EnhancedTabbedPane localTab = lifePathTab.getLocalTab();
+            JPanel pnlNewTab = (JPanel) localTab.getComponentAt(i);
+            JPanel pnlMain = (JPanel) pnlNewTab.getComponent(1);
+            JEditorPane editorProgress = lifePathTab.findEditorPaneByName(pnlMain, "editorProgress");
+            if (editorProgress != null) {
+                editorProgress.setText(lifePathTab.buildIndividualProgressText(i).toString());
+            } else {
+                LOGGER.warn("Could not find editorProgress in updateBuilderFromExistingLifePathRecord");
+            }
+        }
+    }
+
+    private static int getMaxKey(Map<Integer, ?> map) {
+        if (map == null || map.isEmpty()) {
+            return Integer.MIN_VALUE;
+        }
+
+        return Collections.max(map.keySet());
     }
 
     public static void writeToJSONWithDialog(LifePath record) {
@@ -560,17 +669,60 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     private LifePath buildLifePathFromBuilderWizard() {
-        int discount = basicInfoTab.getDiscount();
-        //        LifePathComponentStorage fixedXPTabStorage = fixedXPTab.getFixedXPTabStorage();
-        //        Map<Integer, LifePathComponentStorage> flexibleXPTabStorage = flexibleXPTab.getFlexibleXPTabStorageMap();
-        //
-        //        int xpCost = LifePathXPCostCalculator.calculateXPCost(discount, fixedXPTabStorage, flexibleXPTabStorage);
+        // Basic Info
+        String source = basicInfoTab.getSource();
+        String name = basicInfoTab.getName();
+        String flavorText = basicInfoTab.getFlavorText();
+        int age = basicInfoTab.getAge();
+        int xpDiscount = basicInfoTab.getDiscount();
+        List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
+        List<LifePathCategory> categories = basicInfoTab.getCategories();
 
-        //        return new LifePath(lifePathId, basicInfoTab.getSource(), MHQConstants.VERSION, basicInfoTab.getName(),
-        //              basicInfoTab.getFlavorText(), basicInfoTab.getAge(), basicInfoTab.getDiscount(), xpCost,
-        //              basicInfoTab.getLifeStages(), basicInfoTab.getCategories(),
-        //              requirementsTab.getRequirementsTabStorageMap(), exclusionsTab.getExclusionsTabStorage(),
-        //              fixedXPTabStorage, flexibleXPTabStorage, flexibleXPTab.getPickCount());
-        return null;
+        // Requirements
+        Map<Integer, List<String>> requirementsFactions = requirementsTab.getFactions();
+        Map<Integer, List<UUID>> requirementsLifePath = requirementsTab.getLifePaths();
+        Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories = requirementsTab.getCategories();
+        Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes = requirementsTab.getAttributes();
+        Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits = requirementsTab.getTraits();
+        Map<Integer, Map<String, Integer>> requirementsSkills = requirementsTab.getSkills();
+        Map<Integer, Map<String, Integer>> requirementsAbilities = requirementsTab.getAbilities();
+
+        // Exclusions
+        Map<Integer, List<String>> exclusionsFactions = exclusionsTab.getFactions();
+        Map<Integer, List<UUID>> exclusionsLifePath = exclusionsTab.getLifePaths();
+        Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories = exclusionsTab.getCategories();
+        Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes = exclusionsTab.getAttributes();
+        Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits = exclusionsTab.getTraits();
+        Map<Integer, Map<String, Integer>> exclusionsSkills = exclusionsTab.getSkills();
+        Map<Integer, Map<String, Integer>> exclusionsAbilities = exclusionsTab.getAbilities();
+
+        // Fixed XP
+        Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes = fixedXPTab.getAttributes();
+        Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits = fixedXPTab.getTraits();
+        Map<Integer, Map<String, Integer>> fixedXPSkills = fixedXPTab.getSkills();
+        Map<Integer, Map<String, Integer>> fixedXPAbilities = fixedXPTab.getAbilities();
+
+        // Flexible XP
+        Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes = flexibleXPTab.getAttributes();
+        Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits = flexibleXPTab.getTraits();
+        Map<Integer, Map<String, Integer>> flexibleXPSkills = flexibleXPTab.getSkills();
+        Map<Integer, Map<String, Integer>> flexibleXPAbilities = flexibleXPTab.getAbilities();
+        int flexibleXPPickCount = flexibleXPTab.getPickCount();
+
+        // Dynamic
+        UUID id = lifePathId;
+        Version version = MHQConstants.VERSION;
+        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount,
+              fixedXPTab.getAttributes(), fixedXPTab.getTraits(), fixedXPTab.getSkills(),
+              fixedXPTab.getAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getAttributes(),
+              flexibleXPTab.getTraits(), flexibleXPTab.getSkills(), flexibleXPTab.getAbilities());
+
+        // Build and return the Record
+        return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, lifeStages, categories,
+              requirementsFactions, requirementsLifePath, requirementsCategories, requirementsAttributes,
+              requirementsTraits, requirementsSkills, requirementsAbilities, exclusionsFactions, exclusionsLifePath,
+              exclusionsCategories, exclusionsAttributes, exclusionsTraits, exclusionsSkills, exclusionsAbilities,
+              fixedXPAttributes, fixedXPTraits, fixedXPSkills, fixedXPAbilities, flexibleXPAttributes,
+              flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities, flexibleXPPickCount);
     }
 }
