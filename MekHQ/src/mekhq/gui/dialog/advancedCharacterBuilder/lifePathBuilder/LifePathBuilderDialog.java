@@ -45,11 +45,13 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -61,11 +63,14 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
@@ -74,9 +79,11 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataProcessor;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
+import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
+import mekhq.io.FileType;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class LifePathBuilderDialog extends JDialog {
@@ -364,10 +371,8 @@ public class LifePathBuilderDialog extends JDialog {
         btnSave.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
         btnSave.addActionListener(e -> {
-            LifePathDataProcessor dataProcessor = new LifePathDataProcessor(basicInfoTab, requirementsTab,
-                  exclusionsTab, fixedXPTab, flexibleXPTab);
-            LifePathRecord record = dataProcessor.buildLifePathFromLifePathBuilder(lifePathId);
-            LifePathRecord.writeToJSON(record);
+            LifePathRecord record = processCurrentLifePath();
+            writeToJSONWithDialog(record);
         });
 
         String titleLoad = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.load");
@@ -417,6 +422,53 @@ public class LifePathBuilderDialog extends JDialog {
         return pnlControls;
     }
 
+    private LifePathRecord processCurrentLifePath() {
+        LifePathDataProcessor dataProcessor = new LifePathDataProcessor(basicInfoTab, requirementsTab, exclusionsTab,
+              fixedXPTab, flexibleXPTab);
+        return dataProcessor.buildLifePathFromLifePathBuilder(lifePathId);
+    }
+
+    public static void writeToJSONWithDialog(LifePathRecord record) {
+        String baseName = record.name().replace(" ", "_");
+        if (baseName.isBlank()) {
+            baseName = "unnamed_life_path";
+        }
+
+        // Pick an initial directory (preferably the user directory or fallback)
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if (userDirectory == null || userDirectory.isBlank()) {
+            userDirectory = System.getProperty("user.home");
+        }
+
+        Optional<File> dialogFile = GUI.fileDialogSave(
+              null,
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.save"),
+              FileType.JSON,
+              userDirectory,
+              baseName
+        );
+
+        if (dialogFile.isPresent()) {
+            File file = dialogFile.get();
+            // Ensure it ends with ".json"
+            String name = file.getName();
+            if (!name.toLowerCase().endsWith(".json")) {
+                file = new File(file.getParent(), name + ".json");
+            }
+            // Write the record
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+                objectMapper.writeValue(file, record);
+                LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
+            }
+        } else {
+            LOGGER.info("Save operation cancelled by user.");
+        }
+    }
+
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
      */
@@ -429,6 +481,4 @@ public class LifePathBuilderDialog extends JDialog {
             LOGGER.error("Failed to set user preferences", ex);
         }
     }
-
-
 }

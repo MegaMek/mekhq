@@ -46,6 +46,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
@@ -144,6 +145,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public int getTrait(LifePathEntryDataTraitLookup trait) {
         if (!ATOW_TRAIT.getLookupName().equalsIgnoreCase(classLookupName)) {
             return 0;
@@ -167,6 +169,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     private int getTraitValue(LifePathEntryDataTraitLookup trait, boolean isMinimum) {
         return switch (trait) {
             case BLOODMARK -> isMinimum ? MINIMUM_BLOODMARK : clamp(value, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
@@ -197,6 +200,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public @Nullable String getFactionCode() {
         if (!FACTION_CODE.getLookupName().equalsIgnoreCase(classLookupName)) {
             return null;
@@ -213,6 +217,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public @Nullable UUID getLifePathUUID() {
         if (!LIFE_PATH.getLookupName().equalsIgnoreCase(classLookupName)) {
             return null;
@@ -238,6 +243,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public int getLifePathCategory(LifePathCategory category) {
         if (!LIFE_PATH_CATEGORY.getLookupName().equalsIgnoreCase(classLookupName)) {
             return 0;
@@ -260,6 +266,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public int getSkill(String skillName) {
         if (!SKILL.getLookupName().equalsIgnoreCase(classLookupName)) {
             return 0;
@@ -288,6 +295,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public int getSkillAttribute(SkillAttribute attribute) {
         if (!SKILL_ATTRIBUTE.getLookupName().equalsIgnoreCase(classLookupName)) {
             return MINIMUM_ATTRIBUTE_SCORE;
@@ -314,6 +322,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @JsonIgnore
     public @Nullable IOption getSPA(String lookupName) {
         if (!SPA.getLookupName().equalsIgnoreCase(classLookupName)) {
             return null;
