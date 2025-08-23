@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -43,7 +44,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 public record LifePathTabStorage(
       // Excluded from cost calculations
       int gameYear, List<Faction> factions,
-      List<LifePathRecord> lifePaths,
+      List<UUID> lifePaths,
       Map<LifePathCategory, Integer> categories,
 
       // Included in cost calculations

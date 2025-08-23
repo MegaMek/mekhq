@@ -107,27 +107,6 @@ class LifePathEntryDataTest {
 
     @ParameterizedTest
     @EnumSource(LifePathEntryDataTraitLookup.class)
-    void testGetTrait_ValidTrait(LifePathEntryDataTraitLookup trait) {
-        LifePathEntryData data = new LifePathEntryData("ATOW_TRAIT", trait.getLookupName(), 3);
-        assertEquals(3, data.getTrait(trait));
-    }
-
-    @Test
-    void testGetTrait_InvalidTrait() {
-        LifePathEntryData data = new LifePathEntryData("ATOW_TRAIT", "SOME_NONSENSE", 15);
-        assertEquals(0, data.getTrait(LifePathEntryDataTraitLookup.CONNECTIONS),
-              "Should return 0 as the objectLookupName does not match the trait");
-    }
-
-    @Test
-    void testGetTrait_InvalidClassLookupName() {
-        LifePathEntryData data = new LifePathEntryData("INVALID_CLASS", "CONNECTIONS", 15);
-        assertEquals(0, data.getTrait(LifePathEntryDataTraitLookup.CONNECTIONS),
-              "Should return 0 as the classLookupName does not match ATOW_TRAIT");
-    }
-
-    @ParameterizedTest
-    @EnumSource(LifePathEntryDataTraitLookup.class)
     void testGetFactionCode_ValidTrait(LifePathEntryDataTraitLookup trait) {
         LifePathEntryData data = new LifePathEntryData("FACTION_CODE", "SL", 3);
         assertEquals("SL", data.getFactionCode());

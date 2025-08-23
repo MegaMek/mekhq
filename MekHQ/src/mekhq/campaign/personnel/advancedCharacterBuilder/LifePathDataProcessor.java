@@ -47,10 +47,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabBasicInformation;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabExclusions;
@@ -61,6 +64,8 @@ import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilder
 public record LifePathDataProcessor(LifePathBuilderTabBasicInformation basicInfoTab,
       LifePathBuilderTabRequirements requirementsTab, LifePathBuilderTabExclusions exclusionsTab,
       LifePathBuilderTabFixedXP fixedXPTab, LifePathBuilderTabFlexibleXP flexibleXPTab) {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathDataProcessor.class);
+
     public LifePathRecord buildLifePathFromLifePathBuilder(UUID lifePathID) {
         // Basic Info Tab
         String source = basicInfoTab.getSource();
@@ -211,5 +216,165 @@ public record LifePathDataProcessor(LifePathBuilderTabBasicInformation basicInfo
         }
 
         return processedAttributeData;
+    }
+
+    public UUID updateExistingTabsFromNewLifePath(LifePathRecord record, int gameYear) {
+        // Basic Info Tab
+        basicInfoTab.setName(record.name());
+        basicInfoTab.setFlavorText(record.flavorText());
+        basicInfoTab.setSource(record.source());
+        basicInfoTab.setAge(record.age());
+        basicInfoTab.setDiscount(record.xpDiscount());
+        basicInfoTab.setLifeStages(record.lifeStages());
+        basicInfoTab.setCategories(record.categories());
+
+        // Requirements Tab
+        Map<Integer, LifePathTabStorage> unpackedRequirements = unpackRequirements(record.requirements(),
+              gameYear);
+        requirementsTab.setRequirementsTabStorageMap(record.requirements());
+
+        LifePathBuilderTabExclusions exclusionsTab
+        LifePathBuilderTabFixedXP fixedXPTab
+        LifePathBuilderTabFlexibleXP flexibleXPTab
+
+        return record.id();
+    }
+
+    private Map<Integer, LifePathTabStorage> unpackRequirements(Map<Integer, List<LifePathEntryData>> requirements,
+          int gameYear) {
+        final Factions factionsInstance = Factions.getInstance();
+
+        Map<Integer, LifePathTabStorage> unpackedRequirements = new HashMap<>();
+
+        for (Map.Entry<Integer, List<LifePathEntryData>> entry : requirements.entrySet()) {
+            int stage = entry.getKey();
+            List<LifePathTabStorage> unpackedData = new ArrayList<>();
+
+            Map<LifePathEntryDataTraitLookup, Integer> traits = new HashMap<>();
+            List<Faction> factions = new ArrayList<>();
+            List<UUID> lifePaths = new ArrayList<>();
+            Map<LifePathCategory, Integer> categories = new HashMap<>();
+            Map<SkillAttribute, Integer> attributes = new HashMap<>();
+            Map<SkillType, Integer> skills = new HashMap<>();
+            Map<CampaignOptionsAbilityInfo, Integer> abilities = new HashMap<>();
+
+            for (LifePathEntryData data : entry.getValue()) {
+                LifePathDataClassLookup classLookup = LifePathDataClassLookup.fromLookupName(data.classLookupName());
+                if (classLookup == null) {
+                    LOGGER.error(new IllegalArgumentException("Unknown object lookup name: " + data.classLookupName()));
+                    continue;
+                }
+
+                switch (classLookup) {
+                    case ATOW_TRAIT -> traits.putAll(processTraitNode(data, true));
+                    case FACTION_CODE -> {
+                        Faction faction = processFactionNode(data.getFactionCode(), factionsInstance, factions);
+                        if (faction != null) {
+                            factions.add(faction);
+                        }
+                    }
+                    case LIFE_PATH -> {
+                        UUID lifePath = processLifePathNode(data.getLifePathUUID(), lifePaths);
+                        if (lifePath != null) {
+                            lifePaths.add(lifePath);
+                        }
+                    }
+                    case LIFE_PATH_CATEGORY -> categories.putAll(processLifePathCategoryNode(data));
+                    case SKILL -> skills.putAll(processSkillsNode(data));
+                    case SKILL_ATTRIBUTE -> {}
+                    case SPA -> {}
+                    default -> LOGGER.error(new IllegalArgumentException("Unknown object lookup name: " +
+                                                                               data.objectLookupName()));
+                }
+
+
+                String factionCode = data.getFactionCode();
+
+
+            }
+
+        }
+
+        return unpackedRequirements;
+    }
+
+    private static Map<LifePathEntryDataTraitLookup, Integer> processTraitNode(LifePathEntryData data,
+          boolean compareAgainstMinimum) {
+        Map<LifePathEntryDataTraitLookup, Integer> traits = new HashMap<>();
+
+        LifePathEntryDataTraitLookup lookup = LifePathEntryDataTraitLookup.fromLookupName(data.objectLookupName());
+        if (lookup == null) {
+            LOGGER.error(new IllegalArgumentException("Unknown trait lookup name: " + data.objectLookupName()));
+            return new HashMap<>();
+        }
+
+        traits.put(lookup, data.getTraitValue(lookup, compareAgainstMinimum));
+
+        return traits;
+    }
+
+    private static @Nullable Faction processFactionNode(String factionCode, Factions factionsInstance,
+          List<Faction> factions) {
+        if (factionCode == null || factionCode.isBlank()) {
+            LOGGER.warn("Faction code is null or blank for life path: {}", factionCode);
+            return null;
+        }
+
+        Faction faction = factionsInstance.getFaction(factionCode);
+        if (faction == null) {
+            LOGGER.warn("Faction code does not match existing faction: {}", factionCode);
+            return null;
+        }
+
+        if (factions.contains(faction)) {
+            LOGGER.warn("Duplicate faction found for life path: {}", factionCode);
+            return null;
+        }
+
+        return faction;
+    }
+
+    private static @Nullable UUID processLifePathNode(UUID lifePathID, List<UUID> lifePaths) {
+        if (lifePathID == null) {
+            LOGGER.warn("Life Path UUID is null or blank for life path");
+            return null;
+        }
+
+        if (lifePaths.contains(lifePathID)) {
+            LOGGER.warn("Duplicate Life Path found for life path: {}", lifePathID);
+            return null;
+        }
+
+        return lifePathID;
+    }
+
+    private static Map<LifePathCategory, Integer> processLifePathCategoryNode(LifePathEntryData data) {
+        Map<LifePathCategory, Integer> lifePaths = new HashMap<>();
+
+        LifePathCategory lookup = LifePathCategory.fromLookupName(data.objectLookupName());
+        if (lookup == null) {
+            LOGGER.error(new IllegalArgumentException("Unknown Life Path Category lookup name: " +
+                                                            data.objectLookupName()));
+            return new HashMap<>();
+        }
+
+        lifePaths.put(lookup, data.getLifePathCategory(lookup));
+
+        return lifePaths;
+    }
+
+    private static Map<SkillType, Integer> processSkillsNode(LifePathEntryData data) {
+        Map<SkillType, Integer> skills = new HashMap<>();
+
+        String skillName = data.objectLookupName();
+        SkillType lookup = SkillType.getType(skillName);
+        if (lookup == null) {
+            LOGGER.error(new IllegalArgumentException("Unknown Skill lookup name: " + data.objectLookupName()));
+            return new HashMap<>();
+        }
+
+        skills.put(lookup, data.getSkill(skillName));
+
+        return skills;
     }
 }

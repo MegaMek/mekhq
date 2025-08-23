@@ -83,6 +83,11 @@ public class LifePathBuilderTabRequirements {
         return requirementsTabStorageMap;
     }
 
+    public void setRequirementsTabStorageMap(Map<Integer, LifePathTabStorage> requirementsTabStorageMap) {
+        this.requirementsTabStorageMap.clear();
+        this.requirementsTabStorageMap.putAll(requirementsTabStorageMap);
+    }
+
     public Map<Integer, String> getRequirementsTabTextMap() {
         return requirementsTabTextMap;
     }

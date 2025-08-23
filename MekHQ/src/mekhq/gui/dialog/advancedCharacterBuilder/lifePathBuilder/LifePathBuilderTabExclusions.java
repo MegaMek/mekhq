@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
@@ -52,7 +53,6 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTabStorage;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -161,7 +161,7 @@ public class LifePathBuilderTabExclusions {
         buttonsPanel.add(btnAddFaction);
 
         // Life Paths
-        List<LifePathRecord> lifePaths = new ArrayList<>();
+        List<UUID> lifePaths = new ArrayList<>();
         String titleAddLifePath = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.exclusions.button.addLifePath.label");
         String tooltipAddLifePath = getTextAt(RESOURCE_BUNDLE,
@@ -284,7 +284,7 @@ public class LifePathBuilderTabExclusions {
 
     private void standardizedActions(int gameYear, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
-          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<LifePathRecord> lifePaths,
+          Map<CampaignOptionsAbilityInfo, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtExclusions,
           LifePathTabStorage initialStorage) {
         LifePathTabStorage storage = getExclusionsTabStorage(gameYear, factions, lifePaths, categories,
@@ -300,7 +300,7 @@ public class LifePathBuilderTabExclusions {
     }
 
     private static LifePathTabStorage getExclusionsTabStorage(int gameYear, List<Faction> factions,
-          List<LifePathRecord> lifePaths, Map<LifePathCategory, Integer> categories,
+          List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
           Map<SkillType, Integer> skills, Map<CampaignOptionsAbilityInfo, Integer> abilities) {
         return new LifePathTabStorage(gameYear,
@@ -330,13 +330,14 @@ public class LifePathBuilderTabExclusions {
         }
 
         // Life Paths
-        List<LifePathRecord> lifePaths = storage.lifePaths();
+        List<UUID> lifePaths = storage.lifePaths();
         if (!lifePaths.isEmpty()) {
             appendComma(progressText);
 
             for (int i = 0; i < lifePaths.size(); i++) {
-                LifePathRecord lifePath = lifePaths.get(i);
-                progressText.append(lifePath.name());
+                UUID lifePath = lifePaths.get(i);
+                // TODO lookup the lifePath via its UUID and display its name instead of its UUID
+                progressText.append(lifePath.toString());
                 if (i != lifePaths.size() - 1) {
                     progressText.append(", ");
                 }

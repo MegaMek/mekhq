@@ -383,7 +383,12 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.addActionListener(e -> {
             LifePathRecord record = loadFromJSONWithDialog().orElse(null);
             if (record != null) {
-                // TODO load in new values
+                LifePathDataProcessor processor = new LifePathDataProcessor(basicInfoTab, requirementsTab,
+                      exclusionsTab, fixedXPTab, flexibleXPTab);
+                lifePathId = processor.updateExistingTabsFromNewLifePath(record);
+                updateTxtProgress();
+                invalidate();
+                repaint();
             }
         });
 

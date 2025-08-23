@@ -76,28 +76,56 @@ public class LifePathBuilderTabBasicInformation {
         return txtName.getText();
     }
 
+    public void setName(String name) {
+        txtName.setText(name);
+    }
+
     public String getFlavorText() {
         return txtFlavorText.getText();
+    }
+
+    public void setFlavorText(String flavorText) {
+        txtFlavorText.setText(flavorText);
     }
 
     public String getSource() {
         return txtSource.getText();
     }
 
+    public void setSource(String source) {
+        txtSource.setText(source);
+    }
+
     public int getAge() {
         return (int) spnAge.getValue();
+    }
+
+    public void setAge(int age) {
+        spnAge.setValue(age);
     }
 
     public int getDiscount() {
         return (int) spnDiscount.getValue();
     }
 
+    public void setDiscount(int discount) {
+        spnDiscount.setValue(discount);
+    }
+
     public List<ATOWLifeStage> getLifeStages() {
         return lifeStages;
     }
 
+    public void setLifeStages(List<ATOWLifeStage> lifeStages) {
+        this.lifeStages = lifeStages;
+    }
+
     public List<LifePathCategory> getCategories() {
         return categories;
+    }
+
+    public void setCategories(List<LifePathCategory> categories) {
+        this.categories = categories;
     }
 
     LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {

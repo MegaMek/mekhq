@@ -170,7 +170,7 @@ public record LifePathEntryData(
      * @since 0.50.07
      */
     @JsonIgnore
-    private int getTraitValue(LifePathEntryDataTraitLookup trait, boolean isMinimum) {
+    int getTraitValue(LifePathEntryDataTraitLookup trait, boolean isMinimum) {
         return switch (trait) {
             case BLOODMARK -> isMinimum ? MINIMUM_BLOODMARK : clamp(value, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
             case CONNECTIONS ->
@@ -183,10 +183,6 @@ public record LifePathEntryData(
             // case TITLE -> isMinimum ? MINIMUM_TITLE : clamp(value, MINIMUM_TITLE, MAXIMUM_TITLE);
             case UNLUCKY -> isMinimum ? MINIMUM_UNLUCKY : clamp(value, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
             case WEALTH -> isMinimum ? MINIMUM_WEALTH : clamp(value, MINIMUM_WEALTH, MAXIMUM_WEALTH);
-            default -> {
-                LOGGER.warn("Unexpected life path data trait provided: {}", trait);
-                yield 0;
-            }
         };
     }
 
