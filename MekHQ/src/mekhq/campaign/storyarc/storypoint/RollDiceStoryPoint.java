@@ -36,7 +36,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 
 import megamek.Version;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;

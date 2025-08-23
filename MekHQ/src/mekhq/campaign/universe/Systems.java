@@ -376,13 +376,13 @@ public class Systems {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {
-                logger.error(String.format("System \"%s\" is missing coordinates", system.getId()));
+                logger.error(String.format("SystemFluff \"%s\" is missing coordinates", system.getId()));
                 toRemove.add(system);
                 continue;
             }
 
             if (null == system.getStar()) {
-                logger.error(String.format("System \"%s\" is missing a star", system.getId()));
+                logger.error(String.format("SystemFluff \"%s\" is missing a star", system.getId()));
                 toRemove.add(system);
                 continue;
             }
@@ -390,7 +390,7 @@ public class Systems {
             // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
                 logger.error(String
-                                   .format("System \"%s\" has a primary slot greater than the number of planets",
+                                   .format("SystemFluff \"%s\" has a primary slot greater than the number of planets",
                                          system.getId()));
                 toRemove.add(system);
                 continue;

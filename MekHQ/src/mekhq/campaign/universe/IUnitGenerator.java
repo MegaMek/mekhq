@@ -40,11 +40,11 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.UnitType;
 
 /**
  * Common interface to interact with various methods for generating units.
@@ -93,7 +93,7 @@ public interface IUnitGenerator {
      * @return Whether or not the unit type supports weight class selection.
      */
     static boolean unitTypeSupportsWeightClass(final int unitType) {
-        return (unitType == UnitType.AEROSPACEFIGHTER) || (unitType == UnitType.MEK) || (unitType == UnitType.TANK);
+        return (unitType == UnitType.AEROSPACE_FIGHTER) || (unitType == UnitType.MEK) || (unitType == UnitType.TANK);
     }
 
     /**

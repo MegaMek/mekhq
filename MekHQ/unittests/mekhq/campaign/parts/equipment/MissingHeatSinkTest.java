@@ -44,9 +44,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import megamek.common.Aero;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
+import megamek.common.units.Aero;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;

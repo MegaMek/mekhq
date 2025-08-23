@@ -35,7 +35,7 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;

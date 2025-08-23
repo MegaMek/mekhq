@@ -86,7 +86,7 @@ import org.w3c.dom.Node;
  * - saving to XML and creating from XML
  *
  * <pre>
- * ed.writeToXML(System.out);
+ * ed.writeToXML(SystemFluff.out);
  * ExtraData newEd = ExtraData.createFromXml(xmlNode);
  * </pre>
  */

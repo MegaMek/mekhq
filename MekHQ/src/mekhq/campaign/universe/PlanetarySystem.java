@@ -323,7 +323,7 @@ public class PlanetarySystem {
      */
     public String getPrintableName(LocalDate when) {
         final String system = getName(when);
-        return (system == null) ? "Unknown System" : system;
+        return (system == null) ? "Unknown SystemFluff" : system;
     }
 
     /**

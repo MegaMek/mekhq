@@ -47,7 +47,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;

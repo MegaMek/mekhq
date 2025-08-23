@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JMenuItem;
 
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.HangarSorter;

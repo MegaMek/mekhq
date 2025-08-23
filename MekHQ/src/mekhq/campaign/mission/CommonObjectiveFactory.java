@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import megamek.common.Dropship;
+import megamek.common.units.Dropship;
 import megamek.common.OffBoardDirection;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
@@ -93,8 +94,8 @@ class BloodmarkTest {
     void testGetBloodhuntSchedule_BloodhuntSkippedByRoll() {
         BloodmarkLevel level = BloodmarkLevel.BLOODMARK_ONE;
 
-        try (MockedStatic<megamek.common.Compute> mockedCompute = mockStatic(megamek.common.Compute.class)) {
-            mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(1);
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(level.getRollFrequency())).thenReturn(1);
 
             List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
@@ -106,9 +107,9 @@ class BloodmarkTest {
     void testGetBloodhuntSchedule_NoAssassinationsDueToZeroDivisor() {
         BloodmarkLevel level = BloodmarkLevel.BLOODMARK_ONE;
 
-        try (MockedStatic<megamek.common.Compute> mockedCompute = mockStatic(megamek.common.Compute.class)) {
-            mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(0);
-            mockedCompute.when(() -> megamek.common.Compute.d6(1)).thenReturn(0); // Divisor should prevent attempts
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(level.getRollFrequency())).thenReturn(0);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(0); // Divisor should prevent attempts
 
             List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
@@ -120,9 +121,9 @@ class BloodmarkTest {
     void testGetBloodhuntSchedule_SingleAssassination() {
         BloodmarkLevel level = BloodmarkLevel.BLOODMARK_TWO;
 
-        try (MockedStatic<megamek.common.Compute> mockedCompute = mockStatic(megamek.common.Compute.class)) {
-            mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(0);
-            mockedCompute.when(() -> megamek.common.Compute.d6(1)).thenReturn(2, 3); // One attempt with 3-day lag
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(level.getRollFrequency())).thenReturn(0);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(2, 3); // One attempt with 3-day lag
 
             List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
@@ -135,9 +136,9 @@ class BloodmarkTest {
     void testGetBloodhuntSchedule_MultipleAssassinations() {
         BloodmarkLevel level = BloodmarkLevel.BLOODMARK_THREE;
 
-        try (MockedStatic<megamek.common.Compute> mockedCompute = mockStatic(megamek.common.Compute.class)) {
-            mockedCompute.when(() -> megamek.common.Compute.randomInt(level.getRollFrequency())).thenReturn(0);
-            mockedCompute.when(() -> megamek.common.Compute.d6(1)).thenReturn(6, 2, 3); // 2 assassination attempts
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(level.getRollFrequency())).thenReturn(0);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(6, 2, 3); // 2 assassination attempts
 
             List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 

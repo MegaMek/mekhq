@@ -223,7 +223,7 @@ public class RankSystem {
     }
 
     /**
-     * This generates a single Rank System from an XML file
+     * This generates a single Rank SystemFluff from an XML file
      *
      * @param file the file to load, or null if none are to be loaded
      *
@@ -261,7 +261,7 @@ public class RankSystem {
     }
 
     /**
-     * This loads a Rank System after the initial load of the rank system data.
+     * This loads a Rank SystemFluff after the initial load of the rank system data.
      *
      * @param nl      the node list to parse the rank system from
      * @param version the version to parse the rank system at

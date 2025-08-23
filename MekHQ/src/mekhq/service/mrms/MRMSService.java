@@ -40,11 +40,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Mek;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.Mek;
+import megamek.common.units.Tank;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

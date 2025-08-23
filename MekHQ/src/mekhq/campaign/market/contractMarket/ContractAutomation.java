@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

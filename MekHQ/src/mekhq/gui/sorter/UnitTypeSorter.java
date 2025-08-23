@@ -34,7 +34,7 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 
 /**
  * A comparator for unit types

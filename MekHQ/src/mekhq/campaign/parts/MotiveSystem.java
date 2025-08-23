@@ -35,10 +35,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Entity;
-import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Era;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -61,7 +63,7 @@ public class MotiveSystem extends Part {
 
     public MotiveSystem(int ton, Campaign c) {
         super(ton, c);
-        this.name = "Motive System";
+        this.name = "Motive SystemFluff";
         this.damage = 0;
         this.penalty = 0;
     }

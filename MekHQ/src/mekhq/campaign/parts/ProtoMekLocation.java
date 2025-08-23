@@ -36,15 +36,19 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.Mounted;
-import megamek.common.ProtoMek;
 import megamek.common.SimpleTechLevel;
-import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.TechAdvancement.AdvancementPhase;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.IArmorState;
+import megamek.common.equipment.Mounted;
+import megamek.common.interfaces.ILocationExposureStatus;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.ProtoMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -105,10 +109,10 @@ public class ProtoMekLocation extends Part {
             case ProtoMek.LOC_TORSO:
                 this.name = "ProtoMek Torso";
                 break;
-            case ProtoMek.LOC_LARM:
+            case ProtoMek.LOC_LEFT_ARM:
                 this.name = "ProtoMek Left Arm";
                 break;
-            case ProtoMek.LOC_RARM:
+            case ProtoMek.LOC_RIGHT_ARM:
                 this.name = "ProtoMek Right Arm";
                 break;
             case ProtoMek.LOC_LEG:
@@ -117,7 +121,7 @@ public class ProtoMekLocation extends Part {
                     this.name = "ProtoMek Legs (Quad)";
                 }
                 break;
-            case ProtoMek.LOC_MAINGUN:
+            case ProtoMek.LOC_MAIN_GUN:
                 this.name = "ProtoMek Main Gun";
                 break;
         }
@@ -251,7 +255,7 @@ public class ProtoMekLocation extends Part {
             blownOff = false;
             if (null != unit) {
                 unit.getEntity().setLocationBlownOff(loc, false);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                     // ignore empty & non-hittable slots
                     if (slot == null) {
@@ -268,7 +272,7 @@ public class ProtoMekLocation extends Part {
             breached = false;
             if (null != unit) {
                 unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                     // ignore empty & non-hittable slots
                     if (slot == null) {
@@ -315,7 +319,7 @@ public class ProtoMekLocation extends Part {
             }
             // According to StratOps, this always destroys all equipment in that location as
             // well
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 final CriticalSlot cs = unit.getEntity().getCritical(loc, i);
                 if (null == cs || !cs.isEverHittable()) {
                     continue;
@@ -447,14 +451,14 @@ public class ProtoMekLocation extends Part {
     private int getAppropriateSystemIndex() {
         switch (loc) {
             case ProtoMek.LOC_LEG:
-                return ProtoMek.SYSTEM_LEGCRIT;
-            case ProtoMek.LOC_LARM:
-            case ProtoMek.LOC_RARM:
-                return ProtoMek.SYSTEM_ARMCRIT;
+                return ProtoMek.SYSTEM_LEG_CRIT;
+            case ProtoMek.LOC_LEFT_ARM:
+            case ProtoMek.LOC_RIGHT_ARM:
+                return ProtoMek.SYSTEM_ARM_CRIT;
             case ProtoMek.LOC_HEAD:
-                return ProtoMek.SYSTEM_HEADCRIT;
+                return ProtoMek.SYSTEM_HEAD_CRIT;
             case ProtoMek.LOC_TORSO:
-                return ProtoMek.SYSTEM_TORSOCRIT;
+                return ProtoMek.SYSTEM_TORSO_CRIT;
             default:
                 return -1;
         }
@@ -469,10 +473,10 @@ public class ProtoMekLocation extends Part {
             // fix one of them, because the last crit on protomeks is always location
             // destruction
             int systemIndx = getAppropriateSystemIndex();
-            if (loc != -1 && unit.getEntity().getGoodCriticals(CriticalSlot.TYPE_SYSTEM, systemIndx, loc) <= 0) {
+            if (loc != -1 && unit.getEntity().getGoodCriticalSlots(CriticalSlot.TYPE_SYSTEM, systemIndx, loc) <= 0) {
                 // Because the last crit for protomeks is always location destruction we need to
                 // clear the first system crit we find
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                     if ((slot != null) && slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                         slot.setDestroyed(false);
@@ -499,7 +503,7 @@ public class ProtoMekLocation extends Part {
             }
             // you can only salvage a location that has nothing left on it
             int systemRepairable = 0;
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty & non-hittable slots
                 if ((slot == null) || !slot.isEverHittable()) {
@@ -556,7 +560,7 @@ public class ProtoMekLocation extends Part {
         }
         // you can only salvage a location that has nothing left on it
         int systemRepairable = 0;
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // ignore empty & non-hittable slots
             if ((slot == null) || !slot.isEverHittable()) {

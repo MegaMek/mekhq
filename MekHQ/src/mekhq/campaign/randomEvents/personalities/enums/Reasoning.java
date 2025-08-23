@@ -34,7 +34,7 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 

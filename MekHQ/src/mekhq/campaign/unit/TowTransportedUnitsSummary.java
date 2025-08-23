@@ -41,10 +41,10 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import megamek.common.Entity;
-import megamek.common.Tank;
-import megamek.common.TankTrailerHitch;
-import megamek.common.Transporter;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
+import megamek.common.equipment.TankTrailerHitch;
+import megamek.common.equipment.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

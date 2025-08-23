@@ -48,7 +48,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 import megamek.Version;
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;

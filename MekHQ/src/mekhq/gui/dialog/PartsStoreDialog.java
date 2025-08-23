@@ -54,10 +54,11 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MiscType;
-import megamek.common.TargetRoll;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechBase;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -413,10 +414,10 @@ public class PartsStoreDialog extends JDialog {
                           !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase()) &&
                           !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
-                } else if (((part.getTechBase() == Part.TechBase.CLAN) || part.isClan()) &&
+                } else if (((part.getTechBase() == TechBase.CLAN) || part.isClan()) &&
                                  !campaign.getCampaignOptions().isAllowClanPurchases()) {
                     return false;
-                } else if ((part.getTechBase() == Part.TechBase.IS) &&
+                } else if ((part.getTechBase() == TechBase.IS) &&
                                  !campaign.getCampaignOptions().isAllowISPurchases()
                                  // Hack to allow Clan access to SL tech but not post-Exodus tech
                                  // until 3050.
@@ -520,7 +521,7 @@ public class PartsStoreDialog extends JDialog {
         return switch (group) {
             case SG_ALL -> "All Parts";
             case SG_ARMOR -> "Armor";
-            case SG_SYSTEM -> "System Components";
+            case SG_SYSTEM -> "SystemFluff Components";
             case SG_EQUIP -> "Equipment";
             case SG_LOC -> "Locations";
             case SG_WEAP -> "Weapons";

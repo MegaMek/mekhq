@@ -36,12 +36,12 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
-import static megamek.common.UnitType.*;
-import static megamek.common.WeaponType.CLASS_ARTILLERY;
-import static megamek.common.planetaryconditions.Atmosphere.THIN;
-import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
+import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.planetaryConditions.Atmosphere.THIN;
+import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
+import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
@@ -71,15 +71,27 @@ import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
+import megamek.common.OffBoardDirection;
 import megamek.common.annotations.Nullable;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
-import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.Wind;
+import megamek.common.loaders.MULParser;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.Wind;
+import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
@@ -205,7 +217,7 @@ public class AtBDynamicScenarioFactory {
             if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
                 defaultReinforcements.setAllowedUnitType(SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
             } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
-                defaultReinforcements.setAllowedUnitType(AEROSPACEFIGHTER);
+                defaultReinforcements.setAllowedUnitType(AEROSPACE_FIGHTER);
             }
 
             template.getScenarioForces().put(defaultReinforcements.getForceName(), defaultReinforcements);
@@ -623,7 +635,7 @@ public class AtBDynamicScenarioFactory {
                 requiredRoles.put(TANK, new ArrayList<>(baseRoles));
             } else if (forceTemplate.getAllowedUnitType() == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                 requiredRoles.put(CONV_FIGHTER, new ArrayList<>(baseRoles));
-                requiredRoles.put(AEROSPACEFIGHTER, new ArrayList<>(baseRoles));
+                requiredRoles.put(AEROSPACE_FIGHTER, new ArrayList<>(baseRoles));
             } else if (forceTemplate.getAllowedUnitType() == SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 // TODO: this will need to be adjusted to cover SUPPORT and CIVILIAN separately
                 for (int i = 0; i <= AERO; i++) {
@@ -2819,7 +2831,7 @@ public class AtBDynamicScenarioFactory {
                 case BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case AEROSPACEFIGHTER:
+                case AEROSPACE_FIGHTER:
                 case CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -2841,7 +2853,7 @@ public class AtBDynamicScenarioFactory {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype, campaign.getGameYear())
                                          .getName();
                 crewName += ' ' + bloodname;
-                innerMap.put(Crew.MAP_BLOODNAME, bloodname);
+                innerMap.put(Crew.MAP_BLOOD_NAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
         }
@@ -3149,7 +3161,7 @@ public class AtBDynamicScenarioFactory {
                 }
             }
         } else if (unitTypeCode == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            actualUnitType = AEROSPACEFIGHTER;
+            actualUnitType = AEROSPACE_FIGHTER;
         }
 
         // Add unit types to the list of actual unity types
@@ -3286,7 +3298,7 @@ public class AtBDynamicScenarioFactory {
         weights = adjustForMinWeight(weights, minWeight);
 
         // Aerospace fighter weight cap
-        if (unitTypes.contains(AEROSPACEFIGHTER)) {
+        if (unitTypes.contains(AEROSPACE_FIGHTER)) {
             weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
         }
 
@@ -3671,9 +3683,9 @@ public class AtBDynamicScenarioFactory {
                           unitTypes);
                 }
             } else {
-                if (unitTypes.get(unitIndex) != AEROSPACEFIGHTER) {
+                if (unitTypes.get(unitIndex) != AEROSPACE_FIGHTER) {
                     LOGGER.info("Switching unit type to Aerospace Fighter");
-                    fallbackUnitType = List.of(AEROSPACEFIGHTER);
+                    fallbackUnitType = List.of(AEROSPACE_FIGHTER);
 
                     entity = substituteEntity(faction,
                           skill,

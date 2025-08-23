@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
@@ -53,7 +53,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.unit.cleanup;
 
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 

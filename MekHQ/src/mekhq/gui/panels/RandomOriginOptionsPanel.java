@@ -455,7 +455,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
      */
     public ValidationState validateOptions(final boolean display) {
         // region Errors
-        // Specified System/Planet Validation
+        // Specified SystemFluff/Planet Validation
         if ((getComboSpecifiedSystem().getSelectedItem() == null)
                   || (getComboSpecifiedPlanet().getSelectedItem() == null)) {
             if (display) {

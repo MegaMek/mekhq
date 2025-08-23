@@ -325,7 +325,7 @@ public class InterstellarMapPanel extends JPanel {
                      * item.addActionListener(new ActionListener() {
                      *
                      * @Override
-                     * public void actionPerformed(ActionEvent ae) {
+                     * public void actionPerformed(ActionEvent attackingEntity) {
                      * openPlanetEventEditor(selectedSystem);
                      * }
                      * });

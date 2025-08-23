@@ -35,16 +35,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.IAero;
+import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -74,7 +75,7 @@ public class Avionics extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit &&
-                  (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACEFIGHTER | Entity.ETYPE_LAND_AIR_MEK)) !=
+                  (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACE_FIGHTER | Entity.ETYPE_LAND_AIR_MEK)) !=
                         0) {
             hits = ((IAero) unit.getEntity()).getAvionicsHits();
             if (checkForDestruction &&

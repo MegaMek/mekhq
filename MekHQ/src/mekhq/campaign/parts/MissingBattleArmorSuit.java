@@ -36,10 +36,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import megamek.common.BattleArmor;
-import megamek.common.EntityMovementMode;
-import megamek.common.IArmorState;
-import megamek.common.TargetRoll;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.equipment.IArmorState;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;

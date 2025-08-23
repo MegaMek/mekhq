@@ -32,15 +32,15 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
-import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
-import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
-import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
-import static megamek.common.Mek.LOC_CT;
-import static megamek.common.UnitType.AEROSPACEFIGHTER;
-import static megamek.common.UnitType.INFANTRY;
-import static megamek.common.UnitType.MEK;
-import static megamek.common.UnitType.TANK;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
+import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
+import static megamek.common.units.Mek.LOC_CENTER_TORSO;
+import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
+import static megamek.common.units.UnitType.INFANTRY;
+import static megamek.common.units.UnitType.MEK;
+import static megamek.common.units.UnitType.TANK;
 import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
@@ -67,11 +67,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -187,7 +187,7 @@ public class StarLeagueCache {
                 List<Part> parts = unit.getParts();
                 for (Part part : parts) {
                     if (part instanceof MekLocation) {
-                        if (((MekLocation) part).getLoc() == LOC_CT) {
+                        if (((MekLocation) part).getLoc() == LOC_CENTER_TORSO) {
                             continue;
                         }
                     }
@@ -276,7 +276,7 @@ public class StarLeagueCache {
     }
 
     private List<MekSummary> getUnitSummaries(Map<Integer, List<Integer>> unitsPresent) {
-        final List<Integer> potentialUnitTypes = List.of(INFANTRY, TANK, MEK, AEROSPACEFIGHTER);
+        final List<Integer> potentialUnitTypes = List.of(INFANTRY, TANK, MEK, AEROSPACE_FIGHTER);
 
         List<MekSummary> unitSummaries = new ArrayList<>();
         for (int unitType : potentialUnitTypes) {
@@ -322,7 +322,7 @@ public class StarLeagueCache {
             case 1 -> INFANTRY;
             case 2, 3 -> TANK;
             case 4, 5 -> MEK;
-            case 6 -> AEROSPACEFIGHTER;
+            case 6 -> AEROSPACE_FIGHTER;
             default -> throw new IllegalStateException("Unexpected value in getCompanyUnitType: "
                                                              + roll);
         };

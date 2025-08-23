@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 
@@ -60,7 +60,7 @@ public class AtBStaticWeightGenerator {
      */
     private static int getRandomWeight(final int unitType, final Faction faction,
           final boolean regionVariations) {
-        if (unitType == UnitType.AEROSPACEFIGHTER) {
+        if (unitType == UnitType.AEROSPACE_FIGHTER) {
             return getRandomAerospaceWeight();
         } else if ((unitType == UnitType.MEK) && regionVariations) {
             return getRegionalMekWeight(faction);

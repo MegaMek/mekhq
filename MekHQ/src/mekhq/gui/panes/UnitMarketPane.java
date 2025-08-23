@@ -51,11 +51,11 @@ import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -549,7 +549,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         return getChkShowMeks().isSelected();
                     case UnitType.TANK:
                         return getChkShowVehicles().isSelected();
-                    case UnitType.AEROSPACEFIGHTER:
+                    case UnitType.AEROSPACE_FIGHTER:
                         return getChkShowAerospace().isSelected();
                     case UnitType.CONV_FIGHTER:
                         return getChkShowConvAero().isSelected();

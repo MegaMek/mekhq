@@ -48,7 +48,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import megamek.Version;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;

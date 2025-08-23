@@ -40,9 +40,9 @@ import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import megamek.common.Aero;
-import megamek.common.Tank;
-import megamek.common.VTOL;
+import megamek.common.units.Aero;
+import megamek.common.units.Tank;
+import megamek.common.units.VTOL;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;

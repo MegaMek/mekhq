@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -153,7 +153,7 @@ public class StratconScenarioFactory {
      * Retrieves a random scenario template appropriate for the given unit type. This includes the more general ATB_MIX
      * and ATB_AERO_MIX where appropriate
      *
-     * @param unitType The desired unit type, as per megamek.common.UnitType
+     * @param unitType The desired unit type, as per megamek.common.units.UnitType
      *
      * @return Random scenario template.
      */
@@ -202,7 +202,7 @@ public class StratconScenarioFactory {
     public static int convertSpecificUnitTypeToGeneral(int unitType) {
         switch (unitType) {
             case UnitType.AERO:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
             case UnitType.CONV_FIGHTER:
             case UnitType.DROPSHIP:
             case UnitType.JUMPSHIP:

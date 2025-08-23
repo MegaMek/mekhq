@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;

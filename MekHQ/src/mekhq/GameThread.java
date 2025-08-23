@@ -51,11 +51,11 @@ import megamek.client.ui.clientGUI.IDisconnectSilently;
 import megamek.client.ui.clientGUI.ILocalBots;
 import megamek.client.ui.clientGUI.MegaMekGUI;
 import megamek.client.ui.util.MegaMekController;
-import megamek.common.Entity;
-import megamek.common.MapSettings;
-import megamek.common.WeaponOrderHandler;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.loaders.MapSettings;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
+import megamek.common.units.Entity;
+import megamek.common.weapons.handlers.WeaponOrderHandler;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -175,7 +175,7 @@ class GameThread extends Thread implements CloseClientListener {
 
         createController();
         swingGui = new ClientGUI(client, controller);
-        controller.clientgui = swingGui;
+        controller.clientGUI = swingGui;
         localBots = (ClientGUI) swingGui;
         swingGui.initialize();
 

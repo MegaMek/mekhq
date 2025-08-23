@@ -35,14 +35,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -63,7 +63,7 @@ public class FireControlSystem extends Part {
     public FireControlSystem(int tonnage, Money cost, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
-        this.name = "Fire Control System";
+        this.name = "Fire Control SystemFluff";
     }
 
     @Override
@@ -205,9 +205,9 @@ public class FireControlSystem extends Part {
     public void calculateCost() {
         if (null != unit) {
             if (unit.getEntity() instanceof SmallCraft) {
-                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcsWithGuns());
             } else if (unit.getEntity() instanceof Jumpship) {
-                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcsWithGuns());
             }
         }
     }

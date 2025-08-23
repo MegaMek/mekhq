@@ -47,11 +47,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.universe.FactionLeaderData;

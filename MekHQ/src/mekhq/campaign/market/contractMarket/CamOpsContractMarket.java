@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;

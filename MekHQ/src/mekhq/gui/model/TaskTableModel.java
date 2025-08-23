@@ -44,7 +44,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;

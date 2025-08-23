@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;

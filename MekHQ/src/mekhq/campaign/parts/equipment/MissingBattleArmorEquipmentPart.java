@@ -35,9 +35,9 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;

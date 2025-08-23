@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.unit;
 
-import static megamek.common.MiscType.F_CARGO;
+import static megamek.common.equipment.MiscType.F_CARGO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -41,9 +41,9 @@ import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.IArmorState;
-import megamek.common.Mounted;
+import megamek.common.units.Entity;
+import megamek.common.equipment.IArmorState;
+import megamek.common.equipment.Mounted;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

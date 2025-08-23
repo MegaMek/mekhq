@@ -167,7 +167,7 @@ public class Ranks {
             System.exit(-1);
         }
 
-        logger.info("Completed Rank System XML Load");
+        logger.info("Completed Rank SystemFluff XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {

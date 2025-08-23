@@ -33,7 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static java.lang.Math.min;
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;

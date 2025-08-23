@@ -41,8 +41,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
-import megamek.common.Entity;
-import megamek.common.GunEmplacement;
+import megamek.common.units.Entity;
+import megamek.common.equipment.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;

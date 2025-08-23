@@ -44,10 +44,10 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;

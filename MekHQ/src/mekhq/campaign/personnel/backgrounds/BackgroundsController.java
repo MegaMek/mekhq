@@ -41,7 +41,7 @@ import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.ge
 import java.util.ResourceBundle;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;

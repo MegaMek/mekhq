@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.MAXIMUM_STANDING_LEVEL;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
@@ -45,7 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;

@@ -43,9 +43,9 @@ import java.util.ResourceBundle;
 
 import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

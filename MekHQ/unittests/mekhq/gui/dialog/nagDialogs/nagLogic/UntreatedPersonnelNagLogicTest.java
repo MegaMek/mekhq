@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import megamek.common.EquipmentType;
+import megamek.common.equipment.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

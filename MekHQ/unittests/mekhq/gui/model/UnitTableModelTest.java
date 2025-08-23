@@ -41,9 +41,9 @@
  import java.util.List;
  import java.util.Set;
 
- import megamek.common.Entity;
- import megamek.common.Jumpship;
- import megamek.common.SpaceStation;
+ import megamek.common.units.Entity;
+ import megamek.common.units.Jumpship;
+ import megamek.common.units.SpaceStation;
  import mekhq.campaign.personnel.Person;
  import mekhq.campaign.unit.Unit;
  import org.junit.jupiter.api.Test;

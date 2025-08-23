@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.unit.cleanup;
 
-import megamek.common.AmmoType;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 

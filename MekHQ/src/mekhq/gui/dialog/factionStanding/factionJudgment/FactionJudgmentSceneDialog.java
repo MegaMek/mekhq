@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

@@ -36,9 +36,11 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 
-import megamek.common.ITechnology;
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -503,12 +505,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 }

@@ -34,7 +34,7 @@ package mekhq.campaign.mission.resupplyAndCaches;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
@@ -46,8 +46,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.UUID;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;

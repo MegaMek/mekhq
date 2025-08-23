@@ -51,8 +51,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
-import megamek.common.AmmoType;
-import megamek.common.UnitType;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;

@@ -41,17 +41,37 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import megamek.Version;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.Bay;
+import megamek.common.bays.BayType;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscMounted;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.*;
 import megamek.common.util.C3Util;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestTank;
-import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
@@ -663,8 +683,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     // WeaverThree - This still doesn't account for downgrading engine removing from
                     // the parts
                     // That can wait for rework
-                    locationHasNewStuff[Mek.LOC_LT] = true;
-                    locationHasNewStuff[Mek.LOC_RT] = true;
+                    locationHasNewStuff[Mek.LOC_LEFT_TORSO] = true;
+                    locationHasNewStuff[Mek.LOC_RIGHT_TORSO] = true;
                 }
 
             } else if (newPart instanceof MissingMekGyro) {
@@ -711,7 +731,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         size = ((AmmoBin) newPart).getSize();
                     }
 
-                    int criticalSlots = type.getCriticals(newUnit.getEntity(), size);
+                    int criticalSlots = type.getNumCriticalSlots(newUnit.getEntity(), size);
                     newPart.setUnit(oldUnit);
                     int index = -1;
                     boolean matchFound = false;
@@ -725,13 +745,13 @@ public class Refit extends Part implements IAcquisitionWork {
                         if (oldPart instanceof MissingEquipmentPart) {
                             oldLoc = oldPart.getLocation();
                             oldType = ((MissingEquipmentPart) oldPart).getType();
-                            oldCriticalSlots = oldType.getCriticals(oldUnit.getEntity(),
+                            oldCriticalSlots = oldType.getNumCriticalSlots(oldUnit.getEntity(),
                                   ((MissingEquipmentPart) oldPart).getSize());
 
                         } else if (oldPart instanceof EquipmentPart) {
                             oldLoc = oldPart.getLocation();
                             oldType = ((EquipmentPart) oldPart).getType();
-                            oldCriticalSlots = oldType.getCriticals(oldUnit.getEntity(),
+                            oldCriticalSlots = oldType.getNumCriticalSlots(oldUnit.getEntity(),
                                   ((EquipmentPart) oldPart).getSize());
                         }
 
@@ -1493,9 +1513,10 @@ public class Refit extends Part implements IAcquisitionWork {
             if (part instanceof MekLocation) {
                 int loc = ((MekLocation) part).getLoc();
                 // Don't add center locations or limbs with a bad hip or shoulder to warehouse
-                if ((loc == Mek.LOC_CT) ||
-                          (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0) ||
-                          (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) > 0)) {
+                if ((loc == Mek.LOC_CENTER_TORSO) ||
+                          (oldEntity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0) ||
+                          (oldEntity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) >
+                                 0)) {
                     part.setUnit(null);
                     getCampaign().getWarehouse().removePart(part);
                 }
@@ -1583,8 +1604,9 @@ public class Refit extends Part implements IAcquisitionWork {
             if ((!replacingLocations) && (part instanceof MekLocation)) {
                 // Preserve any hip or shoulder damage
                 int loc = ((MekLocation) part).getLoc();
-                if ((oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0) ||
-                          (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) > 0)) {
+                if ((oldEntity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0) ||
+                          (oldEntity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) >
+                                 0)) {
                     // Apply damage to hip or shoulder at slot 0
                     newEntity.getCritical(loc, 0).setDestroyed(true);
                 }
@@ -2693,7 +2715,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public TechBase getTechBase() {
-        return Part.TechBase.ALL;
+        return TechBase.ALL;
     }
 
     /**
@@ -2764,9 +2786,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 int loc = part.getLocation();
 
                 if (type == Mek.ACTUATOR_LOWER_ARM) {
-                    if (loc == Mek.LOC_RARM) {
+                    if (loc == Mek.LOC_RIGHT_ARM) {
                         rightLowerArm = part;
-                    } else if (loc == Mek.LOC_LARM) {
+                    } else if (loc == Mek.LOC_LEFT_ARM) {
                         leftLowerArm = part;
                     } else if (null == missingArm1 && part instanceof MekActuator) {
                         missingArm1 = (MekActuator) part;
@@ -2774,9 +2796,9 @@ public class Refit extends Part implements IAcquisitionWork {
                         missingArm2 = (MekActuator) part;
                     }
                 } else if (type == Mek.ACTUATOR_HAND) {
-                    if (loc == Mek.LOC_RARM) {
+                    if (loc == Mek.LOC_RIGHT_ARM) {
                         rightHand = part;
-                    } else if (loc == Mek.LOC_LARM) {
+                    } else if (loc == Mek.LOC_LEFT_ARM) {
                         leftHand = part;
                     } else if (null == missingHand1 && part instanceof MekActuator) {
                         missingHand1 = (MekActuator) part;
@@ -2788,45 +2810,45 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         // ok now check all the conditions, assign right hand stuff first
-        if (null == rightHand && m.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_RARM)) {
+        if (null == rightHand && m.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_RIGHT_ARM)) {
             MekActuator part = missingHand1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingHand2;
             }
             if (null != part) {
-                part.setLocation(Mek.LOC_RARM);
+                part.setLocation(Mek.LOC_RIGHT_ARM);
             }
         }
 
-        if (null == leftHand && m.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_LARM)) {
+        if (null == leftHand && m.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_LEFT_ARM)) {
             MekActuator part = missingHand1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingHand2;
             }
 
             if (null != part) {
-                part.setLocation(Mek.LOC_LARM);
+                part.setLocation(Mek.LOC_LEFT_ARM);
             }
         }
 
-        if (null == rightLowerArm && m.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_RARM)) {
+        if (null == rightLowerArm && m.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_RIGHT_ARM)) {
             MekActuator part = missingArm1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingArm2;
             }
 
             if (null != part) {
-                part.setLocation(Mek.LOC_RARM);
+                part.setLocation(Mek.LOC_RIGHT_ARM);
             }
         }
-        if (null == leftLowerArm && m.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_LARM)) {
+        if (null == leftLowerArm && m.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_LEFT_ARM)) {
             MekActuator part = missingArm1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingArm2;
             }
 
             if (null != part) {
-                part.setLocation(Mek.LOC_LARM);
+                part.setLocation(Mek.LOC_LEFT_ARM);
             }
         }
     }
@@ -3071,7 +3093,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be true
      */
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
@@ -3081,7 +3103,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be false
      */
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

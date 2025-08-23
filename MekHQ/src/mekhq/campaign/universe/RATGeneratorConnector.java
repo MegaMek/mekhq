@@ -46,9 +46,9 @@ import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.Parameters;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 

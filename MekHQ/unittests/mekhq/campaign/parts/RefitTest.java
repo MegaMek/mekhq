@@ -55,14 +55,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Game;
 import megamek.common.Player;
+import megamek.common.board.Board;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Quartermaster;
@@ -130,9 +130,9 @@ public class RefitTest {
         lenient().when(mockGame.getBoard()).thenReturn(mockBoard);
         lenient().when(mockBoard.isSpace()).thenReturn(false);
         lenient().when(mockGame.getOptions()).thenReturn(mockGameOptions);
-        lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVAERORULES_SINGLE_NO_CAP))
+        lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVANCED_AERO_RULES_SINGLE_NO_CAP))
               .thenReturn(false);
-        lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVAERORULES_STRATOPS_CAPITAL_FIGHTER))
+        lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVANCED_AERO_RULES_STRATOPS_CAPITAL_FIGHTER))
               .thenReturn(false);
 
         lenient().when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);

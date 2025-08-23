@@ -46,18 +46,18 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import megamek.Version;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.TechConstants;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.util.weightedMaps.WeightedIntMap;
-import megamek.common.weapons.InfantryAttack;
-import megamek.common.weapons.autocannons.ACWeapon;
-import megamek.common.weapons.autocannons.LBXACWeapon;
-import megamek.common.weapons.autocannons.UACWeapon;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.attacks.InfantryAttack;
+import megamek.common.weapons.autoCannons.ACWeapon;
+import megamek.common.weapons.autoCannons.LBXACWeapon;
+import megamek.common.weapons.autoCannons.UACWeapon;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -566,7 +566,7 @@ public class SpecialAbility {
         if (wt.isCapital() ||
                   wt.isSubCapital() ||
                   wt.hasFlag(WeaponType.F_INFANTRY) ||
-                  wt.hasFlag(WeaponType.F_ONESHOT) ||
+                  wt.hasFlag(WeaponType.F_ONE_SHOT) ||
                   wt.hasFlag(WeaponType.F_PROTOTYPE)) {
             return false;
         }
@@ -589,7 +589,7 @@ public class SpecialAbility {
         }
 
         if (clusterOnly &&
-                  !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
+                  !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTER_TABLE) ||
                           (wt instanceof ACWeapon) ||
                           (wt instanceof UACWeapon) ||
                           (wt instanceof LBXACWeapon))) {

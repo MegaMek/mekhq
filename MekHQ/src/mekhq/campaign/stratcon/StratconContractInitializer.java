@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -271,11 +271,11 @@ public class StratconContractInitializer {
             //                        null, template, false);
             //
             //                    if (hiddenCache != null) {
-            //                        logger.info(String.format("A secret cache has been spawned for contract %s",
+            //                        LOGGER.info(String.format("A secret cache has been spawned for contract %s",
             //                            contract.getLabel()));
             //                    }
             //                } else {
-            //                    logger.error("'Chasing a Rumor' scenario failed to deserialize");
+            //                    LOGGER.error("'Chasing a Rumor' scenario failed to deserialize");
             //                }
             //            }
         }

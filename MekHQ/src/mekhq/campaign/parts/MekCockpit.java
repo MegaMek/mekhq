@@ -35,12 +35,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -218,10 +218,10 @@ public class MekCockpit extends Part {
         if (null != unit) {
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
-                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
+                if (entity.getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
                     // check for missing equipment as well
                     if (!unit.isSystemMissing(Mek.SYSTEM_COCKPIT, i)) {
-                        hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i);
+                        hits = entity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i);
                         break;
                     } else {
                         remove(false);
@@ -279,7 +279,7 @@ public class MekCockpit extends Part {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 }
@@ -297,7 +297,7 @@ public class MekCockpit extends Part {
             return false;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0
                       && unit.isLocationDestroyed(i)) {
                 return true;
             }
@@ -324,7 +324,7 @@ public class MekCockpit extends Part {
     @Override
     public int getLocation() {
         if (type == Mek.COCKPIT_TORSO_MOUNTED) {
-            return Mek.LOC_CT;
+            return Mek.LOC_CENTER_TORSO;
         } else {
             return Mek.LOC_HEAD;
         }

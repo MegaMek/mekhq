@@ -42,9 +42,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import org.junit.jupiter.api.Test;

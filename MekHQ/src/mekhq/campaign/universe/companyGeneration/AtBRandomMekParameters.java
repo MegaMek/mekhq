@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.companyGeneration;
 
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 
 /**
  * This class contains the parameters used to generate a random mek, and allows sorting and swapping the order of rolled

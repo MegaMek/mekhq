@@ -41,7 +41,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
 

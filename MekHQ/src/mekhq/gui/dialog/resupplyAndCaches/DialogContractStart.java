@@ -41,7 +41,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.UUID;
 import javax.swing.JDialog;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;

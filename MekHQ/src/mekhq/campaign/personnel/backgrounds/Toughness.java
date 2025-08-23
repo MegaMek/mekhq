@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.backgrounds;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.personnel.Person;
 
 public class Toughness {

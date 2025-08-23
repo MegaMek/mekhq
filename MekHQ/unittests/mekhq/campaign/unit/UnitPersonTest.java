@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;

@@ -88,11 +88,11 @@ public class RankValidator {
 
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
-                    logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
+                    logger.error("Duplicate Rank SystemFluff Code: " + rankSystem.getCode()
                                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
-                                       + " is duplicated by userData Rank System " + rankSystem);
+                                       + " is duplicated by userData Rank SystemFluff " + rankSystem);
                 } else {
-                    logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
+                    logger.error("Duplicate Rank SystemFluff Code: " + rankSystem.getCode()
                                        + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
                                        + " is duplicated by " + rankSystem);
                 }
@@ -100,7 +100,7 @@ public class RankValidator {
             }
         }
 
-        // Default System Validation has passed successfully
+        // Default SystemFluff Validation has passed successfully
         if (rankSystem.getType().isDefault()) {
             return true;
         }

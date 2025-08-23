@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;

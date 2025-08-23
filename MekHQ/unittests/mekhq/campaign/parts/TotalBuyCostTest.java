@@ -40,8 +40,8 @@ import static org.mockito.Mockito.mock;
 
 import java.math.BigDecimal;
 
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;

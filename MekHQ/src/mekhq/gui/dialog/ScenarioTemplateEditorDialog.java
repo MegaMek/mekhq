@@ -55,8 +55,8 @@ import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -1400,7 +1400,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                                selectedItem == UnitType.CONV_FIGHTER ||
-                               selectedItem == UnitType.AEROSPACEFIGHTER;
+                               selectedItem == UnitType.AEROSPACE_FIGHTER;
 
         chkAllowAeroBombs.setEnabled(isAero);
     }

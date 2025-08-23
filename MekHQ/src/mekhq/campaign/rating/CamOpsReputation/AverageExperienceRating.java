@@ -36,11 +36,11 @@ import static java.lang.Math.max;
 import static megamek.common.force.Force.NO_FORCE;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.ProtoMek;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.ProtoMek;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

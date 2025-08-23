@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import megamek.common.MekSummary;
+import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Rank;

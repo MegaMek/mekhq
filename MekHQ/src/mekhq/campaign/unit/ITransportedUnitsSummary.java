@@ -36,7 +36,7 @@ package mekhq.campaign.unit;
 import java.util.Set;
 import java.util.Vector;
 
-import megamek.common.Transporter;
+import megamek.common.equipment.Transporter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
 

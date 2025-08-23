@@ -36,8 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;

@@ -47,7 +47,7 @@ import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.TechConstants;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;

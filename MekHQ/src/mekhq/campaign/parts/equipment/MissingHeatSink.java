@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.EquipmentType;
+import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 

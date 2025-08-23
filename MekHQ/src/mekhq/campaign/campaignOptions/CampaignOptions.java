@@ -546,8 +546,8 @@ public class CampaignOptions {
     private final int[] phenotypeProbabilities;
     // endregion Skill Randomization Tab
 
-    // region Rank System Tab
-    // endregion Rank System Tab
+    // region Rank SystemFluff Tab
+    // endregion Rank SystemFluff Tab
 
     // region Name and Portrait Generation
     private boolean useOriginFactionForNames;
@@ -1177,8 +1177,8 @@ public class CampaignOptions {
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
         // endregion Skill Randomization Tab
 
-        // region Rank System Tab
-        // endregion Rank System Tab
+        // region Rank SystemFluff Tab
+        // endregion Rank SystemFluff Tab
 
         // region Name and Portrait Generation Tab
         useOriginFactionForNames = true;
@@ -5182,8 +5182,7 @@ public class CampaignOptions {
      * Determines if faction standing batchall restriction is enabled.
      *
      * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()}
-     * as
-     * that also verifies that Faction Standing is enabled.</p>
+     * as that also verifies that Faction Standing is enabled.</p>
      *
      * @return {@code true} if faction standing batchall restriction is enabled, {@code false} otherwise.
      */
@@ -5395,7 +5394,7 @@ public class CampaignOptions {
         useImplants = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
         useQuirks = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
         allowCanonOnly = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
-        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECHLEVEL).stringValue());
+        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECH_LEVEL).stringValue());
     }
 
     /**
@@ -5422,6 +5421,6 @@ public class CampaignOptions {
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
 
-        gameOptions.getOption(ALLOWED_TECHLEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
+        gameOptions.getOption(ALLOWED_TECH_LEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
     }
 }

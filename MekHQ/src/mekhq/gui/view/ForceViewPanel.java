@@ -47,8 +47,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import megamek.client.ui.Messages;
-import megamek.common.Entity;
-import megamek.common.UnitType;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;

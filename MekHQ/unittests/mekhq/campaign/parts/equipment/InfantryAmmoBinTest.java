@@ -58,12 +58,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentTypeLookup;
-import megamek.common.Infantry;
-import megamek.common.Mounted;
-import megamek.common.SupportTank;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.units.Infantry;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.SupportTank;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;

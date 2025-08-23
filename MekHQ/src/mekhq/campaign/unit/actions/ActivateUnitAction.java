@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

@@ -35,8 +35,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -112,15 +122,15 @@ public class EnginePart extends Part {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
 
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5;
         }
-        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         // hover have a minimum weight of 20%
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, Ceil.HALF_TON), toReturn);
         }
         return toReturn;
     }
@@ -271,8 +281,8 @@ public class EnginePart extends Part {
             Entity entity = unit.getEntity();
             if (unit.getEntity() instanceof Mek) {
                 for (int i = 0; i < entity.locations(); i++) {
-                    engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
-                    engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
+                    engineHits += entity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
+                    engineCrits += entity.getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
                 }
             }
             if (unit.getEntity() instanceof Aero) {
@@ -391,7 +401,7 @@ public class EnginePart extends Part {
             if (unit.isLocationBreached(i)) {
                 return unit.getEntity().getLocationName(i) + " is breached.";
             }
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
                       && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
@@ -405,7 +415,7 @@ public class EnginePart extends Part {
             return false;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
                       && unit.isLocationDestroyed(i)) {
                 return true;
             }
@@ -460,7 +470,7 @@ public class EnginePart extends Part {
         if (null == unit || null == unit.getEntity()) {
             return false;
         }
-        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CENTER_TORSO) {
             return true;
         }
         boolean needsSideTorso = false;
@@ -471,8 +481,8 @@ public class EnginePart extends Part {
                 needsSideTorso = true;
                 break;
         }
-        if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
-                                     || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT)) {
+        if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO
+                                     || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO)) {
             return true;
         }
         return false;

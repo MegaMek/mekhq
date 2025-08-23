@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;

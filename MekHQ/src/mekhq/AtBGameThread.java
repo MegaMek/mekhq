@@ -59,14 +59,14 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.CommanderGUI;
 import megamek.client.ui.clientGUI.ILocalBots;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Infantry;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
 import megamek.common.Player;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Minefield;
+import megamek.common.loaders.MapSettings;
+import megamek.common.units.Entity;
+import megamek.common.units.IAero;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
@@ -140,7 +140,7 @@ public class AtBGameThread extends GameThread {
             swingGui.initialize();
         }
 
-        controller.clientgui = swingGui;
+        controller.clientGUI = swingGui;
 
         try {
             client.connect();

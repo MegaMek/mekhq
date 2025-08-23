@@ -34,12 +34,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -188,12 +188,12 @@ public class CombatInformationCenter extends Part {
     public void calculateCost() {
         if (null != unit) {
             // There's more to CIC than just Fire Control
-            // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
+            // Use Bridge + Computer + FC Computer + Gunnery Control SystemFluff costs, p158 SO.
             cost = Money.of(200000 +
                                   (10 * unit.getEntity().getWeight()) +
                                   200000 +
                                   100000 +
-                                  (10000 * ((Jumpship) unit.getEntity()).getArcswGuns()));
+                                  (10000 * ((Jumpship) unit.getEntity()).getArcsWithGuns()));
         }
     }
 

@@ -40,10 +40,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
 
-import megamek.common.BipedMek;
-import megamek.common.Dropship;
-import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
+import megamek.common.units.BipedMek;
+import megamek.common.units.Dropship;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Jumpship;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;

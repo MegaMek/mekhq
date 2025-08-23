@@ -33,10 +33,10 @@
 
 package mekhq.campaign.unit;
 
-import megamek.common.Entity;
-import megamek.common.FighterSquadron;
-import megamek.common.GunEmplacement;
-import megamek.common.Jumpship;
+import megamek.common.units.Entity;
+import megamek.common.units.FighterSquadron;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.parts.Part;

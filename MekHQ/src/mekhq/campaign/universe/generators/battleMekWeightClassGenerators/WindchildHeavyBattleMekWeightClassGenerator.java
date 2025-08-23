@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.generators.battleMekWeightClassGenerators;
 
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 
 /**

@@ -34,9 +34,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.DockingCollar;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
+import megamek.common.equipment.DockingCollar;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;

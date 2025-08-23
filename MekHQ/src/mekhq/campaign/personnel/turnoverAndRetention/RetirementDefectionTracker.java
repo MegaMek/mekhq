@@ -45,8 +45,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.TargetRoll;
+import megamek.common.compute.Compute;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;

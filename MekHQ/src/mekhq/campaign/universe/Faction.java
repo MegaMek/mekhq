@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.universe;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 
 import java.awt.Color;
 import java.nio.file.Path;

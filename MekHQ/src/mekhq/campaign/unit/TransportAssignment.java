@@ -34,8 +34,8 @@ package mekhq.campaign.unit;
 
 import java.util.Optional;
 
-import megamek.common.Bay;
-import megamek.common.Transporter;
+import megamek.common.bays.Bay;
+import megamek.common.equipment.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

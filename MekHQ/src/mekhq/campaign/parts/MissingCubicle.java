@@ -34,9 +34,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.BayType;
-import megamek.common.Entity;
-import megamek.common.ITechnology;
+import megamek.common.bays.BayType;
+import megamek.common.units.Entity;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

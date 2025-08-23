@@ -35,7 +35,8 @@ package mekhq.campaign.unit;
 
 import java.util.Optional;
 
-import megamek.common.Transporter;
+import megamek.common.equipment.Transporter;
+import megamek.common.bays.Bay;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
 
@@ -98,7 +99,7 @@ public interface ITransportAssignment {
      *
      * @return true if the unit is transported in a Bay or a subclass
      *
-     * @see megamek.common.Bay
+     * @see Bay
      */
     boolean isTransportedInBay();
 

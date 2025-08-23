@@ -33,7 +33,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.CriticalSlot;
-import megamek.common.QuadVee;
+import megamek.common.units.QuadVee;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;

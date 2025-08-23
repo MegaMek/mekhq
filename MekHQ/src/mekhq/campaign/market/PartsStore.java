@@ -38,13 +38,29 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.TechConstants;
+import megamek.common.bays.BayType;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.ArmorType;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
-import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.Weapon;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.attacks.InfantryAttack;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -190,10 +206,10 @@ public class PartsStore {
                             double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
                             double minweight = weight * 0.5;
                             minweight = Math.ceil(
-                                  (TestEntity.ceilMaxHalf(minweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
+                                  (TestEntity.ceilMaxHalf(minweight, Ceil.HALF_TON) / 10.0) * 2.0) / 2.0;
                             double maxweight = weight * 2.0;
                             maxweight = Math.ceil(
-                                  (TestEntity.ceilMaxHalf(maxweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
+                                  (TestEntity.ceilMaxHalf(maxweight, Ceil.HALF_TON) / 10.0) * 2.0) / 2.0;
                             if (eton < minweight || eton > maxweight) {
                                 continue;
                             }
@@ -318,11 +334,11 @@ public class PartsStore {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        return TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        return TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
     }
 
     private void stockEngines(Campaign c) {
@@ -463,7 +479,7 @@ public class PartsStore {
     }
 
     private void stockMekLocations(Campaign c) {
-        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CLEG; loc++) {
+        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CENTER_LEG; loc++) {
             for (int ton = 20; ton <= 100; ton = ton + 5) {
                 for (int type = 0; type < EquipmentType.structureNames.length; type++) {
                     addMekLocation(c, loc, ton, type, false);
@@ -485,7 +501,7 @@ public class PartsStore {
         } else {
             parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
             parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
-            if (loc > Mek.LOC_LT) {
+            if (loc > Mek.LOC_LEFT_TORSO) {
                 parts.add(new MekLocation(loc, ton, type, clan, false, true, false, false, c));
                 parts.add(new MekLocation(loc, ton, type, clan, true, true, false, false, c));
             }
@@ -493,7 +509,7 @@ public class PartsStore {
     }
 
     private void stockProtomekLocations(Campaign c) {
-        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAINGUN; loc++) {
+        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAIN_GUN; loc++) {
             for (int ton = 2; ton <= 15; ton++) {
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, false, c));

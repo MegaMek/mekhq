@@ -35,11 +35,15 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
-import megamek.common.Compute;
-import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -87,7 +91,7 @@ public class KFChargingSystem extends Part {
         super(tonnage, c);
         this.coreType = coreType;
         this.docks = docks;
-        this.name = "K-F Charging System";
+        this.name = "K-F Charging SystemFluff";
         this.unitTonnageMatters = true;
     }
 
@@ -195,7 +199,7 @@ public class KFChargingSystem extends Part {
     public @Nullable String checkFixable() {
         if (isSalvaging()) {
             // Can't salvage this part of the K-F Drive.
-            return "You cannot salvage a K-F Charging System. You must scrap it instead.";
+            return "You cannot salvage a K-F Charging SystemFluff. You must scrap it instead.";
         }
         return null;
     }

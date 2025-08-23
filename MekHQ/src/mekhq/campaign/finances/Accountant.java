@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import megamek.common.Engine;
-import megamek.common.Entity;
+import megamek.common.equipment.Engine;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;

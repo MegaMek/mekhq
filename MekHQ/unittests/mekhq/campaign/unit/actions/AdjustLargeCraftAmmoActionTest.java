@@ -48,8 +48,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Entity;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.WeaponMounted;
 import mekhq.campaign.Campaign;

@@ -33,8 +33,8 @@
 package mekhq.campaign.market.personnelMarket.markets;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;

@@ -45,27 +45,27 @@ import java.util.Map.Entry;
 import megamek.Version;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Board;
-import megamek.common.BoardDimensions;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
 import megamek.common.WeatherRestriction;
 import megamek.common.annotations.Nullable;
+import megamek.common.board.Board;
+import megamek.common.board.BoardDimensions;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.BlowingSand;
-import megamek.common.planetaryconditions.EMI;
-import megamek.common.planetaryconditions.Fog;
-import megamek.common.planetaryconditions.Light;
-import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.planetaryconditions.Weather;
-import megamek.common.planetaryconditions.Wind;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.BlowingSand;
+import megamek.common.planetaryConditions.EMI;
+import megamek.common.planetaryConditions.Fog;
+import megamek.common.planetaryConditions.Light;
+import megamek.common.planetaryConditions.PlanetaryConditions;
+import megamek.common.planetaryConditions.Weather;
+import megamek.common.planetaryConditions.Wind;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.utilities.BoardClassifier;
@@ -1443,7 +1443,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int unitsPerPoint;
         switch (unitType) {
             case UnitType.TANK:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
                 unitsPerPoint = 2;
                 break;
             case UnitType.PROTOMEK:
@@ -1652,7 +1652,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 aero = getEntity(contract.getEnemyCode(),
                       contract.getEnemySkill(),
                       contract.getEnemyQuality(),
-                      UnitType.AEROSPACEFIGHTER,
+                      UnitType.AEROSPACE_FIGHTER,
                       weightClass,
                       campaign);
                 if (aero != null) {

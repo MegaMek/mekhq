@@ -43,16 +43,21 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
 import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Era;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.options.OptionsConstants;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -584,7 +589,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     protected boolean isClanTechBase() {
-        return getTechBase() == ITechnology.TechBase.CLAN;
+        return getTechBase() == TechBase.CLAN;
     }
 
     public abstract void writeToXML(PrintWriter pw, int indent);

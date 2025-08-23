@@ -50,7 +50,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;

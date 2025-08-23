@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.TechRating;
 import megamek.logging.MMLogger;
 
 /**

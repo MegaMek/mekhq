@@ -35,12 +35,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.ProtoMek;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.TechBase;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -97,7 +98,7 @@ public class ProtoMekLegActuator extends Part {
     public void fix() {
         super.fix();
         if (null != unit) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEGCRIT, ProtoMek.LOC_LEG);
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEG_CRIT, ProtoMek.LOC_LEG);
         }
     }
 
@@ -120,7 +121,7 @@ public class ProtoMekLegActuator extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             int h = Math.max(2, hits);
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEGCRIT, ProtoMek.LOC_LEG, h);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEG_CRIT, ProtoMek.LOC_LEG, h);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -142,7 +143,7 @@ public class ProtoMekLegActuator extends Part {
         if (null != unit) {
             int priorHits = hits;
             hits = unit.getEntity()
-                         .getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEGCRIT, ProtoMek.LOC_LEG);
+                         .getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEG_CRIT, ProtoMek.LOC_LEG);
             if (checkForDestruction
                       && hits > priorHits
                       && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -199,9 +200,9 @@ public class ProtoMekLegActuator extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             if (hits > 0) {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEGCRIT, ProtoMek.LOC_LEG, hits);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEG_CRIT, ProtoMek.LOC_LEG, hits);
             } else {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEGCRIT, ProtoMek.LOC_LEG);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, ProtoMek.SYSTEM_LEG_CRIT, ProtoMek.LOC_LEG);
             }
         }
     }

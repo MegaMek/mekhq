@@ -37,7 +37,7 @@ import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 
 import java.util.Objects;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;

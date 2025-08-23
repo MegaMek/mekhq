@@ -35,13 +35,13 @@ package mekhq.campaign.autoresolve;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Minefield;
 import megamek.common.Player;
-import megamek.common.UnitType;
-import megamek.common.autoresolve.converter.ForceConsolidation;
+import megamek.common.autoResolve.converter.ForceConsolidation;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.Minefield;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;

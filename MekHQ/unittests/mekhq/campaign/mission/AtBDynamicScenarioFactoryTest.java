@@ -42,9 +42,9 @@ import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.io.IOException;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Game;
+import megamek.common.units.Entity;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.game.Game;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;

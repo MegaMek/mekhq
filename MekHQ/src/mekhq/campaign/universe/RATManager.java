@@ -41,13 +41,13 @@ import javax.xml.parsers.DocumentBuilder;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.event.Subscribe;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -356,7 +356,7 @@ public class RATManager extends AbstractUnitGenerator {
     public boolean isSupportedUnitType(final int unitType) {
         return (unitType == UnitType.MEK)
                      || (unitType == UnitType.TANK)
-                     || (unitType == UnitType.AEROSPACEFIGHTER)
+                     || (unitType == UnitType.AEROSPACE_FIGHTER)
                      || (unitType == UnitType.DROPSHIP)
                      || (unitType == UnitType.INFANTRY)
                      || (unitType == UnitType.BATTLE_ARMOR)
@@ -522,7 +522,7 @@ public class RATManager extends AbstractUnitGenerator {
                                     retVal.unitTypes.add(UnitType.CONV_FIGHTER);
                                     break;
                                 case "Aero":
-                                    retVal.unitTypes.add(UnitType.AEROSPACEFIGHTER);
+                                    retVal.unitTypes.add(UnitType.AEROSPACE_FIGHTER);
                                     break;
                                 case "Small Craft":
                                     retVal.unitTypes.add(UnitType.SMALL_CRAFT);

@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.lifeEvents;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.FEMALE;
 import static megamek.common.enums.Gender.MALE;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;

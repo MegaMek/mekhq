@@ -35,16 +35,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
 import megamek.common.CriticalSlot;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Mek;
-import megamek.common.ProtoMek;
-import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Engine;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -121,13 +122,13 @@ public class MissingEnginePart extends MissingPart {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, Ceil.HALF_TON), toReturn);
         }
         return toReturn;
     }
@@ -210,7 +211,7 @@ public class MissingEnginePart extends MissingPart {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
                       && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
@@ -267,7 +268,7 @@ public class MissingEnginePart extends MissingPart {
         if (null == unit || null == unit.getEntity()) {
             return false;
         }
-        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CENTER_TORSO) {
             return true;
         }
         boolean needsSideTorso = false;
@@ -281,8 +282,8 @@ public class MissingEnginePart extends MissingPart {
                 break;
         }
         return needsSideTorso
-                     && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT)
-                               || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
+                     && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO)
+                               || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO));
     }
 
     @Override

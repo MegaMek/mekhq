@@ -34,7 +34,7 @@
 
 package mekhq.campaign.unit;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 
 /**

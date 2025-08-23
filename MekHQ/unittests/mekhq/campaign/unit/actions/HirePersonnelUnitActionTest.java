@@ -34,13 +34,13 @@ package mekhq.campaign.unit.actions;
 
 import static org.mockito.Mockito.*;
 
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
-import megamek.common.SmallCraft;
-import megamek.common.SupportTank;
-import megamek.common.Tank;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.SupportTank;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;

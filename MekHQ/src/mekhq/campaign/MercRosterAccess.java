@@ -46,7 +46,7 @@ import java.util.Properties;
 import java.util.UUID;
 import javax.swing.SwingWorker;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;

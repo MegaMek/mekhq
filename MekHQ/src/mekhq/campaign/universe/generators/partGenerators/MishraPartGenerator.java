@@ -34,7 +34,7 @@ package mekhq.campaign.universe.generators.partGenerators;
 
 import java.util.List;
 
-import megamek.common.Mek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekCockpit;

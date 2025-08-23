@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map.Entry;
 
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;

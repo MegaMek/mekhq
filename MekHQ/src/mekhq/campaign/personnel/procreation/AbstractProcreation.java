@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;

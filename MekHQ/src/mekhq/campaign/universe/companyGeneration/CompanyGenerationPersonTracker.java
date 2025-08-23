@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.companyGeneration;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
