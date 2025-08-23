@@ -278,7 +278,7 @@ public class LifePathBuilderTabRequirements {
         buttonsPanel.add(btnAddTrait);
 
         // Skills
-        Map<SkillType, Integer> skills = new HashMap<>();
+        Map<String, Integer> skills = new HashMap<>();
         if (hasStorage) {
             skills.putAll(storage.skills());
         }
@@ -466,7 +466,7 @@ public class LifePathBuilderTabRequirements {
     }
 
     private void standardizedActions(int gameYear, int index, Map<SkillAttribute, Integer> attributes,
-          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
+          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills,
           Map<String, Integer> abilities, List<Faction> factions, List<UUID> lifePaths,
           Map<LifePathCategory, Integer> categories, JEditorPane txtRequirements,
           LifePathComponentStorage initialStorage) {
@@ -493,7 +493,7 @@ public class LifePathBuilderTabRequirements {
           int gameYear, List<Faction> factions,
           List<UUID> lifePaths, Map<LifePathCategory, Integer> categories,
           Map<SkillAttribute, Integer> attributes, Map<LifePathEntryDataTraitLookup, Integer> traits,
-          Map<SkillType, Integer> skills, Map<String, Integer> abilities) {
+          Map<String, Integer> skills, Map<String, Integer> abilities) {
         return new LifePathComponentStorage(gameYear,
               factions,
               lifePaths,
@@ -592,14 +592,14 @@ public class LifePathBuilderTabRequirements {
         }
 
         // Skills
-        Map<SkillType, Integer> skills = storage.skills();
+        Map<String, Integer> skills = storage.skills();
         if (!skills.isEmpty()) {
             appendComma(progressText);
 
             int counter = 0;
             int length = skills.size();
-            for (Map.Entry<SkillType, Integer> entry : skills.entrySet()) {
-                String label = entry.getKey().getName().replace(SkillType.RP_ONLY_TAG, "");
+            for (Map.Entry<String, Integer> entry : skills.entrySet()) {
+                String label = entry.getKey().replace(SkillType.RP_ONLY_TAG, "");
 
                 progressText.append(label);
                 progressText.append(" ");

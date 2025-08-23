@@ -32,10 +32,13 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
@@ -49,6 +52,24 @@ public record LifePathComponentStorage(
       // Included in cost calculations
       Map<SkillAttribute, Integer> attributes,
       Map<LifePathEntryDataTraitLookup, Integer> traits,
-      Map<SkillType, Integer> skills,
+      Map<String, Integer> skills,
       Map<String, Integer> abilities) {
+    private static final MMLogger LOGGER = MMLogger.create(LifePathComponentStorage.class);
+
+    @JsonIgnore
+    public Map<SkillType, Integer> getSkillTypes() {
+        Map<SkillType, Integer> skillTypes = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entry : skills.entrySet()) {
+            SkillType type = SkillType.getType(entry.getKey());
+            if (type == null) {
+                LOGGER.warn("Unknown skill type: {}", entry.getKey());
+                continue;
+            }
+
+            skillTypes.put(type, entry.getValue());
+        }
+
+        return skillTypes;
+    }
 }

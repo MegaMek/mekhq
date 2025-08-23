@@ -127,7 +127,7 @@ public class LifePathBuilderTabFixedXP {
         buttonsPanel.add(btnAddTrait);
 
         // Skills
-        Map<SkillType, Integer> skills = new HashMap<>();
+        Map<String, Integer> skills = new HashMap<>();
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.fixedXP.button.addSkill.label");
         String tooltipAddSkill = getTextAt(RESOURCE_BUNDLE,
@@ -218,7 +218,7 @@ public class LifePathBuilderTabFixedXP {
     }
 
     private void standardizedActions(Map<SkillAttribute, Integer> attributes,
-          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
+          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills,
           Map<String, Integer> abilities, JEditorPane txtFixedXP, LifePathComponentStorage initialStorage) {
         LifePathComponentStorage storage = getFixedXPTabStorage(attributes, traits, skills, abilities);
         String fixedXPText = buildFixedXPText(storage);
@@ -232,15 +232,20 @@ public class LifePathBuilderTabFixedXP {
     }
 
     private static LifePathComponentStorage getFixedXPTabStorage(Map<SkillAttribute, Integer> attributes,
-          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<SkillType, Integer> skills,
+          Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills,
           Map<String, Integer> abilities) {
+        Map<String, Integer> skillNames = new HashMap<>();
+        for (String skill : skills.keySet()) {
+            skillNames.put(skill, skills.get(skill));
+        }
+
         return new LifePathComponentStorage(0,
               new ArrayList<>(),
               new ArrayList<>(),
               new HashMap<>(),
               attributes,
               traits,
-              skills,
+              skillNames,
               abilities);
     }
 
@@ -290,16 +295,16 @@ public class LifePathBuilderTabFixedXP {
         }
 
         // Skills
-        Map<SkillType, Integer> skills = storage.skills();
+        Map<String, Integer> skills = storage.skills();
         if (!skills.isEmpty()) {
             appendComma(progressText);
 
             int counter = 0;
             int length = skills.size();
-            for (Map.Entry<SkillType, Integer> entry : skills.entrySet()) {
+            for (Map.Entry<String, Integer> entry : skills.entrySet()) {
                 int value = entry.getValue();
 
-                String label = entry.getKey().getName().replace(SkillType.RP_ONLY_TAG, "");
+                String label = entry.getKey().replace(SkillType.RP_ONLY_TAG, "");
 
                 progressText.append(label);
                 progressText.append(value >= 0 ? " +" : " ");

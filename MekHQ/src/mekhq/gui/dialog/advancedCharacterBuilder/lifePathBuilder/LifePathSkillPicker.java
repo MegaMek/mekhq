@@ -82,14 +82,14 @@ class LifePathSkillPicker extends JDialog {
 
     private static final int PADDING = scaleForGUI(10);
 
-    private final Map<SkillType, Integer> storedSkillLevels;
-    private Map<SkillType, Integer> selectedSkillLevels;
+    private final Map<String, Integer> storedSkillLevels;
+    private Map<String, Integer> selectedSkillLevels;
 
-    Map<SkillType, Integer> getSelectedSkillLevels() {
+    Map<String, Integer> getSelectedSkillLevels() {
         return selectedSkillLevels;
     }
 
-    LifePathSkillPicker(Map<SkillType, Integer> selectedSkillLevels, LifePathBuilderTabType tabType) {
+    LifePathSkillPicker(Map<String, Integer> selectedSkillLevels, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -298,7 +298,7 @@ class LifePathSkillPicker extends JDialog {
             spnSkillLevel.addChangeListener(evt -> {
                 int value = (int) spnSkillLevel.getValue();
                 if (value != finalTraitKeyValue) {
-                    selectedSkillLevels.put(type, value);
+                    selectedSkillLevels.put(type.getName(), value);
                 }
             });
 
