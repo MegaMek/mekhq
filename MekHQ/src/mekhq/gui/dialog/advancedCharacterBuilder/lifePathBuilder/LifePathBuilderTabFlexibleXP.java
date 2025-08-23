@@ -98,7 +98,7 @@ public class LifePathBuilderTabFlexibleXP {
         return min((int) spnPicks.getValue(), flexibleXPTabStorageMap.size());
     }
 
-    LifePathBuilderTabFlexibleXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain,
+    LifePathBuilderTabFlexibleXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear,
           Map<String, CampaignOptionsAbilityInfo> allAbilityInfo) {
         this.parent = parent;
         this.allAbilityInfo = allAbilityInfo;
@@ -167,20 +167,20 @@ public class LifePathBuilderTabFlexibleXP {
         EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
         tabbedPane.addChangeListener(e -> btnRemoveFlexibleXPGroup.setEnabled(tabbedPane.getSelectedIndex() != 0));
         btnAddFlexibleXPGroup.addActionListener(e -> {
-            addFlexibleXPTab(tabbedPane, null);
+            addFlexibleXPTab(tabbedPane, null, gameYear);
             tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
         });
-        btnRemoveFlexibleXPGroup.addActionListener(e -> removeFlexibleXPGroup(tabbedPane));
-        btnDuplicateGroup.addActionListener(e -> duplicateGroup(tabbedPane));
+        btnRemoveFlexibleXPGroup.addActionListener(e -> removeFlexibleXPGroup(tabbedPane, gameYear));
+        btnDuplicateGroup.addActionListener(e -> duplicateGroup(tabbedPane, gameYear));
 
         // Add 'Group 0' - this group is required
-        addFlexibleXPTab(tabbedPane, null);
+        addFlexibleXPTab(tabbedPane, null, gameYear);
 
         tabFlexibleXP.add(buttonPanel, BorderLayout.NORTH);
         tabFlexibleXP.add(tabbedPane, BorderLayout.CENTER);
     }
 
-    private void removeFlexibleXPGroup(EnhancedTabbedPane tabbedPane) {
+    private void removeFlexibleXPGroup(EnhancedTabbedPane tabbedPane, int gameYear) {
         int selectedIndex = tabbedPane.getSelectedIndex();
 
         // Remove the current tab, unless it's Group 0
@@ -215,11 +215,11 @@ public class LifePathBuilderTabFlexibleXP {
             tabbedPane.remove(selectedIndex);
 
             // Update the progress panel
-            parent.updateTxtProgress();
+            parent.updateTxtProgress(gameYear);
         }
     }
 
-    private void duplicateGroup(EnhancedTabbedPane tabbedPane) {
+    private void duplicateGroup(EnhancedTabbedPane tabbedPane, int gameYear) {
         int selectedIndex = tabbedPane.getSelectedIndex();
         if (selectedIndex < 0) {
             return; // nothing selected, do nothing
@@ -228,7 +228,7 @@ public class LifePathBuilderTabFlexibleXP {
         LifePathComponentStorage currentValues = flexibleXPTabStorageMap.get(selectedIndex);
         String currentText = flexibleXPTabTextMap.get(selectedIndex);
 
-        addFlexibleXPTab(tabbedPane, currentValues);
+        addFlexibleXPTab(tabbedPane, currentValues, gameYear);
         int newIndex = tabbedPane.getTabCount() - 1;
 
         flexibleXPTabStorageMap.put(newIndex, currentValues);
@@ -243,7 +243,7 @@ public class LifePathBuilderTabFlexibleXP {
             LOGGER.warn("Could not find txtFlexibleXP in duplicateGroup");
         }
 
-        parent.updateTxtProgress();
+        parent.updateTxtProgress(gameYear);
 
         tabbedPane.setSelectedIndex(newIndex);
     }
@@ -260,7 +260,8 @@ public class LifePathBuilderTabFlexibleXP {
         return null;
     }
 
-    private void addFlexibleXPTab(EnhancedTabbedPane tabbedPane, @Nullable LifePathComponentStorage storage) {
+    private void addFlexibleXPTab(EnhancedTabbedPane tabbedPane, @Nullable LifePathComponentStorage storage,
+          int gameYear) {
         boolean hasStorage = storage != null;
 
         int index = tabbedPane.getTabCount();
@@ -373,7 +374,7 @@ public class LifePathBuilderTabFlexibleXP {
             attributes.clear();
             attributes.putAll(picker.getSelectedAttributeScores());
 
-            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage);
+            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage, gameYear);
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
@@ -381,7 +382,7 @@ public class LifePathBuilderTabFlexibleXP {
             traits.clear();
             traits.putAll(picker.getSelectedTraitScores());
 
-            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage);
+            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage, gameYear);
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
@@ -389,7 +390,7 @@ public class LifePathBuilderTabFlexibleXP {
             skills.clear();
             skills.putAll(picker.getSelectedSkillLevels());
 
-            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage);
+            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage, gameYear);
         });
         btnAddSPA.addActionListener(e -> {
             parent.setVisible(false);
@@ -397,7 +398,7 @@ public class LifePathBuilderTabFlexibleXP {
             abilities.clear();
             abilities.putAll(picker.getSelectedAbilities());
 
-            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage);
+            standardizedActions(index, attributes, traits, skills, abilities, txtFlexibleXP, initialStorage, gameYear);
         });
 
         // Add panels and then add Tab
@@ -411,7 +412,8 @@ public class LifePathBuilderTabFlexibleXP {
 
     private void standardizedActions(int index, Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills,
-          Map<String, Integer> abilities, JEditorPane txtFlexibleXP, LifePathComponentStorage initialStorage) {
+          Map<String, Integer> abilities, JEditorPane txtFlexibleXP, LifePathComponentStorage initialStorage,
+          int gameYear) {
         LifePathComponentStorage storage = getFlexibleXPStorage(
               attributes,
               traits,
@@ -422,7 +424,7 @@ public class LifePathBuilderTabFlexibleXP {
 
         flexibleXPTabStorageMap.put(index, initialStorage);
         flexibleXPTabTextMap.put(index, flexibleXPText);
-        parent.updateTxtProgress();
+        parent.updateTxtProgress(gameYear);
 
         parent.setVisible(true);
     }

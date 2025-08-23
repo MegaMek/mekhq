@@ -128,7 +128,7 @@ public class LifePathBuilderTabBasicInformation {
         this.categories = categories;
     }
 
-    LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
+    LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear) {
         JPanel tabBasicInformation = new JPanel();
         tabBasicInformation.setName("basic");
         String titleBasic = getTextAt(RESOURCE_BUNDLE,
@@ -160,7 +160,7 @@ public class LifePathBuilderTabBasicInformation {
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
-              parent::updateTxtProgress
+              () -> parent.updateTxtProgress(gameYear)
         );
 
         // Source
@@ -182,8 +182,8 @@ public class LifePathBuilderTabBasicInformation {
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipSource)
         );
         DocumentChangeListenerUtil.addChangeListener(
-              txtSource.getDocument(),
-              parent::updateTxtProgress
+              txtName.getDocument(),
+              () -> parent.updateTxtProgress(gameYear)
         );
 
         // Flavor Text
@@ -209,8 +209,8 @@ public class LifePathBuilderTabBasicInformation {
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipFlavorText)
         );
         DocumentChangeListenerUtil.addChangeListener(
-              txtFlavorText.getDocument(),
-              parent::updateTxtProgress
+              txtName.getDocument(),
+              () -> parent.updateTxtProgress(gameYear)
         );
 
         // Age Modifier
@@ -231,7 +231,7 @@ public class LifePathBuilderTabBasicInformation {
         spnAge.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAge)
         );
-        spnAge.addChangeListener(e -> parent.updateTxtProgress());
+        spnAge.addChangeListener(e -> parent.updateTxtProgress(gameYear));
 
         // XP Discount
         final String titleDiscount = getTextAt(RESOURCE_BUNDLE,
@@ -251,7 +251,7 @@ public class LifePathBuilderTabBasicInformation {
         spnDiscount.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
         );
-        spnDiscount.addChangeListener(e -> parent.updateTxtProgress());
+        spnDiscount.addChangeListener(e -> parent.updateTxtProgress(gameYear));
 
         // Manage Life Stages
         final String titleManageLifeStages = getTextAt(RESOURCE_BUNDLE,
@@ -265,7 +265,7 @@ public class LifePathBuilderTabBasicInformation {
             LifePathStagePicker picker = new LifePathStagePicker(
                   lifeStages);
             lifeStages = picker.getSelectedLifeStages();
-            parent.updateTxtProgress();
+            parent.updateTxtProgress(gameYear);
             parent.setVisible(true);
         });
 
@@ -281,7 +281,7 @@ public class LifePathBuilderTabBasicInformation {
             LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(
                   categories);
             categories = picker.getSelectedCategories();
-            parent.updateTxtProgress();
+            parent.updateTxtProgress(gameYear);
             parent.setVisible(true);
         });
 

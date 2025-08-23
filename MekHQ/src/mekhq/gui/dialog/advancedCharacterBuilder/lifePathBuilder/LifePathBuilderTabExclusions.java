@@ -304,7 +304,7 @@ public class LifePathBuilderTabExclusions {
         exclusionsTabStorage = initialStorage;
         exclusionsTabTextStorage = exclusionsText;
 
-        parent.updateTxtProgress();
+        parent.updateTxtProgress(gameYear);
         parent.setVisible(true);
     }
 

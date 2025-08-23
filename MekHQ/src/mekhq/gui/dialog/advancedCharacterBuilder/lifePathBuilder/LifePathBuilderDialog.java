@@ -74,7 +74,6 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -116,7 +115,7 @@ public class LifePathBuilderDialog extends JDialog {
     private JPanel pnlProgress;
 
     private LifePathBuilderTabBasicInformation basicInfoTab;
-    private LifePathBuilderTabRequirements requirementsTab;
+    private LifePathTab requirementsTab;
     private LifePathBuilderTabExclusions exclusionsTab;
     private LifePathBuilderTabFixedXP fixedXPTab;
     private LifePathBuilderTabFlexibleXP flexibleXPTab;
@@ -169,9 +168,9 @@ public class LifePathBuilderDialog extends JDialog {
         lblTooltipDisplay.setText(newTooltipText);
     }
 
-    void updateTxtProgress() {
-        txtProgress.setText(LifePathProgressTextBuilder.getProgressText(basicInfoTab, requirementsTab, exclusionsTab,
-              fixedXPTab, flexibleXPTab));
+    void updateTxtProgress(int gameYear) {
+        txtProgress.setText(LifePathProgressTextBuilder.getProgressText(gameYear, basicInfoTab, requirementsTab,
+              exclusionsTab, fixedXPTab, flexibleXPTab));
     }
 
     private JPanel initialize(int gameYear) {
@@ -179,7 +178,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
-        pnlProgress = initializeProgressPanel();
+        pnlProgress = initializeProgressPanel(gameYear);
 
         // Layout using GridBagLayout for a width ratio of 1:2:1
         JPanel container = new JPanel(new GridBagLayout());
@@ -211,7 +210,7 @@ public class LifePathBuilderDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(0, PADDING, PADDING, PADDING);
-        container.add(initializeControlPanel(), gridBagConstraints);
+        container.add(initializeControlPanel(gameYear), gridBagConstraints);
 
         return container;
     }
@@ -302,10 +301,11 @@ public class LifePathBuilderDialog extends JDialog {
         String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.lifePath");
         tabMain.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
 
-        basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
-        fixedXPTab = new LifePathBuilderTabFixedXP(this, tabMain, allAbilityInfo);
-        flexibleXPTab = new LifePathBuilderTabFlexibleXP(this, tabMain, allAbilityInfo);
-        requirementsTab = new LifePathBuilderTabRequirements(this, tabMain, gameYear, allAbilityInfo);
+        basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain, gameYear);
+        fixedXPTab = new LifePathBuilderTabFixedXP(this, tabMain, gameYear, allAbilityInfo);
+        flexibleXPTab = new LifePathBuilderTabFlexibleXP(this, tabMain, gameYear, allAbilityInfo);
+        requirementsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo);
+        requirementsTab.buildTab(true);
         exclusionsTab = new LifePathBuilderTabExclusions(this, tabMain, gameYear, allAbilityInfo);
 
         // Add a listener to handle tab selection changes
@@ -323,7 +323,7 @@ public class LifePathBuilderDialog extends JDialog {
         return tabMain;
     }
 
-    private JPanel initializeProgressPanel() {
+    private JPanel initializeProgressPanel(int gameYear) {
         JPanel pnlProgress = new JPanel(new BorderLayout());
 
         String titleProgress = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.progress");
@@ -332,7 +332,7 @@ public class LifePathBuilderDialog extends JDialog {
         txtProgress = new JEditorPane();
         txtProgress.setContentType("text/html");
         txtProgress.setEditable(false);
-        updateTxtProgress();
+        updateTxtProgress(gameYear);
 
         scrollProgress = new FastJScrollPane(txtProgress);
         scrollProgress.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -346,7 +346,7 @@ public class LifePathBuilderDialog extends JDialog {
         return pnlProgress;
     }
 
-    private JPanel initializeControlPanel() {
+    private JPanel initializeControlPanel(int gameYear) {
         JPanel pnlControls = new JPanel(new GridBagLayout());
         pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
@@ -386,19 +386,42 @@ public class LifePathBuilderDialog extends JDialog {
             LifePath record = loadFromJSONWithDialog().orElse(null);
             if (record != null) {
                 lifePathId = record.id();
-                basicInfoTab.setSource(record.source());
-                basicInfoTab.setName(record.name());
-                basicInfoTab.setFlavorText(record.flavorText());
-                basicInfoTab.setAge(record.age());
-                basicInfoTab.setDiscount(record.xpDiscount());
-                basicInfoTab.setLifeStages(record.lifeStages());
-                basicInfoTab.setCategories(record.categories());
-                requirementsTab.setRequirementsTabStorageMap(record.requirements());
-                exclusionsTab.setExclusionsTabStorage(record.exclusions());
-                fixedXPTab.setFixedXPTabStorage(record.fixedXpAwards());
-                flexibleXPTab.setFlexibleXPTabStorageMap(record.flexibleXpAwards());
+                LOGGER.debug("Loaded lifePathId from: {}", record.id());
 
-                updateTxtProgress();
+                basicInfoTab.setSource(record.source());
+                LOGGER.debug("Loaded source from: {}", record.source());
+
+                basicInfoTab.setName(record.name());
+                LOGGER.debug("Loaded name from: {}", record.name());
+
+                basicInfoTab.setFlavorText(record.flavorText());
+                LOGGER.debug("Loaded flavorText from: {}", record.flavorText());
+
+                basicInfoTab.setAge(record.age());
+                LOGGER.debug("Loaded age from: {}", record.age());
+
+                basicInfoTab.setDiscount(record.xpDiscount());
+                LOGGER.debug("Loaded xpDiscount from: {}", record.xpDiscount());
+
+                basicInfoTab.setLifeStages(record.lifeStages());
+                LOGGER.debug("Loaded lifeStages from: {}", record.lifeStages());
+
+                basicInfoTab.setCategories(record.categories());
+                LOGGER.debug("Loaded categories from: {}", record.categories());
+
+                requirementsTab.updateTabStorage(record.requirements());
+                LOGGER.debug("Loaded requirements from: {}", record.requirements());
+
+                exclusionsTab.setExclusionsTabStorage(record.exclusions());
+                LOGGER.debug("Loaded exclusions from: {}", record.exclusions());
+
+                fixedXPTab.setFixedXPTabStorage(record.fixedXpAwards());
+                LOGGER.debug("Loaded fixedXpAwards from: {}", record.fixedXpAwards());
+
+                flexibleXPTab.setFlexibleXPTabStorageMap(record.flexibleXpAwards());
+                LOGGER.debug("Loaded flexibleXpAwards from: {}", record.flexibleXpAwards());
+
+                updateTxtProgress(gameYear);
                 invalidate();
                 repaint();
             }
@@ -537,10 +560,11 @@ public class LifePathBuilderDialog extends JDialog {
 
         int xpCost = LifePathXPCostCalculator.calculateXPCost(discount, fixedXPTabStorage, flexibleXPTabStorage);
 
-        return new LifePath(lifePathId, basicInfoTab.getSource(), MHQConstants.VERSION, basicInfoTab.getName(),
-              basicInfoTab.getFlavorText(), basicInfoTab.getAge(), basicInfoTab.getDiscount(), xpCost,
-              basicInfoTab.getLifeStages(), basicInfoTab.getCategories(),
-              requirementsTab.getRequirementsTabStorageMap(), exclusionsTab.getExclusionsTabStorage(),
-              fixedXPTabStorage, flexibleXPTabStorage, flexibleXPTab.getPickCount());
+        //        return new LifePath(lifePathId, basicInfoTab.getSource(), MHQConstants.VERSION, basicInfoTab.getName(),
+        //              basicInfoTab.getFlavorText(), basicInfoTab.getAge(), basicInfoTab.getDiscount(), xpCost,
+        //              basicInfoTab.getLifeStages(), basicInfoTab.getCategories(),
+        //              requirementsTab.getRequirementsTabStorageMap(), exclusionsTab.getExclusionsTabStorage(),
+        //              fixedXPTabStorage, flexibleXPTabStorage, flexibleXPTab.getPickCount());
+        return null;
     }
 }

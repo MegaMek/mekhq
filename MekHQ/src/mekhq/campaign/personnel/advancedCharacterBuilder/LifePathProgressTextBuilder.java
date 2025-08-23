@@ -43,14 +43,14 @@ import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilder
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabExclusions;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabFixedXP;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabFlexibleXP;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabRequirements;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
 
 public class LifePathProgressTextBuilder {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
     private static final int TEXT_PANEL_WIDTH = LifePathBuilderDialog.getTextPanelWidth();
 
-    public static String getProgressText(LifePathBuilderTabBasicInformation basicInfoTab,
-          LifePathBuilderTabRequirements requirementsTab, LifePathBuilderTabExclusions exclusionsTab,
+    public static String getProgressText(int gameYear, LifePathBuilderTabBasicInformation basicInfoTab,
+          LifePathTab requirementsTab, LifePathBuilderTabExclusions exclusionsTab,
           LifePathBuilderTabFixedXP fixedXPTab, LifePathBuilderTabFlexibleXP flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
@@ -66,7 +66,7 @@ public class LifePathProgressTextBuilder {
         String newFlexibleXPText = getFlexibleXPText(flexibleXPTab);
         newProgressText.append(newFlexibleXPText);
 
-        String newRequirementsText = getNewRequirementsText(requirementsTab);
+        String newRequirementsText = getNewRequirementsText(requirementsTab, gameYear);
         newProgressText.append(newRequirementsText);
 
         String newExclusionsText = getNewExclusionsText(exclusionsTab);
@@ -147,19 +147,12 @@ public class LifePathProgressTextBuilder {
         return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
     }
 
-    private static String getNewRequirementsText(LifePathBuilderTabRequirements requirementsTab) {
+    private static String getNewRequirementsText(LifePathTab requirementsTab, int gameYear) {
         StringBuilder newRequirementsText = new StringBuilder();
 
         boolean isEmpty = true;
-        Map<Integer, String> unorderedRequirements = requirementsTab.getRequirementsTabTextMap();
-        for (int i = 0; i < unorderedRequirements.size(); i++) {
-            String requirements = unorderedRequirements.get(i);
-            if (!requirements.isBlank()) {
-                isEmpty = false;
-                break;
-            }
-        }
-        if (isEmpty) {
+        List<String> progress = requirementsTab.getTabProgress();
+        if (progress.isEmpty()) {
             return "";
         }
 
@@ -167,14 +160,9 @@ public class LifePathProgressTextBuilder {
         newRequirementsText.append("<h2 style='text-align:center; margin:0;'>").append(requirementsTitle).append(
               "</h2>");
 
-        List<String> orderedRequirements = unorderedRequirements.entrySet().stream()
-                                                 .sorted(Map.Entry.comparingByKey())
-                                                 .map(Map.Entry::getValue)
-                                                 .toList();
-
         boolean firstRequirement = true;
-        for (int i = 0; i < orderedRequirements.size(); i++) {
-            String requirements = orderedRequirements.get(i);
+        for (int i = 0; i < progress.size(); i++) {
+            String requirements = progress.get(i);
             if (requirements.isBlank()) {
                 continue;
             }

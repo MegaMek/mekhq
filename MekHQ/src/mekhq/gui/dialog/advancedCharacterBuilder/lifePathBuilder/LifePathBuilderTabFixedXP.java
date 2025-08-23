@@ -81,7 +81,7 @@ public class LifePathBuilderTabFixedXP {
         return fixedXPTabTextStorage;
     }
 
-    public LifePathBuilderTabFixedXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain,
+    public LifePathBuilderTabFixedXP(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear,
           Map<String, CampaignOptionsAbilityInfo> allAbilityInfo) {
         this.parent = parent;
         this.allAbilityInfo = allAbilityInfo;
@@ -91,11 +91,11 @@ public class LifePathBuilderTabFixedXP {
         String titleFixedXP = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.title.fixedXP");
         tabMain.addTab(titleFixedXP, tabFixedXP);
 
-        JPanel pnlFixedXP = buildFixedXPPanel();
+        JPanel pnlFixedXP = buildFixedXPPanel(gameYear);
         tabFixedXP.add(pnlFixedXP, BorderLayout.CENTER);
     }
 
-    private JPanel buildFixedXPPanel() {
+    private JPanel buildFixedXPPanel(int gameYear) {
         JPanel pnlFixedXP = new JPanel();
         pnlFixedXP.setLayout(new BorderLayout());
 
@@ -183,7 +183,7 @@ public class LifePathBuilderTabFixedXP {
             attributes.clear();
             attributes.putAll(picker.getSelectedAttributeScores());
 
-            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage);
+            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage, gameYear);
         });
         btnAddTrait.addActionListener(e -> {
             parent.setVisible(false);
@@ -191,7 +191,7 @@ public class LifePathBuilderTabFixedXP {
             traits.clear();
             traits.putAll(picker.getSelectedTraitScores());
 
-            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage);
+            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage, gameYear);
         });
         btnAddSkill.addActionListener(e -> {
             parent.setVisible(false);
@@ -199,7 +199,7 @@ public class LifePathBuilderTabFixedXP {
             skills.clear();
             skills.putAll(picker.getSelectedSkillLevels());
 
-            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage);
+            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage, gameYear);
         });
         btnAddSPA.addActionListener(e -> {
             parent.setVisible(false);
@@ -207,7 +207,7 @@ public class LifePathBuilderTabFixedXP {
             abilities.clear();
             abilities.putAll(picker.getSelectedAbilities());
 
-            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage);
+            standardizedActions(attributes, traits, skills, abilities, txtFixedXP, initialStorage, gameYear);
         });
 
         // Add panels and then add Tab
@@ -219,7 +219,8 @@ public class LifePathBuilderTabFixedXP {
 
     private void standardizedActions(Map<SkillAttribute, Integer> attributes,
           Map<LifePathEntryDataTraitLookup, Integer> traits, Map<String, Integer> skills,
-          Map<String, Integer> abilities, JEditorPane txtFixedXP, LifePathComponentStorage initialStorage) {
+          Map<String, Integer> abilities, JEditorPane txtFixedXP, LifePathComponentStorage initialStorage,
+          int gameYear) {
         LifePathComponentStorage storage = getFixedXPTabStorage(attributes, traits, skills, abilities);
         String fixedXPText = buildFixedXPText(storage);
         txtFixedXP.setText(fixedXPText);
@@ -227,7 +228,7 @@ public class LifePathBuilderTabFixedXP {
         fixedXPTabStorage = initialStorage;
         fixedXPTabTextStorage = fixedXPText;
 
-        parent.updateTxtProgress();
+        parent.updateTxtProgress(gameYear);
         parent.setVisible(true);
     }
 
