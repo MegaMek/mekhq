@@ -32,15 +32,22 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.MHQConstants.LIFE_PATHS_DIRECTORY_PATH;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 
@@ -379,6 +386,54 @@ public record LifePathRecord(UUID id,
         if (pickCount > flexibleXpAwards.size()) {
             throw new IllegalArgumentException(
                   "pickCount must be less than or equal to the number of selectable XP awards");
+        }
+    }
+
+    public static void writeToJSON(LifePathRecord record) {
+        String defaultFileName = record.name().replace(" ", "_");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        try {
+            String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+            File outputDir;
+            if (userDirectory == null || userDirectory.isBlank()) {
+                userDirectory = LIFE_PATHS_DIRECTORY_PATH;
+                System.out.println("User directory was blank; defaulting to: " + LIFE_PATHS_DIRECTORY_PATH);
+                outputDir = new File(userDirectory);
+            } else {
+                outputDir = new File(userDirectory, "lifePaths");
+            }
+
+            if (!outputDir.exists()) {
+                if (!outputDir.mkdirs()) {
+                    throw new IOException("Failed to create directory: " + outputDir.getAbsolutePath());
+                }
+            }
+            // Use the provided file name
+
+            String fileName = defaultFileName;
+            if (!fileName.toLowerCase().endsWith(".json")) {
+                fileName = fileName + ".json";
+            }
+            File outFile = new File(outputDir, fileName);
+
+            int count = 1;
+            // Loop to find a unique file name
+            while (outFile.exists()) {
+                String baseName = fileName.substring(0, fileName.length() - 5); // Remove ".json"
+                String newFileName = baseName + "_" + count + ".json";
+                outFile = new File(outputDir, newFileName);
+                count++;
+            }
+
+            objectMapper.writeValue(outFile, record);
+
+            System.out.println("Wrote LifePathRecord JSON to: " + outFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

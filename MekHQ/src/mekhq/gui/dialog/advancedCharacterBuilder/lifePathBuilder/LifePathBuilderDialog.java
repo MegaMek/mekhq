@@ -71,7 +71,9 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataProcessor;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathRecord;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
@@ -361,6 +363,12 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnSave = new RoundedJButton(titleSave);
         btnSave.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
+        btnSave.addActionListener(e -> {
+            LifePathDataProcessor dataProcessor = new LifePathDataProcessor(basicInfoTab, requirementsTab,
+                  exclusionsTab, fixedXPTab, flexibleXPTab);
+            LifePathRecord record = dataProcessor.buildLifePathFromLifePathBuilder(lifePathId);
+            LifePathRecord.writeToJSON(record);
+        });
 
         String titleLoad = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.load");
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
