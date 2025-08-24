@@ -386,7 +386,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         lblTooltipDisplay = new JLabel();
         lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        setLblTooltipDisplay("");
+        setLblTooltipDisplay(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.tootltip.default"));
         lblTooltipDisplay.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JPanel pnlButtons = new JPanel();
