@@ -339,11 +339,14 @@ class LifePathSPAPicker extends JDialog {
                   TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
 
-            final int finalTraitKeyValue = keyValue;
             spnAbilityValue.addChangeListener(evt -> {
                 int value = (int) spnAbilityValue.getValue();
-                if (value != finalTraitKeyValue) {
-                    selectedAbilities.put(ability.getName(), value);
+                if (value != defaultValue) {
+                    if (value == keyValue) {
+                        selectedAbilities.remove(ability.getName());
+                    } else {
+                        selectedAbilities.put(ability.getName(), value);
+                    }
                 }
             });
 

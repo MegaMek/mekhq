@@ -212,11 +212,14 @@ class LifePathAttributePicker extends JDialog {
             JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, categoryMinimumValue,
                   categoryMaximumValue, 1));
 
-            final int finalTraitKeyValue = keyValue;
             spnAttributeScore.addChangeListener(evt -> {
                 int value = (int) spnAttributeScore.getValue();
-                if (value != finalTraitKeyValue) {
-                    selectedAttributeScores.put(attribute, value);
+                if (value != defaultValue) {
+                    if (value == keyValue) {
+                        selectedAttributeScores.remove(attribute);
+                    } else {
+                        selectedAttributeScores.put(attribute, value);
+                    }
                 }
             });
             spnAttributeScore.addMouseListener(

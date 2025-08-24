@@ -233,11 +233,14 @@ class LifePathTraitPicker extends JDialog {
             JSpinner spnTraitScore = new JSpinner(new SpinnerNumberModel(defaultValue, traitMinimumValue,
                   traitMaximumValue, 1));
 
-            final int finalTraitKeyValue = keyValue;
             spnTraitScore.addChangeListener(evt -> {
                 int value = (int) spnTraitScore.getValue();
-                if (value != finalTraitKeyValue) {
-                    selectedTraitScores.put(trait, value);
+                if (value != defaultValue) {
+                    if (value == keyValue) {
+                        selectedTraitScores.remove(trait);
+                    } else {
+                        selectedTraitScores.put(trait, value);
+                    }
                 }
             });
             spnTraitScore.addMouseListener(

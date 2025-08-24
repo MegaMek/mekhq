@@ -265,8 +265,8 @@ class LifePathCategoryCountPicker extends JDialog {
             int maximumSkillLevel = 10;
 
             boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int defaultValue = selectedCategoryCounts.getOrDefault(category,
-                  (isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel));
+            int keyValue = isDefaultMaximum ? minimumSkillLevel : maximumSkillLevel;
+            int defaultValue = selectedCategoryCounts.getOrDefault(category, keyValue);
 
             JLabel lblCategory = new JLabel(label);
             JSpinner spnCategoryCount = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
@@ -278,11 +278,14 @@ class LifePathCategoryCountPicker extends JDialog {
                 spnCategoryCount.setValue(currentValue);
             }
 
-            final int finalTraitKeyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
             spnCategoryCount.addChangeListener(evt -> {
                 int value = (int) spnCategoryCount.getValue();
-                if (value != finalTraitKeyValue) {
-                    selectedCategoryCounts.put(category, value);
+                if (value != defaultValue) {
+                    if (value == keyValue) {
+                        selectedCategoryCounts.remove(category);
+                    } else {
+                        selectedCategoryCounts.put(category, value);
+                    }
                 }
             });
 
