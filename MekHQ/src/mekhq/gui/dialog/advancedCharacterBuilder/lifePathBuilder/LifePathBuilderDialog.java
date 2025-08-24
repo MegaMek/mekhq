@@ -418,8 +418,7 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            flexibleXPTab.resetTab();
-            requirementsTab.resetTab();
+            resetNonBasicTabs();
 
             loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord);
 
@@ -470,6 +469,13 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    private void resetNonBasicTabs() {
+        fixedXPTab.resetTab();
+        flexibleXPTab.resetTab();
+        requirementsTab.resetTab();
+        exclusionsTab.resetTab();
     }
 
     private void performDialogCloseAction() {
