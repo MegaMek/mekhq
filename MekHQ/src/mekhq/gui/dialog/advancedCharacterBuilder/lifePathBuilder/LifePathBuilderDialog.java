@@ -404,7 +404,9 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            resetAllContentTabs();
+            flexibleXPTab.resetTabs();
+            requirementsTab.resetTabs();
+
             loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord);
         });
 
@@ -448,13 +450,6 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
-    }
-
-    private void resetAllContentTabs() {
-        fixedXPTab.resetTabs();
-        flexibleXPTab.resetTabs();
-        requirementsTab.resetTabs();
-        exclusionsTab.resetTabs();
     }
 
     private void displayIDRegenerationDialogs() {
@@ -630,9 +625,13 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     public static void writeToJSONWithDialog(LifePath record) {
-        String baseName = record.name().replace(" ", "_");
+        String baseName = record.name();
         if (baseName.isBlank()) {
             baseName = "unnamed_life_path";
+        } else {
+            baseName = baseName.replaceAll("[<>:\"/\\\\|?*\\p{Cntrl}]", "");
+            baseName = baseName.replaceAll("[. ]+$", "");
+            baseName = baseName.replaceAll("^_|_$", "");
         }
 
         // Pick an initial directory (preferably the user directory or fallback)
