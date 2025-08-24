@@ -140,7 +140,7 @@ public class AtBGameThread extends GameThread {
             swingGui.initialize();
         }
 
-        controller.clientgui = swingGui;
+        controller.clientGUI = swingGui;
 
         try {
             client.connect();
