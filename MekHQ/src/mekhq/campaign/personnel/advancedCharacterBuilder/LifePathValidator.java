@@ -40,6 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import megamek.codeUtilities.StringUtility;
+
 public class LifePathValidator {
     private final LifePath lifePath;
     private final Set<InvalidLifePathReason> invalidReasons = new HashSet<>();
@@ -54,6 +56,10 @@ public class LifePathValidator {
         // Tests
         checkFlexiblePicks();
         checkAffiliationFactionRequirement();
+        checkSource();
+        checkName();
+        checkLifeStages();
+        checkCategories();
     }
 
     private void checkFlexiblePicks() {
@@ -95,6 +101,30 @@ public class LifePathValidator {
 
             // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
             invalidReasons.add(MISSING_FACTION);
+        }
+    }
+
+    private void checkSource() {
+        if (StringUtility.isNullOrBlank(lifePath.source())) {
+            invalidReasons.add(InvalidLifePathReason.MISSING_SOURCE);
+        }
+    }
+
+    private void checkName() {
+        if (StringUtility.isNullOrBlank(lifePath.name())) {
+            invalidReasons.add(InvalidLifePathReason.MISSING_NAME);
+        }
+    }
+
+    private void checkLifeStages() {
+        if (lifePath.lifeStages().isEmpty()) {
+            invalidReasons.add(InvalidLifePathReason.MISSING_LIFE_STAGE);
+        }
+    }
+
+    private void checkCategories() {
+        if (lifePath.categories().isEmpty()) {
+            invalidReasons.add(InvalidLifePathReason.MISSING_CATEGORIES);
         }
     }
 }
