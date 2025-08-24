@@ -657,6 +657,11 @@ public class LifePathTab {
     StringBuilder buildIndividualProgressText(int index) {
         StringBuilder individualProgressText = new StringBuilder();
 
+        boolean isXP = tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP;
+        final String TEXT_LEAD_POSITIVE = isXP ? " +" : " ";
+        final String TEXT_LEAD_NEGATIVE = " ";
+        final String TEXT_TRAIL = isXP ? " XP" : "+";
+
         // Factions
         List<String> workingFactions = storedFactions.get(index);
         if (workingFactions != null && !workingFactions.isEmpty()) {
@@ -696,10 +701,12 @@ public class LifePathTab {
             int counter = 0;
             int length = workingCategories.size();
             for (Map.Entry<LifePathCategory, Integer> entry : workingCategories.entrySet()) {
+                int value = entry.getValue();
+
                 individualProgressText.append(entry.getKey().getDisplayName());
-                individualProgressText.append(" ");
+                individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
                 individualProgressText.append(entry.getValue());
-                individualProgressText.append("+");
+                individualProgressText.append(TEXT_TRAIL);
                 counter++;
                 if (counter != length) {
                     individualProgressText.append(", ");
@@ -715,10 +722,12 @@ public class LifePathTab {
             int counter = 0;
             int length = workingAttributes.size();
             for (Map.Entry<SkillAttribute, Integer> entry : workingAttributes.entrySet()) {
+                int value = entry.getValue();
+
                 individualProgressText.append(entry.getKey().getLabel());
-                individualProgressText.append(" ");
+                individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
                 individualProgressText.append(entry.getValue());
-                individualProgressText.append("+");
+                individualProgressText.append(TEXT_TRAIL);
                 counter++;
                 if (counter != length) {
                     individualProgressText.append(", ");
@@ -734,10 +743,12 @@ public class LifePathTab {
             int counter = 0;
             int length = workingTraits.size();
             for (Map.Entry<LifePathEntryDataTraitLookup, Integer> entry : workingTraits.entrySet()) {
+                int value = entry.getValue();
+
                 individualProgressText.append(entry.getKey().getDisplayName());
-                individualProgressText.append(" ");
+                individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
                 individualProgressText.append(entry.getValue());
-                individualProgressText.append("+");
+                individualProgressText.append(TEXT_TRAIL);
                 counter++;
                 if (counter != length) {
                     individualProgressText.append(", ");
@@ -754,11 +765,12 @@ public class LifePathTab {
             int length = workingSkills.size();
             for (Map.Entry<String, Integer> entry : workingSkills.entrySet()) {
                 String label = entry.getKey().replace(SkillType.RP_ONLY_TAG, "");
+                int value = entry.getValue();
 
                 individualProgressText.append(label);
-                individualProgressText.append(" ");
+                individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
                 individualProgressText.append(entry.getValue());
-                individualProgressText.append("+");
+                individualProgressText.append(TEXT_TRAIL);
                 counter++;
                 if (counter != length) {
                     individualProgressText.append(", ");
@@ -783,7 +795,18 @@ public class LifePathTab {
 
                 SpecialAbility ability = abilityInfo.getAbility();
                 String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
-                individualProgressText.append(label);
+                if (isXP) {
+                    Integer value = workingAbilities.get(abilityName);
+                    if (value != null) {
+                        individualProgressText.append(label);
+                        individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
+                        individualProgressText.append(value);
+                        individualProgressText.append(TEXT_TRAIL);
+                    } else {
+                        LOGGER.warn("Could not find value for abilityName in working abilities: {}", abilityName);
+                    }
+                }
+
                 if (i != spas.size() - 1) {
                     individualProgressText.append(", ");
                 }

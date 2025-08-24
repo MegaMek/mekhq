@@ -199,5 +199,4 @@ public record LifePath(
         }
 
     }
-
 }
