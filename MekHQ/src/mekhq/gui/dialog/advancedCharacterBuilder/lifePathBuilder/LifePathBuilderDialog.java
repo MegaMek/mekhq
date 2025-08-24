@@ -324,7 +324,7 @@ public class LifePathBuilderDialog extends JDialog {
         String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.lifePath");
         tabMain.setBorder(createRoundedLineBorder(title));
 
-        basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain, gameYear);
+        basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
 
         fixedXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FIXED_XP);
         fixedXPTab.buildTab();
@@ -533,6 +533,8 @@ public class LifePathBuilderDialog extends JDialog {
         basicInfoTab.setDiscount(record.xpDiscount());
         basicInfoTab.setLifeStages(record.lifeStages());
         basicInfoTab.setCategories(record.categories());
+        basicInfoTab.setMinimumYear(record.minimumYear());
+        basicInfoTab.setMaximumYear(record.maximumYear());
 
         // Requirements
         int requirementsMaxKey = -1;
@@ -764,6 +766,8 @@ public class LifePathBuilderDialog extends JDialog {
         String flavorText = basicInfoTab.getFlavorText();
         int age = basicInfoTab.getAge();
         int xpDiscount = basicInfoTab.getDiscount();
+        int minimumYear = basicInfoTab.getMinimumYear();
+        int maximumYear = basicInfoTab.getMaximumYear();
         List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
         List<LifePathCategory> categories = basicInfoTab.getCategories();
 
@@ -806,11 +810,12 @@ public class LifePathBuilderDialog extends JDialog {
               flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities);
 
         // Build and return the Record
-        return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, lifeStages, categories,
-              requirementsFactions, requirementsLifePath, requirementsCategories, requirementsAttributes,
-              requirementsTraits, requirementsSkills, requirementsAbilities, exclusionsFactions, exclusionsLifePath,
-              exclusionsCategories, exclusionsAttributes, exclusionsTraits, exclusionsSkills, exclusionsAbilities,
-              fixedXPAttributes, fixedXPTraits, fixedXPSkills, fixedXPAbilities, flexibleXPAttributes,
-              flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities, flexibleXPPickCount);
+        return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, minimumYear, maximumYear,
+              lifeStages, categories, requirementsFactions, requirementsLifePath, requirementsCategories,
+              requirementsAttributes, requirementsTraits, requirementsSkills, requirementsAbilities,
+              exclusionsFactions, exclusionsLifePath, exclusionsCategories, exclusionsAttributes, exclusionsTraits,
+              exclusionsSkills, exclusionsAbilities, fixedXPAttributes, fixedXPTraits, fixedXPSkills,
+              fixedXPAbilities, flexibleXPAttributes, flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities,
+              flexibleXPPickCount);
     }
 }

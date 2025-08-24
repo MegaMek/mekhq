@@ -41,6 +41,7 @@ public enum InvalidLifePathReason {
     MISSING_NAME("MISSING_NAME"),
     MISSING_SOURCE("MISSING_SOURCE"),
     NO_FLEXIBLE_PICKS("NO_FLEXIBLE_PICKS"),
+    MIN_YEAR_ABOVE_MAX_YEAR("MIN_YEAR_ABOVE_MAX_YEAR"),
     TOO_MANY_FLEXIBLE_PICKS("TOO_MANY_FLEXIBLE_PICKS");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InvalidLifePathReason";

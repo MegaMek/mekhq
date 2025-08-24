@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -50,13 +52,15 @@ public record LifePath(
       // Dynamic
       UUID id,
       Version version,
-      int xpCost,
+      Integer xpCost, // Always use full objects, not primitives, so we can use null checks in compatibility handlers
       // Basic Info
       String source,
       String name,
       String flavorText,
-      int age,
-      int xpDiscount,
+      Integer age,
+      Integer xpDiscount,
+      Integer minimumYear,
+      Integer maximumYear,
       List<ATOWLifeStage> lifeStages,
       List<LifePathCategory> categories,
       // Requirements
@@ -87,12 +91,48 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> flexibleXPAbilities,
       int flexibleXPPickCount
 ) {
+    static MMLogger LOGGER = MMLogger.create(LifePath.class);
+
     public LifePath {
+        // Preliminary Checks
         if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
         }
         if (version == null) {
             throw new IllegalArgumentException("version cannot be null");
+        }
+
+        // Cross-Version Compatibility Handlers
+        if (version.isLowerThan(MHQConstants.LAST_MILESTONE)) {
+            throw new IllegalArgumentException("Unsupported version: " + version);
+        }
+
+        Version currentVersion = MHQConstants.VERSION;
+        if (version.isHigherThan(currentVersion)) {
+            throw new IllegalArgumentException("Unsupported version: " + version);
+        }
+
+        if (version.isLowerThan(currentVersion) || version.is(currentVersion)) {
+            // Perform any necessary conversions here. Largely this will be adding new fields to the record. The is()
+            // call is important, as it means these conversions will still occur for Nightly releases. Otherwise,
+            // we'll end up in a situation where players on the Nightlies can't load their Life Paths any time this
+            // class is changed. We only need to keep compatibility handlers until the next Milestone release, at
+            // which point they can be removed.
+
+            if (minimumYear == null) { // Added 50.07
+                LOGGER.warn("Minimum year is null, setting to 0");
+                minimumYear = 0;
+            }
+
+            if (maximumYear == null) { // Added 50.07
+                LOGGER.warn("Maximum year is null, setting to 9999");
+                maximumYear = 9999;
+            }
+        }
+
+        // Data Validation Checks
+        if (xpCost == null) {
+            throw new IllegalArgumentException("xpCost cannot be null");
         }
         if (xpCost < 0) {
             throw new IllegalArgumentException("xpCost must be a non-negative integer");
@@ -106,11 +146,26 @@ public record LifePath(
         if (flavorText == null) {
             throw new IllegalArgumentException("flavorText cannot be null");
         }
+        if (age == null) {
+            throw new IllegalArgumentException("age cannot be null");
+        }
         if (age < 0) {
             throw new IllegalArgumentException("age must be a non-negative integer");
         }
+        if (xpDiscount == null) {
+            throw new IllegalArgumentException("xpDiscount cannot be null");
+        }
         if (xpDiscount < 0) {
             throw new IllegalArgumentException("xpDiscount must be a non-negative integer");
+        }
+        if (minimumYear == null) {
+            throw new IllegalArgumentException("minimumYear cannot be null");
+        }
+        if (maximumYear == null) {
+            throw new IllegalArgumentException("maximumYear cannot be null");
+        }
+        if (maximumYear < minimumYear) {
+            throw new IllegalArgumentException("maximumYear must be greater than or equal to minimumYear");
         }
         if (lifeStages == null) {
             throw new IllegalArgumentException("lifeStages cannot be null");
@@ -197,6 +252,5 @@ public record LifePath(
             throw new IllegalArgumentException(
                   "flexibleXPPickCount must be less than or equal to the total number of flexible XP award groups");
         }
-
     }
 }

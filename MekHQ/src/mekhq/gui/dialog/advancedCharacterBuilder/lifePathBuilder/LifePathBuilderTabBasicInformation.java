@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderMinimumComponentWidth;
@@ -69,6 +70,8 @@ public class LifePathBuilderTabBasicInformation {
     private final JTextArea txtFlavorText;
     private final JSpinner spnAge;
     private final JSpinner spnDiscount;
+    private final JSpinner spnMinimumYear;
+    private final JSpinner spnMaximumYear;
     private List<ATOWLifeStage> lifeStages = new ArrayList<>();
     private List<LifePathCategory> categories = new ArrayList<>();
 
@@ -112,6 +115,29 @@ public class LifePathBuilderTabBasicInformation {
         spnDiscount.setValue(discount);
     }
 
+    public int getMinimumYear() {
+        int value = (int) spnMinimumYear.getValue();
+        int maximumYear = (int) spnMaximumYear.getValue();
+
+        if (value >= maximumYear) {
+            value = max(0, maximumYear - 1);
+        }
+
+        return max(0, value);
+    }
+
+    public void setMinimumYear(int minimumYear) {
+        spnMinimumYear.setValue(minimumYear);
+    }
+
+    public int getMaximumYear() {
+        return max(1, (int) spnMaximumYear.getValue());
+    }
+
+    public void setMaximumYear(int maximumYear) {
+        spnMaximumYear.setValue(maximumYear);
+    }
+
     public List<ATOWLifeStage> getLifeStages() {
         return lifeStages;
     }
@@ -128,7 +154,7 @@ public class LifePathBuilderTabBasicInformation {
         this.categories = categories;
     }
 
-    LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain, int gameYear) {
+    LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
         JPanel tabBasicInformation = new JPanel();
         tabBasicInformation.setName("basic");
         String titleBasic = getTextAt(RESOURCE_BUNDLE,
@@ -151,7 +177,6 @@ public class LifePathBuilderTabBasicInformation {
               scaleForGUI(rowHeight + 12));
         nameScroll.setPreferredSize(nameSize);
         nameScroll.setMaximumSize(nameSize);
-
         lblName.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipName)
         );
@@ -201,7 +226,6 @@ public class LifePathBuilderTabBasicInformation {
               scaleForGUI(rowHeight * 10 + 12));
         flavorScroll.setPreferredSize(flavorSize);
         flavorScroll.setMaximumSize(flavorSize);
-
         lblFlavorText.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipFlavorText)
         );
@@ -224,7 +248,6 @@ public class LifePathBuilderTabBasicInformation {
               spnAge.getPreferredSize().height);
         spnAge.setPreferredSize(ageSize);
         spnAge.setMaximumSize(ageSize);
-
         lblAge.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAge)
         );
@@ -239,12 +262,11 @@ public class LifePathBuilderTabBasicInformation {
         final String tooltipDiscount = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.discount.tooltip");
         JLabel lblDiscount = new JLabel(titleDiscount);
-        spnDiscount = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+        spnDiscount = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
         Dimension discountSize = new Dimension(DERIVED_WIDTH - lblDiscount.getWidth(),
               spnAge.getPreferredSize().height);
         spnDiscount.setPreferredSize(discountSize);
         spnDiscount.setMaximumSize(discountSize);
-
         lblDiscount.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
         );
@@ -252,6 +274,44 @@ public class LifePathBuilderTabBasicInformation {
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
         );
         spnDiscount.addChangeListener(e -> parent.updateTxtProgress());
+
+        // Minimum Year
+        final String titleMinimumYear = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.minimumYear.label");
+        final String tooltipMinimumYear = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.minimumYear.tooltip");
+        JLabel lblMinimumYear = new JLabel(titleMinimumYear);
+        spnMinimumYear = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+        Dimension minimumYearSize = new Dimension(DERIVED_WIDTH - lblMinimumYear.getWidth(),
+              spnAge.getPreferredSize().height);
+        spnMinimumYear.setPreferredSize(minimumYearSize);
+        spnMinimumYear.setMaximumSize(minimumYearSize);
+        lblMinimumYear.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMinimumYear)
+        );
+        spnMinimumYear.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMinimumYear)
+        );
+        spnMinimumYear.addChangeListener(e -> parent.updateTxtProgress());
+
+        // Maximum Year
+        final String titleMaximumYear = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.maximumYear.label");
+        final String tooltipMaximumYear = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.maximumYear.tooltip");
+        JLabel lblMaximumYear = new JLabel(titleMaximumYear);
+        spnMaximumYear = new JSpinner(new SpinnerNumberModel(9999, 1, 9999, 1));
+        Dimension maximumYearSize = new Dimension(DERIVED_WIDTH - lblMaximumYear.getWidth(),
+              spnAge.getPreferredSize().height);
+        spnMaximumYear.setPreferredSize(maximumYearSize);
+        spnMaximumYear.setMaximumSize(maximumYearSize);
+        lblMaximumYear.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMaximumYear)
+        );
+        spnMaximumYear.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMaximumYear)
+        );
+        spnMaximumYear.addChangeListener(e -> parent.updateTxtProgress());
 
         // Manage Life Stages
         final String titleManageLifeStages = getTextAt(RESOURCE_BUNDLE,
@@ -299,6 +359,8 @@ public class LifePathBuilderTabBasicInformation {
                                     .addComponent(lblSource)
                                     .addComponent(lblAge)
                                     .addComponent(lblDiscount)
+                                    .addComponent(lblMinimumYear)
+                                    .addComponent(lblMaximumYear)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                     .addComponent(nameScroll)
@@ -309,6 +371,12 @@ public class LifePathBuilderTabBasicInformation {
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(spnDiscount)
+                                    )
+                                    .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(spnMinimumYear)
+                                    )
+                                    .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(spnMaximumYear)
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(btnManageLifeStages)
@@ -339,6 +407,14 @@ public class LifePathBuilderTabBasicInformation {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(lblDiscount)
                                     .addComponent(spnDiscount)
+                    )
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblMinimumYear)
+                                    .addComponent(spnMinimumYear)
+                    )
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblMaximumYear)
+                                    .addComponent(spnMaximumYear)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(btnManageLifeStages)

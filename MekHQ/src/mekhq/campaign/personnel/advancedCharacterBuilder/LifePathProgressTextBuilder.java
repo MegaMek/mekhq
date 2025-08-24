@@ -85,7 +85,7 @@ public class LifePathProgressTextBuilder {
         }
 
         int age = basicInfoTab.getAge();
-        if (!newText.isEmpty()) {
+        if (!flavorText.isBlank()) {
             newText.append("<br>");
         }
         newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.age", age));
@@ -112,7 +112,7 @@ public class LifePathProgressTextBuilder {
                 lifeStageText.append(", ").append(lifeStage.getDisplayName());
             }
         }
-        newText.append("<br>").append(lifeStageText);
+        newText.append(lifeStageText);
 
         List<LifePathCategory> categories = basicInfoTab.getCategories();
         StringBuilder categoriesText = new StringBuilder();
