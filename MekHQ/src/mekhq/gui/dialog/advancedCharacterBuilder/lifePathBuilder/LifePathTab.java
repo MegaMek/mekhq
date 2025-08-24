@@ -821,7 +821,18 @@ public class LifePathTab {
         }
     }
 
-    public void resetTabs() {
+    public void resetTab() {
         tabLocal.removeAll();
+
+        storedFactions.clear();
+        storedLifePaths.clear();
+        storedCategories.clear();
+        storedAttributes.clear();
+        storedTraits.clear();
+        storedSkills.clear();
+        storedAbilities.clear();
+        spnFlexibleXPPicks.setValue(0);
+
+        parent.updateTxtProgress();
     }
 }

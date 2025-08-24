@@ -51,6 +51,7 @@ public class LifePathIO {
     private static final MMLogger LOGGER = MMLogger.create(LifePathIO.class);
 
     public static Map<UUID, LifePath> loadAllLifePaths() {
+        LOGGER.info("Loading all LifePaths");
         Map<UUID, LifePath> lifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(LIFE_PATHS_DIRECTORY_PATH));
 
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
@@ -75,6 +76,7 @@ public class LifePathIO {
     private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(String directoryPath) {
         Map<UUID, LifePath> lifePathMap = new HashMap<>();
         try {
+            LOGGER.info("Loading LifePaths from directory {}", directoryPath);
             FilenameFilter filter = (dir, name) -> name.toLowerCase().endsWith(".json");
 
             File[] files = Utilities.getAllFiles(directoryPath, filter);
@@ -87,13 +89,17 @@ public class LifePathIO {
                         LifePath record = objectMapper.readValue(file, LifePath.class);
                         UUID id = record.id();
                         if (id != null) {
+                            if (lifePathMap.containsKey(id)) {
+                                LOGGER.warn("Duplicate LifePath id found in directory {}. Overwriting.", directoryPath);
+                            }
+
                             lifePathMap.put(id, record);
-                            LOGGER.info("Loaded LifePath [{}] from {}", id, file.getAbsolutePath());
+                            LOGGER.info("Loaded LifePath [{}] from {}", record.name(), file.getPath());
                         } else {
-                            LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getAbsolutePath());
+                            LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getPath());
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Failed to load LifePath from {}: {}", file.getAbsolutePath(), e.getMessage());
+                        LOGGER.error("Failed to load LifePath from {}: {}", file.getPath(), e.getMessage());
                     }
                 }
             }

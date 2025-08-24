@@ -404,8 +404,8 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            flexibleXPTab.resetTabs();
-            requirementsTab.resetTabs();
+            flexibleXPTab.resetTab();
+            requirementsTab.resetTab();
 
             loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord);
         });
