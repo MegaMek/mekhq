@@ -37,7 +37,11 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
 import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 
 import java.awt.BorderLayout;
@@ -47,6 +51,8 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -83,13 +90,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBuilder;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathXPCostCalculator;
+import mekhq.campaign.personnel.advancedCharacterBuilder.*;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
@@ -162,6 +163,13 @@ public class LifePathBuilderDialog extends JDialog {
         SwingUtilities.invokeLater(() -> scrollInstructions.getVerticalScrollBar().setValue(0));
         SwingUtilities.invokeLater(() -> scrollProgress.getVerticalScrollBar().setValue(0));
 
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                performDialogCloseAction(); // includes dispose() call
+            }
+        });
         setContentPane(contents);
         setMinimumSize(MINIMUM_SIZE);
         setPreferredSize(PREFERRED_SIZE);
@@ -389,7 +397,7 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnCancel.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnCancel.addActionListener(e -> dispose());
+        btnCancel.addActionListener(e -> performDialogCloseAction());
 
         String titleSave = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.save");
         RoundedJButton btnSave = new RoundedJButton(titleSave);
@@ -398,7 +406,11 @@ public class LifePathBuilderDialog extends JDialog {
         btnSave.addActionListener(e -> {
             displayIDRegenerationDialogs();
             LifePath record = buildLifePathFromBuilderWizard();
-            writeToJSONWithDialog(record);
+            boolean isValid = validateLifePath(record);
+
+            if (isValid) {
+                writeToJSONWithDialog(record);
+            }
         });
 
         String titleLoad = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.load");
@@ -452,6 +464,33 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    private void performDialogCloseAction() {
+        Map<UUID, LifePath> lifePaths = LifePathIO.loadAllLifePaths();
+        campaign.setLifePathLibrary(lifePaths);
+        dispose();
+    }
+
+    private boolean validateLifePath(LifePath record) {
+        LifePathValidator validator = new LifePathValidator(record);
+        Set<InvalidLifePathReason> invalidReasons = validator.getInvalidReasons();
+
+        if (invalidReasons.isEmpty()) {
+            return true;
+        }
+
+        StringBuilder invalidText = new StringBuilder(getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.invalid.label"));
+        for (InvalidLifePathReason invalidReason : invalidReasons) {
+            invalidText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.invalid.format",
+                  spanOpeningWithCustomColor(getWarningColor()), invalidReason.getDisplayName(),
+                  CLOSING_SPAN_TAG, invalidReason.getDescription()));
+        }
+
+
+        new ImmersiveDialogNotification(campaign, invalidText.toString(), true);
+        return false;
     }
 
     private void displayIDRegenerationDialogs() {
