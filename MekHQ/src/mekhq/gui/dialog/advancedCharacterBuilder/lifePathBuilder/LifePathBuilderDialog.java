@@ -78,6 +78,7 @@ import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
@@ -89,8 +90,10 @@ import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathProgressTextBui
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathXPCostCalculator;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.GUI;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.io.FileType;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
@@ -121,13 +124,14 @@ public class LifePathBuilderDialog extends JDialog {
     private JPanel pnlInstructions;
     private JPanel pnlProgress;
 
+    private UUID lifePathId = UUID.randomUUID();
     private LifePathBuilderTabBasicInformation basicInfoTab;
     private LifePathTab requirementsTab;
     private LifePathTab exclusionsTab;
     private LifePathTab fixedXPTab;
     private LifePathTab flexibleXPTab;
 
-    private UUID lifePathId = UUID.randomUUID();
+    private final Campaign campaign;
     private final List<String> level3Abilities = new ArrayList<>();
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
 
@@ -147,8 +151,10 @@ public class LifePathBuilderDialog extends JDialog {
         return PADDING;
     }
 
-    public LifePathBuilderDialog(Frame owner, int gameYear) {
+    public LifePathBuilderDialog(Campaign campaign, Frame owner, int gameYear) {
         super(owner, getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.title"), true);
+        this.campaign = campaign;
+
         JPanel contents = initialize(gameYear);
 
         SwingUtilities.invokeLater(() -> scrollInstructions.getVerticalScrollBar().setValue(0));
@@ -306,7 +312,7 @@ public class LifePathBuilderDialog extends JDialog {
     private EnhancedTabbedPane initializeMainPanel(int gameYear) {
         EnhancedTabbedPane tabMain = new EnhancedTabbedPane();
         String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.lifePath");
-        tabMain.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
+        tabMain.setBorder(createRoundedLineBorder(title));
 
         basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain, gameYear);
 
@@ -362,7 +368,7 @@ public class LifePathBuilderDialog extends JDialog {
 
     private JPanel initializeControlPanel() {
         JPanel pnlControls = new JPanel(new GridBagLayout());
-        pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        pnlControls.setBorder(createRoundedLineBorder());
 
         JPanel pnlContents = new JPanel();
         pnlContents.setLayout(new BoxLayout(pnlContents, BoxLayout.Y_AXIS));
@@ -388,6 +394,7 @@ public class LifePathBuilderDialog extends JDialog {
         btnSave.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
         btnSave.addActionListener(e -> {
+            displayIDRegenerationDialogs();
             LifePath record = buildLifePathFromBuilderWizard();
             writeToJSONWithDialog(record);
         });
@@ -438,6 +445,34 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    private void displayIDRegenerationDialogs() {
+        final int REGENERATE_ID = 0;
+
+        ImmersiveDialogSimple dialog = null;
+        boolean choiceConfirmed = false;
+        while (!choiceConfirmed) {
+            dialog = new ImmersiveDialogSimple(campaign,
+                  null,
+                  null,
+                  getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.label.inCharacter"),
+                  List.of(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.button.confirm"),
+                        getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.button.decline")),
+                  getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.label.outOfCharacter"),
+                  null,
+                  false);
+
+            ImmersiveDialogConfirmation confirmationDialog = new ImmersiveDialogConfirmation(campaign);
+            choiceConfirmed = confirmationDialog.wasConfirmed();
+        }
+
+        if (dialog.getDialogChoice() == REGENERATE_ID) {
+            lifePathId = UUID.randomUUID();
+
+            new ImmersiveDialogNotification(campaign,
+                  getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.confirmation.label"), true);
+        }
     }
 
     private void updateBuilderFromExistingLifePathRecord(LifePath record) {
