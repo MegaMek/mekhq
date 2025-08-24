@@ -403,7 +403,10 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnLoad.addActionListener(e -> loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord));
+        btnLoad.addActionListener(e -> {
+            resetAllContentTabs();
+            loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord);
+        });
 
         String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
         RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
@@ -445,6 +448,13 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    private void resetAllContentTabs() {
+        fixedXPTab.resetTabs();
+        flexibleXPTab.resetTabs();
+        requirementsTab.resetTabs();
+        exclusionsTab.resetTabs();
     }
 
     private void displayIDRegenerationDialogs() {

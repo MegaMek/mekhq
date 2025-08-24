@@ -820,4 +820,8 @@ public class LifePathTab {
             progressText.append(", ");
         }
     }
+
+    public void resetTabs() {
+        tabLocal.removeAll();
+    }
 }
