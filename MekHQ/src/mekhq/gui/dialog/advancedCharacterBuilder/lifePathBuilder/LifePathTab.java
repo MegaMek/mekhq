@@ -206,6 +206,7 @@ public class LifePathTab {
         spnFlexibleXPPicks.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
         );
+        spnFlexibleXPPicks.addChangeListener(e -> parent.updateTxtProgress());
         panelPicksRow.add(lblFlexibleXPPicks);
         panelPicksRow.add(spnFlexibleXPPicks);
     }
