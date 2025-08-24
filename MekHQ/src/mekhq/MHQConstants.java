@@ -264,7 +264,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String AWARDS_IMAGE_DIRECTORY_PATH = "data/images/awards";
     public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
-    public static final String LIFE_PATHS_DIRECTORY_PATH = "data/universe/lifePaths";
+    public static final String LIFE_PATHS_DEFAULT_DIRECTORY_PATH = "data/advancedCharacterBuilder/lifePaths";
+    public static final String LIFE_PATHS_USER_DIRECTORY_PATH = "/advancedCharacterBuilder/lifePaths";
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";

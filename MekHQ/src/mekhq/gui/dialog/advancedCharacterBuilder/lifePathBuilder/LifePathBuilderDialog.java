@@ -34,7 +34,8 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.MHQConstants.LIFE_PATHS_DIRECTORY_PATH;
+import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -47,6 +48,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -637,7 +639,9 @@ public class LifePathBuilderDialog extends JDialog {
         // Pick an initial directory (preferably the user directory or fallback)
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
         if (userDirectory == null || userDirectory.isBlank()) {
-            userDirectory = LIFE_PATHS_DIRECTORY_PATH;
+            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+        } else {
+            userDirectory = userDirectory + LIFE_PATHS_USER_DIRECTORY_PATH;
         }
 
         Optional<File> dialogFile = GUI.fileDialogSave(
@@ -672,7 +676,9 @@ public class LifePathBuilderDialog extends JDialog {
     public static Optional<LifePath> loadFromJSONWithDialog() {
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
         if (userDirectory == null || userDirectory.isBlank()) {
-            userDirectory = LIFE_PATHS_DIRECTORY_PATH;
+            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+        } else {
+            userDirectory = Paths.get(userDirectory, LIFE_PATHS_USER_DIRECTORY_PATH).toString();
         }
 
         Optional<File> fileOpt = GUI.fileDialogOpen(

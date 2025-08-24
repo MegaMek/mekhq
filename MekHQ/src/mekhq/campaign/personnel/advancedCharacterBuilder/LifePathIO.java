@@ -32,7 +32,8 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import static mekhq.MHQConstants.LIFE_PATHS_DIRECTORY_PATH;
+import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -52,20 +53,25 @@ public class LifePathIO {
 
     public static Map<UUID, LifePath> loadAllLifePaths() {
         LOGGER.info("Loading all LifePaths");
-        Map<UUID, LifePath> lifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(LIFE_PATHS_DIRECTORY_PATH));
+        Map<UUID, LifePath> lifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(LIFE_PATHS_DEFAULT_DIRECTORY_PATH));
 
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        if (userDirectory != null && !userDirectory.isBlank()) {
-            LOGGER.info("Loading LifePaths from user directory {}", userDirectory);
-            Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(userDirectory));
-            for (UUID id : tempLifePathMap.keySet()) {
-                if (lifePathMap.containsKey(id)) {
-                    LOGGER.warn("Duplicate LifePath id found in both user directory and main directory. Overwriting.");
-                    continue;
-                }
+        if (userDirectory == null || userDirectory.isBlank()) {
+            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+        } else {
+            userDirectory = userDirectory + LIFE_PATHS_USER_DIRECTORY_PATH;
+        }
 
-                lifePathMap.put(id, tempLifePathMap.get(id));
+        LOGGER.info("Loading LifePaths from user directory {}", userDirectory);
+        Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(userDirectory));
+        for (UUID id : tempLifePathMap.keySet()) {
+            if (lifePathMap.containsKey(id)) {
+                LOGGER.warn("Duplicate LifePath id found in both user directory and main directory. Overwriting {} " +
+                                  "with {}.", lifePathMap.get(id).name(), tempLifePathMap.get(id).name());
+                continue;
             }
+
+            lifePathMap.put(id, tempLifePathMap.get(id));
         }
 
         validateLifePath(lifePathMap);
@@ -94,7 +100,7 @@ public class LifePathIO {
                             }
 
                             lifePathMap.put(id, record);
-                            LOGGER.info("Loaded LifePath [{}] from {}", record.name(), file.getPath());
+                            LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
                         } else {
                             LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getPath());
                         }
