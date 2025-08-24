@@ -801,10 +801,9 @@ public class LifePathBuilderDialog extends JDialog {
         // Dynamic
         UUID id = lifePathId;
         Version version = MHQConstants.VERSION;
-        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount,
-              fixedXPTab.getAttributes(), fixedXPTab.getTraits(), fixedXPTab.getSkills(),
-              fixedXPTab.getAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getAttributes(),
-              flexibleXPTab.getTraits(), flexibleXPTab.getSkills(), flexibleXPTab.getAbilities());
+        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount, fixedXPAttributes, fixedXPTraits,
+              fixedXPSkills, fixedXPAbilities, flexibleXPTab.getTabCount(), flexibleXPPickCount, flexibleXPAttributes,
+              flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities);
 
         // Build and return the Record
         return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, lifeStages, categories,

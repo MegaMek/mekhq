@@ -51,8 +51,9 @@ public class LifePathProgressTextBuilder {
 
         int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
               fixedXPTab.getAttributes(), fixedXPTab.getTraits(), fixedXPTab.getSkills(),
-              fixedXPTab.getAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getAttributes(),
-              flexibleXPTab.getTraits(), flexibleXPTab.getSkills(), flexibleXPTab.getAbilities());
+              fixedXPTab.getAbilities(), flexibleXPTab.getTabCount(), flexibleXPTab.getPickCount(),
+              flexibleXPTab.getAttributes(), flexibleXPTab.getTraits(), flexibleXPTab.getSkills(),
+              flexibleXPTab.getAbilities());
 
         String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);
         newProgressText.append(newBasicText);
@@ -76,70 +77,60 @@ public class LifePathProgressTextBuilder {
         StringBuilder newText = new StringBuilder();
 
         String name = basicInfoTab.getName();
-        if (!name.isBlank()) {
-            newText.append("<h1 style='text-align:center; margin:0'>").append(name).append("</h1>");
-        }
+        newText.append("<h1 style='text-align:center; margin:0'>").append(name).append("</h1>");
 
         String flavorText = basicInfoTab.getFlavorText();
         if (!flavorText.isBlank()) {
-            newText.append("<i>").append(flavorText).append("</i>");
+            newText.append("<blockquote><i>").append(flavorText).append("</i></blockquote>");
         }
 
         int age = basicInfoTab.getAge();
-        if (age > 0) {
-            if (!newText.isEmpty()) {
-                newText.append("<br>");
-            }
-            newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.age", age));
+        if (!newText.isEmpty()) {
+            newText.append("<br>");
         }
+        newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.age", age));
 
-        if (calculatedCost > 0) {
-            newText.append("<h2>");
-            newText.append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "LifePathBuilderDialog.tab.progress.basic.cost",
-                  calculatedCost));
-            newText.append("</h2>");
-        }
+        newText.append("<h2>");
+        newText.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.tab.progress.basic.cost",
+              calculatedCost));
+        newText.append("</h2>");
 
         List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
-        if (!lifeStages.isEmpty()) {
-            StringBuilder lifeStageText = new StringBuilder();
-            lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
+        StringBuilder lifeStageText = new StringBuilder();
+        lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
 
-            List<ATOWLifeStage> orderedLifeStages = lifeStages.stream()
-                                                          .sorted(ATOWLifeStage::compareTo)
-                                                          .toList();
+        List<ATOWLifeStage> orderedLifeStages = lifeStages.stream()
+                                                      .sorted(ATOWLifeStage::compareTo)
+                                                      .toList();
 
-            for (int i = 0; i < orderedLifeStages.size(); i++) {
-                ATOWLifeStage lifeStage = orderedLifeStages.get(i);
-                if (i == 0) {
-                    lifeStageText.append(lifeStage.getDisplayName());
-                } else {
-                    lifeStageText.append(", ").append(lifeStage.getDisplayName());
-                }
+        for (int i = 0; i < orderedLifeStages.size(); i++) {
+            ATOWLifeStage lifeStage = orderedLifeStages.get(i);
+            if (i == 0) {
+                lifeStageText.append(lifeStage.getDisplayName());
+            } else {
+                lifeStageText.append(", ").append(lifeStage.getDisplayName());
             }
-            newText.append("<br>").append(lifeStageText);
         }
+        newText.append("<br>").append(lifeStageText);
 
         List<LifePathCategory> categories = basicInfoTab.getCategories();
-        if (!categories.isEmpty()) {
-            StringBuilder categoriesText = new StringBuilder();
-            categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));
+        StringBuilder categoriesText = new StringBuilder();
+        categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));
 
-            List<LifePathCategory> orderedCategories = categories.stream()
-                                                             .sorted(LifePathCategory::compareTo)
-                                                             .toList();
+        List<LifePathCategory> orderedCategories = categories.stream()
+                                                         .sorted(LifePathCategory::compareTo)
+                                                         .toList();
 
-            for (int i = 0; i < orderedCategories.size(); i++) {
-                LifePathCategory category = orderedCategories.get(i);
-                if (i == 0) {
-                    categoriesText.append(category.getDisplayName());
-                } else {
-                    categoriesText.append(", ").append(category.getDisplayName());
-                }
+        for (int i = 0; i < orderedCategories.size(); i++) {
+            LifePathCategory category = orderedCategories.get(i);
+            if (i == 0) {
+                categoriesText.append(category.getDisplayName());
+            } else {
+                categoriesText.append(", ").append(category.getDisplayName());
             }
-            newText.append("<br>").append(categoriesText);
         }
+        newText.append("<br>").append(categoriesText);
 
         return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
     }
