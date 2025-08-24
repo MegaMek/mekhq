@@ -193,6 +193,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathIO;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
@@ -272,6 +274,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
@@ -436,8 +439,9 @@ public class Campaign implements ITechManager {
     // We deliberately don't write this data to the save file as we want it rebuilt
     // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
-    RandomEventLibraries randomEventLibraries;
-    FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private RandomEventLibraries randomEventLibraries;
+    private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private Map<UUID, LifePath> lifePathLibrary;
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -565,6 +569,13 @@ public class Campaign implements ITechManager {
         } catch (Exception ex) {
             logger.error("Unable to initialize FactionStandingUltimatumsLibrary. If this wasn't during automated " +
                                "testing this must be investigated.", ex);
+        }
+
+        try {
+            lifePathLibrary = LifePathIO.loadAllLifePaths();
+        } catch (Exception ex) {
+            logger.error("Unable to initialize Life Path Library. If this wasn't during automated testing this must " +
+                               "be investigated.", ex);
         }
     }
 
@@ -6102,6 +6113,9 @@ public class Campaign implements ITechManager {
             processReputationChanges();
         }
 
+        LifePathBuilderDialog lifePathBuilderDialog = new LifePathBuilderDialog(this,
+              getApp().getCampaigngui().getFrame(), getGameYear());
+
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
         }
@@ -7335,6 +7349,18 @@ public class Campaign implements ITechManager {
 
     public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
         return factionStandingUltimatumsLibrary;
+    }
+
+    public Map<UUID, LifePath> getLifePathLibrary() {
+        return lifePathLibrary;
+    }
+
+    public @Nullable LifePath getSingleLifePath(UUID lifePathID) {
+        return lifePathLibrary.get(lifePathID);
+    }
+
+    public void setLifePathLibrary(Map<UUID, LifePath> lifePathLibrary) {
+        this.lifePathLibrary = lifePathLibrary;
     }
 
     public void writeToXML(final PrintWriter writer) {

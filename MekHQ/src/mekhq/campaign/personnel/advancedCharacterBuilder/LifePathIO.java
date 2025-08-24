@@ -62,12 +62,12 @@ public class LifePathIO {
             userDirectory = userDirectory + LIFE_PATHS_USER_DIRECTORY_PATH;
         }
 
-        LOGGER.info("Loading LifePaths from user directory {}", userDirectory);
+        LOGGER.info("Loading LifePaths from user directory {}", LIFE_PATHS_USER_DIRECTORY_PATH);
         Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(userDirectory));
         for (UUID id : tempLifePathMap.keySet()) {
             if (lifePathMap.containsKey(id)) {
-                LOGGER.warn("Duplicate LifePath id found in both user directory and main directory. Overwriting {} " +
-                                  "with {}.", lifePathMap.get(id).name(), tempLifePathMap.get(id).name());
+                LOGGER.warn("Overriding {} with {}.", lifePathMap.get(id).name(),
+                      tempLifePathMap.get(id).name());
                 continue;
             }
 
@@ -82,7 +82,7 @@ public class LifePathIO {
     private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(String directoryPath) {
         Map<UUID, LifePath> lifePathMap = new HashMap<>();
         try {
-            LOGGER.info("Loading LifePaths from directory {}", directoryPath);
+            LOGGER.info("Loading LifePaths");
             FilenameFilter filter = (dir, name) -> name.toLowerCase().endsWith(".json");
 
             File[] files = Utilities.getAllFiles(directoryPath, filter);
@@ -96,7 +96,8 @@ public class LifePathIO {
                         UUID id = record.id();
                         if (id != null) {
                             if (lifePathMap.containsKey(id)) {
-                                LOGGER.warn("Duplicate LifePath id found in directory {}. Overwriting.", directoryPath);
+                                LOGGER.warn("Duplicate LifePath id found. Overwriting {} with {}.",
+                                      lifePathMap.get(id).name(), record.name());
                             }
 
                             lifePathMap.put(id, record);

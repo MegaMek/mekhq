@@ -175,7 +175,7 @@ class GameThread extends Thread implements CloseClientListener {
 
         createController();
         swingGui = new ClientGUI(client, controller);
-        controller.clientgui = swingGui;
+        controller.clientGUI = swingGui;
         localBots = (ClientGUI) swingGui;
         swingGui.initialize();
 
