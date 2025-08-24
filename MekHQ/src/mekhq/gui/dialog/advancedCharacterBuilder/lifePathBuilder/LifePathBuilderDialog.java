@@ -422,6 +422,12 @@ public class LifePathBuilderDialog extends JDialog {
             requirementsTab.resetTab();
 
             loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord);
+
+            // Reset the progress panel to the top of the page, otherwise it will be scrolled down on load
+            SwingUtilities.invokeLater(() -> {
+                scrollProgress.getVerticalScrollBar().setValue(0);
+                scrollProgress.getHorizontalScrollBar().setValue(0);
+            });
         });
 
         String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
