@@ -182,7 +182,7 @@ public class LifePathBuilderTabBasicInformation {
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipSource)
         );
         DocumentChangeListenerUtil.addChangeListener(
-              txtName.getDocument(),
+              txtSource.getDocument(),
               parent::updateTxtProgress
         );
 
@@ -209,7 +209,7 @@ public class LifePathBuilderTabBasicInformation {
               TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipFlavorText)
         );
         DocumentChangeListenerUtil.addChangeListener(
-              txtName.getDocument(),
+              txtFlavorText.getDocument(),
               parent::updateTxtProgress
         );
 
