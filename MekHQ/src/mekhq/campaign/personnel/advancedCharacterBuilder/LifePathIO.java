@@ -101,7 +101,8 @@ public class LifePathIO {
                             }
 
                             lifePathMap.put(id, record);
-                            LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
+                            // TODO downgrade to debug
+                            LOGGER.info("Loaded LifePath [{}] from {}", record.name(), file.getPath());
                         } else {
                             LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getPath());
                         }
