@@ -181,10 +181,10 @@ public class LifePathBuilderTabBasicInformation {
         nameScroll.setPreferredSize(nameSize);
         nameScroll.setMaximumSize(nameSize);
         lblName.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipName)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipName)
         );
         txtName.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipName)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipName)
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtName.getDocument(),
@@ -204,10 +204,10 @@ public class LifePathBuilderTabBasicInformation {
         sourceScroll.setPreferredSize(nameSize);
         sourceScroll.setMaximumSize(nameSize);
         lblSource.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipSource)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipSource)
         );
         txtSource.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipSource)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipSource)
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtSource.getDocument(),
@@ -230,10 +230,10 @@ public class LifePathBuilderTabBasicInformation {
         flavorScroll.setPreferredSize(flavorSize);
         flavorScroll.setMaximumSize(flavorSize);
         lblFlavorText.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipFlavorText)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipFlavorText)
         );
         flavorScroll.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipFlavorText)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipFlavorText)
         );
         DocumentChangeListenerUtil.addChangeListener(
               txtFlavorText.getDocument(),
@@ -252,10 +252,10 @@ public class LifePathBuilderTabBasicInformation {
         spnAge.setPreferredSize(ageSize);
         spnAge.setMaximumSize(ageSize);
         lblAge.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAge)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAge)
         );
         spnAge.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAge)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAge)
         );
         spnAge.addChangeListener(e -> parent.updateTxtProgress());
 
@@ -271,10 +271,10 @@ public class LifePathBuilderTabBasicInformation {
         spnDiscount.setPreferredSize(discountSize);
         spnDiscount.setMaximumSize(discountSize);
         lblDiscount.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipDiscount)
         );
         spnDiscount.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDiscount)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipDiscount)
         );
         spnDiscount.addChangeListener(e -> parent.updateTxtProgress());
 
@@ -290,10 +290,10 @@ public class LifePathBuilderTabBasicInformation {
         spnMinimumYear.setPreferredSize(minimumYearSize);
         spnMinimumYear.setMaximumSize(minimumYearSize);
         lblMinimumYear.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMinimumYear)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipMinimumYear)
         );
         spnMinimumYear.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMinimumYear)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipMinimumYear)
         );
         spnMinimumYear.addChangeListener(e -> parent.updateTxtProgress());
 
@@ -309,10 +309,10 @@ public class LifePathBuilderTabBasicInformation {
         spnMaximumYear.setPreferredSize(maximumYearSize);
         spnMaximumYear.setMaximumSize(maximumYearSize);
         lblMaximumYear.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMaximumYear)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipMaximumYear)
         );
         spnMaximumYear.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipMaximumYear)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipMaximumYear)
         );
         spnMaximumYear.addChangeListener(e -> parent.updateTxtProgress());
 
@@ -435,7 +435,7 @@ public class LifePathBuilderTabBasicInformation {
         button.setMinimumSize(button.getPreferredSize());
         button.setMaximumSize(button.getPreferredSize());
         button.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(dialogInstance::setLblTooltipDisplay, tooltip)
+              TooltipMouseListenerUtil.forTooltip(dialogInstance::setTxtTooltipArea, tooltip)
         );
 
         return button;

@@ -37,13 +37,11 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabBasicInformation;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
 
 public class LifePathProgressTextBuilder {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
-    private static final int TEXT_PANEL_WIDTH = LifePathBuilderDialog.getTextPanelWidth();
 
     public static String getProgressText(LifePathBuilderTabBasicInformation basicInfoTab, LifePathTab requirementsTab,
           LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
@@ -132,7 +130,7 @@ public class LifePathProgressTextBuilder {
         }
         newText.append("<br>").append(categoriesText);
 
-        return String.format("<div style='width:%dpx;'>%s</div>", TEXT_PANEL_WIDTH, newText);
+        return newText.toString();
     }
 
     private static String getNewRequirementsText(LifePathTab lifePathTab) {

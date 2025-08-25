@@ -10,6 +10,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -199,11 +201,14 @@ public class LifePathTab {
         String tooltipPicks = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.flexible_xp.button.pickCount.tooltip");
         lblFlexibleXPPicks.setText(titlePicks);
-        lblFlexibleXPPicks.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
-        );
+        lblFlexibleXPPicks.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                parent.setTxtTooltipArea(tooltipPicks);
+            }
+        });
         spnFlexibleXPPicks.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipPicks)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPicks)
         );
         spnFlexibleXPPicks.addChangeListener(e -> parent.updateTxtProgress());
         panelPicksRow.add(lblFlexibleXPPicks);
@@ -217,7 +222,7 @@ public class LifePathTab {
               "LifePathBuilderDialog.button.duplicateGroup.tooltip");
         RoundedJButton btnDuplicateGroup = new RoundedJButton(titleDuplicateGroup);
         btnDuplicateGroup.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipDuplicateGroup)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipDuplicateGroup)
         );
         buttonPanel.add(btnDuplicateGroup);
         return btnDuplicateGroup;
@@ -230,7 +235,7 @@ public class LifePathTab {
               "LifePathBuilderDialog.button.removeGroup.tooltip");
         RoundedJButton btnRemoveGroup = new RoundedJButton(titleRemoveGroup);
         btnRemoveGroup.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipRemoveGroup)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipRemoveGroup)
         );
         buttonPanel.add(btnRemoveGroup);
         return btnRemoveGroup;
@@ -243,7 +248,7 @@ public class LifePathTab {
               "LifePathBuilderDialog.button.addGroup.tooltip");
         RoundedJButton btnAddGroup = new RoundedJButton(titleAddGroup);
         btnAddGroup.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddGroup)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddGroup)
         );
         buttonPanel.add(btnAddGroup);
 
@@ -431,7 +436,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addAttribute.tooltip");
         RoundedJButton btnAddAttribute = new RoundedJButton(titleAddAttribute);
         btnAddAttribute.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddAttribute)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddAttribute)
         );
         buttonsPanel.add(btnAddAttribute);
 
@@ -444,7 +449,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addTrait.tooltip");
         RoundedJButton btnAddTrait = new RoundedJButton(titleAddTrait);
         btnAddTrait.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddTrait)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddTrait)
         );
         buttonsPanel.add(btnAddTrait);
 
@@ -457,7 +462,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addSkill.tooltip");
         RoundedJButton btnAddSkill = new RoundedJButton(titleAddSkill);
         btnAddSkill.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddSkill)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddSkill)
         );
         buttonsPanel.add(btnAddSkill);
 
@@ -470,7 +475,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addSPA.tooltip");
         RoundedJButton btnAddSPA = new RoundedJButton(titleAddSPA);
         btnAddSPA.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddSPA)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddSPA)
         );
         buttonsPanel.add(btnAddSPA);
 
@@ -483,7 +488,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addFaction.tooltip");
         RoundedJButton btnAddFaction = new RoundedJButton(titleAddFaction);
         btnAddFaction.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddFaction)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddFaction)
         );
         btnAddFaction.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddFaction);
@@ -497,7 +502,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addLifePath.tooltip");
         RoundedJButton btnAddLifePath = new RoundedJButton(titleAddLifePath);
         btnAddLifePath.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddLifePath)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddLifePath)
         );
         btnAddLifePath.setEnabled(false); // TODO Implement
         btnAddLifePath.setVisible(includeSupplementaryButtons);
@@ -512,7 +517,7 @@ public class LifePathTab {
               "LifePathBuilderDialog." + tabName + ".button.addCategory.tooltip");
         RoundedJButton btnAddCategory = new RoundedJButton(titleAddCategory);
         btnAddCategory.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setLblTooltipDisplay, tooltipAddCategory)
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddCategory)
         );
         btnAddCategory.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddCategory);
