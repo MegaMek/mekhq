@@ -357,7 +357,6 @@ public class LifePathBuilderDialog extends JDialog {
         JPanel pnlControls = new JPanel(new BorderLayout());
         pnlControls.setBorder(createRoundedLineBorder());
 
-        // Tooltip Area at the Top
         txtTooltipArea = new JEditorPane();
         txtTooltipArea.setContentType("text/html");
         txtTooltipArea.setEditable(false);
@@ -378,11 +377,25 @@ public class LifePathBuilderDialog extends JDialog {
 
         pnlButtons.add(Box.createHorizontalGlue());
 
+        String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
+        RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
+        btnToggleInstructions.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnToggleInstructions.addActionListener(e -> pnlInstructions.setVisible(!pnlInstructions.isVisible()));
+        pnlButtons.add(btnToggleInstructions);
+        pnlButtons.add(Box.createHorizontalStrut(PADDING));
+
         String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.cancel");
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnCancel.addActionListener(e -> performDialogCloseAction());
         pnlButtons.add(btnCancel);
+        pnlButtons.add(Box.createHorizontalStrut(PADDING));
+
+        String titleNew = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.new");
+        RoundedJButton btnNew = new RoundedJButton(titleNew);
+        btnNew.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnNew.addActionListener(e -> newLifePathAction());
+        pnlButtons.add(btnNew);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleSave = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.save");
@@ -413,20 +426,6 @@ public class LifePathBuilderDialog extends JDialog {
             });
         });
         pnlButtons.add(btnLoad);
-        pnlButtons.add(Box.createHorizontalStrut(PADDING));
-
-        String titleNew = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.new");
-        RoundedJButton btnNew = new RoundedJButton(titleNew);
-        btnNew.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnNew.addActionListener(e -> newLifePathAction());
-        pnlButtons.add(btnNew);
-        pnlButtons.add(Box.createHorizontalStrut(PADDING));
-
-        String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
-        RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
-        btnToggleInstructions.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnToggleInstructions.addActionListener(e -> pnlInstructions.setVisible(!pnlInstructions.isVisible()));
-        pnlButtons.add(btnToggleInstructions);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleToggleProgress = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleProgress");
