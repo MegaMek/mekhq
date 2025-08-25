@@ -65,6 +65,7 @@ public class LifePathBuilderTabBasicInformation {
     private final static int MINIMUM_COMPONENT_WIDTH = getLifePathBuilderMinimumComponentWidth();
     private final static int PADDING = getLifePathBuilderPadding();
 
+    private final LifePathBuilderDialog parent;
     private final JTextArea txtName;
     private final JTextArea txtSource;
     private final JTextArea txtFlavorText;
@@ -155,6 +156,8 @@ public class LifePathBuilderTabBasicInformation {
     }
 
     LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
+        this.parent = parent;
+
         JPanel tabBasicInformation = new JPanel();
         tabBasicInformation.setName("basic");
         String titleBasic = getTextAt(RESOURCE_BUNDLE,
@@ -436,5 +439,19 @@ public class LifePathBuilderTabBasicInformation {
         );
 
         return button;
+    }
+
+    public void resetTab() {
+        setSource("");
+        setName("");
+        setFlavorText("");
+        setAge(0);
+        setDiscount(0);
+        setLifeStages(new ArrayList<>());
+        setCategories(new ArrayList<>());
+        setMinimumYear(0);
+        setMaximumYear(9999);
+
+        parent.updateTxtProgress();
     }
 }

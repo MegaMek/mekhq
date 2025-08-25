@@ -429,6 +429,12 @@ public class LifePathBuilderDialog extends JDialog {
             });
         });
 
+        String titleNew = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.new");
+        RoundedJButton btnNew = new RoundedJButton(titleNew);
+        btnNew.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnNew.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnNew.addActionListener(e -> newLifePathAction());
+
         String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
         RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
         btnToggleInstructions.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -450,6 +456,8 @@ public class LifePathBuilderDialog extends JDialog {
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
         pnlButtons.add(btnLoad);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
+        pnlButtons.add(btnNew);
+        pnlButtons.add(Box.createHorizontalStrut(PADDING));
         pnlButtons.add(btnToggleProgress);
         pnlButtons.add(Box.createHorizontalGlue());
 
@@ -469,6 +477,24 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlContents, gridBagConstraints);
 
         return pnlControls;
+    }
+
+    private void newLifePathAction() {
+        ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
+        if (!confirmation.wasConfirmed()) {
+            return;
+        }
+
+        lifePathId = UUID.randomUUID();
+        resetBasicTab();
+        resetNonBasicTabs();
+
+        fixedXPTab.addTab();
+        requirementsTab.addTab();
+    }
+
+    private void resetBasicTab() {
+        basicInfoTab.resetTab();
     }
 
     private void resetNonBasicTabs() {
