@@ -3,7 +3,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 import static java.lang.Math.min;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -545,12 +544,7 @@ public class LifePathTab {
 
         String title = switch (tabType) {
             case FIXED_XP, EXCLUSIONS -> "";
-            case FLEXIBLE_XP -> getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.group.formattedLabel");
-            case REQUIREMENTS -> {
-                int count = tabLocal.getComponentCount();
-                yield getFormattedTextAt(RESOURCE_BUNDLE,
-                      "LifePathBuilderDialog.tab." + (count == 0 ? "compulsory" : "optional") + ".formattedLabel");
-            }
+            case FLEXIBLE_XP, REQUIREMENTS -> "<html><b>" + index + "</b></html>";
         };
         tabLocal.addTab(title, groupPanel);
 

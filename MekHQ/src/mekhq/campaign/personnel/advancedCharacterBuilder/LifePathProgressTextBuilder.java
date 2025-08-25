@@ -157,9 +157,7 @@ public class LifePathProgressTextBuilder {
                 newText.append("<br>");
             }
 
-            String header = getFormattedTextAt(RESOURCE_BUNDLE,
-                  "LifePathBuilderDialog.tab." + (i == 0 ? "compulsory" : "optional") + ".label");
-            newText.append("&#9654; <b>").append(header).append(": </b>");
+            newText.append("&#9654; ");
             newText.append(group);
         }
 
