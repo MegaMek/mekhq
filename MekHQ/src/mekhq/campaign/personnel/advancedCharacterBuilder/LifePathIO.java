@@ -36,17 +36,19 @@ import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
 import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
-import mekhq.Utilities;
 
 public class LifePathIO {
     private static final MMLogger LOGGER = MMLogger.create(LifePathIO.class);
@@ -82,34 +84,44 @@ public class LifePathIO {
     private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(String directoryPath) {
         Map<UUID, LifePath> lifePathMap = new HashMap<>();
         try {
-            LOGGER.info("Loading LifePaths");
-            FilenameFilter filter = (dir, name) -> name.toLowerCase().endsWith(".json");
-
-            File[] files = Utilities.getAllFiles(directoryPath, filter);
+            LOGGER.info("Loading LifePaths from directory and its subdirectories: {}", directoryPath);
 
             ObjectMapper objectMapper = new ObjectMapper();
 
-            if (files != null) {
-                for (File file : files) {
-                    try {
-                        LifePath record = objectMapper.readValue(file, LifePath.class);
-                        UUID id = record.id();
-                        if (id != null) {
-                            if (lifePathMap.containsKey(id)) {
-                                LOGGER.warn("Duplicate LifePath id found. Overwriting {} with {}.",
-                                      lifePathMap.get(id).name(), record.name());
-                            }
+            Path startPath = Paths.get(directoryPath);
+            if (Files.exists(startPath)) {
+                try (Stream<Path> paths = Files.walk(startPath)) {
+                    List<File> jsonFiles = paths
+                                                 .filter(Files::isRegularFile)
+                                                 .filter(p -> p.getFileName()
+                                                                    .toString()
+                                                                    .toLowerCase()
+                                                                    .endsWith(".json"))
+                                                 .map(Path::toFile)
+                                                 .toList();
 
-                            lifePathMap.put(id, record);
-                            // TODO downgrade to debug
-                            LOGGER.info("Loaded LifePath [{}] from {}", record.name(), file.getPath());
-                        } else {
-                            LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getPath());
+                    for (File file : jsonFiles) {
+                        try {
+                            LifePath record = objectMapper.readValue(file, LifePath.class);
+                            UUID id = record.id();
+                            if (id != null) {
+                                if (lifePathMap.containsKey(id)) {
+                                    LOGGER.warn("Duplicate LifePath id found. Overwriting {} with {}.",
+                                          lifePathMap.get(id).name(), record.name());
+                                }
+                                lifePathMap.put(id, record);
+                                // TODO downgrade to debug
+                                LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
+                            } else {
+                                LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getPath());
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("Failed to load LifePath from {}: {}", file.getPath(), e.getMessage());
                         }
-                    } catch (Exception e) {
-                        LOGGER.error("Failed to load LifePath from {}: {}", file.getPath(), e.getMessage());
                     }
                 }
+            } else {
+                LOGGER.warn("Directory {} does not exist.", directoryPath);
             }
         } catch (Exception e) {
             LOGGER.error("Failed to load LifePaths from directory {}: {}", directoryPath, e.getMessage());
