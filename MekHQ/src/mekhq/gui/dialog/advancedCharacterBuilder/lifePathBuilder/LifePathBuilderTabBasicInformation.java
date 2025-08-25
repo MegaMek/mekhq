@@ -44,6 +44,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.GroupLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -75,6 +76,7 @@ public class LifePathBuilderTabBasicInformation {
     private final JSpinner spnMaximumYear;
     private List<ATOWLifeStage> lifeStages = new ArrayList<>();
     private List<LifePathCategory> categories = new ArrayList<>();
+    private boolean isPlayerRestricted;
 
     public String getName() {
         return txtName.getText();
@@ -153,6 +155,14 @@ public class LifePathBuilderTabBasicInformation {
 
     public void setCategories(List<LifePathCategory> categories) {
         this.categories = categories;
+    }
+
+    public boolean isPlayerRestricted() {
+        return isPlayerRestricted;
+    }
+
+    public void setPlayerRestricted(boolean isPlayerRestricted) {
+        this.isPlayerRestricted = isPlayerRestricted;
     }
 
     LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
@@ -316,6 +326,21 @@ public class LifePathBuilderTabBasicInformation {
         );
         spnMaximumYear.addChangeListener(e -> parent.updateTxtProgress());
 
+        // Player Restricted
+        final String titlePlayerRestricted = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.playerRestricted.label");
+        final String tooltipPlayerRestricted = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.playerRestricted.tooltip");
+        JLabel lblPlayerRestricted = new JLabel(titlePlayerRestricted);
+        JCheckBox chkPlayerRestricted = new JCheckBox();
+        chkPlayerRestricted.setSelected(isPlayerRestricted);
+        lblPlayerRestricted.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPlayerRestricted)
+        );
+        chkPlayerRestricted.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPlayerRestricted)
+        );
+
         // Manage Life Stages
         final String titleManageLifeStages = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.manageLifeStages.label");
@@ -364,6 +389,7 @@ public class LifePathBuilderTabBasicInformation {
                                     .addComponent(lblDiscount)
                                     .addComponent(lblMinimumYear)
                                     .addComponent(lblMaximumYear)
+                                    .addComponent(lblPlayerRestricted)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                     .addComponent(nameScroll)
@@ -380,6 +406,9 @@ public class LifePathBuilderTabBasicInformation {
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(spnMaximumYear)
+                                    )
+                                    .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(chkPlayerRestricted)
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(btnManageLifeStages)
@@ -418,6 +447,10 @@ public class LifePathBuilderTabBasicInformation {
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(lblMaximumYear)
                                     .addComponent(spnMaximumYear)
+                    )
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblPlayerRestricted)
+                                    .addComponent(chkPlayerRestricted)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(btnManageLifeStages)

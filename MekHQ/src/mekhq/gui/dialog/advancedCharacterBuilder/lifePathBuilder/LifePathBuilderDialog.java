@@ -416,9 +416,9 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            loadFromJSONWithDialog().ifPresent(obj -> {
+            loadFromJSONWithDialog().ifPresent(LifePath -> {
                 resetNonBasicTabs();
-                updateBuilderFromExistingLifePathRecord(obj);
+                updateBuilderFromExistingLifePathRecord(LifePath);
             });
             SwingUtilities.invokeLater(() -> {
                 scrollProgress.getVerticalScrollBar().setValue(0);
@@ -535,6 +535,7 @@ public class LifePathBuilderDialog extends JDialog {
         basicInfoTab.setCategories(record.categories());
         basicInfoTab.setMinimumYear(record.minimumYear());
         basicInfoTab.setMaximumYear(record.maximumYear());
+        basicInfoTab.setPlayerRestricted(record.isPlayerRestricted());
 
         // Requirements
         int requirementsMaxKey = -1;
@@ -768,6 +769,7 @@ public class LifePathBuilderDialog extends JDialog {
         int maximumYear = basicInfoTab.getMaximumYear();
         List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
         List<LifePathCategory> categories = basicInfoTab.getCategories();
+        boolean isPlayerRestricted = basicInfoTab.isPlayerRestricted();
 
         // Requirements
         Map<Integer, List<String>> requirementsFactions = requirementsTab.getFactions();
@@ -809,11 +811,11 @@ public class LifePathBuilderDialog extends JDialog {
 
         // Build and return the Record
         return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, minimumYear, maximumYear,
-              lifeStages, categories, requirementsFactions, requirementsLifePath, requirementsCategories,
-              requirementsAttributes, requirementsTraits, requirementsSkills, requirementsAbilities,
-              exclusionsFactions, exclusionsLifePath, exclusionsCategories, exclusionsAttributes, exclusionsTraits,
-              exclusionsSkills, exclusionsAbilities, fixedXPAttributes, fixedXPTraits, fixedXPSkills,
-              fixedXPAbilities, flexibleXPAttributes, flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities,
-              flexibleXPPickCount);
+              lifeStages, categories, isPlayerRestricted, requirementsFactions, requirementsLifePath,
+              requirementsCategories, requirementsAttributes, requirementsTraits, requirementsSkills,
+              requirementsAbilities, exclusionsFactions, exclusionsLifePath, exclusionsCategories,
+              exclusionsAttributes, exclusionsTraits, exclusionsSkills, exclusionsAbilities, fixedXPAttributes,
+              fixedXPTraits, fixedXPSkills, fixedXPAbilities, flexibleXPAttributes, flexibleXPTraits,
+              flexibleXPSkills, flexibleXPAbilities, flexibleXPPickCount);
     }
 }

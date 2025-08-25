@@ -63,6 +63,7 @@ public record LifePath(
       Integer maximumYear,
       List<ATOWLifeStage> lifeStages,
       List<LifePathCategory> categories,
+      Boolean isPlayerRestricted,
       // Requirements
       Map<Integer, List<String>> requirementsFactions,
       Map<Integer, List<UUID>> requirementsLifePath,
@@ -128,6 +129,10 @@ public record LifePath(
                 LOGGER.warn("Maximum year is null, setting to 9999");
                 maximumYear = 9999;
             }
+
+            if (isPlayerRestricted == null) {
+                isPlayerRestricted = false;
+            }
         }
 
         // Data Validation Checks
@@ -172,6 +177,9 @@ public record LifePath(
         }
         if (categories == null) {
             throw new IllegalArgumentException("categories cannot be null");
+        }
+        if (isPlayerRestricted == null) {
+            throw new IllegalArgumentException("isPlayerRestricted cannot be null");
         }
         if (requirementsFactions == null) {
             throw new IllegalArgumentException("requirementsFactions cannot be null");
