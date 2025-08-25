@@ -533,7 +533,7 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     private void displayIDRegenerationDialogs() {
-        final int REGENERATE_ID = 0;
+        final int REGENERATE_ID = 1;
 
         ImmersiveDialogSimple dialog = null;
         boolean choiceConfirmed = false;
