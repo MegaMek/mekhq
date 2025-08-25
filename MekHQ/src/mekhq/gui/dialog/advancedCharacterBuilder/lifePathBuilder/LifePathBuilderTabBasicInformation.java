@@ -171,7 +171,7 @@ public class LifePathBuilderTabBasicInformation {
         final String tooltipName = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.name.tooltip");
         JLabel lblName = new JLabel(titleName);
-        txtName = JTextAreaWithCharacterLimit.createLimitedTextArea(50, 1);
+        txtName = JTextAreaWithCharacterLimit.createLimitedTextArea(100, 1);
         FastJScrollPane nameScroll = new FastJScrollPane(txtName);
         nameScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         nameScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
