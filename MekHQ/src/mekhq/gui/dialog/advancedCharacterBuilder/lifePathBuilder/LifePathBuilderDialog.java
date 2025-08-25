@@ -418,9 +418,10 @@ public class LifePathBuilderDialog extends JDialog {
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            resetNonBasicTabs();
-
-            loadFromJSONWithDialog().ifPresent(this::updateBuilderFromExistingLifePathRecord);
+            loadFromJSONWithDialog().ifPresent(obj -> {
+                resetNonBasicTabs();
+                updateBuilderFromExistingLifePathRecord(obj);
+            });
 
             // Reset the progress panel to the top of the page, otherwise it will be scrolled down on load
             SwingUtilities.invokeLater(() -> {
