@@ -806,6 +806,8 @@ public class LifePathTab {
                     } else {
                         LOGGER.warn("Could not find value for abilityName in working abilities: {}", abilityName);
                     }
+                } else {
+                    individualProgressText.append(label);
                 }
 
                 if (i != spas.size() - 1) {

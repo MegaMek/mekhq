@@ -265,7 +265,7 @@ class LifePathCategoryCountPicker extends JDialog {
             int maximumSkillLevel = 10;
 
             boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int keyValue = isDefaultMaximum ? minimumSkillLevel : maximumSkillLevel;
+            int keyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
             int defaultValue = selectedCategoryCounts.getOrDefault(category, keyValue);
 
             JLabel lblCategory = new JLabel(label);
