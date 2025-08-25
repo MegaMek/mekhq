@@ -542,8 +542,8 @@ public class LifePathBuilderDialog extends JDialog {
                   null,
                   null,
                   getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.label.inCharacter"),
-                  List.of(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.button.confirm"),
-                        getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.button.decline")),
+                  List.of(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.button.decline"),
+                        getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.button.confirm")),
                   getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.warning.label.outOfCharacter"),
                   null,
                   false);
