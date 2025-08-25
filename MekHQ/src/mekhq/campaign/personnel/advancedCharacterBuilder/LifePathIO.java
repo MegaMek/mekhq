@@ -106,8 +106,8 @@ public class LifePathIO {
                             UUID id = record.id();
                             if (id != null) {
                                 if (lifePathMap.containsKey(id)) {
-                                    LOGGER.warn("Duplicate LifePath id found. Overwriting {} with {}.",
-                                          lifePathMap.get(id).name(), record.name());
+                                    LOGGER.warn("Duplicate LifePath id found ({}). Overwriting {} with {}.",
+                                          id, lifePathMap.get(id).name(), record.name());
                                 }
                                 lifePathMap.put(id, record);
                                 LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
