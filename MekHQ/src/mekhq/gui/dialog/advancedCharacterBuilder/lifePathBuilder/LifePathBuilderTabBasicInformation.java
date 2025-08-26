@@ -74,9 +74,9 @@ public class LifePathBuilderTabBasicInformation {
     private final JSpinner spnDiscount;
     private final JSpinner spnMinimumYear;
     private final JSpinner spnMaximumYear;
+    private final JCheckBox chkPlayerRestricted;
     private List<ATOWLifeStage> lifeStages = new ArrayList<>();
     private List<LifePathCategory> categories = new ArrayList<>();
-    private boolean isPlayerRestricted;
 
     public String getName() {
         return txtName.getText();
@@ -158,11 +158,11 @@ public class LifePathBuilderTabBasicInformation {
     }
 
     public boolean isPlayerRestricted() {
-        return isPlayerRestricted;
+        return chkPlayerRestricted.isSelected();
     }
 
     public void setPlayerRestricted(boolean isPlayerRestricted) {
-        this.isPlayerRestricted = isPlayerRestricted;
+        chkPlayerRestricted.setSelected(isPlayerRestricted);
     }
 
     LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
@@ -332,8 +332,7 @@ public class LifePathBuilderTabBasicInformation {
         final String tooltipPlayerRestricted = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.playerRestricted.tooltip");
         JLabel lblPlayerRestricted = new JLabel(titlePlayerRestricted);
-        JCheckBox chkPlayerRestricted = new JCheckBox();
-        chkPlayerRestricted.setSelected(isPlayerRestricted);
+        chkPlayerRestricted = new JCheckBox();
         lblPlayerRestricted.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPlayerRestricted)
         );
