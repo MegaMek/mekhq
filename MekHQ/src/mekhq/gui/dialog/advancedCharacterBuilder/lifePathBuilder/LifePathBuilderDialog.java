@@ -118,7 +118,7 @@ public class LifePathBuilderDialog extends JDialog {
     private JPanel pnlProgress;
 
     private UUID lifePathId = UUID.randomUUID();
-    private LifePathBuilderTabBasicInformation basicInfoTab;
+    private LifePathTabBasicInformation basicInfoTab;
     private LifePathTab requirementsTab;
     private LifePathTab exclusionsTab;
     private LifePathTab fixedXPTab;
@@ -303,7 +303,7 @@ public class LifePathBuilderDialog extends JDialog {
         String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.lifePath");
         tabMain.setBorder(createRoundedLineBorder(title));
 
-        basicInfoTab = new LifePathBuilderTabBasicInformation(this, tabMain);
+        basicInfoTab = new LifePathTabBasicInformation(this, tabMain);
 
         fixedXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FIXED_XP);
         fixedXPTab.buildTab();

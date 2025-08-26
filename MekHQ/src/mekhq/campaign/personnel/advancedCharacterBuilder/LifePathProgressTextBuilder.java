@@ -37,13 +37,14 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderTabBasicInformation;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
 
 public class LifePathProgressTextBuilder {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
 
-    public static String getProgressText(LifePathBuilderTabBasicInformation basicInfoTab, LifePathTab requirementsTab,
+    public static String getProgressText(
+          mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation basicInfoTab,
+          LifePathTab requirementsTab,
           LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
@@ -71,7 +72,9 @@ public class LifePathProgressTextBuilder {
         return newProgressText.toString();
     }
 
-    private static String getNewBasicText(LifePathBuilderTabBasicInformation basicInfoTab, int calculatedCost) {
+    private static String getNewBasicText(
+          mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation basicInfoTab,
+          int calculatedCost) {
         StringBuilder newText = new StringBuilder();
 
         String name = basicInfoTab.getName();

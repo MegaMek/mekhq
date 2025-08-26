@@ -61,7 +61,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.advancedCharacterBuilder.DocumentChangeListenerUtil;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
-public class LifePathBuilderTabBasicInformation {
+public class LifePathTabBasicInformation {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int MINIMUM_COMPONENT_WIDTH = getLifePathBuilderMinimumComponentWidth();
     private final static int PADDING = getLifePathBuilderPadding();
@@ -174,7 +174,7 @@ public class LifePathBuilderTabBasicInformation {
         chkPlayerRestricted.setSelected(isPlayerRestricted);
     }
 
-    LifePathBuilderTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
+    LifePathTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
         this.parent = parent;
 
         JPanel tabBasicInformation = new JPanel();
@@ -341,7 +341,7 @@ public class LifePathBuilderTabBasicInformation {
         final String tooltipRandomWeight = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.randomWeight.tooltip");
         JLabel lblRandomWeight = new JLabel(titleRandomWeight);
-        spnRandomWeight = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 10.0, 0.01));
+        spnRandomWeight = new JSpinner(new SpinnerNumberModel(1.0, 0.001, 10.0, 0.001));
         Dimension randomWeightSize = new Dimension(DERIVED_WIDTH - lblRandomWeight.getWidth(),
               spnAge.getPreferredSize().height);
         spnRandomWeight.setPreferredSize(maximumYearSize);
