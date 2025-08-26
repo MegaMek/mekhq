@@ -682,7 +682,7 @@ public class LifePathTab {
         // Life Paths
         List<UUID> workingLifePaths = storedLifePaths.get(index);
         if (workingLifePaths != null && !workingLifePaths.isEmpty()) {
-            appendComma(individualProgressText);
+            appendBreaker(individualProgressText);
 
             for (int i = 0; i < workingLifePaths.size(); i++) {
                 // TODO fetch life path from dictionary using ID
@@ -696,7 +696,7 @@ public class LifePathTab {
         // Categories
         Map<LifePathCategory, Integer> workingCategories = storedCategories.get(index);
         if (workingCategories != null && !workingCategories.isEmpty()) {
-            appendComma(individualProgressText);
+            appendBreaker(individualProgressText);
 
             int counter = 0;
             int length = workingCategories.size();
@@ -717,7 +717,7 @@ public class LifePathTab {
         // Attributes
         Map<SkillAttribute, Integer> workingAttributes = storedAttributes.get(index);
         if (workingAttributes != null && !workingAttributes.isEmpty()) {
-            appendComma(individualProgressText);
+            appendBreaker(individualProgressText);
 
             int counter = 0;
             int length = workingAttributes.size();
@@ -738,7 +738,7 @@ public class LifePathTab {
         // Traits
         Map<LifePathEntryDataTraitLookup, Integer> workingTraits = storedTraits.get(index);
         if (workingTraits != null && !workingTraits.isEmpty()) {
-            appendComma(individualProgressText);
+            appendBreaker(individualProgressText);
 
             int counter = 0;
             int length = workingTraits.size();
@@ -759,7 +759,7 @@ public class LifePathTab {
         // Skills
         Map<String, Integer> workingSkills = storedSkills.get(index);
         if (workingSkills != null && !workingSkills.isEmpty()) {
-            appendComma(individualProgressText);
+            appendBreaker(individualProgressText);
 
             int counter = 0;
             int length = workingSkills.size();
@@ -781,7 +781,7 @@ public class LifePathTab {
         // SPAs
         Map<String, Integer> workingAbilities = storedAbilities.get(index);
         if (workingAbilities != null && !workingAbilities.isEmpty()) {
-            appendComma(individualProgressText);
+            appendBreaker(individualProgressText);
 
             List<String> spas = workingAbilities.keySet().stream().toList();
 
@@ -817,9 +817,21 @@ public class LifePathTab {
         return individualProgressText;
     }
 
-    private static void appendComma(StringBuilder progressText) {
+    private void appendBreaker(StringBuilder progressText) {
+        final boolean isFixedXP = tabType == LifePathBuilderTabType.FIXED_XP;
+        final String BREAKER = isFixedXP ? "&#9654; " : ", ";
+
+        if (isFixedXP) {
+            if (!progressText.isEmpty()) {
+                progressText.append("<br>");
+            }
+
+            progressText.append(BREAKER);
+            return;
+        }
+
         if (!progressText.isEmpty()) {
-            progressText.append(", ");
+            progressText.append(BREAKER);
         }
     }
 
