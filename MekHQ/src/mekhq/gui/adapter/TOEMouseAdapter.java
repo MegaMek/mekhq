@@ -54,9 +54,9 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
-import megamek.common.EntityWeightClass;
-import megamek.common.GunEmplacement;
-import megamek.common.UnitType;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;

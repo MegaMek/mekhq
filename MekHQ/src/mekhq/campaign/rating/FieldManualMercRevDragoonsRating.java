@@ -37,9 +37,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.stream.Collectors;
 
-import megamek.common.*;
+import megamek.common.TechConstants;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -228,7 +230,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         // if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
         // hoursNeeded *= 2;
         // } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() >
-        // TechConstants.T_INTRO_BOXSET)) {
+        // TechConstants.T_INTRO_BOX_SET)) {
         // hoursNeeded *= 1.5;
         // }
     }
@@ -1008,7 +1010,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             case UnitType.PROTOMEK:
             case UnitType.CONV_FIGHTER:
             case UnitType.AERO:
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
             case UnitType.TANK:
             case UnitType.VTOL:
             case UnitType.BATTLE_ARMOR:
@@ -1018,7 +1020,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             case UnitType.JUMPSHIP:
                 int techLevel = u.getEntity().getTechLevel();
                 logger.debug("Unit " + u.getName() + " TL = " + TechConstants.getLevelDisplayableName(techLevel));
-                if (techLevel > TechConstants.T_INTRO_BOXSET) {
+                if (techLevel > TechConstants.T_INTRO_BOX_SET) {
                     if (TechConstants.isClan(techLevel)) {
                         setNumberClan(getNumberClan().add(value));
                         if (!u.isConventionalInfantry()) {

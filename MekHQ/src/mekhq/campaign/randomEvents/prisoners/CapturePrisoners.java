@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createCLImprovedSensors;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createCLImprovedSensors;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
@@ -56,12 +56,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.Compute;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.MapSettings;
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.MapSettings;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -144,7 +144,7 @@ public class CapturePrisoners {
         int today = campaign.getLocalDate().getYear();
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        ITechnology.Faction techFaction = searchingFactionIsClan ?
+        megamek.common.enums.Faction techFaction = searchingFactionIsClan ?
                                                 ITechnology.getFactionFromMMAbbr("CLAN") :
                                                 ITechnology.getFactionFromMMAbbr("IS");
         try {

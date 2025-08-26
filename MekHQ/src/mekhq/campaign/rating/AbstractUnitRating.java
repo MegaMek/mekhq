@@ -40,8 +40,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.*;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SpaceStation;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -937,7 +944,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.JUMPSHIP:
                 incrementJumpShipCount();
                 break;
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
             case UnitType.CONV_FIGHTER:
                 incrementFighterCount();
                 break;

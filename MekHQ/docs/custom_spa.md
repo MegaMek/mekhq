@@ -1,6 +1,7 @@
 # Custom SPAs
 
-MekHQ supports unofficial extensions to the SPA (special pilot abilities) system used in MegaMek. This allows support
+MekHQ supports unofficial extensions to the SPA (special pilot abilities) system used in MegaMek. This allows
+support
 personnel to spend XP to gain special abilities used in their duties (though in this context SPA should probably mean
 special personnel abilities) as well as allowing them to set triggers to spend edge points to reroll critical failed
 skill checks in critical situations. At the time of writing, the only custom SPA is Clan tech knowledge, which allows

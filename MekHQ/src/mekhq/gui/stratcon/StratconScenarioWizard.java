@@ -69,8 +69,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import megamek.common.Minefield;
-import megamek.common.TargetRoll;
+import megamek.common.equipment.Minefield;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

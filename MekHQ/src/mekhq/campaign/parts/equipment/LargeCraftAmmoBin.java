@@ -34,9 +34,9 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.WeaponMounted;

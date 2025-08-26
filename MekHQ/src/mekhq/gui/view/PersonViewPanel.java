@@ -36,7 +36,7 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
@@ -95,7 +95,7 @@ import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;

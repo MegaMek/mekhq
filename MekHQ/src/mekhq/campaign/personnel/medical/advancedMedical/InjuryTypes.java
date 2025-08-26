@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;

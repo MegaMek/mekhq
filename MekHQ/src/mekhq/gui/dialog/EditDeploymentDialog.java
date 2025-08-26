@@ -58,7 +58,7 @@ import javax.swing.text.NumberFormatter;
 import megamek.client.ui.GBC;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.UIUtil.TipButton;
-import megamek.common.IStartingPositions;
+import megamek.common.interfaces.IStartingPositions;
 import megamek.common.Player;
 import mekhq.MekHQ;
 

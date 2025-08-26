@@ -33,7 +33,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import static java.io.File.separator;
-import static megamek.common.Board.START_SW;
+import static megamek.common.board.Board.START_SW;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
@@ -51,11 +51,11 @@ import java.util.List;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

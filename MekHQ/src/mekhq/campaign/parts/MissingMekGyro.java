@@ -36,9 +36,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -148,8 +149,8 @@ public class MissingMekGyro extends MissingPart {
         if (null == unit) {
             return null;
         }
-        if (unit.isLocationBreached(Mek.LOC_CT)) {
-            return unit.getEntity().getLocationName(Mek.LOC_CT) + " is breached.";
+        if (unit.isLocationBreached(Mek.LOC_CENTER_TORSO)) {
+            return unit.getEntity().getLocationName(Mek.LOC_CENTER_TORSO) + " is breached.";
         }
         return null;
     }
@@ -162,7 +163,7 @@ public class MissingMekGyro extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CENTER_TORSO);
         }
     }
 
@@ -174,7 +175,7 @@ public class MissingMekGyro extends MissingPart {
 
     @Override
     public int getLocation() {
-        return Mek.LOC_CT;
+        return Mek.LOC_CENTER_TORSO;
     }
 
     @Override

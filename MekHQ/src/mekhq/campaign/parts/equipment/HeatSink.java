@@ -35,11 +35,11 @@ package mekhq.campaign.parts.equipment;
 
 import java.util.StringJoiner;
 
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
+import megamek.common.compute.Compute;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -64,7 +64,7 @@ public class HeatSink extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     * Copied from megamek.common.units.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      */
     @Override
     public Money getStickerPrice() {
@@ -90,7 +90,7 @@ public class HeatSink extends EquipmentPart {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
                       mounted.getLocation());
             }
             if (checkForDestruction

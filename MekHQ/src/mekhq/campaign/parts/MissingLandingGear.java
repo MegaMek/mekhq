@@ -35,15 +35,16 @@ package mekhq.campaign.parts;
 
 import java.util.StringJoiner;
 
-import megamek.common.Aero;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import org.w3c.dom.Node;
 
@@ -90,8 +91,8 @@ public class MissingLandingGear extends MissingPart {
                 if (part instanceof MissingMekLocation) {
                     // The CT cannot be scrapped, so that check is elided.
                     switch (part.getLocation()) {
-                        case Mek.LOC_LT:
-                        case Mek.LOC_RT:
+                        case Mek.LOC_LEFT_TORSO:
+                        case Mek.LOC_RIGHT_TORSO:
                             missingLocs.add(unit.getEntity().getLocationName(part.getLocation()));
                             break;
                         default:

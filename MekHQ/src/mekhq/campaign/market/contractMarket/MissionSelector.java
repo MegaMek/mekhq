@@ -33,7 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.mission.enums.AtBContractType;
 
 /**

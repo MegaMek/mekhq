@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.stratcon;
 
-import megamek.common.Compute;
-import megamek.common.Coords;
+import megamek.common.compute.Compute;
+import megamek.common.board.Coords;
 
 /**
  * This class handles placement of Stratcon terrain

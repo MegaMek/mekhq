@@ -34,7 +34,7 @@
 package mekhq.campaign.randomEvents;
 
 import static java.lang.Math.max;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;

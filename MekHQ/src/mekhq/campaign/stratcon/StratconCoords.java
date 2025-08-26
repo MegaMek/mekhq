@@ -34,7 +34,7 @@ package mekhq.campaign.stratcon;
 
 import java.util.Objects;
 
-import megamek.common.Coords;
+import megamek.common.board.Coords;
 
 /**
  * Coordinates used in the StratCon map system. Derived from the MegaMek coordinates to make use of the hex math already

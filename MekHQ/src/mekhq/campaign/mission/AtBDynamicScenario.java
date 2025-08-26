@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;

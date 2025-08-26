@@ -35,17 +35,17 @@ package mekhq.campaign.parts.utilities;
 import java.util.List;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.common.BattleArmor;
-import megamek.common.Entity;
-import megamek.common.MULParser;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
-import megamek.common.battlevalue.BVCalculator;
-import megamek.common.battlevalue.BattleArmorBVCalculator;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.battleValue.BVCalculator;
+import megamek.common.battleValue.BattleArmorBVCalculator;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.loaders.MULParser;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 
 /**

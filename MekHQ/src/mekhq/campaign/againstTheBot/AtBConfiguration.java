@@ -48,12 +48,12 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilder;
 
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

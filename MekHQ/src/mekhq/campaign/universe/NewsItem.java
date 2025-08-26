@@ -44,7 +44,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.utilities.MHQXMLUtility;
 
 /**

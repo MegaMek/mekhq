@@ -56,8 +56,8 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import megamek.common.Dropship;
-import megamek.common.Jumpship;
+import megamek.common.units.Dropship;
+import megamek.common.units.Jumpship;
 import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;

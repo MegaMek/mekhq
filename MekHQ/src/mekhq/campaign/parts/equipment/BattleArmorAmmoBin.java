@@ -33,11 +33,11 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
+import megamek.common.equipment.AmmoType;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.logging.MMLogger;

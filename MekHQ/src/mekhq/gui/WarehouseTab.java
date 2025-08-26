@@ -51,10 +51,10 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.MiscType;
-import megamek.common.TargetRoll;
-import megamek.common.WeaponType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
 import megamek.common.event.Subscribe;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
@@ -482,7 +482,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         return switch (group) {
             case SG_ALL -> "All Parts";
             case SG_ARMOR -> "Armor";
-            case SG_SYSTEM -> "System Components";
+            case SG_SYSTEM -> "SystemFluff Components";
             case SG_EQUIP -> "Equipment";
             case SG_LOC -> "Locations";
             case SG_WEAP -> "Weapons";

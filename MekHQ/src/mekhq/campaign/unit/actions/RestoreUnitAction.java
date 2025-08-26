@@ -36,15 +36,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.Aero;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.Mek;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import megamek.common.util.C3Util;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -195,8 +195,9 @@ public class RestoreUnitAction implements IUnitAction {
             // TODO: Make this less painful. We just want to fix hips and shoulders.
             Entity entity = unit.getEntity();
             if (entity instanceof Mek) {
-                for (int loc : new int[] { Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM }) {
-                    int numberOfCriticals = entity.getNumberOfCriticals(loc);
+                for (int loc : new int[] { Mek.LOC_CENTER_LEG, Mek.LOC_LEFT_LEG, Mek.LOC_RIGHT_LEG, Mek.LOC_LEFT_ARM,
+                                           Mek.LOC_RIGHT_ARM }) {
+                    int numberOfCriticals = entity.getNumberOfCriticalSlots(loc);
                     for (int crit = 0; crit < numberOfCriticals; ++crit) {
                         CriticalSlot slot = entity.getCritical(loc, crit);
                         if (null != slot) {

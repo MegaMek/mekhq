@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.MekSummary;
+import megamek.common.loaders.MekSummary;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.rating.IUnitRating;

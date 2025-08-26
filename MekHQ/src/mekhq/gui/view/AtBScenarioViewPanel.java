@@ -33,7 +33,7 @@
  */
 package mekhq.gui.view;
 
-import static megamek.common.Entity.getEntityMajorTypeName;
+import static megamek.common.units.Entity.getEntityMajorTypeName;
 import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
 import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 
@@ -62,11 +62,11 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
-import megamek.common.Entity;
-import megamek.common.IStartingPositions;
+import megamek.common.units.Entity;
+import megamek.common.interfaces.IStartingPositions;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;

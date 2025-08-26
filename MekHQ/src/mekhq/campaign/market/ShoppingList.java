@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.Version;
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

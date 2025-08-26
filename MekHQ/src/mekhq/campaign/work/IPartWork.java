@@ -33,9 +33,9 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.MiscType;
-import megamek.common.TargetRoll;
-import megamek.common.WeaponType;
+import megamek.common.equipment.MiscType;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.equipment.WeaponType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;

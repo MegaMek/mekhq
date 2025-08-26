@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import io.sentry.Sentry;
-import megamek.common.Board;
-import megamek.common.MapSettings;
+import megamek.common.board.Board;
+import megamek.common.loaders.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;

@@ -49,7 +49,7 @@ import javax.swing.WindowConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MekSummaryCache;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;

@@ -77,15 +77,15 @@ import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Dropship;
-import megamek.common.EnhancedTabbedPane;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MULParser;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.IconPackage;
 import mekhq.MHQConstants;
@@ -2668,8 +2668,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>If the {@code logNagActive} flag is already set, the method returns immediately to prevent repeat
      * processing. If the currently selected tab is the Command Center, no nag is performed. Otherwise, the method
-     * iterates through the tab list and highlights the Command Center tab by changing its label color
-     * and sets the {@code logNagActive} flag.</p>
+     * iterates through the tab list and highlights the Command Center tab by changing its label color and sets the
+     * {@code logNagActive} flag.</p>
      *
      * <p>If no tab is currently selected, a warning is logged and no action is taken.</p>
      */

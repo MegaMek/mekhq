@@ -36,10 +36,10 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
+import megamek.common.units.Aero;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;

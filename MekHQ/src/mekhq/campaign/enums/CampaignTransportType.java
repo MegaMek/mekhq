@@ -33,10 +33,10 @@
 
 package mekhq.campaign.enums;
 
-import megamek.common.BattleArmorHandles;
-import megamek.common.Bay;
-import megamek.common.DockingCollar;
-import megamek.common.InfantryCompartment;
+import megamek.common.battleArmor.BattleArmorHandles;
+import megamek.common.bays.Bay;
+import megamek.common.equipment.DockingCollar;
+import megamek.common.units.InfantryCompartment;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.ShipTransportedUnitsSummary;

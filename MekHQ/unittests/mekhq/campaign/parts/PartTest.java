@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.personnel.Person;

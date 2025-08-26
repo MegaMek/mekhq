@@ -38,7 +38,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -128,7 +128,7 @@ public class SkillPrerequisite {
      */
     public boolean qualifies(int unitType) {
         return switch (unitType) {
-            case UnitType.AERO, UnitType.AEROSPACEFIGHTER ->
+            case UnitType.AERO, UnitType.AEROSPACE_FIGHTER ->
                   skillSet.containsKey(SkillType.S_PILOT_AERO) || skillSet.containsKey(SkillType.S_GUN_AERO);
             case UnitType.BATTLE_ARMOR ->
                   skillSet.containsKey(SkillType.S_GUN_BA) || skillSet.containsKey(SkillType.S_ANTI_MEK);

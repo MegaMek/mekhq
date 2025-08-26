@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.*;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.utilities.MHQInternationalization;
@@ -120,9 +121,9 @@ public class CampaignTransportUtilities {
      * @return Capacity in tons needed to transport this entity
      */
     private static double calcInfantryBayWeight(Entity entity) {
-        InfantryBay.PlatoonType type = InfantryBay.PlatoonType.getPlatoonType(entity);
+        PlatoonType type = PlatoonType.getPlatoonType(entity);
 
-        if ((entity instanceof Infantry) && (type == InfantryBay.PlatoonType.MECHANIZED)) {
+        if ((entity instanceof Infantry) && (type == PlatoonType.MECHANIZED)) {
             return type.getWeight() * ((Infantry) entity).getSquadCount();
         } else {
             return type.getWeight();

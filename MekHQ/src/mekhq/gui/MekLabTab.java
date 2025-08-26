@@ -48,8 +48,26 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import megamek.common.*;
+import megamek.common.MPCalculationSetting;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.enums.Faction;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
 import megamek.common.verifier.*;
 import megamek.logging.MMLogger;
 import megameklab.MMLConstants;
@@ -265,7 +283,7 @@ public class MekLabTab extends CampaignGuiTab {
         CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
         CConfig.setParam(CConfig.TECH_SHOW_FACTION,
-              String.valueOf(campaignGUI.getCampaign().getTechFaction() != ITechnology.Faction.NONE));
+              String.valueOf(campaignGUI.getCampaign().getTechFaction() != Faction.NONE));
         CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
@@ -472,7 +490,8 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // one shot weapons count 1/4
-            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) || wtype.hasFlag(WeaponType.F_ONESHOT)) {
+            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) ||
+                      wtype.hasFlag(WeaponType.F_ONE_SHOT)) {
                 weaponHeat *= 0.25;
             }
 
@@ -531,7 +550,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public abstract Entity getEntity();
 
-        abstract void setTechFaction(ITechnology.Faction techFaction);
+        abstract void setTechFaction(Faction techFaction);
 
         @Override
         public void scheduleRefresh() {
@@ -684,7 +703,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -815,7 +834,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -940,7 +959,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1064,7 +1083,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1200,7 +1219,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1320,7 +1339,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1432,7 +1451,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1559,7 +1578,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1689,7 +1708,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(ITechnology.Faction techFaction) {
+        void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }

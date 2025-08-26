@@ -35,7 +35,9 @@ package mekhq.campaign.unit;
 
 import java.util.HashMap;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.*;
 import mekhq.campaign.Hangar;
 
 /**
@@ -99,7 +101,8 @@ public class HangarStatistics {
             } else if (en instanceof ConvFighter) {
                 hashMap.put(Entity.ETYPE_CONV_FIGHTER, hashMap.getOrDefault(Entity.ETYPE_CONV_FIGHTER, 0) + 1);
             } else if (en instanceof AeroSpaceFighter) {
-                hashMap.put(Entity.ETYPE_AEROSPACEFIGHTER, hashMap.getOrDefault(Entity.ETYPE_AEROSPACEFIGHTER, 0) + 1);
+                hashMap.put(Entity.ETYPE_AEROSPACE_FIGHTER,
+                      hashMap.getOrDefault(Entity.ETYPE_AEROSPACE_FIGHTER, 0) + 1);
             } else if ((en instanceof Infantry) && !(en instanceof BattleArmor)) {
                 hashMap.put(Entity.ETYPE_INFANTRY, hashMap.getOrDefault(Entity.ETYPE_INFANTRY, 0) + 1);
             } else if (en instanceof BattleArmor) {
@@ -146,7 +149,7 @@ public class HangarStatistics {
         }
 
         // Okay to do an equality check here because this is the hash key, not the entity's ETYPE value.
-        if (type == Entity.ETYPE_AEROSPACEFIGHTER) {
+        if (type == Entity.ETYPE_AEROSPACE_FIGHTER) {
             return Math.min(getTotalASFBays(), num);
         }
 

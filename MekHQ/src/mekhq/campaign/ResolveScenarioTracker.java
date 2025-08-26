@@ -44,12 +44,23 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.client.IClient;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
 import megamek.common.annotations.Nullable;
-import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoResolve.acar.SimulatedClient;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.compute.Compute;
+import megamek.common.equipment.IArmorState;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import megamek.common.event.PostGameResolution;
+import megamek.common.interfaces.IEntityRemovalConditions;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MULParser;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -518,7 +529,7 @@ public class ResolveScenarioTracker {
                 en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
             }
             // Check for mounted and critical slot missingness as well
-            for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < en.getNumberOfCriticalSlots(loc); i++) {
                 final CriticalSlot cs = en.getCritical(loc, i);
                 if (null == cs || !cs.isEverHittable()) {
                     continue;
@@ -1018,7 +1029,7 @@ public class ResolveScenarioTracker {
                       null != entity.getCrew() &&
                       (entity.getCrew().isEjected() &&
                              !campaign.getGameOptions()
-                                    .booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE))) {
+                                    .booleanOption(OptionsConstants.ADVANCED_GROUND_MOVEMENT_EJECTED_PILOTS_FLEE))) {
                 continue;
             }
             // shuffling the crew ensures that casualties are randomly assigned in

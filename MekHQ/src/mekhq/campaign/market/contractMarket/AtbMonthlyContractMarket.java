@@ -34,7 +34,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
@@ -52,7 +52,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;

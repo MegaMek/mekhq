@@ -42,8 +42,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import org.junit.jupiter.api.Test;

@@ -43,7 +43,7 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;

@@ -35,8 +35,8 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
+import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
@@ -54,9 +54,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.ITechnology;
-import megamek.common.Mek;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -95,7 +94,7 @@ public class Resupply {
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
-    private final ITechnology.Faction employerTechCode;
+    private final megamek.common.enums.Faction employerTechCode;
     private final boolean employerIsClan;
     private List<Part> ammoBinPool;
     private double focusAmmo;
@@ -632,7 +631,7 @@ public class Resupply {
      * @return {@code true} if the part is ineligible due to its location or extinction, {@code false} otherwise.
      */
     private boolean checkMekLocation(Part part) {
-        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CT);
+        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CENTER_TORSO);
     }
 
     /**
@@ -671,6 +670,7 @@ public class Resupply {
      * <p>When not performing a loot or smuggler resupply, all processed parts are marked as brand new.</p>
      *
      * @param partsInUse a set of {@link PartInUse} representing the parts currently needed
+     *
      * @return a map of {@link Part} to its {@link PartDetails}, with adjusted weights
      */
     private Map<Part, PartDetails> applyWarehouseWeightModifiers(Set<PartInUse> partsInUse) {

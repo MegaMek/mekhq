@@ -36,14 +36,18 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.Mounted;
 import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.IArmorState;
+import megamek.common.equipment.Mounted;
+import megamek.common.interfaces.ILocationExposureStatus;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -173,7 +177,7 @@ public class TankLocation extends Part {
             breached = false;
             if (null != unit) {
                 unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                     // ignore empty & non-hittable slots
                     if (slot == null) {

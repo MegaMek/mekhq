@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 import java.util.Collections;

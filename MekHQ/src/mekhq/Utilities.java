@@ -66,12 +66,31 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.Player;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.HeavyVehicleBay;
+import megamek.common.bays.InfantryBay;
+import megamek.common.bays.LightVehicleBay;
+import megamek.common.bays.SmallCraftBay;
+import megamek.common.bays.SuperHeavyVehicleBay;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.DockingCollar;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.interfaces.IStartingPositions;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -151,7 +170,7 @@ public class Utilities {
             if ((entity instanceof Aero) &&
                       !ammoType.canAeroUse(entity.getGame()
                                                  .getOptions()
-                                                 .booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
+                                                 .booleanOption(OptionsConstants.ADVANCED_AERO_RULES_AERO_ARTILLERY_MUNITIONS))) {
                 continue;
             }
 
@@ -181,7 +200,7 @@ public class Utilities {
 
             if (ammoType.hasFlag(AmmoType.F_NUCLEAR) &&
                       ammoType.hasFlag(AmmoType.F_CAP_MISSILE) &&
-                      !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
+                      !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVANCED_AERO_RULES_AT2_NUKES)) {
                 continue;
             }
 
@@ -263,7 +282,7 @@ public class Utilities {
             // Weight of the two units must match or we continue, but BA weight gets checked
             // differently
             if (en instanceof BattleArmor battleArmor) {
-                if (battleArmor.getTroopers() != (int) summary.getTWweight()) {
+                if (battleArmor.getTroopers() != (int) summary.getTWWeight()) {
                     continue;
                 }
             } else {
@@ -341,7 +360,7 @@ public class Utilities {
             }
             // Go through the base entity and make a list of all fixed equipment in this
             // location.
-            for (int slot = 0; slot < entity1.getNumberOfCriticals(loc); slot++) {
+            for (int slot = 0; slot < entity1.getNumberOfCriticalSlots(loc); slot++) {
                 CriticalSlot crit = entity1.getCritical(loc, slot);
                 if ((null != crit) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (null != crit.getMount())) {
                     if (!crit.getMount().isOmniPodMounted()) {
@@ -357,7 +376,7 @@ public class Utilities {
             // fixed equipment from the list. If not found or something is left over, there
             // is a
             // fixed equipment difference.
-            for (int slot = 0; slot < entity2.getNumberOfCriticals(loc); slot++) {
+            for (int slot = 0; slot < entity2.getNumberOfCriticalSlots(loc); slot++) {
                 CriticalSlot crit = entity1.getCritical(loc, slot);
                 if ((crit != null) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (crit.getMount() != null)) {
                     if (!crit.getMount().isOmniPodMounted()) {
@@ -835,7 +854,7 @@ public class Utilities {
                     person.setPhenotype(Phenotype.fromString(phenotype));
                 }
 
-                String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
+                String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOOD_NAME);
                 person.setBloodname(bloodname == null ? "" : bloodname);
             }
 

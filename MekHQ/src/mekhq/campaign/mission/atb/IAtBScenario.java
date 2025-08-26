@@ -35,7 +35,7 @@ package mekhq.campaign.mission.atb;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 
 public interface IAtBScenario {

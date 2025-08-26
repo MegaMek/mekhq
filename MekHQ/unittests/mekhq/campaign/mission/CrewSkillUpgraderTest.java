@@ -40,11 +40,13 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import megamek.common.units.*;
 import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

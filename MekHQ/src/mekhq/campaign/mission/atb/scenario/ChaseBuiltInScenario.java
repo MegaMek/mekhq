@@ -36,11 +36,11 @@ import java.util.ArrayList;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Infantry;
 import megamek.common.OffBoardDirection;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

@@ -36,9 +36,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import megamek.common.Bay;
-import megamek.common.Compute;
-import megamek.common.Entity;
+import megamek.common.bays.Bay;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
