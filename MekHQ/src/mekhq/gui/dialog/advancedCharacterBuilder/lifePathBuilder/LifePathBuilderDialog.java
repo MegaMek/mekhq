@@ -536,6 +536,7 @@ public class LifePathBuilderDialog extends JDialog {
         basicInfoTab.setMinimumYear(record.minimumYear());
         basicInfoTab.setMaximumYear(record.maximumYear());
         basicInfoTab.setPlayerRestricted(record.isPlayerRestricted());
+        basicInfoTab.setRandomWeight(record.randomWeight());
 
         // Requirements
         int requirementsMaxKey = -1;
@@ -767,6 +768,7 @@ public class LifePathBuilderDialog extends JDialog {
         int xpDiscount = basicInfoTab.getDiscount();
         int minimumYear = basicInfoTab.getMinimumYear();
         int maximumYear = basicInfoTab.getMaximumYear();
+        double randomWeight = basicInfoTab.getRandomWeight();
         List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
         List<LifePathCategory> categories = basicInfoTab.getCategories();
         boolean isPlayerRestricted = basicInfoTab.isPlayerRestricted();
@@ -811,7 +813,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         // Build and return the Record
         return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, minimumYear, maximumYear,
-              lifeStages, categories, isPlayerRestricted, requirementsFactions, requirementsLifePath,
+              randomWeight, lifeStages, categories, isPlayerRestricted, requirementsFactions, requirementsLifePath,
               requirementsCategories, requirementsAttributes, requirementsTraits, requirementsSkills,
               requirementsAbilities, exclusionsFactions, exclusionsLifePath, exclusionsCategories,
               exclusionsAttributes, exclusionsTraits, exclusionsSkills, exclusionsAbilities, fixedXPAttributes,

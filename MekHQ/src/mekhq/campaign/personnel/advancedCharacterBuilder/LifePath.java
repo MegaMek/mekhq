@@ -61,6 +61,7 @@ public record LifePath(
       Integer xpDiscount,
       Integer minimumYear,
       Integer maximumYear,
+      Double randomWeight,
       List<ATOWLifeStage> lifeStages,
       List<LifePathCategory> categories,
       Boolean isPlayerRestricted,
@@ -120,18 +121,24 @@ public record LifePath(
             // class is changed. We only need to keep compatibility handlers until the next Milestone release, at
             // which point they can be removed.
 
-            if (minimumYear == null) { // Added 50.07
+            if (minimumYear == null) { // Added in 50.07
                 LOGGER.warn("Minimum year is null, setting to 0");
                 minimumYear = 0;
             }
 
-            if (maximumYear == null) { // Added 50.07
+            if (maximumYear == null) { // Added in 50.07
                 LOGGER.warn("Maximum year is null, setting to 9999");
                 maximumYear = 9999;
             }
 
-            if (isPlayerRestricted == null) {
+            if (isPlayerRestricted == null) { // Added in 50.07
+                LOGGER.warn("Player restriction check is null, setting to false");
                 isPlayerRestricted = false;
+            }
+
+            if (randomWeight == null) { // Added in 50.07
+                LOGGER.warn("Random weight is null, setting to 1.0");
+                randomWeight = 1.0;
             }
         }
 
@@ -171,6 +178,9 @@ public record LifePath(
         }
         if (maximumYear < minimumYear) {
             throw new IllegalArgumentException("maximumYear must be greater than or equal to minimumYear");
+        }
+        if (randomWeight == null) {
+            throw new IllegalArgumentException("randomWeight cannot be null");
         }
         if (lifeStages == null) {
             throw new IllegalArgumentException("lifeStages cannot be null");

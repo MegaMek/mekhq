@@ -74,6 +74,7 @@ public class LifePathBuilderTabBasicInformation {
     private final JSpinner spnDiscount;
     private final JSpinner spnMinimumYear;
     private final JSpinner spnMaximumYear;
+    private final JSpinner spnRandomWeight;
     private final JCheckBox chkPlayerRestricted;
     private List<ATOWLifeStage> lifeStages = new ArrayList<>();
     private List<LifePathCategory> categories = new ArrayList<>();
@@ -139,6 +140,14 @@ public class LifePathBuilderTabBasicInformation {
 
     public void setMaximumYear(int maximumYear) {
         spnMaximumYear.setValue(maximumYear);
+    }
+
+    public double getRandomWeight() {
+        return (double) spnRandomWeight.getValue();
+    }
+
+    public void setRandomWeight(double randomWeight) {
+        spnRandomWeight.setValue(randomWeight);
     }
 
     public List<ATOWLifeStage> getLifeStages() {
@@ -326,6 +335,25 @@ public class LifePathBuilderTabBasicInformation {
         );
         spnMaximumYear.addChangeListener(e -> parent.updateTxtProgress());
 
+        // Random Weight
+        final String titleRandomWeight = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.randomWeight.label");
+        final String tooltipRandomWeight = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.randomWeight.tooltip");
+        JLabel lblRandomWeight = new JLabel(titleRandomWeight);
+        spnRandomWeight = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 10.0, 0.01));
+        Dimension randomWeightSize = new Dimension(DERIVED_WIDTH - lblRandomWeight.getWidth(),
+              spnAge.getPreferredSize().height);
+        spnRandomWeight.setPreferredSize(maximumYearSize);
+        spnRandomWeight.setMaximumSize(maximumYearSize);
+        lblRandomWeight.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipRandomWeight)
+        );
+        spnRandomWeight.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipRandomWeight)
+        );
+        spnRandomWeight.addChangeListener(e -> parent.updateTxtProgress());
+
         // Player Restricted
         final String titlePlayerRestricted = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.playerRestricted.label");
@@ -388,6 +416,7 @@ public class LifePathBuilderTabBasicInformation {
                                     .addComponent(lblDiscount)
                                     .addComponent(lblMinimumYear)
                                     .addComponent(lblMaximumYear)
+                                    .addComponent(lblRandomWeight)
                                     .addComponent(lblPlayerRestricted)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -405,6 +434,9 @@ public class LifePathBuilderTabBasicInformation {
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(spnMaximumYear)
+                                    )
+                                    .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(spnRandomWeight)
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(chkPlayerRestricted)
@@ -448,6 +480,10 @@ public class LifePathBuilderTabBasicInformation {
                                     .addComponent(spnMaximumYear)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblRandomWeight)
+                                    .addComponent(spnRandomWeight)
+                    )
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(lblPlayerRestricted)
                                     .addComponent(chkPlayerRestricted)
                     )
@@ -483,6 +519,7 @@ public class LifePathBuilderTabBasicInformation {
         setCategories(new ArrayList<>());
         setMinimumYear(0);
         setMaximumYear(9999);
+        setRandomWeight(1.0);
         setPlayerRestricted(false);
 
         parent.updateTxtProgress();
