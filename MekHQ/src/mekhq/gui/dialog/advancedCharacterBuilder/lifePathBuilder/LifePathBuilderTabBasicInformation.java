@@ -483,6 +483,7 @@ public class LifePathBuilderTabBasicInformation {
         setCategories(new ArrayList<>());
         setMinimumYear(0);
         setMaximumYear(9999);
+        setPlayerRestricted(false);
 
         parent.updateTxtProgress();
     }
