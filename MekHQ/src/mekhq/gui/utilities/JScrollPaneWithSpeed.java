@@ -36,7 +36,7 @@ import java.awt.Component;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.clientGUI.GUIPreferences;
-import megamek.utilities.FastJScrollPane;
+import megamek.common.ui.FastJScrollPane;
 
 /**
  * Use {@link FastJScrollPane} instead
