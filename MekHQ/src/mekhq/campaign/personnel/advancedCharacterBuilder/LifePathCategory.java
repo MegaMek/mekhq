@@ -46,6 +46,7 @@ import megamek.logging.MMLogger;
  * @since 0.50.07
  */
 public enum LifePathCategory {
+    NONE("NONE"),
     FIELD_ANALYSIS("FIELD_ANALYSIS"),
     FIELD_ANTHROPOLOGIST("FIELD_ANTHROPOLOGIST"),
     FIELD_ARCHAEOLOGIST("FIELD_ARCHAEOLOGIST"),
