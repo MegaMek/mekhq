@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 
-import megamek.utilities.PDFReaderPanel;
+import megamek.common.ui.PDFReaderPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
