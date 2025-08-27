@@ -129,9 +129,9 @@ public class LifePathValidator {
         }
 
         List<ATOWLifeStage> lifeStages = lifePath.lifeStages();
-        if (lifeStages.contains(ATOWLifeStage.AFFILIATION) || lifeStages.contains(ATOWLifeStage.CLAN_CASTE)) {
+        if (lifeStages.contains(ATOWLifeStage.SUPPLEMENTAL) || lifeStages.contains(ATOWLifeStage.CLAN_CASTE)) {
             if (lifeStages.size() != 1) {
-                // too many cateogores
+                invalidReasons.add(InvalidLifePathReason.SUPPLEMENTAL_OR_CASTE_TOO_MANY_CATEGORIES);
             }
 
             if (!categories.contains(LifePathCategory.NONE)) {
