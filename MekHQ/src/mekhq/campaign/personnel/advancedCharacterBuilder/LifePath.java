@@ -122,22 +122,22 @@ public record LifePath(
             // which point they can be removed.
 
             if (minimumYear == null) { // Added in 50.07
-                LOGGER.warn("Minimum year is null, setting to 0");
+                LOGGER.warn("{} - {}: Minimum year is null, setting to 0", id, name);
                 minimumYear = 0;
             }
 
             if (maximumYear == null) { // Added in 50.07
-                LOGGER.warn("Maximum year is null, setting to 9999");
+                LOGGER.warn("{} - {}: Maximum year is null, setting to 9999", id, name);
                 maximumYear = 9999;
             }
 
             if (isPlayerRestricted == null) { // Added in 50.07
-                LOGGER.warn("Player restriction check is null, setting to false");
+                LOGGER.warn("{} - {}: Player restriction check is null, setting to false", id, name);
                 isPlayerRestricted = false;
             }
 
             if (randomWeight == null) { // Added in 50.07
-                LOGGER.warn("Random weight is null, setting to 1.0");
+                LOGGER.warn("{} - {}: Random weight is null, setting to 1.0", id, name);
                 randomWeight = 1.0;
             }
         }
