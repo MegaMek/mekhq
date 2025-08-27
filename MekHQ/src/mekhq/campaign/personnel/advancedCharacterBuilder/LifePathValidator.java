@@ -123,8 +123,20 @@ public class LifePathValidator {
     }
 
     private void checkCategories() {
-        if (lifePath.categories().isEmpty()) {
+        List<LifePathCategory> categories = lifePath.categories();
+        if (categories.isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_CATEGORIES);
+        }
+
+        List<ATOWLifeStage> lifeStages = lifePath.lifeStages();
+        if (lifeStages.contains(ATOWLifeStage.AFFILIATION) || lifeStages.contains(ATOWLifeStage.CLAN_CASTE)) {
+            if (lifeStages.size() != 1) {
+                // too many cateogores
+            }
+
+            if (!categories.contains(LifePathCategory.NONE)) {
+                invalidReasons.add(InvalidLifePathReason.SUPPLEMENTAL_OR_CASTE_MISSING_NONE_CATEGORY);
+            }
         }
     }
 }
