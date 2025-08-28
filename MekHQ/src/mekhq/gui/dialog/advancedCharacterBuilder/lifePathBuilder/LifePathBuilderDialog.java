@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
-import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -52,15 +50,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.Box;
@@ -72,15 +67,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.Version;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.MHQConstants;
@@ -90,13 +82,11 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.*;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
-import mekhq.io.FileType;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class LifePathBuilderDialog extends JDialog {
@@ -406,7 +396,7 @@ public class LifePathBuilderDialog extends JDialog {
             LifePath record = buildLifePathFromBuilderWizard();
             boolean isValid = validateLifePath(record);
             if (isValid) {
-                writeToJSONWithDialog(record);
+                LifePathIO.writeToJSONWithDialog(record);
             }
         });
         pnlButtons.add(btnSave);
@@ -416,7 +406,7 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            loadFromJSONWithDialog().ifPresent(LifePath -> {
+            LifePathIO.loadFromJSONWithDialog().ifPresent(LifePath -> {
                 resetNonBasicTabs();
                 updateBuilderFromExistingLifePathRecord(LifePath);
             });
@@ -665,85 +655,6 @@ public class LifePathBuilderDialog extends JDialog {
         }
 
         return Collections.max(map.keySet());
-    }
-
-    public static void writeToJSONWithDialog(LifePath record) {
-        String baseName = record.name();
-        if (baseName.isBlank()) {
-            baseName = "unnamed_life_path";
-        } else {
-            baseName = baseName.replaceAll("[<>:\"/\\\\|?*\\p{Cntrl}]", "");
-            baseName = baseName.replaceAll("[. ]+$", "");
-            baseName = baseName.replaceAll("^_|_$", "");
-        }
-
-        // Pick an initial directory (preferably the user directory or fallback)
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        if (userDirectory == null || userDirectory.isBlank()) {
-            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
-        } else {
-            userDirectory = userDirectory + LIFE_PATHS_USER_DIRECTORY_PATH;
-        }
-
-        Optional<File> dialogFile = GUI.fileDialogSave(
-              null,
-              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.save"),
-              FileType.JSON,
-              userDirectory,
-              baseName
-        );
-
-        if (dialogFile.isPresent()) {
-            File file = dialogFile.get();
-            // Ensure it ends with ".json"
-            String name = file.getName();
-            if (!name.toLowerCase().endsWith(".json")) {
-                file = new File(file.getParent(), name + ".json");
-            }
-            // Write the record
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-                objectMapper.writeValue(file, record);
-                LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-            }
-        } else {
-            LOGGER.info("Save operation cancelled by user.");
-        }
-    }
-
-    public static Optional<LifePath> loadFromJSONWithDialog() {
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        if (userDirectory == null || userDirectory.isBlank()) {
-            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
-        } else {
-            userDirectory = Paths.get(userDirectory, LIFE_PATHS_USER_DIRECTORY_PATH).toString();
-        }
-
-        Optional<File> fileOpt = GUI.fileDialogOpen(
-              null,
-              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.load"),
-              FileType.JSON,
-              userDirectory
-        );
-
-        if (fileOpt.isPresent()) {
-            File file = fileOpt.get();
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                LifePath record = objectMapper.readValue(file, LifePath.class);
-                LOGGER.info("Loaded LifePathRecord from: {}", file.getAbsolutePath());
-                return Optional.of(record);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-            }
-        } else {
-            LOGGER.info("Load operation cancelled by user.");
-        }
-
-        return Optional.empty();
     }
 
     /**

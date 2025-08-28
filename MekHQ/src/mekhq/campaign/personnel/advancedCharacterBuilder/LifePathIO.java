@@ -45,17 +45,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.io.FileType;
 
 public class LifePathIO {
     final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathIO";
@@ -150,7 +154,7 @@ public class LifePathIO {
             if (isUpgrade) {
                 for (Map.Entry<UUID, String> entry : outOfDateLifePaths.entrySet()) {
                     LifePath record = lifePathMap.get(entry.getKey());
-                    resaveLifePath(record, entry.getValue());
+                    writeToJSONWithoutDialog(record, entry.getValue());
                 }
             }
         }
@@ -207,7 +211,39 @@ public class LifePathIO {
         }
     }
 
-    public static void resaveLifePath(LifePath record, String directory) {
+    public static Optional<LifePath> loadFromJSONWithDialog() {
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if (userDirectory == null || userDirectory.isBlank()) {
+            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+        } else {
+            userDirectory = Paths.get(userDirectory, LIFE_PATHS_USER_DIRECTORY_PATH).toString();
+        }
+
+        Optional<File> fileOpt = GUI.fileDialogOpen(
+              null,
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.load"),
+              FileType.JSON,
+              userDirectory
+        );
+
+        if (fileOpt.isPresent()) {
+            File file = fileOpt.get();
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                LifePath record = objectMapper.readValue(file, LifePath.class);
+                LOGGER.info("Loaded LifePathRecord from: {}", file.getAbsolutePath());
+                return Optional.of(record);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
+            }
+        } else {
+            LOGGER.info("Load operation cancelled by user.");
+        }
+
+        return Optional.empty();
+    }
+
+    public static void writeToJSONWithoutDialog(LifePath record, String directory) {
         String baseName = record.name();
         if (baseName == null || baseName.isBlank()) {
             baseName = "unnamed_life_path";
@@ -226,13 +262,60 @@ public class LifePathIO {
 
         // File path
         File file = new File(dir, baseName + ".json");
+        saveAction(record, file);
+    }
+
+    public static void saveAction(LifePath record, File file) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-            objectMapper.writeValue(file, record);
+            DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
+            DefaultIndenter indenter = new DefaultIndenter("    ", DefaultIndenter.SYS_LF); // 4 spaces
+            printer.indentObjectsWith(indenter);
+            printer.indentArraysWith(indenter);
+            objectMapper.writer(printer).writeValue(file, record);
             LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
         } catch (Exception e) {
             LOGGER.error("Failed to write LifePathRecord JSON: {}", e.getMessage());
+        }
+    }
+
+    public static void writeToJSONWithDialog(LifePath record) {
+        String baseName = record.name();
+        if (baseName.isBlank()) {
+            baseName = "unnamed_life_path";
+        } else {
+            baseName = baseName.replaceAll("[<>:\"/\\\\|?*\\p{Cntrl}]", "");
+            baseName = baseName.replaceAll("[. ]+$", "");
+            baseName = baseName.replaceAll("^_|_$", "");
+        }
+
+        // Pick an initial directory (preferably the user directory or fallback)
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if (userDirectory == null || userDirectory.isBlank()) {
+            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+        } else {
+            userDirectory = userDirectory + LIFE_PATHS_USER_DIRECTORY_PATH;
+        }
+
+        Optional<File> dialogFile = GUI.fileDialogSave(
+              null,
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.save"),
+              FileType.JSON,
+              userDirectory,
+              baseName
+        );
+
+        if (dialogFile.isPresent()) {
+            File file = dialogFile.get();
+            // Ensure it ends with ".json"
+            String name = file.getName();
+            if (!name.toLowerCase().endsWith(".json")) {
+                file = new File(file.getParent(), name + ".json");
+            }
+            // Write the record
+            LifePathIO.saveAction(record, file);
+        } else {
+            LOGGER.info("Save operation cancelled by user.");
         }
     }
 }
