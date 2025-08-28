@@ -195,13 +195,13 @@ public record LifePath(
             throw new IllegalArgumentException("lifeStages cannot be null");
         }
         if (lifeStages.isEmpty()) {
-            throw new IllegalArgumentException("lifeStages cannot be empty");
+            LOGGER.warn("{} - {}: Life stages is empty, setting to empty list", id, name);
         }
         if (categories == null) {
             throw new IllegalArgumentException("categories cannot be null");
         }
         if (categories.isEmpty()) {
-            throw new IllegalArgumentException("categories cannot be empty");
+            LOGGER.warn("{} - {}: Categories is empty, setting to empty list", id, name);
         }
         if (isPlayerRestricted == null) {
             throw new IllegalArgumentException("isPlayerRestricted cannot be null");
