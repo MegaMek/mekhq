@@ -35,7 +35,6 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 public enum InvalidLifePathReason {
-    SUPPLEMENTAL_OR_CASTE_TOO_MANY_CATEGORIES("SUPPLEMENTAL_OR_CASTE_TOO_MANY_CATEGORIES"),
     MIN_YEAR_ABOVE_MAX_YEAR("MIN_YEAR_ABOVE_MAX_YEAR"),
     MISSING_CATEGORIES("MISSING_CATEGORIES"),
     MISSING_FACTION("MISSING_FACTION"),
@@ -43,7 +42,6 @@ public enum InvalidLifePathReason {
     MISSING_NAME("MISSING_NAME"),
     MISSING_SOURCE("MISSING_SOURCE"),
     NO_FLEXIBLE_PICKS("NO_FLEXIBLE_PICKS"),
-    SUPPLEMENTAL_OR_CASTE_MISSING_NONE_CATEGORY("SUPPLEMENTAL_OR_CASTE_MISSING_NONE_CATEGORY"),
     TOO_MANY_FLEXIBLE_PICKS("TOO_MANY_FLEXIBLE_PICKS");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InvalidLifePathReason";

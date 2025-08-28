@@ -127,16 +127,5 @@ public class LifePathValidator {
         if (categories.isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_CATEGORIES);
         }
-
-        List<ATOWLifeStage> lifeStages = lifePath.lifeStages();
-        if (lifeStages.contains(ATOWLifeStage.SUPPLEMENTAL) || lifeStages.contains(ATOWLifeStage.CLAN_CASTE)) {
-            if (categories.size() != 1) {
-                invalidReasons.add(InvalidLifePathReason.SUPPLEMENTAL_OR_CASTE_TOO_MANY_CATEGORIES);
-            }
-
-            if (!categories.contains(LifePathCategory.NONE)) {
-                invalidReasons.add(InvalidLifePathReason.SUPPLEMENTAL_OR_CASTE_MISSING_NONE_CATEGORY);
-            }
-        }
     }
 }
