@@ -97,8 +97,6 @@ public class LifePathIO {
         Map<UUID, String> outOfDateLifePaths = new HashMap<>();
 
         try {
-            LOGGER.info("Loading LifePaths from directory and its subdirectories: {}", directoryPath);
-
             ObjectMapper objectMapper = new ObjectMapper();
 
             Path startPath = Paths.get(directoryPath);
@@ -139,10 +137,10 @@ public class LifePathIO {
                     }
                 }
             } else {
-                LOGGER.warn("Directory {} does not exist.", directoryPath);
+                LOGGER.warn("Directory does not exist.");
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to load LifePaths from directory {}: {}", directoryPath, e.getMessage());
+            LOGGER.error("Failed to load LifePaths from directory {}", e.getMessage());
         }
 
         if (!outOfDateLifePaths.isEmpty()) {
