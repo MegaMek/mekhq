@@ -64,7 +64,7 @@ public class LifePathIO {
     public static Map<UUID, LifePath> loadAllLifePaths(Campaign campaign) {
         LOGGER.info("Loading all LifePaths");
         Map<UUID, LifePath> lifePathMap =
-              new HashMap<>(loadAllLifePathsFromDirectory(campaign, LIFE_PATHS_DEFAULT_DIRECTORY_PATH));
+              new HashMap<>(loadAllLifePathsFromDirectory(campaign, LIFE_PATHS_DEFAULT_DIRECTORY_PATH, true));
 
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
         if (userDirectory == null || userDirectory.isBlank()) {
@@ -74,7 +74,8 @@ public class LifePathIO {
         }
 
         LOGGER.info("Loading LifePaths from user directory {}", LIFE_PATHS_USER_DIRECTORY_PATH);
-        Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(campaign, userDirectory));
+        Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(campaign, userDirectory,
+              false));
         for (UUID id : tempLifePathMap.keySet()) {
             if (lifePathMap.containsKey(id)) {
                 LOGGER.warn("Overriding {} with {}.", lifePathMap.get(id).name(),
@@ -90,7 +91,8 @@ public class LifePathIO {
         return lifePathMap;
     }
 
-    private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(Campaign campaign, String directoryPath) {
+    private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(Campaign campaign, String directoryPath,
+          boolean silentlyUpgrade) {
         Map<UUID, LifePath> lifePathMap = new HashMap<>();
         Map<UUID, String> outOfDateLifePaths = new HashMap<>();
 
@@ -145,28 +147,8 @@ public class LifePathIO {
         }
 
         if (!outOfDateLifePaths.isEmpty()) {
-            String message = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.notice",
-                  outOfDateLifePaths.size(), directoryPath);
-            String cancelOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.cancel");
-            String confirmOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.confirm");
-            String warning = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.warning");
-
-            boolean isUpgrade = false;
-            boolean dialogConfirmed = false;
-            while (!dialogConfirmed) {
-                ImmersiveDialogSimple decisionDialog = new ImmersiveDialogSimple(campaign,
-                      null,
-                      null,
-                      message,
-                      List.of(cancelOption, confirmOption),
-                      warning,
-                      null,
-                      false);
-                isUpgrade = decisionDialog.getDialogChoice() == 1;
-
-                ImmersiveDialogConfirmation confirmDialog = new ImmersiveDialogConfirmation(campaign);
-                dialogConfirmed = confirmDialog.wasConfirmed();
-            }
+            boolean isUpgrade = silentlyUpgrade || triggerConfirmationDialog(campaign, directoryPath,
+                  outOfDateLifePaths);
 
             if (isUpgrade) {
                 for (Map.Entry<UUID, String> entry : outOfDateLifePaths.entrySet()) {
@@ -177,6 +159,33 @@ public class LifePathIO {
         }
 
         return lifePathMap;
+    }
+
+    private static boolean triggerConfirmationDialog(Campaign campaign, String directoryPath,
+          Map<UUID, String> outOfDateLifePaths) {
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.notice",
+              outOfDateLifePaths.size(), directoryPath);
+        String cancelOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.cancel");
+        String confirmOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.confirm");
+        String warning = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.warning");
+
+        boolean isUpgrade = false;
+        boolean dialogConfirmed = false;
+        while (!dialogConfirmed) {
+            ImmersiveDialogSimple decisionDialog = new ImmersiveDialogSimple(campaign,
+                  null,
+                  null,
+                  message,
+                  List.of(cancelOption, confirmOption),
+                  warning,
+                  null,
+                  false);
+            isUpgrade = decisionDialog.getDialogChoice() == 1;
+
+            ImmersiveDialogConfirmation confirmDialog = new ImmersiveDialogConfirmation(campaign);
+            dialogConfirmed = confirmDialog.wasConfirmed();
+        }
+        return isUpgrade;
     }
 
     private static void validateLifePath(Map<UUID, LifePath> lifePathMap) {
