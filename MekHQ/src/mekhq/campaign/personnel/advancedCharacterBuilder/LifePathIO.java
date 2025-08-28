@@ -124,7 +124,7 @@ public class LifePathIO {
 
                                 if (record.version().isLowerThan(MHQConstants.VERSION) ||
                                           record.version().equals(MHQConstants.VERSION)) {
-                                    outOfDateLifePaths.put(id, file.getPath());
+                                    outOfDateLifePaths.put(id, file.getParent());
                                     LOGGER.info("LifePath [{}] is out of date.", record.name());
                                 }
 
