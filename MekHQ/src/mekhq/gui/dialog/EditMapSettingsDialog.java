@@ -59,14 +59,14 @@ import javax.swing.*;
 
 import megamek.client.ui.dialogs.minimap.MinimapPanel;
 import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
+import megamek.common.Configuration;
 import megamek.common.board.Board;
 import megamek.common.board.BoardDimensions;
-import megamek.common.Configuration;
 import megamek.common.loaders.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
-import megamek.server.totalwarfare.TWGameManager;
+import megamek.server.totalWarfare.TWGameManager;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;

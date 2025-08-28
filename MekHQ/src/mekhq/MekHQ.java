@@ -95,7 +95,7 @@ import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
-import megamek.server.totalwarfare.TWGameManager;
+import megamek.server.totalWarfare.TWGameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
