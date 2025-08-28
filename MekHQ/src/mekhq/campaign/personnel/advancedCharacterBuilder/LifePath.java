@@ -152,11 +152,20 @@ public record LifePath(
         if (source == null) {
             throw new IllegalArgumentException("source cannot be null");
         }
+        if (source.isBlank()) {
+            LOGGER.warn("{} - {}: Source is blank, setting to empty string", id, name);
+        }
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("name cannot be blank");
+        }
         if (flavorText == null) {
             throw new IllegalArgumentException("flavorText cannot be null");
+        }
+        if (flavorText.isBlank()) {
+            LOGGER.warn("{} - {}: Flavor text is blank, setting to empty string", id, name);
         }
         if (age == null) {
             throw new IllegalArgumentException("age cannot be null");
@@ -185,8 +194,14 @@ public record LifePath(
         if (lifeStages == null) {
             throw new IllegalArgumentException("lifeStages cannot be null");
         }
+        if (lifeStages.isEmpty()) {
+            throw new IllegalArgumentException("lifeStages cannot be empty");
+        }
         if (categories == null) {
             throw new IllegalArgumentException("categories cannot be null");
+        }
+        if (categories.isEmpty()) {
+            throw new IllegalArgumentException("categories cannot be empty");
         }
         if (isPlayerRestricted == null) {
             throw new IllegalArgumentException("isPlayerRestricted cannot be null");
