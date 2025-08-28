@@ -572,7 +572,7 @@ public class Campaign implements ITechManager {
         }
 
         try {
-            lifePathLibrary = LifePathIO.loadAllLifePaths();
+            lifePathLibrary = LifePathIO.loadAllLifePaths(this);
         } catch (Exception ex) {
             logger.error("Unable to initialize Life Path Library. If this wasn't during automated testing this must " +
                                "be investigated.", ex);

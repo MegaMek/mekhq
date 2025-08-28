@@ -467,7 +467,7 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     private void performDialogCloseAction() {
-        Map<UUID, LifePath> lifePaths = LifePathIO.loadAllLifePaths();
+        Map<UUID, LifePath> lifePaths = LifePathIO.loadAllLifePaths(campaign);
         campaign.setLifePathLibrary(lifePaths);
         dispose();
     }

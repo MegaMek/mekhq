@@ -34,6 +34,8 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
 import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -47,15 +49,22 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.campaign.Campaign;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 public class LifePathIO {
+    final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathIO";
     private static final MMLogger LOGGER = MMLogger.create(LifePathIO.class);
 
-    public static Map<UUID, LifePath> loadAllLifePaths() {
+    public static Map<UUID, LifePath> loadAllLifePaths(Campaign campaign) {
         LOGGER.info("Loading all LifePaths");
-        Map<UUID, LifePath> lifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(LIFE_PATHS_DEFAULT_DIRECTORY_PATH));
+        Map<UUID, LifePath> lifePathMap =
+              new HashMap<>(loadAllLifePathsFromDirectory(campaign, LIFE_PATHS_DEFAULT_DIRECTORY_PATH));
 
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
         if (userDirectory == null || userDirectory.isBlank()) {
@@ -65,7 +74,7 @@ public class LifePathIO {
         }
 
         LOGGER.info("Loading LifePaths from user directory {}", LIFE_PATHS_USER_DIRECTORY_PATH);
-        Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(userDirectory));
+        Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(campaign, userDirectory));
         for (UUID id : tempLifePathMap.keySet()) {
             if (lifePathMap.containsKey(id)) {
                 LOGGER.warn("Overriding {} with {}.", lifePathMap.get(id).name(),
@@ -81,8 +90,10 @@ public class LifePathIO {
         return lifePathMap;
     }
 
-    private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(String directoryPath) {
+    private static Map<UUID, LifePath> loadAllLifePathsFromDirectory(Campaign campaign, String directoryPath) {
         Map<UUID, LifePath> lifePathMap = new HashMap<>();
+        Map<UUID, String> outOfDateLifePaths = new HashMap<>();
+
         try {
             LOGGER.info("Loading LifePaths from directory and its subdirectories: {}", directoryPath);
 
@@ -110,6 +121,13 @@ public class LifePathIO {
                                           id, lifePathMap.get(id).name(), record.name());
                                 }
                                 lifePathMap.put(id, record);
+
+                                if (record.version().isLowerThan(MHQConstants.VERSION) ||
+                                          record.version().equals(MHQConstants.VERSION)) {
+                                    outOfDateLifePaths.put(id, file.getPath());
+                                    LOGGER.info("LifePath [{}] is out of date.", record.name());
+                                }
+
                                 LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
                             } else {
                                 LOGGER.warn("File {} missing valid LifePath id. Skipping.", file.getPath());
@@ -125,6 +143,39 @@ public class LifePathIO {
         } catch (Exception e) {
             LOGGER.error("Failed to load LifePaths from directory {}: {}", directoryPath, e.getMessage());
         }
+
+        if (!outOfDateLifePaths.isEmpty()) {
+            String message = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.notice",
+                  outOfDateLifePaths.size(), directoryPath);
+            String cancelOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.cancel");
+            String confirmOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.confirm");
+            String warning = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.warning");
+
+            boolean isUpgrade = false;
+            boolean dialogConfirmed = false;
+            while (!dialogConfirmed) {
+                ImmersiveDialogSimple decisionDialog = new ImmersiveDialogSimple(campaign,
+                      null,
+                      null,
+                      message,
+                      List.of(cancelOption, confirmOption),
+                      warning,
+                      null,
+                      false);
+                isUpgrade = decisionDialog.getDialogChoice() == 1;
+
+                ImmersiveDialogConfirmation confirmDialog = new ImmersiveDialogConfirmation(campaign);
+                dialogConfirmed = confirmDialog.wasConfirmed();
+            }
+
+            if (isUpgrade) {
+                for (Map.Entry<UUID, String> entry : outOfDateLifePaths.entrySet()) {
+                    LifePath record = lifePathMap.get(entry.getKey());
+                    resaveLifePath(record, entry.getValue());
+                }
+            }
+        }
+
         return lifePathMap;
     }
 
@@ -150,4 +201,32 @@ public class LifePathIO {
         }
     }
 
+    public static void resaveLifePath(LifePath record, String directory) {
+        String baseName = record.name();
+        if (baseName == null || baseName.isBlank()) {
+            baseName = "unnamed_life_path";
+        } else {
+            baseName = baseName.replaceAll("[<>:\"/\\\\|?*\\p{Cntrl}]", "");
+            baseName = baseName.replaceAll("[. ]+$", "");
+            baseName = baseName.replaceAll("^_|_$", "");
+        }
+
+        // Ensure the directory exists
+        File dir = new File(directory);
+        if (!dir.exists() && !dir.mkdirs()) {
+            LOGGER.error("Could not create directory: {}", directory);
+            return;
+        }
+
+        // File path
+        File file = new File(dir, baseName + ".json");
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.writeValue(file, record);
+            LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
+        } catch (Exception e) {
+            LOGGER.error("Failed to write LifePathRecord JSON: {}", e.getMessage());
+        }
+    }
 }
