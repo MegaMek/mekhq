@@ -416,7 +416,7 @@ public class CampaignXmlParser {
         campaign.setMarriage(options.getRandomMarriageMethod().getMethod(options));
         campaign.setProcreation(options.getRandomProcreationMethod().getMethod(options));
 
-        long timestamp = System.currentTimeMillis();
+        long timestamp = java.lang.System.currentTimeMillis();
 
         // loop through forces to set force id
         for (Force f : campaign.getAllForces()) {
@@ -448,15 +448,17 @@ public class CampaignXmlParser {
             }
         }
 
-        LOGGER.info(String.format("[Campaign Load] Force IDs set in %dms", System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+        LOGGER.info(String.format("[Campaign Load] Force IDs set in %dms",
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         // Process parts...
         // Note: Units must have their Entities set prior to reaching this point!
         postProcessParts(campaign, version);
 
-        LOGGER.info(String.format("[Campaign Load] Parts processed in %dms", System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+        LOGGER.info(String.format("[Campaign Load] Parts processed in %dms",
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         boolean skipAllDeprecationChecks = false;
         boolean refundAllDeprecatedSkills = false;
@@ -483,8 +485,8 @@ public class CampaignXmlParser {
         }
 
         LOGGER.info(String.format("[Campaign Load] Rank references fixed in %dms",
-              System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
         campaign.getHangar().forEachUnit(unit -> {
@@ -541,8 +543,8 @@ public class CampaignXmlParser {
         });
 
         LOGGER.info(String.format("[Campaign Load] Pilot references fixed in %dms",
-              System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         campaign.getHangar().forEachUnit(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
@@ -558,8 +560,8 @@ public class CampaignXmlParser {
         campaign.refreshNetworks();
 
         LOGGER.info(String.format("[Campaign Load] C3 networks refreshed in %dms",
-              System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         // This removes the risk of having forces with invalid leadership getting locked in
         for (Force force : campaign.getAllForces()) {
@@ -589,21 +591,23 @@ public class CampaignXmlParser {
             campaign.removeUnit(unit.getId());
         }
 
-        LOGGER.info(String.format("[Campaign Load] Units initialized in %dms", System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+        LOGGER.info(String.format("[Campaign Load] Units initialized in %dms",
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         for (Person person : campaign.getPersonnel()) {
             person.fixReferences(campaign);
         }
 
         LOGGER.info(String.format("[Campaign Load] Personnel initialized in %dms",
-              System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         campaign.reloadNews();
 
-        LOGGER.info(String.format("[Campaign Load] News loaded in %dms", System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+        LOGGER.info(String.format("[Campaign Load] News loaded in %dms",
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         // If we don't have a personnel market, create one.
         if (!foundPersonnelMarket) {
@@ -642,8 +646,9 @@ public class CampaignXmlParser {
             bin.unload();
         }
 
-        LOGGER.info(String.format("[Campaign Load] Ammo bins cleared in %dms", System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+        LOGGER.info(String.format("[Campaign Load] Ammo bins cleared in %dms",
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         // Check all parts that are reserved for refit and if the refit id unit
         // is not refitting or is gone then unreserve
@@ -657,8 +662,8 @@ public class CampaignXmlParser {
         }
 
         LOGGER.info(String.format("[Campaign Load] Reserved refit parts fixed in %dms",
-              System.currentTimeMillis() - timestamp));
-        timestamp = System.currentTimeMillis();
+              java.lang.System.currentTimeMillis() - timestamp));
+        timestamp = java.lang.System.currentTimeMillis();
 
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
@@ -681,7 +686,7 @@ public class CampaignXmlParser {
         campaign.setWarehouse(warehouse);
 
         LOGGER.info(String.format("[Campaign Load] Warehouse cleaned up in %dms",
-              System.currentTimeMillis() - timestamp));
+              java.lang.System.currentTimeMillis() - timestamp));
 
         campaign.setUnitRating(null);
 

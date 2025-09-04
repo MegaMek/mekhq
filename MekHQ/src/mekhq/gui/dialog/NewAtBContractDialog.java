@@ -636,17 +636,17 @@ public class NewAtBContractDialog extends NewContractDialog {
         } else if (source.equals(cbEmployer)) {
             logger.info("Setting employer code to {}", getCurrentEmployerCode());
 
-            long time = System.currentTimeMillis();
+            long time = java.lang.System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            logger.info("to set employer code: {}", System.currentTimeMillis() - time);
+            logger.info("to set employer code: {}", java.lang.System.currentTimeMillis() - time);
 
-            time = System.currentTimeMillis();
+            time = java.lang.System.currentTimeMillis();
             updateEnemies();
-            logger.info("to update enemies: {}", System.currentTimeMillis() - time);
+            logger.info("to update enemies: {}", java.lang.System.currentTimeMillis() - time);
 
-            time = System.currentTimeMillis();
+            time = java.lang.System.currentTimeMillis();
             updatePlanets();
-            logger.info("to update planets: {}", System.currentTimeMillis() - time);
+            logger.info("to update planets: {}", java.lang.System.currentTimeMillis() - time);
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

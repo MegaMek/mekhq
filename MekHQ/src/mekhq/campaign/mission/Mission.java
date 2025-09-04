@@ -80,7 +80,7 @@ public class Mission {
 
     public Mission(final @Nullable String name) {
         this.name = name;
-        this.systemId = "Unknown SystemFluff";
+        this.systemId = "Unknown System";
         this.desc = "";
         this.type = "";
         this.status = MissionStatus.ACTIVE;

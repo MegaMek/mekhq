@@ -124,7 +124,7 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openIndividualRankSystem(final JFrame frame) {
-        Optional<File> value = GUI.fileDialogOpen(frame, "Load Individual Rank SystemFluff",
+        Optional<File> value = GUI.fileDialogOpen(frame, "Load Individual Rank System",
               FileType.XML, MekHQ.getMHQOptions().getIndividualRankSystemPath());
         value.ifPresent(x -> MekHQ.getMHQOptions().setIndividualRankSystemPath(x.getParent()));
         return value;
@@ -136,7 +136,7 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveIndividualRankSystem(final JFrame frame) {
-        Optional<File> value = GUI.fileDialogSave(frame, "Save Individual Rank SystemFluff",
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Individual Rank System",
               FileType.XML, MekHQ.getMHQOptions().getIndividualRankSystemPath(),
               "individualRankSystem.xml");
         value.ifPresent(x -> MekHQ.getMHQOptions().setIndividualRankSystemPath(x.getParent()));

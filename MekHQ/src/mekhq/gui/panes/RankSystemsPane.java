@@ -76,7 +76,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     private RankSystem selectedRankSystem;
     private boolean changed;
 
-    // Rank SystemFluff Panel
+    // Rank System Panel
     private SortedComboBoxModel<RankSystem> rankSystemModel;
     private MMComboBox<RankSystem> comboRankSystems;
     private DefaultComboBoxModel<RankSystemType> rankSystemTypeModel;
@@ -117,7 +117,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         this.changed = changed;
     }
 
-    // region Rank SystemFluff Panel
+    // region Rank System Panel
     public SortedComboBoxModel<RankSystem> getRankSystemModel() {
         return rankSystemModel;
     }
@@ -149,7 +149,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     public void setComboRankSystemType(final MMComboBox<RankSystemType> comboRankSystemType) {
         this.comboRankSystemType = comboRankSystemType;
     }
-    // endregion Rank SystemFluff Panel
+    // endregion Rank System Panel
 
     // region Ranks Table Panel
     public JTable getRanksTable() {

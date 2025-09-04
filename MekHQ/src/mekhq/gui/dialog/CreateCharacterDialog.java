@@ -481,7 +481,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(new JLabel("Origin SystemFluff:"), gridBagConstraints);
+        demogPanel.add(new JLabel("Origin System:"), gridBagConstraints);
 
         DefaultComboBoxModel<Planet> planetsModel = new DefaultComboBoxModel<>();
         choicePlanet = new JComboBox<>(planetsModel);

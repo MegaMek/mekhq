@@ -42,7 +42,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
-public class RankSystemFluffTypeTest {
+public class RankSystemTypeTest {
     //region Variable Declarations
     private static final RankSystemType[] types = RankSystemType.values();
 

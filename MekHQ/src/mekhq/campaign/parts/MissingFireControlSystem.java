@@ -60,7 +60,7 @@ public class MissingFireControlSystem extends MissingPart {
     public MissingFireControlSystem(int tonnage, Money cost, Campaign c) {
         super(0, c);
         this.cost = cost;
-        this.name = "Fire Control SystemFluff";
+        this.name = "Fire Control System";
     }
 
     @Override

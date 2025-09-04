@@ -482,7 +482,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         return switch (group) {
             case SG_ALL -> "All Parts";
             case SG_ARMOR -> "Armor";
-            case SG_SYSTEM -> "SystemFluff Components";
+            case SG_SYSTEM -> "System Components";
             case SG_EQUIP -> "Equipment";
             case SG_LOC -> "Locations";
             case SG_WEAP -> "Weapons";

@@ -77,7 +77,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     public SpacecraftCoolingSystem(int tonnage, int totalSinks, int sinkType, Campaign c) {
         super(tonnage, c);
-        this.name = "Spacecraft Cooling SystemFluff";
+        this.name = "Spacecraft Cooling System";
         this.totalSinks = totalSinks;
         this.sinkType = sinkType;
         if (sinkType == Aero.HEAT_DOUBLE && unit != null && unit.isClan()) {
@@ -264,7 +264,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public String checkScrappable() {
-        return "Spacecraft Cooling SystemFluff cannot be scrapped";
+        return "Spacecraft Cooling System cannot be scrapped";
     }
 
     @Override

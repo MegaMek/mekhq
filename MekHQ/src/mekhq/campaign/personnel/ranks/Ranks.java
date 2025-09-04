@@ -164,10 +164,10 @@ public class Ranks {
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
             logger.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
                                + " system. Initialization failure, shutting MekHQ down.");
-            System.exit(-1);
+            java.lang.System.exit(-1);
         }
 
-        logger.info("Completed Rank SystemFluff XML Load");
+        logger.info("Completed Rank System XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {
