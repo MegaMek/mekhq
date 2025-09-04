@@ -767,9 +767,9 @@ public class MekLocation extends Part {
                 if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
                     EquipmentType equipmentType = slot.getMount().getType();
                     if (equipmentType.hasFlag(MiscType.F_NULL_SIG)) {
-                        partsToSalvageOrScrap.add("Null-Signature SystemFluff");
+                        partsToSalvageOrScrap.add("Null-Signature System");
                     } else if (equipmentType.hasFlag(MiscType.F_VOID_SIG)) {
-                        partsToSalvageOrScrap.add("Void-Signature SystemFluff");
+                        partsToSalvageOrScrap.add("Void-Signature System");
                     } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
                         partsToSalvageOrScrap.add("Chameleon Shield");
                     }

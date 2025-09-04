@@ -68,7 +68,7 @@ public class MissingKFChargingSystem extends MissingPart {
         super(0, c);
         this.coreType = coreType;
         this.docks = docks;
-        this.name = "K-F Charging SystemFluff";
+        this.name = "K-F Charging System";
         this.unitTonnageMatters = true;
     }
 

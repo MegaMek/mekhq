@@ -63,7 +63,7 @@ public class FireControlSystem extends Part {
     public FireControlSystem(int tonnage, Money cost, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
-        this.name = "Fire Control SystemFluff";
+        this.name = "Fire Control System";
     }
 
     @Override

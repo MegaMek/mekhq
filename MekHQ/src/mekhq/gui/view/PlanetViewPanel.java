@@ -174,7 +174,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         panel.add(txtPlanetType, gbcText);
         ++infoRow;
 
-        //SystemFluff Position
+        //System Position
         if (planet.getPlanetType() != PlanetaryType.ASTEROID_BELT) {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
@@ -185,7 +185,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             ++infoRow;
         }
 
-        //SystemFluff Position
+        //System Position
         if ((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
             gbcLabel.gridy = infoRow;

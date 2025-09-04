@@ -58,7 +58,7 @@ public class MekLifeSupport extends Part {
     public MekLifeSupport(int tonnage, Campaign c) {
         super(tonnage, c);
         // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
-        this.name = "Mech Life Support SystemFluff";
+        this.name = "Mech Life Support System";
     }
 
     @Override

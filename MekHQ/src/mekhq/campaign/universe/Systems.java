@@ -249,7 +249,7 @@ public class Systems {
      */
     public static Systems loadDefault() throws DOMException, IOException {
         logger.info("Starting load of system data from XML...");
-        long currentTime = System.currentTimeMillis();
+        long currentTime = java.lang.java.lang.System.currentTimeMillis();
 
         Systems systems = new Systems();
 
@@ -265,7 +265,7 @@ public class Systems {
 
         // logging
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
-              systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
+              systems.systemList.size(), (java.lang.java.lang.System.currentTimeMillis() - currentTime) / 1000.0));
         systems.logVeryCloseSystems();
 
         return systems;
@@ -376,13 +376,13 @@ public class Systems {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {
-                logger.error(String.format("SystemFluff \"%s\" is missing coordinates", system.getId()));
+                logger.error(String.format("System \"%s\" is missing coordinates", system.getId()));
                 toRemove.add(system);
                 continue;
             }
 
             if (null == system.getStar()) {
-                logger.error(String.format("SystemFluff \"%s\" is missing a star", system.getId()));
+                logger.error(String.format("System \"%s\" is missing a star", system.getId()));
                 toRemove.add(system);
                 continue;
             }
@@ -390,7 +390,7 @@ public class Systems {
             // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
                 logger.error(String
-                                   .format("SystemFluff \"%s\" has a primary slot greater than the number of planets",
+                                   .format("System \"%s\" has a primary slot greater than the number of planets",
                                          system.getId()));
                 toRemove.add(system);
                 continue;
