@@ -249,7 +249,7 @@ public class Systems {
      */
     public static Systems loadDefault() throws DOMException, IOException {
         logger.info("Starting load of system data from XML...");
-        long currentTime = java.lang.java.lang.System.currentTimeMillis();
+        long currentTime = java.lang.System.currentTimeMillis();
 
         Systems systems = new Systems();
 
@@ -265,7 +265,7 @@ public class Systems {
 
         // logging
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
-              systems.systemList.size(), (java.lang.java.lang.System.currentTimeMillis() - currentTime) / 1000.0));
+              systems.systemList.size(), (java.lang.System.currentTimeMillis() - currentTime) / 1000.0));
         systems.logVeryCloseSystems();
 
         return systems;
