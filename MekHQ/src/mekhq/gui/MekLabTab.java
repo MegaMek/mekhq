@@ -177,7 +177,7 @@ public class MekLabTab extends CampaignGuiTab {
         btnSaveForLater = new JButton("Save For Later");
         btnSaveForLater.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
-            UnitUtil.compactCriticals(entity);
+            UnitUtil.compactCriticalSlots(entity);
             labPanel.refreshAll(); // The crits may have moved
             fileSaver.saveUnitAs(this.getFrame(), entity);
             // Refresh unit cache so newly-saved file is available for refits.
@@ -284,7 +284,7 @@ public class MekLabTab extends CampaignGuiTab {
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
         CConfig.setParam(CConfig.TECH_SHOW_FACTION,
               String.valueOf(campaignGUI.getCampaign().getTechFaction() != Faction.NONE));
-        CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
+        CConfig.setParam(CConfig.TECH_UNOFFICIAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         labPanel = getCorrectLab(entity);
@@ -690,7 +690,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
 
         }
 
@@ -821,7 +821,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
 
         }
 
@@ -946,7 +946,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
 
         }
 
@@ -1070,7 +1070,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
 
         }
 
@@ -1206,7 +1206,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // not used by MekHQ
         }
 
@@ -1326,7 +1326,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
 
         }
 
@@ -1438,7 +1438,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
 
         }
 
@@ -1565,7 +1565,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // Not needed for MekHQ
         }
 
@@ -1695,7 +1695,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+        public void createNewUnit(long entityType, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // Not used by MekHQ
         }
 
