@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.skills.enums;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.logging.MMLogger;
 
 /**
@@ -46,52 +48,69 @@ public enum SkillSubType {
     /**
      * Represents a default value, it normally means the SubType is missing, or hasn't been set.
      */
-    NONE,
+    NONE("NONE"),
 
     /**
      * Represents gunnery-related combat skills.
      */
-    COMBAT_GUNNERY,
+    COMBAT_GUNNERY("COMBAT_GUNNERY"),
 
     /**
      * Represents piloting-related combat skills.
      */
-    COMBAT_PILOTING,
+    COMBAT_PILOTING("COMBAT_PILOTING"),
 
     /**
      * Represents support (non-combat) skills.
      */
-    SUPPORT,
+    SUPPORT("SUPPORT"),
 
     /**
      * Represents command-related support (non-combat) skills.
      */
-    SUPPORT_COMMAND,
+    SUPPORT_COMMAND("SUPPORT_COMMAND"),
 
     /**
      * Represents roleplay or narrative-based skills.
      */
-    ROLEPLAY_GENERAL,
+    ROLEPLAY_GENERAL("ROLEPLAY_GENERAL"),
 
     /**
      * Represents skills related to art or artistic pursuits within the roleplay or narrative context.
      */
-    ROLEPLAY_ART,
+    ROLEPLAY_ART("ROLEPLAY_ART"),
 
     /**
      * Represents roleplay or narrative-based skills related to special interests.
      */
-    ROLEPLAY_INTEREST,
+    ROLEPLAY_INTEREST("ROLEPLAY_INTEREST"),
 
     /**
      * Represents roleplay or narrative-based skills related to science or scientific disciplines.
      */
-    ROLEPLAY_SCIENCE,
+    ROLEPLAY_SCIENCE("ROLEPLAY_SCIENCE"),
 
     /**
      * Represents roleplay or narrative-based skills related to security.
      */
-    ROLEPLAY_SECURITY;
+    ROLEPLAY_SECURITY("ROLEPLAY_SECURITY");
+
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillSubType";
+
+    private final String lookupName;
+
+    SkillSubType(String lookupName) {
+        this.lookupName = lookupName;
+    }
+
+    public String getLookupName() {
+        return lookupName;
+    }
+
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, "SkillSubType." + lookupName + ".label");
+    }
 
     /**
      * Converts a string or integer input to its corresponding {@link SkillSubType}.

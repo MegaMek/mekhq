@@ -37,29 +37,33 @@ import static java.lang.Math.max;
 import java.util.Map;
 
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 
 public class LifePathXPCostCalculator {
     public static int calculateXPCost(int discount,
           Map<Integer, Map<SkillAttribute, Integer>> fixedAttributes,
           Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedTraits,
           Map<Integer, Map<String, Integer>> fixedSkills,
+          Map<Integer, Map<SkillSubType, Integer>> fixedMetaSkills,
           Map<Integer, Map<String, Integer>> fixedAbilities,
           int flexibleTabCount, int flexiblePickCount,
           Map<Integer, Map<SkillAttribute, Integer>> flexibleAttributes,
           Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleTraits,
           Map<Integer, Map<String, Integer>> flexibleSkills,
+          Map<Integer, Map<SkillSubType, Integer>> flexibleMetaSkills,
           Map<Integer, Map<String, Integer>> flexibleAbilities) {
         // Basic Info
         int globalCost = -discount;
 
         // Fixed XP
-        globalCost += getCost(fixedAttributes, fixedTraits, fixedSkills, fixedAbilities);
+        globalCost += getCost(fixedAttributes, fixedTraits, fixedSkills, fixedMetaSkills, fixedAbilities);
 
         // Flexible XP
         if (flexiblePickCount > 0) {
-            int divisor = max(1, flexibleTabCount);
-            int baseCost = getCost(flexibleAttributes, flexibleTraits, flexibleSkills, flexibleAbilities);
-            double costPerTab = ((double) baseCost) / flexibleTabCount;
+            int divisor = max(1, flexibleTabCount); // Prevents divide by zero errors
+            int baseCost = getCost(flexibleAttributes, flexibleTraits, flexibleSkills,
+                  flexibleMetaSkills, flexibleAbilities);
+            double costPerTab = ((double) baseCost) / divisor;
             globalCost += (int) Math.round(costPerTab * flexiblePickCount);
 
         }
@@ -70,7 +74,8 @@ public class LifePathXPCostCalculator {
 
     private static int getCost(Map<Integer, Map<SkillAttribute, Integer>> fixedAttributes,
           Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedTraits,
-          Map<Integer, Map<String, Integer>> fixedSkills, Map<Integer, Map<String, Integer>> fixedAbilities) {
+          Map<Integer, Map<String, Integer>> fixedSkills, Map<Integer, Map<SkillSubType, Integer>> fixedMetaSkills,
+          Map<Integer, Map<String, Integer>> fixedAbilities) {
         int cost = 0;
 
         for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : fixedAttributes.entrySet()) {
@@ -89,15 +94,22 @@ public class LifePathXPCostCalculator {
 
         for (Map.Entry<Integer, Map<String, Integer>> entry : fixedSkills.entrySet()) {
             Map<String, Integer> storage = entry.getValue();
-            for (Map.Entry<String, Integer> traitEntry : storage.entrySet()) {
-                cost += traitEntry.getValue();
+            for (Map.Entry<String, Integer> skillEntry : storage.entrySet()) {
+                cost += skillEntry.getValue();
+            }
+        }
+
+        for (Map.Entry<Integer, Map<SkillSubType, Integer>> entry : fixedMetaSkills.entrySet()) {
+            Map<SkillSubType, Integer> storage = entry.getValue();
+            for (Map.Entry<SkillSubType, Integer> metaSkillEntry : storage.entrySet()) {
+                cost += metaSkillEntry.getValue();
             }
         }
 
         for (Map.Entry<Integer, Map<String, Integer>> entry : fixedAbilities.entrySet()) {
             Map<String, Integer> storage = entry.getValue();
-            for (Map.Entry<String, Integer> traitEntry : storage.entrySet()) {
-                cost += traitEntry.getValue();
+            for (Map.Entry<String, Integer> abilityEntry : storage.entrySet()) {
+                cost += abilityEntry.getValue();
             }
         }
 

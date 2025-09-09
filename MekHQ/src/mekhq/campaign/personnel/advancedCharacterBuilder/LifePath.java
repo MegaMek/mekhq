@@ -40,6 +40,7 @@ import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 
 /**
  * Represents a single Life Path definition for the advanced character builder system, including identifying metadata,
@@ -72,6 +73,7 @@ public record LifePath(
       Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits,
       Map<Integer, Map<String, Integer>> requirementsSkills,
+      Map<Integer, Map<SkillSubType, Integer>> requirementsMetaSkills,
       Map<Integer, Map<String, Integer>> requirementsAbilities,
       // Exclusions
       Map<Integer, List<String>> exclusionsFactions,
@@ -80,16 +82,19 @@ public record LifePath(
       Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits,
       Map<Integer, Map<String, Integer>> exclusionsSkills,
+      Map<Integer, Map<SkillSubType, Integer>> exclusionsMetaSkills,
       Map<Integer, Map<String, Integer>> exclusionsAbilities,
       // Fixed XP
       Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits,
       Map<Integer, Map<String, Integer>> fixedXPSkills,
+      Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills,
       Map<Integer, Map<String, Integer>> fixedXPAbilities,
       // Flexible XP
       Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits,
       Map<Integer, Map<String, Integer>> flexibleXPSkills,
+      Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills,
       Map<Integer, Map<String, Integer>> flexibleXPAbilities,
       int flexibleXPPickCount
 ) {

@@ -67,6 +67,7 @@ import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 class LifePathSkillPicker extends JDialog {
@@ -85,16 +86,26 @@ class LifePathSkillPicker extends JDialog {
     private final Map<String, Integer> storedSkillLevels;
     private Map<String, Integer> selectedSkillLevels;
 
+    private final Map<SkillSubType, Integer> storedMetaSkillLevels;
+    private Map<SkillSubType, Integer> selectedMetaSkillLevels;
+
     Map<String, Integer> getSelectedSkillLevels() {
         return selectedSkillLevels;
     }
 
-    LifePathSkillPicker(Map<String, Integer> selectedSkillLevels, LifePathBuilderTabType tabType) {
+    Map<SkillSubType, Integer> getSelectedMetaSkillLevels() {
+        return selectedMetaSkillLevels;
+    }
+
+    LifePathSkillPicker(Map<String, Integer> selectedSkillLevels, Map<SkillSubType, Integer> selectedMetaSkillLevels,
+          LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
         this.selectedSkillLevels = new HashMap<>(selectedSkillLevels);
         storedSkillLevels = new HashMap<>(selectedSkillLevels);
+        this.selectedMetaSkillLevels = new HashMap<>(selectedMetaSkillLevels);
+        storedMetaSkillLevels = new HashMap<>(selectedMetaSkillLevels);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
 
@@ -145,6 +156,7 @@ class LifePathSkillPicker extends JDialog {
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
             selectedSkillLevels = storedSkillLevels;
+            selectedMetaSkillLevels = storedMetaSkillLevels;
             dispose();
         });
 
@@ -180,6 +192,10 @@ class LifePathSkillPicker extends JDialog {
         List<SkillType> roleplaySkills5 = new ArrayList<>();
         List<String> allSkills = new ArrayList<>(List.of(SkillType.getSkillList()));
         Collections.sort(allSkills);
+
+        List<SkillSubType> metaSkills = new ArrayList<>(List.of(SkillSubType.values()));
+        metaSkills.remove(SkillSubType.NONE);
+        Collections.sort(metaSkills);
 
         // Normal Skills
         for (String skillName : new ArrayList<>(allSkills)) {
@@ -241,6 +257,13 @@ class LifePathSkillPicker extends JDialog {
 
         if (!roleplaySkills5.isEmpty()) {
             buildTab(roleplaySkills5, optionPane, getSkillOptions(roleplaySkills5, tabType));
+        }
+
+        // Meta Skills
+        if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
+            FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills, tabType);
+            optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
+                  pnlMetaSkills);
         }
 
         pnlOptions.add(optionPane);
@@ -311,6 +334,72 @@ class LifePathSkillPicker extends JDialog {
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
             pnlRows.add(lblSkill);
+            pnlRows.add(Box.createHorizontalStrut(PADDING));
+            pnlRows.add(spnSkillLevel);
+            pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            pnlSkills.add(pnlRows, gbc);
+        }
+
+        FastJScrollPane scrollSkills = new FastJScrollPane(pnlSkills);
+        scrollSkills.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollSkills.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollSkills.setBorder(null);
+
+        return scrollSkills;
+    }
+
+    private FastJScrollPane getMetaSkillOptions(List<SkillSubType> metaSkills, LifePathBuilderTabType tabType) {
+        JPanel pnlSkills = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+        int columns = 3;
+        for (int i = 0; i < metaSkills.size(); i++) {
+            SkillSubType metaSkill = metaSkills.get(i);
+            String label = metaSkill.getDisplayName();
+
+            int minimumSkillLevel = switch (tabType) {
+                case REQUIREMENTS, EXCLUSIONS -> 0;
+                case FIXED_XP, FLEXIBLE_XP -> -1000;
+            };
+            int maximumSkillLevel = switch (tabType) {
+                case REQUIREMENTS, EXCLUSIONS -> 10; // Max level is always assumed 10 for meta-skills
+                case FIXED_XP, FLEXIBLE_XP -> 1000;
+            };
+
+            int keyValue = switch (tabType) {
+                case REQUIREMENTS -> minimumSkillLevel;
+                case EXCLUSIONS -> maximumSkillLevel;
+                case FIXED_XP, FLEXIBLE_XP -> 0;
+            };
+
+            int defaultValue = selectedMetaSkillLevels.getOrDefault(metaSkill, keyValue);
+
+            JLabel lblMetaSkill = new JLabel(label);
+            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
+                  maximumSkillLevel, 1));
+
+            spnSkillLevel.addChangeListener(evt -> {
+                int value = (int) spnSkillLevel.getValue();
+                if (value != defaultValue) {
+                    if (value == keyValue) {
+                        selectedMetaSkillLevels.remove(metaSkill);
+                    } else {
+                        selectedMetaSkillLevels.put(metaSkill, value);
+                    }
+                }
+            });
+
+            gbc.gridx = i % columns;
+            gbc.gridy = i / columns;
+
+            JPanel pnlRows = new JPanel();
+            pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
+            pnlRows.add(lblMetaSkill);
             pnlRows.add(Box.createHorizontalStrut(PADDING));
             pnlRows.add(spnSkillLevel);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);

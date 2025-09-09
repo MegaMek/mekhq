@@ -71,6 +71,7 @@ import megamek.Version;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EnhancedTabbedPane;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.logging.MMLogger;
@@ -82,6 +83,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.*;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -392,10 +394,11 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnSave = new RoundedJButton(titleSave);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
         btnSave.addActionListener(e -> {
-            displayIDRegenerationDialogs();
+            // The record builder performs validation checks and will return null if validation fails
             LifePath record = buildLifePathFromBuilderWizard();
-            boolean isValid = validateLifePath(record);
-            if (isValid) {
+
+            if (record != null) {
+                displayIDRegenerationDialogs();
                 LifePathIO.writeToJSONWithDialog(record);
             }
         });
@@ -460,27 +463,6 @@ public class LifePathBuilderDialog extends JDialog {
         Map<UUID, LifePath> lifePaths = LifePathIO.loadAllLifePaths(campaign);
         campaign.setLifePathLibrary(lifePaths);
         dispose();
-    }
-
-    private boolean validateLifePath(LifePath record) {
-        LifePathValidator validator = new LifePathValidator(record);
-        Set<InvalidLifePathReason> invalidReasons = validator.getInvalidReasons();
-
-        if (invalidReasons.isEmpty()) {
-            return true;
-        }
-
-        StringBuilder invalidText = new StringBuilder(getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.invalid.label"));
-        for (InvalidLifePathReason invalidReason : invalidReasons) {
-            invalidText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.invalid.format",
-                  spanOpeningWithCustomColor(getWarningColor()), invalidReason.getDisplayName(),
-                  CLOSING_SPAN_TAG, invalidReason.getDescription()));
-        }
-
-
-        new ImmersiveDialogNotification(campaign, invalidText.toString(), true);
-        return false;
     }
 
     private void displayIDRegenerationDialogs() {
@@ -549,6 +531,7 @@ public class LifePathBuilderDialog extends JDialog {
             requirementsTab.setAttributes(record.requirementsAttributes());
             requirementsTab.setTraits(record.requirementsTraits());
             requirementsTab.setSkills(record.requirementsSkills());
+            requirementsTab.setMetaSkills(record.requirementsMetaSkills());
             requirementsTab.setAbilities(record.requirementsAbilities());
         }
 
@@ -576,6 +559,7 @@ public class LifePathBuilderDialog extends JDialog {
             exclusionsTab.setAttributes(record.exclusionsAttributes());
             exclusionsTab.setTraits(record.exclusionsTraits());
             exclusionsTab.setSkills(record.exclusionsSkills());
+            exclusionsTab.setMetaSkills(record.exclusionsMetaSkills());
             exclusionsTab.setAbilities(record.exclusionsAbilities());
         }
 
@@ -597,6 +581,7 @@ public class LifePathBuilderDialog extends JDialog {
             fixedXPTab.setAttributes(record.fixedXPAttributes());
             fixedXPTab.setTraits(record.fixedXPTraits());
             fixedXPTab.setSkills(record.fixedXPSkills());
+            fixedXPTab.setMetaSkills(record.fixedXPMetaSkills());
             fixedXPTab.setAbilities(record.fixedXPAbilities());
         }
 
@@ -618,6 +603,7 @@ public class LifePathBuilderDialog extends JDialog {
             flexibleXPTab.setAttributes(record.flexibleXPAttributes());
             flexibleXPTab.setTraits(record.flexibleXPTraits());
             flexibleXPTab.setSkills(record.flexibleXPSkills());
+            flexibleXPTab.setMetaSkills(record.flexibleXPMetaSkills());
             flexibleXPTab.setAbilities(record.flexibleXPAbilities());
         }
 
@@ -670,7 +656,7 @@ public class LifePathBuilderDialog extends JDialog {
         }
     }
 
-    private LifePath buildLifePathFromBuilderWizard() {
+    private @Nullable LifePath buildLifePathFromBuilderWizard() {
         // Basic Info
         String source = basicInfoTab.getSource();
         String name = basicInfoTab.getName();
@@ -691,6 +677,7 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes = requirementsTab.getAttributes();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits = requirementsTab.getTraits();
         Map<Integer, Map<String, Integer>> requirementsSkills = requirementsTab.getSkills();
+        Map<Integer, Map<SkillSubType, Integer>> requirementsMetaSkills = requirementsTab.getMetaSkills();
         Map<Integer, Map<String, Integer>> requirementsAbilities = requirementsTab.getAbilities();
 
         // Exclusions
@@ -700,18 +687,21 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes = exclusionsTab.getAttributes();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits = exclusionsTab.getTraits();
         Map<Integer, Map<String, Integer>> exclusionsSkills = exclusionsTab.getSkills();
+        Map<Integer, Map<SkillSubType, Integer>> exclusionsMetaSkills = exclusionsTab.getMetaSkills();
         Map<Integer, Map<String, Integer>> exclusionsAbilities = exclusionsTab.getAbilities();
 
         // Fixed XP
         Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes = fixedXPTab.getAttributes();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits = fixedXPTab.getTraits();
         Map<Integer, Map<String, Integer>> fixedXPSkills = fixedXPTab.getSkills();
+        Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills = fixedXPTab.getMetaSkills();
         Map<Integer, Map<String, Integer>> fixedXPAbilities = fixedXPTab.getAbilities();
 
         // Flexible XP
         Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes = flexibleXPTab.getAttributes();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits = flexibleXPTab.getTraits();
         Map<Integer, Map<String, Integer>> flexibleXPSkills = flexibleXPTab.getSkills();
+        Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills = flexibleXPTab.getMetaSkills();
         Map<Integer, Map<String, Integer>> flexibleXPAbilities = flexibleXPTab.getAbilities();
         int flexibleXPPickCount = flexibleXPTab.getPickCount();
 
@@ -719,16 +709,81 @@ public class LifePathBuilderDialog extends JDialog {
         UUID id = lifePathId;
         Version version = MHQConstants.VERSION;
         int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount, fixedXPAttributes, fixedXPTraits,
-              fixedXPSkills, fixedXPAbilities, flexibleXPTab.getTabCount(), flexibleXPPickCount, flexibleXPAttributes,
-              flexibleXPTraits, flexibleXPSkills, flexibleXPAbilities);
+              fixedXPSkills, fixedXPMetaSkills, fixedXPAbilities, flexibleXPTab.getTabCount(), flexibleXPPickCount,
+              flexibleXPAttributes, flexibleXPTraits, flexibleXPSkills, flexibleXPMetaSkills, flexibleXPAbilities);
+
+        // Validation
+        int maximumGroupSize = LifePathValidator.getMaximumGroupSize(flexibleXPAbilities.size(),
+              flexibleXPAttributes.size(),
+              flexibleXPSkills.size(),
+              flexibleXPMetaSkills.size(),
+              flexibleXPTraits.size());
+        LifePathValidator validator = new LifePathValidator(flexibleXPPickCount, maximumGroupSize, lifeStages,
+              requirementsFactions, source, name, categories);
+        Set<InvalidLifePathReason> invalidReasons = validator.getInvalidReasons();
+        validateLifePath(invalidReasons);
+        if (!invalidReasons.isEmpty()) {
+            return null;
+        }
 
         // Build and return the Record
-        return new LifePath(id, version, xpCost, source, name, flavorText, age, xpDiscount, minimumYear, maximumYear,
-              randomWeight, lifeStages, categories, isPlayerRestricted, requirementsFactions, requirementsLifePath,
-              requirementsCategories, requirementsAttributes, requirementsTraits, requirementsSkills,
-              requirementsAbilities, exclusionsFactions, exclusionsLifePath, exclusionsCategories,
-              exclusionsAttributes, exclusionsTraits, exclusionsSkills, exclusionsAbilities, fixedXPAttributes,
-              fixedXPTraits, fixedXPSkills, fixedXPAbilities, flexibleXPAttributes, flexibleXPTraits,
-              flexibleXPSkills, flexibleXPAbilities, flexibleXPPickCount);
+        return new LifePath(id,
+              version,
+              xpCost,
+              source,
+              name,
+              flavorText,
+              age,
+              xpDiscount,
+              minimumYear,
+              maximumYear,
+              randomWeight,
+              lifeStages,
+              categories,
+              isPlayerRestricted,
+              requirementsFactions,
+              requirementsLifePath,
+              requirementsCategories,
+              requirementsAttributes,
+              requirementsTraits,
+              requirementsSkills,
+              requirementsMetaSkills,
+              requirementsAbilities,
+              exclusionsFactions,
+              exclusionsLifePath,
+              exclusionsCategories,
+              exclusionsAttributes,
+              exclusionsTraits,
+              exclusionsSkills,
+              exclusionsMetaSkills,
+              exclusionsAbilities,
+              fixedXPAttributes,
+              fixedXPTraits,
+              fixedXPSkills,
+              fixedXPMetaSkills,
+              fixedXPAbilities,
+              flexibleXPAttributes,
+              flexibleXPTraits,
+              flexibleXPSkills,
+              flexibleXPMetaSkills,
+              flexibleXPAbilities,
+              flexibleXPPickCount);
     }
+
+    private void validateLifePath(Set<InvalidLifePathReason> invalidReasons) {
+        if (invalidReasons.isEmpty()) {
+            return;
+        }
+
+        StringBuilder invalidText = new StringBuilder(getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.invalid.label"));
+        for (InvalidLifePathReason invalidReason : invalidReasons) {
+            invalidText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.invalid.format",
+                  spanOpeningWithCustomColor(getWarningColor()), invalidReason.getDisplayName(),
+                  CLOSING_SPAN_TAG, invalidReason.getDescription()));
+        }
+
+        new ImmersiveDialogNotification(campaign, invalidText.toString(), true);
+    }
+
 }

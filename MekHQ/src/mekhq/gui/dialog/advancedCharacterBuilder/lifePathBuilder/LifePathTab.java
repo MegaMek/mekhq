@@ -34,6 +34,7 @@ import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -63,6 +64,7 @@ public class LifePathTab {
     private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
     private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
+    private Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedAbilities = new HashMap<>();
 
     private final JLabel lblFlexibleXPPicks = new JLabel();
@@ -114,6 +116,14 @@ public class LifePathTab {
 
     public void setSkills(Map<Integer, Map<String, Integer>> storedSkills) {
         this.storedSkills = storedSkills;
+    }
+
+    public Map<Integer, Map<SkillSubType, Integer>> getMetaSkills() {
+        return storedMetaSkills;
+    }
+
+    public void setMetaSkills(Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills) {
+        this.storedMetaSkills = storedMetaSkills;
     }
 
     public Map<Integer, Map<String, Integer>> getAbilities() {
@@ -336,6 +346,18 @@ public class LifePathTab {
         storedSkills.clear();
         storedSkills.putAll(tempSkills);
 
+        storedMetaSkills.remove(selectedIndex);
+        Map<Integer, Map<SkillSubType, Integer>> tempMetaSkills = new HashMap<>();
+        for (Map.Entry<Integer, Map<SkillSubType, Integer>> entry : storedMetaSkills.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempMetaSkills.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempMetaSkills.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedMetaSkills.clear();
+        storedMetaSkills.putAll(tempMetaSkills);
+
         storedAbilities.remove(selectedIndex);
         Map<Integer, Map<String, Integer>> tempAbilities = new HashMap<>();
         for (Map.Entry<Integer, Map<String, Integer>> entry : storedAbilities.entrySet()) {
@@ -382,6 +404,9 @@ public class LifePathTab {
 
         Map<String, Integer> currentSkills = new HashMap<>(storedSkills.get(selectedIndex));
         storedSkills.put(newIndex, currentSkills);
+
+        Map<SkillSubType, Integer> currentMetaSkills = new HashMap<>(storedMetaSkills.get(selectedIndex));
+        storedMetaSkills.put(newIndex, currentMetaSkills);
 
         Map<String, Integer> currentAbilities = new HashMap<>(storedAbilities.get(selectedIndex));
         storedAbilities.put(newIndex, currentAbilities);
@@ -455,6 +480,7 @@ public class LifePathTab {
 
         // Skills
         storedSkills.put(index, new HashMap<>());
+        storedMetaSkills.put(index, new HashMap<>());
 
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addSkill.label");
@@ -582,8 +608,10 @@ public class LifePathTab {
 
             int currentIndex = tabLocal.getSelectedIndex();
 
-            LifePathSkillPicker picker = new LifePathSkillPicker(storedSkills.get(currentIndex), tabType);
+            LifePathSkillPicker picker = new LifePathSkillPicker(storedSkills.get(currentIndex),
+                  storedMetaSkills.get(currentIndex), tabType);
             storedSkills.put(currentIndex, picker.getSelectedSkillLevels());
+            storedMetaSkills.put(currentIndex, picker.getSelectedMetaSkillLevels());
             standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
@@ -765,6 +793,27 @@ public class LifePathTab {
             int length = workingSkills.size();
             for (Map.Entry<String, Integer> entry : workingSkills.entrySet()) {
                 String label = entry.getKey().replace(SkillType.RP_ONLY_TAG, "");
+                int value = entry.getValue();
+
+                individualProgressText.append(label);
+                individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
+                individualProgressText.append(entry.getValue());
+                individualProgressText.append(TEXT_TRAIL);
+                counter++;
+                if (counter != length) {
+                    individualProgressText.append(", ");
+                }
+            }
+        }
+
+        Map<SkillSubType, Integer> workingMetaSkills = storedMetaSkills.get(index);
+        if (workingMetaSkills != null && !workingMetaSkills.isEmpty()) {
+            appendBreaker(individualProgressText);
+
+            int counter = 0;
+            int length = workingMetaSkills.size();
+            for (Map.Entry<SkillSubType, Integer> entry : workingMetaSkills.entrySet()) {
+                String label = entry.getKey().getDisplayName();
                 int value = entry.getValue();
 
                 individualProgressText.append(label);

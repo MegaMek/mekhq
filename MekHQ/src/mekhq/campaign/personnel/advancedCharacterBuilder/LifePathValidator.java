@@ -38,20 +38,36 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathR
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import megamek.codeUtilities.StringUtility;
 
 public class LifePathValidator {
-    private final LifePath lifePath;
+    private final int flexiblePicks;
+    private final int maximumGroupSize;
+    private final List<ATOWLifeStage> lifeStages;
+    private final Map<Integer, List<String>> requirementsFactions;
+    private final String source;
+    private final String name;
+    private final List<LifePathCategory> categories;
+
     private final Set<InvalidLifePathReason> invalidReasons = new HashSet<>();
 
     public Set<InvalidLifePathReason> getInvalidReasons() {
         return invalidReasons;
     }
 
-    public LifePathValidator(LifePath lifePath) {
-        this.lifePath = lifePath;
+    public LifePathValidator(int flexiblePicks, int maximumGroupSize, List<ATOWLifeStage> lifeStages,
+          Map<Integer, List<String>> requirementsFactions, String source, String name,
+          List<LifePathCategory> categories) {
+        this.flexiblePicks = flexiblePicks;
+        this.maximumGroupSize = maximumGroupSize;
+        this.lifeStages = lifeStages;
+        this.requirementsFactions = requirementsFactions;
+        this.source = source;
+        this.name = name;
+        this.categories = categories;
 
         // Tests
         checkFlexiblePicks();
@@ -62,68 +78,66 @@ public class LifePathValidator {
         checkCategories();
     }
 
-    private void checkFlexiblePicks() {
-        int flexiblePicks = lifePath.flexibleXPPickCount();
-
-        // Find the largest group size among all flexible XP award groups
-        int maxGroupSize = Math.max(
-              Math.max(lifePath.flexibleXPAbilities().size(), lifePath.flexibleXPAttributes().size()),
-              Math.max(lifePath.flexibleXPSkills().size(), lifePath.flexibleXPTraits().size())
+    public static int getMaximumGroupSize(int flexibleAbilitiesCount, int flexibleAttributesCount,
+          int flexibleSkillsCount, int flexibleMetaSkillsCount, int flexibleTraitsCount) {
+        return Math.max(flexibleAbilitiesCount,
+              Math.max(flexibleAttributesCount,
+                    Math.max(flexibleSkillsCount,
+                          Math.max(flexibleMetaSkillsCount, flexibleTraitsCount)
+                    )
+              )
         );
+    }
+
+    private void checkFlexiblePicks() {
+        // Find the largest group size among all flexible XP award groups
+
 
         // If groups are present, but no picks are selected, then the Life Path is invalid
         if (flexiblePicks <= 0) {
-            if (maxGroupSize > 0) {
+            if (maximumGroupSize > 0) {
                 invalidReasons.add(NO_FLEXIBLE_PICKS);
             }
         } else {
             // If there are flexible picks, but the number of picks exceeds the maximum group size, then the Life
             // Path is invalid
-            if (flexiblePicks > maxGroupSize) {
+            if (flexiblePicks > maximumGroupSize) {
                 invalidReasons.add(TOO_MANY_FLEXIBLE_PICKS);
             }
         }
     }
 
     private void checkAffiliationFactionRequirement() {
-        if (lifePath.lifeStages().contains(ATOWLifeStage.AFFILIATION)) {
-            boolean hasEmptyGroup = true;
-            for (List<String> group : lifePath.requirementsFactions().values()) {
-                if (!group.isEmpty()) {
-                    hasEmptyGroup = false;
-                    break;
+        // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
+        if (lifeStages.contains(ATOWLifeStage.AFFILIATION) || lifeStages.contains(ATOWLifeStage.SUB_AFFILIATION)) {
+            for (List<String> group : requirementsFactions.values()) {
+                if (group.isEmpty()) {
+                    invalidReasons.add(MISSING_FACTION);
+                    return;
                 }
             }
-
-            if (!hasEmptyGroup) {
-                return;
-            }
-
-            // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
-            invalidReasons.add(MISSING_FACTION);
         }
     }
 
     private void checkSource() {
-        if (StringUtility.isNullOrBlank(lifePath.source())) {
+        if (StringUtility.isNullOrBlank(source)) {
             invalidReasons.add(InvalidLifePathReason.MISSING_SOURCE);
         }
     }
 
     private void checkName() {
-        if (StringUtility.isNullOrBlank(lifePath.name())) {
+        if (StringUtility.isNullOrBlank(name)) {
             invalidReasons.add(InvalidLifePathReason.MISSING_NAME);
         }
     }
 
     private void checkLifeStages() {
-        if (lifePath.lifeStages().isEmpty()) {
+        if (lifeStages.isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_LIFE_STAGE);
         }
     }
 
     private void checkCategories() {
-        List<LifePathCategory> categories = lifePath.categories();
         if (categories.isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_CATEGORIES);
         }
