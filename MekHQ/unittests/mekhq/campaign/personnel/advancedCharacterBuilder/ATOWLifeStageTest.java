@@ -127,7 +127,7 @@ class ATOWLifeStageTest {
     @Test
     void testFromOrder_InvalidOrder() {
         assertNull(ATOWLifeStage.fromOrder(-1));
-        assertNull(ATOWLifeStage.fromOrder(5));
+        assertNull(ATOWLifeStage.fromOrder(46));
         assertNull(ATOWLifeStage.fromOrder(100));
     }
 
