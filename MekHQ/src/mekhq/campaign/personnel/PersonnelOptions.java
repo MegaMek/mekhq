@@ -95,6 +95,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String FLAW_ILLITERATE = "flaw_illiterate";
+    public static final String FLAW_IN_FOR_LIFE = "flaw_in_for_life";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";

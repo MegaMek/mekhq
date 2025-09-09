@@ -274,7 +274,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
-import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
@@ -6112,9 +6111,6 @@ public class Campaign implements ITechManager {
         if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
             processReputationChanges();
         }
-
-        LifePathBuilderDialog lifePathBuilderDialog = new LifePathBuilderDialog(this,
-              getApp().getCampaigngui().getFrame(), getGameYear());
 
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();

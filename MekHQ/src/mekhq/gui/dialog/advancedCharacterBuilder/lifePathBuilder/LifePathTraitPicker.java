@@ -35,6 +35,14 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_DEPENDENTS;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_EQUIPPED;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_LOST_LIMB;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_OWNED_VEHICLE;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_DEPENDENTS;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_EQUIPPED;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_LOST_LIMB;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_OWNED_VEHICLE;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -196,18 +204,46 @@ class LifePathTraitPicker extends JDialog {
                             traitMinimumValue = MINIMUM_BLOODMARK;
                             traitMaximumValue = MAXIMUM_BLOODMARK;
                         }
-                        //                case ENEMY -> 0; // TODO IMPLEMENT
-                        //                case EXTRA_INCOME -> 0; // TODO IMPLEMENT
-                        //                case PROPERTY -> 0; // TODO IMPLEMENT
                         case CONNECTIONS -> {
                             traitMinimumValue = MINIMUM_CONNECTIONS;
                             traitMaximumValue = MAXIMUM_CONNECTIONS;
+                        }
+                        case DEPENDENTS -> {
+                            traitMinimumValue = MINIMUM_DEPENDENTS;
+                            traitMaximumValue = MAXIMUM_DEPENDENTS;
+                        }
+                        case ENEMY -> {
+                            traitMinimumValue = MINIMUM_ENEMY;
+                            traitMaximumValue = MAXIMUM_ENEMY;
+                        }
+                        case EQUIPPED -> {
+                            traitMinimumValue = MINIMUM_EQUIPPED;
+                            traitMaximumValue = MAXIMUM_EQUIPPED;
+                        }
+                        case EXTRA_INCOME -> {
+                            traitMinimumValue = MINIMUM_EXTRA_INCOME;
+                            traitMaximumValue = MAXIMUM_EXTRA_INCOME;
+                        }
+                        case LOST_LIMB -> {
+                            traitMinimumValue = MINIMUM_LOST_LIMB;
+                            traitMaximumValue = MAXIMUM_LOST_LIMB;
+                        }
+                        case OWNED_VEHICLE -> {
+                            traitMinimumValue = MINIMUM_OWNED_VEHICLE;
+                            traitMaximumValue = MAXIMUM_OWNED_VEHICLE;
+                        }
+                        case PROPERTY -> {
+                            traitMinimumValue = MINIMUM_PROPERTY;
+                            traitMaximumValue = MAXIMUM_PROPERTY;
                         }
                         case REPUTATION -> {
                             traitMinimumValue = MINIMUM_REPUTATION;
                             traitMaximumValue = MAXIMUM_REPUTATION;
                         }
-                        //                case TITLE -> 0; // TODO IMPLEMENT
+                        case TITLE -> {
+                            traitMinimumValue = MINIMUM_TITLE;
+                            traitMaximumValue = MAXIMUM_TITLE;
+                        }
                         case UNLUCKY -> {
                             traitMinimumValue = MINIMUM_UNLUCKY;
                             traitMaximumValue = MAXIMUM_UNLUCKY;

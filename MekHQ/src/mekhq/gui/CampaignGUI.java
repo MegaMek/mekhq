@@ -137,6 +137,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -1068,6 +1069,15 @@ public class CampaignGUI extends JPanel {
         });
 
         menuManage.add(miAutoResolveBehaviorEditor);
+
+        JMenu menuRoleplay = new JMenu(resourceMap.getString("menuRoleplay.text"));
+        JMenuItem miLifePathBuilder = new JMenuItem(resourceMap.getString("miLifePathBuilder.text"));
+        miLifePathBuilder.addActionListener(evt -> {
+            LifePathBuilderDialog lifePathBuilderDialog = new LifePathBuilderDialog(getCampaign(),
+                  getFrame(), getCampaign().getGameYear());
+        });
+        menuRoleplay.add(miLifePathBuilder);
+        menuManage.add(menuRoleplay);
 
         menuBar.add(menuManage);
         // endregion Manage Campaign Menu
@@ -2668,8 +2678,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>If the {@code logNagActive} flag is already set, the method returns immediately to prevent repeat
      * processing. If the currently selected tab is the Command Center, no nag is performed. Otherwise, the method
-     * iterates through the tab list and highlights the Command Center tab by changing its label color
-     * and sets the {@code logNagActive} flag.</p>
+     * iterates through the tab list and highlights the Command Center tab by changing its label color and sets the
+     * {@code logNagActive} flag.</p>
      *
      * <p>If no tab is currently selected, a warning is logged and no action is taken.</p>
      */
