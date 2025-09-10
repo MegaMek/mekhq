@@ -1773,7 +1773,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @throws EntityLoadingException
      */
     public void saveCustomization() throws EntityLoadingException {
-        UnitUtil.compactCriticals(newEntity);
+        UnitUtil.compactCriticalSlots(newEntity);
 
         String unitName = newEntity.getShortNameRaw();
         // MHQXMLUtility.escape() doesn't include `/` or `\` so we need to include them explicitly.
