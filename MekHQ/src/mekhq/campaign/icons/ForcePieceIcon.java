@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
 
 /**
  * ForcePieceIcon is an implementation of StandardForceIcon that contains and displays a Force Icon Piece from the Force
- * Icon Directory's Pieces Subdirectory. These are then combined together to form a single LayeredForceIcon.
+ * Icon Directory's Pieces Subdirectory. These are then combined to form a single LayeredForceIcon.
  *
  * @see LayeredForceIconLayer
  * @see LayeredForceIcon
@@ -145,8 +145,7 @@ public class ForcePieceIcon extends StandardForceIcon {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof ForcePieceIcon) {
-            final ForcePieceIcon dOther = (ForcePieceIcon) other;
+        } else if (other instanceof ForcePieceIcon dOther) {
             return (dOther.getLayer() == getLayer()) && dOther.getCategory().equals(getCategory())
                          && dOther.getFilename().equals(getFilename());
         } else {

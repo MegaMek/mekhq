@@ -115,7 +115,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         //for (AtBContract contract : campaign.getActiveAtBContracts()) {
         //checkForSubcontracts(campaign, contract, unitRatingMod);
         //}
-        // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
+        // TODO: CamOpsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = campaign.getReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);

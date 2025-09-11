@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,7 +72,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Finances {
-    private static final MMLogger logger = MMLogger.create(Finances.class);
+    private static final MMLogger LOGGER = MMLogger.create(Finances.class);
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
           MekHQ.getMHQOptions().getLocale());
@@ -216,7 +216,7 @@ public class Finances {
      *
      * @param type   TransactionType being debited
      * @param date   when the transaction occurred
-     * @param amount Money to remove from the campaign's balanace
+     * @param amount Money to remove from the campaign's balance
      * @param reason String displayed in the ledger
      *
      * @return true if the transaction succeeds, false if it doesn't, such as from insufficient balance
@@ -260,10 +260,10 @@ public class Finances {
                     }
                 }
             } else {
-                logger.error(String.format("Individual Payouts is Empty! Transaction Type: %s Date: %s Reason: %s",
+                LOGGER.error("Individual Payouts is Empty! Transaction Type: {} Date: {} Reason: {}",
                       type,
                       date,
-                      reason));
+                      reason);
             }
             return true;
         }
@@ -569,7 +569,7 @@ public class Finances {
                     campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
                           String.format(resourceMap.getString("InsufficientFunds.text"), resourceMap.getString(
                                 "Shares.text"))));
-                    logger.error("Attempted to payout share amount larger than the payment of the contract");
+                    LOGGER.error("Attempted to payout share amount larger than the payment of the contract");
                 }
             }
         }
@@ -667,8 +667,7 @@ public class Finances {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
               CSVPrinter csvPrinter = new CSVPrinter(writer,
                     CSVFormat.DEFAULT.builder()
-                          .setHeader("Date", "Type", "Description", "Amount", "RunningTotal")
-                          .build())) {
+                          .setHeader("Date", "Type", "Description", "Amount", "RunningTotal").get())) {
             Money runningTotal = Money.zero();
             for (Transaction transaction : getTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
@@ -683,7 +682,7 @@ public class Finances {
 
             report = String.format(resourceMap.getString("FinanceExport.format"), transactions.size());
         } catch (Exception ex) {
-            logger.error("Error exporting finances to " + format, ex);
+            LOGGER.error("Error exporting finances to {}", format, ex);
             report = "Error exporting finances. See log for details.";
         }
 
@@ -754,7 +753,7 @@ public class Finances {
                         break;
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
 

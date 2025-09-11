@@ -49,7 +49,7 @@ import mekhq.campaign.personnel.Person;
  * @author Miguel Azevedo
  */
 public class AssignmentLogger {
-    private static final MMLogger logger = MMLogger.create(AssignmentLogger.class);
+    private static final MMLogger LOGGER = MMLogger.create(AssignmentLogger.class);
 
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
@@ -83,7 +83,7 @@ public class AssignmentLogger {
     public static void reassignedTOEForce(final Campaign campaign, final Person person, final LocalDate date,
           final @Nullable Force oldForce, final @Nullable Force newForce) {
         if ((oldForce == null) && (newForce == null)) {
-            logger.error("Cannot reassign {} on {} because both specified forces are null",
+            LOGGER.error("Cannot reassign {} on {} because both specified forces are null",
                   person.getFullTitle(),
                   date);
             return;

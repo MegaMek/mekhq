@@ -34,6 +34,7 @@ package mekhq.campaign.finances.enums;
 
 import java.util.ResourceBundle;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
@@ -224,7 +225,7 @@ public enum TransactionType {
         }
 
         try {
-            switch (Integer.parseInt(text)) {
+            switch (MathUtility.parseInt(text)) {
                 case 0:
                     return MISCELLANEOUS;
                 case 1:
@@ -279,7 +280,7 @@ public enum TransactionType {
         }
 
         MMLogger.create(TransactionType.class)
-              .error("Unable to parse " + text + " into a TransactionType. Returning MISCELLANEOUS.");
+              .error("Unable to parse {} into a TransactionType. Returning MISCELLANEOUS.", text);
         return MISCELLANEOUS;
     }
     // endregion File I/O

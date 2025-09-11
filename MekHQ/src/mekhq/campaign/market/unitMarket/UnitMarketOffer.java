@@ -35,11 +35,11 @@ package mekhq.campaign.market.unitMarket;
 import java.io.PrintWriter;
 
 import megamek.Version;
-import megamek.common.units.Entity;
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
-import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class UnitMarketOffer {
-    private static final MMLogger logger = MMLogger.create(UnitMarketOffer.class);
+    private static final MMLogger LOGGER = MMLogger.create(UnitMarketOffer.class);
     // region Variable Declarations
     private UnitMarketType marketType;
     private int unitType;
@@ -122,8 +122,9 @@ public class UnitMarketOffer {
         try {
             return new MekFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
         } catch (Exception e) {
-            logger.error("Unable to load entity: " + getUnit().getSourceFile()
-                               + ": " + getUnit().getEntryName() + ". Returning null.", e);
+            LOGGER.error(e, "Unable to load entity: {}: {}. Returning null.",
+                  getUnit().getSourceFile(),
+                  getUnit().getEntryName());
             return null;
         }
     }
@@ -146,8 +147,7 @@ public class UnitMarketOffer {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "offer");
     }
 
-    public static @Nullable UnitMarketOffer generateInstanceFromXML(final Node wn,
-          final Campaign campaign,
+    public static @Nullable UnitMarketOffer generateInstanceFromXML(final Node wn, final Campaign campaign,
           final Version version) {
         UnitMarketOffer retVal = new UnitMarketOffer();
         NodeList nl = wn.getChildNodes();
@@ -167,8 +167,7 @@ public class UnitMarketOffer {
                     final String unitName = wn3.getTextContent().trim();
                     retVal.setUnit(MekSummaryCache.getInstance().getMek(unitName));
                     if (retVal.getUnit() == null) {
-                        logger.error(
-                              "Failed to find unit with name " + unitName + ", removing the offer from the market.");
+                        LOGGER.error("Failed to find unit with name {}, removing the offer from the market.", unitName);
                         return null;
                     }
                 } else if (wn3.getNodeName().equalsIgnoreCase("percent")) {
@@ -178,7 +177,7 @@ public class UnitMarketOffer {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return null;
         }
 

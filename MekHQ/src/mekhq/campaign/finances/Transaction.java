@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Transaction {
-    private static final MMLogger logger = MMLogger.create(Transaction.class);
+    private static final MMLogger LOGGER = MMLogger.create(Transaction.class);
 
     // region Variable Declarations
     private TransactionType type;
@@ -116,7 +116,7 @@ public class Transaction {
                      "Previous = " +
                      previousTransaction.toString() +
                      "} -> {New = " +
-                     toString() +
+                     this +
                      "}";
     }
 
@@ -126,7 +126,7 @@ public class Transaction {
      */
     @Deprecated(since = "0.50.04")
     public String voidTransaction() {
-        return "Deleted Transaction: " + toString();
+        return "Deleted Transaction: " + this;
     }
 
     // region File I/O
@@ -155,7 +155,7 @@ public class Transaction {
                     transaction.setDescription(MHQXMLUtility.unEscape(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
         return transaction;

@@ -48,7 +48,7 @@ import mekhq.module.api.PersonnelMarketMethod;
  *
  * @author Neoancient
  */
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarketRandom implements PersonnelMarketMethod {
 
     @Override
