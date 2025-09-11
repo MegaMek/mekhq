@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathR
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.NO_FLEXIBLE_PICKS;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.TOO_MANY_FLEXIBLE_PICKS;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -118,7 +119,13 @@ public class LifePathValidator {
     private void checkAffiliationFactionRequirement() {
         // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
         if (lifeStages.contains(ATOWLifeStage.AFFILIATION) || lifeStages.contains(ATOWLifeStage.SUB_AFFILIATION)) {
-            for (Set<String> group : requirementsFactions.values()) {
+            Collection<Set<String>> requirements = requirementsFactions.values();
+            if (requirements.isEmpty()) {
+                invalidReasons.add(MISSING_FACTION);
+                return;
+            }
+            
+            for (Set<String> group : requirements) {
                 if (group.isEmpty()) {
                     invalidReasons.add(MISSING_FACTION);
                     return;
