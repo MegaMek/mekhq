@@ -233,6 +233,12 @@ public class LifePathProgressTextBuilder {
         newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
               "</h2>");
 
+        newText.append("<b>");
+        newText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.button.pickCount.label"));
+        newText.append(":</b> ");
+        newText.append(lifePathTab.getPickCount());
+        newText.append("<br>");
+
         for (int i = 0; i < progress.size(); i++) {
             String group = progress.get(i);
             if (group.isBlank()) {
