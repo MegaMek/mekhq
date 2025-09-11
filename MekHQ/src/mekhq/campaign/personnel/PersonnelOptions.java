@@ -235,6 +235,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, FLAW_ILLITERATE, false);
+        addOption(l3a, FLAW_IN_FOR_LIFE, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
