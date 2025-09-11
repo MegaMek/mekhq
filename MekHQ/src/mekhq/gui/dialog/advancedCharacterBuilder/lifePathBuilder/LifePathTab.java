@@ -907,6 +907,7 @@ public class LifePathTab {
         storedAttributes.clear();
         storedTraits.clear();
         storedSkills.clear();
+        storedMetaSkills.clear();
         storedAbilities.clear();
         spnFlexibleXPPicks.setValue(0);
 
