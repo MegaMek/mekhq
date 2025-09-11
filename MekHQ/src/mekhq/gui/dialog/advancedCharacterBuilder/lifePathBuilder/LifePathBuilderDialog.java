@@ -291,22 +291,28 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     private EnhancedTabbedPane initializeMainPanel(int gameYear) {
+        Map<UUID, LifePath> lifePathLibrary = campaign.getLifePathLibrary();
+
         EnhancedTabbedPane tabMain = new EnhancedTabbedPane();
         String title = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.title.lifePath");
         tabMain.setBorder(createRoundedLineBorder(title));
 
         basicInfoTab = new LifePathTabBasicInformation(this, tabMain);
 
-        fixedXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FIXED_XP);
+        fixedXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FIXED_XP,
+              lifePathLibrary);
         fixedXPTab.buildTab();
 
-        flexibleXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FLEXIBLE_XP);
+        flexibleXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FLEXIBLE_XP,
+              lifePathLibrary);
         flexibleXPTab.buildTab();
 
-        requirementsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.REQUIREMENTS);
+        requirementsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.REQUIREMENTS,
+              lifePathLibrary);
         requirementsTab.buildTab();
 
-        exclusionsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.EXCLUSIONS);
+        exclusionsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.EXCLUSIONS,
+              lifePathLibrary);
         exclusionsTab.buildTab();
 
         // Add a listener to handle tab selection changes
@@ -359,7 +365,7 @@ public class LifePathBuilderDialog extends JDialog {
         scrollTooltipArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollTooltipArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollTooltipArea.setBorder(null);
-        scrollTooltipArea.setMinimumSize(new Dimension(MINIMUM_SIDE_COMPONENT_WIDTH, 50));
+        scrollTooltipArea.setMinimumSize(scaleForGUI(250, 50));
 
         pnlControls.add(scrollTooltipArea, BorderLayout.CENTER);
 
@@ -666,13 +672,13 @@ public class LifePathBuilderDialog extends JDialog {
         int minimumYear = basicInfoTab.getMinimumYear();
         int maximumYear = basicInfoTab.getMaximumYear();
         double randomWeight = basicInfoTab.getRandomWeight();
-        List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
-        List<LifePathCategory> categories = basicInfoTab.getCategories();
+        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
+        Set<LifePathCategory> categories = basicInfoTab.getCategories();
         boolean isPlayerRestricted = basicInfoTab.isPlayerRestricted();
 
         // Requirements
-        Map<Integer, List<String>> requirementsFactions = requirementsTab.getFactions();
-        Map<Integer, List<UUID>> requirementsLifePath = requirementsTab.getLifePaths();
+        Map<Integer, Set<String>> requirementsFactions = requirementsTab.getFactions();
+        Map<Integer, Set<UUID>> requirementsLifePath = requirementsTab.getLifePaths();
         Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories = requirementsTab.getCategories();
         Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes = requirementsTab.getAttributes();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits = requirementsTab.getTraits();
@@ -681,8 +687,8 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<String, Integer>> requirementsAbilities = requirementsTab.getAbilities();
 
         // Exclusions
-        Map<Integer, List<String>> exclusionsFactions = exclusionsTab.getFactions();
-        Map<Integer, List<UUID>> exclusionsLifePath = exclusionsTab.getLifePaths();
+        Map<Integer, Set<String>> exclusionsFactions = exclusionsTab.getFactions();
+        Map<Integer, Set<UUID>> exclusionsLifePath = exclusionsTab.getLifePaths();
         Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories = exclusionsTab.getCategories();
         Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes = exclusionsTab.getAttributes();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits = exclusionsTab.getTraits();

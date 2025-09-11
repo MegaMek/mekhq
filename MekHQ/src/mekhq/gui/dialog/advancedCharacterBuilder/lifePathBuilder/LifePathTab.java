@@ -14,8 +14,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import javax.swing.BoxLayout;
 import javax.swing.JEditorPane;
@@ -29,6 +31,7 @@ import megamek.common.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
@@ -57,9 +60,10 @@ public class LifePathTab {
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
     private final LifePathBuilderTabType tabType;
     private final String tabName;
+    private final Map<UUID, LifePath> lifePathLibrary;
 
-    private Map<Integer, List<String>> storedFactions = new HashMap<>();
-    private Map<Integer, List<UUID>> storedLifePaths = new HashMap<>();
+    private Map<Integer, Set<String>> storedFactions = new HashMap<>();
+    private Map<Integer, Set<UUID>> storedLifePaths = new HashMap<>();
     private Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
     private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
     private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
@@ -70,19 +74,19 @@ public class LifePathTab {
     private final JLabel lblFlexibleXPPicks = new JLabel();
     private final JSpinner spnFlexibleXPPicks = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
-    public Map<Integer, List<String>> getFactions() {
+    public Map<Integer, Set<String>> getFactions() {
         return storedFactions;
     }
 
-    public void setFactions(Map<Integer, List<String>> storedFactions) {
+    public void setFactions(Map<Integer, Set<String>> storedFactions) {
         this.storedFactions = storedFactions;
     }
 
-    public Map<Integer, List<UUID>> getLifePaths() {
+    public Map<Integer, Set<UUID>> getLifePaths() {
         return storedLifePaths;
     }
 
-    public void setLifePaths(Map<Integer, List<UUID>> storedLifePaths) {
+    public void setLifePaths(Map<Integer, Set<UUID>> storedLifePaths) {
         this.storedLifePaths = storedLifePaths;
     }
 
@@ -151,13 +155,15 @@ public class LifePathTab {
     }
 
     LifePathTab(LifePathBuilderDialog parent, EnhancedTabbedPane tabGlobal, int gameYear,
-          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType) {
+          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType,
+          Map<UUID, LifePath> lifePathLibrary) {
         this.parent = parent;
         this.tabGlobal = tabGlobal;
         this.gameYear = gameYear;
         this.allAbilityInfo.putAll(allAbilityInfo);
         this.tabType = tabType;
         this.tabName = tabType.getLookupName();
+        this.lifePathLibrary = lifePathLibrary;
     }
 
     protected void buildTab() {
@@ -275,8 +281,8 @@ public class LifePathTab {
         // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
         // correct order (since we're removing a tab, the indexes will shift)
         storedFactions.remove(selectedIndex);
-        Map<Integer, List<String>> tempFactions = new HashMap<>();
-        for (Map.Entry<Integer, List<String>> entry : storedFactions.entrySet()) {
+        Map<Integer, Set<String>> tempFactions = new HashMap<>();
+        for (Map.Entry<Integer, Set<String>> entry : storedFactions.entrySet()) {
             if (entry.getKey() < selectedIndex) {
                 tempFactions.put(entry.getKey(), entry.getValue());
             } else if (entry.getKey() > selectedIndex) {
@@ -287,8 +293,8 @@ public class LifePathTab {
         storedFactions.putAll(tempFactions);
 
         storedLifePaths.remove(selectedIndex);
-        Map<Integer, List<UUID>> tempLifePaths = new HashMap<>();
-        for (Map.Entry<Integer, List<UUID>> entry : storedLifePaths.entrySet()) {
+        Map<Integer, Set<UUID>> tempLifePaths = new HashMap<>();
+        for (Map.Entry<Integer, Set<UUID>> entry : storedLifePaths.entrySet()) {
             if (entry.getKey() < selectedIndex) {
                 tempLifePaths.put(entry.getKey(), entry.getValue());
             } else if (entry.getKey() > selectedIndex) {
@@ -387,10 +393,10 @@ public class LifePathTab {
 
         int newIndex = getTabCount() - 1;
 
-        List<String> currentFactions = new ArrayList<>(storedFactions.get(selectedIndex));
+        Set<String> currentFactions = new HashSet<>(storedFactions.get(selectedIndex));
         storedFactions.put(newIndex, currentFactions);
 
-        List<UUID> currentLifePaths = new ArrayList<>(storedLifePaths.get(selectedIndex));
+        Set<UUID> currentLifePaths = new HashSet<>(storedLifePaths.get(selectedIndex));
         storedLifePaths.put(newIndex, currentLifePaths);
 
         Map<LifePathCategory, Integer> currentCategories = new HashMap<>(storedCategories.get(selectedIndex));
@@ -506,7 +512,7 @@ public class LifePathTab {
         buttonsPanel.add(btnAddSPA);
 
         // Factions
-        storedFactions.put(index, new ArrayList<>());
+        storedFactions.put(index, new HashSet<>());
 
         String titleAddFaction = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addFaction.label");
@@ -520,7 +526,7 @@ public class LifePathTab {
         buttonsPanel.add(btnAddFaction);
 
         // Life Paths
-        storedLifePaths.put(index, new ArrayList<>());
+        storedLifePaths.put(index, new HashSet<>());
 
         String titleAddLifePath = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addLifePath.label");
@@ -691,33 +697,40 @@ public class LifePathTab {
         final String TEXT_TRAIL = isXP ? " XP" : "+";
 
         // Factions
-        List<String> workingFactions = storedFactions.get(index);
+        Set<String> workingFactions = storedFactions.get(index);
         if (workingFactions != null && !workingFactions.isEmpty()) {
-            for (int i = 0; i < workingFactions.size(); i++) {
-                String factionCode = workingFactions.get(i);
+            int workingIndex = 0;
+            int total = workingFactions.size();
+            for (String factionCode : workingFactions) {
                 Faction faction = factions.getFaction(factionCode);
                 if (faction == null) {
                     LOGGER.error("Faction not found: {}", factionCode);
                     continue;
                 }
                 individualProgressText.append(faction.getFullName(gameYear));
-                if (i != workingFactions.size() - 1) {
+                if (workingIndex != total - 1) {
                     individualProgressText.append(", ");
                 }
+                workingIndex++;
             }
         }
 
         // Life Paths
-        List<UUID> workingLifePaths = storedLifePaths.get(index);
+        Set<UUID> workingLifePaths = storedLifePaths.get(index);
         if (workingLifePaths != null && !workingLifePaths.isEmpty()) {
-            appendBreaker(individualProgressText);
-
-            for (int i = 0; i < workingLifePaths.size(); i++) {
-                // TODO fetch life path from dictionary using ID
-                individualProgressText.append("Life Path Name");
-                if (i != workingLifePaths.size() - 1) {
+            int workingIndex = 0;
+            int total = workingLifePaths.size();
+            for (UUID id : workingLifePaths) {
+                LifePath lifePath = lifePathLibrary.get(id);
+                if (lifePath == null) {
+                    LOGGER.error("Life Path not found: {}", id);
+                    continue;
+                }
+                individualProgressText.append(lifePath.name());
+                if (workingIndex != total - 1) {
                     individualProgressText.append(", ");
                 }
+                workingIndex++;
             }
         }
 

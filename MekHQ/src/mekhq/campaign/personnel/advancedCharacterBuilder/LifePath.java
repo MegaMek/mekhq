@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.Version;
@@ -63,12 +63,12 @@ public record LifePath(
       Integer minimumYear,
       Integer maximumYear,
       Double randomWeight,
-      List<ATOWLifeStage> lifeStages,
-      List<LifePathCategory> categories,
+      Set<ATOWLifeStage> lifeStages,
+      Set<LifePathCategory> categories,
       Boolean isPlayerRestricted,
       // Requirements
-      Map<Integer, List<String>> requirementsFactions,
-      Map<Integer, List<UUID>> requirementsLifePath,
+      Map<Integer, Set<String>> requirementsFactions,
+      Map<Integer, Set<UUID>> requirementsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits,
@@ -76,8 +76,8 @@ public record LifePath(
       Map<Integer, Map<SkillSubType, Integer>> requirementsMetaSkills,
       Map<Integer, Map<String, Integer>> requirementsAbilities,
       // Exclusions
-      Map<Integer, List<String>> exclusionsFactions,
-      Map<Integer, List<UUID>> exclusionsLifePath,
+      Map<Integer, Set<String>> exclusionsFactions,
+      Map<Integer, Set<UUID>> exclusionsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits,

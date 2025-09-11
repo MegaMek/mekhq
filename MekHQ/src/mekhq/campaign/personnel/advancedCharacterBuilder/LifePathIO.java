@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -191,8 +192,8 @@ public class LifePathIO {
 
     private static void validateLifePath(Map<UUID, LifePath> lifePathMap) {
         for (LifePath lifePath : lifePathMap.values()) {
-            Collection<List<UUID>> requirementsLifePaths = lifePath.requirementsLifePath().values();
-            for (List<UUID> allIDs : requirementsLifePaths) {
+            Collection<Set<UUID>> requirementsLifePaths = lifePath.requirementsLifePath().values();
+            for (Set<UUID> allIDs : requirementsLifePaths) {
                 for (UUID id : allIDs) {
                     if (!lifePathMap.containsKey(id)) {
                         LOGGER.warn("LifePath {} requires non-existent LifePath {}", lifePath.name(), id);
@@ -200,8 +201,8 @@ public class LifePathIO {
                 }
             }
 
-            Collection<List<UUID>> exclusionsLifePaths = lifePath.exclusionsLifePath().values();
-            for (List<UUID> allIDs : exclusionsLifePaths) {
+            Collection<Set<UUID>> exclusionsLifePaths = lifePath.exclusionsLifePath().values();
+            for (Set<UUID> allIDs : exclusionsLifePaths) {
                 for (UUID id : allIDs) {
                     if (!lifePathMap.containsKey(id)) {
                         LOGGER.warn("LifePath {} excludes non-existent LifePath {}", lifePath.name(), id);

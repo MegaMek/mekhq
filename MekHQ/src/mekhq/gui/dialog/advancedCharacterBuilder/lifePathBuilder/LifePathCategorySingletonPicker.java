@@ -43,8 +43,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -80,19 +80,19 @@ class LifePathCategorySingletonPicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private JLabel lblTooltipDisplay;
-    private final List<LifePathCategory> storedCategories;
-    private List<LifePathCategory> selectedCategories;
+    private final Set<LifePathCategory> storedCategories;
+    private Set<LifePathCategory> selectedCategories;
 
-    List<LifePathCategory> getSelectedCategories() {
+    Set<LifePathCategory> getSelectedCategories() {
         return selectedCategories;
     }
 
-    LifePathCategorySingletonPicker(List<LifePathCategory> selectedCategories) {
+    LifePathCategorySingletonPicker(Set<LifePathCategory> selectedCategories) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedCategories = new ArrayList<>(selectedCategories);
-        storedCategories = new ArrayList<>(selectedCategories);
+        this.selectedCategories = new HashSet<>(selectedCategories);
+        storedCategories = new HashSet<>(selectedCategories);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.title"));
 

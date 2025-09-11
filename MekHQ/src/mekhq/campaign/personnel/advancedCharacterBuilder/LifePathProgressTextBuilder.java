@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
+import java.util.Set;
 
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
 
@@ -97,7 +98,7 @@ public class LifePathProgressTextBuilder {
               calculatedCost));
         newText.append("</h2>");
 
-        List<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
+        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
         StringBuilder lifeStageText = new StringBuilder();
         lifeStageText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.stages"));
 
@@ -115,7 +116,7 @@ public class LifePathProgressTextBuilder {
         }
         newText.append(lifeStageText);
 
-        List<LifePathCategory> categories = basicInfoTab.getCategories();
+        Set<LifePathCategory> categories = basicInfoTab.getCategories();
         StringBuilder categoriesText = new StringBuilder();
         categoriesText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.tab.progress.basic.categories"));
 

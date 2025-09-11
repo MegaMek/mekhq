@@ -46,7 +46,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -81,19 +83,19 @@ class LifePathFactionPicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private final Factions factions = Factions.getInstance();
-    private final List<String> storedFactions;
-    private List<String> selectedFactions;
+    private final Set<String> storedFactions;
+    private Set<String> selectedFactions;
 
-    List<String> getSelectedFactions() {
+    Set<String> getSelectedFactions() {
         return selectedFactions;
     }
 
-    LifePathFactionPicker(List<String> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
+    LifePathFactionPicker(Set<String> selectedFactions, int gameYear, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedFactions = new ArrayList<>(selectedFactions);
-        storedFactions = new ArrayList<>(selectedFactions);
+        this.selectedFactions = new HashSet<>(selectedFactions);
+        storedFactions = new HashSet<>(selectedFactions);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathFactionPicker.title"));
 

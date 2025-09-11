@@ -37,7 +37,6 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathR
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.TOO_MANY_FLEXIBLE_PICKS;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,11 +45,11 @@ import megamek.codeUtilities.StringUtility;
 public class LifePathValidator {
     private final int flexiblePicks;
     private final int maximumGroupSize;
-    private final List<ATOWLifeStage> lifeStages;
-    private final Map<Integer, List<String>> requirementsFactions;
+    private final Set<ATOWLifeStage> lifeStages;
+    private final Map<Integer, Set<String>> requirementsFactions;
     private final String source;
     private final String name;
-    private final List<LifePathCategory> categories;
+    private final Set<LifePathCategory> categories;
 
     private final Set<InvalidLifePathReason> invalidReasons = new HashSet<>();
 
@@ -58,9 +57,9 @@ public class LifePathValidator {
         return invalidReasons;
     }
 
-    public LifePathValidator(int flexiblePicks, int maximumGroupSize, List<ATOWLifeStage> lifeStages,
-          Map<Integer, List<String>> requirementsFactions, String source, String name,
-          List<LifePathCategory> categories) {
+    public LifePathValidator(int flexiblePicks, int maximumGroupSize, Set<ATOWLifeStage> lifeStages,
+          Map<Integer, Set<String>> requirementsFactions, String source, String name,
+          Set<LifePathCategory> categories) {
         this.flexiblePicks = flexiblePicks;
         this.maximumGroupSize = maximumGroupSize;
         this.lifeStages = lifeStages;
@@ -110,7 +109,7 @@ public class LifePathValidator {
     private void checkAffiliationFactionRequirement() {
         // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
         if (lifeStages.contains(ATOWLifeStage.AFFILIATION) || lifeStages.contains(ATOWLifeStage.SUB_AFFILIATION)) {
-            for (List<String> group : requirementsFactions.values()) {
+            for (Set<String> group : requirementsFactions.values()) {
                 if (group.isEmpty()) {
                     invalidReasons.add(MISSING_FACTION);
                     return;

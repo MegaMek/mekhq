@@ -41,8 +41,8 @@ import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePath
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -76,8 +76,8 @@ public class LifePathTabBasicInformation {
     private final JSpinner spnMaximumYear;
     private final JSpinner spnRandomWeight;
     private final JCheckBox chkPlayerRestricted;
-    private List<ATOWLifeStage> lifeStages = new ArrayList<>();
-    private List<LifePathCategory> categories = new ArrayList<>();
+    private Set<ATOWLifeStage> lifeStages = new HashSet<>();
+    private Set<LifePathCategory> categories = new HashSet<>();
 
     public String getName() {
         return txtName.getText();
@@ -150,19 +150,19 @@ public class LifePathTabBasicInformation {
         spnRandomWeight.setValue(randomWeight);
     }
 
-    public List<ATOWLifeStage> getLifeStages() {
+    public Set<ATOWLifeStage> getLifeStages() {
         return lifeStages;
     }
 
-    public void setLifeStages(List<ATOWLifeStage> lifeStages) {
+    public void setLifeStages(Set<ATOWLifeStage> lifeStages) {
         this.lifeStages = lifeStages;
     }
 
-    public List<LifePathCategory> getCategories() {
+    public Set<LifePathCategory> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<LifePathCategory> categories) {
+    public void setCategories(Set<LifePathCategory> categories) {
         this.categories = categories;
     }
 
@@ -515,8 +515,8 @@ public class LifePathTabBasicInformation {
         setFlavorText("");
         setAge(0);
         setDiscount(0);
-        setLifeStages(new ArrayList<>());
-        setCategories(new ArrayList<>());
+        setLifeStages(new HashSet<>());
+        setCategories(new HashSet<>());
         setMinimumYear(0);
         setMaximumYear(9999);
         setRandomWeight(1.0);

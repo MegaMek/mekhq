@@ -71,13 +71,12 @@ class LifePathSPAPicker extends JDialog {
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(575);
 
-    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.95);
     private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.70);
     private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
 
     private static final int PADDING = scaleForGUI(10);
 
-    private JLabel lblTooltipDisplay;
+    private JEditorPane txtTooltipDisplay;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private final Map<String, Integer> storedAbilities;
     private Map<String, Integer> selectedAbilities;
@@ -138,10 +137,17 @@ class LifePathSPAPicker extends JDialog {
         pnlControls.setBorder(createRoundedLineBorder());
         pnlControls.setPreferredSize(scaleForGUI(0, 150));
 
-        lblTooltipDisplay = new JLabel();
-        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
-        setLblTooltipDisplay("");
+        txtTooltipDisplay = new JEditorPane();
+        txtTooltipDisplay.setContentType("text/html");
+        txtTooltipDisplay.setEditable(false);
+        txtTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
+        setTxtTooltipDisplay("");
+
+        FastJScrollPane scrollTooltipArea = new FastJScrollPane(txtTooltipDisplay);
+        scrollTooltipArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollTooltipArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollTooltipArea.setBorder(null);
+        scrollTooltipArea.setMinimumSize(scaleForGUI(250, 50));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -164,7 +170,7 @@ class LifePathSPAPicker extends JDialog {
         buttonPanel.add(btnConfirm);
         buttonPanel.add(Box.createHorizontalGlue());
 
-        pnlControls.add(lblTooltipDisplay);
+        pnlControls.add(scrollTooltipArea);
         pnlControls.add(Box.createVerticalStrut(PADDING));
         pnlControls.add(buttonPanel);
 
@@ -264,7 +270,7 @@ class LifePathSPAPicker extends JDialog {
                 }
             });
             chkAbilityOption.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+                  TooltipMouseListenerUtil.forTooltip(this::setTxtTooltipDisplay, description)
             );
 
             gbc.gridx = i % columns;
@@ -333,10 +339,10 @@ class LifePathSPAPicker extends JDialog {
             JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
                   maximumValue, 1));
             lblAbility.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+                  TooltipMouseListenerUtil.forTooltip(this::setTxtTooltipDisplay, description)
             );
             spnAbilityValue.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
+                  TooltipMouseListenerUtil.forTooltip(this::setTxtTooltipDisplay, description)
             );
 
             spnAbilityValue.addChangeListener(evt -> {
@@ -371,9 +377,8 @@ class LifePathSPAPicker extends JDialog {
         return scrollAbilityOptions;
     }
 
-    private void setLblTooltipDisplay(String newText) {
-        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
-        lblTooltipDisplay.setText(newTooltipText);
+    private void setTxtTooltipDisplay(String newText) {
+        txtTooltipDisplay.setText("<div style='text-align:center;'>" + newText + "</div>");
     }
 
     private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
