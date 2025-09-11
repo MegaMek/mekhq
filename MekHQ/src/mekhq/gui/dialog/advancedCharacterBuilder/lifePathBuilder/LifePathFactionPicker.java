@@ -187,7 +187,7 @@ class LifePathFactionPicker extends JDialog {
         List<Faction> allFactions = new ArrayList<>(factions.getFactions(false));
         List<Faction> allFactionsCopy = new ArrayList<>(allFactions);
 
-        List<String> superFactionsNames = List.of("IS", "CLAN", "Periphery");
+        List<String> superFactionsNames = List.of("IS", "CLAN", "Periphery", "DP");
         for (Faction faction : allFactionsCopy) {
             if (superFactionsNames.contains(faction.getShortName())) {
                 allFactions.remove(faction);
@@ -313,7 +313,7 @@ class LifePathFactionPicker extends JDialog {
                 LOGGER.error("Faction not found: {}", factionCode);
                 continue;
             }
-            String label = faction.getFullName(gameYear);
+            String label = faction.getFullName(gameYear) + " [" + factionCode + "]";
             JCheckBox chkFaction = new JCheckBox(label);
             chkFaction.setSelected(selectedFactions.contains(factionCode));
             chkFaction.addActionListener(evt -> {

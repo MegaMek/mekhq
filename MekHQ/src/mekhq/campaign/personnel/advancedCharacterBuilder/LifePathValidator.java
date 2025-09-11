@@ -100,8 +100,6 @@ public class LifePathValidator {
 
     private void checkFlexiblePicks() {
         // Find the largest group size among all flexible XP award groups
-
-
         // If groups are present, but no picks are selected, then the Life Path is invalid
         if (flexiblePicks <= 0) {
             if (maximumGroupSize > 0) {
@@ -124,7 +122,7 @@ public class LifePathValidator {
                 invalidReasons.add(MISSING_FACTION);
                 return;
             }
-            
+
             for (Set<String> group : requirements) {
                 if (group.isEmpty()) {
                     invalidReasons.add(MISSING_FACTION);
