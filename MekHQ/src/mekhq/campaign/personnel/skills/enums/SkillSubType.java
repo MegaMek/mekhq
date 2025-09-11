@@ -66,6 +66,11 @@ public enum SkillSubType {
     SUPPORT("SUPPORT"),
 
     /**
+     * Represents technician skills.
+     */
+    SUPPORT_TECHNICIAN("SUPPORT_TECHNICIAN"),
+
+    /**
      * Represents command-related support (non-combat) skills.
      */
     SUPPORT_COMMAND("SUPPORT_COMMAND"),
