@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathR
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import megamek.codeUtilities.StringUtility;
 
@@ -52,6 +53,9 @@ public class LifePathValidator {
     private final Set<LifePathCategory> categories;
 
     private final Set<InvalidLifePathReason> invalidReasons = new HashSet<>();
+    private final UUID id;
+    private final Set<UUID> requirementIDs;
+    private final Set<UUID> exclusionIDs;
 
     public Set<InvalidLifePathReason> getInvalidReasons() {
         return invalidReasons;
@@ -59,7 +63,7 @@ public class LifePathValidator {
 
     public LifePathValidator(int flexiblePicks, int maximumGroupSize, Set<ATOWLifeStage> lifeStages,
           Map<Integer, Set<String>> requirementsFactions, String source, String name,
-          Set<LifePathCategory> categories) {
+          Set<LifePathCategory> categories, UUID id, Set<UUID> requirementIDs, Set<UUID> exclusionIDs) {
         this.flexiblePicks = flexiblePicks;
         this.maximumGroupSize = maximumGroupSize;
         this.lifeStages = lifeStages;
@@ -67,6 +71,9 @@ public class LifePathValidator {
         this.source = source;
         this.name = name;
         this.categories = categories;
+        this.id = id;
+        this.requirementIDs = requirementIDs;
+        this.exclusionIDs = exclusionIDs;
 
         // Tests
         checkFlexiblePicks();
@@ -75,6 +82,8 @@ public class LifePathValidator {
         checkName();
         checkLifeStages();
         checkCategories();
+        checkLifePathRequirements();
+        checkLifePathExclusions();
     }
 
     public static int getMaximumGroupSize(int flexibleAbilitiesCount, int flexibleAttributesCount,
@@ -139,6 +148,18 @@ public class LifePathValidator {
     private void checkCategories() {
         if (categories.isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_CATEGORIES);
+        }
+    }
+
+    private void checkLifePathRequirements() {
+        if (requirementIDs.contains(id)) {
+            invalidReasons.add(InvalidLifePathReason.MATCHING_UUID_REQUIREMENT);
+        }
+    }
+
+    private void checkLifePathExclusions() {
+        if (exclusionIDs.contains(id)) {
+            invalidReasons.add(InvalidLifePathReason.MATCHING_UUID_EXCLUSION);
         }
     }
 }

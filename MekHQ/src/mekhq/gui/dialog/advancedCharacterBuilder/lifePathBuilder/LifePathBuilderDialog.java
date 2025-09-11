@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -724,8 +725,19 @@ public class LifePathBuilderDialog extends JDialog {
               flexibleXPSkills.size(),
               flexibleXPMetaSkills.size(),
               flexibleXPTraits.size());
+
+        Set<UUID> requirementIDs = new HashSet<>();
+        for (Set<UUID> ids : requirementsLifePath.values()) {
+            requirementIDs.addAll(ids);
+        }
+        
+        Set<UUID> exclusionIDs = new HashSet<>();
+        for (Set<UUID> ids : exclusionsLifePath.values()) {
+            exclusionIDs.addAll(ids);
+        }
+
         LifePathValidator validator = new LifePathValidator(flexibleXPPickCount, maximumGroupSize, lifeStages,
-              requirementsFactions, source, name, categories);
+              requirementsFactions, source, name, categories, id, requirementIDs, exclusionIDs);
         Set<InvalidLifePathReason> invalidReasons = validator.getInvalidReasons();
         validateLifePath(invalidReasons);
         if (!invalidReasons.isEmpty()) {
