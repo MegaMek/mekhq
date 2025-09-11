@@ -536,7 +536,6 @@ public class LifePathTab {
         btnAddLifePath.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddLifePath)
         );
-        btnAddLifePath.setEnabled(false); // TODO Implement
         btnAddLifePath.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddLifePath);
 
@@ -652,7 +651,9 @@ public class LifePathTab {
 
             int currentIndex = tabLocal.getSelectedIndex();
 
-            // TODO launch a dialog that lists the current requirements and allows the user to remove one
+            LifePathLifePathPicker picker = new LifePathLifePathPicker(storedLifePaths.get(currentIndex),
+                  lifePathLibrary, tabType);
+            storedLifePaths.put(currentIndex, picker.getSelectedLifePaths());
             standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
