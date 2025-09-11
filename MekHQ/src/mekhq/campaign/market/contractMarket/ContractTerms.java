@@ -44,8 +44,8 @@ import mekhq.campaign.universe.Faction;
  * 42 and Supplemental Contract Terms Table on page 43 of CamOps (4th printing).
  */
 public class ContractTerms {
-    private double operationsTempoMultiplier;
-    private int baseLength;
+    private final double operationsTempoMultiplier;
+    private final int baseLength;
     private double employmentMultiplier;
     private int commandModifier;
     private int salvageModifier;
@@ -210,8 +210,8 @@ public class ContractTerms {
                 transportModifier += 1;
             }
             case EXTRACTION_RAID -> {
-                commandModifier += -1;
-                salvageModifier += -1;
+                commandModifier -= 1;
+                salvageModifier -= 1;
                 supportModifier += 2;
                 transportModifier += 1;
             }
@@ -220,46 +220,46 @@ public class ContractTerms {
                 supportModifier += 1;
             }
             case GUERRILLA_WARFARE -> {
-                commandModifier += -2;
+                commandModifier -= 2;
                 salvageModifier += 3;
-                supportModifier += -2;
-                transportModifier += -1;
+                supportModifier -= 2;
+                transportModifier -= 1;
             }
             case OBJECTIVE_RAID -> {
-                commandModifier += -1;
+                commandModifier -= 1;
                 supportModifier += 1;
                 transportModifier += 2;
             }
             case PIRATE_HUNTING -> {
                 commandModifier += 2;
                 salvageModifier += 2;
-                supportModifier += -1;
-                transportModifier += -1;
+                supportModifier -= 1;
+                transportModifier -= 1;
             }
             case PLANETARY_ASSAULT -> {
-                commandModifier += -2;
+                commandModifier -= 2;
                 supportModifier += 2;
                 transportModifier += 3;
             }
             case RECON_RAID -> {
-                commandModifier += -1;
-                salvageModifier += -2;
+                commandModifier -= 1;
+                salvageModifier -= 2;
                 supportModifier += 1;
-                transportModifier += -1;
+                transportModifier -= 1;
             }
             case RELIEF_DUTY -> {
-                commandModifier += -1;
+                commandModifier -= 1;
                 salvageModifier += 1;
                 supportModifier += 1;
                 transportModifier += 1;
             }
             case RIOT_DUTY -> {
-                commandModifier += -2;
+                commandModifier -= 2;
                 salvageModifier += 1;
                 supportModifier += 2;
             }
             case SECURITY_DUTY -> {
-                commandModifier += -3;
+                commandModifier -= 3;
                 supportModifier += 2;
                 transportModifier += 1;
             }
@@ -274,26 +274,26 @@ public class ContractTerms {
             transportModifier += 2;
         } else if (employer.isMajorPower()) {
             employmentMultiplier += 0.2;
-            salvageModifier += -1;
+            salvageModifier -= 1;
             transportModifier += 1;
         } else if (employer.isMinorPower()) {
             employmentMultiplier += 0.1;
-            salvageModifier += -2;
+            salvageModifier -= 2;
         } else if (employer.isCorporation() || employer.isMercenary()) {
             employmentMultiplier += 0.1;
-            commandModifier += -1;
+            commandModifier -= 1;
             salvageModifier += 2;
             supportModifier += 1;
             transportModifier += 1;
         } else if (employer.isIndependent() || employer.isPlanetaryGovt()) {
-            salvageModifier += -1;
-            supportModifier += -1;
+            salvageModifier -= 1;
+            supportModifier -= 1;
         }
         if (employer.isStingy()) {
-            employmentMultiplier += -0.2;
-            salvageModifier += -1;
-            supportModifier += -1;
-            transportModifier += -1;
+            employmentMultiplier -= 0.2;
+            salvageModifier -= 1;
+            supportModifier -= 1;
+            transportModifier -= 1;
         } else if (employer.isGenerous()) {
             employmentMultiplier += 0.2;
             salvageModifier += 1;
@@ -301,14 +301,14 @@ public class ContractTerms {
             transportModifier += 1;
         }
         if (employer.isControlling()) {
-            commandModifier += -2;
-            salvageModifier += -1;
+            commandModifier -= 2;
+            salvageModifier -= 1;
         } else if (employer.isLenient()) {
             commandModifier += 1;
             salvageModifier += 1;
         }
         if (date.getYear() < 2781 || date.getYear() > 3062) {
-            salvageModifier += -2;
+            salvageModifier -= 2;
         }
     }
 

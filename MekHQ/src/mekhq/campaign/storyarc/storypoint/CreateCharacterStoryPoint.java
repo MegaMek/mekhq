@@ -45,7 +45,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;

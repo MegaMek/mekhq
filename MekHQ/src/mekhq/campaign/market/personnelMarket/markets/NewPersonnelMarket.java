@@ -70,7 +70,7 @@ import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.MarketNewPersonnelEvent;
+import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
@@ -878,7 +878,7 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Reinitializes market state and key internal data.
+     * Reinitialized market state and key internal data.
      *
      * @author Illiani
      * @since 0.50.06
@@ -949,7 +949,7 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     public List<PersonnelMarketEntry> getMarketEntriesAsList(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
-        // Maps are inherently non-deterministic in their order, however, we want to be able to both use a map (for
+        // Maps are inherently non-deterministic in their order, however, we want to be able to both use a map for
         // the key:value pairs, but also we need a deterministic list to ease testing. So we create a list here and
         // sort alphabetically based on the profession tied to each entry. This makes testing substantially easier
         // without removing from the randomness of the pick

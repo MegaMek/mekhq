@@ -157,7 +157,20 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.*;
+import mekhq.campaign.events.loans.LoanNewEvent;
+import mekhq.campaign.events.loans.LoanPaidEvent;
+import mekhq.campaign.events.missions.MissionNewEvent;
+import mekhq.campaign.events.missions.MissionRemovedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartWorkEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonRemovedEvent;
+import mekhq.campaign.events.scenarios.ScenarioNewEvent;
+import mekhq.campaign.events.scenarios.ScenarioRemovedEvent;
+import mekhq.campaign.events.units.UnitNewEvent;
+import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
@@ -8682,7 +8695,7 @@ public class Campaign implements ITechManager {
         astechPool += i;
         astechPoolMinutes += (480 * i);
         astechPoolOvertime += (240 * i);
-        MekHQ.triggerEvent(new AstechPoolChangedEvent(this, i));
+        MekHQ.triggerEvent(new AsTechPoolChangedEvent(this, i));
     }
 
     public void fillAstechPool() {
@@ -8697,7 +8710,7 @@ public class Campaign implements ITechManager {
         // always assume that we fire the ones who have not yet worked
         astechPoolMinutes = max(0, astechPoolMinutes - 480 * i);
         astechPoolOvertime = max(0, astechPoolOvertime - 240 * i);
-        MekHQ.triggerEvent(new AstechPoolChangedEvent(this, -i));
+        MekHQ.triggerEvent(new AsTechPoolChangedEvent(this, -i));
     }
 
     public int getNumberAstechs() {

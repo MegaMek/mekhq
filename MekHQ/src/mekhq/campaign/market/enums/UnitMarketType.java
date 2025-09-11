@@ -112,7 +112,7 @@ public enum UnitMarketType {
         }
 
         MMLogger.create(UnitMarketType.class)
-              .error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
+              .error("Unable to parse {} into a UnitMarketType. Returning OPEN.", text);
         return OPEN;
     }
     // endregion File I/O
@@ -133,39 +133,18 @@ public enum UnitMarketType {
      */
     public static int getPricePercentage(int modifier) {
         int roll = Compute.d6(2);
-        int value;
-
-        switch (roll) {
-            case 2:
-                value = modifier + 3;
-                break;
-            case 3:
-                value = modifier + 2;
-                break;
-            case 4:
-            case 5:
-                value = modifier + 1;
-                break;
-            case 6:
-            case 7:
-            case 8:
-                value = modifier;
-                break;
-            case 9:
-            case 10:
-                value = modifier - 1;
-                break;
-            case 11:
-                value = modifier - 2;
-                break;
-            case 12:
-                value = modifier - 3;
-                break;
-            default:
-                throw new IllegalStateException(
-                      "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
-                            + roll);
-        }
+        int value = switch (roll) {
+            case 2 -> modifier + 3;
+            case 3 -> modifier + 2;
+            case 4, 5 -> modifier + 1;
+            case 6, 7, 8 -> modifier;
+            case 9, 10 -> modifier - 1;
+            case 11 -> modifier - 2;
+            case 12 -> modifier - 3;
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
+                        + roll);
+        };
 
         return 100 + (value * 5);
     }

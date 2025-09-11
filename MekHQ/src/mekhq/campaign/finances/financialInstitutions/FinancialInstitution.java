@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class FinancialInstitution {
-    private static final MMLogger logger = MMLogger.create(FinancialInstitution.class);
+    private static final MMLogger LOGGER = MMLogger.create(FinancialInstitution.class);
 
     // region Variable Declarations
     private String name;
@@ -110,7 +110,7 @@ public class FinancialInstitution {
             }
             return financialInstitution;
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return null;
         }
     }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2012-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,8 +52,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 
-import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -198,10 +198,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     }
                 }
             } else {
-                logger.warn("Unable to find any factions around " +
-                                  campaign.getCurrentSystem().getName(campaign.getLocalDate()) +
-                                  " on " +
-                                  campaign.getLocalDate());
+                logger.warn("Unable to find any factions around {} on {}",
+                      campaign.getCurrentSystem().getName(campaign.getLocalDate()),
+                      campaign.getLocalDate());
             }
 
             if (inBackwater) {
@@ -292,7 +291,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 while ((retries > 0) && (contract == null)) {
                     // Send only 1 retry down because we're handling retries in our loop
                     contract = generateAtBContract(campaign,
-                          RandomFactionGenerator.getInstance().getEmployer(),
+                          RandomFactionGenerator.getInstance().getEmployerFaction().getShortName(),
                           unitRatingMod,
                           1);
 
@@ -310,7 +309,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         }
                     } catch (Exception e) {
                         contract.setDifficulty(5);
-                        logger.error("Unable to calculate difficulty for AtB contract " + contract, e);
+                        logger.error(e, "Unable to calculate difficulty for AtB contract {}", contract);
                     }
                     retries--;
                 }
@@ -345,7 +344,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (Factions.getInstance().getFaction(employer).isMercenary()) {
             contract.setMercSubcontract(true);
             for (int attempts = 0; attempts < MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER; ++attempts) {
-                employer = RandomFactionGenerator.getInstance().getEmployer();
+                employer = RandomFactionGenerator.getInstance().getEmployerFaction().getShortName();
                 if ((employer != null) && !Factions.getInstance().getFaction(employer).isMercenary()) {
                     break;
                 }
@@ -407,8 +406,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             jp = contract.getJumpPath(campaign);
         } catch (NullPointerException ex) {
             // could not calculate jump path; leave jp null
-            logger.warn("Could not calculate jump path to contract location: " +
-                              contract.getSystem().getName(campaign.getLocalDate()), ex);
+            logger.warn("Could not calculate jump path to contract location: {}",
+                  contract.getSystem().getName(campaign.getLocalDate()));
         }
 
         if (jp == null) {
@@ -733,7 +732,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         /*
          * AtB rules seem to indicate one admin in each role (though this
          * is not explicitly stated that I have seen) but MekHQ allows
-         * assignment of multiple admins to each role. Therefore we go
+         * assignment of multiple admins to each role. Therefore, we go
          * through all the admins and for each role select the one with
          * the highest admin skill, or higher negotiation if the admin
          * skills are equal.

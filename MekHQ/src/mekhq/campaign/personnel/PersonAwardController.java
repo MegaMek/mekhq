@@ -41,7 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
 import mekhq.campaign.log.PerformanceLogger;
 

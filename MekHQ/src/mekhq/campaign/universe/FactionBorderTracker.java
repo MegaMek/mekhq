@@ -48,8 +48,8 @@ import java.util.concurrent.Executors;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.NewDayEvent;
 
 /**
  * Checks all planets within a given region of space and can report which factions control one or more planets in the

@@ -37,15 +37,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
-import megamek.common.rolls.TargetRoll;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;

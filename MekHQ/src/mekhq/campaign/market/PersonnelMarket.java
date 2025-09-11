@@ -56,8 +56,8 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.MarketNewPersonnelEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.events.MarketNewPersonnelEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
@@ -71,7 +71,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarket {
     private static final MMLogger logger = MMLogger.create(PersonnelMarket.class);
 
@@ -90,7 +90,7 @@ public class PersonnelMarket {
      * Used by AtB to track Units assigned to recruits; the key
      * is the person UUID.
      */
-    private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
+    private final Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
     /* Alternate types of rolls, set by PersonnelMarketDialog */
     private boolean paidRecruitment = false;
     private PersonnelRole paidRecruitRole = PersonnelRole.MEKWARRIOR;
@@ -392,12 +392,10 @@ public class PersonnelMarket {
                     try {
                         en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
-                        logger.error("Unable to load entity: " +
-                                           ms.getSourceFile() +
-                                           ": " +
-                                           ms.getEntryName() +
-                                           ": " +
-                                           ex.getMessage(), ex);
+                        logger.error(ex, "Unable to load entity: {}: {}: {}",
+                              ms.getSourceFile(),
+                              ms.getEntryName(),
+                              ex.getMessage());
                     }
                     if (null != en) {
                         retVal.attachedEntities.put(id, en);
@@ -411,7 +409,7 @@ public class PersonnelMarket {
                 } else {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    logger.error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    logger.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
                 }
             }
 
@@ -433,22 +431,15 @@ public class PersonnelMarket {
     }
 
     public static String getTypeName(int type) {
-        switch (type) {
-            case TYPE_RANDOM:
-                return "Random";
-            case TYPE_DYLANS:
-                return "Dylan's Method";
-            case TYPE_FMMR:
-                return "FM: Mercenaries Revised";
-            case TYPE_CAMPAIGN_OPS:
-                return "Campaign Ops";
-            case TYPE_ATB:
-                return "Against the Bot";
-            case TYPE_NONE:
-                return "Disabled";
-            default:
-                return "ERROR: Default case reached in PersonnelMarket.getTypeName()";
-        }
+        return switch (type) {
+            case TYPE_RANDOM -> "Random";
+            case TYPE_DYLANS -> "Dylan's Method";
+            case TYPE_FMMR -> "FM: Mercenaries Revised";
+            case TYPE_CAMPAIGN_OPS -> "Campaign Ops";
+            case TYPE_ATB -> "Against the Bot";
+            case TYPE_NONE -> "Disabled";
+            default -> "ERROR: Default case reached in PersonnelMarket.getTypeName()";
+        };
     }
 
     public boolean isNone() {
@@ -517,35 +508,35 @@ public class PersonnelMarket {
         if (proto > most) {
             most = proto;
         }
-        long retval = 0;
+        long retVal = 0;
         if (most == meks) {
-            retval = retval | Entity.ETYPE_MEK;
+            retVal = retVal | Entity.ETYPE_MEK;
         }
         if (most == ds) {
-            retval = retval | Entity.ETYPE_DROPSHIP;
+            retVal = retVal | Entity.ETYPE_DROPSHIP;
         }
         if (most == sc) {
-            retval = retval | Entity.ETYPE_SMALL_CRAFT;
+            retVal = retVal | Entity.ETYPE_SMALL_CRAFT;
         }
         if (most == cf) {
-            retval = retval | Entity.ETYPE_CONV_FIGHTER;
+            retVal = retVal | Entity.ETYPE_CONV_FIGHTER;
         }
         if (most == asf) {
-            retval = retval | Entity.ETYPE_AEROSPACE_FIGHTER;
+            retVal = retVal | Entity.ETYPE_AEROSPACE_FIGHTER;
         }
         if (most == vee) {
-            retval = retval | Entity.ETYPE_TANK;
+            retVal = retVal | Entity.ETYPE_TANK;
         }
         if (most == inf) {
-            retval = retval | Entity.ETYPE_INFANTRY;
+            retVal = retVal | Entity.ETYPE_INFANTRY;
         }
         if (most == ba) {
-            retval = retval | Entity.ETYPE_BATTLEARMOR;
+            retVal = retVal | Entity.ETYPE_BATTLEARMOR;
         }
         if (most == proto) {
-            retval = retval | Entity.ETYPE_PROTOMEK;
+            retVal = retVal | Entity.ETYPE_PROTOMEK;
         }
-        return retval;
+        return retVal;
     }
 
     /**

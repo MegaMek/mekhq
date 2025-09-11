@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Carl Spain. All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,7 +60,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -82,7 +82,7 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class CombatTeam {
-    private static final MMLogger logger = MMLogger.create(CombatTeam.class);
+    private static final MMLogger LOGGER = MMLogger.create(CombatTeam.class);
 
     public static final int LANCE_SIZE = 4;
     public static final int STAR_SIZE = 5;
@@ -110,7 +110,7 @@ public class CombatTeam {
 
     /**
      * Determines the standard size for a given faction. The size varies depending on whether the faction is
-     * ComStar/WoB, or others (Inner Sphere, Clan, etc).
+     * ComStar/WoB, or others (Inner Sphere, Clan, etc.).
      *
      * @param faction             The {@link Faction} object for which the standard force size is to be calculated.
      * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard force size is to be
@@ -204,8 +204,6 @@ public class CombatTeam {
      *     <li><b>Other types:</b> Adds 1 to the total.</li>
      * </ul>
      *
-     * @param campaign
-     *
      * @return effective size of the combat team
      */
     public int getSize(Campaign campaign) {
@@ -233,8 +231,6 @@ public class CombatTeam {
      *     .</li>
      *     <li><b>Other types:</b> Adds 1 to the total.</li>
      *     </ul>
-     *
-     * @param campaign
      *
      * @return effective size of the lance for calculating contract requirements
      */
@@ -486,7 +482,7 @@ public class CombatTeam {
 
         // debugging code that will allow you to force the generation of a particular
         // scenario.
-        // when generating a lance-based scenario (Standup, Probe, etc), the second
+        // when generating a lance-based scenario (Standup, Probe, etc.), the second
         // parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
 
@@ -741,7 +737,7 @@ public class CombatTeam {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
         return retVal;
     }
@@ -784,7 +780,7 @@ public class CombatTeam {
                     weight += entity.getWeight();
                 }
             } catch (Exception exception) {
-                logger.error(String.format("Failed to parse unit ID %s: %s", forceId, exception));
+                LOGGER.error("Failed to parse unit ID {}: {}", forceId, exception);
             }
         }
 

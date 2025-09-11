@@ -52,7 +52,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.FileNameComboBoxModel;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.autoresolve.AutoResolveMethod;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
@@ -1099,7 +1099,7 @@ public class RulesetsTab {
         options.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
         options.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
         options.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
-        options.setAutoGenerateOpForCallsigns(chkAutoGenerateOpForCallsigns.isSelected());
+        options.setAutoGenerateOpForCallSigns(chkAutoGenerateOpForCallsigns.isSelected());
         options.setMinimumCallsignSkillLevel(comboMinimumCallsignSkillLevel.getSelectedItem());
         options.setUseDropShips(chkUseDropShips.isSelected());
         options.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
@@ -1171,7 +1171,7 @@ public class RulesetsTab {
         spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
         spnOpForLanceTypeVehicles.setValue(options.getOpForLanceTypeVehicles());
-        chkAutoGenerateOpForCallsigns.setSelected(options.isAutoGenerateOpForCallsigns());
+        chkAutoGenerateOpForCallsigns.setSelected(options.isAutoGenerateOpForCallSigns());
         comboMinimumCallsignSkillLevel.setSelectedItem(options.getMinimumCallsignSkillLevel());
         chkUseDropShips.setSelected(options.isUseDropShips());
         chkOpForUsesVTOLs.setSelected(options.isOpForUsesVTOLs());

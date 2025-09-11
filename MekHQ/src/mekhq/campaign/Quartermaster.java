@@ -36,14 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.units.Entity;
-import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.PartArrivedEvent;
-import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.events.parts.PartArrivedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;

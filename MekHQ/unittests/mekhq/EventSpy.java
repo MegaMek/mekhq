@@ -40,10 +40,10 @@ import java.util.function.Predicate;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.MMEvent;
 import megamek.common.event.Subscribe;
-import mekhq.campaign.event.PartArrivedEvent;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.events.parts.PartArrivedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartNewEvent;
+import mekhq.campaign.events.parts.PartRemovedEvent;
 
 /**
  * Provides a list of events captured during its lifetime. Use this as part of a try-with-resources block.

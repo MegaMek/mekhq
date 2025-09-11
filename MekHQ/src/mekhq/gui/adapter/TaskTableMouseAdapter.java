@@ -43,9 +43,9 @@ import javax.swing.JTable;
 
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartModeChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartModeChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;

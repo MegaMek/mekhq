@@ -46,7 +46,7 @@ import javax.swing.tree.TreePath;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;

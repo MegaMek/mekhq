@@ -53,7 +53,7 @@ import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;

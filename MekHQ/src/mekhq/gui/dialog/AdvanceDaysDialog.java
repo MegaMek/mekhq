@@ -56,7 +56,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.ReportEvent;
+import mekhq.campaign.events.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;

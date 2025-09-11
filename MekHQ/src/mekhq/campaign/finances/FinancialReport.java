@@ -34,8 +34,8 @@ package mekhq.campaign.finances;
 
 import java.util.stream.Collectors;
 
-import megamek.common.units.Aero;
 import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
@@ -48,7 +48,7 @@ import mekhq.campaign.mission.Contract;
 
 public class FinancialReport {
     private Money assets = Money.zero();
-    private Money liabilities = Money.zero();
+    private final Money liabilities = Money.zero();
     private Money cash = Money.zero();
     private Money loans = Money.zero();
     private Money mek = Money.zero();

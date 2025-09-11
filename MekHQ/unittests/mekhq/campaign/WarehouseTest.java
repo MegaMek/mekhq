@@ -54,13 +54,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.EventSpy;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartNewEvent;
+import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;

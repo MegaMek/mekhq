@@ -108,7 +108,7 @@ public class Procurement {
         }
 
         // If the result faction is NONE, I check if I maybe got a not found in the ENUM.
-        if (result.getCodeMM().toUpperCase().equals(faction.getShortName().toUpperCase())) {
+        if (result.getCodeMM().equalsIgnoreCase(faction.getShortName())) {
             return result;
         }
 

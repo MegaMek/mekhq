@@ -86,9 +86,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.ScenarioChangedEvent;
-import mekhq.campaign.event.StratconDeploymentEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.StratConDeploymentEvent;
+import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -1384,7 +1384,7 @@ public class StratconRulesManager {
         // the force may be located in other places on the track - clear it out
         track.unassignForce(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
-        MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
+        MekHQ.triggerEvent(new StratConDeploymentEvent(campaign.getForce(forceID)));
     }
 
     /**

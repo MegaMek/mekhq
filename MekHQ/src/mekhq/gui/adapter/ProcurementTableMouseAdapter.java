@@ -44,7 +44,7 @@ import javax.swing.JTable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;

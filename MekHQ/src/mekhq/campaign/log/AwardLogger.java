@@ -49,7 +49,7 @@ import mekhq.campaign.personnel.Person;
  * @author Miguel Azevedo
  */
 public class AwardLogger {
-    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle(
+    private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle(
           "mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 

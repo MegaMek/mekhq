@@ -96,7 +96,19 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.DayEndingEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.MedicPoolChangedEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.assets.AssetEvent;
+import mekhq.campaign.events.loans.LoanEvent;
+import mekhq.campaign.events.missions.MissionEvent;
+import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.transactions.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
@@ -3191,7 +3203,7 @@ public class CampaignGUI extends JPanel {
      * @param astechPoolChangedEvent the event indicating a change in the astech pool
      */
     @Subscribe
-    public void handle(AstechPoolChangedEvent astechPoolChangedEvent) {
+    public void handle(AsTechPoolChangedEvent astechPoolChangedEvent) {
         refreshTempAstechs();
     }
 

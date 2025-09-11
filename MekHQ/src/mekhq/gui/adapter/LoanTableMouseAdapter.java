@@ -42,8 +42,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import mekhq.MekHQ;
-import mekhq.campaign.event.LoanRemovedEvent;
-import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.events.loans.LoanRemovedEvent;
+import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;

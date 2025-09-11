@@ -45,7 +45,7 @@ import mekhq.module.api.PersonnelMarketMethod;
 /**
  * Method for personnel market generation given in the replacement personnel section of Campaign Operations
  */
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
     @Override
     public String getModuleName() {

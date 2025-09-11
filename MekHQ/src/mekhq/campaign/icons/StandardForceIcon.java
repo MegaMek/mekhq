@@ -48,7 +48,7 @@ import org.w3c.dom.Node;
  * @see AbstractIcon
  */
 public class StandardForceIcon extends AbstractIcon {
-    private static final MMLogger logger = MMLogger.create(StandardForceIcon.class);
+    private static final MMLogger LOGGER = MMLogger.create(StandardForceIcon.class);
 
     // region Variable Declarations
     public static final String DEFAULT_FORCE_ICON_FILENAME = "empty.png";
@@ -91,7 +91,7 @@ public class StandardForceIcon extends AbstractIcon {
                       DEFAULT_FORCE_ICON_FILENAME);
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return forceIcon;
@@ -108,7 +108,7 @@ public class StandardForceIcon extends AbstractIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return new StandardForceIcon();
         }
         return icon;

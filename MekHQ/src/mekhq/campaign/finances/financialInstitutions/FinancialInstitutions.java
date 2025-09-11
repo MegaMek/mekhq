@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class FinancialInstitutions {
-    private static final MMLogger logger = MMLogger.create(FinancialInstitutions.class);
+    private static final MMLogger LOGGER = MMLogger.create(FinancialInstitutions.class);
 
     // region Variable Declarations
     private static final List<FinancialInstitution> financialInstitutions = new ArrayList<>();
@@ -110,7 +110,7 @@ public class FinancialInstitutions {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return new ArrayList<>();
         }
 

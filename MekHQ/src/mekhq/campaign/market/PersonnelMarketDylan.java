@@ -44,7 +44,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 /**
  * Personnel market generation method that uses Dylan's method
  */
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarketDylan extends PersonnelMarketRandom {
 
     @Override

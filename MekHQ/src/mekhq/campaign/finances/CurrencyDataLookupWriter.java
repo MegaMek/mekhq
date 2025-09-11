@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import org.joda.money.format.MoneyPrinter;
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 class CurrencyDataLookupWriter implements MoneyPrinter {
-    private Map<String, String> currencyExtraData;
+    private final Map<String, String> currencyExtraData;
 
     CurrencyDataLookupWriter(Map<String, String> currencyExtraData) {
         this.currencyExtraData = currencyExtraData;
