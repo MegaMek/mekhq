@@ -101,9 +101,9 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.event.PersonCrewAssignmentEvent;
-import mekhq.campaign.event.PersonTechAssignmentEvent;
-import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
+import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
+import mekhq.campaign.events.units.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.AssignmentLogger;
@@ -2820,7 +2820,7 @@ public class Unit implements ITechnology {
             value = getBuyCost();
         }
 
-        if (getCampaign().getCampaignOptions().isUsePercentageMaint()) {
+        if (getCampaign().getCampaignOptions().isUsePercentageMaintenance()) {
             if (en instanceof Mek) {
                 mCost = value.multipliedBy(0.02);
             } else if (en instanceof Warship) {

@@ -50,14 +50,14 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 import megamek.Version;
-import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;

@@ -57,7 +57,18 @@ import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.OvertimeModeEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartModeChangedEvent;
+import mekhq.campaign.events.parts.PartNewEvent;
+import mekhq.campaign.events.parts.PartRemovedEvent;
+import mekhq.campaign.events.parts.PartWorkEvent;
+import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitRefitEvent;
+import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -744,7 +755,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     @Subscribe
-    public void handle(AstechPoolChangedEvent ev) {
+    public void handle(AsTechPoolChangedEvent ev) {
         filterTechs();
     }
 

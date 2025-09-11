@@ -38,12 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.Version;
-import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;

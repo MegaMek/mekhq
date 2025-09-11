@@ -100,8 +100,8 @@ import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.autoresolve.MekHQSetupForces;
-import mekhq.campaign.autoresolve.StratconSetupForces;
+import mekhq.campaign.autoResolve.MekHQSetupForces;
+import mekhq.campaign.autoResolve.StratConSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -765,7 +765,7 @@ public class MekHQ implements GameListener {
 
     private SetupForces getSetupForces(Scenario scenario, List<Unit> units) {
         if (scenario instanceof AtBScenario atBScenario) {
-            return new StratconSetupForces(getCampaign(), units, atBScenario, new SingletonForces());
+            return new StratConSetupForces(getCampaign(), units, atBScenario, new SingletonForces());
         }
         return new MekHQSetupForces(getCampaign(), units, scenario, new SingletonForces());
     }

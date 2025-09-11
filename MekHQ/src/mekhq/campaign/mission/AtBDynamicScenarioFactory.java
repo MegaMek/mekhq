@@ -2871,7 +2871,7 @@ public class AtBDynamicScenarioFactory {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Optionally assign a callsign to the unit commander if enabled and skill at or above minimum level
-        if (campaignOptions.isAutoGenerateOpForCallsigns() &&
+        if (campaignOptions.isAutoGenerateOpForCallSigns() &&
                   (skill.equalsOrGreaterThan(campaignOptions.getMinimumCallsignSkillLevel()))) {
             entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
         }

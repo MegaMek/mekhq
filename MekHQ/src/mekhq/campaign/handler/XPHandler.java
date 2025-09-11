@@ -38,8 +38,8 @@ import megamek.common.compute.Compute;
 import megamek.common.event.Subscribe;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 
 /**

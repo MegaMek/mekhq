@@ -51,7 +51,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import mekhq.MekHQ;
-import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;

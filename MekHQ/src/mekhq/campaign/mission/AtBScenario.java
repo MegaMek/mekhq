@@ -1604,7 +1604,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         // one per "pip" of difficulty.
         // if generating aeros (crude approximation), we have a 1/2 chance of a light,
         // 1/3 chance of medium and 1/6 chance of heavy
-        if (!(campaign.getCampaignOptions().isAllowOpForAeros() && (isStandardScenario() || isBigBattle()))) {
+        if (!(campaign.getCampaignOptions().isAllowOpForAerospace() && (isStandardScenario() || isBigBattle()))) {
             return;
         }
 

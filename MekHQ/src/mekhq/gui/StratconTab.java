@@ -55,10 +55,10 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.MissionCompletedEvent;
-import mekhq.campaign.event.MissionRemovedEvent;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.StratconDeploymentEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.StratConDeploymentEvent;
+import mekhq.campaign.events.missions.MissionCompletedEvent;
+import mekhq.campaign.events.missions.MissionRemovedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
@@ -571,7 +571,7 @@ public class StratconTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(StratconDeploymentEvent ev) {
+    public void handle(StratConDeploymentEvent ev) {
         updateCampaignState();
     }
 

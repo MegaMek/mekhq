@@ -66,7 +66,18 @@ import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.OvertimeModeEvent;
+import mekhq.campaign.events.ProcurementEvent;
+import mekhq.campaign.events.RepairStatusChangedEvent;
+import mekhq.campaign.events.StratConDeploymentEvent;
+import mekhq.campaign.events.parts.PartEvent;
+import mekhq.campaign.events.parts.PartWorkEvent;
+import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
+import mekhq.campaign.events.units.UnitEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
@@ -997,7 +1008,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
-    public void handle(StratconDeploymentEvent ev) {
+    public void handle(StratConDeploymentEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 
@@ -1045,7 +1056,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
-    public void handle(AstechPoolChangedEvent ev) {
+    public void handle(AsTechPoolChangedEvent ev) {
         filterTechs();
     }
 }

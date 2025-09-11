@@ -40,8 +40,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import mekhq.MekHQ;
-import mekhq.campaign.event.TransactionChangedEvent;
-import mekhq.campaign.event.TransactionVoidedEvent;
+import mekhq.campaign.events.transactions.TransactionChangedEvent;
+import mekhq.campaign.events.transactions.TransactionVoidedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.EditTransactionDialog;

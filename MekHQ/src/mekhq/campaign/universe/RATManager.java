@@ -51,7 +51,7 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

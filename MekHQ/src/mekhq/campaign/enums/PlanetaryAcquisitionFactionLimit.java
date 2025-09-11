@@ -96,23 +96,18 @@ public enum PlanetaryAcquisitionFactionLimit {
         }
 
         try {
-            switch (Integer.parseInt(text)) {
-                case 0:
-                    return ALL;
-                case 2:
-                    return ALLIED;
-                case 3:
-                    return SELF;
-                case 1:
-                default:
-                    return NEUTRAL;
-            }
+            return switch (Integer.parseInt(text)) {
+                case 0 -> ALL;
+                case 2 -> ALLIED;
+                case 3 -> SELF;
+                default -> NEUTRAL;
+            };
         } catch (Exception ignored) {
 
         }
 
         MMLogger.create(PlanetaryAcquisitionFactionLimit.class)
-              .error("Unable to parse " + text + " into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.");
+              .error("Unable to parse {} into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.", text);
         return NEUTRAL;
     }
     // endregion File I/O

@@ -40,7 +40,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import mekhq.MekHQ;
-import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;

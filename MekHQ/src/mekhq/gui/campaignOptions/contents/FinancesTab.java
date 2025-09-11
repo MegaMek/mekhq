@@ -849,7 +849,7 @@ public class FinancesTab {
 
         // General Options
         options.setLoanLimits(useLoanLimitsBox.isSelected());
-        options.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
+        options.setUsePercentageMaintenance(usePercentageMaintenanceBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
@@ -916,7 +916,7 @@ public class FinancesTab {
 
         // General Options
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
-        usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaint());
+        usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaintenance());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
         usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,7 +39,6 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,13 +47,12 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilder;
 
-import megamek.common.compute.Compute;
-import megamek.common.units.EntityWeightClass;
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -79,7 +77,7 @@ import org.w3c.dom.NodeList;
  *       tables in the rules, or they avoid hard-coding universe details.
  */
 public class AtBConfiguration {
-    private static final MMLogger logger = MMLogger.create(AtBConfiguration.class);
+    private static final MMLogger LOGGER = MMLogger.create(AtBConfiguration.class);
 
     /* Used to indicate size of lance or equivalent in OpFor forces */
     public static final String ORG_IS = "IS";
@@ -94,8 +92,8 @@ public class AtBConfiguration {
     public static final char WEIGHT_SUPER_HEAVY = 'V';
 
     /* Scenario generation */
-    private HashMap<String, List<WeightedTable<String>>> botForceTables = new HashMap<>();
-    private HashMap<String, List<WeightedTable<String>>> botLanceTables = new HashMap<>();
+    private final HashMap<String, List<WeightedTable<String>>> botForceTables = new HashMap<>();
+    private final HashMap<String, List<WeightedTable<String>>> botLanceTables = new HashMap<>();
 
     /* Personnel and unit markets */
     private Money shipSearchCost;
@@ -121,16 +119,16 @@ public class AtBConfiguration {
      */
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         if (index < 0) {
-            logger.error("Default force tables don't support negative weights, limiting to 0");
+            LOGGER.error("Default force tables don't support negative weights, limiting to 0");
             index = 0;
         }
         String property = defaultProperties.getString(key);
         String[] fields = property.split("\\|");
         if (index >= fields.length) {
             // Deal with too short field lengths
-            logger.error(
-                  String.format("Default force tables have %d weight entries; limiting the original value of %d.",
-                        fields.length, index));
+            LOGGER.error("Default force tables have {} weight entries; limiting the original value of {}.",
+                  fields.length,
+                  index);
             index = fields.length - 1;
         }
         return parseDefaultWeightedTable(fields[index]);
@@ -148,7 +146,7 @@ public class AtBConfiguration {
                 String[] fields = e.split(":");
                 retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
         return retVal;
@@ -158,14 +156,16 @@ public class AtBConfiguration {
      * Used if the config file is missing.
      */
     private void setAllValuesToDefaults() {
+        ArrayList<WeightedTable<String>> list = new ArrayList<>();
+
         for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             String property = defaultProperties.getString(key);
+            Integer searchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
             switch (key) {
                 case "botForce.IS":
                 case "botForce.CLAN":
                 case "botForce.CS":
-                    ArrayList<WeightedTable<String>> list = new ArrayList<>();
                     for (String entry : property.split("\\|")) {
                         list.add(parseDefaultWeightedTable(entry));
                     }
@@ -187,13 +187,13 @@ public class AtBConfiguration {
                     shipSearchLengthWeeks = Integer.parseInt(property);
                     break;
                 case "shipSearchTarget.Dropship":
-                    dropshipSearchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
+                    dropshipSearchTarget = searchTarget;
                     break;
                 case "shipSearchTarget.Jumpship":
-                    jumpshipSearchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
+                    jumpshipSearchTarget = searchTarget;
                     break;
                 case "shipSearchTarget.Warship":
-                    warshipSearchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
+                    warshipSearchTarget = searchTarget;
                     break;
                 case "ships.Dropship":
                     dsTable = parseDefaultWeightedTable(property);
@@ -235,7 +235,7 @@ public class AtBConfiguration {
     public @Nullable String selectBotLances(String org, int weightClass, float rollMod) {
         // Check if the bot force tables contain the required organization
         if (!botForceTables.containsKey(org)) {
-            logger.error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
+            LOGGER.error("Bot force tables for organization \"{}\" not found, ignoring", org);
             return null;
         }
 
@@ -247,10 +247,10 @@ public class AtBConfiguration {
 
         // Check if the weightClassIndex is within valid range
         if (weightClassIndex < 0 || weightClassIndex >= botForceTable.size()) {
-            logger.error(String.format(
-                  "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
+            LOGGER.error(
+                  "Bot force tables for organization \"{}\" don't have an entry for weight class {}, limiting to valid values",
                   org,
-                  weightClass));
+                  weightClass);
 
             // Limit the weightClassIndex within valid range
             weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
@@ -390,7 +390,7 @@ public class AtBConfiguration {
     public static AtBConfiguration loadFromXml() {
         AtBConfiguration retVal = new AtBConfiguration();
 
-        logger.info("Starting load of AtB configuration data from XML...");
+        LOGGER.info("Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) { // TODO : Remove inline file path
@@ -398,11 +398,11 @@ public class AtBConfiguration {
 
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
-            logger.info("File data/universe/atbconfig.xml not found. Loading defaults.");
+            LOGGER.info("File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            logger.error("Error parsing file data/universe/atbconfig.xml. Loading defaults.", ex);
+            LOGGER.error("Error parsing file data/universe/atbconfig.xml. Loading defaults.", ex);
             retVal.setAllValuesToDefaults();
             return retVal;
         }
@@ -430,30 +430,30 @@ public class AtBConfiguration {
         NodeList nl = node.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
-            String[] orgs;
+            String[] organizations;
             List<WeightedTable<String>> list;
             switch (wn.getNodeName()) {
                 case "botForce":
                     if (wn.getAttributes().getNamedItem("org") == null) {
-                        orgs = new String[1];
-                        orgs[0] = ORG_IS;
+                        organizations = new String[1];
+                        organizations[0] = ORG_IS;
                     } else {
-                        orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
+                        organizations = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
                     }
                     list = loadForceTableFromXml(wn);
-                    for (String org : orgs) {
+                    for (String org : organizations) {
                         botForceTables.put(org, list);
                     }
                     break;
                 case "botLance":
                     if (wn.getAttributes().getNamedItem("org") == null) {
-                        orgs = new String[1];
-                        orgs[0] = ORG_IS;
+                        organizations = new String[1];
+                        organizations[0] = ORG_IS;
                     } else {
-                        orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
+                        organizations = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
                     }
                     list = loadForceTableFromXml(wn);
-                    for (String org : orgs) {
+                    for (String org : organizations) {
                         botLanceTables.put(org, list);
                     }
                     break;
@@ -475,7 +475,7 @@ public class AtBConfiguration {
                     }
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
-                    logger.error("Could not parse weight class attribute for enemy forces table", ex);
+                    LOGGER.error("Could not parse weight class attribute for enemy forces table", ex);
                 }
             }
         }
@@ -545,91 +545,4 @@ public class AtBConfiguration {
         return retVal;
     }
 
-    /*
-     * Attaches a start and end date to any object.
-     * Either the start or end date can be null, indicating that
-     * the value should apply to all dates from the beginning
-     * or to the end of the epoch, respectively.
-     */
-    static class DatedRecord<E> {
-        private LocalDate start;
-        private LocalDate end;
-        private E value;
-
-        public DatedRecord(LocalDate start, LocalDate end, E value) {
-            this.start = start;
-            this.end = end;
-            this.value = value;
-        }
-
-        public void setStart(LocalDate start) {
-            this.start = start;
-        }
-
-        public LocalDate getStart() {
-            return start;
-        }
-
-        public void setEnd(LocalDate end) {
-            this.end = end;
-        }
-
-        public LocalDate getEnd() {
-            return end;
-        }
-
-        public void setValue(E v) {
-            value = v;
-        }
-
-        public E getValue() {
-            return value;
-        }
-
-        /**
-         * @param d date to check
-         *
-         * @return true if d is between the start and end date, inclusive
-         */
-        public boolean fitsDate(LocalDate d) {
-            return ((start == null) || !start.isAfter(d))
-                         && ((end == null) || !end.isBefore(d));
-        }
-    }
-
-    static class WeightedTable<T> {
-        private final List<Integer> weights = new ArrayList<>();
-        private final List<T> values = new ArrayList<>();
-
-        public void add(Integer weight, T value) {
-            weights.add(weight);
-            values.add(value);
-        }
-
-        public @Nullable T select() {
-            return select(0f);
-        }
-
-        /**
-         * Select random entry proportionally to the weight values
-         *
-         * @param rollMod - a modifier to the die roll, expressed as a fraction of the total weight
-         *
-         * @return
-         */
-        public @Nullable T select(float rollMod) {
-            int total = weights.stream().mapToInt(Integer::intValue).sum();
-            if (total > 0) {
-                int roll = Math.min(Compute.randomInt(total) + (int) (total * rollMod + 0.5f),
-                      total - 1);
-                for (int i = 0; i < weights.size(); i++) {
-                    if (roll < weights.get(i)) {
-                        return values.get(i);
-                    }
-                    roll -= weights.get(i);
-                }
-            }
-            return null;
-        }
-    }
 }

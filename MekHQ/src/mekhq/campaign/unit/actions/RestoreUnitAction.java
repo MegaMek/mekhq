@@ -49,7 +49,7 @@ import megamek.common.util.C3Util;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.MissingThrusters;
