@@ -680,12 +680,6 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuRefresh);
         // endregion Menu Refresh
 
-        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text"));
-        miMercRoster.setMnemonic(KeyEvent.VK_U);
-        miMercRoster.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        miMercRoster.addActionListener(evt -> new MercRosterDialog(getFrame(), true, getCampaign()).setVisible(true));
-        menuFile.add(miMercRoster);
-
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
         menuOptions.setMnemonic(KeyEvent.VK_C);
         menuOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
