@@ -59,16 +59,14 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Manages machines and materiel for a campaign.
+ * Manages machines and material for a campaign.
  */
-public class Quartermaster {
+public record Quartermaster(Campaign campaign) {
     public enum PartAcquisitionResult {
         PartInherentFailure,
         PlanetSpecificFailure,
         Success
     }
-
-    private final Campaign campaign;
 
     /**
      * Initializes a new instance of the Quartermaster class.
@@ -82,22 +80,23 @@ public class Quartermaster {
     /**
      * Gets the Campaign being managed by the Quartermaster.
      */
-    public Campaign getCampaign() {
+    @Override
+    public Campaign campaign() {
         return campaign;
     }
 
     /**
      * Gets the CampaignOptions from the Campaign.
      */
-    protected CampaignOptions getCampaignOptions() {
-        return getCampaign().getCampaignOptions();
+    private CampaignOptions getCampaignOptions() {
+        return campaign().getCampaignOptions();
     }
 
     /**
      * Gets the Warehouse from the Campaign.
      */
-    protected Warehouse getWarehouse() {
-        return getCampaign().getWarehouse();
+    private Warehouse getWarehouse() {
+        return campaign().getWarehouse();
     }
 
     /**
@@ -180,7 +179,7 @@ public class Quartermaster {
         Objects.requireNonNull(ammoType);
 
         if (shots >= 0) {
-            addPart(new AmmoStorage(0, ammoType, shots, getCampaign()), 0);
+            addPart(new AmmoStorage(0, ammoType, shots, campaign()), 0);
         }
     }
 
@@ -196,7 +195,7 @@ public class Quartermaster {
         Objects.requireNonNull(infantryWeapon);
 
         if (shots >= 0) {
-            addPart(new InfantryAmmoStorage(0, ammoType, shots, infantryWeapon, getCampaign()), 0);
+            addPart(new InfantryAmmoStorage(0, ammoType, shots, infantryWeapon, campaign()), 0);
         }
     }
 
@@ -306,7 +305,7 @@ public class Quartermaster {
         // Check if we removed more than we needed (e.g. we pull LRM20 ammo for an LRM5) ...
         int unusedShots = shotsRemoved - shotsNeeded;
         if (unusedShots > 0) {
-            // ... and if we did, return it to the camaign.
+            // ... and if we did, return it to the campaign.
             addAmmo(ammoType, unusedShots);
         }
 
@@ -321,10 +320,9 @@ public class Quartermaster {
      * @return The matching spare {@code AmmoStorage} part, otherwise {@code null}.
      */
     private @Nullable AmmoStorage findSpareAmmo(AmmoType ammoType) {
-        return (AmmoStorage) getWarehouse().findSparePart(part -> {
-            return isAvailableAsSpareAmmo(part)
-                         && ((AmmoStorage) part).isSameAmmoType(ammoType);
-        });
+        return (AmmoStorage) getWarehouse().findSparePart(part -> isAvailableAsSpareAmmo(part)
+                                                                        &&
+                                                                        ((AmmoStorage) part).isSameAmmoType(ammoType));
     }
 
     /**
@@ -406,9 +404,8 @@ public class Quartermaster {
         }
 
         // Calculate the converted shots needed (rounding up)
-        int convertedShotsNeeded = (shotsNeeded * targetRackSize - 1) / sourceRackSize + 1;
 
-        return convertedShotsNeeded;
+        return (shotsNeeded * targetRackSize - 1) / sourceRackSize + 1;
     }
 
     /**
@@ -439,7 +436,7 @@ public class Quartermaster {
                          .sum();
 
         } else {
-            // If we're using ammo by type, stream through all of
+            // If we're using ammo by type, stream through all
             // the ammo that matches strictly or is compatible.
             return getWarehouse()
                          .streamSpareParts()
@@ -458,7 +455,7 @@ public class Quartermaster {
     }
 
     /**
-     * Gets a value indicating whether or not a given {@code Part} is available for use as spare ammo.
+     * Gets a value indicating whether a given {@code Part} is available for use as spare ammo.
      *
      * @param part The part to check if it can be used as spare ammo.
      */
@@ -518,10 +515,8 @@ public class Quartermaster {
 
         InfantryAmmoStorage ammoStorage = findSpareAmmo(ammoType, infantryWeapon);
 
-        int shotsRemoved = removeAmmo(ammoStorage, shotsNeeded);
-
         // Inform the caller how many shots we actually removed for them.
-        return shotsRemoved;
+        return removeAmmo(ammoStorage, shotsNeeded);
     }
 
     /**
@@ -543,7 +538,7 @@ public class Quartermaster {
         // TODO: move to an event listener, but ensure PartArrivedEvent
         //       includes the quantity which arrived rather than the
         //       quantity in the warehouse.
-        getCampaign().addReport(part.getArrivalReport());
+        campaign().addReport(part.getArrivalReport());
 
         // Add the part back to the Warehouse, asking that
         // it be merged with any existing spare part.
@@ -569,11 +564,11 @@ public class Quartermaster {
         }
 
         if (getCampaignOptions().isPayForUnits()) {
-            Money cost = new Unit(en, getCampaign()).getBuyCost();
-            if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
+            Money cost = new Unit(en, campaign()).getBuyCost();
+            if (campaign().getFinances().debit(TransactionType.UNIT_PURCHASE, campaign().getLocalDate(),
                   cost, "Purchased " + en.getShortName())) {
 
-                getCampaign().addNewUnit(en, false, days, quality);
+                campaign().addNewUnit(en, false, days, quality);
 
                 return true;
             } else {
@@ -581,7 +576,7 @@ public class Quartermaster {
             }
         } else {
 
-            getCampaign().addNewUnit(en, false, days, quality);
+            campaign().addNewUnit(en, false, days, quality);
             return true;
         }
     }
@@ -596,14 +591,14 @@ public class Quartermaster {
 
         Money sellValue = unit.getSellValue();
 
-        getCampaign().getFinances().credit(TransactionType.UNIT_SALE, getCampaign().getLocalDate(),
+        campaign().getFinances().credit(TransactionType.UNIT_SALE, campaign().getLocalDate(),
               sellValue, "Sale of " + unit.getName());
 
-        getCampaign().removeUnit(unit.getId());
+        campaign().removeUnit(unit.getId());
     }
 
     /**
-     * Sell all of the parts on hand.
+     * Sell all the parts on hand.
      *
      * @param part The part to sell.
      */
@@ -650,14 +645,14 @@ public class Quartermaster {
             plural = "s";
         }
 
-        getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
+        campaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + quantity + " " + part.getName() + plural);
 
         getWarehouse().removePart(part, quantity);
     }
 
     /**
-     * Sell all of the ammo on hand.
+     * Sell all the ammo on hand.
      *
      * @param ammo The ammo to sell.
      */
@@ -691,14 +686,14 @@ public class Quartermaster {
 
         Money cost = ammo.getActualValue().multipliedBy(saleProportion);
 
-        getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
+        campaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + shots + " " + ammo.getName());
 
         getWarehouse().removeAmmo(ammo, shots);
     }
 
     /**
-     * Sell all of the armor on hand.
+     * Sell all the armor on hand.
      *
      * @param armor The armor to sell.
      */
@@ -732,7 +727,7 @@ public class Quartermaster {
 
         Money cost = armor.getActualValue().multipliedBy(saleProportion);
 
-        getCampaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, getCampaign().getLocalDate(),
+        campaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + points + " " + armor.getName());
 
         getWarehouse().removeArmor(armor, points);
@@ -741,29 +736,29 @@ public class Quartermaster {
     /**
      * Removes one or more parts from its OmniPod.
      *
-     * @param part The omnipodded part.
+     * @param part The OmniPodded part.
      */
-    public void depodPart(Part part) {
+    public void remotePartFromPod(Part part) {
         Objects.requireNonNull(part);
 
-        depodPart(part, part.getQuantity());
+        remotePartFromPod(part, part.getQuantity());
     }
 
     /**
      * Removes one or more parts from its OmniPod.
      *
-     * @param part     The omnipodded part.
-     * @param quantity The number of omnipodded parts to de-pod.
+     * @param part     The OmniPodded part.
+     * @param quantity The number of OmniPodded parts to de-pod.
      */
-    public void depodPart(Part part, int quantity) {
+    public void remotePartFromPod(Part part, int quantity) {
         Objects.requireNonNull(part);
 
         if (!part.isOmniPodded()) {
-            // We cannot depod non-omnipodded parts.
+            // We cannot de-pod non-OmniPodded parts.
             return;
         }
 
-        // We cannot depod any more than we have
+        // We cannot de-pod any more than we have
         quantity = Math.min(quantity, part.getQuantity());
         if (quantity <= 0) {
             return;
@@ -774,15 +769,15 @@ public class Quartermaster {
         unpodded.setOmniPodded(false);
 
         // Create a new OmniPod part to hold a part of this type
-        OmniPod pod = new OmniPod(unpodded, getCampaign());
+        OmniPod pod = new OmniPod(unpodded, campaign());
 
         while (quantity > 0) {
-            // Now when we 'depod' the part we add to the warehouse
-            // the part itself and the omnipod which held the part.
+            // Now when we 'de-pod' the part we add to the warehouse
+            // the part itself and the OmniPod which held the part.
             addPart(unpodded.clone(), 0);
             addPart(pod.clone(), 0);
 
-            part.decrementQuantity();
+            part.changeQuantity(-1);
             quantity--;
         }
 
@@ -795,7 +790,7 @@ public class Quartermaster {
     }
 
     /**
-     * Tries to buys a refurbishment for a given part.
+     * Tries to buy a refurbishment for a given part.
      *
      * @param part The part being refurbished.
      *
@@ -803,8 +798,8 @@ public class Quartermaster {
      */
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().isPayForParts()) {
-            return getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                  getCampaign().getLocalDate(), part.getActualValue(),
+            return campaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
+                  campaign().getLocalDate(), part.getActualValue(),
                   "Purchase of " + part.getName());
         } else {
             return true;
@@ -837,8 +832,8 @@ public class Quartermaster {
 
         if (getCampaignOptions().isPayForParts()) {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
-            if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                  getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
+            if (campaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
+                  campaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
                 addPart(part, transitDays, true);
                 return true;
             } else {

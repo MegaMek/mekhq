@@ -45,11 +45,8 @@ import megamek.common.compute.Compute;
  * Effects are transient structures, used to implement effect generation at a different spot than effect application as
  * well as implementing player choice with useful information about what effect the choice will potentially have.
  */
-public class GameEffect {
+public record GameEffect(String desc, Consumer<IntUnaryOperator> action) {
     private static final IntUnaryOperator DEFAULT_RND = Compute::randomInt;
-
-    public final String desc;
-    public final Consumer<IntUnaryOperator> action;
 
     /** "No operation" effect (for reporting) */
     public GameEffect(String desc) {

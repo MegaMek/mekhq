@@ -40,7 +40,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
@@ -53,11 +52,10 @@ import mekhq.campaign.unit.enums.TransporterType;
  * @see CampaignTransportType
  */
 public class CampaignTransporterMap {
-    private static final MMLogger logger = MMLogger.create(CampaignTransporterMap.class);
 
     private final Campaign campaign;
     private final Map<TransporterType, Map<Double, Set<UUID>>> transportersMap = new HashMap<>();
-    private CampaignTransportType campaignTransportType;
+    private final CampaignTransportType campaignTransportType;
 
     public CampaignTransporterMap(Campaign campaign, CampaignTransportType campaignTransportType) {
         this.campaign = campaign;

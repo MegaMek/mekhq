@@ -467,9 +467,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         panTechs.add(scrollTechTable, gridBagConstraints);
 
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " +
-                                           getCampaign().getAstechPoolMinutes() +
+                                           getCampaign().getAsTechPoolMinutes() +
                                            " (" +
-                                           getCampaign().getNumberAstechs() +
+                                           getCampaign().getNumberAsTechs() +
                                            " Astechs)</html>");
         astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
         astechPoolLabel.setName("astechPoolLabel");
@@ -937,11 +937,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techsModel.setData(techs);
         filterTechs();
 
-        String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
+        String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
         }
-        astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
+        astechString += " (" + getCampaign().getNumberAsTechs() + " Astechs)</html>";
         astechPoolLabel.setText(astechString);
 
         // Ensuring valid row selection after refresh

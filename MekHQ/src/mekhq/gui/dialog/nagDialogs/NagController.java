@@ -175,7 +175,7 @@ public class NagController {
         }
 
         // Insufficient AsTechs
-        if (InsufficientAstechsNagDialog.checkNag(campaign.getAstechNeed())) {
+        if (InsufficientAstechsNagDialog.checkNag(campaign.getAsTechNeed())) {
             InsufficientAstechsNagDialog insufficientAstechsNagDialog = new InsufficientAstechsNagDialog(campaign);
             if (insufficientAstechsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
@@ -183,9 +183,9 @@ public class NagController {
         }
 
         // Insufficient AsTech Time
-        final int possibleAstechPoolMinutes = campaign.getPossibleAstechPoolMinutes();
+        final int possibleAstechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
         final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-        final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
+        final int possibleAstechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
 
         if (InsufficientAstechTimeNagDialog.checkNag(units,
               possibleAstechPoolMinutes,

@@ -47,25 +47,13 @@ public class WindchildBattleMekQualityGenerator extends AbstractBattleMekQuality
 
     @Override
     public int generate(final int roll) {
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-                return IUnitRating.DRAGOON_F;
-            case 5:
-            case 6:
-                return IUnitRating.DRAGOON_D;
-            case 7:
-            case 8:
-                return IUnitRating.DRAGOON_C;
-            case 9:
-            case 10:
-                return IUnitRating.DRAGOON_B;
-            case 11:
-            case 12:
-                return IUnitRating.DRAGOON_A;
-            default:
-                return IUnitRating.DRAGOON_ASTAR;
-        }
+        return switch (roll) {
+            case 2, 3, 4 -> IUnitRating.DRAGOON_F;
+            case 5, 6 -> IUnitRating.DRAGOON_D;
+            case 7, 8 -> IUnitRating.DRAGOON_C;
+            case 9, 10 -> IUnitRating.DRAGOON_B;
+            case 11, 12 -> IUnitRating.DRAGOON_A;
+            default -> IUnitRating.DRAGOON_ASTAR;
+        };
     }
 }

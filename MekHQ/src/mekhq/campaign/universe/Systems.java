@@ -81,15 +81,15 @@ public class Systems {
         systems = instance;
     }
 
-    private ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
     /**
      * Organizes systems into a grid of 30lyx30ly squares so we can find nearby systems without iterating through the
      * entire planet list.
      */
-    private HashMap<Integer, Map<Integer, Set<PlanetarySystem>>> systemGrid = new HashMap<>();
+    private final HashMap<Integer, Map<Integer, Set<PlanetarySystem>>> systemGrid = new HashMap<>();
 
     // HPG Network cache (to not recalculate all the damn time)
-    private Collection<Systems.HPGLink> hpgNetworkCache = null;
+    private Collection<HPGLink> hpgNetworkCache = null;
     private LocalDate hpgNetworkCacheDate = null;
 
     private Systems() {
@@ -157,13 +157,7 @@ public class Systems {
         List<PlanetarySystem> shoppingSystems = getNearbySystems(system, jumps * 30);
 
         // remove dead planets
-        Iterator<PlanetarySystem> iter = shoppingSystems.iterator();
-        while (iter.hasNext()) {
-            PlanetarySystem s = iter.next();
-            if (null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when)) {
-                iter.remove();
-            }
-        }
+        shoppingSystems.removeIf(s -> null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when));
 
         shoppingSystems.sort((p1, p2) -> {
             // sort first on number of jumps required
@@ -244,8 +238,6 @@ public class Systems {
      * Loads the default planetary system data. This includes all *.yml files in data/universe/planetary_systems and
      * subfolders. It also loads a player's custom planets in their custom user directory, if it exists.
      *
-     * @throws DOMException
-     * @throws IOException
      */
     public static Systems loadDefault() throws DOMException, IOException {
         logger.info("Starting load of system data from XML...");
@@ -276,7 +268,6 @@ public class Systems {
      *
      * @param planetsPath The path to the folder containing planetary XML files.
      *
-     * @throws DOMException
      */
     public void load(String planetsPath) throws DOMException {
         // set up mapper
@@ -318,37 +309,33 @@ public class Systems {
                             loadPlanetarySystem(fis, mapper);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            logger.error(
-                                  String.format("Exception trying to parse %s - ignoring.", file.getPath()),
-                                  ex);
+                            logger.error(ex, "Exception trying to parse {} - ignoring.", file.getPath());
                         }
                     }
                 }
             }
 
             File[] zipFiles = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".zip"));
-            for (File zipFile : zipFiles) {
-                try (ZipFile zip = new ZipFile(zipFile.getPath())) {
-                    Enumeration<? extends ZipEntry> entries = zip.entries();
-                    while (entries.hasMoreElements()) {
-                        ZipEntry entry = entries.nextElement();
-                        // Check if entry is a directory
-                        if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
-                            try (InputStream inputStream = zip.getInputStream(entry)) {
-                                loadPlanetarySystem(inputStream, mapper);
-                            } catch (Exception ex) {
-                                // Ignore this file then
-                                logger.error(
-                                      String.format("Exception trying to parse zip  entry %s - ignoring.",
-                                            entry.getName()),
-                                      ex);
+            if (zipFiles != null) {
+                for (File zipFile : zipFiles) {
+                    try (ZipFile zip = new ZipFile(zipFile.getPath())) {
+                        Enumeration<? extends ZipEntry> entries = zip.entries();
+                        while (entries.hasMoreElements()) {
+                            ZipEntry entry = entries.nextElement();
+                            // Check if entry is a directory
+                            if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
+                                try (InputStream inputStream = zip.getInputStream(entry)) {
+                                    loadPlanetarySystem(inputStream, mapper);
+                                } catch (Exception ex) {
+                                    // Ignore this file then
+                                    logger.error(ex, "Exception trying to parse zip  entry {} - ignoring.",
+                                          entry.getName());
+                                }
                             }
                         }
+                    } catch (Exception ex) {
+                        logger.error(ex, "Exception trying to read the zip file {} -ignoring.", zipFile.getName());
                     }
-                } catch (Exception ex) {
-                    logger.error(
-                          String.format("Exception trying to read the zip file %s -ignoring.", zipFile.getName()),
-                          ex);
                 }
             }
 
@@ -376,22 +363,20 @@ public class Systems {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {
-                logger.error(String.format("System \"%s\" is missing coordinates", system.getId()));
+                logger.error("System \"{}\" is missing coordinates", system.getId());
                 toRemove.add(system);
                 continue;
             }
 
             if (null == system.getStar()) {
-                logger.error(String.format("System \"%s\" is missing a star", system.getId()));
+                logger.error("System \"{}\" is missing a star", system.getId());
                 toRemove.add(system);
                 continue;
             }
 
             // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
-                logger.error(String
-                                   .format("System \"%s\" has a primary slot greater than the number of planets",
-                                         system.getId()));
+                logger.error("System \"{}\" has a primary slot greater than the number of planets", system.getId());
                 toRemove.add(system);
                 continue;
             }
@@ -419,41 +404,6 @@ public class Systems {
                     }
                 }
             }
-        }
-    }
-
-    /** A data class representing a HPG link between two planets */
-    public static final class HPGLink {
-        /**
-         * In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't
-         * matter.
-         */
-        public final PlanetarySystem primary;
-        public final PlanetarySystem secondary;
-        public final HPGRating rating;
-
-        public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, HPGRating rating) {
-            this.primary = primary;
-            this.secondary = secondary;
-            this.rating = rating;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(primary, secondary, rating);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if ((null == obj) || (getClass() != obj.getClass())) {
-                return false;
-            }
-            final HPGLink other = (HPGLink) obj;
-            return Objects.equals(primary, other.primary) && Objects.equals(secondary, other.secondary)
-                         && (rating == other.rating);
         }
     }
 

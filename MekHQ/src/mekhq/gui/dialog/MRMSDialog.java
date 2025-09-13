@@ -992,7 +992,7 @@ public class MRMSDialog extends JDialog {
 
     private void btnStartMRMSActionPerformed(ActionEvent evt) {
         // Not enough Astechs to run the tech teams
-        if (campaignGUI.getCampaign().requiresAdditionalAstechs()) {
+        if (campaignGUI.getCampaign().requiresAdditionalAsTechs()) {
             int savePrompt = JOptionPane.showConfirmDialog(null,
                   resources.getString("NotEnoughAstechs.error"),
                   resources.getString("NotEnoughAstechs.errorTitle"),
@@ -1001,7 +1001,7 @@ public class MRMSDialog extends JDialog {
             if (savePrompt != JOptionPane.YES_OPTION) {
                 return;
             } else {
-                campaignGUI.getCampaign().fillAstechPool();
+                campaignGUI.getCampaign().fillAsTechPool();
             }
         }
 

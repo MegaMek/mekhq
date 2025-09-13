@@ -143,7 +143,6 @@ public class CampaignTransportUtilities {
 
 
     private static final List<Visitor> visitors = List.of(
-
           new Visitor<ProtoMek>() {
               @Override
               public boolean isInterestedIn(Entity entity) {

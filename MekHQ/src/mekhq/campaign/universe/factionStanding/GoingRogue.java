@@ -45,8 +45,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -131,7 +131,7 @@ public class GoingRogue {
 
     /**
      * Handles the processing of forces going rogue by transitioning their alignment to a new faction and determining
-     * the nature of the event (defection or not). It delegates further handling and the consequences to other
+     * the nature of the event (defection or not). It delegates further handling and the consequences of other
      * specialized methods within the class.
      *
      * @param campaign                the current campaign context
@@ -164,12 +164,12 @@ public class GoingRogue {
      *
      * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
      *
-     * @param campaign      the current campaign context
-     * @param chosenFaction the new faction may be the same or a new one
-     * @param commander     the force commander
-     * @param second        secondary command personnel
-     * @param isDefection   whether the 'going rogue' action counts as defection
-     * @param isUltimatum   whether the 'going rogue' action was the result of an ultimatum
+     * @param campaign                the current campaign context
+     * @param chosenFaction           the new faction may be the same or a new one
+     * @param commander               the force commander
+     * @param second                  secondary command personnel
+     * @param isDefection             whether the 'going rogue' action counts as defection
+     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      *
      * @author Illiani

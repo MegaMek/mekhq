@@ -1540,7 +1540,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartOnlyDepodsOmniPoddedParts() {
+    public void remotePartFromPodOnlyDepodsOmniPoddedParts() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1550,13 +1550,13 @@ public class QuartermasterTest {
         when(mockOmniPart.isOmniPodded()).thenReturn(false);
         when(mockOmniPart.getQuantity()).thenReturn(1);
 
-        quartermaster.depodPart(mockOmniPart, 1);
+        quartermaster.remotePartFromPod(mockOmniPart, 1);
 
         verify(mockOmniPart, times(0)).decrementQuantity();
     }
 
     @Test
-    public void depodPartDoesNotDepodZeroParts() {
+    public void depodPartDoesNotRemoteZeroPartsFromPod() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1566,13 +1566,13 @@ public class QuartermasterTest {
         when(mockOmniPart.isOmniPodded()).thenReturn(true);
         when(mockOmniPart.getQuantity()).thenReturn(1);
 
-        quartermaster.depodPart(mockOmniPart, 0);
+        quartermaster.remotePartFromPod(mockOmniPart, 0);
 
         verify(mockOmniPart, times(0)).decrementQuantity();
     }
 
     @Test
-    public void depodPartDoesNotDepodNegativeParts() {
+    public void depodPartDoesNotRemoteNegativePartsFromPod() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1582,13 +1582,13 @@ public class QuartermasterTest {
         when(mockOmniPart.isOmniPodded()).thenReturn(true);
         when(mockOmniPart.getQuantity()).thenReturn(1);
 
-        quartermaster.depodPart(mockOmniPart, -10);
+        quartermaster.remotePartFromPod(mockOmniPart, -10);
 
         verify(mockOmniPart, times(0)).decrementQuantity();
     }
 
     @Test
-    public void depodPartAddsPartAndCorrectOmniPod() {
+    public void remotePartAddsPartFromPodAndCorrectOmniPod() {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
         when(mockCampaignOptions.getDamagedPartsValueMultiplier()).thenReturn(1d);
@@ -1614,7 +1614,7 @@ public class QuartermasterTest {
         when(mockOmniPartClone.getTechBase()).thenReturn(TechBase.ALL);
 
         // ...and depod that part...
-        quartermaster.depodPart(mockOmniPart, 1);
+        quartermaster.remotePartFromPod(mockOmniPart, 1);
 
         // ...giving us a clone of the part...
         verify(mockWarehouse, times(1)).addPart(eq(mockOmniPartClone), eq(true));
@@ -1639,7 +1639,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartAddsCorrectNumberOfPartAndOmniPod() {
+    public void remotePartAddsCorrectNumberOfPartFromPodAndOmniPod() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1653,7 +1653,7 @@ public class QuartermasterTest {
 
         // ...and depod four of that part...
         int quantity = 4;
-        quartermaster.depodPart(mockOmniPart, quantity);
+        quartermaster.remotePartFromPod(mockOmniPart, quantity);
 
         // ...giving us four clones of the part and its omnipod...
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
@@ -1669,7 +1669,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartAddsCorrectNumberOfPartAndOmniPodIfLessOnHand() {
+    public void remotePartAddsCorrectNumberOfPartFromPodAndOmniPodIfLessOnHand() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1684,7 +1684,7 @@ public class QuartermasterTest {
 
         // ...and try to depod four of that part...
         int quantity = 4;
-        quartermaster.depodPart(mockOmniPart, quantity);
+        quartermaster.remotePartFromPod(mockOmniPart, quantity);
 
         // ...giving us only two clones of the part and its omnipod...
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
@@ -1714,7 +1714,7 @@ public class QuartermasterTest {
         when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
 
         // ...and depod all of that part...
-        quartermaster.depodPart(mockOmniPart);
+        quartermaster.remotePartFromPod(mockOmniPart);
 
         // ...giving us four clones of the part and its omnipod...
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
@@ -1730,7 +1730,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartRaisesChangedEventIfSomeRemain() {
+    public void remotePartFromPodRaisesChangedEventIfSomeRemain() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1744,7 +1744,7 @@ public class QuartermasterTest {
 
         try (EventSpy eventSpy = new EventSpy()) {
             // ...and depod some of that part...
-            quartermaster.depodPart(mockOmniPart, 5);
+            quartermaster.remotePartFromPod(mockOmniPart, 5);
 
             // ...and since some remain, we should receive a PartChangedEvent.
             assertNotNull(eventSpy.findEvent(PartChangedEvent.class, e -> e.getPart() == mockOmniPart));
@@ -1752,7 +1752,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartDoesNotRaiseChangedEventIfNoneRemain() {
+    public void remotePartFromPodDoesNotRaiseChangedEventIfNoneRemain() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1766,7 +1766,7 @@ public class QuartermasterTest {
 
         try (EventSpy eventSpy = new EventSpy()) {
             // ...and depod all of that part...
-            quartermaster.depodPart(mockOmniPart);
+            quartermaster.remotePartFromPod(mockOmniPart);
 
             // ...and since none remain, we should NOT receive a PartChangedEvent.
             assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> e.getPart() == mockOmniPart));

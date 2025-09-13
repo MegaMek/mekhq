@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,9 +41,9 @@ import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.Parameters;
-import megamek.common.units.EntityMovementMode;
-import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 
@@ -103,7 +103,6 @@ public class UnitGeneratorParameters implements Cloneable {
     /**
      * Translate the contents of this data structure into a megamek.client.ratgenerator.Parameters object
      *
-     * @return
      */
     public Parameters getRATGeneratorParameters() {
         FactionRecord fRec = Factions.getInstance().getFactionRecordOrFallback(getFaction());

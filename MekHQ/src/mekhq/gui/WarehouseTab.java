@@ -365,9 +365,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panelDoTask.add(scrollTechTable, gridBagConstraints);
 
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " +
-                                           getCampaign().getAstechPoolMinutes() +
+                                           getCampaign().getAsTechPoolMinutes() +
                                            " (" +
-                                           getCampaign().getNumberAstechs() +
+                                           getCampaign().getNumberAsTechs() +
                                            " Astechs)</html>");
         astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
@@ -608,11 +608,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
         techsModel.setData(getCampaign().getTechs(true));
-        String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
+        String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
         }
-        astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
+        astechString += " (" + getCampaign().getNumberAsTechs() + " Astechs)</html>";
         refreshAstechPool(astechString);
 
         // If requested, switch to top entry

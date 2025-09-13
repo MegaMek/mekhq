@@ -41,13 +41,12 @@ import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 
 /**
- * This generic class is designed to hold an absract value and a string that indicates the source of that value. It is
+ * This generic class is designed to hold an abstract value and a string that indicates the source of that value. It is
  * designed primarily to work with planetary information, but could be used for other in-universe sourceable
  * information.
  **/
@@ -127,8 +126,7 @@ public class SourceableValue<T> {
         }
 
         @Override
-        public JsonDeserializer<?> createContextual(DeserializationContext context, BeanProperty property)
-              throws JsonMappingException {
+        public JsonDeserializer<?> createContextual(DeserializationContext context, BeanProperty property) {
             JavaType type = context.getContextualType();
             JavaType containedType = (type != null && type.containedTypeCount() > 0) ?
                                            type.containedType(0) :

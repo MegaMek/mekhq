@@ -75,10 +75,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.HPGLink;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.Systems.HPGLink;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -676,16 +676,16 @@ public class InterstellarMapPanel extends JPanel {
                         }
                     }
                     for (HPGLink link : hpgNetwork) {
-                        PlanetarySystem p1 = link.primary;
-                        PlanetarySystem p2 = link.secondary;
+                        PlanetarySystem p1 = link.primary();
+                        PlanetarySystem p2 = link.secondary();
                         if (isSystemVisible(p1, false) || isSystemVisible(p2, false)) {
-                            if (link.rating == HPGRating.A) {
+                            if (link.rating() == HPGRating.A) {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(thick);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
                                       map2scrY(p2.getY())));
                             }
-                            if (link.rating == HPGRating.B) {
+                            if (link.rating() == HPGRating.B) {
                                 g2.setPaint(Color.BLUE);
                                 g2.setStroke(dashed);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),

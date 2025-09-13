@@ -480,7 +480,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getAstechPoolHours() {
-        return getCampaign().getNumberAstechs() * 20;
+        return getCampaign().getNumberAsTechs() * 20;
     }
 
     int getTechSupportHours() {

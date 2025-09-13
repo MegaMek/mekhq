@@ -856,7 +856,7 @@ public class CampaignGUI extends JPanel {
                   CampaignGUI.MAX_QUANTITY_SPINNER);
             pvcd.setVisible(true);
             if (pvcd.getValue() >= 0) {
-                getCampaign().increaseAstechPool(pvcd.getValue());
+                getCampaign().increaseAsTechPool(pvcd.getValue());
             }
         });
         menuAstechPool.add(miHireAstechs);
@@ -870,10 +870,10 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireAstechsNum.text"),
                   1,
                   0,
-                  getCampaign().getAstechPool());
+                  getCampaign().getAsTechPool());
             pvcd.setVisible(true);
             if (pvcd.getValue() >= 0) {
-                getCampaign().decreaseAstechPool(pvcd.getValue());
+                getCampaign().decreaseAsTechPool(pvcd.getValue());
             }
         });
         menuAstechPool.add(miFireAstechs);
@@ -881,13 +881,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAstechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAstechPool());
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAsTechPool());
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
         miFireAllAstechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAstechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
+        miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAsTechPool(getCampaign().getAsTechPool()));
         menuAstechPool.add(miFireAllAstechs);
         menuMarket.add(menuAstechPool);
         // endregion Astech Pool
@@ -2764,7 +2764,7 @@ public class CampaignGUI extends JPanel {
 
     private void refreshTempAstechs() {
         // FIXME : Localize
-        String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAstechPool() + "</html>";
+        String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAsTechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
 

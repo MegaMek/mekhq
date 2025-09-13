@@ -66,7 +66,7 @@ import org.w3c.dom.Node;
  * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
  * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
  * ExtraData.Key&lt;DateTime&gt; DATEKEY = new ExtraData.DateKey("current date");
- * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
+ * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("really?");
  * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
  * <p>
@@ -76,9 +76,9 @@ import org.w3c.dom.Node;
  * ed.set(INTKEY, 75);
  * ed.set(DOUBLEKEY, 12.5);
  * ed.set(DATEKEY, new DateTime());
- * Integer intVal = ed.get(INTKEY));
- * Double doubleVal = ed.get(DOUBLEKEY));
- * DateTime date = ed.get(DATEKEY));
+ * Integer intVal = ed.get(INTKEY);
+ * Double doubleVal = ed.get(DOUBLEKEY);
+ * DateTime date = ed.get(DATEKEY);
  * // the next one guarantees to not return null, but -1 if the value is not set
  * int anotherIntVal = ed.get(INTKEY, -1);
  * </pre>
@@ -302,7 +302,7 @@ public class ExtraData {
     private static class JAXBValueAdapter
           extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
         @Override
-        public Map<Class<?>, Map<String, Object>> unmarshal(XmlValueListArray v) throws Exception {
+        public Map<Class<?>, Map<String, Object>> unmarshal(XmlValueListArray v) {
             if ((null == v) || (null == v.list) || v.list.isEmpty()) {
                 return new HashMap<>();
             }
@@ -330,7 +330,7 @@ public class ExtraData {
         }
 
         @Override
-        public XmlValueListArray marshal(Map<Class<?>, Map<String, Object>> v) throws Exception {
+        public XmlValueListArray marshal(Map<Class<?>, Map<String, Object>> v) {
             if ((null == v) || v.isEmpty()) {
                 return null;
             }

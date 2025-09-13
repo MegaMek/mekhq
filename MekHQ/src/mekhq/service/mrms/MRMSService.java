@@ -161,7 +161,7 @@ public class MRMSService {
                   unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
             campaign.addReport(msg);
             return msg;
-        } else if (campaign.requiresAdditionalAstechs()) {
+        } else if (campaign.requiresAdditionalAsTechs()) {
             String message = resources.getString("MRMS.InsufficientAstechs.report");
             campaign.addReport(message);
             return message;
@@ -232,7 +232,7 @@ public class MRMSService {
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
             return;
-        } else if (campaign.requiresAdditionalAstechs()) {
+        } else if (campaign.requiresAdditionalAsTechs()) {
             campaign.addReport(resources.getString("MRMS.InsufficientAstechs.report"));
             return;
         }

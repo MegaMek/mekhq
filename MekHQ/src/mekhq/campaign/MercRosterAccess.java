@@ -63,21 +63,20 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     private static final MMLogger logger = MMLogger.create(MercRosterAccess.class);
 
     // region Variable Declarations
-    private Campaign campaign;
-    private String username;
-    private String hostname;
-    private String passwd;
-    private String table;
-    private int port;
+    private final Campaign campaign;
+    private final String username;
+    private final String hostname;
+    private final String passwd;
+    private final String table;
+    private final int port;
     private Statement statement = null;
     private Connection connect = null;
     private PreparedStatement preparedStatement = null;
-    private Properties conProperties;
 
     // we also need some hashes to cross-reference stuff by id
-    private Map<String, Integer> skillHash;
-    private Map<UUID, Integer> personHash;
-    private Map<UUID, Integer> forceHash;
+    private final Map<String, Integer> skillHash;
+    private final Map<UUID, Integer> personHash;
+    private final Map<UUID, Integer> forceHash;
 
     // to track progress
     private String progressNote;
@@ -101,14 +100,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     // endregion Constructors
 
     public void connect() throws SQLException {
-        conProperties = new Properties();
+        Properties conProperties = new Properties();
         conProperties.put("user", username);
         conProperties.put("password", passwd);
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connect = DriverManager.getConnection("jdbc:mysql://" + hostname + ':' + port + '/' + table, conProperties);
-        } catch (SQLException e) {
-            throw e;
         } catch (ClassNotFoundException e) {
             logger.error("", e);
         }
@@ -195,7 +192,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         } catch (SQLException e) {
             logger.error("", e);
         }
-        // write crewtypes
+        // write crew types
         progressNote = "Uploading personnel types";
         determineProgress();
         // TODO: get correct vehicle types and squad status
@@ -480,10 +477,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement.execute("TRUNCATE TABLE " + table + ".equipmenttypes");
             for (int i = 0; i < UnitType.SIZE; i++) {
-                int maxweight = 100;
-                int minweight = 20;
-                int weightstep = 5;
-                String weightscale = "ton";
+                int maxWeight = 100;
+                int minWeight = 20;
+                int weightStep = 5;
+                String weightScale = "ton";
                 // TODO: get these right for various unit types
                 preparedStatement = connect.prepareStatement("INSERT INTO " +
                                                                    table +
@@ -491,10 +488,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.setInt(1, i + 1);
                 preparedStatement.setString(2, truncateString(UnitType.getTypeDisplayableName(i), 45));
                 preparedStatement.setInt(3, i + 1);
-                preparedStatement.setInt(4, maxweight);
-                preparedStatement.setInt(5, minweight);
-                preparedStatement.setInt(6, weightstep);
-                preparedStatement.setString(7, weightscale);
+                preparedStatement.setInt(4, maxWeight);
+                preparedStatement.setInt(5, minWeight);
+                preparedStatement.setInt(6, weightStep);
+                preparedStatement.setString(7, weightScale);
                 preparedStatement.setInt(8, i + 1);
                 preparedStatement.setInt(9, 1);
                 preparedStatement.setInt(10, 1);
@@ -580,7 +577,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private void writePersonnelData() {
-        // check for a uuid column
+        // check for an uuid column
         try (ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".crew")) {
             // add in a UUID column if not already present
             if (!hasColumn(rs, "uuid")) {
@@ -694,7 +691,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     private void writeEquipmentData() {
         // TODO: we need to clear the equipment table because equipment will come and go
 
-        // check for a uuid column
+        // check for an uuid column
         try {
             // add in a UUID column if not already present
             ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".equipment");
@@ -768,10 +765,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int columns = rsmd.getColumnCount();
+        ResultSetMetaData resultSetMetaData = rs.getMetaData();
+        int columns = resultSetMetaData.getColumnCount();
         for (int x = 1; x <= columns; x++) {
-            if (columnName.equals(rsmd.getColumnName(x))) {
+            if (columnName.equals(resultSetMetaData.getColumnName(x))) {
                 return true;
             }
         }
@@ -810,7 +807,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                      SkillType.skillList.length +
                      PersonnelRole.values().length * 2 +
                      UnitType.SIZE +
-                     campaign.getPersonnel().size() * +campaign.getHangar().getUnits().size() +
+                     campaign.getPersonnel().size() * campaign.getHangar().getUnits().size() +
                      campaign.getAllForces().size() * 2;
     }
 

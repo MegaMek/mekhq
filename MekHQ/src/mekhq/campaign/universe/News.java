@@ -63,14 +63,13 @@ public class News {
 
     private final static Object LOADING_LOCK = new Object[0];
 
-    // Marshaller / unmarshaller instances
-    private static Marshaller marshaller;
     private static Unmarshaller unmarshaller;
 
     static {
         try {
             JAXBContext context = JAXBContext.newInstance(NewsItem.class);
-            marshaller = context.createMarshaller();
+            // Marshaller / unmarshaller instances
+            Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             unmarshaller = context.createUnmarshaller();
@@ -110,7 +109,7 @@ public class News {
             archive = new HashMap<>();
             news = new HashMap<>();
             int id = 0;
-            logger.debug("Starting load of news data for " + year + " from XML...");
+            logger.debug("Starting load of news data for {} from XML...", year);
 
             // Initialize variables.
             Document xmlDoc;
@@ -162,7 +161,7 @@ public class News {
                             logger.error("Null or empty headline for a news item");
                             continue;
                         } else if (null == newsItem.getDate()) {
-                            logger.error("The date is null for news Item " + newsItem.getHeadline());
+                            logger.error("The date is null for news Item {}", newsItem.getHeadline());
                             continue;
                         } else if (StringUtility.isNullOrBlank(newsItem.getDescription())) {
                             logger.error("Null or empty headline for a news item");
@@ -184,7 +183,7 @@ public class News {
                     }
                 }
             }
-            logger.debug("Loaded " + archive.size() + " days of news items for " + year);
+            logger.debug("Loaded {} days of news items for {}", archive.size(), year);
         }
     }
 }

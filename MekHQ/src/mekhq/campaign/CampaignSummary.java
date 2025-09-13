@@ -111,7 +111,7 @@ public class CampaignSummary {
     }
 
     /**
-     * This will update all of the values in CampaignSummary to the latest from the campaign. It should be run before
+     * This will update all the values in CampaignSummary to the latest from the campaign. It should be run before
      * pulling out any reports
      */
     public void updateInformation() {
@@ -210,33 +210,28 @@ public class CampaignSummary {
         HangarStatistics hangarStats = campaign.getHangarStatistics();
         int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
-        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
         int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
-        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
+        int noLV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
+        int noHV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
+        int noInf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
                                      hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
-        int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
+        int freeHV = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
               0);
         int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() -
                                     hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
         // check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
-        nolv = Math.max(nolv - freehv, 0);
+        noLV = Math.max(noLV - freeHV, 0);
 
-        unitsOver = noMek + noASF + nolv + nohv + noinf + noBA + noProto;
+        unitsOver = noMek + noASF + noLV + noHV + noInf + noBA + noProto;
         unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MEK) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER) +

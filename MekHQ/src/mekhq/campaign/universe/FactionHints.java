@@ -58,7 +58,7 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class FactionHints {
-    private static final MMLogger logger = MMLogger.create(FactionHints.class);
+    private static final MMLogger LOGGER = MMLogger.create(FactionHints.class);
 
     private final Set<Faction> neutralFactions;
 
@@ -83,7 +83,6 @@ public class FactionHints {
     /**
      * Factory that loads the default data
      *
-     * @return
      */
     public static FactionHints defaultFactionHints() {
         FactionHints hints = new FactionHints();
@@ -95,7 +94,7 @@ public class FactionHints {
         try {
             loadFactionHints();
         } catch (DOMException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -228,17 +227,17 @@ public class FactionHints {
      * @return A Set of all factions (if any) contained within the borders of the host faction.
      */
     public Set<Faction> getContainedFactions(Faction f, LocalDate date) {
-        HashSet<Faction> retval = new HashSet<>();
+        HashSet<Faction> retVal = new HashSet<>();
         if (containedFactions.get(f) != null) {
             for (Faction f2 : containedFactions.get(f).keySet()) {
                 for (AltLocation l : containedFactions.get(f).get(f2)) {
                     if (l.isInDateRange(date)) {
-                        retval.add(f2);
+                        retVal.add(f2);
                     }
                 }
             }
         }
-        return retval;
+        return retVal;
     }
 
     /**
@@ -377,11 +376,10 @@ public class FactionHints {
     /**
      * Adds faction to list of non-combatants
      *
-     * @param f
      */
-    protected void addNeutralFaction(Faction f) {
-        if (null != f) {
-            neutralFactions.add(f);
+    protected void addNeutralFaction(Faction faction) {
+        if (null != faction) {
+            neutralFactions.add(faction);
         }
     }
 
@@ -433,7 +431,7 @@ public class FactionHints {
     }
 
     private void loadFactionHints() throws DOMException {
-        logger.info("Starting load of faction hint data from XML...");
+        LOGGER.info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
         try (InputStream is = new FileInputStream(MHQConstants.FACTION_HINTS_FILE)) {
@@ -441,7 +439,7 @@ public class FactionHints {
 
             xmlDoc = db.parse(is);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return;
         }
 
@@ -459,71 +457,73 @@ public class FactionHints {
             if (wn.getNodeType() == Node.ELEMENT_NODE) {
                 String nodeName = wn.getNodeName();
 
-                if (nodeName.equals("neutral")) {
-                    String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
-                    Faction f = Factions.getInstance().getFaction(fKey);
-                    if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        logger.error("Invalid faction code in factionhints.xml: " + fKey);
-                    } else {
-                        neutralFactions.add(f);
-                        addNeutralExceptions(f, wn);
-                    }
-                } else if (nodeName.equals("rivals")) {
-                    setFactionHint(rivals, wn);
-                } else if (nodeName.equals("war")) {
-                    setFactionHint(wars, wn);
-                } else if (nodeName.equals("alliance")) {
-                    setFactionHint(alliances, wn);
-                } else if (nodeName.equals("location")) {
-                    LocalDate start = null;
-                    LocalDate end = null;
-                    double fraction = 0.0;
-                    String outerCode = "";
-                    String innerCode = "";
-                    List<Faction> opponents = null;
-                    if (wn.getAttributes().getNamedItem("start") != null) {
-                        start = MHQXMLUtility
-                                      .parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
-                    }
-                    if (wn.getAttributes().getNamedItem("end") != null) {
-                        end = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
-                    }
-                    for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
-                        try {
-                            Node wn2 = wn.getChildNodes().item(j);
-                            switch (wn2.getNodeName()) {
-                                case "outer":
-                                    outerCode = wn2.getTextContent().trim();
-                                    break;
-                                case "inner":
-                                    innerCode = wn2.getTextContent().trim();
-                                    break;
-                                case "fraction":
-                                    fraction = Double.parseDouble(wn2.getTextContent().trim());
-                                    break;
-                                case "opponents":
-                                    opponents = new ArrayList<>();
-                                    for (String fKey : wn2.getTextContent().trim().split(",")) {
-                                        Faction f = Factions.getInstance().getFaction(fKey);
-                                        if (!f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                                            opponents.add(f);
-                                        }
-                                    }
-                                    break;
-                            }
-                        } catch (Exception e) {
-                            logger.error("", e);
+                switch (nodeName) {
+                    case "neutral" -> {
+                        String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
+                        Faction f = Factions.getInstance().getFaction(fKey);
+                        if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                            LOGGER.error("Invalid faction code in factionhints.xml: {}", fKey);
+                        } else {
+                            neutralFactions.add(f);
+                            addNeutralExceptions(f, wn);
                         }
                     }
+                    case "rivals" -> setFactionHint(rivals, wn);
+                    case "war" -> setFactionHint(wars, wn);
+                    case "alliance" -> setFactionHint(alliances, wn);
+                    case "location" -> {
+                        LocalDate start = null;
+                        LocalDate end = null;
+                        double fraction = 0.0;
+                        String outerCode = "";
+                        String innerCode = "";
+                        List<Faction> opponents = null;
+                        if (wn.getAttributes().getNamedItem("start") != null) {
+                            start = MHQXMLUtility
+                                          .parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                        }
+                        if (wn.getAttributes().getNamedItem("end") != null) {
+                            end = MHQXMLUtility.parseDate(wn.getAttributes()
+                                                                .getNamedItem("end")
+                                                                .getTextContent()
+                                                                .trim());
+                        }
+                        for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
+                            try {
+                                Node wn2 = wn.getChildNodes().item(j);
+                                switch (wn2.getNodeName()) {
+                                    case "outer":
+                                        outerCode = wn2.getTextContent().trim();
+                                        break;
+                                    case "inner":
+                                        innerCode = wn2.getTextContent().trim();
+                                        break;
+                                    case "fraction":
+                                        fraction = Double.parseDouble(wn2.getTextContent().trim());
+                                        break;
+                                    case "opponents":
+                                        opponents = new ArrayList<>();
+                                        for (String fKey : wn2.getTextContent().trim().split(",")) {
+                                            Faction f = Factions.getInstance().getFaction(fKey);
+                                            if (!f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                                                opponents.add(f);
+                                            }
+                                        }
+                                        break;
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error("", e);
+                            }
+                        }
 
-                    final Faction outer = Factions.getInstance().getFaction(outerCode);
-                    final Faction inner = Factions.getInstance().getFaction(innerCode);
-                    if (outer.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)
-                              || inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        logger.error("Invalid faction code in factionhints.xml: "
-                                           + outerCode + "/" + innerCode);
-                    } else {
-                        addContainedFaction(outer, inner, start, end, fraction, opponents);
+                        final Faction outer = Factions.getInstance().getFaction(outerCode);
+                        final Faction inner = Factions.getInstance().getFaction(innerCode);
+                        if (outer.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)
+                                  || inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                            LOGGER.error("Invalid faction code in factionhints.xml: {}/{}", outerCode, innerCode);
+                        } else {
+                            addContainedFaction(outer, inner, start, end, fraction, opponents);
+                        }
                     }
                 }
             }
@@ -561,7 +561,7 @@ public class FactionHints {
                 for (int i = 0; i < factionKeys.length; i++) {
                     final Faction faction = Factions.getInstance().getFaction(factionKeys[i]);
                     if (faction.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        logger.error("Invalid faction code in factionhints.xml: " + factionKeys[i]);
+                        LOGGER.error("Invalid faction code in factionhints.xml: {}", factionKeys[i]);
                         continue;
                     }
                     parties[i] = faction;
@@ -596,7 +596,7 @@ public class FactionHints {
                 for (String party : parties) {
                     final Faction f = Factions.getInstance().getFaction(party);
                     if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        logger.error("Invalid faction code in factionhints.xml: " + party);
+                        LOGGER.error("Invalid faction code in factionhints.xml: {}", party);
                         continue;
                     }
                     addNeutralExceptions("", localStart, localEnd, faction, f);

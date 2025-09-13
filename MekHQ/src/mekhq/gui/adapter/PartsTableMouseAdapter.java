@@ -245,13 +245,13 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("DEPOD")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().getQuartermaster().depodPart(p, 1);
+                    gui.getCampaign().getQuartermaster().remotePartFromPod(p, 1);
                 }
             }
         } else if (command.equalsIgnoreCase("DEPOD_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().getQuartermaster().depodPart(p);
+                    gui.getCampaign().getQuartermaster().remotePartFromPod(p);
                 }
             }
         } else if (command.equalsIgnoreCase("DEPOD_N")) {
@@ -268,7 +268,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().getQuartermaster().depodPart(selectedPart, q);
+                gui.getCampaign().getQuartermaster().remotePartFromPod(selectedPart, q);
             }
         } else if (command.equalsIgnoreCase("BUY")) {
             for (Part p : parts) {

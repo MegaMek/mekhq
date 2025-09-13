@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,31 +30,30 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe.selectors.planetSelectors;
+package mekhq.campaign.universe;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Planet;
+import java.util.Objects;
+
+import mekhq.campaign.universe.enums.HPGRating;
 
 /**
- * Does not select a {@link Planet}.
+ * A data class representing a HPG link between two planets
+ *
+ * @param primary In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't
+ *                matter.
  */
-public class NoPlanetSelector extends AbstractPlanetSelector {
-    // region Constructors
-    public NoPlanetSelector(final RandomOriginOptions options) {
-        super(options);
-    }
-    // endregion Constructors
+public record HPGLink(PlanetarySystem primary, PlanetarySystem secondary, HPGRating rating) {
 
     @Override
-    public @Nullable Planet selectPlanet(final Campaign campaign) {
-        return null;
-    }
-
-    @Override
-    public @Nullable Planet selectPlanet(final Campaign campaign, final @Nullable Faction faction) {
-        return null;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if ((null == obj) || (getClass() != obj.getClass())) {
+            return false;
+        }
+        final HPGLink other = (HPGLink) obj;
+        return Objects.equals(primary, other.primary) && Objects.equals(secondary, other.secondary)
+                     && (rating == other.rating);
     }
 }

@@ -852,11 +852,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("overtime")) {
                     campaign.setOvertime(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPool")) {
-                    campaign.setAstechPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                    campaign.setAsTechPool(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPoolMinutes")) {
-                    campaign.setAstechPoolMinutes(MathUtility.parseInt(childNode.getTextContent().trim()));
+                    campaign.setAsTechPoolMinutes(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPoolOvertime")) {
-                    campaign.setAstechPoolOvertime(MathUtility.parseInt(childNode.getTextContent().trim()));
+                    campaign.setAsTechPoolOvertime(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("medicPool")) {
                     campaign.setMedicPool(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("id")) {

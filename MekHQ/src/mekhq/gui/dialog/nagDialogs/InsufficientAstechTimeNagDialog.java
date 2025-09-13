@@ -162,9 +162,9 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
 
         if (campaign != null) {
             final Collection<Unit> units = campaign.getUnits();
-            final int possibleAstechPoolMinutes = campaign.getPossibleAstechPoolMinutes();
+            final int possibleAstechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
             final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-            final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
+            final int possibleAstechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
 
             count = getAsTechTimeDeficit(units,
                   possibleAstechPoolMinutes,

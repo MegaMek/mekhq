@@ -519,7 +519,7 @@ public class FactionStandings {
     }
 
     /**
-     * Retrieves all current faction standings based on climate climate.
+     * Retrieves all current faction standings based on climate.
      *
      * @return a {@link Map} containing all faction codes mapped to their current regard values.
      *
@@ -1216,8 +1216,7 @@ public class FactionStandings {
      * Processes the outcome of a contract upon its completion and updates regard standings accordingly.
      *
      * <p>Depending on the mission status (success, partial, failure, or breach), this method determines the
-     * appropriate
-     * regard delta for the employer faction and its allies.</p>
+     * appropriate regard delta for the employer faction and its allies.</p>
      *
      * <p>If the employer faction is missing, a report is generated and returned accordingly. This report informs the
      * player that they need to manually apply the Standing change via the Standing Report GUI.</p>
@@ -1245,16 +1244,7 @@ public class FactionStandings {
             return new ArrayList<>();
         }
 
-        double regardDeltaEmployer = switch (missionStatus) {
-            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
-            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
-            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
-            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
-        };
-
-        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
-        regardDeltaEmployer *= durationMultiplier;
+        double regardDeltaEmployer = getRegardDeltaEmployer(missionStatus, contractDuration);
 
         List<String> regardChangeReports = new ArrayList<>();
 
@@ -1294,6 +1284,20 @@ public class FactionStandings {
         }
 
         return regardChangeReports;
+    }
+
+    private static double getRegardDeltaEmployer(MissionStatus missionStatus, double contractDuration) {
+        double regardDeltaEmployer = switch (missionStatus) {
+            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
+            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
+        };
+
+        double durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        regardDeltaEmployer *= durationMultiplier;
+        return regardDeltaEmployer;
     }
 
     /**
@@ -1434,8 +1438,7 @@ public class FactionStandings {
      * Processes the penalty for refusing a batchall against a specific Clan faction.
      *
      * <p>This method applies a regard penalty to the given clan faction code for the specified year and generates a
-     * regard
-     * change report if applicable.</p>
+     * regard change report if applicable.</p>
      *
      * <p>This method is included as a shortcut to allow developers to call Batchall refusal changes without needing to
      * worry about setting up bespoke methods any time this could occur.</p>
@@ -1468,9 +1471,8 @@ public class FactionStandings {
      * Applies regard changes when the player executes prisoners of war.
      *
      * <p>For each victim in the specified list, the method identifies their origin faction and increments a regard
-     * penalty
-     * for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction, their
-     * penalties are accumulated.</p>
+     * penalty for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction,
+     * their penalties are accumulated.</p>
      *
      * <p>After processing all victims, the method applies the total regard change for each affected faction for the
      * specified game year and collects any resulting regard change reports.</p>

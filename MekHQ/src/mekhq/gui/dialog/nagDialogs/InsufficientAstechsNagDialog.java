@@ -153,7 +153,7 @@ public class InsufficientAstechsNagDialog extends ImmersiveDialogNag {
         int count = 0;
 
         if (campaign != null) {
-            count = campaign.getAstechNeed();
+            count = campaign.getAsTechNeed();
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, count);

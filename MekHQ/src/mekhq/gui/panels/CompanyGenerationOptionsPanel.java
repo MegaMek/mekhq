@@ -48,8 +48,8 @@ import javax.swing.JSpinner.NumberEditor;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.panels.JDisableablePanel;
-import megamek.common.units.EntityWeightClass;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.EntityWeightClass;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -2059,7 +2059,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         getChkAssignMostSkilledToPrimaryLances().setSelected(options.isAssignMostSkilledToPrimaryLances());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
         getChkUseSpecifiedFactionToAssignRanks().setSelected(options.isUseSpecifiedFactionToAssignRanks());
-        getChkAssignMekWarriorsCallsigns().setSelected(options.isAssignMekWarriorsCallsigns());
+        getChkAssignMekWarriorsCallsigns().setSelected(options.isAssignMekWarriorsCallSigns());
         getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
 
         // Personnel Randomization
@@ -2191,7 +2191,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         options.setAssignMostSkilledToPrimaryLances(getChkAssignMostSkilledToPrimaryLances().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
         options.setUseSpecifiedFactionToAssignRanks(getChkUseSpecifiedFactionToAssignRanks().isSelected());
-        options.setAssignMekWarriorsCallsigns(getChkAssignMekWarriorsCallsigns().isSelected());
+        options.setAssignMekWarriorsCallSigns(getChkAssignMekWarriorsCallsigns().isSelected());
         options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
 
         // Personnel Randomization

@@ -560,7 +560,7 @@ public class AcquisitionsDialog extends JDialog {
                 Part replacement = podded.findReplacement(false);
 
                 if (replacement != null) {
-                    campaignGUI.getCampaign().getQuartermaster().depodPart(replacement, 1);
+                    campaignGUI.getCampaign().getQuartermaster().remotePartFromPod(replacement, 1);
                     MekHQ.triggerEvent(new PartChangedEvent(replacement));
                 }
                 refresh();

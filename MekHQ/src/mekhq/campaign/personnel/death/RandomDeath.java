@@ -429,7 +429,7 @@ public class RandomDeath {
             return ERA_MULTIPLIER_STAR_LEAGUE;
         }
 
-        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOSTECH)
+        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOS_TECH)
                   || flags.contains(LATE_SUCCESSION_WARS_RENAISSANCE)) {
             return ERA_MULTIPLIER_SUCCESSION_WARS;
         }
