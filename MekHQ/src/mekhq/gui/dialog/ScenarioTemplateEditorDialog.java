@@ -68,7 +68,7 @@ import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -858,7 +858,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance()
+        Map<String, StratConBiomeManifest.MapTypeList> mapTypes = StratConBiomeManifest.getInstance()
                                                                         .getBiomeMapTypes();
         List<String> keys = mapTypes.keySet().stream().sorted().toList();
         List<Integer> indexes = new ArrayList<>();

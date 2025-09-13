@@ -38,8 +38,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import megamek.common.equipment.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Transporter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -54,7 +54,7 @@ import mekhq.campaign.utilities.CampaignTransportUtilities;
  *
  */
 public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
-    private static final MMLogger logger = MMLogger.create(TacticalTransportedUnitsSummary.class);
+    private static final MMLogger LOGGER = MMLogger.create(TacticalTransportedUnitsSummary.class);
 
     public TacticalTransportedUnitsSummary(Unit transport) {
         super(transport, CampaignTransportType.TACTICAL_TRANSPORT);
@@ -91,11 +91,9 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      *
      * @param transporterType type (Enum) of bay or Transporter
      * @param units           units being loaded
-     *
-     * @return old transports; what were  the units' previous transport, if they had one
      */
-    public Set<Unit> loadTransport(TransporterType transporterType, Set<Unit> units) {
-        return loadTransport(units, null, transporterType);
+    public void loadTransport(TransporterType transporterType, Set<Unit> units) {
+        loadTransport(units, null, transporterType);
     }
 
 
@@ -153,10 +151,9 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         } else if (transporterType != null) {
             transportedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transporterType));
         } else {
-            logger.error(String.format(
-                  "Cannot load transport (%s) with unit (%s) without a transported location or transporter!",
+            LOGGER.error("Cannot load transport ({}) with unit ({}) without a transported location or transporter!",
                   transport.getId(),
-                  transportedUnit.getId()));
+                  transportedUnit.getId());
             return oldTransport;
         }
         addTransportedUnit(Objects.requireNonNull(transportedUnit));
@@ -186,7 +183,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * Bay unloading utility used when removing a bay-equipped Transport unit This removes all units assigned to the
      * transport from it
      *
-     * @param campaign used to remove this unit as a transport from any other units in the campaign
+     * @param campaign used to remove this unit as transport from any other units in the campaign
      */
     @Override
     public void clearTransportedUnits(Campaign campaign) {
@@ -218,17 +215,17 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
                         loadTransport(realUnit.getTacticalTransportAssignment().getTransporterType(),
                               new HashSet<>(Collections.singleton(realUnit)));
                     } else {
-                        logger.error(
-                              String.format(
-                                    "Unit %s ('%s') references tactical transported unit %s which has no transport assignment",
-                                    unit.getId(),
-                                    unit.getName(),
-                                    tacticalTransportedUnit.getId()));
+                        LOGGER.error(
+                              "Unit {} ('{}') references tactical transported unit {} which has no transport assignment",
+                              unit.getId(),
+                              unit.getName(),
+                              tacticalTransportedUnit.getId());
                     }
                 } else {
-                    logger.error(
-                          String.format("Unit %s ('%s') references missing tactical transported unit %s",
-                                unit.getId(), unit.getName(), tacticalTransportedUnit.getId()));
+                    LOGGER.error("Unit {} ('{}') references missing tactical transported unit {}",
+                          unit.getId(),
+                          unit.getName(),
+                          tacticalTransportedUnit.getId());
                 }
             } else {
                 loadTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(),

@@ -34,9 +34,6 @@
 package mekhq.campaign.unit;
 
 import megamek.common.units.Entity;
-import megamek.common.units.FighterSquadron;
-import megamek.common.equipment.GunEmplacement;
-import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.parts.Part;
@@ -44,19 +41,10 @@ import mekhq.campaign.parts.Part;
 /**
  * Provides methods to gather statistics on cargo in a campaign.
  */
-public class CargoStatistics {
-    private Campaign campaign;
-
-    public CargoStatistics(Campaign campaign) {
-        this.campaign = campaign;
-    }
-
-    public Campaign getCampaign() {
-        return campaign;
-    }
+public record CargoStatistics(Campaign campaign) {
 
     public Hangar getHangar() {
-        return getCampaign().getHangar();
+        return campaign().getHangar();
     }
 
     public double getTotalInsulatedCargoCapacity() {
@@ -101,14 +89,14 @@ public class CargoStatistics {
 
     @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
     public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
-        HangarStatistics stats = getCampaign().getHangarStatistics();
+        HangarStatistics stats = campaign().getHangarStatistics();
 
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
 
         // if we're in transit or the part is present and has a meaningful tonnage, accumulate it
         // not sure what the "in transit" flag is for, but I'm leaving it to retain current behavior
-        for (Part part : getCampaign().getWarehouse().getSpareParts()) {
+        for (Part part : campaign().getWarehouse().getSpareParts()) {
             if ((inTransit || part.isPresent()) && !Double.isNaN(part.getTonnage())) {
                 cargoTonnage += part.getQuantity() * part.getTonnage();
             }
@@ -124,12 +112,7 @@ public class CargoStatistics {
             Entity en = unit.getEntity();
             if (unit.isMothballed()) {
                 mothballedTonnage += en.getWeight();
-                continue;
             }
-            if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
-                continue;
-            }
-            // cargoTonnage += en.getWeight();
         }
         if (mothballed) {
             return mothballedTonnage;

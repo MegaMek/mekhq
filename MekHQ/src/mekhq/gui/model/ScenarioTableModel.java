@@ -47,10 +47,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -131,7 +131,7 @@ public class ScenarioTableModel extends DataTableModel {
         } else if (col == COL_STATUS) {
             if (campaign.getCampaignOptions().isUseStratCon() && scenario instanceof AtBScenario) {
                 AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                       (AtBScenario) scenario);
 
                 if (stratconScenario != null) {
@@ -180,13 +180,13 @@ public class ScenarioTableModel extends DataTableModel {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario) {
                     AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                    StratconCampaignState campaignState = contract.getStratconCampaignState();
-                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                    StratConCampaignState campaignState = contract.getStratconCampaignState();
+                    StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                           ((AtBScenario) scenario));
 
                     if (campaignState != null && stratconScenario != null) {
-                        StratconTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
-                        StratconCoords coords = stratconScenario.getCoords();
+                        StratConTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
+                        StratConCoords coords = stratconScenario.getCoords();
 
                         if (coords == null) {
                             return track.getDisplayableName();

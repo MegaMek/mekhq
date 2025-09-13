@@ -37,8 +37,8 @@ import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
 import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -68,16 +68,16 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconFacility;
-import mekhq.campaign.stratcon.StratconFacilityFactory;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest.ImageType;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConFacility;
+import mekhq.campaign.stratCon.StratConFacilityFactory;
+import mekhq.campaign.stratCon.StratConRulesManager;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
 import mekhq.utilities.ReportingUtilities;
@@ -127,8 +127,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private final float scale = 1f;
 
-    private StratconTrackState currentTrack;
-    private StratconCampaignState campaignState;
+    private StratConTrackState currentTrack;
+    private StratConCampaignState campaignState;
     private final Campaign campaign;
 
     private final BoardState boardState = new BoardState();
@@ -145,7 +145,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     // data structure holding how many unit/scenario/base icons have been drawn in
     // the hex
     // used to control how low the text description goes.
-    private final Map<StratconCoords, Integer> numIconsInHex = new HashMap<>();
+    private final Map<StratConCoords, Integer> numIconsInHex = new HashMap<>();
 
     private final StratconScenarioWizard scenarioWizard;
     private final TrackForceAssignmentUI assignmentUI;
@@ -179,7 +179,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     /**
      * Handler for when a specific track is selected - switches rendering to that track.
      */
-    public void selectTrack(StratconCampaignState campaignState, StratconTrackState track) {
+    public void selectTrack(StratConCampaignState campaignState, StratConTrackState track) {
         this.campaignState = campaignState;
         currentTrack = track;
 
@@ -194,14 +194,14 @@ public class StratconPanel extends JPanel implements ActionListener {
     /**
      * Constructs the right-click context menu, optionally for a scenario
      */
-    private void buildRightClickMenu(StratconCoords coords) {
+    private void buildRightClickMenu(StratConCoords coords) {
         rightClickMenu = new JPopupMenu();
 
-        StratconScenario scenario = getSelectedScenario();
+        StratConScenario scenario = getSelectedScenario();
 
         // display "Manage Force Assignment" if there is not a force already on the hex
         // except if there is already a non-cloaked scenario here.
-        if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
+        if (StratConRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
             menuItemManageForceAssignments = new JMenuItem();
             menuItemManageForceAssignments.setText("Manage Deployment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
@@ -272,7 +272,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 menuItemAddAlliedFacility.setText("Allied");
                 menuItemAddFacility.add(menuItemAddAlliedFacility);
 
-                for (StratconFacility facility : StratconFacilityFactory.getAlliedFacilities()) {
+                for (StratConFacility facility : StratConFacilityFactory.getAlliedFacilities()) {
                     JMenuItem facilityItem = new JMenuItem();
                     facilityItem.setText(facility.getDisplayableName());
                     facilityItem.setActionCommand(RCLICK_COMMAND_ADD_FACILITY);
@@ -285,7 +285,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 menuItemAddHostileFacility.setText("Hostile");
                 menuItemAddFacility.add(menuItemAddHostileFacility);
 
-                for (StratconFacility facility : StratconFacilityFactory.getHostileFacilities()) {
+                for (StratConFacility facility : StratConFacilityFactory.getHostileFacilities()) {
                     JMenuItem facilityItem = new JMenuItem();
                     facilityItem.setText(facility.getDisplayableName());
                     facilityItem.setActionCommand(RCLICK_COMMAND_ADD_FACILITY);
@@ -421,7 +421,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
-                StratconCoords currentCoords = new StratconCoords(x, y);
+                StratConCoords currentCoords = new StratConCoords(x, y);
 
                 if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(BLACK);
@@ -453,7 +453,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                     // draw fog of war if applicable
                     if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
-                        BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR,
+                        BufferedImage fogOfWarLayerImage = getImage(StratConBiomeManifest.FOG_OF_WAR,
                               ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
                             fogOfWarLayerImage = addTintToBufferedImage(fogOfWarLayerImage, BLUE);
@@ -476,7 +476,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                     // draw selected hex and also detect the clicked hex
                     if ((translatedClickedPoint != null) && graphHex.contains(translatedClickedPoint)) {
-                        BufferedImage selectedHexImage = getImage(StratconBiomeManifest.HEX_SELECTED,
+                        BufferedImage selectedHexImage = getImage(StratConBiomeManifest.HEX_SELECTED,
                               ImageType.TerrainTile);
                         if (selectedHexImage != null) {
                             g2D.drawImage(selectedHexImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
@@ -529,17 +529,17 @@ public class StratconPanel extends JPanel implements ActionListener {
         return imageCache.containsKey(imageKey);
     }
 
-    private BufferedImage getFacilityImage(StratconFacility facility) {
+    private BufferedImage getFacilityImage(StratConFacility facility) {
         String imageKeyPrefix = facility.getOwner() == Allied ?
-                                      StratconBiomeManifest.FACILITY_ALLIED :
-                                      StratconBiomeManifest.FACILITY_HOSTILE;
+                                      StratConBiomeManifest.FACILITY_ALLIED :
+                                      StratConBiomeManifest.FACILITY_HOSTILE;
         String imageKey = imageKeyPrefix + facility.getFacilityType().name();
 
         return getImage(imageKey, ImageType.Facility);
     }
 
     /**
-     * Retrieves a buffered image from a file given a key into the config file (StratconBiomeManifest.xml)
+     * Retrieves a buffered image from a file given a key into the config file (StratConBiomeManifest.xml)
      */
     private BufferedImage getImage(String imageKey, ImageType imageType) {
         if (imageCache.containsKey(imageKey)) {
@@ -550,10 +550,10 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         switch (imageType) {
             case TerrainTile:
-                imageName = StratconBiomeManifest.getInstance().getBiomeImage(imageKey);
+                imageName = StratConBiomeManifest.getInstance().getBiomeImage(imageKey);
                 break;
             case Facility:
-                imageName = StratconBiomeManifest.getInstance().getFacilityImage(imageKey);
+                imageName = StratConBiomeManifest.getInstance().getFacilityImage(imageKey);
                 break;
         }
 
@@ -604,8 +604,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
-                StratconCoords currentCoords = new StratconCoords(x, y);
-                StratconScenario scenario = currentTrack.getScenario(currentCoords);
+                StratConCoords currentCoords = new StratConCoords(x, y);
+                StratConScenario scenario = currentTrack.getScenario(currentCoords);
 
                 // if there's a scenario here that has a deployment/battle date
                 // or if there's a scenario here and the hex has been revealed
@@ -618,7 +618,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                  trackRevealed)) {
                     g2D.setColor(MekHQ.getMHQOptions().getFontColorNegative());
 
-                    BufferedImage scenarioImage = getImage(StratconBiomeManifest.FORCE_HOSTILE, ImageType.TerrainTile);
+                    BufferedImage scenarioImage = getImage(StratConBiomeManifest.FORCE_HOSTILE, ImageType.TerrainTile);
                     if (scenarioImage != null) {
                         g2D.drawImage(scenarioImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                     } else {
@@ -665,8 +665,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
-                StratconCoords currentCoords = new StratconCoords(x, y);
-                StratconFacility facility = currentTrack.getFacility(currentCoords);
+                StratConCoords currentCoords = new StratConCoords(x, y);
+                StratConFacility facility = currentTrack.getFacility(currentCoords);
 
                 if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == Allied ? Color.CYAN : Color.RED);
@@ -709,7 +709,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
-                StratconCoords currentCoords = new StratconCoords(x, y);
+                StratConCoords currentCoords = new StratConCoords(x, y);
 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
@@ -726,7 +726,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                         g2D.setColor(Color.GREEN);
 
-                        BufferedImage forceImage = getImage(StratconBiomeManifest.FORCE_FRIENDLY,
+                        BufferedImage forceImage = getImage(StratConBiomeManifest.FORCE_FRIENDLY,
                               ImageType.TerrainTile);
                         if (forceImage != null) {
                             g2D.drawImage(forceImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
@@ -765,7 +765,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Draws some text and line to it from a given polygon. Smart enough not to layer multiple strings on top of each
      * other if they're all drawn in the same hex.
      */
-    private void drawTextEffect(Graphics2D g2D, Shape marker, String text, StratconCoords coords) {
+    private void drawTextEffect(Graphics2D g2D, Shape marker, String text, StratConCoords coords) {
         int verticalOffsetIndex = numIconsInHex.getOrDefault(coords, 0);
 
         double startX = marker.getBounds().getMaxX();
@@ -888,7 +888,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             clickedPoint = e.getPoint();
             detectClickedHex();
 
-            StratconCoords selectedCoords = boardState.getSelectedCoords();
+            StratConCoords selectedCoords = boardState.getSelectedCoords();
             if (selectedCoords == null) {
                 return;
             }
@@ -899,15 +899,15 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
 
-    public StratconScenario getSelectedScenario() {
+    public StratConScenario getSelectedScenario() {
         return currentTrack.getScenario(boardState.getSelectedCoords());
     }
 
-    public StratconTrackState getCurrentTrack() {
+    public StratConTrackState getCurrentTrack() {
         return currentTrack;
     }
 
-    public StratconCoords getSelectedCoords() {
+    public StratConCoords getSelectedCoords() {
         return boardState.getSelectedCoords();
     }
 
@@ -951,7 +951,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
 
         if (coordsRevealed || currentTrack.isGmRevealed()) {
-            StratconFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
+            StratConFacility facility = currentTrack.getFacility(boardState.getSelectedCoords());
 
             if ((facility != null) && (facility.getFacilityType() != null)) {
                 if (facility.isStrategicObjective()) {
@@ -982,7 +982,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
         infoBuilder.append("<br/>");
 
-        StratconScenario selectedScenario = getSelectedScenario();
+        StratConScenario selectedScenario = getSelectedScenario();
         if (selectedScenario != null) {
             AtBDynamicScenario backingScenario = selectedScenario.getBackingScenario();
 
@@ -1003,11 +1003,11 @@ public class StratconPanel extends JPanel implements ActionListener {
         public Integer selectedX;
         public Integer selectedY;
 
-        public StratconCoords getSelectedCoords() {
+        public StratConCoords getSelectedCoords() {
             if ((selectedX == null) || (selectedY == null)) {
                 return null;
             } else {
-                return new StratconCoords(selectedX, selectedY);
+                return new StratConCoords(selectedX, selectedY);
             }
         }
     }
@@ -1035,7 +1035,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      *           <li>-- If deselected, the force is removed from the track's sticky forces.</li>
      *   <li><b>{@code RCLICK_COMMAND_REMOVE_FACILITY}:</b> Deletes the facility present at the selected coordinates.</li>
      *   <li><b>{@code RCLICK_COMMAND_CAPTURE_FACILITY}:</b> Changes the ownership of the facility at the selected coordinates
-     *       to a different faction or player, as per the rules defined in {@link StratconRulesManager}.</li>
+     *       to a different faction or player, as per the rules defined in {@link StratConRulesManager}.</li>
      *   <li><b>{@code RCLICK_COMMAND_ADD_FACILITY}:</b> Adds a new facility to the selected coordinates. The facility's
      *       properties (visibility, type, etc.) are copied from the provided source facility.</li>
      *   <li><b>{@code RCLICK_COMMAND_REMOVE_SCENARIO}:</b> Deletes the currently selected scenario from the campaign.</li>
@@ -1046,7 +1046,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      *
      *            <p><b>Behavior:</b></p>
      *            <ul>
-     *              <li>The method retrieves the {@link StratconCoords} currently selected by the user, and performs actions based on the
+     *              <li>The method retrieves the {@link StratConCoords} currently selected by the user, and performs actions based on the
      *                  provided command string in the event.</li>
      *              <li>The scenarios, forces, and facilities of the {@link #currentTrack} are modified based on the command type, and
      *                  updates are visually reflected in the UI.</li>
@@ -1054,7 +1054,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      *                  UI components are updated and made visible to the user.</li>
      *            </ul>
      *
-     *            <p><b>General Information:</b> If no valid {@link StratconCoords} are selected at the time of the event,
+     *            <p><b>General Information:</b> If no valid {@link StratConCoords} are selected at the time of the event,
      *            the method will terminate with no further action. Certain commands (e.g., {@code RCLICK_COMMAND_REVEAL_TRACK},
      *            {@code RCLICK_COMMAND_ADD_FACILITY}) require valid coordinates or source properties to execute successfully.</p>
      *
@@ -1062,13 +1062,13 @@ public class StratconPanel extends JPanel implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
-        StratconCoords selectedCoords = boardState.getSelectedCoords();
+        StratConCoords selectedCoords = boardState.getSelectedCoords();
         if (selectedCoords == null) {
             return;
         }
 
         boolean isPrimaryForce = false;
-        StratconScenario selectedScenario = currentTrack.getScenario(selectedCoords);
+        StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RCLICK_COMMAND_MANAGE_FORCES:
                 if (selectedScenario == null) {
@@ -1142,24 +1142,24 @@ public class StratconPanel extends JPanel implements ActionListener {
                 currentTrack.removeFacility(selectedCoords);
                 break;
             case RCLICK_COMMAND_CAPTURE_FACILITY:
-                StratconRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
+                StratConRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
                 break;
             case RCLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();
-                StratconFacility facility = (StratconFacility) eventSource.getClientProperty(RCLICK_COMMAND_ADD_FACILITY);
-                StratconFacility newFacility = facility.clone();
+                StratConFacility facility = (StratConFacility) eventSource.getClientProperty(RCLICK_COMMAND_ADD_FACILITY);
+                StratConFacility newFacility = facility.clone();
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
                 break;
             case RCLICK_COMMAND_REMOVE_SCENARIO:
-                StratconScenario scenario = getSelectedScenario();
+                StratConScenario scenario = getSelectedScenario();
 
                 if (scenario != null) {
                     campaign.removeScenario(scenario.getBackingScenario());
                 }
                 break;
             case RCLICK_COMMAND_RESET_DEPLOYMENT:
-                StratconScenario scenarioToReset = getSelectedScenario();
+                StratConScenario scenarioToReset = getSelectedScenario();
 
                 if (scenarioToReset != null) {
                     scenarioToReset.resetScenario(campaign);

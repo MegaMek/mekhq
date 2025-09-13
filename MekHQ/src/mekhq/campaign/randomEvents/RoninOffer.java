@@ -66,7 +66,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.randomEvents.RoninEventDialog;
 
@@ -93,11 +93,11 @@ public class RoninOffer {
      * choose whether to recruit them.
      *
      * @param campaign            The current {@link Campaign} instance associated with the game.
-     * @param campaignState       The optional {@link StratconCampaignState}. If {@code null} we will use a fallback
+     * @param campaignState       The optional {@link StratConCampaignState}. If {@code null} we will use a fallback
      *                            C-Bill cost, instead or Support Points.
      * @param requiredCombatTeams The number of combat teams needed, affecting the cost of hiring.
      */
-    public RoninOffer(Campaign campaign, @Nullable StratconCampaignState campaignState, int requiredCombatTeams) {
+    public RoninOffer(Campaign campaign, @Nullable StratConCampaignState campaignState, int requiredCombatTeams) {
         this.campaign = campaign;
 
         int roll = randomInt(5);
@@ -133,10 +133,10 @@ public class RoninOffer {
      *
      * @param campaign            The active {@link Campaign} instance.
      * @param ronin               The Ronin {@link Person} being offered for recruitment.
-     * @param campaignState       The optional {@link StratconCampaignState} providing strategic information.
+     * @param campaignState       The optional {@link StratConCampaignState} providing strategic information.
      * @param requiredCombatTeams The number of combat teams required for the recruitment.
      */
-    private void displayAndProcessConversation(Campaign campaign, Person ronin, StratconCampaignState campaignState,
+    private void displayAndProcessConversation(Campaign campaign, Person ronin, StratConCampaignState campaignState,
           int requiredCombatTeams) {
         String commanderAddress = campaign.getCommanderAddress();
         int response = displayInitialMessage(commanderAddress, ronin.getCallsign());

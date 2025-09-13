@@ -80,9 +80,9 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -414,8 +414,8 @@ public class StarLeagueCache {
         return unitWeights;
     }
 
-    public void createDudDialog(StratconTrackState track, StratconScenario scenario) {
-        StratconCoords stratconCoords = scenario.getCoords();
+    public void createDudDialog(StratConTrackState track, StratConScenario scenario) {
+        StratConCoords stratconCoords = scenario.getCoords();
 
         // Dialog dimensions and representative
         final int DIALOG_WIDTH = 400;

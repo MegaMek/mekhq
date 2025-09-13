@@ -38,8 +38,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
@@ -53,10 +53,10 @@ public class PrisonerEscapeeScenarioDialog extends ImmersiveDialogCore {
      * Creates a dialog to communicate the outcome of a prisoner escapee scenario trigger.
      *
      * @param campaign The current campaign instance, which provides the context for the dialog.
-     * @param track    The {@link StratconTrackState} associated with the prisoner escape scenario.
-     * @param coords   The coordinates ({@link StratconCoords}) where the scenario is taking place.
+     * @param track    The {@link StratConTrackState} associated with the prisoner escape scenario.
+     * @param coords   The coordinates ({@link StratConCoords}) where the scenario is taking place.
      */
-    public PrisonerEscapeeScenarioDialog(Campaign campaign, StratconTrackState track, StratconCoords coords) {
+    public PrisonerEscapeeScenarioDialog(Campaign campaign, StratConTrackState track, StratConCoords coords) {
         super(campaign,
               campaign.getSeniorAdminPerson(COMMAND),
               null,
@@ -94,13 +94,13 @@ public class PrisonerEscapeeScenarioDialog extends ImmersiveDialogCore {
      * StratCon track, and the sector coordinates where the scenario is taking place.</p>
      *
      * @param campaign The current campaign context, including player information.
-     * @param track    The {@link StratconTrackState} providing information about the track where the scenario is
+     * @param track    The {@link StratConTrackState} providing information about the track where the scenario is
      *                 occurring.
-     * @param coords   The {@link StratconCoords} representing the location of the event in game.
+     * @param coords   The {@link StratConCoords} representing the location of the event in game.
      *
      * @return A formatted string containing the in-character narrative message.
      */
-    private static String createInCharacterMessage(Campaign campaign, StratconTrackState track, StratconCoords coords) {
+    private static String createInCharacterMessage(Campaign campaign, StratConTrackState track, StratConCoords coords) {
         String commanderAddress = campaign.getCommanderAddress();
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "escapeeScenario.report",

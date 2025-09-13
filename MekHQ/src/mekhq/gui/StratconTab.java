@@ -60,10 +60,10 @@ import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionRemovedEvent;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.stratcon.StratconStrategicObjective;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.stratCon.StratConStrategicObjective;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -127,7 +127,7 @@ public class StratconTab extends CampaignGuiTab {
             @Override
             public void mousePressed(MouseEvent me) {
                 TrackDropdownItem currentTDI = listCurrentTrack.getSelectedValue();
-                StratconCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
+                StratConCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
                 objectivesCollapsed = !objectivesCollapsed;
                 objectiveStatusText.setText(getStrategicObjectiveText(campaignState));
             }
@@ -302,7 +302,7 @@ public class StratconTab extends CampaignGuiTab {
             return;
         }
 
-        StratconCampaignState campaignState = currentContract.getStratconCampaignState();
+        StratConCampaignState campaignState = currentContract.getStratconCampaignState();
         expandedObjectivePanel.setVisible(true);
 
         StringBuilder sb = new StringBuilder();
@@ -328,7 +328,7 @@ public class StratconTab extends CampaignGuiTab {
     /**
      * Builds strategic objective text, appropriately appending details if the objectives are not "collapsed".
      */
-    private String getStrategicObjectiveText(StratconCampaignState campaignState) {
+    private String getStrategicObjectiveText(StratConCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>")
               .append(buildShortStrategicObjectiveText(campaignState));
@@ -348,11 +348,11 @@ public class StratconTab extends CampaignGuiTab {
     /**
      * Builds strategic objective one-liner summary
      */
-    private String buildShortStrategicObjectiveText(StratconCampaignState campaignState) {
+    private String buildShortStrategicObjectiveText(StratConCampaignState campaignState) {
         int completedObjectives = 0, desiredObjectives = 0;
 
-        for (StratconTrackState track : campaignState.getTracks()) {
-            for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
+        for (StratConTrackState track : campaignState.getTracks()) {
+            for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
                 desiredObjectives++;
 
                 if (objective.isObjectiveCompleted(track)) {
@@ -388,7 +388,7 @@ public class StratconTab extends CampaignGuiTab {
     /**
      * Builds detailed strategic objective list
      */
-    private String buildStrategicObjectiveText(StratconCampaignState campaignState) {
+    private String buildStrategicObjectiveText(StratConCampaignState campaignState) {
         StringBuilder sb = new StringBuilder();
 
         // loop through all tracks
@@ -399,8 +399,8 @@ public class StratconTab extends CampaignGuiTab {
         // if hostile facility "capture or destroy [facility name]"
         // if allied facility "maintain control of [facility name]"
         // if revealed, " on track [current track] at coordinates [coords]
-        for (StratconTrackState track : campaignState.getTracks()) {
-            for (StratconStrategicObjective objective : track.getStrategicObjectives()) {
+        for (StratConTrackState track : campaignState.getTracks()) {
+            for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
                 boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
                 boolean displayCoordinateData = objective.getObjectiveCoords() != null;
                 boolean objectiveCompleted = objective.isObjectiveCompleted(track);
@@ -515,9 +515,9 @@ public class StratconTab extends CampaignGuiTab {
                 continue;
             }
 
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
             if (campaignState != null) {
-                for (StratconTrackState track : campaignState.getTracks()) {
+                for (StratConTrackState track : campaignState.getTracks()) {
                     TrackDropdownItem trackItem = new TrackDropdownItem(contract, track);
                     listModel.addElement(trackItem);
                 }
@@ -582,9 +582,9 @@ public class StratconTab extends CampaignGuiTab {
      */
     private static class TrackDropdownItem {
         AtBContract contract;
-        StratconTrackState track;
+        StratConTrackState track;
 
-        public TrackDropdownItem(AtBContract contract, StratconTrackState track) {
+        public TrackDropdownItem(AtBContract contract, StratConTrackState track) {
             this.contract = contract;
             this.track = track;
         }

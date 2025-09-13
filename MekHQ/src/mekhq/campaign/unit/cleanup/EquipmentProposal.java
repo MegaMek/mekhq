@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import megamek.common.equipment.Mounted;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -48,7 +48,7 @@ import mekhq.campaign.unit.Unit;
 public class EquipmentProposal {
     // region Variable Declarations
     protected final Unit unit;
-    protected final Map<Integer, Mounted> equipment = new HashMap<>();
+    protected final Map<Integer, Mounted<?>> equipment = new HashMap<>();
     protected final Map<Part, Integer> original = new HashMap<>();
     protected final Map<Part, Integer> mapped = new HashMap<>();
     // endregion Variable Declarations
@@ -84,7 +84,7 @@ public class EquipmentProposal {
         return Collections.unmodifiableSet(original.keySet());
     }
 
-    public Set<Map.Entry<Integer, Mounted>> getEquipment() {
+    public Set<Map.Entry<Integer, Mounted<?>>> getEquipment() {
         return Collections.unmodifiableSet(equipment.entrySet());
     }
 

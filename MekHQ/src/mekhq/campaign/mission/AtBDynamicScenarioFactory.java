@@ -117,13 +117,13 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconFacility;
-import mekhq.campaign.stratcon.StratconFacility.FacilityType;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConContractInitializer;
+import mekhq.campaign.stratCon.StratConFacility;
+import mekhq.campaign.stratCon.StratConFacility.FacilityType;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -1014,10 +1014,10 @@ public class AtBDynamicScenarioFactory {
                         int fighterMultiplier = 0;
 
                         try {
-                            StratconTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
+                            StratConTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
 
                             if (scenarioHomeTrack != null) {
-                                for (StratconFacility facility : scenarioHomeTrack.getFacilities().values()) {
+                                for (StratConFacility facility : scenarioHomeTrack.getFacilities().values()) {
                                     if (facility.getFacilityType().equals(FacilityType.AirBase)) {
                                         fighterMultiplier++;
                                     }
@@ -1304,27 +1304,27 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Retrieves the {@link StratconTrackState} associated with the given {@link AtBDynamicScenario}.
+     * Retrieves the {@link StratConTrackState} associated with the given {@link AtBDynamicScenario}.
      * <p>
-     * This method iterates over all {@link StratconTrackState} instances in the provided {@link AtBContract}'s
-     * {@link StratconCampaignState} to find the track that contains a {@link StratconScenario} corresponding to the
+     * This method iterates over all {@link StratConTrackState} instances in the provided {@link AtBContract}'s
+     * {@link StratConCampaignState} to find the track that contains a {@link StratConScenario} corresponding to the
      * specified {@link AtBDynamicScenario}. If a match is found, the track is returned; otherwise, {@code null} is
      * returned.
      * </p>
      *
      * @param scenario the {@link AtBDynamicScenario} whose associated track is to be identified.
-     * @param contract the {@link AtBContract} containing the {@link StratconCampaignState} with all available tracks.
+     * @param contract the {@link AtBContract} containing the {@link StratConCampaignState} with all available tracks.
      *
-     * @return the {@link StratconTrackState} that contains the {@link StratconScenario} backed by the specified
+     * @return the {@link StratConTrackState} that contains the {@link StratConScenario} backed by the specified
      *       {@link AtBDynamicScenario}, or {@code null} if no matching track is found.
      */
-    private static @Nullable StratconTrackState getStratconTrackState(AtBDynamicScenario scenario,
+    private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
           AtBContract contract) {
-        List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
-        StratconTrackState scenarioHomeTrack = null;
+        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        StratConTrackState scenarioHomeTrack = null;
 
-        for (StratconTrackState track : tracks) {
-            for (StratconScenario stratconScenario : track.getScenarios().values()) {
+        for (StratConTrackState track : tracks) {
+            for (StratConScenario stratconScenario : track.getScenarios().values()) {
                 if (stratconScenario.getBackingScenarioID() == scenario.getId()) {
                     scenarioHomeTrack = track;
                     break;
@@ -1769,9 +1769,9 @@ public class AtBDynamicScenarioFactory {
         // otherwise, pick one from the allowed ones
         if (scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain) {
             scenario.setBoardType(T_GROUND);
-            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
-            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+            StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
                                                 .floorEntry(kelvinTemp)
                                                 .getValue().allowedTerrainTypes;
 
@@ -1788,12 +1788,12 @@ public class AtBDynamicScenarioFactory {
             scenario.setTerrain();
             scenario.setMapFile();
         } else {
-            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
-            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedFacility = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+            StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedFacility = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
                                                  .floorEntry(kelvinTemp)
                                                  .getValue().allowedTerrainTypes;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
                                                 .floorEntry(kelvinTemp)
                                                 .getValue().allowedTerrainTypes;
             List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
@@ -4123,10 +4123,10 @@ public class AtBDynamicScenarioFactory {
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
             AtBContract contract = scenario.getContract(campaign);
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
 
-            for (StratconTrackState track : campaignState.getTracks()) {
-                StratconScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
+            for (StratConTrackState track : campaignState.getTracks()) {
+                StratConScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
                 if (stratconScenario != null) {
                     primaryForceIDs = stratconScenario.getPrimaryForceIDs();
                 }

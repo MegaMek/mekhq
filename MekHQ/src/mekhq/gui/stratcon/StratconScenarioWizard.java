@@ -35,18 +35,18 @@ package mekhq.gui.stratcon;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INSTANT;
-import static mekhq.campaign.stratcon.StratconRulesManager.calculateReinforcementTargetNumber;
-import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
-import static mekhq.campaign.stratcon.StratconRulesManager.getReinforcementType;
-import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
+import static mekhq.campaign.stratCon.StratConRulesManager.BASE_LEADERSHIP_BUDGET;
+import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementEligibilityType;
+import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType;
+import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INSTANT;
+import static mekhq.campaign.stratCon.StratConRulesManager.calculateReinforcementTargetNumber;
+import static mekhq.campaign.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
+import static mekhq.campaign.stratCon.StratConRulesManager.getReinforcementType;
+import static mekhq.campaign.stratCon.StratConRulesManager.processReinforcementDeployment;
+import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
 
 import java.awt.BorderLayout;
@@ -69,9 +69,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -81,10 +81,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConRulesManager;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.StratconPanel;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
@@ -98,10 +98,10 @@ import org.apache.commons.math3.util.Pair;
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratconScenarioWizard extends JDialog {
-    private StratconScenario currentScenario;
+    private StratConScenario currentScenario;
     private final Campaign campaign;
-    private StratconTrackState currentTrackState;
-    private StratconCampaignState currentCampaignState;
+    private StratConTrackState currentTrackState;
+    private StratConCampaignState currentCampaignState;
     private final String resourcePath = "mekhq.resources.AtBStratCon";
     private final transient ResourceBundle resources = ResourceBundle.getBundle(resourcePath,
           MekHQ.getMHQOptions().getLocale());
@@ -136,9 +136,9 @@ public class StratconScenarioWizard extends JDialog {
      * Configures and sets the current Stratcon scenario, updating the associated track and campaign states as well as
      * preparing the available forces and units for the scenario.
      *
-     * @param scenario       the {@link StratconScenario} to be set as the current scenario.
-     * @param trackState     the {@link StratconTrackState} representing the state of the scenario's track.
-     * @param campaignState  the {@link StratconCampaignState} representing the state of the overall campaign.
+     * @param scenario       the {@link StratConScenario} to be set as the current scenario.
+     * @param trackState     the {@link StratConTrackState} representing the state of the scenario's track.
+     * @param campaignState  the {@link StratConCampaignState} representing the state of the overall campaign.
      * @param isPrimaryForce a boolean flag indicating whether the primary force is being assigned for this scenario.
      *                                             <ul>
      *                                               <li>{@code true}: Indicates that the primary force is being deployed.</li>
@@ -148,12 +148,12 @@ public class StratconScenarioWizard extends JDialog {
      *                       <p>Functionality and Process:</p>
      *                       <ul>
      *                         <li>Sets the provided scenario as the {@code currentScenario}.</li>
-     *                         <li>Updates the {@link StratconCampaignState}, {@link StratconTrackState}, and clears previous force/unit lists.</li>
+     *                         <li>Updates the {@link StratConCampaignState}, {@link StratConTrackState}, and clears previous force/unit lists.</li>
      *                         <li>Initializes the user interface by calling {@link #setUI(boolean)}, passing the {@code isPrimaryForce} parameter.</li>
      *                       </ul>
      */
-    public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState,
-          StratconCampaignState campaignState, boolean isPrimaryForce) {
+    public void setCurrentScenario(StratConScenario scenario, StratConTrackState trackState,
+          StratConCampaignState campaignState, boolean isPrimaryForce) {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
@@ -435,7 +435,7 @@ public class StratconScenarioWizard extends JDialog {
         gbc.gridy++;
 
         // Obtain eligible infantry units
-        List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleFrontlineUnits(campaign, currentScenario);
+        List<Unit> eligibleInfantryUnits = StratConRulesManager.getEligibleFrontlineUnits(campaign, currentScenario);
         eligibleInfantryUnits.sort(Comparator.comparing(Unit::getName));
 
         // Add a unit selector for infantry units
@@ -503,7 +503,7 @@ public class StratconScenarioWizard extends JDialog {
         JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
-              StratconRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
+              StratConRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
                     campaign,
                     currentTrackState,
                     (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
@@ -697,7 +697,7 @@ public class StratconScenarioWizard extends JDialog {
      *                               <li>The button opens the {@link #reinforcementConfirmDialog()}, which handles
      *                                   reinforcement confirmation logic.</li>
      *                               <li>The button is only enabled if the current campaign has sufficient support points,
-     *                                   as determined by {@link StratconCampaignState#getSupportPoints()}.</li>
+     *                                   as determined by {@link StratConCampaignState#getSupportPoints()}.</li>
      *                             </ul>
      *                         </li>
      *                         <li>The button is added to the content panel, with its position controlled by the provided
@@ -907,7 +907,7 @@ public class StratconScenarioWizard extends JDialog {
 
         // every force that's been deployed to this scenario gets assigned to the track
         for (int forceID : currentScenario.getAssignedForces()) {
-            StratconRulesManager.processForceDeployment(currentScenario.getCoords(),
+            StratConRulesManager.processForceDeployment(currentScenario.getCoords(),
                   forceID,
                   campaign,
                   currentTrackState,

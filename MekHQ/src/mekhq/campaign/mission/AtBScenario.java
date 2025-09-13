@@ -87,11 +87,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -228,7 +228,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
           MekHQ.getMHQOptions().getLocale());
 
     private static TerrainConditionsOddsManifest TCO;
-    private static StratconBiomeManifest SB;
+    private static StratConBiomeManifest SB;
     private int modifiedTemperature;
     // endregion Variable Declarations
 
@@ -248,7 +248,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         forceCount = 0;
         rerollsRemaining = 0;
         TCO = TerrainConditionsOddsManifest.getInstance();
-        SB = StratconBiomeManifest.getInstance();
+        SB = StratConBiomeManifest.getInstance();
     }
 
     public void initialize(Campaign campaign, CombatTeam combatTeam, boolean attacker, LocalDate date) {
@@ -2336,43 +2336,43 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     /**
-     * Retrieves the {@link StratconScenario} associated with the given {@link AtBScenario} for the specified
+     * Retrieves the {@link StratConScenario} associated with the given {@link AtBScenario} for the specified
      * {@link AtBContract}.
      *
-     * <p>This method attempts to locate a {@link StratconScenario} that matches the provided
-     * {@link AtBScenario} within the tracks of the {@link StratconCampaignState} associated with the provided contract.
+     * <p>This method attempts to locate a {@link StratConScenario} that matches the provided
+     * {@link AtBScenario} within the tracks of the {@link StratConCampaignState} associated with the provided contract.
      * If the campaign state, tracks, or scenarios are unavailable, or if no match is found, the method returns
      * {@code null}.
      *
-     * <p>The search proceeds by iterating through all {@link StratconTrackState} objects
-     * in the campaign state. For each track, it goes through the collection of associated {@link StratconScenario}
-     * instances. If a {@link StratconScenario} has a non-null {@link AtBDynamicScenario} that matches the provided
-     * {@link AtBScenario}, the method returns that {@link StratconScenario}.
+     * <p>The search proceeds by iterating through all {@link StratConTrackState} objects
+     * in the campaign state. For each track, it goes through the collection of associated {@link StratConScenario}
+     * instances. If a {@link StratConScenario} has a non-null {@link AtBDynamicScenario} that matches the provided
+     * {@link AtBScenario}, the method returns that {@link StratConScenario}.
      *
-     * @param contract    the {@link AtBContract} from which to retrieve the {@link StratconCampaignState} and
+     * @param contract    the {@link AtBContract} from which to retrieve the {@link StratConCampaignState} and
      *                    associated tracks
-     * @param atBScenario the {@link AtBScenario} to match against the backing scenarios of the {@link StratconScenario}
+     * @param atBScenario the {@link AtBScenario} to match against the backing scenarios of the {@link StratConScenario}
      *                    instances
      *
-     * @return the matching {@link StratconScenario} if found, or {@code null} if no match is found or any required data
+     * @return the matching {@link StratConScenario} if found, or {@code null} if no match is found or any required data
      *       is missing
      */
-    public @Nullable StratconScenario getStratconScenario(AtBContract contract, AtBScenario atBScenario) {
+    public @Nullable StratConScenario getStratconScenario(AtBContract contract, AtBScenario atBScenario) {
         if (contract == null || atBScenario == null) {
             return null;
         }
 
         // Fetch campaign state
-        StratconCampaignState campaignState = contract.getStratconCampaignState();
+        StratConCampaignState campaignState = contract.getStratconCampaignState();
         if (campaignState == null) {
             return null;
         }
 
         // Find associated StratCon Scenario, if any
-        for (StratconTrackState track : campaignState.getTracks()) {
-            Collection<StratconScenario> trackScenarios = track.getScenarios().values();
+        for (StratConTrackState track : campaignState.getTracks()) {
+            Collection<StratConScenario> trackScenarios = track.getScenarios().values();
 
-            for (StratconScenario stratconScenario : trackScenarios) {
+            for (StratConScenario stratconScenario : trackScenarios) {
                 AtBDynamicScenario backingScenario = stratconScenario.getBackingScenario();
                 if (backingScenario == null) {
                     continue;

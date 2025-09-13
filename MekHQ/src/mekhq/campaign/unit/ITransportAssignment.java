@@ -35,13 +35,13 @@ package mekhq.campaign.unit;
 
 import java.util.Optional;
 
-import megamek.common.equipment.Transporter;
 import megamek.common.bays.Bay;
+import megamek.common.equipment.Transporter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
 
 /**
- * Represents an assignment on a transport.
+ * Represents an assignment on transport.
  *
  * @see ITransportedUnitsSummary
  * @see mekhq.campaign.enums.CampaignTransportType
@@ -51,7 +51,6 @@ public interface ITransportAssignment {
     /**
      * The transport that is assigned
      *
-     * @return
      */
     Unit getTransport();
 
@@ -88,7 +87,7 @@ public interface ITransportAssignment {
      * @param campaign Campaign we need to fix references for
      * @param unit     Unit we need to fix references for
      *
-     * @see Unit#fixReferences(Campaign campaign)
+     * @see Unit#fixReferences(Campaign)
      */
     void fixReferences(Campaign campaign, Unit unit);
 

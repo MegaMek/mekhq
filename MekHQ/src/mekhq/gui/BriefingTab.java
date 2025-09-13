@@ -115,8 +115,8 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -706,7 +706,7 @@ public final class BriefingTab extends CampaignGuiTab {
             case SUCCESS, PARTIAL -> {
                 if ((getCampaign().getCampaignOptions().isUseStratCon()) &&
                           (mission instanceof AtBContract)) {
-                    StratconCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
+                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
 
                     if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
                         yield getCampaign().getCampaignOptions().getMissionXpSuccess();
@@ -798,7 +798,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // This handles StratCon undeployment
             if (scenario instanceof AtBScenario) {
                 AtBContract contract = ((AtBScenario) scenario).getContract(getCampaign());
-                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                StratConScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                       (AtBScenario) scenario);
 
                 if (stratConScenario != null) {

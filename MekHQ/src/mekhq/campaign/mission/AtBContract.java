@@ -66,7 +66,7 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
-import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
+import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 
@@ -135,10 +135,10 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconContractDefinition;
-import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConContractDefinition;
+import mekhq.campaign.stratCon.StratConContractInitializer;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -216,7 +216,7 @@ public class AtBContract extends Contract {
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
 
-    private StratconCampaignState stratconCampaignState;
+    private StratConCampaignState stratconCampaignState;
     private boolean isAttacker;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBContract",
@@ -442,14 +442,14 @@ public class AtBContract extends Contract {
 
                 // If we have a StratCon enabled contract, regenerate Scenario Odds
                 if (stratconCampaignState != null) {
-                    StratconContractDefinition contractDefinition = getContractDefinition(getContractType());
+                    StratConContractDefinition contractDefinition = getContractDefinition(getContractType());
 
                     if (contractDefinition != null) {
                         List<Integer> definedScenarioOdds = contractDefinition.getScenarioOdds();
 
                         int scenarioOddsMultiplier = randomInt(20) == 0 ? 2 : 1;
 
-                        for (StratconTrackState trackState : stratconCampaignState.getTracks()) {
+                        for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
                             int baseScenarioOdds = getRandomItem(definedScenarioOdds);
 
                             trackState.setScenarioOdds(baseScenarioOdds * scenarioOddsMultiplier);
@@ -958,7 +958,7 @@ public class AtBContract extends Contract {
                                 specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                                 specialEventScenarioType = AtBScenario.AMBUSH;
                             } else {
-                                StratconCampaignState campaignState = getStratconCampaignState();
+                                StratConCampaignState campaignState = getStratconCampaignState();
 
                                 if (campaignState != null) {
                                     text += ": -1 Support Point";
@@ -1284,8 +1284,8 @@ public class AtBContract extends Contract {
                     specialEventScenarioDate = MHQXMLUtility.parseDate(item.getTextContent().trim());
                 } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                     specialEventScenarioType = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
-                    stratconCampaignState = StratconCampaignState.Deserialize(item);
+                } else if (item.getNodeName().equalsIgnoreCase(StratConCampaignState.ROOT_XML_ELEMENT_NAME)) {
+                    stratconCampaignState = StratConCampaignState.Deserialize(item);
                     stratconCampaignState.setContract(this);
                     this.setStratConCampaignState(stratconCampaignState);
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
@@ -1622,20 +1622,20 @@ public class AtBContract extends Contract {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
 
-    public StratconCampaignState getStratconCampaignState() {
+    public StratConCampaignState getStratconCampaignState() {
         return stratconCampaignState;
     }
 
-    public void setStratConCampaignState(StratconCampaignState state) {
+    public void setStratConCampaignState(StratConCampaignState state) {
         stratconCampaignState = state;
     }
 
     @Override
     public void acceptContract(Campaign campaign) {
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            StratconContractDefinition stratconContractDefinition = getContractDefinition(getContractType());
+            StratConContractDefinition stratconContractDefinition = getContractDefinition(getContractType());
             if (stratconContractDefinition != null) {
-                StratconContractInitializer.initializeCampaignState(this, campaign, stratconContractDefinition);
+                StratConContractInitializer.initializeCampaignState(this, campaign, stratconContractDefinition);
             }
         }
     }

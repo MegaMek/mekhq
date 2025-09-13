@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;

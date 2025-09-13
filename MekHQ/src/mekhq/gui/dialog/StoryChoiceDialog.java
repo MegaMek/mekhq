@@ -45,8 +45,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import javax.swing.*;
 
-import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint;
+import mekhq.campaign.storyArc.StoryArc;
+import mekhq.campaign.storyArc.storypoint.ChoiceStoryPoint;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.panels.StoryChoicePanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;

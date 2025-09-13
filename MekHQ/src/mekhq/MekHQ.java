@@ -110,7 +110,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
@@ -918,7 +918,7 @@ public class MekHQ implements GameListener {
     private void initEventHandlers() {
         EVENT_BUS.register(new XPHandler());
 
-        StratconRulesManager srm = new StratconRulesManager();
+        StratConRulesManager srm = new StratConRulesManager();
         srm.startup();
         EVENT_BUS.register(srm);
     }

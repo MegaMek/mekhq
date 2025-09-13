@@ -47,9 +47,9 @@ import javax.swing.ListSelectionModel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
@@ -63,7 +63,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     private static final String CMD_CONFIRM = "CMD_TRACK_FORCE_CONFIRM";
 
     private Campaign campaign;
-    private StratconCampaignState currentCampaignState;
+    private StratConCampaignState currentCampaignState;
     private JList<Force> availableForceList = new JList<>();
     private JButton btnConfirm = new JButton();
     private StratconPanel ownerPanel;
@@ -99,7 +99,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
         // if we're waiting to assign primary forces, we can only do so from the current track
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
-              StratconRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
+              StratConRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
                     campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
 
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -123,7 +123,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     /**
      * Display the track force assignment UI.
      */
-    public void display(Campaign campaign, StratconCampaignState campaignState, StratconCoords coords) {
+    public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords) {
         this.campaign = campaign;
         this.currentCampaignState = campaignState;
 
@@ -140,7 +140,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
             // clicking the button fifty times and getting a bunch of scenarios.
             btnConfirm.setEnabled(false);
             for (Force force : availableForceList.getSelectedValuesList()) {
-                StratconRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
+                StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
                       force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
             }
             setVisible(false);

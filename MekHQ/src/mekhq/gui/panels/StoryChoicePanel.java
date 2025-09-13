@@ -41,7 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyArc.StoryArc;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 

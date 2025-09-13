@@ -46,8 +46,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import mekhq.campaign.storyarc.Personality;
-import mekhq.campaign.storyarc.storypoint.DialogStoryPoint;
+import mekhq.campaign.storyArc.Personality;
+import mekhq.campaign.storyArc.storypoint.DialogStoryPoint;
 
 /**
  * This is the base class for dialogs related to the Story Arc, to help create a similar look and feel. Inheriting

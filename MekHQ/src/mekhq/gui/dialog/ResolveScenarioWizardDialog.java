@@ -85,7 +85,7 @@ import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
@@ -1632,13 +1632,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        StratconRulesManager.processScenarioCompletion(tracker);
+        StratConRulesManager.processScenarioCompletion(tracker);
 
         if (reinforcementsSent &&
                   tracker.getScenario().getStatus().isOverallVictory() &&
                   tracker.getScenario().getLinkedScenario() != 0) {
 
-            StratconRulesManager.linkedScenarioProcessing(tracker, linkedForces);
+            StratConRulesManager.linkedScenarioProcessing(tracker, linkedForces);
         }
 
         aborted = false;

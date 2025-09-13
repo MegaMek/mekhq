@@ -54,7 +54,7 @@ import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -513,7 +513,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will not be captured.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                        StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               (AtBContract) tracker.getMission(),
                               false,
                               false);
@@ -525,7 +525,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will be destroyed.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                        StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               (AtBContract) tracker.getMission(),
                               true,
                               false);
@@ -537,7 +537,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "Allied forces will control this facility.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                        StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               (AtBContract) tracker.getMission(),
                               false,
                               true);

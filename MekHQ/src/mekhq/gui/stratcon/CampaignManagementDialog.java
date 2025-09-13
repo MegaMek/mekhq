@@ -45,9 +45,9 @@ import javax.swing.JLabel;
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConRulesManager;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.StratconTab;
 
 /**
@@ -57,7 +57,7 @@ import mekhq.gui.StratconTab;
  */
 public class CampaignManagementDialog extends JDialog {
     private Campaign campaign;
-    private StratconCampaignState currentCampaignState;
+    private StratConCampaignState currentCampaignState;
     private final StratconTab parent;
     private JButton btnRemoveCVP;
     private JButton btnGMRemoveSP;
@@ -77,8 +77,8 @@ public class CampaignManagementDialog extends JDialog {
     /**
      * Show the dialog for a given campaign state, and whether GM mode is on or not
      */
-    public void display(Campaign campaign, StratconCampaignState campaignState,
-          StratconTrackState currentTrack, boolean gmMode) {
+    public void display(Campaign campaign, StratConCampaignState campaignState,
+          StratConTrackState currentTrack, boolean gmMode) {
         currentCampaignState = campaignState;
 
         btnRemoveCVP.setEnabled(gmMode);
@@ -89,7 +89,7 @@ public class CampaignManagementDialog extends JDialog {
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
             lblTrackScenarioOdds.setText(String.format(resources.getString("trackScenarioOdds.text"),
-                  StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
+                  StratConRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
                         false)));
         }
 

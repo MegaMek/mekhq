@@ -43,7 +43,7 @@ import javax.swing.ListSelectionModel;
 import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;

@@ -83,8 +83,8 @@ import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
-import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
-import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
+import static mekhq.campaign.stratCon.StratConRulesManager.processIgnoredDynamicScenario;
+import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
@@ -273,11 +273,11 @@ import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.storyArc.StoryArc;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConContractInitializer;
+import mekhq.campaign.stratCon.StratConRulesManager;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
@@ -1467,7 +1467,7 @@ public class Campaign implements ITechManager {
     public void importMission(final Mission mission) {
         mission.getScenarios().forEach(this::importScenario);
         addMissionWithoutId(mission);
-        StratconContractInitializer.restoreTransientStratconInformation(mission, this);
+        StratConContractInitializer.restoreTransientStratconInformation(mission, this);
     }
 
     private void addMissionWithoutId(Mission m) {
@@ -2976,7 +2976,7 @@ public class Campaign implements ITechManager {
     public List<Unit> getServiceableUnits() {
         List<Unit> service = new ArrayList<>();
         for (Unit u : getUnits()) {
-            if (u.isAvailable() && u.isServiceable() && !StratconRulesManager.isUnitDeployedToStratCon(u)) {
+            if (u.isAvailable() && u.isServiceable() && !StratConRulesManager.isUnitDeployedToStratCon(u)) {
                 service.add(u);
             }
         }
@@ -5061,7 +5061,7 @@ public class Campaign implements ITechManager {
 
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
-                StratconCampaignState campaignState = contract.getStratconCampaignState();
+                StratConCampaignState campaignState = contract.getStratconCampaignState();
 
                 if (campaignState != null && deficit > 0) {
                     addReport(String.format(resources.getString("contractBreach.text"),
@@ -5089,7 +5089,7 @@ public class Campaign implements ITechManager {
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
                     if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
-                        StratconCampaignState campaignState = contract.getStratconCampaignState();
+                        StratConCampaignState campaignState = contract.getStratconCampaignState();
 
                         if (campaignState == null) {
                             return;
@@ -6758,7 +6758,7 @@ public class Campaign implements ITechManager {
             if ((mission instanceof AtBContract) &&
                       (((AtBContract) mission).getStratconCampaignState() != null) &&
                       (scenario instanceof AtBDynamicScenario)) {
-                ((AtBContract) mission).getStratconCampaignState().removeStratconScenario(scenario.getId());
+                ((AtBContract) mission).getStratconCampaignState().removeStratConScenario(scenario.getId());
             }
         }
         scenarios.remove(scenario.getId());
@@ -6817,7 +6817,7 @@ public class Campaign implements ITechManager {
         // clear out StratCon force assignments
         for (AtBContract contract : getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() != null) {
-                for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
+                for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
                     track.unassignForce(fid);
                 }
             }

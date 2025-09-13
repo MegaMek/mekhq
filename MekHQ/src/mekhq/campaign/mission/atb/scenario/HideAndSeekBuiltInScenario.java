@@ -47,8 +47,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
@@ -69,7 +69,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        Map<String, MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        Map<String, MapTypeList> mapTypes = StratConBiomeManifest.getInstance().getBiomeMapTypes();
         List<String> keys = mapTypes.keySet().stream().sorted().toList();
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));

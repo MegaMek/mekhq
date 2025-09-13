@@ -65,7 +65,7 @@ import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.utilities.MHQXMLUtility;
 
 @XmlRootElement(name = "TerrainConditionsOddsManifest")
@@ -140,7 +140,7 @@ public class TerrainConditionsOddsManifest {
     }
 
     private static void validations() {
-        Set<String> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes().keySet();
+        Set<String> mapTypes = StratConBiomeManifest.getInstance().getBiomeMapTypes().keySet();
         List<String> types = List.of(Light.class.getSimpleName(),
               Wind.class.getSimpleName(),
               Weather.class.getSimpleName(),

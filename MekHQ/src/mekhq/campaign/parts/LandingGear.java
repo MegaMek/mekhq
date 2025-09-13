@@ -82,7 +82,7 @@ public class LandingGear extends Part {
                     hits = 0;
                 }
             } else if (unit.getEntity() instanceof LandAirMek) {
-                hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_LANDING_GEAR);
+                hits = unit.getHitCriticalSlots(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_LANDING_GEAR);
             }
             if (checkForDestruction
                       && hits > priorHits

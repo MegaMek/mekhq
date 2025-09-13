@@ -58,8 +58,8 @@ import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
-import mekhq.campaign.stratcon.StratconContractDefinition;
-import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratCon.StratConContractDefinition;
+import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -606,9 +606,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         // campaign
         // to ensure presence of mission ID
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            StratconContractInitializer.initializeCampaignState(contract,
+            StratConContractInitializer.initializeCampaignState(contract,
                   campaign,
-                  Objects.requireNonNull(StratconContractDefinition.getContractDefinition(contract.getContractType())));
+                  Objects.requireNonNull(StratConContractDefinition.getContractDefinition(contract.getContractType())));
         }
 
         setVisible(false);
