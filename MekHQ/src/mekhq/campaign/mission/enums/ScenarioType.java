@@ -44,7 +44,7 @@ import megamek.logging.MMLogger;
  * <p>Currently available scenario types:</p>
  * <ul>
  *   <li>{@code NONE} - Default scenario type.</li>
- *   <li>{@code SPECIAL_LOSTECH} - Indicates a special LosTech-related scenario.</li>
+ *   <li>{@code SPECIAL_LOS_TECH} - Indicates a special LosTech-related scenario.</li>
  *   <li>{@code SPECIAL_RESUPPLY} - Indicates a resupply-related scenario.</li>
  * </ul>
  *
@@ -53,7 +53,7 @@ import megamek.logging.MMLogger;
  */
 public enum ScenarioType {
     NONE,
-    SPECIAL_LOSTECH,
+    SPECIAL_LOS_TECH,
     SPECIAL_RESUPPLY,
     SPECIAL_JAIL_BREAK,
     CONVOY;
@@ -62,7 +62,7 @@ public enum ScenarioType {
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
      */
     public boolean isLosTech() {
-        return this == SPECIAL_LOSTECH;
+        return this == SPECIAL_LOS_TECH;
     }
 
     /**
@@ -91,7 +91,7 @@ public enum ScenarioType {
      * @return {@code true} if the instance is one of the special types; {@code false} otherwise.
      */
     public boolean isSpecial() {
-        return this == SPECIAL_LOSTECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK;
+        return this == SPECIAL_LOS_TECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK;
     }
 
     /**

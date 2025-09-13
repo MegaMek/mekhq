@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,9 +36,9 @@ import java.util.ArrayList;
 
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
+import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.loaders.MekSummary;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -52,7 +52,7 @@ import mekhq.campaign.rating.IUnitRating;
 public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScenario {
     @Override
     public int getScenarioType() {
-        return STARLEAGUECACHE2;
+        return STAR_LEAGUE_CACHE_2;
     }
 
     @Override

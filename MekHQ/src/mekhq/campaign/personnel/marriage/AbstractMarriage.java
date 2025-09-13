@@ -383,7 +383,7 @@ public abstract class AbstractMarriage {
             spouseGender = personGender.isMale() ? Gender.FEMALE : Gender.MALE;
         }
 
-        List<Person> potentialSpouses = new ArrayList<>();
+        List<Person> potentialSpouses;
         Person spouse = null;
 
         if (isInterUnit) {

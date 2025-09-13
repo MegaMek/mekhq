@@ -45,7 +45,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
 
 public enum AtBContractType {
-    // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
+    // TODO: Missing CamOps Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
     //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK
     // region Enum Declarations
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
@@ -161,29 +161,15 @@ public enum AtBContractType {
     }
 
     private int calculateVariableLength(final AtBContract contract) {
-        switch (this) {
-            case CADRE_DUTY:
-            case SECURITY_DUTY:
-                return 4;
-            case GARRISON_DUTY:
-                return 9 + Compute.d6(3);
-            case DIVERSIONARY_RAID:
-            case RECON_RAID:
-                return 1;
-            case EXTRACTION_RAID:
-                return 1 + contract.getEnemySkill().ordinal();
-            case OBJECTIVE_RAID:
-            case PIRATE_HUNTING:
-                return 3 + Compute.randomInt(3);
-            case PLANETARY_ASSAULT:
-            case RELIEF_DUTY:
-                return 4 + Compute.randomInt(3);
-            case GUERRILLA_WARFARE:
-            case RIOT_DUTY:
-                return 6;
-            default:
-                return 12;
-        }
+        return switch (this) {
+            case CADRE_DUTY, SECURITY_DUTY -> 4;
+            case GARRISON_DUTY -> 9 + Compute.d6(3);
+            case DIVERSIONARY_RAID, RECON_RAID -> 1;
+            case EXTRACTION_RAID -> 1 + contract.getEnemySkill().ordinal();
+            case OBJECTIVE_RAID, PIRATE_HUNTING -> 3 + Compute.randomInt(3);
+            case PLANETARY_ASSAULT, RELIEF_DUTY -> 4 + Compute.randomInt(3);
+            case GUERRILLA_WARFARE, RIOT_DUTY -> 6;
+        };
     }
 
     /**
@@ -249,65 +235,65 @@ public enum AtBContractType {
             case RECON_RAID:
             case EXTRACTION_RAID:
                 switch (roll) {
-                    case 21, 20 -> {return BIGBATTLE;}
-                    case 19 -> {return SPECIALEVENTS;}
+                    case 21, 20 -> {return BIG_BATTLE;}
+                    case 19 -> {return SPECIAL_EVENTS;}
                     case 18 -> {return REINFORCEMENTS;}
-                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 17 -> {return LOGISTICS_FAILURE;}
                     case 16 -> {return TREACHERY;}
                     case 15, 14 -> {return BETRAYAL;}
                     case 13, 12, 11, 10 -> {return SPECIAL_SCENARIO;}
-                    default -> {return BONUSROLL;}
+                    default -> {return BONUS_ROLL;}
                 }
             case GARRISON_DUTY:
                 switch (roll) {
-                    case 21, 20 -> {return BIGBATTLE;}
-                    case 19 -> {return SPECIALEVENTS;}
+                    case 21, 20 -> {return BIG_BATTLE;}
+                    case 19 -> {return SPECIAL_EVENTS;}
                     case 18 -> {return REINFORCEMENTS;}
-                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 17 -> {return LOGISTICS_FAILURE;}
                     case 16 -> {return TREACHERY;}
                     case 15 -> {return BETRAYAL;}
                     case 14 -> {return REBELLION;}
-                    case 13 -> {return SPORADICUPRISINGS;}
-                    case 12 -> {return CIVILDISTURBANCE;}
+                    case 13 -> {return SPORADIC_UPRISINGS;}
+                    case 12 -> {return CIVIL_DISTURBANCE;}
                     case 11, 10, 9, 8 -> {return SPECIAL_SCENARIO;}
-                    default -> {return BONUSROLL;}
+                    default -> {return BONUS_ROLL;}
                 }
             case RIOT_DUTY:
                 switch (roll) {
-                    case 21, 20 -> {return BIGBATTLE;}
-                    case 19 -> {return SPECIALEVENTS;}
+                    case 21, 20 -> {return BIG_BATTLE;}
+                    case 19 -> {return SPECIAL_EVENTS;}
                     case 18 -> {return REINFORCEMENTS;}
-                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 17 -> {return LOGISTICS_FAILURE;}
                     case 16 -> {return TREACHERY;}
                     case 15 -> {return BETRAYAL;}
                     case 14, 13 -> {return REBELLION;}
-                    case 12 -> {return SPORADICUPRISINGS;}
-                    case 11 -> {return CIVILDISTURBANCE;}
+                    case 12 -> {return SPORADIC_UPRISINGS;}
+                    case 11 -> {return CIVIL_DISTURBANCE;}
                     case 10, 9, 8 -> {return SPECIAL_SCENARIO;}
-                    default -> {return BONUSROLL;}
+                    default -> {return BONUS_ROLL;}
                 }
             case PIRATE_HUNTING:
                 switch (roll) {
-                    case 21, 20 -> {return BIGBATTLE;}
-                    case 19 -> {return SPECIALEVENTS;}
+                    case 21, 20 -> {return BIG_BATTLE;}
+                    case 19 -> {return SPECIAL_EVENTS;}
                     case 18 -> {return REINFORCEMENTS;}
-                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 17 -> {return LOGISTICS_FAILURE;}
                     case 16 -> {return TREACHERY;}
                     case 15 -> {return BETRAYAL;}
-                    case 14 -> {return CIVILDISTURBANCE;}
+                    case 14 -> {return CIVIL_DISTURBANCE;}
                     case 13, 12, 11, 10 -> {return SPECIAL_SCENARIO;}
-                    default -> {return BONUSROLL;}
+                    default -> {return BONUS_ROLL;}
                 }
             default:
                 switch (roll) {
-                    case 21, 20 -> {return BIGBATTLE;}
-                    case 19 -> {return SPECIALEVENTS;}
+                    case 21, 20 -> {return BIG_BATTLE;}
+                    case 19 -> {return SPECIAL_EVENTS;}
                     case 18 -> {return REINFORCEMENTS;}
-                    case 17 -> {return LOGISTICSFAILURE;}
+                    case 17 -> {return LOGISTICS_FAILURE;}
                     case 16 -> {return TREACHERY;}
                     case 15 -> {return BETRAYAL;}
                     case 14, 13, 12, 11, 10 -> {return SPECIAL_SCENARIO;}
-                    default -> {return BONUSROLL;}
+                    default -> {return BONUS_ROLL;}
                 }
         }
     }
@@ -327,59 +313,59 @@ public enum AtBContractType {
         switch (this) {
             case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
                 return switch (roll) {
-                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
-                    case 17 -> LOGISTICSFAILURE;
+                    case 17 -> LOGISTICS_FAILURE;
                     case 16 -> TREACHERY;
                     case 15, 14 -> BETRAYAL;
-                    default -> BONUSROLL;
+                    default -> BONUS_ROLL;
                 };
             }
             case GARRISON_DUTY -> {
                 return switch (roll) {
-                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
-                    case 17 -> LOGISTICSFAILURE;
+                    case 17 -> LOGISTICS_FAILURE;
                     case 16 -> TREACHERY;
                     case 15 -> BETRAYAL;
                     case 14 -> REBELLION;
-                    case 13 -> SPORADICUPRISINGS;
-                    case 12 -> CIVILDISTURBANCE;
-                    default -> BONUSROLL;
+                    case 13 -> SPORADIC_UPRISINGS;
+                    case 12 -> CIVIL_DISTURBANCE;
+                    default -> BONUS_ROLL;
                 };
             }
             case RIOT_DUTY -> {
                 return switch (roll) {
-                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
-                    case 17 -> LOGISTICSFAILURE;
+                    case 17 -> LOGISTICS_FAILURE;
                     case 16 -> TREACHERY;
                     case 15 -> BETRAYAL;
                     case 14, 13 -> REBELLION;
-                    case 12 -> SPORADICUPRISINGS;
-                    case 11 -> CIVILDISTURBANCE;
-                    default -> BONUSROLL;
+                    case 12 -> SPORADIC_UPRISINGS;
+                    case 11 -> CIVIL_DISTURBANCE;
+                    default -> BONUS_ROLL;
                 };
             }
             case PIRATE_HUNTING -> {
                 return switch (roll) {
-                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
-                    case 17 -> LOGISTICSFAILURE;
+                    case 17 -> LOGISTICS_FAILURE;
                     case 16 -> TREACHERY;
                     case 15 -> BETRAYAL;
-                    case 14 -> CIVILDISTURBANCE;
-                    default -> BONUSROLL;
+                    case 14 -> CIVIL_DISTURBANCE;
+                    default -> BONUS_ROLL;
                 };
             }
             default -> {
                 return switch (roll) {
-                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
-                    case 17 -> LOGISTICSFAILURE;
+                    case 17 -> LOGISTICS_FAILURE;
                     case 16 -> TREACHERY;
                     case 15 -> BETRAYAL;
-                    default -> BONUSROLL;
+                    default -> BONUS_ROLL;
                 };
             }
         }
@@ -394,91 +380,91 @@ public enum AtBContractType {
         return switch (this) {
             case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
                 if (roll <= 1) {
-                    yield AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICER_DUEL;
                 } else if (roll == 2) {
-                    yield AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACE_DUEL;
                 } else if (roll <= 6) {
                     yield AtBScenario.AMBUSH;
                 } else if (roll == 7) {
-                    yield AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIAN_HELP;
                 } else if (roll == 8) {
-                    yield AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIED_TRAITORS;
                 } else if (roll <= 12) {
-                    yield AtBScenario.PRISONBREAK;
+                    yield AtBScenario.PRISON_BREAK;
                 } else if (roll <= 16) {
-                    yield AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_1;
                 } else {
-                    yield AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_2;
                 }
             }
             case GARRISON_DUTY -> {
                 if (roll <= 2) {
-                    yield AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICER_DUEL;
                 } else if (roll <= 4) {
-                    yield AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACE_DUEL;
                 } else if (roll <= 6) {
                     yield AtBScenario.AMBUSH;
                 } else if (roll <= 10) {
-                    yield AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIAN_HELP;
                 } else if (roll <= 12) {
-                    yield AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIED_TRAITORS;
                 } else if (roll <= 16) {
-                    yield AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_1;
                 } else {
-                    yield AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_2;
                 }
             }
             case RIOT_DUTY -> {
                 if (roll <= 1) {
-                    yield AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICER_DUEL;
                 } else if (roll <= 3) {
-                    yield AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACE_DUEL;
                 } else if (roll <= 7) {
                     yield AtBScenario.AMBUSH;
                 } else if (roll == 8) {
-                    yield AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIAN_HELP;
                 } else if (roll <= 12) {
-                    yield AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIED_TRAITORS;
                 } else if (roll <= 16) {
-                    yield AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_1;
                 } else {
-                    yield AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_2;
                 }
             }
             case PIRATE_HUNTING -> {
                 if (roll <= 1) {
-                    yield AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICER_DUEL;
                 } else if (roll <= 4) {
-                    yield AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACE_DUEL;
                 } else if (roll <= 7) {
                     yield AtBScenario.AMBUSH;
                 } else if (roll <= 11) {
-                    yield AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIAN_HELP;
                 } else if (roll == 12) {
-                    yield AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIED_TRAITORS;
                 } else if (roll <= 16) {
-                    yield AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_1;
                 } else {
-                    yield AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_2;
                 }
             }
             default -> {
                 if (roll <= 2) {
-                    yield AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICER_DUEL;
                 } else if (roll <= 4) {
-                    yield AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACE_DUEL;
                 } else if (roll <= 6) {
                     yield AtBScenario.AMBUSH;
                 } else if (roll <= 8) {
-                    yield AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIAN_HELP;
                 } else if (roll <= 10) {
-                    yield AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIED_TRAITORS;
                 } else if (roll <= 12) {
-                    yield AtBScenario.PRISONBREAK;
+                    yield AtBScenario.PRISON_BREAK;
                 } else if (roll <= 16) {
-                    yield AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_1;
                 } else {
-                    yield AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STAR_LEAGUE_CACHE_2;
                 }
             }
         };
@@ -492,55 +478,55 @@ public enum AtBContractType {
             case RECON_RAID:
             case EXTRACTION_RAID:
                 if (roll <= 1) {
-                    return AtBScenario.ALLYRESCUE;
-                } else if (roll <= 2) {
-                    return AtBScenario.CONVOYRESCUE;
+                    return AtBScenario.ALLY_RESCUE;
+                } else if (roll == 2) {
+                    return AtBScenario.CONVOY_RESCUE;
                 } else if (roll <= 5) {
-                    return AtBScenario.CONVOYATTACK;
+                    return AtBScenario.CONVOY_ATTACK;
                 } else {
-                    return AtBScenario.PIRATEFREEFORALL;
+                    return AtBScenario.PIRATE_FREE_FOR_ALL;
                 }
             case GARRISON_DUTY:
                 if (roll <= 2) {
-                    return AtBScenario.ALLYRESCUE;
-                } else if (roll <= 3) {
-                    return AtBScenario.CIVILIANRIOT;
+                    return AtBScenario.ALLY_RESCUE;
+                } else if (roll == 3) {
+                    return AtBScenario.CIVILIAN_RIOT;
                 } else if (roll <= 5) {
-                    return AtBScenario.CONVOYRESCUE;
+                    return AtBScenario.CONVOY_RESCUE;
                 } else {
-                    return AtBScenario.PIRATEFREEFORALL;
+                    return AtBScenario.PIRATE_FREE_FOR_ALL;
                 }
             case RIOT_DUTY:
                 if (roll <= 1) {
-                    return AtBScenario.ALLYRESCUE;
+                    return AtBScenario.ALLY_RESCUE;
                 } else if (roll <= 4) {
-                    return AtBScenario.CIVILIANRIOT;
-                } else if (roll <= 5) {
-                    return AtBScenario.CONVOYRESCUE;
+                    return AtBScenario.CIVILIAN_RIOT;
+                } else if (roll == 5) {
+                    return AtBScenario.CONVOY_RESCUE;
                 } else {
-                    return AtBScenario.PIRATEFREEFORALL;
+                    return AtBScenario.PIRATE_FREE_FOR_ALL;
                 }
             case PIRATE_HUNTING:
                 if (roll <= 1) {
-                    return AtBScenario.ALLYRESCUE;
+                    return AtBScenario.ALLY_RESCUE;
                 } else if (roll <= 3) {
-                    return AtBScenario.CONVOYRESCUE;
-                } else if (roll <= 4) {
-                    return AtBScenario.CONVOYATTACK;
+                    return AtBScenario.CONVOY_RESCUE;
+                } else if (roll == 4) {
+                    return AtBScenario.CONVOY_ATTACK;
                 } else {
-                    return AtBScenario.PIRATEFREEFORALL;
+                    return AtBScenario.PIRATE_FREE_FOR_ALL;
                 }
             default:
                 if (roll <= 2) {
-                    return AtBScenario.ALLYRESCUE;
-                } else if (roll <= 3) {
-                    return AtBScenario.CIVILIANRIOT;
-                } else if (roll <= 4) {
-                    return AtBScenario.CONVOYRESCUE;
-                } else if (roll <= 5) {
-                    return AtBScenario.CONVOYATTACK;
+                    return AtBScenario.ALLY_RESCUE;
+                } else if (roll == 3) {
+                    return AtBScenario.CIVILIAN_RIOT;
+                } else if (roll == 4) {
+                    return AtBScenario.CONVOY_RESCUE;
+                } else if (roll == 5) {
+                    return AtBScenario.CONVOY_ATTACK;
                 } else {
-                    return AtBScenario.PIRATEFREEFORALL;
+                    return AtBScenario.PIRATE_FREE_FOR_ALL;
                 }
         }
     }
@@ -593,7 +579,7 @@ public enum AtBContractType {
         }
 
         MMLogger.create(AtBContractType.class)
-              .error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
+              .error("Failed to parse text {} into an AtBContractType, returning GARRISON_DUTY.", text);
 
         return GARRISON_DUTY;
     }

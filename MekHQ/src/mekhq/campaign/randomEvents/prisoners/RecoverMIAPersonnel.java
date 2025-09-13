@@ -63,7 +63,7 @@ public class RecoverMIAPersonnel {
     final int SAR_CONTAINS_VTOL_OR_WIGE = 1;
     final int SAR_HAS_IMPROVED_SENSORS = 2; // largest only
     final int SAR_HAS_ACTIVE_PROBE = 1; // largest only
-    private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
+    private final TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
     /**
      * Constructs a new instance to handle the SAR search for MIA personnel.
@@ -85,8 +85,8 @@ public class RecoverMIAPersonnel {
         boolean isClan = searchingFaction != null && searchingFaction.isClan();
 
         megamek.common.enums.Faction techFaction = isClan ?
-                                                ITechnology.getFactionFromMMAbbr("CLAN") :
-                                                ITechnology.getFactionFromMMAbbr("IS");
+                                                         ITechnology.getFactionFromMMAbbr("CLAN") :
+                                                         ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
             if (searchingFaction != null) {

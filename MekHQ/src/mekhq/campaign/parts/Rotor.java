@@ -44,6 +44,8 @@ import megamek.common.equipment.IArmorState;
 import megamek.common.units.VTOL;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingRotor;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -118,13 +120,13 @@ public class Rotor extends TankLocation {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             ((VTOL) unit.getEntity()).resetMovementDamage();
             for (Part part : unit.getParts()) {
                 if (part instanceof MotiveSystem) {

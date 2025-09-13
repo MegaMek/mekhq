@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,11 +34,11 @@ package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
 
+import megamek.common.OffBoardDirection;
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.OffBoardDirection;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
@@ -56,7 +56,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 public class ReconRaidBuiltInScenario extends AtBScenario {
     @Override
     public int getScenarioType() {
-        return RECONRAID;
+        return RECON_RAID;
     }
 
     @Override

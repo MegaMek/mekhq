@@ -620,7 +620,7 @@ class EventEffectsManagerTest {
 
         AtBContract contract = new AtBContract("Test");
         StratconCampaignState campaignState = new StratconCampaignState(contract);
-        contract.setStratconCampaignState(campaignState);
+        contract.setStratConCampaignState(campaignState);
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
 
         EventResult eventResult = new EventResult(SUPPORT_POINT, false, MAGNITUDE, "");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,14 +41,14 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.codeUtilities.MathUtility;
+import megamek.common.HitData;
+import megamek.common.ToHitData;
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
-import megamek.common.HitData;
-import megamek.common.equipment.Mounted;
-import megamek.common.ToHitData;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.Mounted;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -71,7 +71,7 @@ import mekhq.campaign.universe.Factions;
  * @author NickAragua
  */
 public class AtBScenarioModifierApplicator {
-    private static final MMLogger logger = MMLogger.create(AtBScenarioModifierApplicator.class);
+    private static final MMLogger LOGGER = MMLogger.create(AtBScenarioModifierApplicator.class);
 
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
@@ -100,7 +100,7 @@ public class AtBScenarioModifierApplicator {
 
         int weightClass = randomForceWeight();
 
-        logger.info(String.format("++ Generating a force for the %s template ++", templateToApply.getForceName())
+        LOGGER.info(String.format("++ Generating a force for the %s template ++", templateToApply.getForceName())
                           .toUpperCase());
 
         generateForce(scenario,
@@ -230,7 +230,7 @@ public class AtBScenarioModifierApplicator {
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient,
           int skillAdjustment) {
         // We want a non-none Skill Level
-        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[MathUtility.clamp(scenario.getEffectiveOpforSkill()
+        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[MathUtility.clamp(scenario.getEffectiveOpForSkill()
                                                                                      .ordinal() + skillAdjustment,
               SkillLevel.ULTRA_GREEN.ordinal(),
               SkillLevel.LEGENDARY.ordinal())];
@@ -242,7 +242,7 @@ public class AtBScenarioModifierApplicator {
             abstractSkillGenerator.setType(SkillGeneratorType.CLAN);
         }
 
-        // now go through all the opfor entities currently in the scenario
+        // now go through all the op for entities currently in the scenario
         // and re-generate their
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce bf = scenario.getBotForce(x);
@@ -258,12 +258,12 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that adjusts the scenario's unit quality by the indicated amount, capped between 0 and 5. Only
-     * effective for units generated after the adjustment has taken place. Only capable of being applied to opfor.
+     * effective for units generated after the adjustment has taken place. Only capable of being applied to op for.
      */
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient,
           int qualityAdjustment) {
         if (eventRecipient != ForceAlignment.Opposing) {
-            logger.warn("Can only adjust opfor unit quality");
+            LOGGER.warn("Can only adjust op for unit quality");
             return;
         }
 
@@ -272,7 +272,7 @@ public class AtBScenarioModifierApplicator {
         currentQuality += qualityAdjustment;
         currentQuality = Math.min(IUnitRating.DRAGOON_ASTAR, currentQuality);
         currentQuality = Math.max(IUnitRating.DRAGOON_F, currentQuality);
-        scenario.setEffectiveOpforQuality(currentQuality);
+        scenario.setEffectiveOpForQuality(currentQuality);
     }
 
     /**
@@ -298,7 +298,7 @@ public class AtBScenarioModifierApplicator {
 
                     // we can hide the "commander tactics skill" number of units, but we must keep
                     // at least one visible
-                    // as the bot is unable to handle an invisible opfor at the moment.
+                    // as the bot is unable to handle an invisible op for at the moment.
                     int maxHiddenUnits = Math.min(playerForce.getAllUnits(false).size() - 1,
                           scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
                     int numHiddenUnits = 0;
@@ -309,7 +309,7 @@ public class AtBScenarioModifierApplicator {
                         }
 
                         Unit currentUnit = campaign.getUnit(unitID);
-                        // to hide, a unit must exist and not be in mid-air
+                        // to hide, a unit must exist and not be in midair
                         if (currentUnit != null &&
                                   !currentUnit.getEntity().isAero() &&
                                   !currentUnit.getEntity().hasETypeFlag(Entity.ETYPE_VTOL)) {
@@ -341,7 +341,7 @@ public class AtBScenarioModifierApplicator {
                             break;
                         }
 
-                        // to hide, a unit must not be in mid-air
+                        // to hide, a unit must not be in midair
                         if (!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
                             entity.setHidden(true);
                             numHiddenUnits++;

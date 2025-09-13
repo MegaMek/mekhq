@@ -35,14 +35,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.Tank;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingVeeSensor;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
@@ -103,13 +105,13 @@ public class VeeSensor extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);

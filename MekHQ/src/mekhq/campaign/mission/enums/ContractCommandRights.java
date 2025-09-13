@@ -125,7 +125,7 @@ public enum ContractCommandRights {
         }
 
         MMLogger.create(ContractCommandRights.class)
-              .error("Unable to parse " + text + " into a ContractCommandRights. Returning HOUSE.");
+              .error("Unable to parse {} into a ContractCommandRights. Returning HOUSE.", text);
         return HOUSE;
     }
     // endregion File I/O

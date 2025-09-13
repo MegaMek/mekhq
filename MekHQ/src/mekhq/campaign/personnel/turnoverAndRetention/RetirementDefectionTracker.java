@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,10 +45,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.compute.Compute;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -77,7 +77,7 @@ import org.w3c.dom.NodeList;
  *       retire/defect/get sacked and families of those killed in battle.
  */
 public class RetirementDefectionTracker {
-    private static final MMLogger logger = MMLogger.create(RetirementDefectionTracker.class);
+    private static final MMLogger LOGGER = MMLogger.create(RetirementDefectionTracker.class);
 
     public static final int RETIREMENT_AGE = 50;
 
@@ -685,7 +685,6 @@ public class RetirementDefectionTracker {
         for (Person person : campaign.getActivePersonnel(false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
             if (primaryRole.isAssistant() && person.getSecondaryRole().isNone()) {
-                continue;
             } else if (primaryRole.isCivilian()) {
                 personnel += 0.1;
             } else {
@@ -1258,7 +1257,7 @@ public class RetirementDefectionTracker {
                 }
             }
         } catch (Exception ex) {
-            logger.error(
+            LOGGER.error(
                   "RetirementDefectionTracker: either the class name is invalid or the listed name doesn't exist.",
                   ex);
         }

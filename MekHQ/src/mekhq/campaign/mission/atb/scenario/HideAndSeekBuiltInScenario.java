@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
@@ -55,7 +54,7 @@ import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
 public class HideAndSeekBuiltInScenario extends AtBScenario {
     @Override
     public int getScenarioType() {
-        return HIDEANDSEEK;
+        return HIDE_AND_SEEK;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
     @Override
     public void setTerrain() {
         Map<String, MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        List<String> keys = mapTypes.keySet().stream().sorted().toList();
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
         } while (getTerrainType().equals("ColdSea")

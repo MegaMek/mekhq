@@ -106,10 +106,9 @@ public enum FamilialRelationshipDisplayLevel {
 
         }
 
-        MMLogger.create(FamilialRelationshipDisplayLevel.class).error("Unable to parse " +
-                                                                            text
-                                                                            +
-                                                                            " into a FamilialRelationshipDisplayLevel. Returning PARENTS_CHILDREN_SIBLINGS.");
+        MMLogger.create(FamilialRelationshipDisplayLevel.class)
+              .error("Unable to parse {} into a FamilialRelationshipDisplayLevel. Returning PARENTS_CHILDREN_SIBLINGS.",
+                    text);
         return PARENTS_CHILDREN_SIBLINGS;
     }
     // endregion File I/O

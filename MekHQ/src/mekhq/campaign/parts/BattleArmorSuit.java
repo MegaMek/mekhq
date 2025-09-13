@@ -36,7 +36,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import megamek.common.*;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;
@@ -54,6 +54,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
+import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.TestUnit;
@@ -74,7 +76,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorSuit extends Part {
-    private static final MMLogger logger = MMLogger.create(BattleArmorSuit.class);
+    private static final MMLogger LOGGER = MMLogger.create(BattleArmorSuit.class);
 
     protected String chassis;
     protected String model;
@@ -288,7 +290,7 @@ public class BattleArmorSuit extends Part {
         }
         cost = cost.plus(25000 * (groundMP - 1));
         for (Part p : getChildParts()) {
-            if (p instanceof BaArmor) {
+            if (p instanceof BAArmor) {
                 cost = cost.plus(p.getActualValue());
             } else if (!(p instanceof BattleArmorSuit)) {
                 cost = cost.plus(p.getStickerPrice());
@@ -420,7 +422,7 @@ public class BattleArmorSuit extends Part {
                     alternateTon = Double.parseDouble(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -460,11 +462,11 @@ public class BattleArmorSuit extends Part {
                     addChildPart(part);
                 }
 
-                if ((part instanceof BaArmor) && (part.getLocation() == trooper)) {
-                    BaArmor armorClone = (BaArmor) part.clone();
-                    armorClone.setAmount(((BaArmor) part).getAmount());
+                if ((part instanceof BAArmor) && (part.getLocation() == trooper)) {
+                    BAArmor armorClone = (BAArmor) part.clone();
+                    armorClone.setAmount(((BAArmor) part).getAmount());
                     armorClone.setParentPart(this);
-                    campaign.getQuartermaster().addPart(armorClone, 0);
+                    campaign.getQuartermaster().addPart(armorClone, 0, false);
                     addChildPart(armorClone);
                 }
             }
@@ -476,7 +478,7 @@ public class BattleArmorSuit extends Part {
             unit.getEntity().setLocationBlownOff(trooper, false);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             trooper = 0;
             unit.removePart(this);
         }
@@ -488,7 +490,7 @@ public class BattleArmorSuit extends Part {
         if (!salvage) {
             campaign.getWarehouse().removePart(this);
         } else if (null != spare) {
-            spare.incrementQuantity();
+            spare.changeQuantity(1);
             campaign.getWarehouse().removePart(this);
         }
         setUnit(null);
@@ -499,7 +501,7 @@ public class BattleArmorSuit extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             if (trooper < 0) {
-                logger.error("Trooper location -1 found on BattleArmorSuit attached to unit");
+                LOGGER.error("Trooper location -1 found on BattleArmorSuit attached to unit");
                 return;
             }
 
@@ -543,8 +545,8 @@ public class BattleArmorSuit extends Part {
             int armor = 0;
             if (!hasChildParts()) {
                 for (Part p : getChildParts()) {
-                    if (p instanceof BaArmor) {
-                        armor = ((BaArmor) p).getAmount();
+                    if (p instanceof BAArmor) {
+                        armor = ((BAArmor) p).getAmount();
                     } else {
                         nEquip++;
                     }
@@ -622,7 +624,7 @@ public class BattleArmorSuit extends Part {
         try {
             newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
         Unit newUnit = null;
         if (null != newEntity) {
@@ -638,14 +640,14 @@ public class BattleArmorSuit extends Part {
                           && (((BattleArmorEquipmentPart) part).getTrooper() == BattleArmor.LOC_TROOPER_1)) {
                     Part newEquip = part.clone();
                     newEquip.setParentPart(this);
-                    campaign.getQuartermaster().addPart(newEquip, 0);
+                    campaign.getQuartermaster().addPart(newEquip, 0, false);
                     addChildPart(newEquip);
-                } else if ((part instanceof BaArmor)
+                } else if ((part instanceof BAArmor)
                                  && (part.getLocation() == BattleArmor.LOC_TROOPER_1)) {
-                    BaArmor armorClone = (BaArmor) part.clone();
+                    BAArmor armorClone = (BAArmor) part.clone();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
                     armorClone.setParentPart(this);
-                    campaign.getQuartermaster().addPart(armorClone, 0);
+                    campaign.getQuartermaster().addPart(armorClone, 0, false);
                     addChildPart(armorClone);
                 }
             }
@@ -653,7 +655,7 @@ public class BattleArmorSuit extends Part {
     }
 
     /**
-     * Sets a value indicating whether or not this part is being used as a replacement.
+     * Sets a value indicating whether this part is being used as a replacement.
      */
     public void isReplacement(boolean value) {
         isReplacement = value;

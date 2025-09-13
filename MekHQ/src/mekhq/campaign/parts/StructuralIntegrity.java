@@ -50,6 +50,7 @@ import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -58,7 +59,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class StructuralIntegrity extends Part {
-    private static final MMLogger logger = MMLogger.create(StructuralIntegrity.class);
+    private static final MMLogger LOGGER = MMLogger.create(StructuralIntegrity.class);
 
     // Slight variations for ASFs, CFs, and SC/DS
     static final TechAdvancement TA_ASF = new TechAdvancement(TechBase.ALL)
@@ -151,7 +152,7 @@ public class StructuralIntegrity extends Part {
                     pointsNeeded = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
     }

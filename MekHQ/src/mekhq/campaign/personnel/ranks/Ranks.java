@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ import org.w3c.dom.NodeList;
  * custom one there.
  */
 public class Ranks {
-    private static final MMLogger logger = MMLogger.create(Ranks.class);
+    private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
     // region Variable Declarations
     public static final String DEFAULT_SYSTEM_CODE = "SSLDF";
@@ -131,12 +131,12 @@ public class Ranks {
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystems");
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
     public static void initializeRankSystems() {
-        logger.info("Starting Rank Systems XML load...");
+        LOGGER.info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystemType type : RankSystemType.values()) {
@@ -162,12 +162,12 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            logger.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
+            LOGGER.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
                                + " system. Initialization failure, shutting MekHQ down.");
             java.lang.System.exit(-1);
         }
 
-        logger.info("Completed Rank System XML Load");
+        LOGGER.info("Completed Rank System XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {
@@ -190,7 +190,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return new ArrayList<>();
         }
 

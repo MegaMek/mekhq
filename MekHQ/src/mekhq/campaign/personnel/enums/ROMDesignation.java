@@ -213,9 +213,9 @@ public enum ROMDesignation {
         // Parse based on the enum name
         try {
             return valueOf(text);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
             MMLogger.create(ROMDesignation.class)
-                  .error(ignored, "Unable to parse " + text + " into a ROMDesignation. Returning NONE");
+                  .error(exception, "Unable to parse {} into a ROMDesignation. Returning NONE", text);
             return ROMDesignation.NONE;
         }
     }

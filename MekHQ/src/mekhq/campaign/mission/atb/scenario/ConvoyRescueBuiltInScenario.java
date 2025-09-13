@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ConvoyRescueBuiltInScenario extends AtBScenario {
-    private static String CONVOY_FORCE_ID = "Convoy";
+    private static final String CONVOY_FORCE_ID = "Convoy";
 
     @Override
     public boolean isBigBattle() {
@@ -62,7 +62,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CONVOYRESCUE;
+        return CONVOY_RESCUE;
     }
 
     @Override

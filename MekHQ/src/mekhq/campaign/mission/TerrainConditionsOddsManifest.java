@@ -71,7 +71,7 @@ import mekhq.utilities.MHQXMLUtility;
 @XmlRootElement(name = "TerrainConditionsOddsManifest")
 @XmlAccessorType(XmlAccessType.NONE)
 public class TerrainConditionsOddsManifest {
-    private static final MMLogger logger = MMLogger.create(TerrainConditionsOddsManifest.class);
+    private static final MMLogger LOGGER = MMLogger.create(TerrainConditionsOddsManifest.class);
 
     @XmlElement(name = "TerrainConditionsOdds")
     private static List<TerrainConditionsOdds> TCO = new ArrayList<>();
@@ -92,12 +92,12 @@ public class TerrainConditionsOddsManifest {
 
         File inputFile = new File(MHQConstants.TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH);
         if (!inputFile.exists()) {
-            result.TCO.addAll(initLight());
-            result.TCO.addAll(initWind());
-            result.TCO.addAll(initWeather());
-            result.TCO.addAll(initFog());
-            result.TCO.addAll(initBlowingSand());
-            result.TCO.addAll(initEMI());
+            TCO.addAll(initLight());
+            TCO.addAll(initWind());
+            TCO.addAll(initWeather());
+            TCO.addAll(initFog());
+            TCO.addAll(initBlowingSand());
+            TCO.addAll(initEMI());
 
             try {
                 JAXBContext context = JAXBContext.newInstance(TerrainConditionsOddsManifest.class);
@@ -119,7 +119,7 @@ public class TerrainConditionsOddsManifest {
                 fw.append(writer.toString());
                 fw.close();
             } catch (Exception ex) {
-                logger.error("Error Serializing TerrainConditionsOddsManifest", ex);
+                LOGGER.error("Error Serializing TerrainConditionsOddsManifest", ex);
             }
         } else {
             try {
@@ -132,7 +132,7 @@ public class TerrainConditionsOddsManifest {
                     result = element.getValue();
                 }
             } catch (Exception ex) {
-                logger.error("Error Deserializing TerrainConditionsOddsManifest", ex);
+                LOGGER.error("Error Deserializing TerrainConditionsOddsManifest", ex);
             }
         }
 
@@ -162,9 +162,9 @@ public class TerrainConditionsOddsManifest {
         Map<String, Set<String>> conditionTerrain = new HashMap<>();
         Set<String> terrainSet;
 
-        for (TerrainConditionsOdds tco : instance.TCO) {
+        for (TerrainConditionsOdds tco : TCO) {
             String msg = tco.type + " " + tco.name + " odds sum: " + tco.odds.values().stream().mapToInt(i -> i).sum();
-            logger.info(msg);
+            LOGGER.info(msg);
 
             for (String terrain : tco.terrain) {
                 String key = tco.type + " " + terrain;
@@ -187,27 +187,27 @@ public class TerrainConditionsOddsManifest {
         }
 
         if (!unknownTerrain.isEmpty()) {
-            logger.info("unknown terrain: {}",
+            LOGGER.info("unknown terrain: {}",
                   unknownTerrain.stream().map(Object::toString).collect(Collectors.joining(", ")));
         }
         if (!unknownTypes.isEmpty()) {
-            logger.info("unknown type: {}",
+            LOGGER.info("unknown type: {}",
                   unknownTypes.stream().map(Object::toString).collect(Collectors.joining(", ")));
         }
         if (!unknownEnums.isEmpty()) {
-            logger.info("unknown odds key: {}",
+            LOGGER.info("unknown odds key: {}",
                   unknownEnums.stream().map(Object::toString).collect(Collectors.joining(", ")));
         }
         for (Map.Entry<String, Integer> entry : dupTerrain.entrySet()) {
             if (entry.getValue() > 1) {
-                logger.info("duplicate terrain: {}, {}", entry.getKey(), entry.getValue());
+                LOGGER.info("duplicate terrain: {}, {}", entry.getKey(), entry.getValue());
             }
         }
         for (Map.Entry<String, Set<String>> entry : conditionTerrain.entrySet()) {
             Set<String> missing = new HashSet<>(mapTypes);
             missing.removeAll(entry.getValue());
             if (!missing.isEmpty()) {
-                logger.info("missing terrain {}: {}",
+                LOGGER.info("missing terrain {}: {}",
                       entry.getKey(),
                       missing.stream().map(Object::toString).collect(Collectors.joining(", ")));
             }

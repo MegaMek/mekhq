@@ -36,12 +36,12 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.Mounted;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -72,7 +72,7 @@ public class InfantryAmmoBin extends AmmoBin {
      * @param shots      The number of shots of ammo needed to refill the bin
      * @param weaponType The weapon this ammo is for
      * @param clips      The number of clips of ammo
-     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param omniPodded Whether the weapon is pod-mounted on an OmniVehicle
      * @param c          The campaign instance
      */
     public InfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum, int shots,

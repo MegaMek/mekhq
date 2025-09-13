@@ -50,7 +50,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson
  */
 public class RandomSkillPreferences {
-    private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(CampaignOptions.class);
 
     private int overallRecruitBonus;
     Map<PersonnelRole, Integer> recruitmentBonuses;
@@ -60,10 +60,10 @@ public class RandomSkillPreferences {
     private boolean randomizeTraits;
     private boolean useClanBonuses;
     private int antiMekProb;
-    private int[] specialAbilityBonus;
+    private final int[] specialAbilityBonus;
     private int combatSmallArmsBonus;
     private int supportSmallArmsBonus;
-    private int[] commandSkillsModifier;
+    private final int[] commandSkillsModifier;
     private int roleplaySkillModifier;
     private int artilleryProb;
     private int artilleryBonus;
@@ -273,7 +273,7 @@ public class RandomSkillPreferences {
     }
 
     public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {
-        logger.debug("Loading Random Skill Preferences from XML...");
+        LOGGER.debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
         RandomSkillPreferences retVal = new RandomSkillPreferences();
@@ -288,7 +288,7 @@ public class RandomSkillPreferences {
                 continue;
             }
 
-            logger.debug("{}: {}", wn2.getNodeName(), wn2.getTextContent());
+            LOGGER.debug("{}: {}", wn2.getNodeName(), wn2.getTextContent());
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
@@ -333,11 +333,11 @@ public class RandomSkillPreferences {
                     }
                 }
             } catch (Exception ex) {
-                logger.debug(ex, "Unknown Exception - generateRandomSkillPreferencesFromXML");
+                LOGGER.debug(ex, "Unknown Exception - generateRandomSkillPreferencesFromXML");
             }
         }
 
-        logger.debug("Load Random Skill Preferences Complete!");
+        LOGGER.debug("Load Random Skill Preferences Complete!");
 
         return retVal;
     }
@@ -370,7 +370,7 @@ public class RandomSkillPreferences {
             try {
                 skillPreferences.addRecruitmentBonus(PersonnelRole.valueOf(nodeName), Integer.parseInt(nodeValue));
             } catch (Exception ex) {
-                logger.error(ex, "Failed to process recruitment bonus node: {}, {}", nodeName, nodeValue);
+                LOGGER.error(ex, "Failed to process recruitment bonus node: {}, {}", nodeName, nodeValue);
             }
         }
     }

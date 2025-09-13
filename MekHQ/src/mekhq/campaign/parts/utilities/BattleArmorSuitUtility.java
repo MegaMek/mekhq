@@ -41,12 +41,12 @@ import megamek.common.battleValue.BVCalculator;
 import megamek.common.battleValue.BattleArmorBVCalculator;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
-import megamek.common.loaders.MULParser;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
 
 /**
  * Battle Armor Suits and Missing Battle Armor Suits do not track enough information to determine if two suits with same
@@ -54,11 +54,11 @@ import megamek.logging.MMLogger;
  * for Elemental [Flamer](Sqd3). This utility class will look up a BA part's corresponding entity and can be used to get
  * the information needed for the part/missing part to make the comparison.
  *
- * @see mekhq.campaign.parts.MissingBattleArmorSuit
+ * @see MissingBattleArmorSuit
  * @see mekhq.campaign.parts.BattleArmorSuit
  */
 public class BattleArmorSuitUtility {
-    private static final MMLogger logger = MMLogger.create(BattleArmorSuitUtility.class);
+    private static final MMLogger LOGGER = MMLogger.create(BattleArmorSuitUtility.class);
 
     String chassis;
     String model;
@@ -120,18 +120,16 @@ public class BattleArmorSuitUtility {
     /**
      * Parts don't store their entity. We can look it up in the same way that the MUL parser does, using the chassis and
      * model. This is based on the MULParser's implementation.
-     *
-     * @see MULParser#getEntity(String, String)
      */
     private static Entity getEntity(String chassis, @Nullable String model) {
-        StringBuffer key = new StringBuffer(chassis);
+        StringBuilder key = new StringBuilder(chassis);
         MekSummary ms = MekSummaryCache.getInstance().getMek(key.toString());
         if (!StringUtility.isNullOrBlank(model)) {
             key.append(" ").append(model);
             ms = MekSummaryCache.getInstance().getMek(key.toString());
             // That didn't work. Try swapping model and chassis.
             if (ms == null) {
-                key = new StringBuffer(model);
+                key = new StringBuilder(model);
                 key.append(" ").append(chassis);
                 ms = MekSummaryCache.getInstance().getMek(key.toString());
             }
@@ -141,7 +139,7 @@ public class BattleArmorSuitUtility {
             try {
                 newEntity = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
             }
         }
         return newEntity;

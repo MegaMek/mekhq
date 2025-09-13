@@ -65,6 +65,18 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.kfs.KFBoom;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -433,7 +445,7 @@ public class PartsStoreDialog extends JDialog {
                 if (nGroup == SG_ALL) {
                     return true;
                 } else if (nGroup == SG_ARMOR) {
-                    return part instanceof Armor; // ProtoMekAmor and BaArmor are derived from Armor
+                    return part instanceof Armor; // ProtoMekAmor and BAArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     return (part instanceof MekLifeSupport) ||
                                  (part instanceof MekSensor) ||
@@ -441,7 +453,7 @@ public class PartsStoreDialog extends JDialog {
                                  (part instanceof Avionics) ||
                                  (part instanceof FireControlSystem) ||
                                  (part instanceof AeroSensor) ||
-                                 (part instanceof KfBoom) ||
+                                 (part instanceof KFBoom) ||
                                  (part instanceof DropshipDockingCollar) ||
                                  (part instanceof JumpshipDockingCollar) ||
                                  (part instanceof BayDoor) ||

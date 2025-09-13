@@ -79,7 +79,7 @@ public class StratconContractInitializer {
 
         // dependency: this is required here in order for scenario initialization to
         // work properly
-        contract.setStratconCampaignState(campaignState);
+        contract.setStratConCampaignState(campaignState);
 
         // First, initialize the proper number of tracks. Then:
         // for each objective:

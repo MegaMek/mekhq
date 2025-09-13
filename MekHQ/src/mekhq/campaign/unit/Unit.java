@@ -113,6 +113,25 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.parts.kfs.KFBoom;
+import mekhq.campaign.parts.kfs.KFChargingSystem;
+import mekhq.campaign.parts.kfs.KFDriveCoil;
+import mekhq.campaign.parts.kfs.KFDriveController;
+import mekhq.campaign.parts.kfs.KFFieldInitiator;
+import mekhq.campaign.parts.kfs.KFHeliumTank;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.missing.*;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekArmor;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1042,7 +1061,7 @@ public class Unit implements ITechnology {
                     armorFound = true;
                 }
             }
-            if (!armorFound && part instanceof BaArmor a) {
+            if (!armorFound && part instanceof BAArmor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
@@ -3254,7 +3273,7 @@ public class Unit implements ITechnology {
                 turretLock = part;
             } else if (part instanceof DropshipDockingCollar || part instanceof MissingDropshipDockingCollar) {
                 dropCollar = part;
-            } else if ((part instanceof KfBoom) || (part instanceof MissingKFBoom)) {
+            } else if ((part instanceof KFBoom) || (part instanceof MissingKFBoom)) {
                 kfBoom = part;
             } else if ((part instanceof ProtoMekArmActuator) || (part instanceof MissingProtoMekArmActuator)) {
                 int loc = part.getLocation();
@@ -3387,7 +3406,7 @@ public class Unit implements ITechnology {
                     addPart(a);
                     partsToAdd.add(a);
                 } else if (entity instanceof BattleArmor) {
-                    BaArmor a = new BaArmor((int) getEntity().getWeight(),
+                    BAArmor a = new BAArmor((int) getEntity().getWeight(),
                           getEntity().getOArmor(i, false),
                           entity.getArmorType(1),
                           i,
@@ -4016,7 +4035,7 @@ public class Unit implements ITechnology {
                 partsToAdd.add(dropCollar);
             }
             if (null == kfBoom && entity instanceof Dropship) {
-                kfBoom = new KfBoom((int) entity.getWeight(), getCampaign(), ((Dropship) entity).getBoomType());
+                kfBoom = new KFBoom((int) entity.getWeight(), getCampaign(), ((Dropship) entity).getBoomType());
                 addPart(kfBoom);
                 partsToAdd.add(kfBoom);
             }

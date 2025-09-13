@@ -49,6 +49,8 @@ import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingAeroLifeSupport;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -110,7 +112,7 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public int getBaseTime() {
-        int time = 0;
+        int time;
         if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
@@ -176,13 +178,13 @@ public class AeroLifeSupport extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -213,8 +215,7 @@ public class AeroLifeSupport extends Part {
             cost = Money.of(50000);
         }
         if (null != unit) {
-            cost = Money.of(5000.0 *
-                                  (((Aero) unit.getEntity()).getNCrew() + ((Aero) unit.getEntity()).getNPassenger()));
+            cost = Money.of(5000.0 * (unit.getEntity().getNCrew() + unit.getEntity().getNPassenger()));
         }
     }
 

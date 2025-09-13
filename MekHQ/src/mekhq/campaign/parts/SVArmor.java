@@ -53,7 +53,7 @@ import org.w3c.dom.Node;
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
 public class SVArmor extends Armor {
-    private static final MMLogger logger = MMLogger.create(SVArmor.class);
+    private static final MMLogger LOGGER = MMLogger.create(SVArmor.class);
 
     private int bar;
     private TechRating techRating;
@@ -177,9 +177,11 @@ public class SVArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
-        });
+        SVArmor armor = (SVArmor) campaign.getWarehouse()
+                                        .findSparePart(part -> isSamePartType(part) &&
+                                                                     part.isPresent() &&
+                                                                     Objects.equals(getRefitUnit(),
+                                                                           part.getRefitUnit()));
 
         if (null != armor) {
             int amountRemaining = armor.getAmount() + amount;
@@ -216,7 +218,7 @@ public class SVArmor extends Armor {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }

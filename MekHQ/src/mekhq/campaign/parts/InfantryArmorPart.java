@@ -35,12 +35,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.units.Entity;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingInfantryArmorPart;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -158,7 +160,7 @@ public class InfantryArmorPart extends Part {
             } else if (null != spare) {
                 int number = quantity;
                 while (number > 0) {
-                    spare.incrementQuantity();
+                    spare.changeQuantity(1);
                     number--;
                 }
                 campaign.getWarehouse().removePart(this);

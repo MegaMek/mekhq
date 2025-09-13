@@ -48,7 +48,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
 public class TheatreOfWarAwards {
-    private static final MMLogger logger = MMLogger.create(TheatreOfWarAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(TheatreOfWarAwards.class);
 
     /**
      * This function loops through Theatre of War Awards, checking whether the person is eligible to receive each type
@@ -84,7 +84,7 @@ public class TheatreOfWarAwards {
                                                  .split(","));
 
             if (wartime.size() != 2) {
-                logger.warn("Award {} from the {} set has invalid start/end date {}",
+                LOGGER.warn("Award {} from the {} set has invalid start/end date {}",
                       award.getName(), award.getSet(), award.getSize());
                 continue;
             }
@@ -102,13 +102,13 @@ public class TheatreOfWarAwards {
                     }
 
                     if ((attackers.isEmpty()) || (defenders.isEmpty())) {
-                        logger.warn("Award {} from the {} set has incorrectly formated belligerents {}",
+                        LOGGER.warn("Award {} from the {} set has incorrectly formated belligerents {}",
                               award.getName(), award.getSet(), award.getRange());
                         continue;
                     }
                 }
             } else {
-                logger.warn("Award {} from the {} set has no belligerents",
+                LOGGER.warn("Award {} from the {} set has no belligerents",
                       award.getName(), award.getSet());
                 continue;
             }
@@ -160,7 +160,7 @@ public class TheatreOfWarAwards {
                          .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.get(0)))
                                                       && (checkYear <= Integer.parseInt(wartime.get(1))));
         } catch (Exception e) {
-            logger.error("Failed to parse isDuringWartime. Returning false.");
+            LOGGER.error("Failed to parse isDuringWartime. Returning false.");
             return false;
         }
     }

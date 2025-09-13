@@ -58,7 +58,7 @@ import org.w3c.dom.NodeList;
  * to determine familial relationships between people
  */
 public class Genealogy {
-    private static final MMLogger logger = MMLogger.create(Genealogy.class);
+    private static final MMLogger LOGGER = MMLogger.create(Genealogy.class);
 
     // region Variables
     private final Person origin;
@@ -185,17 +185,12 @@ public class Genealogy {
                 }
             }
         } else if (getFamily().get(relationshipType) == null) {
-            logger.error("Could not remove family member of unknown relationship "
-                               +
-                               relationshipType.name() +
-                               " between person " +
-                               person.getFullTitle()
-                               +
-                               "and unknown potential relation " +
-                               person.getFullTitle() +
-                               ' ' +
-                               person.getId() +
-                               '.');
+            LOGGER.error(
+                  "Could not remove family member of unknown relationship {} between person {}and unknown potential relation {} {}.",
+                  relationshipType.name(),
+                  person.getFullTitle(),
+                  person.getFullTitle(),
+                  person.getId());
         } else {
             final List<Person> familyTypeMembers = getFamily().get(relationshipType);
             familyTypeMembers.remove(person);
@@ -370,7 +365,7 @@ public class Genealogy {
     }
 
     /**
-     * Siblings are defined as sharing either parent. Inlaws are not counted.
+     * Siblings are defined as sharing either parent. In laws are not counted.
      *
      * @return the siblings of the current person
      */
@@ -485,7 +480,7 @@ public class Genealogy {
 
     /**
      * @param pw     the PrintWriter to write to
-     * @param indent the indent for the base line (i.e. the line containing genealogy)
+     * @param indent the indent for the baseline (i.e. the line containing genealogy)
      */
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "genealogy");
@@ -535,25 +530,26 @@ public class Genealogy {
                         if (wn.hasChildNodes()) {
                             loadFormerSpouses(wn.getChildNodes());
                         } else {
-                            logger.error("Cannot parse a former spouses node without child nodes for "
-                                               + getOrigin().getId());
+                            LOGGER.error("Cannot parse a former spouses node without child nodes for {}",
+                                  getOrigin().getId());
                         }
                         break;
                     case "family":
                         if (wn.hasChildNodes()) {
                             loadFamily(wn.getChildNodes());
                         } else {
-                            logger.error("Cannot parse a family node without child nodes for "
-                                               + getOrigin().getId());
+                            LOGGER.error("Cannot parse a family node without child nodes for {}", getOrigin().getId());
                         }
                         break;
                     default:
                         break;
                 }
             } catch (Exception ex) {
-                logger.error("Failed to parse a node with name "
-                                   + wn.getNodeName() + " containing " + wn.getTextContent() + " for "
-                                   + getOrigin().getId(), ex);
+                LOGGER.error("Failed to parse a node with name {} containing {} for {}",
+                      wn.getNodeName(),
+                      wn.getTextContent(),
+                      getOrigin().getId(),
+                      ex);
             }
         }
     }
@@ -571,7 +567,7 @@ public class Genealogy {
                     getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
     }

@@ -79,16 +79,17 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
-            int sarmsLvl = Utilities.generateExpLevel((primaryRole.isSupport(true) || secondaryRole.isSupport(true)) ?
-                                                            skillPreferences.getSupportSmallArmsBonus() :
-                                                            skillPreferences.getCombatSmallArmsBonus());
+            int smallArmsLevel = Utilities.generateExpLevel((primaryRole.isSupport(true) ||
+                                                                   secondaryRole.isSupport(true)) ?
+                                                                  skillPreferences.getSupportSmallArmsBonus() :
+                                                                  skillPreferences.getCombatSmallArmsBonus());
 
             if (primaryRole.isCivilian()) {
-                sarmsLvl = 0;
+                smallArmsLevel = 0;
             }
 
-            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl, skillPreferences.randomizeSkill(), bonus);
+            if (smallArmsLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, SkillType.S_SMALL_ARMS, smallArmsLevel, skillPreferences.randomizeSkill(), bonus);
             }
         }
 

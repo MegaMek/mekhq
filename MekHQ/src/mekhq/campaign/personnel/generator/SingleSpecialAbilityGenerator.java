@@ -75,82 +75,44 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         String displayName = SpecialAbility.getDisplayName(name);
         switch (name) {
             case OptionsConstants.GUNNERY_SPECIALIST: {
-                final String special;
-                switch (Compute.randomInt(2)) {
-                    case 0:
-                        special = Crew.SPECIAL_ENERGY;
-                        break;
-                    case 1:
-                        special = Crew.SPECIAL_BALLISTIC;
-                        break;
-                    case 2:
-                    default:
-                        special = Crew.SPECIAL_MISSILE;
-                        break;
-                }
+                final String special = switch (Compute.randomInt(2)) {
+                    case 0 -> Crew.SPECIAL_ENERGY;
+                    case 1 -> Crew.SPECIAL_BALLISTIC;
+                    default -> Crew.SPECIAL_MISSILE;
+                };
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.GUNNERY_RANGE_MASTER: {
-                final String special;
-                switch (Compute.randomInt(2)) {
-                    case 0:
-                        special = Crew.RANGEMASTER_MEDIUM;
-                        break;
-                    case 1:
-                        special = Crew.RANGEMASTER_LONG;
-                        break;
-                    case 2:
-                    default:
-                        special = Crew.RANGEMASTER_EXTREME;
-                        break;
-                }
+                final String special = switch (Compute.randomInt(2)) {
+                    case 0 -> Crew.RANGEMASTER_MEDIUM;
+                    case 1 -> Crew.RANGEMASTER_LONG;
+                    default -> Crew.RANGEMASTER_EXTREME;
+                };
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.MISC_ENV_SPECIALIST: {
-                final String special;
-                switch (Compute.randomInt(4)) {
-                    case 0:
-                        special = Crew.ENVIRONMENT_SPECIALIST_FOG;
-                        break;
-                    case 1:
-                        special = Crew.ENVIRONMENT_SPECIALIST_LIGHT;
-                        break;
-                    case 2:
-                        special = Crew.ENVIRONMENT_SPECIALIST_RAIN;
-                        break;
-                    case 3:
-                        special = Crew.ENVIRONMENT_SPECIALIST_SNOW;
-                        break;
-                    case 4:
-                    default:
-                        special = Crew.ENVIRONMENT_SPECIALIST_WIND;
-                        break;
-                }
+                final String special = switch (Compute.randomInt(4)) {
+                    case 0 -> Crew.ENVIRONMENT_SPECIALIST_FOG;
+                    case 1 -> Crew.ENVIRONMENT_SPECIALIST_LIGHT;
+                    case 2 -> Crew.ENVIRONMENT_SPECIALIST_RAIN;
+                    case 3 -> Crew.ENVIRONMENT_SPECIALIST_SNOW;
+                    default -> Crew.ENVIRONMENT_SPECIALIST_WIND;
+                };
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.MISC_HUMAN_TRO: {
-                final String special;
-                switch (Compute.randomInt(3)) {
-                    case 0:
-                        special = Crew.HUMAN_TRO_MEK;
-                        break;
-                    case 1:
-                        special = Crew.HUMAN_TRO_AERO;
-                        break;
-                    case 2:
-                        special = Crew.HUMAN_TRO_VEE;
-                        break;
-                    case 3:
-                    default:
-                        special = Crew.HUMAN_TRO_BA;
-                        break;
-                }
+                final String special = switch (Compute.randomInt(3)) {
+                    case 0 -> Crew.HUMAN_TRO_MEK;
+                    case 1 -> Crew.HUMAN_TRO_AERO;
+                    case 2 -> Crew.HUMAN_TRO_VEE;
+                    default -> Crew.HUMAN_TRO_BA;
+                };
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;

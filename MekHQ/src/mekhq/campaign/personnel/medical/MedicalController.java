@@ -58,7 +58,7 @@ import mekhq.campaign.unit.Unit;
  * @since MekHQ 0.50.06
  */
 public class MedicalController {
-    private static final MMLogger logger = MMLogger.create(MedicalController.class);
+    private static final MMLogger LOGGER = MMLogger.create(MedicalController.class);
 
     final String RESOURCE_BUNDLE = "mekhq.resources.MedicalController";
 
@@ -132,7 +132,7 @@ public class MedicalController {
                 healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
             } else if (checkNaturalHealing(patient)) {
                 // TODO change logging level from info to debug in 50.08
-                logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
+                LOGGER.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
                       patient.getHyperlinkedFullTitle()));
                 Unit unit = patient.getUnit();
                 if (unit != null) {
@@ -190,7 +190,7 @@ public class MedicalController {
      */
     private void healPerson(Person patient, Person doctor, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
-        logger.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
+        LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
         SkillCheckUtility skillCheckUtility = new SkillCheckUtility(doctor, S_SURGERY,
@@ -199,7 +199,7 @@ public class MedicalController {
               isUseSupportEdge,
               false, isUseAgingEffects, isClanCampaign, today);
 
-        logger.debug(skillCheckUtility.getResultsText());
+        LOGGER.debug(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
             patient.heal();

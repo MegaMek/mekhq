@@ -68,9 +68,9 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since MekHQ 0.50.05
  */
 public class ComingOfAgeAnnouncement {
-    private static final MMLogger logger = MMLogger.create(ComingOfAgeAnnouncement.class);
+    private static final MMLogger LOGGER = MMLogger.create(ComingOfAgeAnnouncement.class);
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources.ComingOfAgeAnnouncement";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ComingOfAgeAnnouncement";
 
     private final Campaign campaign;
     private final Person birthdayHaver;
@@ -183,7 +183,7 @@ public class ComingOfAgeAnnouncement {
         Person commander = campaign.getCommander();
 
         if (genealogy == null) {
-            logger.debug("No genealogy found for {}. Using fallback speaker.", birthdayHaver.getFullName());
+            LOGGER.debug("No genealogy found for {}. Using fallback speaker.", birthdayHaver.getFullName());
             return getFallbackSpeaker();
         }
 
@@ -192,7 +192,7 @@ public class ComingOfAgeAnnouncement {
 
         for (Person parent : parents) {
             if (parent == null) {
-                logger.debug("Null parent found for {}. Skipping.", birthdayHaver.getFullName());
+                LOGGER.debug("Null parent found for {}. Skipping.", birthdayHaver.getFullName());
                 continue;
             }
 
@@ -284,7 +284,7 @@ public class ComingOfAgeAnnouncement {
     /**
      * Generates the button labels for the immersive announcement dialog.
      *
-     * <p>These labels include positive, neutral, negative, and suppress responses, ailored to the birthday haver's
+     * <p>These labels include positive, neutral, negative, and suppress responses, tailored to the birthday haver's
      * first name and localized based on the resource bundle.</p>
      *
      * @param birthdayHaverFirstName the first name of the birthday haver, used for personalizing button labels.

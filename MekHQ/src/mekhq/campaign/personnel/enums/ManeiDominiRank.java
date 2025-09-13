@@ -98,9 +98,9 @@ public enum ManeiDominiRank {
     public static ManeiDominiRank parseFromString(final String text) {
         try {
             return valueOf(text);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
             MMLogger.create(ManeiDominiRank.class)
-                  .error(ignored, "Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
+                  .error(exception, "Unable to parse {} into a ManeiDominiRank. Returning NONE.", text);
             return NONE;
 
         }

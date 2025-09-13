@@ -33,15 +33,15 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.equipment.MiscType;
-import megamek.common.rolls.TargetRoll;
-import megamek.common.equipment.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 

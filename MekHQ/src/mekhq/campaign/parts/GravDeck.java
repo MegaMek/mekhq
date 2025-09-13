@@ -46,6 +46,8 @@ import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingGravDeck;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -55,7 +57,7 @@ import org.w3c.dom.NodeList;
  * @author MKerensky
  */
 public class GravDeck extends Part {
-    private static final MMLogger logger = MMLogger.create(GravDeck.class);
+    private static final MMLogger LOGGER = MMLogger.create(GravDeck.class);
 
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TechBase.ALL)
                                                       .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
@@ -160,13 +162,13 @@ public class GravDeck extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -238,7 +240,7 @@ public class GravDeck extends Part {
                     deckNumber = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
     }

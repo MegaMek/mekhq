@@ -48,7 +48,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This object tracks a specific skill prerequisite for a special ability. This object can list more than one skill and
+ * This object tracks a specific skill prerequisite for a special ability. This object can list more than one skill, and
  * we will track these skills in a hashmap where the value gives the minimum skill level. The collection of skills is
  * treated as an OR statement such that a person possessing any of the skills at the appropriate level will evaluate as
  * eligible. To create AND conditions, use multiple skill prereqs in the SpecialAbility object.

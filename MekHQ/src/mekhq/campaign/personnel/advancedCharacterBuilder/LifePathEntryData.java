@@ -133,15 +133,7 @@ public record LifePathEntryData(
             return 0;
         }
 
-        if (!trait.getLookupName().equalsIgnoreCase(objectLookupName)) {
-            return getTraitValue(trait, true);
-        }
-
-        if (trait.getLookupName().equalsIgnoreCase(objectLookupName)) {
-            return getTraitValue(trait, false);
-        }
-
-        return 0;
+        return getTraitValue(trait, !trait.getLookupName().equalsIgnoreCase(objectLookupName));
     }
 
     /**
@@ -168,10 +160,6 @@ public record LifePathEntryData(
             // case TITLE -> isMinimum ? MINIMUM_TITLE : clamp(value, MINIMUM_TITLE, MAXIMUM_TITLE);
             case UNLUCKY -> isMinimum ? MINIMUM_UNLUCKY : clamp(value, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
             case WEALTH -> isMinimum ? MINIMUM_WEALTH : clamp(value, MINIMUM_WEALTH, MAXIMUM_WEALTH);
-            default -> {
-                LOGGER.warn("Unexpected life path data trait provided: {}", trait);
-                yield 0;
-            }
         };
     }
 

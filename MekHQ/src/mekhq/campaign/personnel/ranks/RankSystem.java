@@ -56,7 +56,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class RankSystem {
-    private static final MMLogger logger = MMLogger.create(RankSystem.class);
+    private static final MMLogger LOGGER = MMLogger.create(RankSystem.class);
 
     // region Variable Declarations
     private String code; // Primary Key, must be unique
@@ -191,7 +191,7 @@ public class RankSystem {
             writeToXML(pw, indent, true);
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "individualRankSystem");
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -199,7 +199,7 @@ public class RankSystem {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "code", getCode());
 
-        // Only write out any other information if we are exporting the system or we are
+        // Only write out any other information if we are exporting the system, or we are
         // using a
         // campaign-specific custom system
         if (export || getType().isCampaign()) {
@@ -241,7 +241,7 @@ public class RankSystem {
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception ex) {
-            logger.error("Failed to open file, returning null", ex);
+            LOGGER.error("Failed to open file, returning null", ex);
             return null;
         }
         element.normalize();
@@ -256,7 +256,7 @@ public class RankSystem {
                 return generateInstanceFromXML(wn.getChildNodes(), version);
             }
         }
-        logger.error("Failed to parse file, returning null");
+        LOGGER.error("Failed to parse file, returning null");
         return null;
     }
 
@@ -295,7 +295,7 @@ public class RankSystem {
 
                 if (wn.getNodeName().equalsIgnoreCase("code")) {
                     final String systemCode = MMXMLUtility.unEscape(wn.getTextContent().trim());
-                    // If this isn't the initial load and we already have a loaded system with the
+                    // If this isn't the initial load, and we already have a loaded system with the
                     // provided key, just return the rank system saved by the key in question.
                     // This does not need to be validated to ensure it is a proper rank system
                     if (!initialLoad && Ranks.getRankSystems().containsKey(systemCode)) {
@@ -315,7 +315,7 @@ public class RankSystem {
                 }
             }
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return null;
         }
         return rankSystem;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -68,7 +68,7 @@ public class AtBScenarioManifest {
         AtBScenarioManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
-            logger.warn(String.format("Specified file %s does not exist", fileName));
+            logger.warn("Specified file {} does not exist", fileName);
             return null;
         }
 

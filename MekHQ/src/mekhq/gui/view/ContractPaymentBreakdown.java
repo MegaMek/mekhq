@@ -183,7 +183,7 @@ public class ContractPaymentBreakdown {
         JLabel lblFeeAmount1;
         if (contract.payMRBCFee()) {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text")
-                                             + " (-" + contract.getMrbcFeePercentage() + "% "
+                                             + " (-" + contract.getMRBCFeePercentage() + "% "
                                              + resourceMap.getString("lblOfGrossIncome.text") + ")");
         } else {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text"));

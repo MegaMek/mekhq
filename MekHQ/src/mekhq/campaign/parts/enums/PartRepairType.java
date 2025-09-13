@@ -184,7 +184,7 @@ public enum PartRepairType {
         }
 
         MMLogger.create(PartRepairType.class)
-              .error("Unable to parse " + text + " into a PartRepairType. Returning GENERAL_LOCATION.");
+              .error("Unable to parse {} into a PartRepairType. Returning GENERAL_LOCATION.", text);
         return GENERAL_LOCATION;
     }
     // endregion File I/O

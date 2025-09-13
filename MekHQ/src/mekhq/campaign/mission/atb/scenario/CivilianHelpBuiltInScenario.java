@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CIVILIANHELP;
+        return CIVILIAN_HELP;
     }
 
     @Override

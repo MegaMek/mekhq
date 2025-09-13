@@ -49,11 +49,11 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.units.Entity;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
-import megamek.common.loaders.EntityLoadingException;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -76,7 +76,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loot {
-    private static final MMLogger logger = MMLogger.create(Loot.class);
+    private static final MMLogger LOGGER = MMLogger.create(Loot.class);
 
     private String name;
     private Money cash;
@@ -197,12 +197,12 @@ public class Loot {
                 if (unit != null) {
                     if (unitsStatuses.containsKey(unitId)) {
                         if (unitsStatuses.get(unitId).isTotalLoss()) {
-                            logger.debug("Unit {} is total loss", unit.getName());
+                            LOGGER.debug("Unit {} is total loss", unit.getName());
                             continue;
                         }
 
                         if (unitsStatuses.get(unitId).isLikelyCaptured()) {
-                            logger.debug("Unit {} is likely captured", unit.getName());
+                            LOGGER.debug("Unit {} is likely captured", unit.getName());
                             continue;
                         }
                     }
@@ -210,11 +210,11 @@ public class Loot {
                     cargo += unit.getCargoCapacity();
                 }
             }
-            logger.debug("cargo capacity: {}", cargo);
+            LOGGER.debug("cargo capacity: {}", cargo);
         }
 
         if (cash.isPositive()) {
-            logger.debug("Looting cash: {}", cash);
+            LOGGER.debug("Looting cash: {}", cash);
 
             campaign.getFinances()
                   .credit(TransactionType.MISCELLANEOUS,
@@ -232,7 +232,7 @@ public class Loot {
         List<String> lootedParts = new ArrayList<>();
         Collections.shuffle(parts);
 
-        logger.info("Looting parts: {}", parts.toString());
+        LOGGER.info("Looting parts: {}", parts.toString());
 
         for (Part part : parts) {
             double partWeight = part.getTonnage();
@@ -253,12 +253,12 @@ public class Loot {
                 }
             }
 
-            logger.debug("Looting part: {}", part.getName());
+            LOGGER.debug("Looting part: {}", part.getName());
 
             lootedParts.add("<br>- " + part.getName() + " (" + partWeight + " tons)");
             campaign.getQuartermaster().addPart(part, 0, true);
 
-            logger.debug("Looting parts complete");
+            LOGGER.debug("Looting parts complete");
         }
 
         if (!lootedParts.isEmpty()) {
@@ -282,7 +282,7 @@ public class Loot {
         HashMap<String, Integer> qualityAndModifier = getQualityAndModifier(campaign.getMission(scenario.getMissionId()));
 
         for (Entity entity : units) {
-            logger.debug("Looting unit: {}", entity.getDisplayName());
+            LOGGER.debug("Looting unit: {}", entity.getDisplayName());
 
             if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                 qualityAndModifier.put("quality",
@@ -291,7 +291,7 @@ public class Loot {
 
             campaign.addNewUnit(entity, false, 0, PartQuality.fromNumeric(qualityAndModifier.get("quality")));
 
-            logger.debug("Looting units complete");
+            LOGGER.debug("Looting units complete");
         }
     }
 
@@ -405,7 +405,7 @@ public class Loot {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

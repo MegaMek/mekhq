@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EquipmentPart extends Part {
-    private static final MMLogger logger = MMLogger.create(EquipmentPart.class);
+    private static final MMLogger LOGGER = MMLogger.create(EquipmentPart.class);
 
     // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
@@ -114,7 +114,7 @@ public class EquipmentPart extends Part {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
     }
@@ -160,7 +160,7 @@ public class EquipmentPart extends Part {
         }
 
         if (type == null) {
-            logger.error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            LOGGER.error("Mounted.restore: could not restore equipment type \"{}\"", typeName);
         }
     }
 
@@ -253,7 +253,7 @@ public class EquipmentPart extends Part {
             MissingEquipmentPart missing = getMissingPart();
             if (null != missing) {
                 unit.addPart(missing);
-                campaign.getQuartermaster().addPart(missing, 0);
+                campaign.getQuartermaster().addPart(missing, 0, false);
             }
 
             unit.removePart(this);
@@ -265,7 +265,7 @@ public class EquipmentPart extends Part {
             } else {
                 // Now that we're a spare part, add us back into the campaign
                 // to merge us with any other parts of the same type
-                campaign.getQuartermaster().addPart(this, 0);
+                campaign.getQuartermaster().addPart(this, 0, false);
             }
 
             checkWeaponBay(unit, getType(), equipmentNum);
@@ -306,7 +306,6 @@ public class EquipmentPart extends Part {
                   (getHits() > priorHits) &&
                   (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
             remove(false);
-            return;
         }
     }
 
@@ -369,7 +368,7 @@ public class EquipmentPart extends Part {
                 return mounted;
             }
 
-            logger.warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            LOGGER.warn("Missing valid equipment for {} on unit {}", getName(), getUnit().getName());
         }
 
         return null;
@@ -497,7 +496,7 @@ public class EquipmentPart extends Part {
         Money itemCost = Money.of(type.getRawCost());
 
         if (itemCost.getAmount().intValue() == EquipmentType.COST_VARIABLE) {
-            itemCost = resolveVariableCost(isArmored);
+            itemCost = resolveVariableCost(false);
         }
 
         if (unit != null) {
@@ -513,10 +512,6 @@ public class EquipmentPart extends Part {
             itemCost = itemCost.multipliedBy(1.25);
         }
 
-        if (isArmored) {
-            // need a getCriticals command - but how does this work?
-            // finalCost += 150000 * getCriticals(entity);
-        }
         return itemCost;
     }
 
@@ -572,8 +567,6 @@ public class EquipmentPart extends Part {
                 varCost = Money.of((1 + getTonnage()) * 10000);
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
                 // TODO: Handle this through subtyping
-                // varCost = (int) Math.ceil((500 * entity.getEngine().getRating() *
-                // entity.getWeight()) / 75);
             } else if (type.hasFlag(MiscType.F_TALON)) {
                 varCost = Money.of(getTonnage() * 300);
             } else if (type.hasFlag(MiscType.F_SPIKES)) {
@@ -582,8 +575,6 @@ public class EquipmentPart extends Part {
                 varCost = Money.of(getTonnage() * 50000);
             } else if (type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
                 // TODO: subtype this one
-                // int multiplier = entity.locationIsLeg(loc) ? 700 : 500;
-                // costValue = (int) Math.ceil(entity.getWeight() * multiplier);
             } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
                 varCost = Money.of(getUnitTonnage() * 200);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
@@ -594,7 +585,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            logger.debug("I don't know how much " + name + " costs.");
+            LOGGER.debug("I don't know how much {} costs.", name);
         }
         return varCost;
     }
@@ -735,9 +726,9 @@ public class EquipmentPart extends Part {
         }
 
         // if we are still here then we need to check the other weapons, if any of them
-        // are usable then we should do the same thing. Otherwise all weapons are
+        // are usable then we should do the same thing. Otherwise, all weapons are
         // destroyed
-        // and we should mark the bay as unusuable.
+        // and we should mark the bay as unusable.
         for (WeaponMounted m : weaponBay.getBayWeapons()) {
             if (!m.isDestroyed()) {
                 weaponBay.setHit(false);

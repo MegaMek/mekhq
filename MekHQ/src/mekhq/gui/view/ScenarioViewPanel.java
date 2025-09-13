@@ -215,8 +215,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 continue;
             }
 
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(stub.getName());
-            for (String en : stub.getEntityList()) {
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(stub.name());
+            for (String en : stub.entityList()) {
                 top.add(new DefaultMutableTreeNode(en));
             }
             JTree tree = new JTree(top);

@@ -49,7 +49,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 
 public class RandomPortraitGenerator {
-    private static final MMLogger logger = MMLogger.create(RandomPortraitGenerator.class);
+    private static final MMLogger LOGGER = MMLogger.create(RandomPortraitGenerator.class);
 
     private RandomPortraitGenerator() {
 
@@ -81,7 +81,7 @@ public class RandomPortraitGenerator {
         File genderFile = new File(person.getGender().isFemale() ? "Female" : "Male");
 
         PersonnelRole primaryRole = person.getPrimaryRole();
-        String primaryRoleLabel = primaryRole.getLabel(person.isClanPersonnel());
+        String primaryRoleLabel;
         if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
             primaryRoleLabel = "Civilian";
         } else {
@@ -92,18 +92,7 @@ public class RandomPortraitGenerator {
         List<String> possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 
         if (possiblePortraits.isEmpty()) {
-            String searchCat_RoleGroup = "";
-            if (person.getPrimaryRole().isAdministrator()) {
-                searchCat_RoleGroup = "Admin";
-            } else if (person.getPrimaryRole().isVesselCrew()) {
-                searchCat_RoleGroup = "Vessel Crew";
-            } else if (person.getPrimaryRole().isVehicleCrewMember()) {
-                searchCat_RoleGroup = "Vehicle Crew";
-            } else if (person.getPrimaryRole().isTech()) {
-                searchCat_RoleGroup = "Tech";
-            } else if (person.getPrimaryRole().isMedicalStaff()) {
-                searchCat_RoleGroup = "Medical";
-            }
+            String searchCat_RoleGroup = getCatRoleGroup(person);
 
             if (!searchCat_RoleGroup.isBlank()) {
                 searchFile = new File(genderFile, searchCat_RoleGroup);
@@ -126,16 +115,31 @@ public class RandomPortraitGenerator {
             if (temp.length == 2) {
                 return new Portrait(temp[0], temp[1]);
             } else {
-                logger.error("Failed to generate portrait for " + person.getFullTitle() +
-                                   ". " +
-                                   chosenPortrait +
-                                   " does not split into an array of length 2.");
+                LOGGER.error("Failed to generate portrait for {}. {} does not split into an array of length 2.",
+                      person.getFullTitle(),
+                      chosenPortrait);
             }
         } else {
-            logger.warn("Failed to generate portrait for " + person.getFullTitle() + ". No possible portraits found.");
+            LOGGER.warn("Failed to generate portrait for {}. No possible portraits found.", person.getFullTitle());
         }
 
         return new Portrait();
+    }
+
+    private static String getCatRoleGroup(Person person) {
+        String searchCat_RoleGroup = "";
+        if (person.getPrimaryRole().isAdministrator()) {
+            searchCat_RoleGroup = "Admin";
+        } else if (person.getPrimaryRole().isVesselCrew()) {
+            searchCat_RoleGroup = "Vessel Crew";
+        } else if (person.getPrimaryRole().isVehicleCrewMember()) {
+            searchCat_RoleGroup = "Vehicle Crew";
+        } else if (person.getPrimaryRole().isTech()) {
+            searchCat_RoleGroup = "Tech";
+        } else if (person.getPrimaryRole().isMedicalStaff()) {
+            searchCat_RoleGroup = "Medical";
+        }
+        return searchCat_RoleGroup;
     }
 
     /**

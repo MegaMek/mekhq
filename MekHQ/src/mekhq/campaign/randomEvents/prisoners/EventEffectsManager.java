@@ -96,12 +96,12 @@ import mekhq.utilities.ReportingUtilities;
  * campaign.</p>
  */
 public class EventEffectsManager {
-    private static final MMLogger logger = MMLogger.create(EventEffectsManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(EventEffectsManager.class);
 
     private final Campaign campaign;
 
     private String eventReport = "";
-    private Set<Person> escapees = new HashSet<>();
+    private final Set<Person> escapees = new HashSet<>();
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -718,7 +718,7 @@ public class EventEffectsManager {
             allPotentialTargets.remove(target);
         }
 
-        logger.info(escapees.toString());
+        LOGGER.info(escapees.toString());
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 

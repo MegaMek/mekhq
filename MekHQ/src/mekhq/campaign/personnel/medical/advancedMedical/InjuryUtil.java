@@ -43,8 +43,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 
-import megamek.common.units.Aero;
 import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
@@ -86,12 +86,12 @@ public final class InjuryUtil {
         // TODO: Reporting
         if ((null != doc) && doc.isDoctor()) {
             if (p.getDaysToWaitForHealing() <= 0) {
-                genMedicalTreatment(c, p, doc).stream().forEach(GameEffect::apply);
+                genMedicalTreatment(c, p, doc).forEach(GameEffect::apply);
             }
         } else {
-            genUntreatedEffects(c, p).stream().forEach(GameEffect::apply);
+            genUntreatedEffects(c, p).forEach(GameEffect::apply);
         }
-        genNaturalHealing(c, p).stream().forEach(GameEffect::apply);
+        genNaturalHealing(c, p).forEach(GameEffect::apply);
         p.decrementDaysToWaitForHealing();
     }
 
@@ -128,9 +128,9 @@ public final class InjuryUtil {
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
         final Unit u = p.getUnit();
         final Entity en = (null != u) ? u.getEntity() : null;
-        final boolean mwasf = ((en instanceof Mek) || (en instanceof Aero));
-        final int critMod = mwasf ? 0 : 2;
-        final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator = mwasf ?
+        final boolean mekOrAero = ((en instanceof Mek) || (en instanceof Aero));
+        final int critMod = mekOrAero ? 0 : 2;
+        final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator = mekOrAero ?
                                                                                                             HitLocationGen::mekAndAsf :
                                                                                                             HitLocationGen::generic;
         final Map<BodyLocation, Integer> hitAccumulator = new HashMap<>();
@@ -254,15 +254,15 @@ public final class InjuryUtil {
     }
 
     /** Called when creating a new injury to generate a slightly randomized healing time */
-    public static int genHealingTime(Campaign c, Person p, InjuryType itype, int severity) {
+    public static int genHealingTime(Campaign c, Person p, InjuryType injuryType, int severity) {
         int mod = 100;
         int rand = Compute.randomInt(100);
         if (rand < 5) {
             mod += (Compute.d6() < 4) ? rand : -rand;
         }
 
-        int time = itype.getRecoveryTime(severity);
-        if (itype == InjuryTypes.LACERATION) {
+        int time = injuryType.getRecoveryTime(severity);
+        if (injuryType == InjuryTypes.LACERATION) {
             time += Compute.d6();
         }
 
@@ -499,11 +499,6 @@ public final class InjuryUtil {
                           if (rnd.applyAsInt(100) < 30) {
                               i.setTime(i.getTime() + 1);
                               // TODO: Disabled, too much spam
-                            /*
-                            LogEntry entry = new LogEntry(c.getDate(),
-                                String.format("%s worsened its condition due to lack of proper medical attention", i.getName()), Person.LOGTYPE_MEDICAL);
-                            p.addPersonalLogEntry(entry);
-                            */
                           }
                       }));
             }

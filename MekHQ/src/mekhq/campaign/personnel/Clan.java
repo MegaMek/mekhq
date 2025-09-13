@@ -315,6 +315,14 @@ public class Clan {
         return retVal;
     }
 
+    public int getAbjurationDate() {
+        return abjurationDate;
+    }
+
+    public void setAbjurationDate(int abjurationDate) {
+        this.abjurationDate = abjurationDate;
+    }
+
     /**
      * This holds dated records for Clan events
      */

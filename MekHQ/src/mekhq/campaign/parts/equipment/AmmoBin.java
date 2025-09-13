@@ -72,7 +72,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
-    private static final MMLogger logger = MMLogger.create(AmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(AmmoBin.class);
 
     protected int shotsNeeded;
     protected boolean oneShot;
@@ -257,7 +257,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
 
@@ -317,7 +317,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 return mounted;
             }
 
-            logger.warn("Missing valid equipment for {} to manage ammo on unit {}", getName(), getUnit().getName());
+            LOGGER.warn("Missing valid equipment for {} to manage ammo on unit {}", getName(), getUnit().getName());
         }
 
         return null;

@@ -84,7 +84,7 @@ public enum BloodGroup {
     }
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
-    ;
+
 
     /**
      * Gets the chance value for this blood group.

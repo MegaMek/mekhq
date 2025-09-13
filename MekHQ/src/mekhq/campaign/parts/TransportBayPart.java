@@ -34,15 +34,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import megamek.common.bays.Bay;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingBayDoor;
+import mekhq.campaign.parts.missing.MissingCubicle;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -110,7 +112,7 @@ public class TransportBayPart extends Part {
                 // not an undamaged door at the same time.
                 List<Part> doors = getChildParts().stream()
                                          .filter(p -> (p instanceof BayDoor) && !p.needsFixing())
-                                         .collect(Collectors.toList());
+                                         .toList();
                 for (Part door : doors) {
                     if (checkForDestruction
                               && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -129,7 +131,7 @@ public class TransportBayPart extends Part {
             if ((hits > prevHits) && checkForDestruction) {
                 List<Part> cubicles = getChildParts().stream()
                                             .filter(p -> p instanceof Cubicle)
-                                            .collect(Collectors.toList());
+                                            .toList();
                 while ((hits > prevHits) && !cubicles.isEmpty()) {
                     Part cubicle = cubicles.get(Compute.randomInt(cubicles.size()));
                     cubicle.remove(false);

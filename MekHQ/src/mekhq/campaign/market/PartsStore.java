@@ -69,6 +69,19 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.parts.kfs.KFBoom;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekArmor;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 
 /**
  * This is a parts store which will contain one copy of every possible part that might be needed as well as a variety of
@@ -121,7 +134,7 @@ public class PartsStore {
             p.setBrandNew(true);
             sb.setLength(0);
             sb.append(p.getName());
-            if (!(p instanceof Armor)) { // ProtoMekArmor and BaArmor are derived from Armor
+            if (!(p instanceof Armor)) { // ProtoMekArmor and BAArmor are derived from Armor
                 String details = p.getDetails();
                 if (!details.isEmpty()) {
                     sb.append(" (").append(details).append(")");
@@ -436,8 +449,8 @@ public class PartsStore {
         parts.add(new FireControlSystem(0, Money.zero(), c));
         parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_STANDARD));
         parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_NO_BOOM));
-        parts.add(new KfBoom(0, c, Dropship.BOOM_STANDARD));
-        parts.add(new KfBoom(0, c, Dropship.BOOM_PROTOTYPE));
+        parts.add(new KFBoom(0, c, Dropship.BOOM_STANDARD));
+        parts.add(new KFBoom(0, c, Dropship.BOOM_PROTOTYPE));
         parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_STANDARD));
         parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_NO_BOOM));
         parts.add(new GravDeck(0, 0, c, GravDeck.GRAV_DECK_TYPE_STANDARD));
@@ -466,7 +479,7 @@ public class PartsStore {
         for (ArmorType armor : ArmorType.allArmorTypes()) {
             if (armor.hasFlag(MiscType.F_BA_EQUIPMENT)) {
                 amount = (int) (5 * armor.getWeightPerPoint());
-                parts.add(new BaArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
+                parts.add(new BAArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
             } else {
                 amount = (int) (5.0 * armor.getPointsPerTon());
                 parts.add(new Armor(0, armor.getArmorType(), amount, -1, false, armor.isClan(), c));

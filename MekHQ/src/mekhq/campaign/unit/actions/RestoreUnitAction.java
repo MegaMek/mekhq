@@ -51,10 +51,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingThrusters;
 import mekhq.campaign.unit.Unit;
 
 /**

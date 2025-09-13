@@ -80,17 +80,15 @@ public enum RankSystemType {
     // endregion Boolean Comparison Methods
 
     public String getFilePath() {
-        switch (this) {
-            case DEFAULT:
-                return MHQConstants.RANKS_FILE_PATH;
-            case USER_DATA:
-                return MHQConstants.USER_RANKS_FILE_PATH;
-            case CAMPAIGN:
-            default:
+        return switch (this) {
+            case DEFAULT -> MHQConstants.RANKS_FILE_PATH;
+            case USER_DATA -> MHQConstants.USER_RANKS_FILE_PATH;
+            default -> {
                 MMLogger.create(RankSystemType.class).error(
                       "Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
-                return "";
-        }
+                yield "";
+            }
+        };
     }
 
     @Override

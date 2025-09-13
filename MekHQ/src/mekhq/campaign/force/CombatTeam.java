@@ -489,7 +489,7 @@ public class CombatTeam {
         /*
          * if (true) {
          * AtBScenario scenario = AtBScenarioFactory.createScenario(campaign, this,
-         * AtBScenario.BASEATTACK, true, getBattleDate(campaign.getLocalDate()));
+         * AtBScenario.BASE_ATTACK, true, getBattleDate(campaign.getLocalDate()));
          * scenario.setMissionId(this.getMissionId());
          * return scenario;
          * }
@@ -501,7 +501,7 @@ public class CombatTeam {
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.BASEATTACK,
+                          AtBScenario.BASE_ATTACK,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 9) {
@@ -532,20 +532,20 @@ public class CombatTeam {
                     } else {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
-                              AtBScenario.HOLDTHELINE,
+                              AtBScenario.HOLD_THE_LINE,
                               false,
                               getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 41) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.HOLDTHELINE,
+                          AtBScenario.HOLD_THE_LINE,
                           true,
                           getBattleDate(campaign.getLocalDate()));
                 } else {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.BASEATTACK,
+                          AtBScenario.BASE_ATTACK,
                           true,
                           getBattleDate(campaign.getLocalDate()));
                 }
@@ -555,7 +555,7 @@ public class CombatTeam {
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.BASEATTACK,
+                          AtBScenario.BASE_ATTACK,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 11) {
@@ -568,14 +568,14 @@ public class CombatTeam {
                     } else {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
-                              AtBScenario.HIDEANDSEEK,
+                              AtBScenario.HIDE_AND_SEEK,
                               false,
                               getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 21) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.HIDEANDSEEK,
+                          AtBScenario.HIDE_AND_SEEK,
                           true,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 31) {
@@ -599,7 +599,7 @@ public class CombatTeam {
                 } else {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.RECONRAID,
+                          AtBScenario.RECON_RAID,
                           true,
                           getBattleDate(campaign.getLocalDate()));
                 }
@@ -609,19 +609,19 @@ public class CombatTeam {
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.BASEATTACK,
+                          AtBScenario.BASE_ATTACK,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 5) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.HOLDTHELINE,
+                          AtBScenario.HOLD_THE_LINE,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 9) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.RECONRAID,
+                          AtBScenario.RECON_RAID,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 13) {
@@ -633,7 +633,7 @@ public class CombatTeam {
                 } else if (roll < 17) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.HIDEANDSEEK,
+                          AtBScenario.HIDE_AND_SEEK,
                           true,
                           getBattleDate(campaign.getLocalDate()));
                 } else {
@@ -649,13 +649,13 @@ public class CombatTeam {
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.BASEATTACK,
+                          AtBScenario.BASE_ATTACK,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 3) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.HOLDTHELINE,
+                          AtBScenario.HOLD_THE_LINE,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 5) {
@@ -681,7 +681,7 @@ public class CombatTeam {
                 } else if (roll < 9) {
                     return AtBScenarioFactory.createScenario(campaign,
                           this,
-                          AtBScenario.HIDEANDSEEK,
+                          AtBScenario.HIDE_AND_SEEK,
                           false,
                           getBattleDate(campaign.getLocalDate()));
                 } else {
@@ -694,7 +694,7 @@ public class CombatTeam {
                     } else {
                         return AtBScenarioFactory.createScenario(campaign,
                               this,
-                              AtBScenario.HOLDTHELINE,
+                              AtBScenario.HOLD_THE_LINE,
                               false,
                               getBattleDate(campaign.getLocalDate()));
                     }

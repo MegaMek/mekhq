@@ -69,8 +69,18 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -444,7 +454,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 if (nGroup == SG_ALL) {
                     inGroup = true;
                 } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor); // ProtoMekArmor and BaArmor are derived from Armor
+                    inGroup = (part instanceof Armor); // ProtoMekArmor and BAArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     inGroup = part instanceof MekGyro ||
                                     part instanceof EnginePart ||

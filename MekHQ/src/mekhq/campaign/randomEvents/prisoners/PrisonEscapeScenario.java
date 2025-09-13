@@ -51,12 +51,12 @@ import java.util.List;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.units.Crew;
-import megamek.common.units.Entity;
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
-import megamek.common.annotations.Nullable;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -85,7 +85,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class PrisonEscapeScenario {
     private final Campaign campaign;
     private final AtBContract contract;
-    private Set<Person> escapees;
+    private final Set<Person> escapees;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
     private final MMLogger logger = MMLogger.create(PrisonEscapeScenario.class);
@@ -243,7 +243,7 @@ public class PrisonEscapeScenario {
 
         // If we've failed to deserialize the requested template, report the error and make the delivery.
         if (template == null) {
-            logger.info(String.format("Failed to deserialize %s", GENERIC));
+            logger.info("Failed to deserialize {}", GENERIC);
             return;
         }
 
@@ -255,7 +255,7 @@ public class PrisonEscapeScenario {
             List<StratconTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
-            logger.info(String.format("Failed to fetch a track: %s", e.getMessage()));
+            logger.info("Failed to fetch a track: {}", e.getMessage());
             return;
         }
 

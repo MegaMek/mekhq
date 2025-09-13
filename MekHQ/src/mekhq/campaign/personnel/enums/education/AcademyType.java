@@ -120,39 +120,20 @@ public enum AcademyType {
      */
     //region File I/O
     public static AcademyType parseFromString(final String academyType) {
-        switch (academyType) {
-            case "0":
-            case "None":
-                return NONE;
-            case "1":
-            case "High School":
-                return HIGH_SCHOOL;
-            case "2":
-            case "College":
-                return COLLEGE;
-            case "3":
-            case "University":
-                return UNIVERSITY;
-            case "4":
-            case "Military Academy":
-                return MILITARY_ACADEMY;
-            case "5":
-            case "Basic Training":
-                return BASIC_TRAINING;
-            case "6":
-            case "NCO Academy":
-                return NCO_ACADEMY;
-            case "7":
-            case "Warrant Officer Academy":
-                return WARRANT_OFFICER_ACADEMY;
-            case "8":
-            case "Officer Academy":
-                return OFFICER_ACADEMY;
-            default:
-                throw new IllegalStateException(
-                      "Unexpected value in mekhq/campaign/personnel/enums/education/AcademyType.java/parseFromString: "
-                            + academyType);
-        }
+        return switch (academyType) {
+            case "0", "None" -> NONE;
+            case "1", "High School" -> HIGH_SCHOOL;
+            case "2", "College" -> COLLEGE;
+            case "3", "University" -> UNIVERSITY;
+            case "4", "Military Academy" -> MILITARY_ACADEMY;
+            case "5", "Basic Training" -> BASIC_TRAINING;
+            case "6", "NCO Academy" -> NCO_ACADEMY;
+            case "7", "Warrant Officer Academy" -> WARRANT_OFFICER_ACADEMY;
+            case "8", "Officer Academy" -> OFFICER_ACADEMY;
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/enums/education/AcademyType.java/parseFromString: "
+                        + academyType);
+        };
     }
     //endregion File I/O
 

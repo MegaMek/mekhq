@@ -159,11 +159,6 @@ public class JumpJet extends EquipmentPart {
     }
 
     @Override
-    public boolean needsFixing() {
-        return hits > 0;
-    }
-
-    @Override
     public boolean isOmniPoddable() {
         return true;
     }

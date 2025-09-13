@@ -77,7 +77,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Scenario implements IPlayerSettings {
-    private static final MMLogger logger = MMLogger.create(Scenario.class);
+    private static final MMLogger LOGGER = MMLogger.create(Scenario.class);
 
     // region Variable Declarations
     public static final int S_DEFAULT_ID = -1;
@@ -155,7 +155,7 @@ public class Scenario implements IPlayerSettings {
     private boolean hasTrack;
 
     // Stores combinations of units and the transports they are assigned to
-    private Map<UUID, List<UUID>> playerTransportLinkages;
+    private final Map<UUID, List<UUID>> playerTransportLinkages;
     // endregion Variable Declarations
 
     public Scenario() {
@@ -272,7 +272,7 @@ public class Scenario implements IPlayerSettings {
         return linkedScenarioID;
     }
 
-    public void setlinkedScenarioID(int ScenarioID) {
+    public void setLinkedScenarioID(int ScenarioID) {
         linkedScenarioID = ScenarioID;
     }
 
@@ -971,8 +971,8 @@ public class Scenario implements IPlayerSettings {
 
         if (!botForcesStubs.isEmpty()) {
             for (BotForceStub botStub : botForcesStubs) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "botForceStub", "name", botStub.getName());
-                for (String entity : botStub.getEntityList()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "botForceStub", "name", botStub.name());
+                for (String entity : botStub.entityList()) {
                     MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityStub", entity);
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForceStub");
@@ -1044,20 +1044,20 @@ public class Scenario implements IPlayerSettings {
                 }
 
                 if (battleType == -1) {
-                    logger.error("Unable to load an old AtBScenario because we could not determine the battle type");
+                    LOGGER.error("Unable to load an old AtBScenario because we could not determine the battle type");
                     return null;
                 }
 
                 List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
 
                 if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
-                    logger.error("Unable to load an old AtBScenario of battle type " + battleType);
+                    LOGGER.error("Unable to load an old AtBScenario of battle type {}", battleType);
                     return null;
                 }
 
-                retVal = (Scenario) scenarioClassList.get(0).newInstance();
+                retVal = (Scenario) scenarioClassList.get(0).getDeclaredConstructor().newInstance();
             } else {
-                retVal = (Scenario) Class.forName(className).newInstance();
+                retVal = (Scenario) Class.forName(className).getDeclaredConstructor().newInstance();
             }
 
             retVal.loadFieldsFromXmlNode(wn, version, c);
@@ -1100,8 +1100,7 @@ public class Scenario implements IPlayerSettings {
 
                         if (!wn3.getNodeName().equalsIgnoreCase("loot")) {
                             // Error condition of sorts!
-                            // Errr, what should we do here?
-                            logger.error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            LOGGER.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
@@ -1119,7 +1118,7 @@ public class Scenario implements IPlayerSettings {
                     } else if (retVal.getStatus().isCurrent()) {
                         // Campaigns <50.05 won't have 'team' recorded, so we need to use a fallback value.
                         // The value is equal to 'Allied' which means the scenario will inherit the pre-change behavior
-                        logger.info("Scenario {} predates Blind Drop changes. Using fallback team of 1.",
+                        LOGGER.info("Scenario {} predates Blind Drop changes. Using fallback team of 1.",
                               retVal.getName());
                     }
                     retVal.botForcesStubs.add(new BotForceStub(name, stub, teamValue));
@@ -1128,7 +1127,7 @@ public class Scenario implements IPlayerSettings {
                     try {
                         bf.setFieldsFromXmlNode(wn2, version, c);
                     } catch (Exception e) {
-                        logger.error("Error loading bot force in scenario", e);
+                        LOGGER.error("Error loading bot force in scenario", e);
                         bf = null;
                     }
 
@@ -1179,13 +1178,11 @@ public class Scenario implements IPlayerSettings {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
                     retVal.gravity = Float.parseFloat(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("emi")) {
-                    EMI emi = Boolean.parseBoolean(wn2.getTextContent()) ? EMI.EMI : EMI.EMI_NONE;
-                    retVal.emi = emi;
+                    retVal.emi = Boolean.parseBoolean(wn2.getTextContent()) ? EMI.EMI : EMI.EMI_NONE;
                 } else if (wn2.getNodeName().equalsIgnoreCase("blowingSand")) {
-                    BlowingSand blowingSand = Boolean.parseBoolean(wn2.getTextContent()) ?
-                                                    BlowingSand.BLOWING_SAND :
-                                                    BlowingSand.BLOWING_SAND_NONE;
-                    retVal.blowingSand = blowingSand;
+                    retVal.blowingSand = Boolean.parseBoolean(wn2.getTextContent()) ?
+                                               BlowingSand.BLOWING_SAND :
+                                               BlowingSand.BLOWING_SAND_NONE;
                 } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindDirection")) {
                     retVal.shiftWindDirection = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindStrength")) {
@@ -1198,7 +1195,7 @@ public class Scenario implements IPlayerSettings {
 
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

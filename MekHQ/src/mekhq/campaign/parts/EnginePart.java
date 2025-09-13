@@ -52,6 +52,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingEnginePart;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -62,7 +64,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EnginePart extends Part {
-    private static final MMLogger logger = MMLogger.create(EnginePart.class);
+    private static final MMLogger LOGGER = MMLogger.create(EnginePart.class);
 
     protected Engine engine;
     protected boolean forHover;
@@ -211,7 +213,7 @@ public class EnginePart extends Part {
                     forHover = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -262,13 +264,13 @@ public class EnginePart extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
     }
@@ -305,10 +307,8 @@ public class EnginePart extends Part {
             }
             if (engineHits >= engineCrits) {
                 remove(false);
-            } else if (engineHits > 0) {
-                hits = engineHits;
             } else {
-                hits = 0;
+                hits = Math.max(engineHits, 0);
             }
         }
     }
@@ -436,11 +436,6 @@ public class EnginePart extends Part {
     }
 
     @Override
-    public boolean isPartForEquipmentNum(int index, int loc) {
-        return false;
-    }
-
-    @Override
     public boolean isRightTechType(String skillType) {
         if (getEngine().hasFlag(Engine.TANK_ENGINE)) {
             return skillType.equals(SkillType.S_TECH_MECHANIC);
@@ -473,19 +468,13 @@ public class EnginePart extends Part {
         if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CENTER_TORSO) {
             return true;
         }
-        boolean needsSideTorso = false;
-        switch (getEngine().getEngineType()) {
-            case Engine.XL_ENGINE:
-            case Engine.LIGHT_ENGINE:
-            case Engine.XXL_ENGINE:
-                needsSideTorso = true;
-                break;
-        }
-        if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO
-                                     || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO)) {
-            return true;
-        }
-        return false;
+        boolean needsSideTorso = switch (getEngine().getEngineType()) {
+            case Engine.XL_ENGINE, Engine.LIGHT_ENGINE, Engine.XXL_ENGINE -> true;
+            default -> false;
+        };
+
+        return needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO
+                                        || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO);
     }
 
     @Override

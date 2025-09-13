@@ -215,6 +215,10 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.protomeks.ProtoMekArmor;
 import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -4781,8 +4785,8 @@ public class Campaign implements ITechManager {
                 return report;
             }
         }
-        if ((partWork instanceof BaArmor) && !partWork.isSalvaging()) {
-            if (!((BaArmor) partWork).isInSupply()) {
+        if ((partWork instanceof BAArmor) && !partWork.isSalvaging()) {
+            if (!((BAArmor) partWork).isInSupply()) {
                 report += "<b>Not enough BA armor remaining.  Task suspended.</b>";
                 addReport(report);
                 return report;
@@ -9714,7 +9718,7 @@ public class Campaign implements ITechManager {
             }
             if (part.isSamePartType(p)) {
                 if (p.isPresent()) {
-                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
+                    if (p instanceof Armor) { // ProtomekArmor and BAArmor are derived from Armor
                         nSupply += ((Armor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nSupply += ((AmmoStorage) p).getShots();
@@ -9722,7 +9726,7 @@ public class Campaign implements ITechManager {
                         nSupply += p.getQuantity();
                     }
                 } else {
-                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
+                    if (p instanceof Armor) { // ProtomekArmor and BAArmor are derived from Armor
                         nTransit += ((Armor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nTransit += ((AmmoStorage) p).getShots();
@@ -9739,7 +9743,7 @@ public class Campaign implements ITechManager {
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
-            if (onOrder instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
+            if (onOrder instanceof Armor) { // ProtoMek Armor and BAArmor are derived from Armor
                 nOrdered += ((Armor) onOrder).getAmount() * ((Armor) onOrder).getQuantity();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
@@ -9751,7 +9755,7 @@ public class Campaign implements ITechManager {
         inventory.setOrdered(nOrdered);
 
         String countModifier = "";
-        if (part instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
+        if (part instanceof Armor) { // ProtoMek Armor and BAArmor are derived from Armor
             countModifier = "points";
         }
         if (part instanceof AmmoStorage) {

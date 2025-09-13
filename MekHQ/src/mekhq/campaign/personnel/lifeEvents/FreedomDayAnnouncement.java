@@ -42,7 +42,6 @@ import java.util.Objects;
 import javax.swing.ImageIcon;
 
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -59,12 +58,9 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * @since 0.50.05
  */
-public class FreedomDayAnnouncement {
-    private static final MMLogger logger = MMLogger.create(FreedomDayAnnouncement.class);
+public record FreedomDayAnnouncement(Campaign campaign) {
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources.FreedomDayAnnouncement";
-
-    private final Campaign campaign;
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FreedomDayAnnouncement";
 
     // Constants for significant holiday-related dates.
     private final static int FREEDOM_DAY_START_YEAR = 3131;

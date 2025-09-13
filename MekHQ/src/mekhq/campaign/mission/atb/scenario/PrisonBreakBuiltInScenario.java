@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,8 +55,8 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class PrisonBreakBuiltInScenario extends AtBScenario {
-    private static String GUARD_FORCE_ID = "Guards";
-    private static String PRISONER_FORCE_ID = "Prisoners";
+    private static final String GUARD_FORCE_ID = "Guards";
+    private static final String PRISONER_FORCE_ID = "Prisoners";
 
     @Override
     public boolean isSpecialScenario() {
@@ -65,7 +65,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return PRISONBREAK;
+        return PRISON_BREAK;
     }
 
     @Override

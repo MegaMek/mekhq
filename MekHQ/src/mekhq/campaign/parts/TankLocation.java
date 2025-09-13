@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
@@ -62,7 +63,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TankLocation extends Part {
-    private static final MMLogger logger = MMLogger.create(TankLocation.class);
+    private static final MMLogger LOGGER = MMLogger.create(TankLocation.class);
 
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL).setAdvancement(2460, 2470, 2510)
                                                           .setApproximate(true, false, false)
@@ -165,7 +166,7 @@ public class TankLocation extends Part {
                     breached = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -212,7 +213,7 @@ public class TankLocation extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
@@ -308,14 +309,13 @@ public class TankLocation extends Part {
         // Technically weight of the location structure for consistency with MekLocation
         // Cannot have endo steel etc.
         // Turrets are handled separately
-        double tonnage = getUnitTonnage() * 0.1 / 4;
-        return (tonnage);
+        return (getUnitTonnage() * 0.1 / 4);
     }
 
     @Override
     public Money getStickerPrice() {
         // Chassis prices are returned here
-        double totalCost = 0;
+        double totalCost;
         double structureCost = 0;
         double controlsCost = 0;
         // Tech Manual, 1st printing, p279-280
@@ -348,7 +348,7 @@ public class TankLocation extends Part {
         toReturn += ">";
         toReturn += "<b>Seal " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeft() + " minutes" + scheduled;
         toReturn += "</font></html>";
         return toReturn;
     }

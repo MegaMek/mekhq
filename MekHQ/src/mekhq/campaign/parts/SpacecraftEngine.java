@@ -53,6 +53,8 @@ import megamek.common.units.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingSpacecraftEngine;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -78,9 +80,9 @@ public class SpacecraftEngine extends Part {
         this(0, 0, null, false);
     }
 
-    public SpacecraftEngine(int tonnage, double etonnage, Campaign c, boolean clan) {
+    public SpacecraftEngine(int tonnage, double eTonnage, Campaign c, boolean clan) {
         super(tonnage, c);
-        this.engineTonnage = etonnage;
+        this.engineTonnage = eTonnage;
         this.clan = clan;
         this.name = "Spacecraft Engine";
     }
@@ -206,13 +208,13 @@ public class SpacecraftEngine extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -319,11 +321,6 @@ public class SpacecraftEngine extends Part {
             }
         }
         return null;
-    }
-
-    @Override
-    public boolean isMountedOnDestroyedLocation() {
-        return false;
     }
 
     @Override
