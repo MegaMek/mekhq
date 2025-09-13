@@ -401,11 +401,13 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnSave = new RoundedJButton(titleSave);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
         btnSave.addActionListener(e -> {
+            // This has to be before we build the Life Path as records cannot be edited post-substantialization
+            displayIDRegenerationDialogs();
+
             // The record builder performs validation checks and will return null if validation fails
             LifePath record = buildLifePathFromBuilderWizard();
 
             if (record != null) {
-                displayIDRegenerationDialogs();
                 LifePathIO.writeToJSONWithDialog(record);
             }
         });
@@ -730,7 +732,7 @@ public class LifePathBuilderDialog extends JDialog {
         for (Set<UUID> ids : requirementsLifePath.values()) {
             requirementIDs.addAll(ids);
         }
-        
+
         Set<UUID> exclusionIDs = new HashSet<>();
         for (Set<UUID> ids : exclusionsLifePath.values()) {
             exclusionIDs.addAll(ids);
