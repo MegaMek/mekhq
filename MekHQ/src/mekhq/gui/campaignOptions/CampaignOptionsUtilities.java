@@ -82,7 +82,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </ul>
  */
 public class CampaignOptionsUtilities {
-    private static final MMLogger logger = MMLogger.create(CampaignOptionsUtilities.class);
+    private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsUtilities.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
@@ -325,7 +325,7 @@ public class CampaignOptionsUtilities {
 
                     tipText = lineBreaks + tipText;
                 } else if (missingLines < 0) {
-                    logger.warn("Tip panel for {} exceeds the maximum number of lines ({}). Line count should be " +
+                    LOGGER.warn("Tip panel for {} exceeds the maximum number of lines ({}). Line count should be " +
                                       "increased by {}",
                           associatedHeaderPanel.getName(),
                           panelLineCount,

@@ -356,9 +356,7 @@ public class AccoladeSelectionDialog extends JDialog {
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
         pnlInputs.add(comboAccolade, gbc);
-        comboAccolade.addActionListener(e -> {
-            clampAccoladeForFactionSelected();
-        });
+        comboAccolade.addActionListener(e -> clampAccoladeForFactionSelected());
 
         updateAccoladeForFactionSelection();
         clampAccoladeForFactionSelected();

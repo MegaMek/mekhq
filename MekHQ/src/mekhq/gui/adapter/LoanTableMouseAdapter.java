@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,9 +51,9 @@ import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.model.LoanTableModel;
 
 public class LoanTableMouseAdapter extends JPopupMenuAdapter {
-    private CampaignGUI gui;
-    private JTable loanTable;
-    private LoanTableModel loanModel;
+    private final CampaignGUI gui;
+    private final JTable loanTable;
+    private final LoanTableModel loanModel;
 
     protected LoanTableMouseAdapter(CampaignGUI gui, JTable loanTable, LoanTableModel loanModel) {
         this.gui = gui;
@@ -101,7 +101,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
                         if (null != p) {
                             int quantity = part[1];
                             while (quantity > 0 && p.getQuantity() > 0) {
-                                p.decrementQuantity();
+                                p.changeQuantity(-1);
                                 quantity--;
                                 MekHQ.triggerEvent(new PartRemovedEvent(p));
                             }
@@ -130,7 +130,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
         Loan loan = loanModel.getLoan(loanTable.convertRowIndexToModel(loanTable.getSelectedRow()));
         JMenuItem menuItem;
         JMenu menu;
-        // **lets fill the pop up menu**//
+        // **let's fill the pop-up menu**//
         menuItem = new JMenuItem("Pay Off Full Balance ("
                                        + loan.determineRemainingValue().toAmountAndSymbolString() + ")");
         menuItem.setActionCommand("PAY_BALANCE");

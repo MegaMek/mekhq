@@ -93,7 +93,7 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
           final String name, final String title) {
         super(dialog, frame, modal, resources, name, title);
     }
-    //endregion Constructors
+
     //endregion Constructors
 
     /**

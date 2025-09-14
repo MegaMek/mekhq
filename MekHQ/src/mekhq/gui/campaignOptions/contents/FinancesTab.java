@@ -68,7 +68,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * It is primarily composed of multiple `JPanel` sections organized using `GroupLayout` for modularity and clarity.
  */
 public class FinancesTab {
-    private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
     //start General Options
@@ -150,7 +149,6 @@ public class FinancesTab {
      *                 campaign-related options and data.
      */
     public FinancesTab(Campaign campaign) {
-        this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 
         initialize();

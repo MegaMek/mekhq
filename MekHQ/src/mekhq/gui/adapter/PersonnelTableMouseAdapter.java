@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -159,20 +159,20 @@ import mekhq.gui.utilities.StaticChecks;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
-    private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTableMouseAdapter.class);
 
     // region Variable Declarations
     private static final String CMD_SKILL_CHECK = "SKILL_CHECK";
     private static final String CMD_ATTRIBUTE_CHECK = "ATTRIBUTE_CHECK";
     private static final String CMD_MEDICAL_RECORDS = "MEDICAL_RECORDS";
-    private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
+    private static final String CMD_RANK_SYSTEM = "RANK_SYSTEM";
     private static final String CMD_RANK = "RANK";
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK";
     private static final String CMD_MANEI_DOMINI_CLASS = "MD_CLASS";
-    private static final String CMD_PRIMARY_ROLE = "PROLE";
-    private static final String CMD_SECONDARY_ROLE = "SROLE";
-    private static final String CMD_PRIMARY_DESIGNATOR = "DESIG_PRI";
-    private static final String CMD_SECONDARY_DESIGNATOR = "DESIG_SEC";
+    private static final String CMD_PRIMARY_ROLE = "PRIMARY_ROLL";
+    private static final String CMD_SECONDARY_ROLE = "SECONDARY_ROLL";
+    private static final String CMD_PRIMARY_DESIGNATOR = "PRIMARY_DESIGNATOR";
+    private static final String CMD_SECONDARY_DESIGNATOR = "SECONDARY_DESIGNATOR";
     private static final String CMD_ADD_AWARD = "ADD_AWARD";
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
     private static final String CMD_BEGIN_EDUCATION_ENROLLMENT = "BEGIN_EDUCATION_ENROLLMENT";
@@ -219,11 +219,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
     private static final String CMD_CHANGE_STATUS = "STATUS";
     private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST";
-    private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST";
+    private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WEAPON_SPECIALIST";
     private static final String CMD_ACQUIRE_SANDBLASTER = "SANDBLASTER";
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER";
-    private static final String CMD_ACQUIRE_ENVSPEC = "ENVSPEC";
-    private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO";
+    private static final String CMD_ACQUIRE_ENVIRONMENT_SPECIALIST = "ENVIRONMENT_SPECIALIST";
+    private static final String CMD_ACQUIRE_HUMAN_TRO = "HUMAN_TRO";
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
     private static final String CMD_REFUND_SKILL = "REFUND_SKILL";
@@ -258,7 +258,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion";
     private static final String OPT_EDGE_KO = "edge_when_ko";
     private static final String OPT_EDGE_TAC = "edge_when_tac";
-    private static final String OPT_EDGE_HEADHIT = "edge_when_headhit";
+    private static final String OPT_EDGE_HEAD_HIT = "edge_when_headhit";
 
     // Aero Edge Options
     private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS = "edge_when_aero_alt_loss";
@@ -373,7 +373,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 medDialog.setVisible(true);
                 break;
             }
-            case CMD_RANKSYSTEM: {
+            case CMD_RANK_SYSTEM: {
                 final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
                 final RankValidator rankValidator = new RankValidator();
                 for (final Person person : people) {
@@ -397,7 +397,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         autoAwardsController.PromotionController(getCampaign(), false);
                     }
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
                 break;
             }
@@ -408,7 +408,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    logger.error("Failed to assign Manei Domini Class", e);
+                    LOGGER.error("Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -426,7 +426,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    logger.error("Failed to assign ROM designator", e);
+                    LOGGER.error("Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -437,7 +437,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    logger.error("Failed to assign ROM secondary designator", e);
+                    LOGGER.error("Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -522,7 +522,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                         getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        logger.error("Could not remove award.", e);
+                        LOGGER.error("Could not remove award.", e);
                     }
                 }
                 break;
@@ -543,7 +543,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
                     if (academy == null) {
-                        logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                        LOGGER.debug("Found null academy for {} skipping", person.getFullTitle());
                         continue;
                     }
 
@@ -614,7 +614,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
                     if (academy == null) {
-                        logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                        LOGGER.debug("Found null academy for {} skipping", person.getFullTitle());
                         continue;
                     }
 
@@ -684,7 +684,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     case WEALTH_LABEL -> selectedPerson.setWealth(target);
                     case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
                     case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
-                    default -> logger.error("Invalid trait type: {}", type);
+                    default -> LOGGER.error("Invalid trait type: {}", type);
                 }
 
                 selectedPerson.spendXP(cost);
@@ -851,7 +851,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().personUpdated(selectedPerson);
                 break;
             }
-            case CMD_ACQUIRE_ENVSPEC: {
+            case CMD_ACQUIRE_ENVIRONMENT_SPECIALIST: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
@@ -867,7 +867,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().personUpdated(selectedPerson);
                 break;
             }
-            case CMD_ACQUIRE_HUMANTRO: {
+            case CMD_ACQUIRE_HUMAN_TRO: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
@@ -925,7 +925,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("Unknown PrisonerStatus Option. No changes will be made.", e);
+                    LOGGER.error("Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
@@ -963,13 +963,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADOPTION: {
                 Person orphan = getCampaign().getPerson(UUID.fromString(data[1]));
                 if (orphan == null) {
-                    logger.error("Could not find orphaned person with UUID {}. No changes will be made.", data[1]);
+                    LOGGER.error("Could not find orphaned person with UUID {}. No changes will be made.", data[1]);
                     return;
                 }
 
                 Genealogy orphanGenealogy = orphan.getGenealogy();
                 if (orphanGenealogy == null) {
-                    logger.error("Could not find orphaned person's genealogy. No changes will be made.");
+                    LOGGER.error("Could not find orphaned person's genealogy. No changes will be made.");
                     return;
                 }
 
@@ -983,7 +983,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Person person : people) {
                     Genealogy personGenealogy = person.getGenealogy();
                     if (personGenealogy == null) {
-                        logger.error("Could not find {}'s genealogy. No changes will be made.", person.getFullTitle());
+                        LOGGER.error("Could not find {}'s genealogy. No changes will be made.", person.getFullTitle());
                         continue;
                     }
 
@@ -996,7 +996,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         Person spouse = personGenealogy.getSpouse();
                         Genealogy spouseGenealogy = spouse.getGenealogy();
                         if (spouseGenealogy == null) {
-                            logger.error("Could not find {}'s (spouse) genealogy. No changes will be made.",
+                            LOGGER.error("Could not find {}'s (spouse) genealogy. No changes will be made.",
                                   spouse.getFullTitle());
                             continue;
                         }
@@ -1229,8 +1229,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_HITS: {
-                EditPersonnelHitsDialog ephd = new EditPersonnelHitsDialog(getFrame(), true, selectedPerson);
-                ephd.setVisible(true);
+                EditPersonnelHitsDialog editPersonnelHitsDialog = new EditPersonnelHitsDialog(getFrame(),
+                      true,
+                      selectedPerson);
+                editPersonnelHitsDialog.setVisible(true);
                 if (0 == selectedPerson.getHits()) {
                     selectedPerson.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
                 }
@@ -1263,14 +1265,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_XP: {
-                PopupValueChoiceDialog pvcda = new PopupValueChoiceDialog(getFrame(),
+                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("xp.text"),
                       1,
                       0);
-                pvcda.setVisible(true);
+                popupValueChoiceDialog.setVisible(true);
 
-                int ia = pvcda.getValue();
+                int ia = popupValueChoiceDialog.getValue();
                 if (ia <= 0) {
                     // <0 indicates Cancellation
                     // =0 is a No-Op
@@ -1284,16 +1286,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SET_XP: {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
+                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("xp.text"),
                       selectedPerson.getXP(),
                       0);
-                pvcd.setVisible(true);
-                if (pvcd.getValue() < 0) {
+                popupValueChoiceDialog.setVisible(true);
+                if (popupValueChoiceDialog.getValue() < 0) {
                     return;
                 }
-                int i = pvcd.getValue();
+                int i = popupValueChoiceDialog.getValue();
                 for (Person person : people) {
                     person.setXP(getCampaign(), i);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -1319,17 +1321,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SET_EDGE: {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
+                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("edge.text"),
                       selectedPerson.getEdge(),
                       0,
                       10);
-                pvcd.setVisible(true);
-                if (pvcd.getValue() < 0) {
+                popupValueChoiceDialog.setVisible(true);
+                if (popupValueChoiceDialog.getValue() < 0) {
                     return;
                 }
-                int i = pvcd.getValue();
+                int i = popupValueChoiceDialog.getValue();
                 for (Person person : people) {
                     person.setEdge(i);
                     // Reset currentEdge for support people
@@ -1375,8 +1377,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_KILL_LOG: {
-                EditKillLogDialog ekld = new EditKillLogDialog(getFrame(), true, getCampaign(), selectedPerson);
-                ekld.setVisible(true);
+                EditKillLogDialog editKillLogDialog = new EditKillLogDialog(getFrame(),
+                      true,
+                      getCampaign(),
+                      selectedPerson);
+                editKillLogDialog.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
@@ -1465,8 +1470,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_SCENARIO_LOG: {
-                EditScenarioLogDialog emld = new EditScenarioLogDialog(getFrame(), true, getCampaign(), selectedPerson);
-                emld.setVisible(true);
+                EditScenarioLogDialog editScenarioLogDialog = new EditScenarioLogDialog(getFrame(),
+                      true,
+                      getCampaign(),
+                      selectedPerson);
+                editScenarioLogDialog.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
@@ -1531,11 +1539,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_INJURIES: {
-                EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(getFrame(),
+                EditPersonnelInjuriesDialog editPersonnelInjuriesDialog = new EditPersonnelInjuriesDialog(getFrame(),
                       true,
                       getCampaign(),
                       selectedPerson);
-                epid.setVisible(true);
+                editPersonnelInjuriesDialog.setVisible(true);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
@@ -1581,15 +1589,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_GIVE_PAYMENT: {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(getFrame(),
+                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("givePayment.title"),
                       1000,
                       1,
                       1000000);
-                pcvd.setVisible(true);
+                popupValueChoiceDialog.setVisible(true);
 
-                int payment = pcvd.getValue();
+                int payment = popupValueChoiceDialog.getValue();
                 if (payment <= 0) {
                     // <0 indicates Cancellation
                     // =0 is a No-Op
@@ -1617,7 +1625,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(person, false);
+                    PersonalityController.generatePersonality(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2027,7 +2035,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // First allow them to revert to the campaign system
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("useCampaignRankSystem.text"));
         cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
-        cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, campaignRankSystem.getCode()));
+        cbMenuItem.setActionCommand(makeCommand(CMD_RANK_SYSTEM, campaignRankSystem.getCode()));
         cbMenuItem.addActionListener(this);
         menu.add(cbMenuItem);
 
@@ -2040,7 +2048,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             cbMenuItem = new JCheckBoxMenuItem(rankSystem.toString());
             cbMenuItem.setSelected(rankSystem.equals(person.getRankSystem()));
-            cbMenuItem.setActionCommand(makeCommand(CMD_RANKSYSTEM, rankSystem.getCode()));
+            cbMenuItem.setActionCommand(makeCommand(CMD_RANK_SYSTEM, rankSystem.getCode()));
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
         }
@@ -2582,7 +2590,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
                 if (academy == null) {
-                    logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                    LOGGER.debug("Found null academy for {} skipping", person.getFullTitle());
                 } else {
                     // this pile of if-statements just checks that the individual is eligible for
                     // re-enrollment
@@ -2827,7 +2835,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                               costDesc));
                         menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_FOG)) {
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
                                   Crew.ENVIRONMENT_SPECIALIST_FOG,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2842,7 +2850,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
                                   Crew.ENVIRONMENT_SPECIALIST_LIGHT,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2857,7 +2865,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
                                   Crew.ENVIRONMENT_SPECIALIST_RAIN,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2872,7 +2880,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
                                   Crew.ENVIRONMENT_SPECIALIST_SNOW,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2887,7 +2895,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
                                   Crew.ENVIRONMENT_SPECIALIST_WIND,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2919,7 +2927,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                               costDesc));
                         menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         if (!tros.contains(Crew.HUMAN_TRO_MEK)) {
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
                                   Crew.HUMAN_TRO_MEK,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2934,7 +2942,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
                                   Crew.HUMAN_TRO_AERO,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2949,7 +2957,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
                                   Crew.HUMAN_TRO_VEE,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2964,7 +2972,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                                    "<br><br>" +
                                                                    spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
                                   Crew.HUMAN_TRO_BA,
                                   String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -3199,7 +3207,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         if (skill.isImprovementLegal()) {
                             SkillType skillType = getType(typeName);
                             if (skillType == null) {
-                                logger.error("(Current Skills) Unknown skill type: {}", typeName);
+                                LOGGER.error("(Current Skills) Unknown skill type: {}", typeName);
                                 continue;
                             }
 
@@ -3220,13 +3228,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 case ROLEPLAY_INTEREST -> roleplaySkillsInterestCurrent.add(menuItem);
                                 case ROLEPLAY_SCIENCE -> roleplaySkillsScienceCurrent.add(menuItem);
                                 case ROLEPLAY_SECURITY -> roleplaySkillsSecurityCurrent.add(menuItem);
-                                default -> logger.error("(Current Skills) Unknown skill sub type: {}", subType);
+                                default -> LOGGER.error("(Current Skills) Unknown skill sub type: {}", subType);
                             }
                         }
                     } else {
                         SkillType skillType = getType(typeName);
                         if (skillType == null) {
-                            logger.error("(New Skills) Unknown skill type: {}", typeName);
+                            LOGGER.error("(New Skills) Unknown skill type: {}", typeName);
                             continue;
                         }
 
@@ -3245,7 +3253,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             case ROLEPLAY_INTEREST -> roleplaySkillsInterestNew.add(menuItem);
                             case ROLEPLAY_SCIENCE -> roleplaySkillsScienceNew.add(menuItem);
                             case ROLEPLAY_SECURITY -> roleplaySkillsSecurityNew.add(menuItem);
-                            default -> logger.error("(New Skills) Unknown skill sub type: {}", subType);
+                            default -> LOGGER.error("(New Skills) Unknown skill sub type: {}", subType);
                         }
                     }
                 }
@@ -3487,8 +3495,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // Start of Edge reroll options
                 // MekWarriors
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerHeadHits.text"));
-                cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_HEADHIT));
-                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
+                cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_HEAD_HIT));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEAD_HIT));
                 if (!person.getPrimaryRole().isMekWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
@@ -3647,7 +3655,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 submenu = new JMenu(resources.getString("On.text"));
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerHeadHits.text"));
-                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT, TRUE));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEAD_HIT, TRUE));
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
@@ -3733,7 +3741,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 submenu = new JMenu(resources.getString("Off.text"));
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerHeadHits.text"));
-                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT, FALSE));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEAD_HIT, FALSE));
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
@@ -3878,9 +3886,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editPerformanceLog.text"));
-            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
         } else {
             menuItem = new JMenuItem(resources.getString("addSingleLogEntry.text"));
             menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
@@ -3911,10 +3916,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("addSinglePerformanceLogEntry.text"));
-            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
         }
+        menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
 
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 

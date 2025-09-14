@@ -56,9 +56,9 @@ import mekhq.gui.model.TaskTableModel;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
-    private CampaignGUI gui;
-    private JTable taskTable;
-    private TaskTableModel taskModel;
+    private final CampaignGUI gui;
+    private final JTable taskTable;
+    private final TaskTableModel taskModel;
     //endregion Variable Declaration
 
     //region Constructors

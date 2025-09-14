@@ -174,8 +174,6 @@ public class PersonnelTab {
     private JTextArea txtAwardSetFilterList;
     //end Awards Tab
 
-    //start Medical Tab
-    private CampaignOptionsHeaderPanel medicalHeader;
     private JCheckBox chkUseAdvancedMedical;
     private JLabel lblHealWaitingPeriod;
     private JSpinner spnHealWaitingPeriod;
@@ -786,7 +784,8 @@ public class PersonnelTab {
      */
     public JPanel createMedicalTab() {
         // Header
-        medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
+        //start Medical Tab
+        CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
               getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
               3);
 
@@ -1201,39 +1200,8 @@ public class PersonnelTab {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public JPanel createSalariesTab() {
-        // Header
-        //        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
-        //
-        //        // Contents
-        //        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
-        //        chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-        //              "DisableSecondaryRoleSalary"));
-        //        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
-        //        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
-        //        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        //        layout.gridwidth = 5;
-        //        layout.gridy = 0;
-        //        panel.add(salariesHeader, layout);
-        //
-        //        layout.gridx = 0;
-        //        layout.gridy++;
-        //        layout.gridwidth = 1;
-        //        panel.add(chkDisableSecondaryRoleSalary, layout);
-        //
-        //        layout.gridy++;
-        //        panel.add(pnlSalaryMultipliersPanel, layout);
-        //        layout.gridx++;
-        //        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
-        //
-        //        layout.gridx = 0;
-        //        layout.gridy++;
-        //        layout.gridwidth = 2;
-        //        panel.add(pnlSalaryBaseSalaryPanel, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "SalariesTab");

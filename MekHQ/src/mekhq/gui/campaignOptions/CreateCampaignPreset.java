@@ -39,7 +39,6 @@ import java.awt.GridBagLayout;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
@@ -823,6 +822,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
                      .filter(p -> (faction == null) ||
                                         p.getFactionSet(getCampaign().getLocalDate()).contains(faction.getFaction()))
                      .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
-                     .collect(Collectors.toList()).toArray(new PlanetarySystem[] {});
+                     .toList().toArray(new PlanetarySystem[] {});
     }
 }
