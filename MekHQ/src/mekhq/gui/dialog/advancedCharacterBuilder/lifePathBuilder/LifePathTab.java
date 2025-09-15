@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -31,6 +32,7 @@ import megamek.common.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
@@ -719,19 +721,26 @@ public class LifePathTab {
         // Life Paths
         Set<UUID> workingLifePaths = storedLifePaths.get(index);
         if (workingLifePaths != null && !workingLifePaths.isEmpty()) {
-            int workingIndex = 0;
-            int total = workingLifePaths.size();
+            appendBreaker(individualProgressText);
+
+            int counter = 0;
+            int length = workingLifePaths.size();
             for (UUID id : workingLifePaths) {
                 LifePath lifePath = lifePathLibrary.get(id);
                 if (lifePath == null) {
                     LOGGER.error("Life Path not found: {}", id);
                     continue;
                 }
-                individualProgressText.append(lifePath.name());
-                if (workingIndex != total - 1) {
+                individualProgressText.append(lifePath.name())
+                      .append(" (")
+                      .append(lifePath.lifeStages().stream()
+                                    .map(ATOWLifeStage::getDisplayName)
+                                    .collect(Collectors.joining(",")))
+                      .append(")");
+                counter++;
+                if (counter != length) {
                     individualProgressText.append(", ");
                 }
-                workingIndex++;
             }
         }
 

@@ -224,23 +224,23 @@ public class LifePathLifePathPicker extends JDialog {
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
         if (!lifePaths1.isEmpty()) {
-            buildTab(lifePaths1, optionPane, getSkillOptions(lifePaths1));
+            buildTab(lifePaths1, optionPane, getLifePathOptions(lifePaths1));
         }
 
         if (!lifePaths2.isEmpty()) {
-            buildTab(lifePaths2, optionPane, getSkillOptions(lifePaths2));
+            buildTab(lifePaths2, optionPane, getLifePathOptions(lifePaths2));
         }
 
         if (!lifePaths3.isEmpty()) {
-            buildTab(lifePaths3, optionPane, getSkillOptions(lifePaths3));
+            buildTab(lifePaths3, optionPane, getLifePathOptions(lifePaths3));
         }
 
         if (!lifePaths4.isEmpty()) {
-            buildTab(lifePaths4, optionPane, getSkillOptions(lifePaths4));
+            buildTab(lifePaths4, optionPane, getLifePathOptions(lifePaths4));
         }
 
         if (!lifePaths5.isEmpty()) {
-            buildTab(lifePaths5, optionPane, getSkillOptions(lifePaths5));
+            buildTab(lifePaths5, optionPane, getLifePathOptions(lifePaths5));
         }
 
         pnlOptions.add(optionPane, BorderLayout.NORTH);
@@ -261,7 +261,7 @@ public class LifePathLifePathPicker extends JDialog {
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getSkillOptions(List<LifePath> lifePaths) {
+    private FastJScrollPane getLifePathOptions(List<LifePath> lifePaths) {
         JPanel pnlLifePaths = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -278,6 +278,12 @@ public class LifePathLifePathPicker extends JDialog {
             boolean isEnabled = selectedLifePaths.contains(id);
 
             JLabel lblLifePath = new JLabel(label);
+            lblLifePath.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    tooltipUpdater(lifePath);
+                }
+            });
             JCheckBox chkLifePath = new JCheckBox();
             chkLifePath.setSelected(isEnabled);
             chkLifePath.addActionListener(evt -> {
@@ -290,12 +296,7 @@ public class LifePathLifePathPicker extends JDialog {
             chkLifePath.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    String format = "<html><h2 style='text-align:center;'>%s</2=h2>%s</html>";
-                    String lifeStages = lifePath.lifeStages().stream()
-                                              .map(ATOWLifeStage::getDisplayName)
-                                              .collect(Collectors.joining(","));
-                    String display = String.format(lifeStages, lifePath.flavorText());
-                    setTxtTooltipDisplay(display);
+                    tooltipUpdater(lifePath);
                 }
             });
 
@@ -304,9 +305,9 @@ public class LifePathLifePathPicker extends JDialog {
 
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(lblLifePath);
-            pnlRows.add(Box.createHorizontalStrut(PADDING));
             pnlRows.add(chkLifePath);
+            pnlRows.add(Box.createHorizontalStrut(PADDING));
+            pnlRows.add(lblLifePath);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             pnlLifePaths.add(pnlRows, gbc);
@@ -318,6 +319,15 @@ public class LifePathLifePathPicker extends JDialog {
         scrollLifePaths.setBorder(null);
 
         return scrollLifePaths;
+    }
+
+    private void tooltipUpdater(LifePath lifePath) {
+        String format = "<html><b>(%s)</b> %s</html>";
+        String lifeStages = lifePath.lifeStages().stream()
+                                  .map(ATOWLifeStage::getDisplayName)
+                                  .collect(Collectors.joining(","));
+        String display = String.format(format, lifeStages, lifePath.flavorText());
+        setTxtTooltipDisplay(display);
     }
 
     private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
