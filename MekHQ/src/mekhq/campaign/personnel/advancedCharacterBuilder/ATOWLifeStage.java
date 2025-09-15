@@ -34,6 +34,10 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -129,6 +133,21 @@ public enum ATOWLifeStage {
      */
     public String getDescription() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
+    }
+
+    /**
+     * Returns a list of all {@link ATOWLifeStage} values, sorted by their ascending order.
+     *
+     * @return a sorted list of {@link ATOWLifeStage} values by order
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static List<ATOWLifeStage> getOrderedLifeStages() {
+        List<ATOWLifeStage> stages = Arrays.asList(values());
+        stages.sort(Comparator.comparingInt(ATOWLifeStage::getOrder));
+
+        return stages;
     }
 
     /**

@@ -49,6 +49,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,8 @@ public class LifePathLifePathPicker extends JDialog {
     private JEditorPane txtTooltipDisplay;
     private final Set<UUID> storedLifePaths;
     private Set<UUID> selectedLifePaths;
+    private final Map<ATOWLifeStage, Set<LifePath>> sortedLifePaths = new HashMap<>();
+    private final Map<LifePath, List<JCheckBox>> lifePathOptionDictionary = new HashMap<>();
 
     Set<UUID> getSelectedLifePaths() {
         return selectedLifePaths;
@@ -109,10 +112,12 @@ public class LifePathLifePathPicker extends JDialog {
         this.selectedLifePaths = new HashSet<>(selectedLifePaths);
         storedLifePaths = new HashSet<>(selectedLifePaths);
 
+        populateDictionaries(lifePathLibrary.values());
+
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(lifePathLibrary.values());
+        JPanel pnlOptions = buildLifeStagePanel();
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -191,20 +196,48 @@ public class LifePathLifePathPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel(Collection<LifePath> allLifePaths) {
-        JPanel pnlOptions = new JPanel();
-        pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
+    private void populateDictionaries(Collection<LifePath> allLifePaths) {
+        for (LifePath lifePath : allLifePaths) {
+            for (ATOWLifeStage lifeStage : lifePath.lifeStages()) {
+                if (!sortedLifePaths.containsKey(lifeStage)) {
+                    sortedLifePaths.put(lifeStage, new HashSet<>());
+                }
+                sortedLifePaths.get(lifeStage).add(lifePath);
+            }
+
+            lifePathOptionDictionary.put(lifePath, new ArrayList<>());
+        }
+    }
+
+    private JPanel buildLifeStagePanel() {
+        JPanel pnlLifeStages = new JPanel();
+        pnlLifeStages.setLayout(new BoxLayout(pnlLifeStages, BoxLayout.Y_AXIS));
 
         String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.options.label");
-        pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
+        pnlLifeStages.setBorder(createRoundedLineBorder(titleOptions));
 
+        EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
+        for (ATOWLifeStage lifeStage : ATOWLifeStage.getOrderedLifeStages()) {
+            Set<LifePath> lifePaths = sortedLifePaths.get(lifeStage);
+            if (lifePaths == null) {
+                continue;
+            }
+            
+            optionPane.addTab(lifeStage.getDisplayName(), buildOptionsPanel(lifePaths));
+        }
+
+        pnlLifeStages.add(optionPane, BorderLayout.NORTH);
+        return pnlLifeStages;
+    }
+
+    private EnhancedTabbedPane buildOptionsPanel(Set<LifePath> lifePaths) {
         List<LifePath> lifePaths1 = new ArrayList<>();
         List<LifePath> lifePaths2 = new ArrayList<>();
         List<LifePath> lifePaths3 = new ArrayList<>();
         List<LifePath> lifePaths4 = new ArrayList<>();
         List<LifePath> lifePaths5 = new ArrayList<>();
 
-        List<LifePath> sortedLifePaths = new ArrayList<>(allLifePaths);
+        List<LifePath> sortedLifePaths = new ArrayList<>(lifePaths);
         sortedLifePaths.sort(Comparator.comparing(LifePath::name));
 
         int groups = 3; // Can go up to 5 without additional code changes
@@ -243,8 +276,7 @@ public class LifePathLifePathPicker extends JDialog {
             buildTab(lifePaths5, optionPane, getLifePathOptions(lifePaths5));
         }
 
-        pnlOptions.add(optionPane, BorderLayout.NORTH);
-        return pnlOptions;
+        return optionPane;
     }
 
     private static void buildTab(List<LifePath> lifePaths, EnhancedTabbedPane optionPane,
@@ -284,21 +316,8 @@ public class LifePathLifePathPicker extends JDialog {
                     tooltipUpdater(lifePath);
                 }
             });
-            JCheckBox chkLifePath = new JCheckBox();
-            chkLifePath.setSelected(isEnabled);
-            chkLifePath.addActionListener(evt -> {
-                if (chkLifePath.isSelected()) {
-                    selectedLifePaths.add(id);
-                } else {
-                    selectedLifePaths.remove(id);
-                }
-            });
-            chkLifePath.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    tooltipUpdater(lifePath);
-                }
-            });
+            JCheckBox chkLifePath = GetLifePathCheckbox(isEnabled, id, lifePath);
+            lifePathOptionDictionary.get(lifePath).add(chkLifePath);
 
             gbc.gridx = i % columns;
             gbc.gridy = i / columns;
@@ -319,6 +338,33 @@ public class LifePathLifePathPicker extends JDialog {
         scrollLifePaths.setBorder(null);
 
         return scrollLifePaths;
+    }
+
+    private JCheckBox GetLifePathCheckbox(boolean isEnabled, UUID id, LifePath lifePath) {
+        JCheckBox chkLifePath = new JCheckBox();
+        chkLifePath.setSelected(isEnabled);
+        chkLifePath.addActionListener(evt -> {
+            if (chkLifePath.isSelected()) {
+                selectedLifePaths.add(id);
+
+                for (JCheckBox option : lifePathOptionDictionary.get(lifePath)) {
+                    option.setSelected(true);
+                }
+            } else {
+                selectedLifePaths.remove(id);
+
+                for (JCheckBox option : lifePathOptionDictionary.get(lifePath)) {
+                    option.setSelected(false);
+                }
+            }
+        });
+        chkLifePath.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                tooltipUpdater(lifePath);
+            }
+        });
+        return chkLifePath;
     }
 
     private void tooltipUpdater(LifePath lifePath) {
