@@ -83,7 +83,7 @@ public class LifePathProgressTextBuilder {
 
         String flavorText = basicInfoTab.getFlavorText();
         if (!flavorText.isBlank()) {
-            newText.append("<blockquote><i>").append(flavorText).append("</i></blockquote>");
+            newText.append("<i>").append(flavorText).append("</i><br>");
         }
 
         int age = basicInfoTab.getAge();
