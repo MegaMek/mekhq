@@ -96,6 +96,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String FLAW_ILLITERATE = "flaw_illiterate";
     public static final String FLAW_IN_FOR_LIFE = "flaw_in_for_life";
+    public static final String ATOW_G_TOLERANCE = "atow_g_tolerance";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -236,6 +237,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, FLAW_ILLITERATE, false);
         addOption(l3a, FLAW_IN_FOR_LIFE, false);
+        addOption(l3a, ATOW_G_TOLERANCE, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
