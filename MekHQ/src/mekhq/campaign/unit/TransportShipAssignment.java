@@ -83,7 +83,7 @@ public class TransportShipAssignment extends TransportAssignment {
      * @param campaign Campaign we need to fix references for
      * @param unit     the unit that needs references fixed
      *
-     * @see Unit#fixReferences(Campaign campaign)
+     * @see Unit#fixReferences(Campaign)
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
@@ -92,9 +92,10 @@ public class TransportShipAssignment extends TransportAssignment {
             if (transportShip != null) {
                 setTransport(transportShip);
             } else {
-                logger.error(
-                      String.format("Unit %s ('%s') references missing transport ship %s",
-                            unit.getId(), unit.getName(), getTransportShip().getId()));
+                LOGGER.error("Unit {} ('{}') references missing transport ship {}",
+                      unit.getId(),
+                      unit.getName(),
+                      getTransportShip().getId());
 
                 unit.setTransportShipAssignment(null);
             }

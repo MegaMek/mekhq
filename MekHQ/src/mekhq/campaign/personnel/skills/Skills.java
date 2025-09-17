@@ -57,7 +57,7 @@ public class Skills {
     }
 
     /**
-     * Removes all of the skills.
+     * Removes all the skills.
      */
     public void clear() {
         skills.clear();

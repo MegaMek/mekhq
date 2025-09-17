@@ -60,7 +60,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Mission {
-    private static final MMLogger logger = MMLogger.create(Mission.class);
+    private static final MMLogger LOGGER = MMLogger.create(Mission.class);
 
     // region Variable Declarations
     private String name;
@@ -68,7 +68,7 @@ public class Mission {
     private MissionStatus status;
     private String desc;
     private String type;
-    private List<Scenario> scenarios;
+    private final List<Scenario> scenarios;
     private int id = -1;
     private String legacyPlanetName;
     // endregion Variable Declarations
@@ -136,7 +136,6 @@ public class Mission {
      * Convenience property to return the name of the current planet. Sometimes, the "current planet" doesn't match up
      * with an existing planet in our planet database, in which case we return whatever was stored.
      *
-     * @return
      */
     public String getSystemName(LocalDate when) {
         if (getSystem() == null) {
@@ -205,7 +204,7 @@ public class Mission {
     /**
      * Don't use this method directly as it will not add an id to the added scenario. Use Campaign#AddScenario instead
      *
-     * @param scenario the scenario to add this this mission
+     * @param scenario the scenario to add this mission
      */
     public void addScenario(final Scenario scenario) {
         scenario.setMissionId(getId());
@@ -248,8 +247,7 @@ public class Mission {
      * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int) instead}
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public void writeToXML(final PrintWriter pw, int indent) {
-        return;
+    public void writeToXML(final PrintWriter printWriter, int indent) {
     }
 
     public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
@@ -261,7 +259,7 @@ public class Mission {
      * @deprecated use {@link #writeToXMLBegin(Campaign, PrintWriter, int)} instead;
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+    protected int writeToXMLBegin(final PrintWriter printWriter, int indent) {
         return indent;
     }
 
@@ -293,8 +291,7 @@ public class Mission {
      * @deprecated use {@link #loadFieldsFromXmlNode(Campaign, Version, Node)}  instead;
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
-        return;
+    public void loadFieldsFromXmlNode(Node node) throws ParseException {
     }
 
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
@@ -310,7 +307,7 @@ public class Mission {
         try {
             // Instantiate the correct child class, and call its parsing
             // function.
-            retVal = (Mission) Class.forName(className).newInstance();
+            retVal = (Mission) Class.forName(className).getDeclaredConstructor().newInstance();
             retVal.loadFieldsFromXmlNode(campaign, version, node);
 
             // Okay, now load mission-specific fields!
@@ -351,8 +348,8 @@ public class Mission {
 
                         if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
                             // Error condition of sorts!
-                            // Errr, what should we do here?
-                            logger.error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
+                            // what should we do here?
+                            LOGGER.error("Unknown node type not loaded in Scenario nodes: {}", wn3.getNodeName());
 
                             continue;
                         }
@@ -365,7 +362,7 @@ public class Mission {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

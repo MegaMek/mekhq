@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,10 +37,10 @@ import java.beans.PropertyChangeSupport;
 import java.util.Objects;
 
 public class ObservableString {
-    private String name;
+    private final String name;
     private String value;
 
-    private PropertyChangeSupport support;
+    private final PropertyChangeSupport support;
 
     public ObservableString(String name, String initialValue) {
         Objects.requireNonNull(name);

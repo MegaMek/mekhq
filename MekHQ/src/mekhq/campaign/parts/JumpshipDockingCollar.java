@@ -48,6 +48,8 @@ import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingJumpshipDockingCollar;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -57,7 +59,7 @@ import org.w3c.dom.NodeList;
  * @author MKerensky
  */
 public class JumpshipDockingCollar extends Part {
-    private static final MMLogger logger = MMLogger.create(JumpshipDockingCollar.class);
+    private static final MMLogger LOGGER = MMLogger.create(JumpshipDockingCollar.class);
 
     static final TechAdvancement TA_BOOM = new TechAdvancement(TechBase.ALL)
                                                  .setAdvancement(2458, 2470, 2500)
@@ -178,13 +180,13 @@ public class JumpshipDockingCollar extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -247,7 +249,7 @@ public class JumpshipDockingCollar extends Part {
                     collarNumber = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }

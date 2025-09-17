@@ -50,7 +50,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MASC extends EquipmentPart {
-    private static final MMLogger logger = MMLogger.create(MASC.class);
+    private static final MMLogger LOGGER = MMLogger.create(MASC.class);
 
     protected int engineRating;
 
@@ -145,7 +145,7 @@ public class MASC extends EquipmentPart {
                     engineRating = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
         restore();
@@ -175,7 +175,7 @@ public class MASC extends EquipmentPart {
             details.append(", ");
         }
         if (isSupercharger()) {
-            // Causes extra information but needed so omnipods show all data
+            // Causes extra information but needed so OmniPods show all data
             details.append(equipTonnage)
                   .append(" tons, ");
         }

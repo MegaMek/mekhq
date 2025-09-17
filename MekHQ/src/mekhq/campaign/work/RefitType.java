@@ -49,7 +49,7 @@ public enum RefitType {
     IMPOSSIBLE(9, "impossible", Double.POSITIVE_INFINITY, Integer.MAX_VALUE); // To mark some changes as forbidden
 
     // Initialize by-id array lookup table
-    private static RefitType[] idMap;
+    private static final RefitType[] idMap;
 
     static {
         int maxId = 0;
@@ -74,9 +74,10 @@ public enum RefitType {
     public static RefitType of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch (NumberFormatException nfex) {
+        } catch (NumberFormatException ignored) {
             // Try something else
         }
+
         return valueOf(str.toUpperCase(Locale.ROOT));
     }
 
@@ -86,7 +87,7 @@ public enum RefitType {
     public final double timeMultiplier;
     public final int mod;
 
-    private RefitType(int id, String name, double timeMultiplier, int mod) {
+    RefitType(int id, String name, double timeMultiplier, int mod) {
         this.id = id;
         this.name = name;
         this.timeMultiplier = timeMultiplier;

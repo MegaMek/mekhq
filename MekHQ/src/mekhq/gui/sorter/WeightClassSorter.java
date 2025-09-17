@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,7 +44,7 @@ import megamek.common.units.EntityWeightClass;
 public class WeightClassSorter implements Comparator<String> {
     @Override
     public int compare(String s0, String s1) {
-        // lets find the weight class integer for each name
+        // let's find the weight class integer for each name
         int l0 = 0;
         int l1 = 0;
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {

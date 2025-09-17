@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -517,8 +517,6 @@ public class ResolveScenarioTracker {
      * This method should be run the first time an entity is loaded into the tracker, either from the game or from a MUL
      * file.
      *
-     * @param en
-     * @param controlsField
      */
     private void checkForLostLimbs(Entity en, boolean controlsField) {
         for (int loc = 0; loc < en.locations(); loc++) {
@@ -597,7 +595,7 @@ public class ResolveScenarioTracker {
     }
 
     public void checkStatusOfPersonnel() {
-        // lets cycle through units and get their crew
+        // let's cycle through units and get their crew
         for (Unit u : units) {
             // shuffling the crew ensures that casualties are randomly assigned in
             // multi-crew units
@@ -837,7 +835,7 @@ public class ResolveScenarioTracker {
                 }
             }
         }
-        // Check crewed aeros for existing hits since they could be flying without full
+        // Check crewed aerospace for existing hits since they could be flying without full
         // crews
         int casualties;
         int casualtiesAssigned = 0;
@@ -999,9 +997,9 @@ public class ResolveScenarioTracker {
                 continue; // Shouldn't happen... but well... ya know
             }
             Entity entity = null;
-            UnitStatus ustatus = salvageStatus.get(unit.getId());
-            if (null != ustatus) {
-                entity = ustatus.getEntity();
+            UnitStatus unitStatus = salvageStatus.get(unit.getId());
+            if (null != unitStatus) {
+                entity = unitStatus.getEntity();
             }
             if (null == entity) {
                 continue;
@@ -1041,13 +1039,13 @@ public class ResolveScenarioTracker {
                                       .collect(Collectors.toList());
             crew = shuffleCrew(crew);
 
-            // For vees we may need to know the commander or driver, which aren't assigned
+            // For vees, we may need to know the commander or driver, which aren't assigned
             // for TestUnit.
             Person commander = null;
             Person driver = null;
             Person console = null;
             if (entity instanceof Tank) {
-                // Prefer gunner over driver, as in Unit::getCommander
+                // Prefer gunner to driver, as in Unit::getCommander
                 for (Person p : crew) {
                     if (p.getPrimaryRole().isVehicleGunner()) {
                         commander = p;
@@ -1081,7 +1079,7 @@ public class ResolveScenarioTracker {
             }
 
             if ((entity instanceof Aero) && !unit.usesSoloPilot()) {
-                // need to check for existing hits because you can fly aeros with less than full
+                // need to check for existing hits because you can fly aerospace with less than full
                 // crew
                 int existingHits = 0;
                 int currentHits = 0;
@@ -1219,7 +1217,7 @@ public class ResolveScenarioTracker {
 
         killCredits = parser.getKills();
 
-        // Map everyone's ID to External Id
+        // Map everyone's ID to External ID
         for (Entity e : parser.getEntities()) {
             idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
         }
@@ -1531,7 +1529,7 @@ public class ResolveScenarioTracker {
     }
 
     public void resolveScenario(ScenarioStatus resolution, String report) {
-        // lets start by generating a stub file for our records
+        // let's start by generating a stub file for our records
         scenario.generateStub(campaign);
 
         // and create trackers for ransomed prisoners and units
@@ -1657,18 +1655,18 @@ public class ResolveScenarioTracker {
 
         // now lets update all units
         for (Unit unit : getUnits()) {
-            UnitStatus ustatus = unitsStatus.get(unit.getId());
-            if (null == ustatus) {
+            UnitStatus unitStatus = unitsStatus.get(unit.getId());
+            if (null == unitStatus) {
                 // shouldn't happen
                 continue;
             }
-            Entity en = ustatus.getEntity();
+            Entity en = unitStatus.getEntity();
             Money unitValue = unit.getBuyCost();
             if (campaign.getCampaignOptions().isBLCSaleValue()) {
                 unitValue = unit.getSellValue();
             }
 
-            if (ustatus.isTotalLoss()) {
+            if (unitStatus.isTotalLoss()) {
                 // missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
@@ -1688,7 +1686,7 @@ public class ResolveScenarioTracker {
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
                 if (en.isAero()) {
-                    ((IAero) en).setFuelTonnage(((IAero) ustatus.getBaseEntity()).getFuelTonnage());
+                    ((IAero) en).setFuelTonnage(((IAero) unitStatus.getBaseEntity()).getFuelTonnage());
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
@@ -1706,7 +1704,7 @@ public class ResolveScenarioTracker {
                 Money repairBLC = Money.zero();
                 String blcString = "battle loss compensation (parts) for " + unit.getName();
                 if (!unit.isRepairable()) {
-                    // if the unit is not repairable, you should get BLC for it but we should
+                    // if the unit is not repairable, you should get BLC for it, but we should
                     // subtract
                     // the value of salvageable parts
                     blcValue = unitValue.minus(unit.getSellValue());
@@ -1737,10 +1735,10 @@ public class ResolveScenarioTracker {
 
         // now lets take care of salvage
         for (TestUnit salvageUnit : getActualSalvage()) {
-            UnitStatus salstatus = new UnitStatus(salvageUnit);
+            UnitStatus salvageStatus = new UnitStatus(salvageUnit);
             // FIXME: Need to implement a "fuel" part just like the "armor" part
             if (salvageUnit.getEntity() instanceof Aero) {
-                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salstatus.getBaseEntity()).getFuelTonnage());
+                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
             }
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit);
@@ -1808,7 +1806,7 @@ public class ResolveScenarioTracker {
         scenario.setStatus(resolution);
         scenario.setReport(report);
         scenario.clearAllForcesAndPersonnel(campaign);
-        // lets reset the network ids from the c3UUIDs
+        // let's reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
         scenario.setDate(campaign.getLocalDate());
@@ -2069,20 +2067,20 @@ public class ResolveScenarioTracker {
         }
 
         @Override
-        public int compareTo(PersonStatus ostatus) {
-            return unitName.compareTo(ostatus.getUnitName());
+        public int compareTo(PersonStatus status) {
+            return unitName.compareTo(status.getUnitName());
         }
 
     }
 
     /**
-     * This object is used to track the status of a opposition personnel. We need to actually put the whole person
+     * This object is used to track the status of an opposition personnel. We need to actually put the whole person
      * object here because we are not already tracking it on the campaign
      *
      * @author Jay Lawson
      */
     public static class OppositionPersonnelStatus extends PersonStatus {
-        // for prisoners we have to track a whole person
+        // for prisoners, we have to track a whole person
         private final Person person;
         private boolean captured;
 
@@ -2123,9 +2121,9 @@ public class ResolveScenarioTracker {
             this.name = unit.getName();
             chassis = unit.getEntity().getFullChassis();
             model = unit.getEntity().getModel();
-            // assume its a total loss until we find something that says otherwise
+            // assume it's a total loss until we find something that says otherwise
             totalLoss = true;
-            // create a brand new entity until we find one
+            // create a brand-new entity until we find one
             MekSummary summary = MekSummaryCache.getInstance().getMek(getLookupName());
             if (null != summary) {
                 try {

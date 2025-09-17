@@ -45,8 +45,8 @@ import mekhq.campaign.Hangar;
  */
 public class HangarStatistics {
     private final Hangar hangar;
-    private long LIGHT_VEHICLE_BIT = 1L << 62;
-    private long SUPER_HEAVY_BIT = 1L << 63;
+    private final long LIGHT_VEHICLE_BIT = 1L << 62;
+    private final long SUPER_HEAVY_BIT = 1L << 63;
 
     public HangarStatistics(Hangar hangar) {
         this.hangar = hangar;
@@ -67,9 +67,6 @@ public class HangarStatistics {
     /**
      * Tally all used bay types and return a hashmap of ETYPE : Count
      *
-     * @param inTransit
-     *
-     * @return
      */
     public HashMap<Long, Integer> tallyBaysByType(boolean inTransit) {
         HashMap<Long, Integer> hashMap = new HashMap<>();

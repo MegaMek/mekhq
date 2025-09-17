@@ -125,29 +125,18 @@ public enum BattleMekWeightClassGenerationMethod {
     //endregion Boolean Comparison Methods
 
     public AbstractBattleMekWeightClassGenerator getGenerator() {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBBattleMekWeightClassGenerator();
-            case WINDCHILD_LIGHT:
-                return new WindchildLightBattleMekWeightClassGenerator();
-            case WINDCHILD_MEDIUM:
-                return new WindchildMediumBattleMekWeightClassGenerator();
-            case WINDCHILD_HEAVY:
-                return new WindchildHeavyBattleMekWeightClassGenerator();
-            case WINDCHILD_ASSAULT:
-                return new WindchildAssaultBattleMekWeightClassGenerator();
-            case LIGHT:
-                return new LightBattleMekWeightClassGenerator();
-            case MEDIUM:
-                return new MediumBattleMekWeightClassGenerator();
-            case HEAVY:
-                return new HeavyBattleMekWeightClassGenerator();
-            case ASSAULT:
-                return new AssaultBattleMekWeightClassGenerator();
-            case WINDCHILD:
-            default:
-                return new WindchildBattleMekWeightClassGenerator();
-        }
+        return switch (this) {
+            case AGAINST_THE_BOT -> new AtBBattleMekWeightClassGenerator();
+            case WINDCHILD_LIGHT -> new WindchildLightBattleMekWeightClassGenerator();
+            case WINDCHILD_MEDIUM -> new WindchildMediumBattleMekWeightClassGenerator();
+            case WINDCHILD_HEAVY -> new WindchildHeavyBattleMekWeightClassGenerator();
+            case WINDCHILD_ASSAULT -> new WindchildAssaultBattleMekWeightClassGenerator();
+            case LIGHT -> new LightBattleMekWeightClassGenerator();
+            case MEDIUM -> new MediumBattleMekWeightClassGenerator();
+            case HEAVY -> new HeavyBattleMekWeightClassGenerator();
+            case ASSAULT -> new AssaultBattleMekWeightClassGenerator();
+            default -> new WindchildBattleMekWeightClassGenerator();
+        };
     }
 
     @Override

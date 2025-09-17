@@ -55,7 +55,7 @@ import org.w3c.dom.NodeList;
 
 @Deprecated(since = "0.50.07")
 public class FameAndInfamyController {
-    private Map<String, Double> trackingFactions;
+    private final Map<String, Double> trackingFactions;
 
 
     private final static MMLogger logger = MMLogger.create(FameAndInfamyController.class);
@@ -104,9 +104,9 @@ public class FameAndInfamyController {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("FameAndInfamyController failed to parse contents of 'shortname'" +
-                                             " in 'data/universe/factions.xml'. Last successfully parsed Faction shortname: %s",
-                  shortnames.get(shortnames.size() - 1)));
+            logger.error("FameAndInfamyController failed to parse contents of 'shortname' in 'data/universe/factions" +
+                               ".xml'. Last successfully parsed Faction shortname: {}",
+                  shortnames.get(shortnames.size() - 1));
             return shortnames;
         }
 
@@ -198,7 +198,6 @@ public class FameAndInfamyController {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public void updateFameForFaction(Campaign campaign, String factionCode, double adjustment) {
-        int originalFame = getFameLevelForFaction(factionCode);
 
         double currentFame = trackingFactions.get(factionCode);
         adjustment = currentFame + adjustment;
@@ -206,12 +205,6 @@ public class FameAndInfamyController {
 
         trackingFactions.put(factionCode, adjustment);
 
-        int newFame = getFameLevelForFaction(factionCode);
-
-        if (originalFame != newFame) {
-            //             campaign.addReport(String.format(resources.getString("fameChangeReportInfamy.text"),
-            //                   newFame, Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear())));
-        }
     }
 
     /**

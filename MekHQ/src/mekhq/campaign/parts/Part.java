@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,6 +66,12 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.missing.MissingMekActuator;
+import mekhq.campaign.parts.missing.MissingMekLocation;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingVeeStabilizer;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -95,7 +101,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class Part implements IPartWork, ITechnology {
-    private static final MMLogger logger = MMLogger.create(Part.class);
+    private static final MMLogger LOGGER = MMLogger.create(Part.class);
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -167,7 +173,7 @@ public abstract class Part implements IPartWork, ITechnology {
     /*
      * This will be unusual but in some circumstances certain parts will be linked
      * to other parts.
-     * These linked parts will be considered integral and subsidary to those other
+     * These linked parts will be considered integral and subsidiary to those other
      * parts and will
      * not show up independently. Currently (8/8/2015), we are only using this for
      * BA suits
@@ -770,11 +776,11 @@ public abstract class Part implements IPartWork, ITechnology {
                 retVal.setUnit(null);
             }
         } catch (ClassNotFoundException classNotFoundException) {
-            logger.error(classNotFoundException, "Could not find Part subclass with name {}, please check if this " +
-                                                       "class was not renamed, if thats the case, register its new " +
+            LOGGER.error(classNotFoundException, "Could not find Part subclass with name {}, please check if this " +
+                                                       "class was not renamed, if that's the case, register its new " +
                                                        "name in the function Part#fixForRenamedClasses", className);
         } catch (Exception ex) {
-            logger.error(ex, "Unexpected error {}", ex.getMessage());
+            LOGGER.error(ex, "Unexpected error {}", ex.getMessage());
         }
 
         return retVal;
@@ -922,7 +928,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public TargetRoll getAllModsForMaintenance() {
-        // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts
+        // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts,
         // but we will make this user customizable
         final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
@@ -1020,7 +1026,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Sets the the team member who has reserved this part for work they are performing overnight.
+     * Sets the team member who has reserved this part for work they are performing overnight.
      *
      * @param tech The team member.
      */
@@ -1778,7 +1784,7 @@ public abstract class Part implements IPartWork, ITechnology {
             int id = replacementPart.getId();
             replacementPart = campaign.getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
-                logger.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
         }
 
@@ -1786,7 +1792,7 @@ public abstract class Part implements IPartWork, ITechnology {
             int id = parentPart.getId();
             parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
-                logger.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
         }
 
@@ -1797,7 +1803,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    logger.error("Part {} ('{}') references missing child part {}",
+                    LOGGER.error("Part {} ('{}') references missing child part {}",
                           getId(),
                           getName(),
                           childPart.getId());
@@ -1810,14 +1816,14 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                logger.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
             }
         }
         if (reservedBy instanceof PartPersonRef) {
             UUID id = reservedBy.getId();
             reservedBy = campaign.getPerson(id);
             if (reservedBy == null) {
-                logger.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
             }
         }
 
@@ -1825,7 +1831,7 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error("Part {} ('{}') references missing unit (reservation) {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing unit (reservation) {}", getId(), getName(), id);
             }
         }
 
@@ -1833,7 +1839,7 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = refitUnit.getId();
             refitUnit = campaign.getUnit(id);
             if (refitUnit == null) {
-                logger.error("Part {} ('{}') references missing refit unit {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing refit unit {}", getId(), getName(), id);
             }
         }
     }

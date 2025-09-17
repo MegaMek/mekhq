@@ -67,17 +67,17 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author NickAragua
  */
 public class ForceTemplateAssignmentDialog extends JDialog {
-    private JLabel lblInstructions = new JLabel();
-    private JList<Force> forceList = new JList<>();
-    private JList<Unit> unitList = new JList<>();
-    private JList<ScenarioForceTemplate> templateList = new JList<>();
-    private JButton btnAssign = new JButton();
-    private JButton btnClose = new JButton();
+    private final JLabel lblInstructions = new JLabel();
+    private final JList<Force> forceList = new JList<>();
+    private final JList<Unit> unitList = new JList<>();
+    private final JList<ScenarioForceTemplate> templateList = new JList<>();
+    private final JButton btnAssign = new JButton();
+    private final JButton btnClose = new JButton();
 
-    private AtBDynamicScenario currentScenario;
-    private Vector<Force> currentForceVector;
-    private Vector<Unit> currentUnitVector;
-    private CampaignGUI campaignGUI;
+    private final AtBDynamicScenario currentScenario;
+    private final Vector<Force> currentForceVector;
+    private final Vector<Unit> currentUnitVector;
+    private final CampaignGUI campaignGUI;
 
     // FIXME : Unlocalized text
     private static final String DEPLOY_TRANSPORTED_DIALOG_TEXT = " is a transport with units assigned to it. \n" +
@@ -204,13 +204,9 @@ public class ForceTemplateAssignmentDialog extends JDialog {
      * Handles logic for updating the assign button state.
      */
     private void updateAssignButtonState() {
-        if (((forceList.getSelectedIndex() >= 0) ||
-                   (unitList.getSelectedIndex() >= 0)) &&
-                  (templateList.getSelectedIndex() >= 0)) {
-            btnAssign.setEnabled(true);
-        } else {
-            btnAssign.setEnabled(false);
-        }
+        btnAssign.setEnabled(((forceList.getSelectedIndex() >= 0) ||
+                                    (unitList.getSelectedIndex() >= 0)) &&
+                                   (templateList.getSelectedIndex() >= 0));
     }
 
     /**
@@ -258,7 +254,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     }
 
     /**
-     * Worker function that prompts the player to deploy any units assigned to a transport to a scenario when the
+     * Worker function that prompts the player to deploy any units assigned to transport to a scenario when the
      * transport is deployed to that scenario
      *
      * @param unit The transport unit whose name and cargo we wish to deal with

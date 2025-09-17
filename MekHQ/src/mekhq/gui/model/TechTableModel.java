@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,7 +51,7 @@ import mekhq.utilities.ReportingUtilities;
 /**
  * A table model for displaying work items
  */
-public class TechTableModel extends DataTableModel {
+public class TechTableModel extends DataTableModel<Person> {
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
@@ -62,12 +62,12 @@ public class TechTableModel extends DataTableModel {
           SkillType.S_TECH_VESSEL,
           };
 
-    private CampaignGUI tab;
-    private ITechWorkPanel panel;
+    private final CampaignGUI tab;
+    private final ITechWorkPanel panel;
 
     public TechTableModel(CampaignGUI tab, ITechWorkPanel panel) {
         columnNames = new String[] { "Techs" };
-        data = new ArrayList<Person>();
+        data = new ArrayList<>();
         this.tab = tab;
         this.panel = panel;
     }
@@ -78,7 +78,7 @@ public class TechTableModel extends DataTableModel {
     }
 
     public Person getTechAt(int row) {
-        return (Person) data.get(row);
+        return data.get(row);
     }
 
     public Campaign getCampaign() {
@@ -141,7 +141,7 @@ public class TechTableModel extends DataTableModel {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
-            toReturn.append(" color='" + ReportingUtilities.getPositiveColor() + "'><b>@");
+            toReturn.append(" color='").append(ReportingUtilities.getPositiveColor()).append("'><b>@");
         } else {
             toReturn.append("><b>");
         }

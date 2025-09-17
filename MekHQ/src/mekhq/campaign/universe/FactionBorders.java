@@ -138,13 +138,13 @@ public class FactionBorders {
                                                          p.getY(),
                                                          intersection))
                                                    .sorted(Comparator.comparingDouble(PlanetarySystem::getX))
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         List<PlanetarySystem> ourSystems = getSystems().stream()
                                                  .filter(p -> RegionPerimeter.isInsideRegion(p.getX(),
                                                        p.getY(),
                                                        intersection))
                                                  .sorted(Comparator.comparingDouble(PlanetarySystem::getX))
-                                                 .collect(Collectors.toList());
+                                                 .toList();
 
         List<PlanetarySystem> retVal = new ArrayList<>();
         int start = 0;

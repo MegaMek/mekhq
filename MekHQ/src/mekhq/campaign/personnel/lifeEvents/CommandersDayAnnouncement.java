@@ -60,10 +60,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * @since 0.50.05
  */
-public class CommandersDayAnnouncement {
-    private static String RESOURCE_BUNDLE = "mekhq.resources.CommandersDayAnnouncement";
-
-    private final Campaign campaign;
+public record CommandersDayAnnouncement(Campaign campaign) {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandersDayAnnouncement";
 
     private final static int COMMANDERS_DAY_MONTH = 6;
     private final static int COMMANDERS_DAY_DAY = 16;

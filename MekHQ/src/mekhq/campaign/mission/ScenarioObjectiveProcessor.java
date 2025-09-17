@@ -44,8 +44,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.units.Entity;
 import megamek.common.OffBoardDirection;
+import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -54,7 +54,7 @@ import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -64,8 +64,8 @@ import org.apache.logging.log4j.LogManager;
  */
 public class ScenarioObjectiveProcessor {
 
-    private Map<ScenarioObjective, Set<String>> qualifyingObjectiveUnits;
-    private Map<ScenarioObjective, Set<String>> potentialObjectiveUnits;
+    private final Map<ScenarioObjective, Set<String>> qualifyingObjectiveUnits;
+    private final Map<ScenarioObjective, Set<String>> potentialObjectiveUnits;
 
     /**
      * Blank constructor
@@ -167,13 +167,11 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Update the objective qualification status of a given entity based on its current state and on whether or not it
-     * has "escaped". Assumes that the entity is potentially eligible for the objective.
+     * Update the objective qualification status of a given entity based on its current state and on whether it has
+     * "escaped". Assumes that the entity is potentially eligible for the objective.
      *
-     * @param entity
-     * @param forceEntityEscape             Whether the entity was marked as 'escaped', regardless of entity status
-     * @param forceEntityDestruction        Whether the entity was marked as 'destroyed', regardless of entity status
-     * @param opponentHasBattlefieldControl
+     * @param forceEntityEscape      Whether the entity was marked as 'escaped', regardless of entity status
+     * @param forceEntityDestruction Whether the entity was marked as 'destroyed', regardless of entity status
      */
     public void updateObjectiveEntityState(Entity entity, boolean forceEntityEscape,
           boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
@@ -284,10 +282,10 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Check whether or not the entity can be considered as having reached the destination edge in the given objective
+     * Check whether the entity can be considered as having reached the destination edge in the given objective
      */
     private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective) {
-        // we've reached the destination edge if we've reached an edge and it's the right one
+        // we've reached the destination edge if we've reached an edge, and it's the right one
         return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) &&
                       (entity.getRetreatedDirection() == objective.getDestinationEdge()));
     }
@@ -469,7 +467,7 @@ public class ScenarioObjectiveProcessor {
                     }
                 }
                 break;
-            case ContractMoraleUpdate:
+            case ContractMoraleUpdate, BVBudgetUpdate:
                 break;
             case ContractVictory:
                 if (dryRun) {
@@ -488,8 +486,6 @@ public class ScenarioObjectiveProcessor {
                           String.format("Defeat in scenario %s ends the contract with a defeat",
                                 tracker.getScenario().getDescription()));
                 }
-                break;
-            case BVBudgetUpdate:
                 break;
             case AtBBonus:
                 if (tracker.getMission() instanceof AtBContract contract) {
@@ -517,7 +513,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will not be captured.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                        StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               (AtBContract) tracker.getMission(),
                               false,
                               false);
@@ -529,7 +525,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "This facility will be destroyed.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                        StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               (AtBContract) tracker.getMission(),
                               true,
                               false);
@@ -541,7 +537,7 @@ public class ScenarioObjectiveProcessor {
                     if (dryRun) {
                         return "Allied forces will control this facility.";
                     } else {
-                        StratconRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
+                        StratConRulesManager.updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               (AtBContract) tracker.getMission(),
                               false,
                               true);

@@ -50,17 +50,13 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  */
 public class MarkdownEditorDialog extends JDialog {
     private MarkdownEditorPanel mkEditor;
-    private JButton btnOK;
-    private JButton btnCancel;
     private boolean changed;
 
     /**
      * Constructor
      *
-     * @param parent
-     * @param modal
-     * @param title  - a <code>String</code> for the title of the dialog
-     * @param text   - a <code>String</code> for existing text to be placed in the editor when created.
+     * @param title - a <code>String</code> for the title of the dialog
+     * @param text  - a <code>String</code> for existing text to be placed in the editor when created.
      */
     public MarkdownEditorDialog(JFrame parent, boolean modal, String title, String text) {
         super(parent, modal);
@@ -81,8 +77,8 @@ public class MarkdownEditorDialog extends JDialog {
     private void initComponents() {
 
         mkEditor = new MarkdownEditorPanel();
-        btnOK = new JButton();
-        btnCancel = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog",
               MekHQ.getMHQOptions().getLocale());

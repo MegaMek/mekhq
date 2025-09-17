@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,19 +41,20 @@ import java.util.stream.Collectors;
 
 import megamek.common.equipment.AmmoType;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
-    private IAcquisitionWork partToBuy;
+    private final IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
     private double tonnagePerItem;
     private int transferCount;
     private int plannedCount;
     private Money cost = Money.zero();
-    private List<Part> spares = new ArrayList<>();
+    private final List<Part> spares = new ArrayList<>();
     private double requestedStock;
     private boolean isBundle;
 
@@ -85,7 +86,7 @@ public class PartInUse {
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
             this.description = sb.toString();
-            AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
+            AmmoType ammoType = ((AmmoStorage) partToBuy).getType();
             if (ammoType.getKgPerShot() > 0) {
                 this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
             } else {

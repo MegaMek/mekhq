@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,6 +46,8 @@ import megamek.common.units.Entity;
 import megamek.common.units.QuadVee;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingQuadVeeGear;
 import org.w3c.dom.Node;
 
 /**
@@ -88,7 +90,7 @@ public class QuadVeeGear extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
-            hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+            hits = unit.getHitCriticalSlots(CriticalSlot.TYPE_SYSTEM,
                   QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
@@ -147,13 +149,13 @@ public class QuadVeeGear extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);

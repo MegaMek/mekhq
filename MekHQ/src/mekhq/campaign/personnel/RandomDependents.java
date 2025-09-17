@@ -64,9 +64,9 @@ public class RandomDependents {
     private final boolean isUseRandomDependentRemoval;
     private final LocalDate currentDay;
 
-    private List<Person> activeDependents = new ArrayList<>();
-    private int activeNonDependents;
-    private int dependentCapacity;
+    private final List<Person> activeDependents = new ArrayList<>();
+    private final int activeNonDependents;
+    private final int dependentCapacity;
 
     final static double DEPENDENT_CAPACITY_MULTIPLIER = 0.05;
 

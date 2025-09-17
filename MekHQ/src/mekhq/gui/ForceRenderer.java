@@ -41,8 +41,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
-import megamek.common.units.Entity;
 import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -53,7 +53,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
-    private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
+    private static final MMLogger LOGGER = MMLogger.create(ForceRenderer.class);
 
     // region Constructors
     public ForceRenderer() {
@@ -180,27 +180,31 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
 
-            ForceType forceType = force.getForceType();
-            String typeKey = forceType.getSymbol();
-
-            String formattedForceName = String.format("<html>%s%s%s%s%s%s%s</html>",
-                  force.isCombatTeam() ? "<b>" : "",
-                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
-                  force.getName(),
-                  force.isCombatTeam() ? "</b>" : "",
-                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
-                  force.isCombatTeam() ? " <s>c</s>" : "",
-                  typeKey);
+            String formattedForceName = getFormattedForceName(force);
 
             setText(formattedForceName);
         } else {
-            logger.error("Attempted to render node with unknown node class of "
-                               + ((value != null) ? value.getClass() : "null"));
+            LOGGER.error("Attempted to render node with unknown node class of {}",
+                  (value != null) ? value.getClass() : "null");
         }
 
         setIcon(getIcon(value));
 
         return this;
+    }
+
+    private static String getFormattedForceName(Force force) {
+        ForceType forceType = force.getForceType();
+        String typeKey = forceType.getSymbol();
+
+        return String.format("<html>%s%s%s%s%s%s%s</html>",
+              force.isCombatTeam() ? "<b>" : "",
+              force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+              force.getName(),
+              force.isCombatTeam() ? "</b>" : "",
+              force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+              force.isCombatTeam() ? " <s>c</s>" : "",
+              typeKey);
     }
 
     protected Icon getIcon(Object node) {

@@ -77,7 +77,7 @@ import org.w3c.dom.NodeList;
  * @since 0.50.5
  */
 public class Attributes {
-    private static final MMLogger logger = MMLogger.create(Attributes.class);
+    private static final MMLogger LOGGER = MMLogger.create(Attributes.class);
 
     private int strength;
     private int body;
@@ -250,7 +250,7 @@ public class Attributes {
      */
     public int getAttributeScore(SkillAttribute attribute) {
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(getAttributeScore) attribute is null or NONE.");
+            LOGGER.warn("(getAttributeScore) attribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
         }
 
@@ -263,7 +263,7 @@ public class Attributes {
             case WILLPOWER -> willpower;
             case CHARISMA -> charisma;
             default -> {
-                logger.error("(getAttributeScore) Invalid attribute requested: {}", attribute);
+                LOGGER.error("(getAttributeScore) Invalid attribute requested: {}", attribute);
                 yield DEFAULT_ATTRIBUTE_SCORE;
             }
         };
@@ -294,7 +294,7 @@ public class Attributes {
      */
     public void setAttributeScore(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int score) {
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(setAttributeScore) attribute is null or NONE.");
+            LOGGER.warn("(setAttributeScore) attribute is null or NONE.");
             return;
         }
 
@@ -312,7 +312,7 @@ public class Attributes {
             case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            default -> logger.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
+            default -> LOGGER.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
         }
     }
 
@@ -366,7 +366,7 @@ public class Attributes {
             case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
             case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
             default -> {
-                logger.error("(setAttributeScore) Invalid attribute requested for cap modifier: {}", attribute);
+                LOGGER.error("(setAttributeScore) Invalid attribute requested for cap modifier: {}", attribute);
                 yield 0;
             }
         };
@@ -515,12 +515,12 @@ public class Attributes {
      */
     public void changeAllAttributes(Phenotype phenotype, PersonnelOptions options, int delta) {
         if (phenotype == null) {
-            logger.warn("(changeAllAttributes) phenotype is null.");
+            LOGGER.warn("(changeAllAttributes) phenotype is null.");
             return;
         }
 
         if (options == null) {
-            logger.warn("(changeAllAttributes) options is null.");
+            LOGGER.warn("(changeAllAttributes) options is null.");
             return;
         }
 
@@ -555,16 +555,16 @@ public class Attributes {
      */
     public void changeAttribute(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int delta) {
         if (phenotype == null) {
-            logger.warn("(changeAttribute) phenotype is null.");
+            LOGGER.warn("(changeAttribute) phenotype is null.");
             return;
         }
         if (options == null) {
-            logger.warn("(changeAttribute) options is null.");
+            LOGGER.warn("(changeAttribute) options is null.");
             return;
         }
 
         if (attribute == null || attribute.isNone()) {
-            logger.warn("(changeAttribute) attribute is null or NONE.");
+            LOGGER.warn("(changeAttribute) attribute is null or NONE.");
             return;
         }
 
@@ -755,7 +755,7 @@ public class Attributes {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Could not parse Attributes: ", ex);
+            LOGGER.error("Could not parse Attributes: ", ex);
         }
 
         return this;

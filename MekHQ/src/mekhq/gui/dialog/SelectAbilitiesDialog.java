@@ -57,10 +57,8 @@ import mekhq.campaign.personnel.SpecialAbility;
  * @author Taharqa
  */
 public class SelectAbilitiesDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(SelectAbilitiesDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(SelectAbilitiesDialog.class);
 
-    private JButton btnClose;
-    private JButton btnOK;
     private List<JCheckBox> chkAbility;
     private Vector<String> selected;
     private List<String> spaNames;
@@ -79,8 +77,8 @@ public class SelectAbilitiesDialog extends JDialog {
     }
 
     private void initComponents() {
-        btnOK = new JButton();
-        btnClose = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnClose = new JButton();
 
         chkAbility = new ArrayList<>();
         spaNames = new ArrayList<>();
@@ -131,7 +129,7 @@ public class SelectAbilitiesDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

@@ -34,29 +34,17 @@ package mekhq.gui.displayWrappers;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
-public class RankDisplay {
-    //region Variable Declarations
-    private final int rankNumeric;
-    private final String displayName;
+/**
+ * @param rankNumeric region Variable Declarations
+ */
+public record RankDisplay(int rankNumeric, String displayName) {
     //endregion Variable Declarations
-
-    //region Constructors
-    public RankDisplay(final int rankNumeric, final String displayName) {
-        this.rankNumeric = rankNumeric;
-        this.displayName = displayName;
-    }
-    //endregion Constructors
-
-    //region Getters
-    public int getRankNumeric() {
-        return rankNumeric;
-    }
-    //endregion Getters
 
     /**
      * This creates a list of all valid rank displays, which can then be added to a checkbox or used to create menu
@@ -81,6 +69,7 @@ public class RankDisplay {
     }
 
     @Override
+    @Nonnull
     public String toString() {
         return displayName;
     }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -992,7 +992,7 @@ public class Person {
     /**
      * Use {@link #setPrimaryRole(LocalDate, PersonnelRole)} instead
      */
-    @Deprecated(since = "0.50.07", forRemoval = false) // we need to remove the uses before removal
+    @Deprecated(since = "0.50.07") // we need to remove the uses before removal
     public void setPrimaryRole(final Campaign campaign, final PersonnelRole primaryRole) {
         // don't need to do any processing for no changes
         if (primaryRole == getPrimaryRole()) {
@@ -4132,7 +4132,7 @@ public class Person {
     }
 
     /**
-     * Retrieves the character's rank <b>sub-level</b>. Predominantly used in ComStar rank styles.
+     * Retrieves the character's rank <b>sublevel</b>. Predominantly used in ComStar rank styles.
      *
      * <p><b>Important:</b> You almost always want to use {@link #getRankNumeric()} instead.</p>
      *
@@ -6776,10 +6776,10 @@ public class Person {
 
             if (joinedCampaign != null) {
                 if (updateRecruitment) {
-                    recruitment = estimatedJoinDate;
+                    recruitment = null;
                 }
                 if (updateLastRankChange) {
-                    lastRankChangeDate = estimatedJoinDate;
+                    lastRankChangeDate = null;
                 }
                 recruitment = joinedCampaign;
                 return;
@@ -7485,7 +7485,7 @@ public class Person {
     }
 
     /**
-     * Determines whether a character's dark secret is revealed based on a dice roll, configured modifiers, and campaign
+     * Determines whether a character's dark secret is revealed based on a die roll, configured modifiers, and campaign
      * options.
      *
      * <p>If the character does not have a dark secret, an empty string is returned. Otherwise, a target number is
@@ -7498,7 +7498,7 @@ public class Person {
      *
      * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
      *                      {@link #hasDarkSecret()}
-     * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
+     * @param forceReveal   {@code true} if the reveal should be forced without a die roll.
      *
      * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise
      *
@@ -7595,7 +7595,7 @@ public class Person {
             return 0;
         }
 
-        // If the character has a dark secret but it is not revealed, return a default modifier (e.g., -1)
+        // If the character has a dark secret, but it is not revealed, return a default modifier (e.g., -1)
         if (!darkSecretRevealed && hasDarkSecret()) {
             return -1; // Default modifier for unrevealed dark secrets
         }

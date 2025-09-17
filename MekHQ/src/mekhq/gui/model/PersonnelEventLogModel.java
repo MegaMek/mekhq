@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,7 +49,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-public class PersonnelEventLogModel extends DataTableModel {
+public class PersonnelEventLogModel extends DataTableModel<LogEntry> {
     private static final String EMPTY_CELL = "";
 
     public static final int COL_DATE = 0;
@@ -62,15 +62,10 @@ public class PersonnelEventLogModel extends DataTableModel {
           MekHQ.getMHQOptions().getLocale());
 
     public PersonnelEventLogModel() {
-        data = new ArrayList<LogEntry>();
+        data = new ArrayList<>();
         dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions()
                                                                 .getDisplayFormattedDate(LocalDate.now())
                                                                 .concat("MM"));
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
     }
 
     @Override
@@ -80,27 +75,21 @@ public class PersonnelEventLogModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_DATE:
-                return resourceMap.getString("date.heading");
-            case COL_TEXT:
-                return resourceMap.getString("event.heading");
-            default:
-                return EMPTY_CELL;
-        }
+        return switch (column) {
+            case COL_DATE -> resourceMap.getString("date.heading");
+            case COL_TEXT -> resourceMap.getString("event.heading");
+            default -> EMPTY_CELL;
+        };
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         LogEntry event = getEvent(row);
-        switch (column) {
-            case COL_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(event.getDate());
-            case COL_TEXT:
-                return event.getDesc();
-            default:
-                return EMPTY_CELL;
-        }
+        return switch (column) {
+            case COL_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(event.getDate());
+            case COL_TEXT -> event.getDesc();
+            default -> EMPTY_CELL;
+        };
     }
 
     @Override
@@ -108,39 +97,28 @@ public class PersonnelEventLogModel extends DataTableModel {
         return String.class;
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
     public LogEntry getEvent(int row) {
         if ((row < 0) || (row >= data.size())) {
             return null;
         } else {
-            return (LogEntry) data.get(row);
+            return data.get(row);
         }
     }
 
     public int getAlignment(int column) {
-        switch (column) {
-            case COL_DATE:
-                return StyleConstants.ALIGN_RIGHT;
-            case COL_TEXT:
-                return StyleConstants.ALIGN_LEFT;
-            default:
-                return StyleConstants.ALIGN_CENTER;
-        }
+        return switch (column) {
+            case COL_DATE -> StyleConstants.ALIGN_RIGHT;
+            case COL_TEXT -> StyleConstants.ALIGN_LEFT;
+            default -> StyleConstants.ALIGN_CENTER;
+        };
     }
 
     public int getPreferredWidth(int column) {
-        switch (column) {
-            case COL_DATE:
-                return dateTextWidth;
-            case COL_TEXT:
-                return 300;
-            default:
-                return 100;
-        }
+        return switch (column) {
+            case COL_DATE -> dateTextWidth;
+            case COL_TEXT -> 300;
+            default -> 100;
+        };
     }
 
     public boolean hasConstantWidth(int col) {

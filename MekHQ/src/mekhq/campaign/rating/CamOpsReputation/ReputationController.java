@@ -65,7 +65,7 @@ import org.w3c.dom.NodeList;
 
 public class ReputationController {
     // utilities
-    private static final MMLogger logger = MMLogger.create(ReputationController.class);
+    private static final MMLogger LOGGER = MMLogger.create(ReputationController.class);
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CamOpsReputation",
           MekHQ.getMHQOptions().getLocale());
@@ -188,7 +188,7 @@ public class ReputationController {
 
         // step nine: total everything
         calculateTotalReputation();
-        logger.debug("TOTAL REPUTATION = {}", reputationRating);
+        LOGGER.debug("TOTAL REPUTATION = {}", reputationRating);
     }
 
     /**
@@ -753,7 +753,7 @@ public class ReputationController {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Could not parse Reputation: ", ex);
+            LOGGER.error("Could not parse Reputation: ", ex);
         }
 
         return this;
@@ -782,13 +782,13 @@ public class ReputationController {
                         List<Integer> list = Arrays.stream(numbers).map(Integer::parseInt).collect(Collectors.toList());
                         technicianRequirements.put(node.getNodeName(), list);
                     } catch (NumberFormatException ex) {
-                        logger.error("Could not parse TechnicianRequirements: ", ex);
+                        LOGGER.error("Could not parse TechnicianRequirements: ", ex);
                     }
                 } else {
                     try {
                         map.put(node.getNodeName(), MathUtility.parseInt(node.getTextContent()));
                     } catch (Exception ex) {
-                        logger.error("Could not parse {}: ", map, ex);
+                        LOGGER.error("Could not parse {}: ", map, ex);
                     }
                 }
             }

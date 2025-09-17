@@ -62,7 +62,7 @@ import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 
 public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
-    private static final MMLogger logger = MMLogger.create(AdvanceDaysDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(AdvanceDaysDialog.class);
 
     // region Variable Declarations
     private final CampaignGUI gui;
@@ -311,7 +311,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             days = Math.toIntExact(ChronoUnit.DAYS.between(today,
                   LocalDate.ofYearDay(today.getYear() + 5 - (today.getYear() % 5), 1)));
         } else {
-            logger.error("Unknown source to start advancing days. Advancing to tomorrow.");
+            LOGGER.error("Unknown source to start advancing days. Advancing to tomorrow.");
             days = 1;
         }
 
@@ -334,7 +334,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
                 }
                 reports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
                 break;
             }
         }

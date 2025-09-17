@@ -49,11 +49,11 @@ import mekhq.campaign.mission.Contract;
  * @author Miguel Azevedo
  */
 public class ContractPaymentBreakdown {
-    private JPanel mainPanel;
-    private Campaign campaign;
-    private Contract contract;
+    private final JPanel mainPanel;
+    private final Campaign campaign;
+    private final Contract contract;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractPaymentBreakdown",
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractPaymentBreakdown",
           MekHQ.getMHQOptions().getLocale());
 
     private static final String indentation = "    ";
@@ -91,7 +91,7 @@ public class ContractPaymentBreakdown {
     /**
      * Draws and fill all the elements for the contract payment breakdown
      *
-     * @param y         gridBagConstraint.gridy, in case it is appending to an existing grid
+     * @param y         gridBagConstraint.gridY, in case it is appending to an existing grid
      * @param gridWidth the gridBagConstraint.gridWidth to use for text, in case it is appending to an existing grid
      */
     public void display(int y, int gridWidth) {
@@ -183,7 +183,7 @@ public class ContractPaymentBreakdown {
         JLabel lblFeeAmount1;
         if (contract.payMRBCFee()) {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text")
-                                             + " (-" + contract.getMrbcFeePercentage() + "% "
+                                             + " (-" + contract.getMRBCFeePercentage() + "% "
                                              + resourceMap.getString("lblOfGrossIncome.text") + ")");
         } else {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text"));
@@ -307,7 +307,7 @@ public class ContractPaymentBreakdown {
     }
 
     /**
-     * Refreshes all of the values
+     * Refreshes all the values
      */
     public void refresh() {
         setLblBaseAmount2();

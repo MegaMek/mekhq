@@ -169,7 +169,7 @@ public class PostScenarioDialogHandler {
             boolean isCivilianHelp = false;
 
             if (tracker.getScenario() instanceof AtBScenario atbScenario) {
-                isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIANHELP;
+                isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIAN_HELP;
             }
 
             AutoAwardsController autoAwardsController = new AutoAwardsController();

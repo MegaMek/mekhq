@@ -58,11 +58,11 @@ import megamek.logging.MMLogger;
  * @author Neoancient
  */
 public class UnitTechProgression {
-    private static final MMLogger logger = MMLogger.create(UnitTechProgression.class);
+    private static final MMLogger LOGGER = MMLogger.create(UnitTechProgression.class);
 
     private static final UnitTechProgression instance = new UnitTechProgression();
 
-    private Map<Faction, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
+    private final Map<Faction, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
 
     /**
      * Initializes the data for a particular faction
@@ -140,7 +140,7 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         return null;
     }
@@ -149,12 +149,12 @@ public class UnitTechProgression {
         try {
             Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
-                logger.error("Entity was null: " + ms.getName());
+                LOGGER.error("Entity was null: {}", ms.getName());
                 return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {
-            logger.error("Exception loading entity " + ms.getName(), ex);
+            LOGGER.error("Exception loading entity {}", ms.getName(), ex);
             return null;
         }
     }
@@ -163,20 +163,15 @@ public class UnitTechProgression {
      * Goes through all the entries in MekSummaryCache, loads them, and calculates the composite tech level of all the
      * equipment and construction options for a specific faction.
      */
-    private static class BuildMapTask implements Callable<Map<MekSummary, ITechnology>> {
-        private Faction techFaction;
-
-        BuildMapTask(Faction techFaction) {
-            this.techFaction = techFaction;
-        }
+    private record BuildMapTask(Faction techFaction) implements Callable<Map<MekSummary, ITechnology>> {
 
         // Load all the Entities in the MekSummaryCache and calculate the tech level for
         // the given faction.
         @Override
-        public Map<MekSummary, ITechnology> call() throws Exception {
+        public Map<MekSummary, ITechnology> call() {
             Map<MekSummary, ITechnology> map = new HashMap<>();
-            for (MekSummary ms : MekSummaryCache.getInstance().getAllMeks()) {
-                map.put(ms, calcTechProgression(ms, techFaction));
+            for (MekSummary mekSummary : MekSummaryCache.getInstance().getAllMeks()) {
+                map.put(mekSummary, calcTechProgression(mekSummary, techFaction));
             }
             return map;
         }

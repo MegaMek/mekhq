@@ -44,6 +44,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,7 +53,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MotiveSystem extends Part {
-    private static final MMLogger logger = MMLogger.create(MotiveSystem.class);
+    private static final MMLogger LOGGER = MMLogger.create(MotiveSystem.class);
 
     int damage;
     int penalty;
@@ -121,7 +122,7 @@ public class MotiveSystem extends Part {
                     penalty = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -167,10 +168,9 @@ public class MotiveSystem extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         // motive systems don't have to check for destruction since they
         // cannot be removed
-        if (null != unit && unit.getEntity() instanceof Tank) {
-            Tank t = (Tank) unit.getEntity();
-            damage = t.getMotiveDamage();
-            penalty = t.getMotivePenalty();
+        if (null != unit && unit.getEntity() instanceof Tank tank) {
+            damage = tank.getMotiveDamage();
+            penalty = tank.getMotivePenalty();
         }
     }
 

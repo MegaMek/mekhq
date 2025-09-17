@@ -70,7 +70,7 @@ import mekhq.gui.displayWrappers.RankDisplay;
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(HireBulkPersonnelDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(HireBulkPersonnelDialog.class);
 
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
@@ -336,7 +336,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -344,7 +344,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         int number = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
-            logger.error("Attempted to bulk hire for null PersonnelType!");
+            LOGGER.error("Attempted to bulk hire for null PersonnelType!");
             return;
         }
 
@@ -372,7 +372,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                 }
             }
 
-            person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+            person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
 
             int age = person.getAge(today);
             if (useAge) {

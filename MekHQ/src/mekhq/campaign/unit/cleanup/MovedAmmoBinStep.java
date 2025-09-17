@@ -48,7 +48,7 @@ public class MovedAmmoBinStep extends UnscrambleStep {
     }
 
     public void visit(final EquipmentProposal proposal, final AmmoBin ammoBin) {
-        for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
+        for (final Entry<Integer, Mounted<?>> equipment : proposal.getEquipment()) {
             final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed() || !(m.getType() instanceof AmmoType)) {
                 continue;

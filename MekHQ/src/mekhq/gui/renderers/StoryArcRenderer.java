@@ -39,7 +39,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.panels.StoryArcPanel;
 
 public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<StoryArcStub> {

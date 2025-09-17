@@ -46,21 +46,11 @@ import javax.swing.*;
  * @author Taharqa (Aaron Gullickson)
  */
 public class MarkdownEditorPanel extends JPanel {
-    private JTabbedPane tabPane;
-    private JTextArea editor;
-    private JScrollPane scrollEditor;
-    private JScrollPane scrollViewer;
-    private JTextPane viewer;
-
-    private JButton btnH1;
-    private JButton btnH2;
-    private JButton btnH3;
-    private JButton btnBold;
-    private JButton btnItalic;
-    private JButton btnHR;
-    private JButton btnUL;
-    private JButton btnOL;
-    private JButton btnQuestion;
+    private final JTabbedPane tabPane;
+    private final JTextArea editor;
+    private final JScrollPane scrollEditor;
+    private final JScrollPane scrollViewer;
+    private final JTextPane viewer;
 
     /**
      * Constructor for new MarkdownEditorPanel
@@ -89,62 +79,60 @@ public class MarkdownEditorPanel extends JPanel {
 
         //set up buttons
         JPanel pnlButtons = new JPanel(new WrapLayout(FlowLayout.LEFT));
-        btnH1 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924.png")); // TODO : Remove inline file path
+        JButton btnH1 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924.png")); // TODO : Remove inline file path
         btnH1.setToolTipText("Header 1");
         btnH1.setPreferredSize(new Dimension(36, 36));
         btnH1.addActionListener(ev -> insertHeader(1));
         pnlButtons.add(btnH1);
 
-        btnH2 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_20px.png")); // TODO : Remove inline file path
+        JButton btnH2 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_20px.png")); // TODO : Remove inline file path
         btnH2.setToolTipText("Header 2");
         btnH2.setPreferredSize(new Dimension(36, 36));
         btnH2.addActionListener(ev -> insertHeader(2));
         pnlButtons.add(btnH2);
 
-        btnH3 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_16px.png")); // TODO : Remove inline file path
+        JButton btnH3 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_16px.png")); // TODO : Remove inline file path
         btnH3.setToolTipText("Header 3");
         btnH3.setPreferredSize(new Dimension(36, 36));
         btnH3.addActionListener(ev -> insertHeader(3));
         pnlButtons.add(btnH3);
 
-        btnBold = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_bold_48px_352381.png")); // TODO : Remove inline file path
+        JButton btnBold = new JButton(new ImageIcon(
+              "data/images/misc/markdown_editor/iconfinder_ic_format_bold_48px_352381.png")); // TODO : Remove inline file path
         btnBold.setToolTipText("Bold");
         btnBold.setPreferredSize(new Dimension(36, 36));
         btnBold.addActionListener(ev -> boldText());
         pnlButtons.add(btnBold);
 
-        btnItalic = new JButton(new ImageIcon(
+        JButton btnItalic = new JButton(new ImageIcon(
               "data/images/misc/markdown_editor/iconfinder_ic_format_italic_48px_352387.png")); // TODO : Remove inline file path
         btnItalic.setToolTipText("Italicize");
         btnItalic.setPreferredSize(new Dimension(36, 36));
         btnItalic.addActionListener(ev -> italicizeText());
         pnlButtons.add(btnItalic);
 
-        btnHR = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_remove_48px_352440.png")); // TODO : Remove inline file path
+        JButton btnHR = new JButton(new ImageIcon(
+              "data/images/misc/markdown_editor/iconfinder_ic_remove_48px_352440.png")); // TODO : Remove inline file path
         btnHR.setToolTipText("Horizontal line");
         btnHR.setPreferredSize(new Dimension(36, 36));
         btnHR.addActionListener(ev -> insertHR());
         pnlButtons.add(btnHR);
 
-        btnUL = new JButton(new ImageIcon(
+        JButton btnUL = new JButton(new ImageIcon(
               "data/images/misc/markdown_editor/iconfinder_ic_format_list_bulleted_48px_352389.png")); // TODO : Remove inline file path
         btnUL.setToolTipText("Unordered list");
         btnUL.setPreferredSize(new Dimension(36, 36));
         btnUL.addActionListener(ev -> insertBullet(false));
         pnlButtons.add(btnUL);
 
-        btnOL = new JButton(new ImageIcon(
+        JButton btnOL = new JButton(new ImageIcon(
               "data/images/misc/markdown_editor/iconfinder_ic_format_list_numbered_48px_352390.png")); // TODO : Remove inline file path
         btnOL.setToolTipText("Ordered list");
         btnOL.setPreferredSize(new Dimension(36, 36));
         btnOL.addActionListener(ev -> insertBullet(true));
         pnlButtons.add(btnOL);
 
-        btnQuestion = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_help_48px_352423.png")); // TODO : Remove inline file path
-        btnQuestion.setToolTipText("More information");
-        btnQuestion.setPreferredSize(new Dimension(36, 36));
-        btnQuestion.addActionListener(ev -> JOptionPane.showMessageDialog(null,
-              "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>"));
+        JButton btnQuestion = getBtnQuestion();
         pnlButtons.add(btnQuestion);
 
         JPanel editorPanel = new JPanel(new BorderLayout());
@@ -188,6 +176,16 @@ public class MarkdownEditorPanel extends JPanel {
         });
     }
 
+    private static JButton getBtnQuestion() {
+        JButton btnQuestion = new JButton(new ImageIcon(
+              "data/images/misc/markdown_editor/iconfinder_ic_help_48px_352423.png")); // TODO : Remove inline file path
+        btnQuestion.setToolTipText("More information");
+        btnQuestion.setPreferredSize(new Dimension(36, 36));
+        btnQuestion.addActionListener(ev -> JOptionPane.showMessageDialog(null,
+              "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>"));
+        return btnQuestion;
+    }
+
     /**
      * Set the text for the editor. This can be used when called up on existing text to initially fill the editor.
      *
@@ -209,7 +207,7 @@ public class MarkdownEditorPanel extends JPanel {
 
     /**
      * Insert bold (**) markup on the selection. If an existing word or phrase is highlighted, this will put the markup
-     * at either ends. Otherwise it will put an empty markup (****) with the cursor in the middle.
+     * at either ends. Otherwise, it will put an empty markup (****) with the cursor in the middle.
      */
     private void boldText() {
         int start = editor.getSelectionStart();
@@ -226,7 +224,7 @@ public class MarkdownEditorPanel extends JPanel {
 
     /**
      * Insert italic (*) markup on the selection. If an existing word or phrase is highlighted, this will put the markup
-     * at either ends. Otherwise it will put an empty markup (**) with the cursor in the middle.
+     * at either ends. Otherwise, it will put an empty markup (**) with the cursor in the middle.
      */
     private void italicizeText() {
         int start = editor.getSelectionStart();
@@ -247,13 +245,11 @@ public class MarkdownEditorPanel extends JPanel {
      * @param level - the level of heading
      */
     private void insertHeader(int level) {
-        String toInsert = "";
-        for (int i = 0; i < level; i++) {
-            toInsert = toInsert + "#";
-        }
-        toInsert = toInsert + " ";
+        StringBuilder toInsert = new StringBuilder();
+        toInsert.append("#".repeat(Math.max(0, level)));
+        toInsert.append(" ");
         int start = editor.getSelectionStart();
-        editor.insert(toInsert, start);
+        editor.insert(toInsert.toString(), start);
         editor.setCaretPosition(start + toInsert.length());
         editor.requestFocusInWindow();
     }

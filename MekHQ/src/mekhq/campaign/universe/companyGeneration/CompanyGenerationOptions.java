@@ -48,8 +48,8 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 import megamek.Version;
-import megamek.common.units.EntityWeightClass;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.EntityWeightClass;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.RandomOriginOptions;
@@ -97,7 +97,7 @@ public class CompanyGenerationOptions {
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
     private boolean useSpecifiedFactionToAssignRanks;
-    private boolean assignMekWarriorsCallsigns;
+    private boolean assignMekWarriorsCallSigns;
     private boolean assignFounderFlag;
 
     // Personnel Randomization
@@ -206,7 +206,7 @@ public class CompanyGenerationOptions {
         setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
         setUseSpecifiedFactionToAssignRanks(false);
-        setAssignMekWarriorsCallsigns(true);
+        setAssignMekWarriorsCallSigns(true);
         setAssignFounderFlag(true);
 
         // Personnel Randomization
@@ -450,12 +450,12 @@ public class CompanyGenerationOptions {
         this.useSpecifiedFactionToAssignRanks = useSpecifiedFactionToAssignRanks;
     }
 
-    public boolean isAssignMekWarriorsCallsigns() {
-        return assignMekWarriorsCallsigns;
+    public boolean isAssignMekWarriorsCallSigns() {
+        return assignMekWarriorsCallSigns;
     }
 
-    public void setAssignMekWarriorsCallsigns(final boolean assignMekWarriorsCallsigns) {
-        this.assignMekWarriorsCallsigns = assignMekWarriorsCallsigns;
+    public void setAssignMekWarriorsCallSigns(final boolean assignMekWarriorsCallSigns) {
+        this.assignMekWarriorsCallSigns = assignMekWarriorsCallSigns;
     }
 
     public boolean isAssignFounderFlag() {
@@ -954,7 +954,7 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToAssignRanks",
               isUseSpecifiedFactionToAssignRanks());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMekWarriorsCallsigns", isAssignMekWarriorsCallsigns());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMekWarriorsCallSigns", isAssignMekWarriorsCallSigns());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
         // Personnel Randomization
@@ -1080,9 +1080,9 @@ public class CompanyGenerationOptions {
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
           final Version version) {
         if (MHQConstants.VERSION.isLowerThan(version)) {
-            logger.error(String.format(
-                  "Cannot parse Company Generation Options from %s in older version %s.",
-                  version.toString(), MHQConstants.VERSION));
+            logger.error("Cannot parse Company Generation Options from {} in older version {}.",
+                  version.toString(),
+                  MHQConstants.VERSION);
             return null;
         }
 
@@ -1172,8 +1172,8 @@ public class CompanyGenerationOptions {
                     case "useSpecifiedFactionToAssignRanks":
                         options.setUseSpecifiedFactionToAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "assignMekWarriorsCallsigns":
-                        options.setAssignMekWarriorsCallsigns(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "assignMekWarriorsCallSigns":
+                        options.setAssignMekWarriorsCallSigns(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "assignFounderFlag":
                         options.setAssignFounderFlag(Boolean.parseBoolean(wn.getTextContent().trim()));

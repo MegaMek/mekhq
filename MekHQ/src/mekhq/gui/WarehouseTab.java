@@ -69,8 +69,18 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -94,7 +104,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
-    private static final MMLogger logger = MMLogger.create(WarehouseTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
 
     // parts filter groups
     private static final int SG_ALL = 0;
@@ -102,7 +112,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private static final int SG_SYSTEM = 2;
     private static final int SG_EQUIP = 3;
     private static final int SG_LOC = 4;
-    private static final int SG_WEAP = 5;
+    private static final int SG_WEAPON = 5;
     private static final int SG_AMMO = 6;
     private static final int SG_MISC = 7;
     private static final int SG_ENGINE = 8;
@@ -119,16 +129,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private static final int SV_DAMAGED = 5;
     private static final int SV_NUM = 6;
 
-    private JPanel panSupplies;
-    private JSplitPane splitWarehouse;
     private JTable partsTable;
     private JTable techTable;
     private RoundedJButton btnDoTask;
     private RoundedMMToggleButton btnShowAllTechsWarehouse;
     private JLabel lblTargetNumWarehouse;
     private JTextArea textTargetWarehouse;
-    private JLabel astechPoolLabel;
-    private RoundedJButton btnPartsReport;
+    private JLabel asTechPoolLabel;
     private JComboBox<String> choiceParts;
     private JComboBox<String> choicePartsView;
 
@@ -161,10 +168,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
               MekHQ.getMHQOptions().getLocale());
 
-        panSupplies = new JPanel(new GridBagLayout());
+        JPanel panSupplies = new JPanel(new GridBagLayout());
         panSupplies.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
+        RoundedJButton btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
 
@@ -354,21 +361,21 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrollTechTable, gridBagConstraints);
 
-        astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " +
-                                           getCampaign().getAstechPoolMinutes() +
+        asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
+                                           getCampaign().getAsTechPoolMinutes() +
                                            " (" +
-                                           getCampaign().getNumberAstechs() +
-                                           " Astechs)</html>");
-        astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                                           getCampaign().getNumberAsTechs() +
+                                           " AsTechs)</html>");
+        asTechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panelDoTask.add(astechPoolLabel, gridBagConstraints);
+        panelDoTask.add(asTechPoolLabel, gridBagConstraints);
 
-        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panSupplies, panelDoTask);
+        JSplitPane splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panSupplies, panelDoTask);
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
@@ -395,7 +402,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             partsTable.setName("partsTable");
             preferences.manage(new JTablePreference(partsTable));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -444,7 +451,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 if (nGroup == SG_ALL) {
                     inGroup = true;
                 } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor); // ProtoMekArmor and BaArmor are derived from Armor
+                    inGroup = (part instanceof Armor); // ProtoMekArmor and BAArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     inGroup = part instanceof MekGyro ||
                                     part instanceof EnginePart ||
@@ -455,7 +462,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     inGroup = part instanceof EquipmentPart;
                 } else if (nGroup == SG_LOC) {
                     inGroup = part instanceof MekLocation || part instanceof TankLocation;
-                } else if (nGroup == SG_WEAP) {
+                } else if (nGroup == SG_WEAPON) {
                     inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
                 } else if (nGroup == SG_AMMO) {
                     inGroup = part instanceof AmmoStorage;
@@ -496,7 +503,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             case SG_SYSTEM -> "System Components";
             case SG_EQUIP -> "Equipment";
             case SG_LOC -> "Locations";
-            case SG_WEAP -> "Weapons";
+            case SG_WEAPON -> "Weapons";
             case SG_AMMO -> "Ammunition";
             case SG_MISC -> "Miscellaneous Equipment";
             case SG_ENGINE -> "Engines";
@@ -598,12 +605,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
         techsModel.setData(getCampaign().getTechs(true));
-        String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
+        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
         }
-        astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
-        refreshAstechPool(astechString);
+        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
+        refreshAsTechPool(astechString);
 
         // If requested, switch to top entry
         if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech()) &&
@@ -694,12 +701,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         return partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
     }
 
-    public void refreshAstechPool(String astechString) {
-        astechPoolLabel.setText(astechString);
+    public void refreshAsTechPool(String astechString) {
+        asTechPoolLabel.setText(astechString);
     }
 
-    private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
-    private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    private final ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
+    private final ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
     public void handle(UnitRemovedEvent ev) {

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Rank {
-    private static final MMLogger logger = MMLogger.create(Rank.class);
+    private static final MMLogger LOGGER = MMLogger.create(Rank.class);
     // region Variable Declarations
     // Rank Size Codes
     // Enlisted
@@ -146,7 +146,7 @@ public class Rank {
                 try {
                     level = Integer.parseInt(split[1].trim());
                 } catch (Exception ex) {
-                    logger.error(ex, "Unknown Exception - initializeRank");
+                    LOGGER.error(ex, "Unknown Exception - initializeRank");
                 }
             }
             getRankNames().put(profession, name);
@@ -233,7 +233,7 @@ public class Rank {
                 }
             }
         } catch (Exception exception) {
-            logger.error(exception, "Unknown Exception");
+            LOGGER.error(exception, "Unknown Exception");
             return null;
         }
 

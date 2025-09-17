@@ -48,8 +48,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import megamek.Version;
-import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import megamek.logging.MMLogger;
@@ -91,14 +91,14 @@ import org.w3c.dom.NodeList;
  */
 public class RandomDeath {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomDeath";
-    private static final MMLogger logger = MMLogger.create(RandomDeath.class);
+    private static final MMLogger LOGGER = MMLogger.create(RandomDeath.class);
 
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final Map<AgeGroup, Boolean> enabledAgeGroups;
     private final boolean enableRandomDeathSuicideCause;
     private Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
-    private double randomDeathMultiplier;
+    private final double randomDeathMultiplier;
 
     // Base Chances
     private final List<RandomDeathChance> deathChances = List.of(
@@ -184,7 +184,7 @@ public class RandomDeath {
      */
     private void initializeCausesFromFile(final File file) {
         if (!file.exists()) {
-            logger.warn("File does not exist: {}", file.getPath());
+            LOGGER.warn("File does not exist: {}", file.getPath());
             return;
         }
 
@@ -194,7 +194,7 @@ public class RandomDeath {
         }
 
         final Version version = new Version(rootElement.getAttribute("version"));
-        logger.info("Parsing Random Death Causes from {}-origin XML", version);
+        LOGGER.info("Parsing Random Death Causes from {}-origin XML", version);
 
         final NodeList genderNodes = rootElement.getChildNodes();
         for (int i = 0; i < genderNodes.getLength(); i++) {
@@ -206,7 +206,7 @@ public class RandomDeath {
             try {
                 parseGenderNode(genderNode);
             } catch (Exception e) {
-                logger.error("Error parsing gender node: {} - {}", genderNode.getNodeName(), e);
+                LOGGER.error("Error parsing gender node: {} - {}", genderNode.getNodeName(), e);
             }
         }
     }
@@ -226,7 +226,7 @@ public class RandomDeath {
             element.normalize();
             return element;
         } catch (Exception ex) {
-            logger.error("Failed to parse XML file: {} - {}", file.getPath(), ex);
+            LOGGER.error("Failed to parse XML file: {} - {}", file.getPath(), ex);
             return null;
         }
     }
@@ -250,7 +250,7 @@ public class RandomDeath {
             try {
                 parseAgeRangeNode(gender, ageRangeNode);
             } catch (Exception e) {
-                logger.error("Error parsing age range node for gender: " + gender, e);
+                LOGGER.error(e, "Error parsing age range node for gender: {}", gender);
             }
         }
     }
@@ -276,7 +276,7 @@ public class RandomDeath {
             try {
                 parseStatusNode(ageRangeCauses, statusNode);
             } catch (Exception e) {
-                logger.error("Error parsing status node: " + statusNode.getNodeName(), e);
+                LOGGER.error(e, "Error parsing status node: {}", statusNode.getNodeName());
             }
         }
     }
@@ -301,7 +301,7 @@ public class RandomDeath {
             final double weight = Double.parseDouble(statusNode.getTextContent().trim());
             ageRangeCauses.add(weight, status);
         } catch (NumberFormatException e) {
-            logger.info("Unable to parse status node {}: {}", statusNode.getNodeName(), e.getMessage());
+            LOGGER.info("Unable to parse status node {}: {}", statusNode.getNodeName(), e.getMessage());
         }
     }
 
@@ -429,7 +429,7 @@ public class RandomDeath {
             return ERA_MULTIPLIER_STAR_LEAGUE;
         }
 
-        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOSTECH)
+        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOS_TECH)
                   || flags.contains(LATE_SUCCESSION_WARS_RENAISSANCE)) {
             return ERA_MULTIPLIER_SUCCESSION_WARS;
         }

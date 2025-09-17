@@ -118,11 +118,6 @@ public class HeatSink extends EquipmentPart {
     }
 
     @Override
-    public boolean needsFixing() {
-        return hits > 0;
-    }
-
-    @Override
     public PartRepairType getRepairPartType() {
         return PartRepairType.HEAT_SINK;
     }

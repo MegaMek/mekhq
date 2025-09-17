@@ -79,18 +79,14 @@ public enum PersonnelFilterStyle {
     //endregion Boolean Comparison Methods
 
     public List<PersonnelFilter> getFilters(final boolean standard) {
-        switch (this) {
-            case INDIVIDUAL_ROLE:
-                return standard ? PersonnelFilter.getIndividualRolesStandardPersonnelFilters()
-                             : PersonnelFilter.getIndividualRolesExpandedPersonnelFilters();
-            case ALL:
-                return standard ? PersonnelFilter.getAllStandardFilters()
-                             : PersonnelFilter.getAllIndividualRoleFilters();
-            default:
-            case STANDARD:
-                return standard ? PersonnelFilter.getStandardPersonnelFilters()
+        return switch (this) {
+            case INDIVIDUAL_ROLE -> standard ? PersonnelFilter.getIndividualRolesStandardPersonnelFilters()
+                                          : PersonnelFilter.getIndividualRolesExpandedPersonnelFilters();
+            case ALL -> standard ? PersonnelFilter.getAllStandardFilters()
+                              : PersonnelFilter.getAllIndividualRoleFilters();
+            default -> standard ? PersonnelFilter.getStandardPersonnelFilters()
                              : PersonnelFilter.getExpandedPersonnelFilters();
-        }
+        };
     }
 
     @Override

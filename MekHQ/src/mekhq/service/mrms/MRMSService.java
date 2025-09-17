@@ -40,23 +40,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import megamek.common.units.Aero;
 import megamek.common.battleArmor.BattleArmor;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
-import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingMekLocation;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.missing.MissingMekLocation;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
@@ -161,7 +161,7 @@ public class MRMSService {
                   unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
             campaign.addReport(msg);
             return msg;
-        } else if (campaign.requiresAdditionalAstechs()) {
+        } else if (campaign.requiresAdditionalAsTechs()) {
             String message = resources.getString("MRMS.InsufficientAstechs.report");
             campaign.addReport(message);
             return message;
@@ -232,7 +232,7 @@ public class MRMSService {
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
             return;
-        } else if (campaign.requiresAdditionalAstechs()) {
+        } else if (campaign.requiresAdditionalAsTechs()) {
             campaign.addReport(resources.getString("MRMS.InsufficientAstechs.report"));
             return;
         }

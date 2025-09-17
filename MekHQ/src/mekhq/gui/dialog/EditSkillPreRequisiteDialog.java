@@ -59,16 +59,14 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author Taharqa
  */
 public class EditSkillPreRequisiteDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditSkillPreRequisiteDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditSkillPreRequisiteDialog.class);
 
     private SkillPrerequisite prereq;
 
-    private JButton btnClose;
-    private JButton btnOK;
     private boolean cancelled;
 
     private final Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
-    private final Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
+    private final Hashtable<String, JCheckBox> skillChecks = new Hashtable<>();
 
     public EditSkillPreRequisiteDialog(final JFrame frame, final SkillPrerequisite pre) {
         super(frame, true);
@@ -80,8 +78,8 @@ public class EditSkillPreRequisiteDialog extends JDialog {
     }
 
     private void initComponents() {
-        btnOK = new JButton();
-        btnClose = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnClose = new JButton();
 
         JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length, 2));
 
@@ -90,7 +88,7 @@ public class EditSkillPreRequisiteDialog extends JDialog {
             JCheckBox chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
             chkSkill.addItemListener(evt -> changeLevelEnabled(type));
-            skillChks.put(type, chkSkill);
+            skillChecks.put(type, chkSkill);
 
             DefaultComboBoxModel<SkillLevel> skillLvlModel = new DefaultComboBoxModel<>();
             skillLvlModel.addElement(SkillLevel.NONE);
@@ -142,14 +140,14 @@ public class EditSkillPreRequisiteDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
     private void done() {
         prereq = new SkillPrerequisite();
         for (String type : SkillType.skillList) {
-            if (skillChks.get(type).isSelected()) {
+            if (skillChecks.get(type).isSelected()) {
                 prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
             }
         }
@@ -170,6 +168,6 @@ public class EditSkillPreRequisiteDialog extends JDialog {
     }
 
     private void changeLevelEnabled(String type) {
-        skillLevels.get(type).setEnabled(skillChks.get(type).isSelected());
+        skillLevels.get(type).setEnabled(skillChecks.get(type).isSelected());
     }
 }

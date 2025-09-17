@@ -282,12 +282,7 @@ public class PersonnelMarketDialog extends JDialog {
         rightPanel.add(availabilityLabel, rightGbc);
 
         // Slider
-        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
-                                             MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
-                                             MAXIMUM_DAYS_IN_MONTH;
-        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
-        JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
-        personnelAvailabilitySlider.setEnabled(false);
+        JSlider personnelAvailabilitySlider = getPersonnelAvailabilitySlider();
         rightPanel.add(personnelAvailabilitySlider, rightGbc);
 
         // Experience Label
@@ -308,6 +303,16 @@ public class PersonnelMarketDialog extends JDialog {
         panel.add(rightPanel, mainGbc);
 
         return panel;
+    }
+
+    private JSlider getPersonnelAvailabilitySlider() {
+        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
+                                             MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
+                                             MAXIMUM_DAYS_IN_MONTH;
+        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
+        JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
+        personnelAvailabilitySlider.setEnabled(false);
+        return personnelAvailabilitySlider;
     }
 
 

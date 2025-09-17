@@ -847,7 +847,7 @@ public class Planet {
     }
 
     // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
-    private interface EventGetter<T> {
+    protected interface EventGetter<T> {
         T get(PlanetaryEvent e);
     }
 

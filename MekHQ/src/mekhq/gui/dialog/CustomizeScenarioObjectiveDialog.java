@@ -58,8 +58,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 
-    private ScenarioObjective objective;
-    private List<String> botForceNames;
+    private final ScenarioObjective objective;
+    private final List<String> botForceNames;
     private JPanel panObjectiveType;
     private JPanel panForce;
     private JPanel panTimeLimits;
@@ -557,7 +557,12 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void addForce() {
-        forceModel.addElement(cboForceName.getSelectedItem().toString());
+        Object object = cboForceName.getSelectedItem();
+
+        if (object instanceof String string) {
+            forceModel.addElement(string);
+        }
+
         pack();
     }
 
@@ -580,21 +585,29 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void setDirectionDropdownVisibility() {
-        switch ((ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
-            case PreventReachMapEdge:
-            case ReachMapEdge:
-                cboDirection.setVisible(true);
-                break;
-            default:
-                cboDirection.setVisible(false);
-                break;
+        Object object = cboDirection.getSelectedItem();
+
+        if (object instanceof ObjectiveCriterion criterion) {
+            switch (criterion) {
+                case PreventReachMapEdge:
+                case ReachMapEdge:
+                    cboDirection.setVisible(true);
+                    break;
+                default:
+                    cboDirection.setVisible(false);
+                    break;
+            }
         }
     }
 
     private void updateTimeLimitUI() {
-        boolean enable = !cboTimeScaling.getSelectedItem().equals(TimeLimitType.None);
-        spnTimeLimit.setEnabled(enable);
-        cboTimeLimitDirection.setEnabled(enable);
+        Object object = cboTimeScaling.getSelectedItem();
+
+        if (object instanceof TimeLimitType timeLimitType) {
+            boolean enable = !timeLimitType.equals(TimeLimitType.None);
+            spnTimeLimit.setEnabled(enable);
+            cboTimeLimitDirection.setEnabled(enable);
+        }
     }
 
     public ScenarioObjective getObjective() {
@@ -605,7 +618,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         objective.setObjectiveCriterion((ObjectiveCriterion) cboObjectiveType.getSelectedItem());
         objective.setDescription(txtShortDescription.getText());
         int number = (int) spnAmount.getValue();
-        if (cboCountType.getSelectedItem().equals(ObjectiveAmountType.Percentage)) {
+        ObjectiveAmountType objectiveAmountType = cboCountType.getSelectedItem();
+        if (objectiveAmountType != null && objectiveAmountType.equals(ObjectiveAmountType.Percentage)) {
             objective.setPercentage(number);
             objective.setFixedAmount(null);
         } else {

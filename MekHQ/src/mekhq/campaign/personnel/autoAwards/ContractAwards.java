@@ -47,7 +47,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 
 public class ContractAwards {
-    private static final MMLogger logger = MMLogger.create(ContractAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(ContractAwards.class);
 
     /**
      * This function loops through Contract Awards, checking whether the person is eligible to receive each type of
@@ -61,7 +61,7 @@ public class ContractAwards {
     public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, Mission mission,
           UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
-        List<Award> eligibleAwardsBestable = new ArrayList<>();
+        List<Award> bestEligibleAwards = new ArrayList<>();
         Award bestAward = new Award();
 
         long contractDuration = ChronoUnit.MONTHS.between(
@@ -80,10 +80,10 @@ public class ContractAwards {
                         int requiredDuration = award.getQty();
 
                         if (contractDuration >= requiredDuration) {
-                            eligibleAwardsBestable.add(award);
+                            bestEligibleAwards.add(award);
                         }
                     } catch (Exception e) {
-                        logger.warn("Award {} from the {} set has an invalid qty value {}",
+                        LOGGER.warn("Award {} from the {} set has an invalid qty value {}",
                               award.getName(), award.getSet(), award.getQty());
                     }
                 } else if (validTypes.contains(award.getRange().toLowerCase())) {
@@ -104,17 +104,17 @@ public class ContractAwards {
                             }
                     }
                 } else {
-                    logger.warn("Award {} from the {} set has an invalid range value {}",
+                    LOGGER.warn("Award {} from the {} set has an invalid range value {}",
                           award.getName(), award.getSet(), award.getRange());
                 }
             }
         }
 
-        if (!eligibleAwardsBestable.isEmpty()) {
+        if (!bestEligibleAwards.isEmpty()) {
             int rollingQty = 0;
 
             if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
-                for (Award award : eligibleAwardsBestable) {
+                for (Award award : bestEligibleAwards) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();
                         bestAward = award;
@@ -122,7 +122,7 @@ public class ContractAwards {
                 }
                 eligibleAwards.add(bestAward);
             } else {
-                eligibleAwards.addAll(eligibleAwardsBestable);
+                eligibleAwards.addAll(bestEligibleAwards);
             }
         }
 

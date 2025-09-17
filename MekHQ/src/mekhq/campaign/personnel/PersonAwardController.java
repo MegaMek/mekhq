@@ -51,10 +51,10 @@ import mekhq.campaign.log.PerformanceLogger;
  * @author Miguel Azevedo
  */
 public class PersonAwardController {
-    private static final MMLogger logger = MMLogger.create(PersonAwardController.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonAwardController.class);
 
-    private List<Award> awards;
-    private Person person;
+    private final List<Award> awards;
+    private final Person person;
 
     public PersonAwardController(Person person) {
         awards = new ArrayList<>();
@@ -130,13 +130,13 @@ public class PersonAwardController {
             award = getAward(setName, awardName);
 
             if (!award.canBeAwarded(person)) {
-                logger.info("Award not stackable, returning.");
+                LOGGER.info("Award not stackable, returning.");
                 return;
             }
         } else {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
             if (award == null) {
-                logger.error("Cannot award a null award, returning.");
+                LOGGER.error("Cannot award a null award, returning.");
                 return;
             }
 

@@ -60,7 +60,7 @@ public enum HPGRating {
         try {
             return HPGRating.valueOf(val.toUpperCase());
         } catch (Exception ex) {
-            logger.error(ex, "Couldn't find a HPG rating level matching " + val.toUpperCase());
+            logger.error(ex, "Couldn't find a HPG rating level matching {}", val.toUpperCase());
             return X;
         }
     }

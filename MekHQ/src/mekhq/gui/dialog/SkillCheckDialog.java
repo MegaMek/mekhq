@@ -64,7 +64,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * <p>This dialog allows the user to perform skill checks for a specific skill by selecting the skill, applying
  * modifiers, and choosing whether to use Edge. It consists of an initial dialog to gather input, executes the skill
- * check, and then presents the result in a results dialog.</p>
+ * check, and then presents the result in a results' dialog.</p>
  *
  * @author Illiani
  * @since 0.50.05
@@ -172,7 +172,7 @@ public class SkillCheckDialog {
 
 
     /**
-     * Displays the results of the skill check in a results dialog.
+     * Displays the results of the skill check in a results' dialog.
      *
      * @param results the results text to display
      *

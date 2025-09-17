@@ -45,10 +45,7 @@ import mekhq.campaign.unit.Unit;
 /**
  * Swaps the {@code AmmoType} for an {@code AmmoBin} on a {@code Unit}.
  */
-public class SwapAmmoTypeAction implements IUnitAction {
-
-    private final AmmoBin ammoBin;
-    private final AmmoType ammoType;
+public record SwapAmmoTypeAction(AmmoBin ammoBin, AmmoType ammoType) implements IUnitAction {
 
     /**
      * Initializes a new instance of the {@code SwapAmmoTypeAction} class.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,10 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.board.Board;
+import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.mission.AtBContract;
@@ -63,7 +63,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return PIRATEFREEFORALL;
+        return PIRATE_FREE_FOR_ALL;
     }
 
     @Override

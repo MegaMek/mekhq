@@ -60,9 +60,9 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -79,8 +79,8 @@ import mekhq.utilities.ReportingUtilities;
 public class AcquisitionsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(AcquisitionsDialog.class);
 
-    private CampaignGUI campaignGUI;
-    private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
+    private final CampaignGUI campaignGUI;
+    private final Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
     private JPanel pnlSummary;
     private JLabel lblSummary;
@@ -264,8 +264,8 @@ public class AcquisitionsDialog extends JDialog {
     }
 
     public class AcquisitionPanel extends JPanel {
-        private List<IAcquisitionWork> awList;
-        private int idx;
+        private final List<IAcquisitionWork> awList;
+        private final int idx;
 
         private IAcquisitionWork targetWork;
         private Part part;
@@ -350,23 +350,7 @@ public class AcquisitionsDialog extends JDialog {
 
                 sbText.append("<br/>");
 
-                String countModifier = partCountInfo.getCountModifier();
-
-                if (!StringUtility.isNullOrBlank(countModifier)) {
-                    countModifier = ' ' + countModifier;
-                }
-
-                String inventoryInfo = "Inventory: " +
-                                             partCountInfo.getInTransitCount() +
-                                             countModifier +
-                                             " in transit, " +
-                                             partCountInfo.getOnOrderCount() +
-                                             countModifier +
-                                             " on order";
-
-                if (partCountInfo.getOmniPodCount() > 0 && part.isOmniPoddable()) {
-                    inventoryInfo += ", " + partCountInfo.getOmniPodCount() + countModifier + " OmniPod";
-                }
+                String inventoryInfo = getInventoryInfo();
 
                 sbText.append(inventoryInfo);
                 sbText.append("<br/>");
@@ -398,6 +382,27 @@ public class AcquisitionsDialog extends JDialog {
             sbText.append("</font></html>");
 
             return sbText.toString();
+        }
+
+        private String getInventoryInfo() {
+            String countModifier = partCountInfo.getCountModifier();
+
+            if (!StringUtility.isNullOrBlank(countModifier)) {
+                countModifier = ' ' + countModifier;
+            }
+
+            String inventoryInfo = "Inventory: " +
+                                         partCountInfo.getInTransitCount() +
+                                         countModifier +
+                                         " in transit, " +
+                                         partCountInfo.getOnOrderCount() +
+                                         countModifier +
+                                         " on order";
+
+            if (partCountInfo.getOmniPodCount() > 0 && part.isOmniPoddable()) {
+                inventoryInfo += ", " + partCountInfo.getOmniPodCount() + countModifier + " OmniPod";
+            }
+            return inventoryInfo;
         }
 
         private void initComponents() {
@@ -560,7 +565,7 @@ public class AcquisitionsDialog extends JDialog {
                 Part replacement = podded.findReplacement(false);
 
                 if (replacement != null) {
-                    campaignGUI.getCampaign().getQuartermaster().depodPart(replacement, 1);
+                    campaignGUI.getCampaign().getQuartermaster().remotePartFromPod(replacement, 1);
                     MekHQ.triggerEvent(new PartChangedEvent(replacement));
                 }
                 refresh();
@@ -569,37 +574,42 @@ public class AcquisitionsDialog extends JDialog {
             gbcActions.gridy++;
 
             if (campaignGUI.getCampaign().isGM()) {
-                JButton btnGM = new JButton("[GM] Acquire Instantly");
-                btnGM.setToolTipText("GM Override - Acquire all missing items instantly");
-                btnGM.setName("btnGM");
-                btnGM.addActionListener(ev -> {
-                    IAcquisitionWork actualWork = targetWork;
-
-                    // ammo bins have some internal logic for generating acquisition work?
-                    if (actualWork instanceof AmmoBin) {
-                        actualWork = ((AmmoBin) actualWork).getAcquisitionWork();
-                    }
-
-                    // GM find the actual number required
-                    for (int count = 0; count < partCountInfo.getRequiredCount(); count++) {
-                        campaignGUI.getCampaign()
-                              .addReport(String.format("GM Acquiring %s. %s",
-                                    actualWork.getAcquisitionName(),
-                                    actualWork.find(0)));
-                    }
-
-                    Unit unit = actualWork.getUnit();
-                    if (unit != null) {
-                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                    }
-
-                    refresh();
-                });
+                JButton btnGM = getBtnGM();
                 actionButtons.add(btnGM, gbcActions);
                 gbcActions.gridy++;
             }
 
             return actionButtons;
+        }
+
+        private JButton getBtnGM() {
+            JButton btnGM = new JButton("[GM] Acquire Instantly");
+            btnGM.setToolTipText("GM Override - Acquire all missing items instantly");
+            btnGM.setName("btnGM");
+            btnGM.addActionListener(ev -> {
+                IAcquisitionWork actualWork = targetWork;
+
+                // ammo bins have some internal logic for generating acquisition work?
+                if (actualWork instanceof AmmoBin) {
+                    actualWork = ((AmmoBin) actualWork).getAcquisitionWork();
+                }
+
+                // GM find the actual number required
+                for (int count = 0; count < partCountInfo.getRequiredCount(); count++) {
+                    campaignGUI.getCampaign()
+                          .addReport(String.format("GM Acquiring %s. %s",
+                                actualWork.getAcquisitionName(),
+                                actualWork.find(0)));
+                }
+
+                Unit unit = actualWork.getUnit();
+                if (unit != null) {
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                }
+
+                refresh();
+            });
+            return btnGM;
         }
     }
 }

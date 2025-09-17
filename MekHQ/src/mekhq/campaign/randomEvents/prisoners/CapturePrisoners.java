@@ -89,7 +89,7 @@ import mekhq.utilities.ReportingUtilities;
  * mechanics, and provides support for defection offers.</p>
  */
 public class CapturePrisoners {
-    private static final MMLogger logger = MMLogger.create(CapturePrisoners.class);
+    private static final MMLogger LOGGER = MMLogger.create(CapturePrisoners.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
@@ -115,7 +115,7 @@ public class CapturePrisoners {
     final static int SAR_INCLUDES_DROPSHIP = -2;
 
     final static int BASE_TARGET_NUMBER = 8; // Base Target Number (CamOps pg 223)
-    private TargetRoll sarTargetNumber = new TargetRoll(BASE_TARGET_NUMBER, "Base TN");
+    private final TargetRoll sarTargetNumber = new TargetRoll(BASE_TARGET_NUMBER, "Base TN");
 
     /**
      * Constructs a {@link CapturePrisoners} object and initializes modifiers based on the faction, scenario, and SAR
@@ -145,11 +145,12 @@ public class CapturePrisoners {
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
         megamek.common.enums.Faction techFaction = searchingFactionIsClan ?
-                                                ITechnology.getFactionFromMMAbbr("CLAN") :
-                                                ITechnology.getFactionFromMMAbbr("IS");
+                                                         ITechnology.getFactionFromMMAbbr("CLAN") :
+                                                         ITechnology.getFactionFromMMAbbr("IS");
         try {
-            // searchingFaction being null is fine because we're just ignoring any exceptions
-            techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
+            if (searchingFaction != null) {
+                techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
+            }
         } catch (Exception ignored) {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
@@ -187,7 +188,7 @@ public class CapturePrisoners {
             }
         }
 
-        logger.info(sarTargetNumber.toString());
+        LOGGER.info(sarTargetNumber.toString());
     }
 
     /**
@@ -568,7 +569,7 @@ public class CapturePrisoners {
     }
 
     /**
-     * Performs a dice roll using a specified number of dice and returns the total.
+     * Performs a die roll using a specified number of dice and returns the total.
      *
      * <p>This method allows us to pass in explicit values in during Unit Testing.</p>
      *

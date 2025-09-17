@@ -86,17 +86,12 @@ public enum ForceNamingMethod {
     //endregion Boolean Comparison Methods
 
     public String getValue(final Alphabet alphabet) {
-        switch (this) {
-            case ICAO_1956:
-                return alphabet.getICAO1956();
-            case ENGLISH_ALPHABET:
-                return alphabet.getEnglish();
-            case GREEK_ALPHABET:
-                return alphabet.getGreek();
-            case CCB_1943:
-            default:
-                return alphabet.getCCB1943();
-        }
+        return switch (this) {
+            case ICAO_1956 -> alphabet.getICAO1956();
+            case ENGLISH_ALPHABET -> alphabet.getEnglish();
+            case GREEK_ALPHABET -> alphabet.getGreek();
+            default -> alphabet.getCCB1943();
+        };
     }
 
     @Override

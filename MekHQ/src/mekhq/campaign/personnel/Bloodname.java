@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,16 +37,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 
-import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.utilities.MHQXMLUtility;
@@ -59,7 +56,7 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class Bloodname {
-    private static final MMLogger logger = MMLogger.create(Bloodname.class);
+    private static final MMLogger LOGGER = MMLogger.create(Bloodname.class);
 
     // region Variable Declarations
     private static List<Bloodname> bloodnames;
@@ -68,14 +65,14 @@ public class Bloodname {
     private String founder;
     private Clan origClan;
     private boolean exclusive;
-    private boolean limited;
+    private final boolean limited;
     private int inactive;
     private int abjured;
     private int reactivated;
     private int startDate;
     private Phenotype phenotype;
-    private List<Clan> postReavingClans;
-    private List<NameAcquired> acquiringClans;
+    private final List<Clan> postReavingClans;
+    private final List<NameAcquired> acquiringClans;
     private NameAcquired absorbed;
     // endregion Variable Declarations
 
@@ -156,32 +153,23 @@ public class Bloodname {
      *       for PM pilots than other aerospace names.
      */
     private int phenotypeMultiplier(Phenotype warriorType, int year) {
-        switch (getPhenotype()) {
-            case MEKWARRIOR:
-                return warriorType.isMekWarrior() ? 3 : 0;
-            case AEROSPACE:
-                return (warriorType.isAerospace() || warriorType.isProtoMek()) ? 3 : 0;
-            case ELEMENTAL:
+        return switch (getPhenotype()) {
+            case MEKWARRIOR -> warriorType.isMekWarrior() ? 3 : 0;
+            case AEROSPACE -> (warriorType.isAerospace() || warriorType.isProtoMek()) ? 3 : 0;
+            case ELEMENTAL -> {
                 if (year < 2870) {
-                    return 1;
+                    yield 1;
                 }
-                return warriorType.isElemental() ? 3 : 0;
-            case PROTOMEK:
-                switch (warriorType) {
-                    case PROTOMEK:
-                        return 9;
-                    case AEROSPACE:
-                        return 1;
-                    default:
-                        return 0;
-                }
-            case NAVAL:
-                return warriorType.isNaval() ? 3 : 0;
-            case VEHICLE:
-            case GENERAL:
-            default:
-                return 1;
-        }
+                yield warriorType.isElemental() ? 3 : 0;
+            }
+            case PROTOMEK -> switch (warriorType) {
+                case PROTOMEK -> 9;
+                case AEROSPACE -> 1;
+                default -> 0;
+            };
+            case NAVAL -> warriorType.isNaval() ? 3 : 0;
+            default -> 1;
+        };
     }
 
     public static Bloodname loadFromXml(Node node) {
@@ -233,7 +221,7 @@ public class Bloodname {
                     retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -270,12 +258,13 @@ public class Bloodname {
      */
     public static @Nullable Bloodname randomBloodname(Clan faction, Phenotype phenotype, int year) {
         if (faction == null) {
-            logger.error("Random Bloodname attempted for a clan that does not exist." +
-                               System.lineSeparator() +
-                               "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
+            LOGGER.error(
+                  "Random Bloodname attempted for a clan that does not exist.{}Please ensure that your clan exists " +
+                        "in both the clans.xml and bloodnames.xml files as appropriate.",
+                  System.lineSeparator());
             return null;
         } else if (phenotype == null) {
-            logger.error(
+            LOGGER.error(
                   "Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
             return null;
         }
@@ -336,7 +325,7 @@ public class Bloodname {
              */
             if (year < 3100) {
                 int numClans = 1;
-                for (Bloodname.NameAcquired a : name.getAcquiringClans()) {
+                for (NameAcquired a : name.getAcquiringClans()) {
                     if (a.year < year) {
                         numClans++;
                     }
@@ -360,7 +349,7 @@ public class Bloodname {
                          * The fraction is squared to represent the combined effect
                          * of increasing distribution among the Clans and the likelihood
                          * that non-exclusive names would suffer
-                         * more reavings and have a lower Bloodcount.
+                         * more reavings and have a lower Blood count.
                          */
                         weight.mul(weight);
                     }
@@ -370,7 +359,7 @@ public class Bloodname {
                      * When the actual Clans sharing the Bloodname are known, it is divided
                      * among those Clans.
                      */
-                    for (Bloodname.NameAcquired a : name.getAcquiringClans()) {
+                    for (NameAcquired a : name.getAcquiringClans()) {
                         if (faction.getGenerationCode().equals(a.clan)) {
                             weight = new Fraction(1, numClans);
                             break;
@@ -387,7 +376,7 @@ public class Bloodname {
                     weight = new Fraction(name.phenotypeMultiplier(phenotype, year), name.getPostReavingClans().size());
                     /*
                      * Assume that Bloodnames that were exclusive before the Wars of Reaving
-                     * are more numerous (higher bloodcount).
+                     * are more numerous (higher blood count).
                      */
                     if (!name.isLimited()) {
                         if (name.isExclusive()) {
@@ -461,7 +450,7 @@ public class Bloodname {
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            logger.error("Cannot find file bloodnames.xml");
+            LOGGER.error("Cannot find file bloodnames.xml");
             return;
         }
 
@@ -472,7 +461,7 @@ public class Bloodname {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            logger.error("Could not parse bloodnames.xml", ex);
+            LOGGER.error("Could not parse bloodnames.xml", ex);
             return;
         }
 
@@ -488,161 +477,7 @@ public class Bloodname {
                 }
             }
         }
-        logger.info("Loaded " + bloodnames.size() + " Bloodname records.");
+        LOGGER.info("Loaded {} Bloodname records.", bloodnames.size());
     }
 
-    private static class NameAcquired {
-        public int year;
-        public String clan;
-
-        public NameAcquired(int y, String c) {
-            year = y;
-            clan = c;
-        }
-    }
-
-    static class Fraction {
-        private int numerator;
-        private int denominator;
-
-        public Fraction() {
-            numerator = 0;
-            denominator = 1;
-        }
-
-        public Fraction(int n, int d) {
-            if (d == 0) {
-                throw new IllegalArgumentException("Denominator is zero.");
-            }
-            if (d < 0) {
-                n = -n;
-                d = -d;
-            }
-            numerator = n;
-            denominator = d;
-        }
-
-        public Fraction(int i) {
-            numerator = i;
-            denominator = 1;
-        }
-
-        public Fraction(Fraction f) {
-            numerator = f.numerator;
-            denominator = f.denominator;
-        }
-
-        @Override
-        public String toString() {
-            return numerator + "/" + denominator;
-        }
-
-        @Override
-        public boolean equals(final @Nullable Object object) {
-            if (this == object) {
-                return true;
-            } else if (!(object instanceof Fraction)) {
-                return false;
-            } else {
-                return value() == ((Fraction) object).value();
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return Double.valueOf(value()).hashCode();
-        }
-
-        @Override
-        public Object clone() {
-            return new Fraction(this);
-        }
-
-        public double value() {
-            return (double) numerator / (double) denominator;
-        }
-
-        public void reduce() {
-            if (denominator > 1) {
-                for (int i = denominator - 1; i > 1; i--) {
-                    if (numerator % i == 0 && denominator % i == 0) {
-                        numerator /= i;
-                        denominator /= i;
-                        i = denominator - 1;
-                    }
-                }
-            }
-        }
-
-        public int getNumerator() {
-            return numerator;
-        }
-
-        public int getDenominator() {
-            return denominator;
-        }
-
-        public void add(Fraction f) {
-            numerator = numerator * f.denominator + f.numerator * denominator;
-            denominator = denominator * f.denominator;
-            reduce();
-        }
-
-        public void add(int i) {
-            numerator += i * denominator;
-            reduce();
-        }
-
-        public void sub(Fraction f) {
-            numerator = numerator * f.denominator - f.numerator * denominator;
-            denominator = denominator * f.denominator;
-            reduce();
-        }
-
-        public void sub(int i) {
-            numerator -= i * denominator;
-            reduce();
-        }
-
-        public void mul(Fraction f) {
-            numerator *= f.numerator;
-            denominator *= f.denominator;
-            reduce();
-        }
-
-        public void mul(int i) {
-            numerator *= i;
-            reduce();
-        }
-
-        public void div(Fraction f) {
-            numerator *= f.denominator;
-            denominator *= f.numerator;
-            reduce();
-        }
-
-        public void div(int i) {
-            denominator *= i;
-        }
-
-        public static int lcd(Collection<Fraction> list) {
-            Set<Integer> denominators = new HashSet<>();
-            for (Fraction f : list) {
-                denominators.add(f.denominator);
-            }
-            boolean done = false;
-            int retVal = 1;
-            while (!done) {
-                done = true;
-                for (Integer d : denominators) {
-                    if (d / retVal > 1 || retVal % d != 0) {
-                        retVal++;
-                        done = false;
-                        break;
-                    }
-                }
-            }
-            return retVal;
-        }
-    }
 }

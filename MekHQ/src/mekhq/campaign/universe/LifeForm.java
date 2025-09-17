@@ -33,12 +33,19 @@
 package mekhq.campaign.universe;
 
 public enum LifeForm {
-    NONE("None"), MICROBE("Microbes"), PLANT("Plants"), INSECT("Insects"), FISH("Fish"),
-    AMPHIBIAN("Amphibians"), REPTILE("Reptiles"), BIRD("Birds"), MAMMAL("Mammals");
+    NONE("None"),
+    MICROBE("Microbes"),
+    PLANT("Plants"),
+    INSECT("Insects"),
+    FISH("Fish"),
+    AMPHIBIAN("Amphibians"),
+    REPTILE("Reptiles"),
+    BIRD("Birds"),
+    MAMMAL("Mammals");
 
     public final String name;
 
-    private LifeForm(String name) {
+    LifeForm(String name) {
         this.name = name;
     }
 

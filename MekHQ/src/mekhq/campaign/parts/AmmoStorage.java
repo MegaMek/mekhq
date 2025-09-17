@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
-    private static final MMLogger logger = MMLogger.create(AmmoStorage.class);
+    private static final MMLogger LOGGER = MMLogger.create(AmmoStorage.class);
 
     protected int shots;
 
@@ -96,7 +96,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        // CAW: previously we went thru AmmoType::getCost, which
+        // CAW: previously we went through AmmoType::getCost, which
         // for AmmoType was the default implementation
         // that simply returned 'cost'. Avoid the hassle for
         // now and just return the raw cost as our sticker price.
@@ -151,7 +151,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Gets a value indicating whether or not an {@code AmmoType} is compatible with this instance's ammo.
+     * Gets a value indicating whether an {@code AmmoType} is compatible with this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
      *
@@ -191,7 +191,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                     shots = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
 
@@ -251,7 +251,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>Reload " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeft() + " minutes" + scheduled;
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -364,9 +364,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getQuantityName(int quan) {
         int totalShots = quan * getShots();
-        String report = "" + totalShots + " shots of " + getName();
+        String report = totalShots + " shots of " + getName();
         if (totalShots == 1) {
-            report = "" + totalShots + " shot of " + getName();
+            report = totalShots + " shot of " + getName();
         }
         return report;
     }
@@ -381,11 +381,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             report += " have arrived";
         }
         return report;
-    }
-
-    @Override
-    public boolean needsMaintenance() {
-        return true;
     }
 
     @Override

@@ -117,10 +117,6 @@ public class CampaignFactory {
         CampaignXmlParser parser = new CampaignXmlParser(is, this.app);
         Campaign campaign = parser.parse();
 
-        if (campaign == null) {
-            return null;
-        }
-
         return checkForLoadProblems(campaign);
     }
 

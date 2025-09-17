@@ -45,7 +45,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 
@@ -55,7 +55,7 @@ import mekhq.gui.dialog.MercenaryAuctionDialog;
  * while failures notify the player of the outcome.
  */
 public class MercenaryAuction {
-    private static final MMLogger logger = MMLogger.create(MercenaryAuction.class);
+    private static final MMLogger LOGGER = MMLogger.create(MercenaryAuction.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
@@ -72,7 +72,7 @@ public class MercenaryAuction {
      * @param campaign The current {@link Campaign} instance where the auction takes place.
      * @param unitType The type of unit being auctioned (e.g., `MEK`, `VEHICLE`).
      */
-    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
+    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratConCampaignState campaignState,
           int unitType) {
         String faction = campaign.getFaction().getShortName();
 
@@ -85,7 +85,7 @@ public class MercenaryAuction {
               campaign);
 
         if (entity == null) {
-            logger.error("Unable to find entity for unit type {} in 'MercenaryAuction'", unitType);
+            LOGGER.error("Unable to find entity for unit type {} in 'MercenaryAuction'", unitType);
             return;
         }
 
@@ -131,7 +131,7 @@ public class MercenaryAuction {
               maximumBid,
               AUCTION_TIER_SUCCESS_PERCENT);
         int bidSuccessChance = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) *
-                                          AUCTION_TIER_SUCCESS_PERCENT;
+                                     AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction, then check whether they were successful,
         // deliver the unit, and deduct funds.

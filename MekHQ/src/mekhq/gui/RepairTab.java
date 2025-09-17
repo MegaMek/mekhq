@@ -110,22 +110,18 @@ import mekhq.service.mrms.MRMSService;
  * Shows damaged units and controls for repair.
  */
 public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
-    private static final MMLogger logger = MMLogger.create(RepairTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(RepairTab.class);
 
-    private JPanel panDoTask;
-    private JPanel panDoTaskText;
-    private JSplitPane splitServicedUnits;
     private JTable servicedUnitTable;
     private JTable taskTable;
     private JTable techTable;
     private RoundedJButton btnDoTask;
     private RoundedMMToggleButton btnShowAllTechs;
-    private JScrollPane scrTextTarget;
     private JLabel lblTargetNum;
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
     private JTextPane txtResult;
-    private JLabel astechPoolLabel;
+    private JLabel asTechPoolLabel;
     private JComboBox<String> choiceLocation;
     private RoundedJButton btnAcquisitions;
     private JScrollPane scrollServicedUnitView;
@@ -134,7 +130,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private TaskTableModel taskModel;
     private TechTableModel techsModel;
 
-    private TableRowSorter<UnitTableModel> servicedUnitSorter;
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
@@ -174,21 +169,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         RoundedJButton btnMRMSDialog = new RoundedJButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
         btnMRMSDialog.setName("btnMRMSDialog");
-        btnMRMSDialog.addActionListener(evt -> {
-            new MRMSDialog(getFrame(), true, getCampaignGui(), null, MRMSMode.UNITS).setVisible(true);
-        });
+        btnMRMSDialog.addActionListener(evt -> new MRMSDialog(getFrame(),
+              true,
+              getCampaignGui(),
+              null,
+              MRMSMode.UNITS).setVisible(true));
 
-        RoundedJButton btnMRMSInstantAll = new RoundedJButton("Instant Mass Repair/Salvage All");
-        btnMRMSInstantAll.setToolTipText(
-              "Perform Mass Repair/Salvage immediately on all units using active configuration");
-        btnMRMSInstantAll.setName("btnMRMSInstantAll");
-        btnMRMSInstantAll.addActionListener(evt -> {
-            MRMSService.mrmsAllUnits(getCampaign());
-            JOptionPane.showMessageDialog(getCampaignGui().getFrame(),
-                  "Mass Repair/Salvage complete.",
-                  "Complete",
-                  JOptionPane.INFORMATION_MESSAGE);
-        });
+        RoundedJButton btnMRMSInstantAll = getBtnMRMSInstantAll();
 
         btnAcquisitions = new RoundedJButton("Parts");
         btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
@@ -249,7 +236,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         servicedUnitTable.setColumnModel(new XTableColumnModel());
         servicedUnitTable.createDefaultColumnsFromModel();
-        servicedUnitSorter = new TableRowSorter<>(servicedUnitModel);
+        TableRowSorter<UnitTableModel> servicedUnitSorter = new TableRowSorter<>(servicedUnitModel);
         servicedUnitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         servicedUnitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         servicedUnitTable.setRowSorter(servicedUnitSorter);
@@ -266,7 +253,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                       (i != UnitTableModel.COL_STATUS) &&
                       (i != UnitTableModel.COL_REPAIR) &&
                       (i != UnitTableModel.COL_SITE) &&
-                      (i != UnitTableModel.COL_RSTATUS)) {
+                      (i != UnitTableModel.COL_MODE)) {
                 ((XTableColumnModel) servicedUnitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }
@@ -287,7 +274,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         scrollServicedUnitView.setMinimumSize(new Dimension(350, 400));
         scrollServicedUnitView.setPreferredSize(new Dimension(350, 400));
 
-        splitServicedUnits = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollServicedUnitTable, scrollServicedUnitView);
+        JSplitPane splitServicedUnits = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+              scrollServicedUnitTable,
+              scrollServicedUnitView);
         splitServicedUnits.setOneTouchExpandable(true);
         splitServicedUnits.setResizeWeight(0.0);
         gridBagConstraints = new GridBagConstraints();
@@ -317,7 +306,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
 
-        panDoTask = new JPanel(new GridBagLayout());
+        JPanel panDoTask = new JPanel(new GridBagLayout());
         panDoTask.setMinimumSize(UIUtil.scaleForGUI(100, 100));
         panDoTask.setName("panelDoTask");
         panDoTask.setPreferredSize(UIUtil.scaleForGUI(100, 100));
@@ -364,7 +353,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTask, gridBagConstraints);
 
-        panDoTaskText = new JPanel(new GridBagLayout());
+        JPanel panDoTaskText = new JPanel(new GridBagLayout());
         panDoTaskText.setMinimumSize(new Dimension(150, 100));
         panDoTaskText.setName("panelDoTask");
         panDoTaskText.setPreferredSize(new Dimension(150, 100));
@@ -378,7 +367,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         textTarget.setWrapStyleWord(true);
         textTarget.setBorder(null);
         textTarget.setName("textTarget");
-        scrTextTarget = new JScrollPaneWithSpeed(textTarget);
+        JScrollPane scrTextTarget = new JScrollPaneWithSpeed(textTarget);
         scrTextTarget.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         gridBagConstraints = new GridBagConstraints();
@@ -466,20 +455,20 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weighty = 1.0;
         panTechs.add(scrollTechTable, gridBagConstraints);
 
-        astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " +
-                                           getCampaign().getAstechPoolMinutes() +
+        asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
+                                           getCampaign().getAsTechPoolMinutes() +
                                            " (" +
-                                           getCampaign().getNumberAstechs() +
-                                           " Astechs)</html>");
-        astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        astechPoolLabel.setName("astechPoolLabel");
+                                           getCampaign().getNumberAsTechs() +
+                                           " AsTechs)</html>");
+        asTechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        asTechPoolLabel.setName("asTechPoolLabel");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panTechs.add(astechPoolLabel, gridBagConstraints);
+        panTechs.add(asTechPoolLabel, gridBagConstraints);
 
         add(panServicedUnits);
         add(panTasks);
@@ -497,6 +486,21 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         filterTechs();
     }
 
+    private RoundedJButton getBtnMRMSInstantAll() {
+        RoundedJButton btnMRMSInstantAll = new RoundedJButton("Instant Mass Repair/Salvage All");
+        btnMRMSInstantAll.setToolTipText(
+              "Perform Mass Repair/Salvage immediately on all units using active configuration");
+        btnMRMSInstantAll.setName("btnMRMSInstantAll");
+        btnMRMSInstantAll.addActionListener(evt -> {
+            MRMSService.mrmsAllUnits(getCampaign());
+            JOptionPane.showMessageDialog(getCampaignGui().getFrame(),
+                  "Mass Repair/Salvage complete.",
+                  "Complete",
+                  JOptionPane.INFORMATION_MESSAGE);
+        });
+        return btnMRMSInstantAll;
+    }
+
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
      */
@@ -507,7 +511,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             servicedUnitTable.setName("serviceUnitsTable");
             preferences.manage(new JTablePreference(servicedUnitTable));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -578,7 +582,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     @Override
     public @Nullable Person getSelectedTech() {
         if (techTable == null) {
-            logger.error(new IllegalStateException(), "Tech table is not initialized.");
+            LOGGER.error(new IllegalStateException(), "Tech table is not initialized.");
             return null;
         }
 
@@ -588,7 +592,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
 
         if (techsModel == null) {
-            logger.error(new IllegalStateException(), "Tech model is not initialized.");
+            LOGGER.error(new IllegalStateException(), "Tech model is not initialized.");
             return null;
         }
 
@@ -907,7 +911,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      *       (with elites appearing at the bottom).</li>
      *   <li>Updates the `techsModel` with the new list of technicians, and re-applies the row
      *       filter through the `filterTechs()` method to ensure only valid rows are displayed.</li>
-     *   <li>Updates the AsTech pool statistics (minutes, overtime availability, and Astech count)
+     *   <li>Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count)
      *       in the UI label.</li>
      *   <li>Ensures the table selection is consistent after the updates:
      *       <ul>
@@ -937,12 +941,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techsModel.setData(techs);
         filterTechs();
 
-        String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
+        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
         }
-        astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
-        astechPoolLabel.setText(astechString);
+        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
+        asTechPoolLabel.setText(astechString);
 
         // Ensuring valid row selection after refresh
         if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
@@ -982,10 +986,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnAcquisitions.firePropertyChange("counts", -1, 0);
     }
 
-    private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
-    private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
-    private ActionScheduler taskScheduler = new ActionScheduler(this::refreshTaskList);
-    private ActionScheduler acquireScheduler = new ActionScheduler(this::refreshPartsAcquisition);
+    private final ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
+    private final ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    private final ActionScheduler taskScheduler = new ActionScheduler(this::refreshTaskList);
+    private final ActionScheduler acquireScheduler = new ActionScheduler(this::refreshPartsAcquisition);
 
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {

@@ -42,16 +42,16 @@ import mekhq.campaign.universe.SourceableValue;
  */
 public class SourceableValueLabel extends JLabel {
 
-    SourceableValue sourcedValue;
+    SourceableValue<?> sourcedValue;
     String format;
 
 
-    public SourceableValueLabel(SourceableValue v) {
+    public SourceableValueLabel(SourceableValue<?> v) {
         this(v, "%s");
 
     }
 
-    public SourceableValueLabel(SourceableValue v, String f) {
+    public SourceableValueLabel(SourceableValue<?> v, String f) {
         super();
         sourcedValue = v;
         format = f;

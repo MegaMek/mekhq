@@ -52,11 +52,11 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class CustomOption {
-    private static final MMLogger logger = MMLogger.create(CustomOption.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomOption.class);
 
     private static List<CustomOption> customAbilities = null;
 
-    private String name;
+    private final String name;
     private String group;
     private int type;
     private Object defaultVal;
@@ -108,7 +108,7 @@ public class CustomOption {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return;
         }
 
@@ -149,7 +149,7 @@ public class CustomOption {
     public static CustomOption generateInstanceFromXML(Node wn) {
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            logger.error("Custom ability does not have a 'name' attribute.");
+            LOGGER.error("Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -183,7 +183,7 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            logger.error("Error parsing custom ability " + retVal.name, ex);
+            LOGGER.error(ex, "Error parsing custom ability {}", retVal.name);
         }
 
         return retVal;

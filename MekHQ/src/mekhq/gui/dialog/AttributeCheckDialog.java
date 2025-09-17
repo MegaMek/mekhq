@@ -211,7 +211,7 @@ public class AttributeCheckDialog {
 
 
     /**
-     * Displays the results of the Attribute check in a results dialog.
+     * Displays the results of the Attribute check in a results' dialog.
      *
      * @param results the results text to display
      *

@@ -44,11 +44,11 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.UnitType;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -65,18 +65,18 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  *
  * @author Jay lawson
  */
-public class PersonnelTableModel extends DataTableModel {
+public class PersonnelTableModel extends DataTableModel<Person> {
     //region Variable Declarations
     public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
 
-    private Campaign campaign;
+    private final Campaign campaign;
     private PersonnelMarket personnelMarket;
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
     //endregion Variable Declarations
 
     public PersonnelTableModel(Campaign c) {
-        data = new ArrayList<Person>();
+        data = new ArrayList<>();
         campaign = c;
     }
 
@@ -183,14 +183,14 @@ public class PersonnelTableModel extends DataTableModel {
             setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
             // Colouring
-            boolean personIsDamaged = false;
+            boolean personIsDamaged;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
                 personIsDamaged = person.hasInjuries(true);
             } else {
                 personIsDamaged = person.getHits() > 0;
             }
             boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
-                    && (getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+                                              && (getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
                   person.getSkillLevel(campaign, false)) >= 5));
 
             if (!isSelected) {
@@ -259,7 +259,7 @@ public class PersonnelTableModel extends DataTableModel {
                             if ((!(u.getEntity() instanceof SmallCraft) || !(u.getEntity() instanceof Jumpship))) {
                                 desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                             }
-                            desc += "<br>" + u.getStatus() + "";
+                            desc += "<br>" + u.getStatus();
                             setText(desc);
                             Image mekImage = u.getImage(this);
                             if (mekImage != null) {
@@ -315,22 +315,15 @@ public class PersonnelTableModel extends DataTableModel {
         }
 
         private @Nullable Image getHitsImage(int hits) {
-            switch (hits) {
-                case 1:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
-                case 2:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
-                case 3:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
-                case 4:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
-                case 5:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
-                case 6:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
-                default:
-                    return null;
-            }
+            return switch (hits) {
+                case 1 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
+                case 2 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
+                case 3 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
+                case 4 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
+                case 5 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
+                case 6 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
+                default -> null;
+            };
         }
     }
 

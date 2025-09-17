@@ -53,8 +53,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -196,7 +196,7 @@ public class FactionCensureEvent {
                  COMMANDER_IMPRISONMENT,
                  LEADERSHIP_IMPRISONED,
                  NEWS_ARTICLE,
-                 CHATTERWEB_DISCUSSION ->
+                 CHATTER_WEB_DISCUSSION ->
                   new FactionJudgmentNewsArticle(campaign, commander, secondInCommand, censureAction.getLookupName(),
                         censuringFaction, FactionStandingJudgmentType.CENSURE, false);
         }
@@ -279,7 +279,7 @@ public class FactionCensureEvent {
             }
             case BARRED -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.BARRED, censuringFaction);
-            case CHATTERWEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
+            case CHATTER_WEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
                   processMassLoyaltyChange(campaign, false, false);
             case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL -> processClanTrial(false);
             case CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL -> processClanTrial(true);

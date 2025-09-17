@@ -35,15 +35,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.units.Aero;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingThrusters;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -98,16 +100,13 @@ public class Thrusters extends Part {
 
     @Override
     public int getBaseTime() {
-        int time = 0;
+        int time;
         if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             // Test of proposed errata for repair times
             if (isSalvaging()) {
                 time = 600;
             } else {
                 time = 90;
-            }
-            if (hits == 1) {
-                time *= 1;
             }
             if (hits == 2) {
                 time *= 2;
@@ -183,13 +182,13 @@ public class Thrusters extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -240,9 +239,8 @@ public class Thrusters extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         boolean match = false;
-        if (part instanceof Thrusters) {
-            Thrusters t = (Thrusters) part;
-            if (t.isLeftThrusters() == isLeftThrusters) {
+        if (part instanceof Thrusters thrusters) {
+            if (thrusters.isLeftThrusters() == isLeftThrusters) {
                 match = true;
             }
         }

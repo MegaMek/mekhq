@@ -69,7 +69,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author NickAragua
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
-    private static final MMLogger logger = MMLogger.create(MassMothballDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MassMothballDialog.class);
 
     // region Variable Declarations
     private final Map<Integer, List<Unit>> unitsByType = new HashMap<>();
@@ -257,7 +257,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

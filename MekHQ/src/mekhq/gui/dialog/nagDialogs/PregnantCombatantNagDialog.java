@@ -83,9 +83,8 @@ public class PregnantCombatantNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean hasActiveContract, List<Person> activePersonnel) {
-        final String NAG_KEY = NAG_PREGNANT_COMBATANT;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_PREGNANT_COMBATANT) &&
                      (hasActivePregnantCombatant(hasActiveContract, activePersonnel));
     }
 }

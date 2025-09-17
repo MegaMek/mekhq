@@ -98,7 +98,7 @@ public class StratConReinforcementsConfirmationDialog {
         /** GM reinforcements. */
         REINFORCE_GM,
         /** Instant GM reinforcements. */
-        REINFORCE_GM_INSTANTLY;
+        REINFORCE_GM_INSTANTLY
     }
 
     /**

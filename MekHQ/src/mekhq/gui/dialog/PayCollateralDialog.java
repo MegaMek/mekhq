@@ -67,9 +67,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author Taharqa
  */
 public class PayCollateralDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(PayCollateralDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(PayCollateralDialog.class);
 
-    private final JFrame frame;
     private final Campaign campaign;
     private boolean cancelled;
     private boolean paid;
@@ -80,12 +79,9 @@ public class PayCollateralDialog extends JDialog {
     private Map<JSlider, Integer> partSliders;
     private JProgressBar barAmount;
     private JButton btnPay;
-    private JButton btnDontPay;
-    private JButton btnCancel;
 
     public PayCollateralDialog(final JFrame frame, final boolean modal, final Campaign campaign, final Loan loan) {
         super(frame, modal);
-        this.frame = frame;
         this.campaign = campaign;
         this.loan = loan;
         cancelled = false;
@@ -209,11 +205,11 @@ public class PayCollateralDialog extends JDialog {
         btnPay.setEnabled(false);
         panBtn.add(btnPay);
 
-        btnDontPay = new JButton(resourceMap.getString("btnDontPay.text"));
+        JButton btnDontPay = new JButton(resourceMap.getString("btnDontPay.text"));
         btnDontPay.addActionListener(evt -> dontPayCollateral());
         panBtn.add(btnDontPay);
 
-        btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
         btnCancel.setName("btnCancel");
         btnCancel.addActionListener(evt -> {
             cancelled = true;
@@ -268,7 +264,7 @@ public class PayCollateralDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

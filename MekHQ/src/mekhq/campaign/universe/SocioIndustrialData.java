@@ -41,11 +41,12 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
+import megamek.logging.MMLogger;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 
 public class SocioIndustrialData {
-
+    private final static MMLogger LOGGER = MMLogger.create(SocioIndustrialData.class);
     private final static String SEPARATOR = "-";
     private static final EnumMap<PlanetarySophistication, TechRating> sophisticationToTechRating = new EnumMap<>(
           PlanetarySophistication.class);
@@ -104,7 +105,7 @@ public class SocioIndustrialData {
                      agriculture.getName();
     }
 
-    /** @return the USILR rating as a HTML description */
+    /** @return the USILR rating as an HTML description */
     public String getHTMLDescription() {
         StringBuilder sb = new StringBuilder("<html>");
         switch (tech) {
@@ -301,7 +302,7 @@ public class SocioIndustrialData {
                 }
                 return result;
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e, "Unable to deserialize SocioIndustrialData: {}", e.getMessage());
                 return null;
             }
         }

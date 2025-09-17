@@ -49,14 +49,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditScenarioLogControl;
 
 public class EditScenarioLogDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditScenarioLogDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditScenarioLogDialog.class);
 
     private final JFrame frame;
     private final Campaign campaign;
     private final Person person;
-
-    private EditScenarioLogControl editMissionsControl;
-    private JButton btnOK;
 
     /**
      * Creates new form EditPersonnelLogDialog
@@ -82,10 +79,10 @@ public class EditScenarioLogDialog extends JDialog {
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
 
-        editMissionsControl = new EditScenarioLogControl(frame, campaign, person);
+        EditScenarioLogControl editMissionsControl = new EditScenarioLogControl(frame, campaign, person);
         getContentPane().add(editMissionsControl, BorderLayout.CENTER);
 
-        btnOK = new JButton();
+        JButton btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(evt -> setVisible(false));
@@ -103,7 +100,7 @@ public class EditScenarioLogDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 }

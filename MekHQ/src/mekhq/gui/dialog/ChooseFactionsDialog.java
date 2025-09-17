@@ -69,7 +69,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class ChooseFactionsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseFactionsDialog.class);
 
-    private LocalDate date;
+    private final LocalDate date;
 
     private JList<Faction> factionList;
     private List<String> result;
@@ -175,8 +175,8 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     private static class FactionListModel extends AbstractListModel<Faction> {
-        private TreeMap<String, Faction> factionMap = new TreeMap<>();
-        private List<String> names;
+        private final TreeMap<String, Faction> factionMap = new TreeMap<>();
+        private final List<String> names;
 
         public FactionListModel(LocalDate date) {
             for (Faction faction : Factions.getInstance().getFactions()) {

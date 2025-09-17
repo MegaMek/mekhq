@@ -100,9 +100,9 @@ public enum ManeiDominiClass {
         // Parse based on the enum name
         try {
             return valueOf(text);
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
             MMLogger.create(ManeiDominiClass.class)
-                  .error(ignored, "Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
+                  .error(ex, "Unable to parse {} into a ManeiDominiClass. Returning NONE.", text);
             return NONE;
 
         }

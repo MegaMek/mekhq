@@ -36,11 +36,11 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.units.Aero;
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
+import megamek.common.units.Aero;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -72,7 +72,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         return (AmmoType) super.getType();
     }
 
-    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
+    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for OmniFighter
      * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
     @Override
     public String getLocationName() {
@@ -122,7 +122,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public void fix() {
         AmmoBin replacement = getNewPart();
         unit.addPart(replacement);
-        campaign.getQuartermaster().addPart(replacement, 0);
+        campaign.getQuartermaster().addPart(replacement, 0, false);
 
         remove(false);
 
@@ -158,7 +158,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         if (oneShot) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", oneShot);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", true);
         }
 
         super.writeToXMLEnd(pw, indent);

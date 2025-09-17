@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
@@ -47,8 +46,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
 
 @AtBScenarioEnabled
 public class ProbeBuiltInScenario extends AtBScenario {
@@ -69,8 +68,8 @@ public class ProbeBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        Map<String, MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        Map<String, MapTypeList> mapTypes = StratConBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().toList();
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
         } while (getTerrainType().toUpperCase().contains("URBAN"));

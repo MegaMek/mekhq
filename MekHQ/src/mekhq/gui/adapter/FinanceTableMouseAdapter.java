@@ -48,9 +48,9 @@ import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.model.FinanceTableModel;
 
 public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
-    private CampaignGUI gui;
-    private JTable financeTable;
-    private FinanceTableModel financeModel;
+    private final CampaignGUI gui;
+    private final JTable financeTable;
+    private final FinanceTableModel financeModel;
 
     protected FinanceTableMouseAdapter(CampaignGUI gui, JTable financeTable, FinanceTableModel financeModel) {
         this.gui = gui;

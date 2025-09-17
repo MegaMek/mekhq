@@ -44,6 +44,8 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingTurret;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -53,7 +55,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Turret extends TankLocation {
-    private static final MMLogger logger = MMLogger.create(Turret.class);
+    private static final MMLogger LOGGER = MMLogger.create(Turret.class);
 
     protected double weight;
 
@@ -131,7 +133,7 @@ public class Turret extends TankLocation {
                     damage = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -149,13 +151,13 @@ public class Turret extends TankLocation {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             ((Tank) unit.getEntity()).unlockTurret();
         }
         setUnit(null);
@@ -233,11 +235,6 @@ public class Turret extends TankLocation {
     @Override
     public boolean canNeverScrap() {
         return false;
-    }
-
-    @Override
-    public String getDetails() {
-        return getDetails(true);
     }
 
     @Override

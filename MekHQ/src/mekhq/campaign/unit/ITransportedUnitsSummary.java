@@ -43,7 +43,7 @@ import mekhq.campaign.unit.enums.TransporterType;
 public interface ITransportedUnitsSummary {
 
     /**
-     * Gets a value indicating whether or not this unit is transporting units.
+     * Gets a value indicating whether this unit is transporting units.
      *
      * @return true if the unit has any transported units
      */
@@ -133,16 +133,9 @@ public interface ITransportedUnitsSummary {
      * Bay unloading utility used when removing a bay-equipped Transport unit This removes all units assigned to the
      * transport from it
      *
-     * @param campaign used to remove this unit as a transport from any other units in the campaign
+     * @param campaign used to remove this unit as transport from any other units in the campaign
      */
     void clearTransportedUnits(Campaign campaign);
-
-    /**
-     * Main method to be used for loading units onto a transport
-     * @param transportedUnits Units we wish to load
-     * @return the old transports the transportedUnits were assigned to, or an empty set
-     */
-    //Set<Unit> loadTransport(Unit... transportedUnits);
 
     /**
      * Main method to be used for unloading units from a transport

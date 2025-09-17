@@ -58,12 +58,10 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * @since 0.50.05
  */
-public class WinterHolidayAnnouncement {
-    private static final MMLogger logger = MMLogger.create(WinterHolidayAnnouncement.class);
+public record WinterHolidayAnnouncement(Campaign campaign) {
+    private static final MMLogger LOGGER = MMLogger.create(WinterHolidayAnnouncement.class);
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources.WinterHolidayAnnouncement";
-
-    private final Campaign campaign;
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.WinterHolidayAnnouncement";
 
     // Constants for significant holiday-related dates.
     private final static int WINTER_HOLIDAY_START_YEAR = 2957;
@@ -117,7 +115,7 @@ public class WinterHolidayAnnouncement {
             case WINTER_HOLIDAY_DAY_ZERO -> getInCharacterMessageDayZero();
             case WINTER_HOLIDAY_DAY_ELEVEN -> getInCharacterMessageDayEleven();
             default -> {
-                logger.error("WinterHolidayAnnouncement: getInCharacterMessage: unexpected day of month: {}",
+                LOGGER.error("WinterHolidayAnnouncement: getInCharacterMessage: unexpected day of month: {}",
                       currentDate.getDayOfMonth());
                 yield "";
             }

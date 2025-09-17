@@ -83,7 +83,7 @@ public class PersonUtility {
     /**
      * Re-rolls the loyalty of a person based on their experience level.
      *
-     * <p>The loyalty score is determined by a dice roll and is influenced by the person's skill
+     * <p>The loyalty score is determined by a die roll and is influenced by the person's skill
      * level. A higher skill level generally corresponds to lower (worse) loyalty values.</p>
      *
      * @param person     the {@link Person} whose loyalty is being re-rolled.
@@ -176,7 +176,7 @@ public class PersonUtility {
     /**
      * Randomizes the skill levels of the given person within a specific range.
      *
-     * <p>Each skill's level may increase, decrease, or stay the same based on a dice roll.</p>
+     * <p>Each skill's level may increase, decrease, or stay the same based on a die roll.</p>
      *
      * @param person the {@link Person} whose skills are being randomized.
      * @param skills a list of skill names that should be randomized.

@@ -49,6 +49,9 @@ import megamek.common.CriticalSlot;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.missing.MissingAvionics;
+import mekhq.campaign.parts.missing.MissingLandingGear;
+import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 

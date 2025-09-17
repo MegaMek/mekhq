@@ -166,10 +166,9 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to unmaintained units, {@code false} otherwise.
      */
     public static boolean checkNag(Collection<Unit> units, boolean isCheckMaintenance) {
-        final String NAG_KEY = NAG_UNMAINTAINED_UNITS;
 
         return isCheckMaintenance &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNMAINTAINED_UNITS) &&
                      campaignHasUnmaintainedUnits(units);
     }
 }

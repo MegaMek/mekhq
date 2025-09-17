@@ -65,8 +65,7 @@ public class FormerSpouse {
      * @param date         the date the person became a former spouse
      * @param reason       the reason the person is a former spouse
      */
-    public FormerSpouse(final Person formerSpouse, final LocalDate date,
-          final FormerSpouseReason reason) {
+    public FormerSpouse(final Person formerSpouse, final LocalDate date, final FormerSpouseReason reason) {
         setFormerSpouse(formerSpouse);
         setDate(date);
         setReason(reason);
@@ -174,13 +173,12 @@ public class FormerSpouse {
     public boolean equals(@Nullable Object object) {
         if (this == object) {
             return true;
-        } else if (!(object instanceof FormerSpouse)) {
+        } else if (!(object instanceof FormerSpouse passedInFormerSpouse)) {
             return false;
         } else {
-            final FormerSpouse formerSpouse = (FormerSpouse) object;
-            return getFormerSpouse().equals(formerSpouse.getFormerSpouse())
-                         && getDate().isEqual(formerSpouse.getDate())
-                         && (getReason() == formerSpouse.getReason());
+            return getFormerSpouse().equals(passedInFormerSpouse.getFormerSpouse())
+                         && getDate().isEqual(passedInFormerSpouse.getDate())
+                         && (getReason() == passedInFormerSpouse.getReason());
         }
     }
 

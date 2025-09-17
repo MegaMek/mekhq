@@ -48,9 +48,9 @@ import org.w3c.dom.NodeList;
 
 /**
  * BA equipment is never critted so we are going to disable salvaging as well. It would be nice at some point to allow
- * for this but we would need some way in MM of tracking how many actual weapons on the squad are operational (nWeapon?)
- * When an individual suit is removed we also remove all the equipment and keep it with the suit. See BattleArmorSuit
- * for details.
+ * for this, but we would need some way in MM of tracking how many actual weapons on the squad are operational
+ * (nWeapon?) When an individual suit is removed we also remove all the equipment and keep it with the suit. See
+ * BattleArmorSuit for details.
  * <p>
  * Taharqa: as of 8/7/2015, I am working on making a change to this to allow for salvaging out parts that are modularly
  * mounted. The way I am planning on handling this is to set up a check in Unit for whether a BattleSuit is operable or
@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {
-    private static final MMLogger logger = MMLogger.create(BattleArmorEquipmentPart.class);
+    private static final MMLogger LOGGER = MMLogger.create(BattleArmorEquipmentPart.class);
 
     private int trooper;
 
@@ -115,7 +115,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
                     trooper = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
         restore();
@@ -127,7 +127,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             // need to record this as missing for trooper on entity
             Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted && isModular()) {
@@ -159,7 +159,6 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             if (null != mounted) {
                 if (mounted.isMissingForTrooper(trooper)) {
                     remove(false);
-                    return;
                 }
             }
         }

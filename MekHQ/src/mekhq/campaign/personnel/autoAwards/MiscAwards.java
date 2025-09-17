@@ -62,7 +62,7 @@ public class MiscAwards {
      * @param person                 the person to check award eligibility for
      * @param awards                 the awards to be processed (should only include awards where item == Kill)
      * @param missionWasSuccessful   true if the completed mission was successful, false otherwise
-     * @param isCivilianHelp         true if the completed scenario was AtB Scenario CIVILIANHELP
+     * @param isCivilianHelp         true if the completed scenario was AtB Scenario CIVILIAN_HELP
      * @param killCount              the number of kills (null if not applicable)
      * @param injuryCount            the number of injuries (null if not applicable)
      * @param supportPersonOfTheYear a UUID identifying the candidate for Support Person of the Year awards

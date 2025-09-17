@@ -37,9 +37,10 @@ import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 
-import megamek.common.units.Dropship;
 import megamek.common.OffBoardDirection;
+import megamek.common.units.Dropship;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -100,19 +101,7 @@ public class CommonObjectiveFactory {
             keepFriendliesAlive.setPercentage(number);
         }
         keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
-        keepFriendliesAlive.addForce(forceName);
-
-        ObjectiveEffect successEffect = new ObjectiveEffect();
-        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = OperationalVP;
-        keepFriendliesAlive.addSuccessEffect(successEffect);
-
-        ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
-        friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        friendlyFailureEffect.howMuch = OperationalVP;
-        keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);
-
-        return keepFriendliesAlive;
+        return getScenarioObjective(forceName, OperationalVP, keepFriendliesAlive);
     }
 
     /**
@@ -138,32 +127,33 @@ public class CommonObjectiveFactory {
         addAssignedPlayerUnitsToObjective(scenario, campaign, keepFriendliesAlive);
         addEmployerUnitsToObjective(scenario, contract, keepFriendliesAlive);
 
-        ObjectiveEffect successEffect = new ObjectiveEffect();
-        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = OperationalVP;
-        keepFriendliesAlive.addSuccessEffect(successEffect);
-
-        ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
-        friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        friendlyFailureEffect.howMuch = OperationalVP;
-        keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);
-
-        return keepFriendliesAlive;
+        return getScenarioObjective(OperationalVP, keepFriendliesAlive);
     }
 
     /**
      * Generates a "destroy x% of all units" from the given force name objective
      *
-     * @param forcename Explicit enemy force name
+     * @param forceName Explicit enemy force name
      */
-    public static ScenarioObjective getDestroyEnemies(String forcename, int OperationalVP, int percentage) {
+    public static ScenarioObjective getDestroyEnemies(String forceName, int OperationalVP, int percentage) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();
         destroyHostiles.setDescription(String.format(resourceMap.getString("commonObjectives.forceWithdraw.text"),
               percentage));
         destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.ForceWithdraw);
         destroyHostiles.setPercentage(percentage);
-        destroyHostiles.addForce(forcename);
+        return getScenarioObjective(forceName, OperationalVP, destroyHostiles);
+    }
 
+    @Nonnull
+    private static ScenarioObjective getScenarioObjective(String forceName, int OperationalVP,
+          ScenarioObjective destroyHostiles) {
+        destroyHostiles.addForce(forceName);
+
+        return getScenarioObjective(OperationalVP, destroyHostiles);
+    }
+
+    @Nonnull
+    private static ScenarioObjective getScenarioObjective(int OperationalVP, ScenarioObjective destroyHostiles) {
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
         successEffect.howMuch = OperationalVP;
@@ -199,17 +189,7 @@ public class CommonObjectiveFactory {
         destroyHostiles.setDestinationEdge(direction);
         destroyHostiles.addForce(contract.getEnemyBotName());
 
-        ObjectiveEffect successEffect = new ObjectiveEffect();
-        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = OperationalVP;
-        destroyHostiles.addSuccessEffect(successEffect);
-
-        ObjectiveEffect failureEffect = new ObjectiveEffect();
-        failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        failureEffect.howMuch = OperationalVP;
-        destroyHostiles.addFailureEffect(failureEffect);
-
-        return destroyHostiles;
+        return getScenarioObjective(OperationalVP, destroyHostiles);
     }
 
     /**
@@ -228,17 +208,7 @@ public class CommonObjectiveFactory {
         addAssignedPlayerUnitsToObjective(scenario, campaign, breakthrough);
         addEmployerUnitsToObjective(scenario, contract, breakthrough);
 
-        ObjectiveEffect successEffect = new ObjectiveEffect();
-        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = OperationalVP;
-        breakthrough.addSuccessEffect(successEffect);
-
-        ObjectiveEffect failureEffect = new ObjectiveEffect();
-        failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        failureEffect.howMuch = OperationalVP;
-        breakthrough.addFailureEffect(failureEffect);
-
-        return breakthrough;
+        return getScenarioObjective(OperationalVP, breakthrough);
     }
 
     /**
@@ -279,7 +249,7 @@ public class CommonObjectiveFactory {
 
     /**
      * Worker function that adds all employer units in the given scenario (as specified in the contract) to the given
-     * objective, with the exception of DropShips.
+     * objective, except DropShips.
      */
     private static void addEmployerUnitsToObjective(AtBScenario scenario, AtBContract contract,
           ScenarioObjective objective) {

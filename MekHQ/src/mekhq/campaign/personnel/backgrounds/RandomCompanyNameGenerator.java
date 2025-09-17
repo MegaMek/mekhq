@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.backgrounds;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import mekhq.MHQConstants;
  */
 public class RandomCompanyNameGenerator implements Serializable {
     //region Variable Declarations
+    @Serial
     private static final long serialVersionUID = 4721410214327210288L;
     private static final int NAME_MIDDLE_WORD_CORPORATE = 0;
     private static final int NAME_END_WORD_CORPORATE = 1;

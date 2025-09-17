@@ -36,9 +36,9 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
@@ -95,10 +95,10 @@ import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQStaticDirectoryManager;
@@ -142,7 +142,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PersonViewPanel extends JScrollablePanel {
-    private static final MMLogger logger = MMLogger.create(PersonViewPanel.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
 
@@ -725,7 +725,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, ribbonFileName);
                 if (ribbon == null) {
-                    logger.warn("No ribbon icon found for award: {}", directory + ribbonFileName);
+                    LOGGER.warn("No ribbon icon found for award: {}", directory + ribbonFileName);
                     continue;
                 }
 
@@ -737,7 +737,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 ribbonLabel.setToolTipText(award.getTooltip(campaignOptions, person));
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
 
             i++;
@@ -802,7 +802,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, medalFileName);
                 if (medal == null) {
-                    logger.warn("No medal icon found for award: {}", directory + medalFileName);
+                    LOGGER.warn("No medal icon found for award: {}", directory + medalFileName);
                     continue;
                 }
 
@@ -814,7 +814,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 medalLabel.setToolTipText(award.getTooltip(campaignOptions, person));
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -825,7 +825,7 @@ public class PersonViewPanel extends JScrollablePanel {
      * Draws the misc awards below the medals.
      */
     private JPanel drawMiscAwards() {
-        JPanel pnlMiscs = new JPanel();
+        JPanel pnlMisc = new JPanel();
 
         List<Award> awards = new ArrayList<>();
         for (Award award : person.getAwardController().getAwards()) {
@@ -848,7 +848,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 misc = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, miscFileName);
                 if (misc == null) {
-                    logger.warn("No misc icon found for award: {}", directory + miscFileName);
+                    LOGGER.warn("No misc icon found for award: {}", directory + miscFileName);
                     continue;
                 }
 
@@ -858,13 +858,13 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 miscLabel.setIcon(new ImageIcon(misc));
                 miscLabel.setToolTipText(award.getTooltip(campaignOptions, person));
-                pnlMiscs.add(miscLabel);
+                pnlMisc.add(miscLabel);
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
-        return pnlMiscs;
+        return pnlMisc;
     }
 
     /**
@@ -938,25 +938,23 @@ public class PersonViewPanel extends JScrollablePanel {
      *
      * <p>Origin information is conditionally added depending on campaign options.</p>
      *
-     * @return a {@link JPanel} containing empty or default information fields
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    private JPanel fillInfoEmpty() {
+    private void fillInfoEmpty() {
         // TODO Update layout for new person view (needs that PR to be merged) - Illiani, 50.06
 
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder("-"));
 
         // Helper to simplify row addition (text, value, isPair, gridwidth)
-        BiConsumer<String[], Integer> addRow = (arr, gridwidth) -> {
+        BiConsumer<String[], Integer> addRow = (arr, gridWidth) -> {
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.anchor = GridBagConstraints.NORTHWEST;
             gbc.fill = GridBagConstraints.NONE;
             if (arr.length == 1) {
                 gbc.gridx = 0;
-                gbc.gridwidth = gridwidth;
+                gbc.gridwidth = gridWidth;
                 gbc.weightx = 1.0;
                 gbc.insets = new Insets(0, 0, 5, 0);
                 pnlInfo.add(new JLabel(arr[0]), gbc);
@@ -984,7 +982,6 @@ public class PersonViewPanel extends JScrollablePanel {
         addRow.accept(new String[] { resourceMap.getString("lblGender1.text"), "-" }, 4);
         addRow.accept(new String[] { resourceMap.getString("lblBloodType1.text"), "-" }, 4);
 
-        return pnlInfo;
     }
 
     private JPanel fillInfo() {
@@ -1492,7 +1489,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         GridBagConstraints gridBagConstraints;
 
-        int firsty = 0;
+        int firstY = 0;
 
         final Person spouse = person.getGenealogy().getSpouse();
         if (spouse != null) {
@@ -1500,7 +1497,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblSpouse1.setName("lblSpouse1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = firstY;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblSpouse1, gridBagConstraints);
@@ -1516,11 +1513,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
             });
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = firstY;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             pnlFamily.add(lblSpouse2, gridBagConstraints);
-            firsty++;
+            firstY++;
         }
 
         if (person.getGenealogy().hasFormerSpouse()) {
@@ -1528,7 +1525,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblFormerSpouses1.setText(resourceMap.getString("lblFormerSpouses1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = firstY;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblFormerSpouses1, gridBagConstraints);
@@ -1544,7 +1541,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 Person ex = formerSpouse.getFormerSpouse();
                 String name = getRelativeName(ex);
 
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.getAccessibleContext()
@@ -1562,7 +1559,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     }
                 });
                 pnlFamily.add(lblFormerSpouses2, gridBagConstraints);
-                firsty++;
+                firstY++;
             }
         }
 
@@ -1573,7 +1570,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblChildren1, gridBagConstraints);
@@ -1585,7 +1582,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 for (Person child : children) {
                     String name = getRelativeName(child);
 
-                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.gridy = firstY;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2");
                     lblChildren2.getAccessibleContext()
@@ -1600,7 +1597,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblChildren2, gridBagConstraints);
-                    firsty++;
+                    firstY++;
                 }
             }
 
@@ -1611,7 +1608,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblGrandchildren1, gridBagConstraints);
@@ -1626,7 +1623,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 for (Person grandchild : grandchildren) {
                     String name = getRelativeName(grandchild);
 
-                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.gridy = firstY;
                     lblGrandchildren2 = new JLabel();
                     lblGrandchildren2.setName("lblGrandchildren2");
                     lblGrandchildren2.getAccessibleContext()
@@ -1641,7 +1638,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblGrandchildren2, gridBagConstraints);
-                    firsty++;
+                    firstY++;
                 }
             }
 
@@ -1652,7 +1649,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 labelParent.setName("lblParent");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(labelParent, gridBagConstraints);
@@ -1671,7 +1668,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
                 pnlFamily.add(labelParentName, gridBagConstraints);
-                firsty++;
+                firstY++;
             }
 
             final List<Person> siblings = person.getGenealogy().getSiblings();
@@ -1680,7 +1677,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblSiblings1, gridBagConstraints);
@@ -1695,7 +1692,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 for (Person sibling : siblings) {
                     String name = getRelativeName(sibling);
 
-                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.gridy = firstY;
                     lblSiblings2 = new JLabel(String.format("<html>%s</html>", name));
                     lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.getAccessibleContext()
@@ -1710,7 +1707,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblSiblings2, gridBagConstraints);
-                    firsty++;
+                    firstY++;
                 }
             }
 
@@ -1720,7 +1717,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblGrandparents1, gridBagConstraints);
@@ -1735,7 +1732,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 for (Person grandparent : grandparents) {
                     String name = getRelativeName(grandparent);
 
-                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.gridy = firstY;
                     lblGrandparents2 = new JLabel(String.format("<html>%s</html>", name));
                     lblGrandparents2.setName("lblGrandparents2");
                     lblGrandparents2.getAccessibleContext()
@@ -1749,7 +1746,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblGrandparents2, gridBagConstraints);
-                    firsty++;
+                    firstY++;
                 }
             }
 
@@ -1759,7 +1756,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblAuntsOrUncles1, gridBagConstraints);
@@ -1774,7 +1771,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 for (Person auntOrUncle : auntsAndUncles) {
                     String name = getRelativeName(auntOrUncle);
 
-                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.gridy = firstY;
                     lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>", name));
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.getAccessibleContext()
@@ -1789,7 +1786,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblAuntsOrUncles2, gridBagConstraints);
-                    firsty++;
+                    firstY++;
                 }
             }
 
@@ -1799,7 +1796,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridy = firstY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblCousins1, gridBagConstraints);
@@ -1814,7 +1811,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 for (Person cousin : cousins) {
                     String name = getRelativeName(cousin);
 
-                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.gridy = firstY;
                     lblCousins2 = new JLabel();
                     lblCousins2.setName("lblCousins2");
                     lblCousins2.getAccessibleContext()
@@ -1829,7 +1826,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblCousins2, gridBagConstraints);
-                    firsty++;
+                    firstY++;
                 }
             }
         }
@@ -1895,22 +1892,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            int ageModifier = skill.getAgingModifier();
-            int totalModifier = attributeModifier + spaModifier + ageModifier;
-
-            String color = "";
-            String icon = "";
-            if (totalModifier != 0) {
-                color = totalModifier < 0 ?
-                              ReportingUtilities.getNegativeColor() :
-                              ReportingUtilities.getPositiveColor();
-                icon = totalModifier < 0 ? "&#x25BC" : "&#x25B2";
-            }
-
-            String adjustment = "";
-            if (!color.isBlank()) {
-                adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
-            }
+            String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(options, attributes, adjustedReputation),
@@ -1939,6 +1921,26 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         return pnlSkills;
+    }
+
+    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier) {
+        int ageModifier = skill.getAgingModifier();
+        int totalModifier = attributeModifier + spaModifier + ageModifier;
+
+        String color = "";
+        String icon = "";
+        if (totalModifier != 0) {
+            color = totalModifier < 0 ?
+                          ReportingUtilities.getNegativeColor() :
+                          ReportingUtilities.getPositiveColor();
+            icon = totalModifier < 0 ? "&#x25BC" : "&#x25B2";
+        }
+
+        String adjustment = "";
+        if (!color.isBlank()) {
+            adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
+        }
+        return adjustment;
     }
 
     /**
@@ -2454,9 +2456,9 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
 
-        double vweight = 1.0;
+        double vWeight = 1.0;
         if (person.hasInjuries(false)) {
-            vweight = 0.0;
+            vWeight = 0.0;
         }
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2");
@@ -2466,7 +2468,7 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = vweight;
+        gridBagConstraints.weighty = vWeight;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;

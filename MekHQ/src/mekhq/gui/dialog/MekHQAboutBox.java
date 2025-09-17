@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,7 +54,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 
 public class MekHQAboutBox extends JDialog {
-    private static final MMLogger logger = MMLogger.create(MekHQAboutBox.class);
+    private static final MMLogger LOGGER = MMLogger.create(MekHQAboutBox.class);
 
     public MekHQAboutBox(JFrame parent) {
         super(parent);
@@ -155,7 +155,7 @@ public class MekHQAboutBox extends JDialog {
                         URI uri = new URI(mekhqProperties.getString("Application.homepage"));
                         Desktop.getDesktop().browse(uri);
                     } catch (Exception ex) {
-                        logger.error(ex, "Unable to display the About Box.");
+                        LOGGER.error(ex, "Unable to display the About Box.");
                     }
                 }
             }
@@ -191,7 +191,7 @@ public class MekHQAboutBox extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 }

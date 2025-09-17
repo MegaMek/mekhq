@@ -43,7 +43,7 @@ import javax.swing.event.ListDataListener;
 
 public class FilterableListModel<E> extends AbstractListModel<E> implements ListDataListener {
     private ListModel<E> peerModel;
-    private List<Integer> indices;
+    private final List<Integer> indices;
     private Predicate<E> filter;
 
     public FilterableListModel() {

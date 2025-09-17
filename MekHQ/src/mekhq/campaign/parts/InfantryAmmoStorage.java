@@ -35,10 +35,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.equipment.AmmoType;
-import megamek.common.equipment.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
  * munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
-    private static final MMLogger logger = MMLogger.create(InfantryAmmoStorage.class);
+    private static final MMLogger LOGGER = MMLogger.create(InfantryAmmoStorage.class);
 
     private InfantryWeapon weaponType;
 
@@ -76,7 +76,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
                 this.name = weaponType.getShortName() + " Ammo";
             }
         } else {
-            logger.error("InfantryAmmoStorage does not have a weapon type!");
+            LOGGER.error("InfantryAmmoStorage does not have a weapon type!");
         }
     }
 
@@ -118,7 +118,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     /**
-     * Gets a value indicating whether or not the {@code AmmoType} for the {@code InfantryWeapon} is the same as this
+     * Gets a value indicating whether the {@code AmmoType} for the {@code InfantryWeapon} is the same as this
      * instance.
      *
      * @param ammoType   The {@code AmmoType}.

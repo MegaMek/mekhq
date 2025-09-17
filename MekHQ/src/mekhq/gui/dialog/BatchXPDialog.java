@@ -66,7 +66,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public final class BatchXPDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(BatchXPDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(BatchXPDialog.class);
 
     private final Campaign campaign;
     private final PersonnelTableModel personnelModel;
@@ -93,7 +93,7 @@ public final class BatchXPDialog extends JDialog {
 
     private JLabel matchedPersonnelLabel;
 
-    private transient String choiceNoSkill;
+    private final transient String choiceNoSkill;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
           MekHQ.getMHQOptions().getLocale());
 
@@ -273,7 +273,7 @@ public final class BatchXPDialog extends JDialog {
                 final String skillName = (String) choiceSkill.getSelectedItem();
                 final SkillType skillType = SkillType.getType(skillName);
                 if (skillType == null) {
-                    logger.error("Cannot mass train unknown skill type with name " + skillName);
+                    LOGGER.error("Cannot mass train unknown skill type with name {}", skillName);
                     return;
                 }
                 personnelFilter.setSkillName(skillName);
@@ -485,7 +485,7 @@ public final class BatchXPDialog extends JDialog {
         }
 
         /**
-         * Sets the the name of the target skill.
+         * Sets the name of the target skill.
          *
          * @param skillName the name of the skill to be set.
          */

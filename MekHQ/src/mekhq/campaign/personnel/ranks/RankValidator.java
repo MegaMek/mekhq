@@ -43,7 +43,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 
 public class RankValidator {
-    private static final MMLogger logger = MMLogger.create(RankValidator.class);
+    private static final MMLogger LOGGER = MMLogger.create(RankValidator.class);
 
     // region Constructors
     public RankValidator() {
@@ -88,13 +88,15 @@ public class RankValidator {
 
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
-                    logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
-                                       + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
-                                       + " is duplicated by userData Rank System " + rankSystem);
+                    LOGGER.error("Duplicate Rank System Code: {}. Current {} is duplicated by userData Rank System {}",
+                          rankSystem.getCode(),
+                          Ranks.getRankSystems().get(rankSystem.getCode()),
+                          rankSystem);
                 } else {
-                    logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
-                                       + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
-                                       + " is duplicated by " + rankSystem);
+                    LOGGER.error("Duplicate Rank System Code: {}. Current {} is duplicated by {}",
+                          rankSystem.getCode(),
+                          Ranks.getRankSystems().get(rankSystem.getCode()),
+                          rankSystem);
                 }
                 return false;
             }
@@ -110,20 +112,21 @@ public class RankValidator {
         // total number of
         // rank tiers
         if (rankSystem.getRanks().size() != Rank.RC_NUM) {
-            logger.error(String.format("Illegal number of ranks of %d when %d is required",
-                  rankSystem.getRanks().size(), Rank.RC_NUM));
+            LOGGER.error("Illegal number of ranks of {} when {} is required",
+                  rankSystem.getRanks().size(),
+                  Rank.RC_NUM);
             return false;
         }
 
         // Index 0 needs to be checked individually for empty ranks, as that is a no-go.
-        // Additionally, we need to setup the default professions for later redirect
+        // Additionally, we need to set up the default professions for later redirect
         // testing
         final Rank initialRank = rankSystem.getRank(0);
         final Profession[] professions = Profession.values();
         final Set<Profession> defaultProfessions = new HashSet<>(); // Professions with legal level 1 names
         for (final Profession profession : professions) {
             if (initialRank.isEmpty(profession)) {
-                logger.error("Illegal Rank index 0 empty profession of " + profession + " for " + rankSystem);
+                LOGGER.error("Illegal Rank index 0 empty profession of {} for {}", profession, rankSystem);
                 return false;
             } else if (!initialRank.indicatesAlternativeSystem(profession)) {
                 defaultProfessions.add(profession);
@@ -132,7 +135,7 @@ public class RankValidator {
 
         // We do require a single default profession
         if (defaultProfessions.isEmpty()) {
-            logger.error("You cannot have Rank Index 0 all indicate alternative professions for " + rankSystem);
+            LOGGER.error("You cannot have Rank Index 0 all indicate alternative professions for {}", rankSystem);
         }
 
         // Now, we need to check each profession
@@ -181,10 +184,10 @@ public class RankValidator {
     private boolean validateRankAlternatives(final Rank rank, final Profession profession,
           final int maxRecursions, final int recursion) {
         if (recursion > maxRecursions) {
-            logger.error("Hit max recursions, rank system contains an infinite loop");
+            LOGGER.error("Hit max recursions, rank system contains an infinite loop");
             return false;
         } else if (rank.isEmpty(profession)) {
-            logger.error("Cannot have an empty value as an alternative");
+            LOGGER.error("Cannot have an empty value as an alternative");
             return false;
         } else if (rank.indicatesAlternativeSystem(profession)) {
             return validateRankAlternatives(rank, profession.getAlternateProfession(rank),

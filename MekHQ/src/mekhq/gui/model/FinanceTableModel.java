@@ -45,7 +45,7 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 /**
  * A table model for displaying financial transactions (i.e. a ledger)
  */
-public class FinanceTableModel extends DataTableModel {
+public class FinanceTableModel extends DataTableModel<Transaction> {
     public static final int COL_DATE = 0;
     public static final int COL_CATEGORY = 1;
     public static final int COL_DESC = 2;
@@ -55,12 +55,7 @@ public class FinanceTableModel extends DataTableModel {
     public static final int N_COL = 6;
 
     public FinanceTableModel() {
-        data = new ArrayList<Transaction>();
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
+        data = new ArrayList<>();
     }
 
     @Override
@@ -70,22 +65,15 @@ public class FinanceTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_DATE:
-                return "Date";
-            case COL_CATEGORY:
-                return "Category";
-            case COL_DESC:
-                return "Notes";
-            case COL_DEBIT:
-                return "Debit";
-            case COL_CREDIT:
-                return "Credit";
-            case COL_BALANCE:
-                return "Balance";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_DATE -> "Date";
+            case COL_CATEGORY -> "Category";
+            case COL_DESC -> "Notes";
+            case COL_DEBIT -> "Debit";
+            case COL_CREDIT -> "Credit";
+            case COL_BALANCE -> "Balance";
+            default -> "?";
+        };
     }
 
     @Override
@@ -126,25 +114,18 @@ public class FinanceTableModel extends DataTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_DESC:
-                return 150;
-            case COL_CATEGORY:
-                return 100;
-            default:
-                return 50;
-        }
+        return switch (c) {
+            case COL_DESC -> 150;
+            case COL_CATEGORY -> 100;
+            default -> 50;
+        };
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            case COL_DEBIT:
-            case COL_CREDIT:
-            case COL_BALANCE:
-                return SwingConstants.RIGHT;
-            default:
-                return SwingConstants.LEFT;
-        }
+        return switch (col) {
+            case COL_DEBIT, COL_CREDIT, COL_BALANCE -> SwingConstants.RIGHT;
+            default -> SwingConstants.LEFT;
+        };
     }
 
     @Override
@@ -152,13 +133,8 @@ public class FinanceTableModel extends DataTableModel {
         return getValueAt(0, c).getClass();
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
     public Transaction getTransaction(int row) {
-        return (Transaction) data.get(row);
+        return data.get(row);
     }
 
     public void setTransaction(int row, Transaction transaction) {

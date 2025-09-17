@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -73,11 +73,11 @@ import mekhq.gui.view.PersonViewPanel;
  * This dialog is used to both hire new pilots and to edit existing ones
  */
 public class NewRecruitDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(NewRecruitDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewRecruitDialog.class);
 
     private Person person;
 
-    private CampaignGUI hqView;
+    private final CampaignGUI hqView;
 
     private JComboBox<RankDisplay> choiceRanks;
 
@@ -226,7 +226,7 @@ public class NewRecruitDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -247,7 +247,7 @@ public class NewRecruitDialog extends JDialog {
     private void createNewRecruit() {
         person = getCampaign().newPerson(person.getPrimaryRole());
         refreshRanksCombo();
-        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
     }
 
     private void randomName() {
@@ -303,7 +303,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void changeRank() {
-        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
         refreshView();
     }
 

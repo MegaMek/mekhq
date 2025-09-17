@@ -62,7 +62,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.gui.utilities.JMoneyTextField;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
-    private static final MMLogger logger = MMLogger.create(EditTransactionDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditTransactionDialog.class);
 
     private final Transaction oldTransaction;
     private final Transaction newTransaction;
@@ -110,7 +110,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

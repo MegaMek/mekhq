@@ -48,6 +48,8 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.LandAirMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingAvionics;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
@@ -105,9 +107,6 @@ public class Avionics extends Part {
                 } else {
                     time *= 5;
                 }
-            }
-            if (hits == 1) {
-                time *= 1;
             }
             if (hits == 2) {
                 time *= 2;
@@ -182,13 +181,13 @@ public class Avionics extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);

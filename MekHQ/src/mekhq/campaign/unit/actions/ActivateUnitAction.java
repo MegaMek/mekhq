@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -42,18 +42,15 @@ import mekhq.campaign.unit.Unit;
 /**
  * Activates a unit.
  */
-public class ActivateUnitAction implements IUnitAction {
-    private static final MMLogger logger = MMLogger.create(ActivateUnitAction.class);
-
-    private final Person tech;
-    private final boolean isGM;
+public record ActivateUnitAction(Person tech, boolean isGM) implements IUnitAction {
+    private static final MMLogger LOGGER = MMLogger.create(ActivateUnitAction.class);
 
     /**
      * Initializes a new instance of the ActivateUnitAction class.
      *
-     * @param tech The technician performing the work, or null if noone is needed to perform the work (self crewed or
+     * @param tech The technician performing the work, or null if no one is needed to perform the work (self crewed or
      *             GM).
-     * @param isGM A boolean value indicating whether or not GM mode should be used to complete the action.
+     * @param isGM A boolean value indicating whether GM mode should be used to complete the action.
      */
     public ActivateUnitAction(@Nullable Person tech, boolean isGM) {
         this.tech = tech;
@@ -72,18 +69,18 @@ public class ActivateUnitAction implements IUnitAction {
             Entity entity = unit.getEntity();
 
             if (entity == null) {
-                logger.error("Unit has no entity: {}", unit.getName());
+                LOGGER.error("Unit has no entity: {}", unit.getName());
                 return;
             }
 
             if (tech != null && entity.isLargeCraft() && !unit.getCrew().contains(tech)) {
                 if (!tech.isTechLargeVessel()) {
-                    logger.error("{} is not a vessel tech", tech.getFullTitle());
+                    LOGGER.error("{} is not a vessel tech", tech.getFullTitle());
                     return;
                 }
 
                 if (!unit.canTakeMoreVesselCrew()) {
-                    logger.warn("Unit has too many vessel crew members: {}", unit.getName());
+                    LOGGER.warn("Unit has too many vessel crew members: {}", unit.getName());
                     return;
                 }
 

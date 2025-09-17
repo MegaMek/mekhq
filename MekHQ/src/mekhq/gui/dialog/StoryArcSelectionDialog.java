@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -51,7 +51,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private StoryArcSelectionPane selectionPanel;
     private JTextPane descriptionPane;
-    private boolean startNew;
+    private final boolean startNew;
     //endregion Variable Declarations
 
     //region Constructors

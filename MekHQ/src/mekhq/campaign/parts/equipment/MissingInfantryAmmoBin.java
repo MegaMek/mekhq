@@ -35,11 +35,11 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
-import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
  * Ammo bin missing from a small support vehicle
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
-    private static final MMLogger logger = MMLogger.create(MissingInfantryAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(MissingInfantryAmmoBin.class);
 
     private InfantryWeapon weaponType;
 
@@ -69,7 +69,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
      * @param equipNum   The equipment index on the unit
      * @param weaponType The weapon this ammo is for
      * @param clips      The number of clips of ammo
-     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param omniPodded Whether the weapon is pod-mounted on an OmniVehicle
      * @param c          The campaign instance
      */
     public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
@@ -88,7 +88,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         if (getWeaponType() != null) {
             name = getWeaponType().getName() + " Ammo Bin";
         } else {
-            logger.error("MissingInfantryAmmoBin does not have a weapon type!");
+            LOGGER.error("MissingInfantryAmmoBin does not have a weapon type!");
         }
     }
 
@@ -131,9 +131,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         // than an InfantryAmmoBin. Subclasses should use a similar check, which
         // breaks Composability to a degree but in this case we've used
         // subclasses where they're not truly composable.
-        if ((part instanceof InfantryAmmoBin)
-                  && (part.getClass() == InfantryAmmoBin.class)) {
-            InfantryAmmoBin bin = (InfantryAmmoBin) part;
+        if ((part instanceof InfantryAmmoBin bin) && (part.getClass() == InfantryAmmoBin.class)) {
             return getType().equals(bin.getType())
                          && getWeaponType().equals(bin.getWeaponType())
                          && (getClips() == bin.getClips());

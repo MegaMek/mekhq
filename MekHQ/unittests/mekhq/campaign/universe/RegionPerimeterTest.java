@@ -65,9 +65,9 @@ public class RegionPerimeterTest {
 
         list.sort(RegionPerimeter.leastYSorter);
 
-        assertEquals(list.get(0).getY(), -1, RegionPerimeter.EPSILON);
-        assertEquals(list.get(0).getX(), -1, RegionPerimeter.EPSILON);
-        assertEquals(list.get(1).getX(), 2, RegionPerimeter.EPSILON);
+        assertEquals(list.get(0).y(), -1, RegionPerimeter.EPSILON);
+        assertEquals(list.get(0).x(), -1, RegionPerimeter.EPSILON);
+        assertEquals(list.get(1).x(), 2, RegionPerimeter.EPSILON);
     }
 
     @Test
@@ -117,8 +117,8 @@ public class RegionPerimeterTest {
         list.sort(sorter);
 
         for (int i = 0; i < list.size(); i++) {
-            assertEquals(list.get(i).getX(), points[i].getX(), RegionPerimeter.EPSILON);
-            assertEquals(list.get(i).getY(), points[i].getY(), RegionPerimeter.EPSILON);
+            assertEquals(list.get(i).x(), points[i].x(), RegionPerimeter.EPSILON);
+            assertEquals(list.get(i).y(), points[i].y(), RegionPerimeter.EPSILON);
         }
     }
 
@@ -134,7 +134,7 @@ public class RegionPerimeterTest {
         RegionPerimeter border = new RegionPerimeter(list);
 
         for (Point p : border.getVertices()) {
-            assertTrue((Math.abs(p.getX()) == 1) || (Math.abs(p.getY()) == 1));
+            assertTrue((Math.abs(p.x()) == 1) || (Math.abs(p.y()) == 1));
         }
     }
 

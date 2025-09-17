@@ -83,13 +83,10 @@ public enum CompanyGenerationMethod {
 
     public AbstractCompanyGenerator getGenerator(final Campaign campaign,
           final CompanyGenerationOptions options) {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBCompanyGenerator(campaign, options);
-            case WINDCHILD:
-            default:
-                return new WindchildCompanyGenerator(campaign, options);
-        }
+        return switch (this) {
+            case AGAINST_THE_BOT -> new AtBCompanyGenerator(campaign, options);
+            default -> new WindchildCompanyGenerator(campaign, options);
+        };
     }
 
     @Override

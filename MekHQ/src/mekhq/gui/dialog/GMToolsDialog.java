@@ -93,7 +93,7 @@ import mekhq.gui.panels.LayeredForceIconCreationPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class GMToolsDialog extends AbstractMHQDialogBasic {
-    private static final MMLogger logger = MMLogger.create(GMToolsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(GMToolsDialog.class);
 
     // region Variable Declarations
     private final CampaignGUI gui;
@@ -137,7 +137,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
     // Callsign Panel
     private JSpinner spnCallsignNumber;
     private JLabel lblCurrentCallsign;
-    private JTextArea txtCallsignsGenerated;
+    private JTextArea txtCallSignsGenerated;
     private String lastGeneratedCallsign;
 
     // Company Name Panel
@@ -392,12 +392,12 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         this.lblCurrentCallsign = lblCurrentCallsign;
     }
 
-    public JTextArea getTxtCallsignsGenerated() {
-        return txtCallsignsGenerated;
+    public JTextArea getTxtCallSignsGenerated() {
+        return txtCallSignsGenerated;
     }
 
-    public void setTxtCallsignsGenerated(final JTextArea txtCallsignsGenerated) {
-        this.txtCallsignsGenerated = txtCallsignsGenerated;
+    public void setTxtCallSignsGenerated(final JTextArea txtCallSignsGenerated) {
+        this.txtCallSignsGenerated = txtCallSignsGenerated;
     }
 
     public @Nullable String getLastGeneratedCallsign() {
@@ -556,8 +556,6 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         getTabbedPane().setName("GMToolsTabbedPane");
         getTabbedPane().addTab(resources.getString("generalTab.title"), createGeneralTab());
         getTabbedPane().addTab(resources.getString("namesTab.title"), createNamesTab());
-        // getTabbedPane().addTab(resources.getString("personnelModuleTab.title"),
-        // createPersonnelModuleTab());
         getTabbedPane().addTab(resources.getString("layeredForceIconTab.title"), createLayeredForceIconTab());
         return getTabbedPane();
     }
@@ -1005,10 +1003,10 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         lblCallsignGenerated.setName((getPerson() == null) ? "lblCallsignsGenerated" : "lblCallsignGenerated");
         panel.add(lblCallsignGenerated, gbc);
 
-        setTxtCallsignsGenerated(new JTextArea("-"));
-        getTxtCallsignsGenerated().setName((getPerson() == null) ? "txtCallsignsGenerated" : "txtCallsignGenerated");
+        setTxtCallSignsGenerated(new JTextArea("-"));
+        getTxtCallSignsGenerated().setName((getPerson() == null) ? "txtCallSignsGenerated" : "txtCallsignGenerated");
         gbc.gridx++;
-        panel.add(getTxtCallsignsGenerated(), gbc);
+        panel.add(getTxtCallSignsGenerated(), gbc);
 
         maxGridX = gbc.gridx;
 
@@ -1018,13 +1016,13 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             gbc.gridx++;
             panel.add(getSpnCallsignNumber(), gbc);
 
-            final JButton btnGenerateCallsigns = new MMButton("btnGenerateCallsigns",
+            final JButton btnGenerateCallSigns = new MMButton("btnGenerateCallSigns",
                   resources,
                   "btnGenerateCallsigns.text",
                   "btnGenerateCallsigns.toolTipText",
                   evt -> generateCallsigns());
             gbc.gridx++;
-            panel.add(btnGenerateCallsigns, gbc);
+            panel.add(btnGenerateCallSigns, gbc);
         } else {
             final JButton btnAssignCallsign = new MMButton("btnAssignCallsign",
                   resources,
@@ -1045,7 +1043,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         }
 
         // Programmatically Assign Accessibility Labels
-        lblCallsignGenerated.setLabelFor(getTxtCallsignsGenerated());
+        lblCallsignGenerated.setLabelFor(getTxtCallSignsGenerated());
 
         return panel;
     }
@@ -1335,8 +1333,6 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 3, 0, 3);
 
-        final int maxGridX;
-
         // Create the Components and Layout
         if (getPerson() != null) {
             final JLabel lblEligible = new JLabel(resources.getString("Eligible.text"));
@@ -1469,35 +1465,21 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
      * Determine if a person's primary role supports operating a given unit type.
      */
     private boolean doesPersonPrimarilyDriveUnitType(final int unitType) {
-        switch (unitType) {
-            case UnitType.AERO:
-            case UnitType.AEROSPACE_FIGHTER:
-                return getPerson().getPrimaryRole().isAerospacePilot();
-            case UnitType.BATTLE_ARMOR:
-                return getPerson().getPrimaryRole().isBattleArmour();
-            case UnitType.CONV_FIGHTER:
-                return getPerson().getPrimaryRole().isConventionalAircraftPilot() ||
-                             getPerson().getPrimaryRole().isAerospacePilot();
-            case UnitType.DROPSHIP:
-            case UnitType.JUMPSHIP:
-            case UnitType.SMALL_CRAFT:
-            case UnitType.WARSHIP:
-                return getPerson().getPrimaryRole().isVesselPilot();
-            case UnitType.INFANTRY:
-                return getPerson().getPrimaryRole().isSoldier();
-            case UnitType.MEK:
-                return getPerson().getPrimaryRole().isMekWarrior();
-            case UnitType.NAVAL:
-                return getPerson().getPrimaryRole().isNavalVehicleDriver();
-            case UnitType.PROTOMEK:
-                return getPerson().getPrimaryRole().isProtoMekPilot();
-            case UnitType.TANK:
-                return getPerson().getPrimaryRole().isGroundVehicleDriver();
-            case UnitType.VTOL:
-                return getPerson().getPrimaryRole().isVTOLPilot();
-            default:
-                return false;
-        }
+        return switch (unitType) {
+            case UnitType.AERO, UnitType.AEROSPACE_FIGHTER -> getPerson().getPrimaryRole().isAerospacePilot();
+            case UnitType.BATTLE_ARMOR -> getPerson().getPrimaryRole().isBattleArmour();
+            case UnitType.CONV_FIGHTER -> getPerson().getPrimaryRole().isConventionalAircraftPilot() ||
+                                                getPerson().getPrimaryRole().isAerospacePilot();
+            case UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.SMALL_CRAFT, UnitType.WARSHIP ->
+                  getPerson().getPrimaryRole().isVesselPilot();
+            case UnitType.INFANTRY -> getPerson().getPrimaryRole().isSoldier();
+            case UnitType.MEK -> getPerson().getPrimaryRole().isMekWarrior();
+            case UnitType.NAVAL -> getPerson().getPrimaryRole().isNavalVehicleDriver();
+            case UnitType.PROTOMEK -> getPerson().getPrimaryRole().isProtoMekPilot();
+            case UnitType.TANK -> getPerson().getPrimaryRole().isGroundVehicleDriver();
+            case UnitType.VTOL -> getPerson().getPrimaryRole().isVTOLPilot();
+            default -> false;
+        };
     }
     // endregion Initialization
 
@@ -1515,7 +1497,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         }
         sb.append(individualDice.get(individualDice.size() - 1));
 
-        getTxtIndividualDiceResults().setText((sb.length() > 0) ? sb.toString() : "-");
+        getTxtIndividualDiceResults().setText((!sb.isEmpty()) ? sb.toString() : "-");
     }
 
     private @Nullable Entity performRATRoll() {
@@ -1567,7 +1549,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             final String message = String.format(Messages.getString("entityLoadFailure.error"),
                   summary.getName(),
                   summary.getSourceFile());
-            logger.error(message, ex);
+            LOGGER.error(message, ex);
             getLblUnitPicked().setText(message);
             return null;
         }
@@ -1647,8 +1629,8 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
     }
 
     private void generateCallsign() {
-        getTxtCallsignsGenerated().setText(RandomCallsignGenerator.getInstance().generate());
-        setLastGeneratedCallsign(getTxtCallsignsGenerated().getText());
+        getTxtCallSignsGenerated().setText(RandomCallsignGenerator.getInstance().generate());
+        setLastGeneratedCallsign(getTxtCallSignsGenerated().getText());
     }
 
     private void generateCallsigns() {
@@ -1656,7 +1638,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         for (int i = 0; i < (Integer) getSpnCallsignNumber().getValue(); i++) {
             sj.add(RandomCallsignGenerator.getInstance().generate());
         }
-        getTxtCallsignsGenerated().setText(sj.toString());
+        getTxtCallSignsGenerated().setText(sj.toString());
     }
 
     private void assignCallsign() {

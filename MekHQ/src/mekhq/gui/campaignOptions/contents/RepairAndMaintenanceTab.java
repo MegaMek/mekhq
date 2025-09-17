@@ -71,8 +71,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
 
-    //start Repair Tab
-    private CampaignOptionsHeaderPanel repairHeader;
     private JCheckBox chkTechsUseAdministration;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
@@ -86,8 +84,6 @@ public class RepairAndMaintenanceTab {
     private JSpinner spnDestroyPartTarget;
     //end Repair Tab
 
-    //start Maintenance Tab
-    private CampaignOptionsHeaderPanel maintenanceHeader;
     private JCheckBox checkMaintenance;
     private JLabel lblMaintenanceDays;
     private JSpinner spnMaintenanceDays;
@@ -193,7 +189,8 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createRepairTab() {
         // Header
-        repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
+        //start Repair Tab
+        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
               getImageDirectory() + "logo_clan_burrock.png", 3);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
@@ -303,7 +300,8 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createMaintenanceTab() {
         // Header
-        maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
+        //start Maintenance Tab
+        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
               getImageDirectory() + "logo_magistracy_of_canopus.png", 6);
 
         // Contents

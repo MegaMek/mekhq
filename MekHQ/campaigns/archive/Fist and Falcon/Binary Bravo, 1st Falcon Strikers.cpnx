@@ -2201,7 +2201,7 @@
 		<secondSkillBonus>-4</secondSkillBonus>
 	</randomSkillPreferences>
 	<parts>
-		<part id="1" type="mekhq.campaign.parts.MekLocation">
+		<part id="1" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>1</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2236,7 +2236,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="3" type="mekhq.campaign.parts.MekLocation">
+		<part id="3" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>3</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2287,7 +2287,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="6" type="mekhq.campaign.parts.MekLocation">
+		<part id="6" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>6</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2338,7 +2338,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="9" type="mekhq.campaign.parts.MekLocation">
+		<part id="9" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>9</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2389,7 +2389,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="12" type="mekhq.campaign.parts.MekLocation">
+		<part id="12" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>12</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2424,7 +2424,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="14" type="mekhq.campaign.parts.MekLocation">
+		<part id="14" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>14</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2459,7 +2459,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="16" type="mekhq.campaign.parts.MekLocation">
+		<part id="16" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>16</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2494,7 +2494,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="18" type="mekhq.campaign.parts.MekLocation">
+		<part id="18" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>18</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>70</unitTonnage>
@@ -2753,7 +2753,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="45" type="mekhq.campaign.parts.MekGyro">
+		<part id="45" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>45</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>70</unitTonnage>
@@ -2765,7 +2765,7 @@
 			<type>0</type>
 			<gyroTonnage>3.0</gyroTonnage>
 		</part>
-		<part id="46" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="46" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>46</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>70</unitTonnage>
@@ -2775,7 +2775,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="47" type="mekhq.campaign.parts.MekSensor">
+		<part id="47" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>47</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>70</unitTonnage>
@@ -2785,7 +2785,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="48" type="mekhq.campaign.parts.MekCockpit">
+		<part id="48" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>48</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>70</unitTonnage>
@@ -2796,7 +2796,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="49" type="mekhq.campaign.parts.MekActuator">
+		<part id="49" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>49</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2808,7 +2808,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="50" type="mekhq.campaign.parts.MekActuator">
+		<part id="50" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>50</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2820,7 +2820,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="51" type="mekhq.campaign.parts.MekActuator">
+		<part id="51" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>51</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2832,7 +2832,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="52" type="mekhq.campaign.parts.MekActuator">
+		<part id="52" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>52</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2844,7 +2844,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="53" type="mekhq.campaign.parts.MekActuator">
+		<part id="53" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>53</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2856,7 +2856,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="54" type="mekhq.campaign.parts.MekActuator">
+		<part id="54" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>54</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2868,7 +2868,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="55" type="mekhq.campaign.parts.MekActuator">
+		<part id="55" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>55</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2880,7 +2880,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="56" type="mekhq.campaign.parts.MekActuator">
+		<part id="56" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>56</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>70</unitTonnage>
@@ -2892,7 +2892,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="57" type="mekhq.campaign.parts.MekLocation">
+		<part id="57" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>57</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -2927,7 +2927,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="59" type="mekhq.campaign.parts.MekLocation">
+		<part id="59" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>59</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -2978,7 +2978,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="62" type="mekhq.campaign.parts.MekLocation">
+		<part id="62" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>62</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -3029,7 +3029,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="65" type="mekhq.campaign.parts.MekLocation">
+		<part id="65" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>65</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -3080,7 +3080,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="68" type="mekhq.campaign.parts.MekLocation">
+		<part id="68" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>68</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -3115,7 +3115,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="70" type="mekhq.campaign.parts.MekLocation">
+		<part id="70" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>70</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -3150,7 +3150,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="72" type="mekhq.campaign.parts.MekLocation">
+		<part id="72" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>72</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -3185,7 +3185,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="74" type="mekhq.campaign.parts.MekLocation">
+		<part id="74" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>74</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -3276,7 +3276,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="85" type="mekhq.campaign.parts.MekGyro">
+		<part id="85" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>85</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>30</unitTonnage>
@@ -3288,7 +3288,7 @@
 			<type>0</type>
 			<gyroTonnage>3.0</gyroTonnage>
 		</part>
-		<part id="86" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="86" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>86</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>30</unitTonnage>
@@ -3298,7 +3298,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="87" type="mekhq.campaign.parts.MekSensor">
+		<part id="87" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>87</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>30</unitTonnage>
@@ -3308,7 +3308,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="88" type="mekhq.campaign.parts.MekCockpit">
+		<part id="88" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>88</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>30</unitTonnage>
@@ -3319,7 +3319,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="89" type="mekhq.campaign.parts.MekActuator">
+		<part id="89" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>89</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3331,7 +3331,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="90" type="mekhq.campaign.parts.MekActuator">
+		<part id="90" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>90</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3343,7 +3343,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="91" type="mekhq.campaign.parts.MekActuator">
+		<part id="91" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>91</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3355,7 +3355,7 @@
 			<type>9</type>
 			<location>4</location>
 		</part>
-		<part id="92" type="mekhq.campaign.parts.MekActuator">
+		<part id="92" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>92</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3367,7 +3367,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="93" type="mekhq.campaign.parts.MekActuator">
+		<part id="93" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>93</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3379,7 +3379,7 @@
 			<type>10</type>
 			<location>4</location>
 		</part>
-		<part id="94" type="mekhq.campaign.parts.MekActuator">
+		<part id="94" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>94</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3391,7 +3391,7 @@
 			<type>10</type>
 			<location>5</location>
 		</part>
-		<part id="95" type="mekhq.campaign.parts.MekActuator">
+		<part id="95" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>95</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3403,7 +3403,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="96" type="mekhq.campaign.parts.MekActuator">
+		<part id="96" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>96</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3415,7 +3415,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="97" type="mekhq.campaign.parts.MekActuator">
+		<part id="97" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>97</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3427,7 +3427,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="98" type="mekhq.campaign.parts.MekActuator">
+		<part id="98" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>98</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3439,7 +3439,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="99" type="mekhq.campaign.parts.MekActuator">
+		<part id="99" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>99</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3451,7 +3451,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="100" type="mekhq.campaign.parts.MekActuator">
+		<part id="100" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>100</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -3463,7 +3463,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="101" type="mekhq.campaign.parts.MekLocation">
+		<part id="101" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>101</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3498,7 +3498,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="103" type="mekhq.campaign.parts.MekLocation">
+		<part id="103" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>103</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3549,7 +3549,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="106" type="mekhq.campaign.parts.MekLocation">
+		<part id="106" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>106</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3600,7 +3600,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="109" type="mekhq.campaign.parts.MekLocation">
+		<part id="109" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>109</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3651,7 +3651,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="112" type="mekhq.campaign.parts.MekLocation">
+		<part id="112" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>112</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3686,7 +3686,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="114" type="mekhq.campaign.parts.MekLocation">
+		<part id="114" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>114</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3721,7 +3721,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="116" type="mekhq.campaign.parts.MekLocation">
+		<part id="116" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>116</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3756,7 +3756,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="118" type="mekhq.campaign.parts.MekLocation">
+		<part id="118" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>118</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -3894,7 +3894,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="137" type="mekhq.campaign.parts.MekGyro">
+		<part id="137" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>137</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>45</unitTonnage>
@@ -3906,7 +3906,7 @@
 			<type>0</type>
 			<gyroTonnage>4.0</gyroTonnage>
 		</part>
-		<part id="138" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="138" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>138</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>45</unitTonnage>
@@ -3916,7 +3916,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="139" type="mekhq.campaign.parts.MekSensor">
+		<part id="139" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>139</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>45</unitTonnage>
@@ -3926,7 +3926,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="140" type="mekhq.campaign.parts.MekCockpit">
+		<part id="140" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>140</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>45</unitTonnage>
@@ -3937,7 +3937,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="141" type="mekhq.campaign.parts.MekActuator">
+		<part id="141" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>141</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -3949,7 +3949,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="142" type="mekhq.campaign.parts.MekActuator">
+		<part id="142" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>142</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -3961,7 +3961,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="143" type="mekhq.campaign.parts.MekActuator">
+		<part id="143" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>143</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -3973,7 +3973,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="144" type="mekhq.campaign.parts.MekActuator">
+		<part id="144" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>144</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -3985,7 +3985,7 @@
 			<type>10</type>
 			<location>5</location>
 		</part>
-		<part id="145" type="mekhq.campaign.parts.MekActuator">
+		<part id="145" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>145</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -3997,7 +3997,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="146" type="mekhq.campaign.parts.MekActuator">
+		<part id="146" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>146</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4009,7 +4009,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="147" type="mekhq.campaign.parts.MekActuator">
+		<part id="147" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>147</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4021,7 +4021,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="148" type="mekhq.campaign.parts.MekActuator">
+		<part id="148" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>148</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4033,7 +4033,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="149" type="mekhq.campaign.parts.MekActuator">
+		<part id="149" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>149</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4045,7 +4045,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="150" type="mekhq.campaign.parts.MekActuator">
+		<part id="150" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>150</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4057,7 +4057,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="151" type="mekhq.campaign.parts.MekLocation">
+		<part id="151" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>151</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4092,7 +4092,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="153" type="mekhq.campaign.parts.MekLocation">
+		<part id="153" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>153</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4143,7 +4143,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="156" type="mekhq.campaign.parts.MekLocation">
+		<part id="156" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>156</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4194,7 +4194,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="159" type="mekhq.campaign.parts.MekLocation">
+		<part id="159" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>159</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4245,7 +4245,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="162" type="mekhq.campaign.parts.MekLocation">
+		<part id="162" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>162</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4280,7 +4280,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="164" type="mekhq.campaign.parts.MekLocation">
+		<part id="164" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>164</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4315,7 +4315,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="166" type="mekhq.campaign.parts.MekLocation">
+		<part id="166" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>166</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4350,7 +4350,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="168" type="mekhq.campaign.parts.MekLocation">
+		<part id="168" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>168</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -4444,7 +4444,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="177" type="mekhq.campaign.parts.MekGyro">
+		<part id="177" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>177</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>45</unitTonnage>
@@ -4456,7 +4456,7 @@
 			<type>0</type>
 			<gyroTonnage>4.0</gyroTonnage>
 		</part>
-		<part id="178" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="178" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>178</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>45</unitTonnage>
@@ -4466,7 +4466,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="179" type="mekhq.campaign.parts.MekSensor">
+		<part id="179" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>179</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>45</unitTonnage>
@@ -4476,7 +4476,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="180" type="mekhq.campaign.parts.MekCockpit">
+		<part id="180" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>180</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>45</unitTonnage>
@@ -4487,7 +4487,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="181" type="mekhq.campaign.parts.MekActuator">
+		<part id="181" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>181</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4499,7 +4499,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="182" type="mekhq.campaign.parts.MekActuator">
+		<part id="182" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>182</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4511,7 +4511,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="183" type="mekhq.campaign.parts.MekActuator">
+		<part id="183" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>183</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4523,7 +4523,7 @@
 			<type>9</type>
 			<location>4</location>
 		</part>
-		<part id="184" type="mekhq.campaign.parts.MekActuator">
+		<part id="184" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>184</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4535,7 +4535,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="185" type="mekhq.campaign.parts.MekActuator">
+		<part id="185" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>185</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4547,7 +4547,7 @@
 			<type>10</type>
 			<location>4</location>
 		</part>
-		<part id="186" type="mekhq.campaign.parts.MekActuator">
+		<part id="186" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>186</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4559,7 +4559,7 @@
 			<type>10</type>
 			<location>5</location>
 		</part>
-		<part id="187" type="mekhq.campaign.parts.MekActuator">
+		<part id="187" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>187</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4571,7 +4571,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="188" type="mekhq.campaign.parts.MekActuator">
+		<part id="188" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>188</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4583,7 +4583,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="189" type="mekhq.campaign.parts.MekActuator">
+		<part id="189" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>189</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4595,7 +4595,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="190" type="mekhq.campaign.parts.MekActuator">
+		<part id="190" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>190</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4607,7 +4607,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="191" type="mekhq.campaign.parts.MekActuator">
+		<part id="191" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>191</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4619,7 +4619,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="192" type="mekhq.campaign.parts.MekActuator">
+		<part id="192" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>192</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -4631,7 +4631,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="193" type="mekhq.campaign.parts.MekLocation">
+		<part id="193" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>193</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4666,7 +4666,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="195" type="mekhq.campaign.parts.MekLocation">
+		<part id="195" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>195</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4717,7 +4717,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="198" type="mekhq.campaign.parts.MekLocation">
+		<part id="198" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>198</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4768,7 +4768,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="201" type="mekhq.campaign.parts.MekLocation">
+		<part id="201" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>201</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4819,7 +4819,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="204" type="mekhq.campaign.parts.MekLocation">
+		<part id="204" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>204</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4854,7 +4854,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="206" type="mekhq.campaign.parts.MekLocation">
+		<part id="206" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>206</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4889,7 +4889,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="208" type="mekhq.campaign.parts.MekLocation">
+		<part id="208" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>208</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -4924,7 +4924,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="210" type="mekhq.campaign.parts.MekLocation">
+		<part id="210" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>210</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>30</unitTonnage>
@@ -5075,7 +5075,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="226" type="mekhq.campaign.parts.MekGyro">
+		<part id="226" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>226</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>30</unitTonnage>
@@ -5087,7 +5087,7 @@
 			<type>0</type>
 			<gyroTonnage>3.0</gyroTonnage>
 		</part>
-		<part id="227" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="227" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>227</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>30</unitTonnage>
@@ -5097,7 +5097,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="228" type="mekhq.campaign.parts.MekSensor">
+		<part id="228" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>228</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>30</unitTonnage>
@@ -5107,7 +5107,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="229" type="mekhq.campaign.parts.MekCockpit">
+		<part id="229" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>229</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>30</unitTonnage>
@@ -5118,7 +5118,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="230" type="mekhq.campaign.parts.MekActuator">
+		<part id="230" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>230</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5130,7 +5130,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="231" type="mekhq.campaign.parts.MekActuator">
+		<part id="231" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>231</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5142,7 +5142,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="232" type="mekhq.campaign.parts.MekActuator">
+		<part id="232" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>232</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5154,7 +5154,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="233" type="mekhq.campaign.parts.MekActuator">
+		<part id="233" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>233</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5166,7 +5166,7 @@
 			<type>10</type>
 			<location>5</location>
 		</part>
-		<part id="234" type="mekhq.campaign.parts.MekActuator">
+		<part id="234" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>234</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5178,7 +5178,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="235" type="mekhq.campaign.parts.MekActuator">
+		<part id="235" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>235</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5190,7 +5190,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="236" type="mekhq.campaign.parts.MekActuator">
+		<part id="236" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>236</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5202,7 +5202,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="237" type="mekhq.campaign.parts.MekActuator">
+		<part id="237" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>237</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5214,7 +5214,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="238" type="mekhq.campaign.parts.MekActuator">
+		<part id="238" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>238</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5226,7 +5226,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="239" type="mekhq.campaign.parts.MekActuator">
+		<part id="239" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>239</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>30</unitTonnage>
@@ -5238,7 +5238,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="240" type="mekhq.campaign.parts.MekLocation">
+		<part id="240" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>240</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5273,7 +5273,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="242" type="mekhq.campaign.parts.MekLocation">
+		<part id="242" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>242</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5324,7 +5324,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="245" type="mekhq.campaign.parts.MekLocation">
+		<part id="245" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>245</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5375,7 +5375,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="248" type="mekhq.campaign.parts.MekLocation">
+		<part id="248" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>248</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5426,7 +5426,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="251" type="mekhq.campaign.parts.MekLocation">
+		<part id="251" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>251</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5461,7 +5461,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="253" type="mekhq.campaign.parts.MekLocation">
+		<part id="253" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>253</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5496,7 +5496,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="255" type="mekhq.campaign.parts.MekLocation">
+		<part id="255" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>255</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5531,7 +5531,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="257" type="mekhq.campaign.parts.MekLocation">
+		<part id="257" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>257</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>100</unitTonnage>
@@ -5692,7 +5692,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="281" type="mekhq.campaign.parts.MekGyro">
+		<part id="281" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>281</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>100</unitTonnage>
@@ -5704,7 +5704,7 @@
 			<type>0</type>
 			<gyroTonnage>4.0</gyroTonnage>
 		</part>
-		<part id="282" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="282" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>282</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>100</unitTonnage>
@@ -5714,7 +5714,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="283" type="mekhq.campaign.parts.MekSensor">
+		<part id="283" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>283</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>100</unitTonnage>
@@ -5724,7 +5724,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="284" type="mekhq.campaign.parts.MekCockpit">
+		<part id="284" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>284</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>100</unitTonnage>
@@ -5735,7 +5735,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="285" type="mekhq.campaign.parts.MekActuator">
+		<part id="285" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>285</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5747,7 +5747,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="286" type="mekhq.campaign.parts.MekActuator">
+		<part id="286" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>286</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5759,7 +5759,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="287" type="mekhq.campaign.parts.MekActuator">
+		<part id="287" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>287</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5771,7 +5771,7 @@
 			<type>9</type>
 			<location>4</location>
 		</part>
-		<part id="288" type="mekhq.campaign.parts.MekActuator">
+		<part id="288" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>288</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5783,7 +5783,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="289" type="mekhq.campaign.parts.MekActuator">
+		<part id="289" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>289</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5795,7 +5795,7 @@
 			<type>10</type>
 			<location>4</location>
 		</part>
-		<part id="290" type="mekhq.campaign.parts.MekActuator">
+		<part id="290" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>290</id>
 			<name>Hand Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5807,7 +5807,7 @@
 			<type>10</type>
 			<location>5</location>
 		</part>
-		<part id="291" type="mekhq.campaign.parts.MekActuator">
+		<part id="291" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>291</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5819,7 +5819,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="292" type="mekhq.campaign.parts.MekActuator">
+		<part id="292" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>292</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5831,7 +5831,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="293" type="mekhq.campaign.parts.MekActuator">
+		<part id="293" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>293</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5843,7 +5843,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="294" type="mekhq.campaign.parts.MekActuator">
+		<part id="294" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>294</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5855,7 +5855,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="295" type="mekhq.campaign.parts.MekActuator">
+		<part id="295" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>295</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5867,7 +5867,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="296" type="mekhq.campaign.parts.MekActuator">
+		<part id="296" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>296</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>100</unitTonnage>
@@ -5879,7 +5879,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="297" type="mekhq.campaign.parts.MekLocation">
+		<part id="297" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>297</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -5914,7 +5914,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="299" type="mekhq.campaign.parts.MekLocation">
+		<part id="299" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>299</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -5965,7 +5965,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="302" type="mekhq.campaign.parts.MekLocation">
+		<part id="302" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>302</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -6016,7 +6016,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="305" type="mekhq.campaign.parts.MekLocation">
+		<part id="305" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>305</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -6067,7 +6067,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="308" type="mekhq.campaign.parts.MekLocation">
+		<part id="308" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>308</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -6102,7 +6102,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="310" type="mekhq.campaign.parts.MekLocation">
+		<part id="310" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>310</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -6137,7 +6137,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="312" type="mekhq.campaign.parts.MekLocation">
+		<part id="312" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>312</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -6172,7 +6172,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="314" type="mekhq.campaign.parts.MekLocation">
+		<part id="314" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>314</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>75</unitTonnage>
@@ -6352,7 +6352,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="331" type="mekhq.campaign.parts.MekGyro">
+		<part id="331" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>331</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>75</unitTonnage>
@@ -6364,7 +6364,7 @@
 			<type>0</type>
 			<gyroTonnage>4.0</gyroTonnage>
 		</part>
-		<part id="332" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="332" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>332</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>75</unitTonnage>
@@ -6374,7 +6374,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="333" type="mekhq.campaign.parts.MekSensor">
+		<part id="333" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>333</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>75</unitTonnage>
@@ -6384,7 +6384,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="334" type="mekhq.campaign.parts.MekCockpit">
+		<part id="334" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>334</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>75</unitTonnage>
@@ -6395,7 +6395,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="335" type="mekhq.campaign.parts.MekActuator">
+		<part id="335" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>335</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6407,7 +6407,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="336" type="mekhq.campaign.parts.MekActuator">
+		<part id="336" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>336</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6419,7 +6419,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="337" type="mekhq.campaign.parts.MekActuator">
+		<part id="337" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>337</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6431,7 +6431,7 @@
 			<type>9</type>
 			<location>4</location>
 		</part>
-		<part id="338" type="mekhq.campaign.parts.MekActuator">
+		<part id="338" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>338</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6443,7 +6443,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="339" type="mekhq.campaign.parts.MekActuator">
+		<part id="339" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>339</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6455,7 +6455,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="340" type="mekhq.campaign.parts.MekActuator">
+		<part id="340" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>340</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6467,7 +6467,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="341" type="mekhq.campaign.parts.MekActuator">
+		<part id="341" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>341</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6479,7 +6479,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="342" type="mekhq.campaign.parts.MekActuator">
+		<part id="342" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>342</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6491,7 +6491,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="343" type="mekhq.campaign.parts.MekActuator">
+		<part id="343" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>343</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6503,7 +6503,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="344" type="mekhq.campaign.parts.MekActuator">
+		<part id="344" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>344</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>75</unitTonnage>
@@ -6515,7 +6515,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="345" type="mekhq.campaign.parts.MekLocation">
+		<part id="345" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>345</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6550,7 +6550,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="347" type="mekhq.campaign.parts.MekLocation">
+		<part id="347" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>347</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6601,7 +6601,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="350" type="mekhq.campaign.parts.MekLocation">
+		<part id="350" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>350</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6652,7 +6652,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="353" type="mekhq.campaign.parts.MekLocation">
+		<part id="353" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>353</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6703,7 +6703,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="356" type="mekhq.campaign.parts.MekLocation">
+		<part id="356" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>356</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6738,7 +6738,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="358" type="mekhq.campaign.parts.MekLocation">
+		<part id="358" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>358</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6773,7 +6773,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="360" type="mekhq.campaign.parts.MekLocation">
+		<part id="360" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>360</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6808,7 +6808,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="362" type="mekhq.campaign.parts.MekLocation">
+		<part id="362" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>362</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>45</unitTonnage>
@@ -6956,7 +6956,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="383" type="mekhq.campaign.parts.MekGyro">
+		<part id="383" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>383</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>45</unitTonnage>
@@ -6968,7 +6968,7 @@
 			<type>0</type>
 			<gyroTonnage>3.0</gyroTonnage>
 		</part>
-		<part id="384" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="384" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>384</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>45</unitTonnage>
@@ -6978,7 +6978,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="385" type="mekhq.campaign.parts.MekSensor">
+		<part id="385" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>385</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>45</unitTonnage>
@@ -6988,7 +6988,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="386" type="mekhq.campaign.parts.MekCockpit">
+		<part id="386" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>386</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>45</unitTonnage>
@@ -6999,7 +6999,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="387" type="mekhq.campaign.parts.MekActuator">
+		<part id="387" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>387</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7011,7 +7011,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="388" type="mekhq.campaign.parts.MekActuator">
+		<part id="388" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>388</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7023,7 +7023,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="389" type="mekhq.campaign.parts.MekActuator">
+		<part id="389" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>389</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7035,7 +7035,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="390" type="mekhq.campaign.parts.MekActuator">
+		<part id="390" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>390</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7047,7 +7047,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="391" type="mekhq.campaign.parts.MekActuator">
+		<part id="391" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>391</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7059,7 +7059,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="392" type="mekhq.campaign.parts.MekActuator">
+		<part id="392" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>392</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7071,7 +7071,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="393" type="mekhq.campaign.parts.MekActuator">
+		<part id="393" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>393</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7083,7 +7083,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="394" type="mekhq.campaign.parts.MekActuator">
+		<part id="394" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>394</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>45</unitTonnage>
@@ -7095,7 +7095,7 @@
 			<type>14</type>
 			<location>7</location>
 		</part>
-		<part id="443" type="mekhq.campaign.parts.MekLocation">
+		<part id="443" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>443</id>
 			<name>Mech Head (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7130,7 +7130,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="445" type="mekhq.campaign.parts.MekLocation">
+		<part id="445" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>445</id>
 			<name>Mech Center Torso (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7181,7 +7181,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="448" type="mekhq.campaign.parts.MekLocation">
+		<part id="448" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>448</id>
 			<name>Mech Right Torso (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7232,7 +7232,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="451" type="mekhq.campaign.parts.MekLocation">
+		<part id="451" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>451</id>
 			<name>Mech Left Torso (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7283,7 +7283,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="454" type="mekhq.campaign.parts.MekLocation">
+		<part id="454" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>454</id>
 			<name>Mech Right Arm (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7318,7 +7318,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="456" type="mekhq.campaign.parts.MekLocation">
+		<part id="456" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>456</id>
 			<name>Mech Left Arm (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7353,7 +7353,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="458" type="mekhq.campaign.parts.MekLocation">
+		<part id="458" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>458</id>
 			<name>Mech Right Leg (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7388,7 +7388,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="460" type="mekhq.campaign.parts.MekLocation">
+		<part id="460" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>460</id>
 			<name>Mech Left Leg (Endo-Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -7493,7 +7493,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="476" type="mekhq.campaign.parts.MekGyro">
+		<part id="476" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>476</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>35</unitTonnage>
@@ -7505,7 +7505,7 @@
 			<type>0</type>
 			<gyroTonnage>4.0</gyroTonnage>
 		</part>
-		<part id="477" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="477" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>477</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>35</unitTonnage>
@@ -7515,7 +7515,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="478" type="mekhq.campaign.parts.MekSensor">
+		<part id="478" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>478</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>35</unitTonnage>
@@ -7525,7 +7525,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="479" type="mekhq.campaign.parts.MekCockpit">
+		<part id="479" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>479</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>35</unitTonnage>
@@ -7536,7 +7536,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="480" type="mekhq.campaign.parts.MekActuator">
+		<part id="480" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>480</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7548,7 +7548,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="481" type="mekhq.campaign.parts.MekActuator">
+		<part id="481" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>481</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7560,7 +7560,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="482" type="mekhq.campaign.parts.MekActuator">
+		<part id="482" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>482</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7572,7 +7572,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="483" type="mekhq.campaign.parts.MekActuator">
+		<part id="483" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>483</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7584,7 +7584,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="484" type="mekhq.campaign.parts.MekActuator">
+		<part id="484" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>484</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7596,7 +7596,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="485" type="mekhq.campaign.parts.MekActuator">
+		<part id="485" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>485</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7608,7 +7608,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="486" type="mekhq.campaign.parts.MekActuator">
+		<part id="486" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>486</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -7620,7 +7620,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="487" type="mekhq.campaign.parts.MekActuator">
+		<part id="487" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>487</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -8640,7 +8640,7 @@
 			<size>1.0</size>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
-		<part id="566" type="mekhq.campaign.parts.MekLocation">
+		<part id="566" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>566</id>
 			<name>Mech Head (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8675,7 +8675,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="568" type="mekhq.campaign.parts.MekLocation">
+		<part id="568" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>568</id>
 			<name>Mech Center Torso (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8726,7 +8726,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="571" type="mekhq.campaign.parts.MekLocation">
+		<part id="571" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>571</id>
 			<name>Mech Right Torso (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8777,7 +8777,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="574" type="mekhq.campaign.parts.MekLocation">
+		<part id="574" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>574</id>
 			<name>Mech Left Torso (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8828,7 +8828,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="577" type="mekhq.campaign.parts.MekLocation">
+		<part id="577" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>577</id>
 			<name>Mech Right Arm (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8863,7 +8863,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="579" type="mekhq.campaign.parts.MekLocation">
+		<part id="579" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>579</id>
 			<name>Mech Left Arm (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8898,7 +8898,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="581" type="mekhq.campaign.parts.MekLocation">
+		<part id="581" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>581</id>
 			<name>Mech Right Leg (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -8933,7 +8933,7 @@
 			<amountNeeded>0</amountNeeded>
 			<clan>true</clan>
 		</part>
-		<part id="583" type="mekhq.campaign.parts.MekLocation">
+		<part id="583" type="mekhq.campaign.parts.meks.MekLocation">
 			<id>583</id>
 			<name>Mech Left Leg (Endo Steel)</name>
 			<unitTonnage>35</unitTonnage>
@@ -9189,7 +9189,7 @@
 			<engineFlags>1</engineFlags>
 			<forHover>false</forHover>
 		</part>
-		<part id="600" type="mekhq.campaign.parts.MekGyro">
+		<part id="600" type="mekhq.campaign.parts.meks.MekGyro">
 			<id>600</id>
 			<name>Standard Gyro</name>
 			<unitTonnage>35</unitTonnage>
@@ -9201,7 +9201,7 @@
 			<type>0</type>
 			<gyroTonnage>2.0</gyroTonnage>
 		</part>
-		<part id="601" type="mekhq.campaign.parts.MekLifeSupport">
+		<part id="601" type="mekhq.campaign.parts.meks.MekLifeSupport">
 			<id>601</id>
 			<name>Mech Life Support System</name>
 			<unitTonnage>35</unitTonnage>
@@ -9211,7 +9211,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="602" type="mekhq.campaign.parts.MekSensor">
+		<part id="602" type="mekhq.campaign.parts.meks.MekSensor">
 			<id>602</id>
 			<name>Mech Sensors</name>
 			<unitTonnage>35</unitTonnage>
@@ -9221,7 +9221,7 @@
 			<quantity>1</quantity>
 			<quality>3</quality>
 		</part>
-		<part id="603" type="mekhq.campaign.parts.MekCockpit">
+		<part id="603" type="mekhq.campaign.parts.meks.MekCockpit">
 			<id>603</id>
 			<name>Standard Cockpit</name>
 			<unitTonnage>35</unitTonnage>
@@ -9232,7 +9232,7 @@
 			<quality>3</quality>
 			<type>0</type>
 		</part>
-		<part id="604" type="mekhq.campaign.parts.MekActuator">
+		<part id="604" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>604</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9244,7 +9244,7 @@
 			<type>8</type>
 			<location>4</location>
 		</part>
-		<part id="605" type="mekhq.campaign.parts.MekActuator">
+		<part id="605" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>605</id>
 			<name>Upper Arm Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9256,7 +9256,7 @@
 			<type>8</type>
 			<location>5</location>
 		</part>
-		<part id="606" type="mekhq.campaign.parts.MekActuator">
+		<part id="606" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>606</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9268,7 +9268,7 @@
 			<type>9</type>
 			<location>4</location>
 		</part>
-		<part id="607" type="mekhq.campaign.parts.MekActuator">
+		<part id="607" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>607</id>
 			<name>Lower Arm Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9280,7 +9280,7 @@
 			<type>9</type>
 			<location>5</location>
 		</part>
-		<part id="608" type="mekhq.campaign.parts.MekActuator">
+		<part id="608" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>608</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9292,7 +9292,7 @@
 			<type>12</type>
 			<location>6</location>
 		</part>
-		<part id="609" type="mekhq.campaign.parts.MekActuator">
+		<part id="609" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>609</id>
 			<name>Upper Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9304,7 +9304,7 @@
 			<type>12</type>
 			<location>7</location>
 		</part>
-		<part id="610" type="mekhq.campaign.parts.MekActuator">
+		<part id="610" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>610</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9316,7 +9316,7 @@
 			<type>13</type>
 			<location>6</location>
 		</part>
-		<part id="611" type="mekhq.campaign.parts.MekActuator">
+		<part id="611" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>611</id>
 			<name>Lower Leg Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9328,7 +9328,7 @@
 			<type>13</type>
 			<location>7</location>
 		</part>
-		<part id="612" type="mekhq.campaign.parts.MekActuator">
+		<part id="612" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>612</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>35</unitTonnage>
@@ -9340,7 +9340,7 @@
 			<type>14</type>
 			<location>6</location>
 		</part>
-		<part id="613" type="mekhq.campaign.parts.MekActuator">
+		<part id="613" type="mekhq.campaign.parts.meks.MekActuator">
 			<id>613</id>
 			<name>Foot Actuator</name>
 			<unitTonnage>35</unitTonnage>

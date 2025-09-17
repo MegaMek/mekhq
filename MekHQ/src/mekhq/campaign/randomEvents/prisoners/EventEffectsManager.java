@@ -77,7 +77,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.randomEvents.prisoners.records.EventResult;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -96,12 +96,12 @@ import mekhq.utilities.ReportingUtilities;
  * campaign.</p>
  */
 public class EventEffectsManager {
-    private static final MMLogger logger = MMLogger.create(EventEffectsManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(EventEffectsManager.class);
 
     private final Campaign campaign;
 
     private String eventReport = "";
-    private Set<Person> escapees = new HashSet<>();
+    private final Set<Person> escapees = new HashSet<>();
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -718,7 +718,7 @@ public class EventEffectsManager {
             allPotentialTargets.remove(target);
         }
 
-        logger.info(escapees.toString());
+        LOGGER.info(escapees.toString());
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
@@ -916,10 +916,10 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        Map<AtBContract, StratconCampaignState> potentialTargets = new HashMap<>();
+        Map<AtBContract, StratConCampaignState> potentialTargets = new HashMap<>();
 
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
 
             if (campaignState != null) {
                 potentialTargets.put(contract, campaignState);
@@ -932,7 +932,7 @@ public class EventEffectsManager {
 
         AtBContract target = getRandomItem(potentialTargets.keySet());
 
-        StratconCampaignState targetState = potentialTargets.get(target);
+        StratConCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,

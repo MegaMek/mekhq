@@ -174,7 +174,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(person, false);
+        PersonalityController.generatePersonality(person);
 
         // update skill age modifiers
         if (campaignOptions.isUseAgeEffects()) {

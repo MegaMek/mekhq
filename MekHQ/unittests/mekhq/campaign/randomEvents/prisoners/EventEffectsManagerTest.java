@@ -67,7 +67,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.records.EventResult;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
@@ -619,8 +619,8 @@ class EventEffectsManagerTest {
         when(mockCampaignOptions.isUseStratCon()).thenReturn(true);
 
         AtBContract contract = new AtBContract("Test");
-        StratconCampaignState campaignState = new StratconCampaignState(contract);
-        contract.setStratconCampaignState(campaignState);
+        StratConCampaignState campaignState = new StratConCampaignState(contract);
+        contract.setStratConCampaignState(campaignState);
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
 
         EventResult eventResult = new EventResult(SUPPORT_POINT, false, MAGNITUDE, "");

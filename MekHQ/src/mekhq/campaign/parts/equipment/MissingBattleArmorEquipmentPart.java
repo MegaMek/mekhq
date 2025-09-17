@@ -54,9 +54,9 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         this(0, null, -1, 1.0, -1, null, 0.0);
     }
 
-    public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, double size,
-          int trooper, Campaign c, double etonnage) {
-        super(tonnage, et, equipNum, size, c, etonnage);
+    public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType equipmentType, int equipNum, double size,
+          int trooper, Campaign campaign, double eTonnage) {
+        super(tonnage, equipmentType, equipNum, size, campaign, eTonnage);
         this.trooper = trooper;
     }
 
@@ -137,10 +137,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     @Override
     public boolean needsFixing() {
         // can only be replaced the normal way if modular and suit exists
-        if (null != unit && unit.getEntity().getInternal(trooper) >= 0 && isModular()) {
-            return true;
-        }
-        return false;
+        return null != unit && unit.getEntity().getInternal(trooper) >= 0 && isModular();
     }
 
     public int getTrooper() {
@@ -157,8 +154,8 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
-            campaign.getQuartermaster().addPart(actualReplacement, 0);
-            replacement.decrementQuantity();
+            campaign.getQuartermaster().addPart(actualReplacement, 0, false);
+            replacement.changeQuantity(-1);
             ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
             ((BattleArmorEquipmentPart) actualReplacement).setTrooper(trooper);
             remove(false);
@@ -169,20 +166,19 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if (part instanceof BattleArmorEquipmentPart) {
-            BattleArmorEquipmentPart eqpart = (BattleArmorEquipmentPart) part;
-            EquipmentType et = eqpart.getType();
-            return type.equals(et) && (getTonnage() == part.getTonnage())
-                         && (getSize() == ((BattleArmorEquipmentPart) part).getSize());
+        if (part instanceof BattleArmorEquipmentPart equipmentPart) {
+            EquipmentType equipmentType = equipmentPart.getType();
+            return type.equals(equipmentType) && (getTonnage() == part.getTonnage())
+                         && (getSize() == equipmentPart.getSize());
         }
         return false;
     }
 
     @Override
     public BattleArmorEquipmentPart getNewPart() {
-        BattleArmorEquipmentPart epart = new BattleArmorEquipmentPart(getUnitTonnage(), type, -1, size, -1, campaign);
-        epart.setEquipTonnage(equipTonnage);
-        return epart;
+        BattleArmorEquipmentPart ePart = new BattleArmorEquipmentPart(getUnitTonnage(), type, -1, size, -1, campaign);
+        ePart.setEquipTonnage(equipTonnage);
+        return ePart;
     }
 
     @Override

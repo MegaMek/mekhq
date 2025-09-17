@@ -54,16 +54,14 @@ import mekhq.gui.model.KillTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class EditKillLogControl extends JPanel {
-    private JFrame parent;
-    private Campaign campaign;
-    private Person person;
-    private KillTableModel killModel;
+    private final JFrame parent;
+    private final Campaign campaign;
+    private final Person person;
+    private final KillTableModel killModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JTable killTable;
-    private JScrollPane scrollKillTable;
 
     public EditKillLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
@@ -82,28 +80,28 @@ public class EditKillLogControl extends JPanel {
         setName(resourceMap.getString("control.name"));
         this.setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
 
-        btnAdd = new JButton();
+        JButton btnAdd = new JButton();
         btnAdd.setText(resourceMap.getString("btnAdd.text"));
         btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addKill());
-        panBtns.add(btnAdd);
+        panButtons.add(btnAdd);
 
         btnEdit = new JButton();
         btnEdit.setText(resourceMap.getString("btnEdit.text"));
         btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editKill());
-        panBtns.add(btnEdit);
+        panButtons.add(btnEdit);
 
         btnDelete = new JButton();
         btnDelete.setText(resourceMap.getString("btnDelete.text"));
         btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteKill());
-        panBtns.add(btnDelete);
-        this.add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDelete);
+        this.add(panButtons, BorderLayout.PAGE_START);
 
         killTable = new JTable(killModel);
         killTable.setName("killTable");
@@ -118,7 +116,7 @@ public class EditKillLogControl extends JPanel {
         killTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         killTable.getSelectionModel().addListSelectionListener(this::killTableValueChanged);
 
-        scrollKillTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollKillTable = new JScrollPaneWithSpeed();
         scrollKillTable.setName("scrollPartsTable");
         scrollKillTable.setViewportView(killTable);
         this.add(scrollKillTable, BorderLayout.CENTER);

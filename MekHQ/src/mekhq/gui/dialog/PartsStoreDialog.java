@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,7 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -65,6 +66,18 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.kfs.KFBoom;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -76,7 +89,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author Taharqa
  */
 public class PartsStoreDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(PartsStoreDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(PartsStoreDialog.class);
 
     // region Variable Declarations
     // parts filter groups
@@ -85,7 +98,7 @@ public class PartsStoreDialog extends JDialog {
     private static final int SG_SYSTEM = 2;
     private static final int SG_EQUIP = 3;
     private static final int SG_LOC = 4;
-    private static final int SG_WEAP = 5;
+    private static final int SG_WEAPON = 5;
     private static final int SG_AMMO = 6;
     private static final int SG_MISC = 7;
     private static final int SG_ENGINE = 8;
@@ -96,11 +109,11 @@ public class PartsStoreDialog extends JDialog {
     private static final int SG_OMNI_POD = 13;
     private static final int SG_NUM = 14;
 
-    private Campaign campaign;
-    private CampaignGUI campaignGUI;
-    private PartsTableModel partsModel;
+    private final Campaign campaign;
+    private final CampaignGUI campaignGUI;
+    private final PartsTableModel partsModel;
     private TableRowSorter<PartsTableModel> partsSorter;
-    private boolean addToCampaign;
+    private final boolean addToCampaign;
     private Part selectedPart;
     private Person logisticsPerson;
 
@@ -388,7 +401,7 @@ public class PartsStoreDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -433,7 +446,7 @@ public class PartsStoreDialog extends JDialog {
                 if (nGroup == SG_ALL) {
                     return true;
                 } else if (nGroup == SG_ARMOR) {
-                    return part instanceof Armor; // ProtoMekAmor and BaArmor are derived from Armor
+                    return part instanceof Armor; // ProtoMekAmor and BAArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     return (part instanceof MekLifeSupport) ||
                                  (part instanceof MekSensor) ||
@@ -441,7 +454,7 @@ public class PartsStoreDialog extends JDialog {
                                  (part instanceof Avionics) ||
                                  (part instanceof FireControlSystem) ||
                                  (part instanceof AeroSensor) ||
-                                 (part instanceof KfBoom) ||
+                                 (part instanceof KFBoom) ||
                                  (part instanceof DropshipDockingCollar) ||
                                  (part instanceof JumpshipDockingCollar) ||
                                  (part instanceof BayDoor) ||
@@ -456,7 +469,7 @@ public class PartsStoreDialog extends JDialog {
                     return (part instanceof MekLocation) ||
                                  (part instanceof TankLocation) ||
                                  (part instanceof ProtoMekLocation);
-                } else if (nGroup == SG_WEAP) {
+                } else if (nGroup == SG_WEAPON) {
                     return (part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType);
                 } else if (nGroup == SG_AMMO) {
                     return part instanceof AmmoStorage;
@@ -524,7 +537,7 @@ public class PartsStoreDialog extends JDialog {
             case SG_SYSTEM -> "System Components";
             case SG_EQUIP -> "Equipment";
             case SG_LOC -> "Locations";
-            case SG_WEAP -> "Weapons";
+            case SG_WEAPON -> "Weapons";
             case SG_AMMO -> "Ammunition";
             case SG_MISC -> "Miscellaneous Equipment";
             case SG_ENGINE -> "Engines";
@@ -566,7 +579,7 @@ public class PartsStoreDialog extends JDialog {
          * Provides a lazy view to a {@link TargetRoll} for use in a UI (e.g. sorting in a table).
          */
         public static class TargetProxy implements Comparable<TargetProxy> {
-            private TargetRoll target;
+            private final TargetRoll target;
             private String details;
             private String description;
 
@@ -660,16 +673,12 @@ public class PartsStoreDialog extends JDialog {
         /**
          * Provides a container for a value formatted for display and the value itself for sorting.
          */
-        public static class FormattedValue<T extends Comparable<T>> implements Comparable<FormattedValue<T>> {
-            private T value;
-            private String formatted;
-
+        public record FormattedValue<T extends Comparable<T>>(T value, String formatted)
+              implements Comparable<FormattedValue<T>> {
             /**
              * Creates a wrapper around a value and a formatted string representing the value.
              */
-            public FormattedValue(T v, String f) {
-                value = v;
-                formatted = f;
+            public FormattedValue {
             }
 
             /**
@@ -677,7 +686,8 @@ public class PartsStoreDialog extends JDialog {
              *
              * @return The value.
              */
-            public T getValue() {
+            @Override
+            public T value() {
                 return value;
             }
 
@@ -687,6 +697,7 @@ public class PartsStoreDialog extends JDialog {
              * @return The formatted value.
              */
             @Override
+            @Nonnull
             public String toString() {
                 return formatted;
             }
@@ -697,11 +708,8 @@ public class PartsStoreDialog extends JDialog {
              * @return {@inheritDoc}
              */
             @Override
-            public int compareTo(FormattedValue<T> o) {
-                if (null == o) {
-                    return -1;
-                }
-                return getValue().compareTo(o.getValue());
+            public int compareTo(@Nonnull FormattedValue<T> o) {
+                return value().compareTo(o.value());
             }
         }
 
@@ -709,7 +717,7 @@ public class PartsStoreDialog extends JDialog {
          * Provides a lazy view to a {@link Part} for use in a UI (e.g. sorting in a table).
          */
         public class PartProxy {
-            private Part part;
+            private final Part part;
             private String details;
             private TargetProxy targetProxy;
             private FormattedValue<Money> cost;

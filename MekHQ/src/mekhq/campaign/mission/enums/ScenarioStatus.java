@@ -151,7 +151,7 @@ public enum ScenarioStatus {
         }
 
         MMLogger.create(ScenarioStatus.class)
-              .error("Unable to parse " + text + " into a ScenarioStatus. Returning CURRENT.");
+              .error("Unable to parse {} into a ScenarioStatus. Returning CURRENT.", text);
         return CURRENT;
     }
     // endregion File I/O

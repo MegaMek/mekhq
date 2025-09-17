@@ -359,22 +359,15 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     @Override
     public String getUnitRatingName(int rating) {
-        switch (rating) {
-            case DRAGOON_F:
-                return "F";
-            case DRAGOON_D:
-                return "D";
-            case DRAGOON_C:
-                return "C";
-            case DRAGOON_B:
-                return "B";
-            case DRAGOON_A:
-                return "A";
-            case DRAGOON_ASTAR:
-                return "A*";
-            default:
-                return "Unrated";
-        }
+        return switch (rating) {
+            case DRAGOON_F -> "F";
+            case DRAGOON_D -> "D";
+            case DRAGOON_C -> "C";
+            case DRAGOON_B -> "B";
+            case DRAGOON_A -> "A";
+            case DRAGOON_ASTAR -> "A*";
+            default -> "Unrated";
+        };
     }
 
     @Override
@@ -421,7 +414,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the sum of all experience rating for all combat units.
      *
-     * @param canInit Whether or not this method may initialize the values
+     * @param canInit Whether this method may initialize the values
      */
     BigDecimal getTotalSkillLevels(boolean canInit) {
         if (canInit && !isInitialized()) {
@@ -898,20 +891,20 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.transportPercent = transportPercent;
     }
 
-    void updateUnitCounts(Unit u) {
-        if (u.isMothballed()) {
+    void updateUnitCounts(Unit unit) {
+        if (unit.isMothballed()) {
             return;
         }
-        logger.debug("Adding " + u.getName() + " to unit counts.");
+        logger.debug("Adding {} to unit counts.", unit.getName());
 
-        Entity e = u.getEntity();
-        if (null == e) {
-            logger.debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
+        Entity entity = unit.getEntity();
+        if (null == entity) {
+            logger.debug("Unit {} is not an Entity.  Skipping.", unit.getName());
             return;
         }
 
-        int unitType = e.getUnitType();
-        logger.debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        int unitType = entity.getUnitType();
+        logger.debug("Unit {} is a {}", unit.getName(), UnitType.getTypeDisplayableName(unitType));
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
@@ -923,10 +916,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                logger.debug("Unit " + u.getName() + " weight is " + e.getWeight());
-                if (e.getWeight() <= 50f) {
+                logger.debug("Unit {} weight is {}", unit.getName(), entity.getWeight());
+                if (entity.getWeight() <= 50f) {
                     incrementLightVeeCount();
-                } else if (e.getWeight() <= 100f) {
+                } else if (entity.getWeight() <= 100f) {
                     incrementHeavyVeeCount();
                 } else {
                     incrementSuperHeavyVeeCount();
@@ -950,10 +943,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 break;
             case UnitType.BATTLE_ARMOR:
                 incrementNumberBaSquads();
-                incrementBattleArmorCount(((BattleArmor) e).getSquadSize());
+                incrementBattleArmorCount(((BattleArmor) entity).getSquadSize());
                 break;
             case UnitType.INFANTRY:
-                Infantry i = (Infantry) e;
+                Infantry i = (Infantry) entity;
 
                 incrementInfantryCount(i.getSquadSize() * i.getSquadCount());
                 incrementInfantryUnitCount();

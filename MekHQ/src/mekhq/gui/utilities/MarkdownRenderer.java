@@ -52,8 +52,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 public class MarkdownRenderer {
     private static MarkdownRenderer renderer;
 
-    private Parser parser;
-    private HtmlRenderer htmlRenderer;
+    private final Parser parser;
+    private final HtmlRenderer htmlRenderer;
 
     private MarkdownRenderer() {
         // only enable certain block types
@@ -72,7 +72,7 @@ public class MarkdownRenderer {
     /**
      * This method renders markdown-flavored text as HTML
      *
-     * @param input - a String possible containing markdown markup (and html) to be rendered
+     * @param input - a String possible containing Markdown markup (and html) to be rendered
      *
      * @return a string rendered to html
      */

@@ -97,8 +97,7 @@ public class UnableToAffordJumpNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
     public static boolean checkNag(Campaign campaign) {
-        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_JUMP;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && unableToAffordNextJump(campaign);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_JUMP) && unableToAffordNextJump(campaign);
     }
 }

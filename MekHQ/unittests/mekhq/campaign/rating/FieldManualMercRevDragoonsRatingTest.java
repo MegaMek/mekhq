@@ -163,9 +163,9 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getActivePersonnel(true)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getActivePersonnel(false)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getNumberMedics()).thenCallRealMethod();
-        when(mockCampaign.getNumberAstechs()).thenCallRealMethod();
-        when(mockCampaign.getNumberPrimaryAstechs()).thenCallRealMethod();
-        when(mockCampaign.getNumberSecondaryAstechs()).thenCallRealMethod();
+        when(mockCampaign.getNumberAsTechs()).thenCallRealMethod();
+        when(mockCampaign.getNumberPrimaryAsTechs()).thenCallRealMethod();
+        when(mockCampaign.getNumberSecondaryAsTechs()).thenCallRealMethod();
 
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.isUseQuirks()).thenReturn(false);
@@ -422,7 +422,7 @@ public class FieldManualMercRevDragoonsRatingTest {
               mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 165;
-        when(mockCampaign.getAstechPool()).thenReturn(6);
+        when(mockCampaign.getAsTechPool()).thenReturn(6);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
 
         // Add a mekwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.

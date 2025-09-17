@@ -33,9 +33,9 @@
  */
 package mekhq.gui.view;
 
-import static megamek.common.units.Entity.getEntityMajorTypeName;
 import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
 import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
+import static megamek.common.units.Entity.getEntityMajorTypeName;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -62,11 +62,11 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
-import megamek.common.units.Entity;
-import megamek.common.interfaces.IStartingPositions;
 import megamek.common.annotations.Nullable;
+import megamek.common.interfaces.IStartingPositions;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.PlanetaryConditions;
+import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -86,67 +86,64 @@ import mekhq.gui.baseComponents.JScrollablePanel;
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
-    private AtBScenario scenario;
-    private Campaign campaign;
-    private ForceStub playerForces;
-    private List<String> attachedAllyStub;
+    private final AtBScenario scenario;
+    private final Campaign campaign;
+    private final List<String> attachedAllyStub;
     private List<BotForceStub> botStubs;
-    private JFrame frame;
+    private final JFrame frame;
 
     private JPanel panStats;
 
-    private JLabel lblStatus = new JLabel();
-    private JLabel lblStatusDesc = new JLabel();
-    private JLabel lblType = new JLabel();
-    private JLabel lblTypeDesc = new JLabel();
-    private JLabel lblForce = new JLabel();
-    private JLabel lblForceDesc = new JLabel();
-    private JLabel lblTerrain = new JLabel();
-    private JLabel lblTerrainDesc = new JLabel();
-    private JLabel lblMap = new JLabel();
-    private JLabel lblMapDesc = new JLabel();
-    private JLabel lblMapSize = new JLabel();
-    private JLabel lblMapSizeDesc = new JLabel();
-    private JLabel lblLight = new JLabel();
-    private JLabel lblLightDesc = new JLabel();
-    private JLabel lblWeather = new JLabel();
-    private JLabel lblWeatherDesc = new JLabel();
-    private JLabel lblWind = new JLabel();
-    private JLabel lblWindDesc = new JLabel();
-    private JLabel lblFog = new JLabel();
-    private JLabel lblFogDesc = new JLabel();
-    private JLabel lblBlowingSand = new JLabel();
-    private JLabel lblBlowingSandDesc = new JLabel();
-    private JLabel lblEMI = new JLabel();
-    private JLabel lblEMIDesc = new JLabel();
+    private final JLabel lblStatusDesc = new JLabel();
+    private final JLabel lblType = new JLabel();
+    private final JLabel lblTypeDesc = new JLabel();
+    private final JLabel lblForce = new JLabel();
+    private final JLabel lblForceDesc = new JLabel();
+    private final JLabel lblTerrain = new JLabel();
+    private final JLabel lblTerrainDesc = new JLabel();
+    private final JLabel lblMap = new JLabel();
+    private final JLabel lblMapDesc = new JLabel();
+    private final JLabel lblMapSize = new JLabel();
+    private final JLabel lblMapSizeDesc = new JLabel();
+    private final JLabel lblLight = new JLabel();
+    private final JLabel lblLightDesc = new JLabel();
+    private final JLabel lblWeather = new JLabel();
+    private final JLabel lblWeatherDesc = new JLabel();
+    private final JLabel lblWind = new JLabel();
+    private final JLabel lblWindDesc = new JLabel();
+    private final JLabel lblFog = new JLabel();
+    private final JLabel lblFogDesc = new JLabel();
+    private final JLabel lblBlowingSand = new JLabel();
+    private final JLabel lblBlowingSandDesc = new JLabel();
+    private final JLabel lblEMI = new JLabel();
+    private final JLabel lblEMIDesc = new JLabel();
 
-    private JLabel lblTemp = new JLabel();
+    private final JLabel lblTemp = new JLabel();
 
-    private JLabel lblTempDesc = new JLabel();
-    private JLabel lblAtmosphere = new JLabel();
-    private JLabel lblAtmosphereDesc = new JLabel();
-    private JLabel lblGravity = new JLabel();
-    private JLabel lblGravityDesc = new JLabel();
-    private JLabel lblPlayerStart = new JLabel();
-    private JLabel lblPlayerStartPos = new JLabel();
+    private final JLabel lblTempDesc = new JLabel();
+    private final JLabel lblAtmosphere = new JLabel();
+    private final JLabel lblAtmosphereDesc = new JLabel();
+    private final JLabel lblGravity = new JLabel();
+    private final JLabel lblGravityDesc = new JLabel();
+    private final JLabel lblPlayerStart = new JLabel();
+    private final JLabel lblPlayerStartPos = new JLabel();
 
-    private JTextArea txtDetails = new JTextArea();
+    private final JTextArea txtDetails = new JTextArea();
 
     private final static int REROLL_TERRAIN = 0;
     private final static int REROLL_MAP = 1;
-    private final static int REROLL_MAPSIZE = 2;
+    private final static int REROLL_MAP_SIZE = 2;
     private final static int REROLL_LIGHT = 3;
     private final static int REROLL_WEATHER = 4;
     private final static int REROLL_NUM = 5;
-    private JCheckBox[] chkReroll = new JCheckBox[REROLL_NUM];
+    private final JCheckBox[] chkReroll = new JCheckBox[REROLL_NUM];
     private JButton btnReroll;
 
     private JTree playerForceTree;
 
     private JTextArea txtDesc;
-    private JTextArea txtReport;
 
-    private StubTreeModel playerForceModel;
+    private final StubTreeModel playerForceModel;
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
         super();
@@ -155,15 +152,16 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         this.campaign = c;
         botStubs = new ArrayList<>();
 
+        ForceStub playerForces;
         if (s.getStatus().isCurrent()) {
             s.refresh(c);
-            this.playerForces = new ForceStub(s.getForces(campaign), campaign);
+            playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = Utilities.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
                 botStubs.add(s.getBotForce(i).generateStub(campaign));
             }
         } else {
-            this.playerForces = s.getForceStub();
+            playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
             botStubs = s.getBotForcesStubs();
         }
@@ -176,7 +174,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         panStats = new JPanel();
         txtDesc = new JTextArea();
-        txtReport = new JTextArea();
+        JTextArea txtReport = new JTextArea();
         playerForceTree = new JTree();
 
         setLayout(new GridBagLayout());
@@ -207,7 +205,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -219,7 +217,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
               MekHQ.getMHQOptions().getLocale());
-        lblStatus = new JLabel();
+        JLabel lblStatus = new JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         panStats.setLayout(new GridBagLayout());
@@ -287,9 +285,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 continue;
             }
 
-            int team = botStub.getTeam();
-            List<String> allEntries = botStub.getEntityList();
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
+            int team = botStub.team();
+            List<String> allEntries = botStub.entityList();
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).name());
 
             if (!(isTrueBlindDrop && (team != 1))) {
                 boolean hideInformation = isCurrent && isBlindDrop && (team != 1);
@@ -310,7 +308,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
                         String label = weightClass + ' ' + unitType;
                         top.add(new DefaultMutableTreeNode(label));
-                        continue;
                     } else {
                         top.add(new DefaultMutableTreeNode(entityString));
                     }
@@ -396,7 +393,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         if (scenario.getBoardType() == Scenario.T_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
         } else if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-            y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
+            y = fillLowAtmosphereStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
         }
@@ -507,7 +504,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         if (!scenario.getLoot().isEmpty()) {
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 0.0;
@@ -558,9 +555,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             }
 
             lblTerrainDesc.setText(scenario.getTerrainType());
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = y++;
-            panStats.add(lblTerrainDesc, gridBagConstraints);
         } else {
             lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
             gridBagConstraints.gridx = 0;
@@ -570,10 +564,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
             String hasTrack = scenario.getHasTrack() ? " \u2606" : "";
             lblTerrainDesc.setText(scenario.getTerrainType() + hasTrack);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = y++;
-            panStats.add(lblTerrainDesc, gridBagConstraints);
         }
+
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblTerrainDesc, gridBagConstraints);
 
         lblMap.setText(resourceMap.getString("lblMap.text"));
         gridBagConstraints.gridx = 0;
@@ -602,14 +597,14 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblMapSize, gridBagConstraints);
 
-        chkReroll[REROLL_MAPSIZE] = new JCheckBox();
+        chkReroll[REROLL_MAP_SIZE] = new JCheckBox();
         if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            panStats.add(chkReroll[REROLL_MAPSIZE], gridBagConstraints);
-            chkReroll[REROLL_MAPSIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
-            chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
+            panStats.add(chkReroll[REROLL_MAP_SIZE], gridBagConstraints);
+            chkReroll[REROLL_MAP_SIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
+            chkReroll[REROLL_MAP_SIZE].addItemListener(checkBoxListener);
         }
 
         lblMapSizeDesc.setText(scenario.getMapX() + " W x " + scenario.getMapY() + " H");
@@ -786,14 +781,14 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblMapSize, gridBagConstraints);
 
-        chkReroll[REROLL_MAPSIZE] = new JCheckBox();
+        chkReroll[REROLL_MAP_SIZE] = new JCheckBox();
         if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            panStats.add(chkReroll[REROLL_MAPSIZE], gridBagConstraints);
-            chkReroll[REROLL_MAPSIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
-            chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
+            panStats.add(chkReroll[REROLL_MAP_SIZE], gridBagConstraints);
+            chkReroll[REROLL_MAP_SIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
+            chkReroll[REROLL_MAP_SIZE].addItemListener(checkBoxListener);
         }
 
         lblMapSizeDesc.setText(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
@@ -813,7 +808,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      *
      * @return the row at which we wind up after doing all this
      */
-    private int fillLowAtmoStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
+    private int fillLowAtmosphereStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
         lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -831,14 +826,14 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblMapSize, gridBagConstraints);
 
-        chkReroll[REROLL_MAPSIZE] = new JCheckBox();
+        chkReroll[REROLL_MAP_SIZE] = new JCheckBox();
         if (scenario.getStatus().isCurrent()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            panStats.add(chkReroll[REROLL_MAPSIZE], gridBagConstraints);
-            chkReroll[REROLL_MAPSIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
-            chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
+            panStats.add(chkReroll[REROLL_MAP_SIZE], gridBagConstraints);
+            chkReroll[REROLL_MAP_SIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
+            chkReroll[REROLL_MAP_SIZE].addItemListener(checkBoxListener);
         }
 
         lblMapSizeDesc.setText(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
@@ -849,7 +844,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         return y;
     }
 
-    private ItemListener checkBoxListener = e -> countRerollBoxes();
+    private final ItemListener checkBoxListener = e -> countRerollBoxes();
 
     private void countRerollBoxes() {
         int checkedBoxes = 0;
@@ -887,11 +882,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblMapDesc.setText(scenario.getMapForDisplay());
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
-        if (chkReroll[REROLL_MAPSIZE] != null && chkReroll[REROLL_MAPSIZE].isSelected()) {
+        if (chkReroll[REROLL_MAP_SIZE] != null && chkReroll[REROLL_MAP_SIZE].isSelected()) {
             scenario.setMapSize();
             scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
-            chkReroll[REROLL_MAPSIZE].setSelected(false);
+            chkReroll[REROLL_MAP_SIZE].setSelected(false);
             lblMapDesc.setText(scenario.getMapForDisplay());
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
@@ -923,8 +918,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class StubTreeModel implements TreeModel {
-        private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<>();
+        private final ForceStub rootForce;
+        private final Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;
@@ -1002,7 +997,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
-        private JTree tree;
+        private final JTree tree;
         int forceIndex;
 
         public TreeMouseAdapter(JTree tree, int forceIndex) {

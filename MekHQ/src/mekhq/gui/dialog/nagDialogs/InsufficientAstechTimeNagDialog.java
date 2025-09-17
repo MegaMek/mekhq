@@ -35,8 +35,8 @@ package mekhq.gui.dialog.nagDialogs;
 import static mekhq.MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogic.getAsTechTimeDeficit;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogic.hasAsTechTimeDeficit;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechTimeNagLogic.getAsTechTimeDeficit;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechTimeNagLogic.hasAsTechTimeDeficit;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.Collection;
@@ -162,9 +162,9 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
 
         if (campaign != null) {
             final Collection<Unit> units = campaign.getUnits();
-            final int possibleAstechPoolMinutes = campaign.getPossibleAstechPoolMinutes();
+            final int possibleAstechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
             final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-            final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
+            final int possibleAstechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
 
             count = getAsTechTimeDeficit(units,
                   possibleAstechPoolMinutes,

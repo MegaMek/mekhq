@@ -45,7 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 
 public class TrainingAwards {
-    private static final MMLogger logger = MMLogger.create(TrainingAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(TrainingAwards.class);
 
     /**
      * This function loops through Training Awards, checking whether the person is eligible to receive each type of
@@ -72,7 +72,7 @@ public class TrainingAwards {
         try {
             academyEducationLevel = (int) academyAttributes.get(0);
         } catch (ClassCastException e) {
-            logger.warn("{} has invalid academyEducationLevel value '{}'. Aborting.",
+            LOGGER.warn("{} has invalid academyEducationLevel value '{}'. Aborting.",
                   student.getFullName(), academyAttributes.get(0).toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
@@ -81,7 +81,7 @@ public class TrainingAwards {
         try {
             academyType = (AcademyType) academyAttributes.get(1);
         } catch (ClassCastException e) {
-            logger.warn("{} has invalid academyType value '{}'. Aborting.",
+            LOGGER.warn("{} has invalid academyType value '{}'. Aborting.",
                   student.getFullName(), academyAttributes.get(1).toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
@@ -90,7 +90,7 @@ public class TrainingAwards {
         try {
             academyName = academyAttributes.get(2).toString();
         } catch (ClassCastException e) {
-            logger.warn("{} has invalid academyName value '{}'. Aborting.",
+            LOGGER.warn("{} has invalid academyName value '{}'. Aborting.",
                   student.getFullName(), academyAttributes.get(2).toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
@@ -105,7 +105,7 @@ public class TrainingAwards {
             try {
                 requiredEducationLevel = award.getQty();
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid qty value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid qty value {}",
                       award.getName(), award.getSet(), award.getQty());
                 continue;
             }
@@ -113,7 +113,7 @@ public class TrainingAwards {
             try {
                 requiredType = AcademyType.parseFromString(award.getSize());
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid size value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid size value {}",
                       award.getName(), award.getSet(), award.getSize());
                 continue;
             }
@@ -121,7 +121,7 @@ public class TrainingAwards {
             try {
                 requiredAcademyName = award.getRange();
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid range value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid range value {}",
                       award.getName(), award.getSet(), award.getRange());
                 continue;
             }

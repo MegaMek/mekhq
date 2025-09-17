@@ -35,7 +35,6 @@ package mekhq.gui.menus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -187,7 +186,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
             final List<Unit> units = HangarSorter.defaultSorting()
                                            .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable))
-                                           .collect(Collectors.toList());
+                                           .toList();
             for (final Unit unit : units) {
                 Entity entity = unit.getEntity();
                 if (entity.getUnitType() != unitType) {

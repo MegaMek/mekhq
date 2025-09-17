@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,11 +38,11 @@ import java.util.List;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
+import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.loaders.MekSummary;
 import megamek.common.units.UnitType;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.mission.AtBContract;
@@ -68,7 +68,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return STARLEAGUECACHE1;
+        return STAR_LEAGUE_CACHE_1;
     }
 
     @Override

@@ -47,24 +47,12 @@ public class WindchildHeavyBattleMekWeightClassGenerator extends AbstractBattleM
 
     @Override
     public int generate(final int roll) {
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-                return EntityWeightClass.WEIGHT_LIGHT;
-            case 6:
-            case 7:
-                return EntityWeightClass.WEIGHT_MEDIUM;
-            case 8:
-            case 9:
-            case 10:
-                return EntityWeightClass.WEIGHT_HEAVY;
-            case 5:
-            case 11:
-            case 12:
-                return EntityWeightClass.WEIGHT_ASSAULT;
-            default:
-                return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-        }
+        return switch (roll) {
+            case 2, 3, 4 -> EntityWeightClass.WEIGHT_LIGHT;
+            case 6, 7 -> EntityWeightClass.WEIGHT_MEDIUM;
+            case 8, 9, 10 -> EntityWeightClass.WEIGHT_HEAVY;
+            case 5, 11, 12 -> EntityWeightClass.WEIGHT_ASSAULT;
+            default -> EntityWeightClass.WEIGHT_SUPER_HEAVY;
+        };
     }
 }

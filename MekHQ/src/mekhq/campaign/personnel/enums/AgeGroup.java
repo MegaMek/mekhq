@@ -111,7 +111,7 @@ public enum AgeGroup {
             }
         }
 
-        MMLogger.create(AgeGroup.class).error("Illegal age of " + age + " entered for a person. Returning Adult");
+        MMLogger.create(AgeGroup.class).error("Illegal age of {} entered for a person. Returning Adult", age);
 
         // This is a default return, which will only happen on error cases
         return ADULT;

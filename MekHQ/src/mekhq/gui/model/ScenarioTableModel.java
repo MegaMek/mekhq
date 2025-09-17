@@ -47,17 +47,17 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying scenarios
  */
-public class ScenarioTableModel extends DataTableModel {
+public class ScenarioTableModel extends DataTableModel<Scenario> {
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -74,7 +74,7 @@ public class ScenarioTableModel extends DataTableModel {
 
     //region Constructors
     public ScenarioTableModel(Campaign c) {
-        data = new ArrayList<Scenario>();
+        data = new ArrayList<>();
         campaign = c;
     }
     //endregion Constructors
@@ -113,7 +113,7 @@ public class ScenarioTableModel extends DataTableModel {
     }
 
     public Scenario getScenario(int row) {
-        return (row < getRowCount()) ? (Scenario) data.get(row) : null;
+        return (row < getRowCount()) ? data.get(row) : null;
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ScenarioTableModel extends DataTableModel {
         } else if (col == COL_STATUS) {
             if (campaign.getCampaignOptions().isUseStratCon() && scenario instanceof AtBScenario) {
                 AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                       (AtBScenario) scenario);
 
                 if (stratconScenario != null) {
@@ -180,13 +180,13 @@ public class ScenarioTableModel extends DataTableModel {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario) {
                     AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                    StratconCampaignState campaignState = contract.getStratconCampaignState();
-                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                    StratConCampaignState campaignState = contract.getStratconCampaignState();
+                    StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                           ((AtBScenario) scenario));
 
                     if (campaignState != null && stratconScenario != null) {
-                        StratconTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
-                        StratconCoords coords = stratconScenario.getCoords();
+                        StratConTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
+                        StratConCoords coords = stratconScenario.getCoords();
 
                         if (coords == null) {
                             return track.getDisplayableName();

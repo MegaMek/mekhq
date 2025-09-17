@@ -54,7 +54,6 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.client.ui.models.XTableColumnModel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -332,28 +331,3 @@ public class AutoAwardsDialog extends JDialog {
     }
 }
 
-class AutoAwardsTable extends JTable {
-    public AutoAwardsTable(AutoAwardsTableModel model) {
-        super(model);
-        setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        XTableColumnModel columnModel = new XTableColumnModel();
-        setColumnModel(columnModel);
-        createDefaultColumnsFromModel();
-        TableColumn column;
-        for (int columnIndex = 0; columnIndex < AutoAwardsTableModel.N_COL; columnIndex++) {
-            column = getColumnModel().getColumn(convertColumnIndexToView(columnIndex));
-            column.setPreferredWidth(model.getColumnWidth(columnIndex));
-            if (columnIndex != AutoAwardsTableModel.COL_AWARD) {
-                column.setCellRenderer(model.getRenderer(columnIndex));
-            }
-        }
-
-        setRowHeight(50);
-        setIntercellSpacing(new Dimension(0, 0));
-        setShowGrid(false);
-
-        getColumnModel().getColumn(convertColumnIndexToView(AutoAwardsTableModel.COL_AWARD))
-              .setCellEditor(new DefaultCellEditor(new JCheckBox()));
-    }
-}

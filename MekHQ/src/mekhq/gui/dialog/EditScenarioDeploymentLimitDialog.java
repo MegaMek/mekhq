@@ -53,7 +53,7 @@ import mekhq.campaign.mission.ScenarioDeploymentLimit.QuantityType;
 public class EditScenarioDeploymentLimitDialog extends JDialog {
 
     private ScenarioDeploymentLimit deploymentLimit;
-    private boolean newLimit;
+    private final boolean newLimit;
 
     private JSpinner spnQuantity;
     private MMComboBox<QuantityType> choiceQuantityType;
