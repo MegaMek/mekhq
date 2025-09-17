@@ -74,7 +74,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  * @author Neoancient
  */
 public class NewAtBContractDialog extends NewContractDialog {
-    private static final MMLogger logger = MMLogger.create(NewAtBContractDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewAtBContractDialog.class);
 
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
@@ -108,7 +108,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             setName("NewAtBContractDialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -403,7 +403,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
         gbc.gridx = 0;
-        gbc.gridy = y++;
+        gbc.gridy = y;
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -634,19 +634,19 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            logger.info("Setting employer code to {}", getCurrentEmployerCode());
+            LOGGER.info("Setting employer code to {}", getCurrentEmployerCode());
 
             long time = java.lang.System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            logger.info("to set employer code: {}", java.lang.System.currentTimeMillis() - time);
+            LOGGER.info("to set employer code: {}", java.lang.System.currentTimeMillis() - time);
 
             time = java.lang.System.currentTimeMillis();
             updateEnemies();
-            logger.info("to update enemies: {}", java.lang.System.currentTimeMillis() - time);
+            LOGGER.info("to update enemies: {}", java.lang.System.currentTimeMillis() - time);
 
             time = java.lang.System.currentTimeMillis();
             updatePlanets();
-            logger.info("to update planets: {}", java.lang.System.currentTimeMillis() - time);
+            LOGGER.info("to update planets: {}", java.lang.System.currentTimeMillis() - time);
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

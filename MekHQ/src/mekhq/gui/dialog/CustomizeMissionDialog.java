@@ -61,20 +61,15 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  * @author Taharqa
  */
 public class CustomizeMissionDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(CustomizeMissionDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomizeMissionDialog.class);
 
     private final Mission mission;
     private final Campaign campaign;
     private final boolean newMission;
 
-    private JButton btnClose;
-    private JButton btnOK;
-    private JLabel lblName;
     private JTextField txtName;
-    private JLabel lblType;
     private JTextField txtType;
     private MarkdownEditorPanel txtDesc;
-    private JLabel lblPlanetName;
     private JSuggestField suggestPlanet;
 
     public CustomizeMissionDialog(JFrame parent, boolean modal, Mission m, Campaign c) {
@@ -101,12 +96,12 @@ public class CustomizeMissionDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         txtName = new JTextField();
-        lblName = new JLabel();
+        JLabel lblName = new JLabel();
         txtType = new JTextField();
-        lblType = new JLabel();
-        btnOK = new JButton();
-        btnClose = new JButton();
-        lblPlanetName = new JLabel();
+        JLabel lblType = new JLabel();
+        JButton btnOK = new JButton();
+        JButton btnClose = new JButton();
+        JLabel lblPlanetName = new JLabel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -234,7 +229,7 @@ public class CustomizeMissionDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

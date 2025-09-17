@@ -59,7 +59,7 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
 
     private int imgWidth;
 
-    private DialogStoryPoint storyPoint;
+    private final DialogStoryPoint storyPoint;
 
     public StoryDialog(final JFrame parent, DialogStoryPoint sEvent) {
         super(parent, sEvent.getTitle(), true);

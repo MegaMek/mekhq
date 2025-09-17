@@ -73,14 +73,11 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.Paperdoll;
 
 public class MedicalViewDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(MedicalViewDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MedicalViewDialog.class);
 
     private static final String MENU_CMD_SEPARATOR = ",";
 
     private static final Key<String> DOCTOR_NOTES = new StringKey("doctor_notes");
-
-    // TODO: Custom paper dolls
-    // private static final Key<String> PAPERDOLL = new StringKey("paperdoll_xml_file");
 
     private final Campaign campaign;
     private final Person person;
@@ -92,12 +89,12 @@ public class MedicalViewDialog extends JDialog {
     private JPanel injuryPanel;
     private JTextArea notesArea;
 
-    private ActionListener dollActionListener;
+    private final ActionListener dollActionListener;
 
-    private transient Font labelFont;
-    private transient Font handwritingFont;
-    private transient Color labelColor;
-    private transient ImageIcon healImageIcon;
+    private final transient Font labelFont;
+    private final transient Font handwritingFont;
+    private final transient Color labelColor;
+    private final transient ImageIcon healImageIcon;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
           MekHQ.getMHQOptions().getLocale());
 
@@ -106,14 +103,14 @@ public class MedicalViewDialog extends JDialog {
         this.campaign = Objects.requireNonNull(c);
         this.person = Objects.requireNonNull(p);
 
-        // Preload default paperdolls
+        // Preload default paper dolls
         try (InputStream fis = new FileInputStream(c.getApp()
                                                          .getIconPackage()
                                                          .getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file
             // path
             defaultMaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
         try (InputStream fis = new FileInputStream(c.getApp()
@@ -122,7 +119,7 @@ public class MedicalViewDialog extends JDialog {
             // path
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
         setPreferredSize(new Dimension(1024, 840));
@@ -274,7 +271,7 @@ public class MedicalViewDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -376,12 +373,12 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
 
-    private JPanel genMedicalHistory(Campaign c, Person p) {
+    private JPanel genMedicalHistory(Campaign campaign, Person person) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("medicalHistory.text")));
-        Map<String, List<LogEntry>> groupedEntries = p.getMedicalLog()
+        Map<String, List<LogEntry>> groupedEntries = person.getMedicalLog()
                                                            .stream()
                                                            .filter(entry -> entry.getType() == LogEntryType.MEDICAL)
                                                            .sorted(Comparator.comparing(LogEntry::getDate))
@@ -414,7 +411,7 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
 
-    private JPanel genAllergies(Campaign c, Person p) {
+    private JPanel genAllergies(Campaign campaign, Person person) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -424,7 +421,7 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
 
-    private JPanel genIllnesses(Campaign c, Person p) {
+    private JPanel genIllnesses(Campaign campaign, Person person) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -435,10 +432,10 @@ public class MedicalViewDialog extends JDialog {
     }
 
     /** Get the maximum injury level in the specified location */
-    private InjuryLevel getMaxInjuryLevel(Person p, BodyLocation loc) {
-        return p.getInjuries()
+    private InjuryLevel getMaxInjuryLevel(Person person, BodyLocation bodyLocation) {
+        return person.getInjuries()
                      .stream()
-                     .filter(inj -> !inj.isHidden() && (inj.getLocation() == loc))
+                     .filter(inj -> !inj.isHidden() && (inj.getLocation() == bodyLocation))
                      .min((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
                      .map(Injury::getLevel)
                      .orElse(InjuryLevel.NONE);
@@ -511,13 +508,13 @@ public class MedicalViewDialog extends JDialog {
 
     }
 
-    private JPanel genNotes(Campaign c, Person p) {
+    private JPanel genNotes(Campaign campaign, Person person) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(genLabel(resourceMap.getString("doctorsNotes.text")));
 
-        String notes = p.getExtraData().get(DOCTOR_NOTES, "");
+        String notes = person.getExtraData().get(DOCTOR_NOTES, "");
         notesArea = new JTextArea(notes);
         notesArea.setEditable(true);
         notesArea.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -583,8 +580,8 @@ public class MedicalViewDialog extends JDialog {
         private final JLabel label;
         private final Person person;
         private final Injury injury;
-        private ImageIcon healImageIcon;
-        private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
+        private final ImageIcon healImageIcon;
+        private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
               MekHQ.getMHQOptions().getLocale());
 
         public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {

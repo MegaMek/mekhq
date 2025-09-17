@@ -36,7 +36,6 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -51,9 +50,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -92,7 +89,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author Neoancient
  */
 public class RetirementDefectionDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(RetirementDefectionDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(RetirementDefectionDialog.class);
 
     private static final String PAN_OVERVIEW = "PanOverview";
     private static final String PAN_RESULTS = "PanResults";
@@ -505,7 +502,7 @@ public class RetirementDefectionDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -560,24 +557,12 @@ public class RetirementDefectionDialog extends JDialog {
     private void initResults() {
         // This and the below code is not referenced outside of this method and neither variables are used outside
         //  adding units to the list.
-        // List<UUID>      unassignedMeks = new ArrayList<>();
-        // List<UUID>      unassignedASF  = new ArrayList<>();
         ArrayList<UUID> availableUnits = new ArrayList<>();
         hqView.getCampaign().getHangar().forEachUnit(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
                 return;
             }
             availableUnits.add(u.getId());
-            // if (UnitType.MEK == u.getEntity().getUnitType()) {
-            //     if (null == u.getCommander()) {
-            //         unassignedMeks.add(u.getId());
-            //     }
-            // }
-            // if (UnitType.AEROSPACE_FIGHTER == u.getEntity().getUnitType()) {
-            //     if (null == u.getCommander()) {
-            //         unassignedASF.add(u.getId());
-            //     }
-            // }
         });
 
         for (UUID id : rdTracker.getRetirees(contract)) {
@@ -987,56 +972,3 @@ public class RetirementDefectionDialog extends JDialog {
     }
 }
 
-class RetirementTable extends JTable {
-    private static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
-        final private JSpinner spinner;
-
-        public SpinnerEditor() {
-            spinner = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
-            ((DefaultEditor) spinner.getEditor()).getTextField().setEditable(false);
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            return spinner.getValue();
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
-              int column) {
-            spinner.setValue(value);
-            return spinner;
-        }
-    }
-
-    public RetirementTable(RetirementTableModel model, CampaignGUI hqView) {
-        super(model);
-        setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        XTableColumnModel columnModel = new XTableColumnModel();
-        setColumnModel(columnModel);
-        createDefaultColumnsFromModel();
-        TableColumn column;
-        for (int i = 0; i < RetirementTableModel.N_COL; i++) {
-            column = getColumnModel().getColumn(convertColumnIndexToView(i));
-            column.setPreferredWidth(model.getColumnWidth(i));
-            if ((i != RetirementTableModel.COL_PAY_BONUS) && (i != RetirementTableModel.COL_MISC_MOD)) {
-                column.setCellRenderer(model.getRenderer(i));
-            }
-        }
-
-        setRowHeight(50);
-        setIntercellSpacing(new Dimension(0, 0));
-        setShowGrid(false);
-
-        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS))
-              .setCellEditor(new DefaultCellEditor(new JCheckBox()));
-
-        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD))
-              .setCellEditor(new SpinnerEditor());
-    }
-
-    public void setGeneralMod(int mod) {
-        ((RetirementTableModel) getModel()).setGeneralMod(mod);
-    }
-}

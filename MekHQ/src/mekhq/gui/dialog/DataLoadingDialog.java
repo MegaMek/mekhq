@@ -104,8 +104,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final Task task;
     private RawImagePanel splash;
     private JProgressBar progressBar;
-    private StoryArcStub storyArcStub;
-    private boolean isInAppNewCampaign;
+    private final StoryArcStub storyArcStub;
+    private final boolean isInAppNewCampaign;
 
     private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
 
@@ -244,7 +244,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     /**
      * Main task. This is executed in a background thread.
      */
-    private class Task extends SwingWorker<Campaign, Campaign> {
+    public class Task extends SwingWorker<Campaign, Campaign> {
         JDialog dialog;
 
         public Task(JDialog dialog) {
@@ -270,7 +270,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         @Override
         public Campaign doInBackground() throws Exception {
-            // region Progress 0
+            // region progress 0
             setProgress(0);
             CurrencyManager.getInstance().loadCurrencies();
             Eras.initializeEras();
@@ -283,12 +283,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             SpecialAbility.initializeSPA();
             // endregion Progress 0
 
-            // region Progress 1
+            // region progress 1
             setProgress(1);
             Factions.setInstance(Factions.loadDefault());
             // endregion Progress 1
 
-            // region Progress 2
+            // region progress 2
             setProgress(2);
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
@@ -296,17 +296,17 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             Bloodname.loadBloodnameData();
             // endregion Progress 2
 
-            // region Progress 3
+            // region progress 3
             setProgress(3);
             Systems.setInstance(Systems.loadDefault());
             // endregion Progress 3
 
-            // region Progress 4
+            // region progress 4
             setProgress(4);
             MHQStaticDirectoryManager.initialize();
             // endregion Progress 4
 
-            // region Progress 5
+            // region progress 5
             setProgress(5);
             while (!MekSummaryCache.getInstance().isInitialized()) {
                 try {
@@ -320,7 +320,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             setProgress(6);
             final Campaign campaign;
             if (getCampaignFile() == null) {
-                // region Progress 6
+                // region progress 6
                 LOGGER.info("Starting a new campaign");
                 campaign = new Campaign();
 
@@ -382,7 +382,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 }
                 // endregion Progress 6
 
-                // region Progress 7
+                // region progress 7
                 setProgress(7);
                 campaign.beginReport("<b>" +
                                            MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) +
@@ -427,7 +427,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.initTurnover();
                 // endregion Progress 7
             } else {
-                // region Progress 6
+                // region progress 6
                 LOGGER.info("Loading campaign file from XML file {}", getCampaignFile());
 
                 // And then load the campaign object from it.
@@ -441,7 +441,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
                 // endregion Progress 6
 
-                // region Progress 7
+                // region progress 7
                 setProgress(7);
 
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());

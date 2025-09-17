@@ -73,15 +73,15 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  * @author Neoancient
  */
 public class CustomizeAtBContractDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(CustomizeAtBContractDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomizeAtBContractDialog.class);
 
-    private JFrame frame;
-    private AtBContract contract;
-    private Campaign campaign;
+    private final JFrame frame;
+    private final AtBContract contract;
+    private final Campaign campaign;
     private Camouflage allyCamouflage;
-    private PlayerColour allyColour;
+    private final PlayerColour allyColour;
     private Camouflage enemyCamouflage;
-    private PlayerColour enemyColour;
+    private final PlayerColour enemyColour;
 
     protected JTextField txtName;
     protected FactionComboBox cbEmployer;
@@ -153,7 +153,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 
         currentFactions = RandomFactionGenerator.getInstance().getCurrentFactions();
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        GridBagConstraints gbc;
 
         txtName = new JTextField();
         JLabel lblName = new JLabel();
@@ -458,7 +458,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
         gbc.gridx = 0;
-        gbc.gridy = y++;
+        gbc.gridy = y;
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -527,14 +527,14 @@ public class CustomizeAtBContractDialog extends JDialog {
         lblEnemyCamo.setText(resourceMap.getString("lblEnemyCamo.text"));
         lblEnemyCamo.setName("lblEnemyCamo");
         gbc.gridx = 0;
-        gbc.gridy = y;
+        gbc.gridy = y++;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(lblEnemyCamo, gbc);
 
         btnEnemyCamo.setPreferredSize(new Dimension(84, 72));
         gbc.gridx = 1;
-        gbc.gridy = y++;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -566,7 +566,7 @@ public class CustomizeAtBContractDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

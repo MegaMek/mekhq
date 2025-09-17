@@ -59,7 +59,7 @@ import mekhq.gui.control.EditLogControl.LogType;
  * @author Taharqa
  */
 public class EditLogDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditLogDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditLogDialog.class);
 
     private final JFrame frame;
     private final Person person;
@@ -119,7 +119,7 @@ public class EditLogDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 }

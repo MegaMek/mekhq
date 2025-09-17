@@ -35,7 +35,7 @@ package mekhq.gui.dialog.nagDialogs;
 import static mekhq.MHQConstants.NAG_INSUFFICIENT_ASTECHS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechsNagLogic.hasAsTechsNeeded;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
@@ -48,28 +48,28 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog class used to notify players about an insufficient number of astechs in their campaign.
+ * A dialog class used to notify players about an insufficient number of AsTechs in their campaign.
  *
- * <p>The {@code InsufficientAstechsNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
- * designed to alert players when there is a shortage of astechs required for efficient operations. It uses predefined
+ * <p>The {@link InsufficientAsTechsNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
+ * designed to alert players when there is a shortage of AsTechs required for efficient operations. It uses predefined
  * values, including the {@code NAG_INSUFFICIENT_ASTECHS} constant, and no specific speaker specialization is provided,
  * relying on a default fallback mechanism.</p>
  */
-public class InsufficientAstechsNagDialog extends ImmersiveDialogNag {
+public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
 
     /**
-     * Constructs a new {@code InsufficientAstechsNagDialog} instance to display the insufficient astechs nag dialog.
+     * Constructs a new {@code InsufficientAsTechsNagDialog} instance to display the insufficient AsTechs nag dialog.
      *
      * <p>This constructor initializes the dialog with preconfigured parameters, such as the
      * {@code NAG_INSUFFICIENT_ASTECHS} constant, to manage dialog suppression and the
-     * {@code "InsufficientAstechsNagDialog"} message key for retrieving localized dialog content. No specialized
+     * {@code "InsufficientAsTechsNagDialog"} message key for retrieving localized dialog content. No specialized
      * speaker is provided, triggering the fallback logic to determine the appropriate speaker for the dialog.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
      *                 settings required for constructing the dialog.
      */
-    public InsufficientAstechsNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INSUFFICIENT_ASTECHS, "InsufficientAstechsNagDialog");
+    public InsufficientAsTechsNagDialog(final Campaign campaign) {
+        super(campaign, null, NAG_INSUFFICIENT_ASTECHS, "InsufficientAsTechsNagDialog");
     }
 
     /**
@@ -173,8 +173,6 @@ public class InsufficientAstechsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs, {@code false} otherwise.
      */
     public static boolean checkNag(int asTechsNeeded) {
-        final String NAG_KEY = NAG_INSUFFICIENT_ASTECHS;
-
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasAsTechsNeeded(asTechsNeeded);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_ASTECHS) && hasAsTechsNeeded(asTechsNeeded);
     }
 }

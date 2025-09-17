@@ -102,10 +102,9 @@ public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
     public static boolean checkNag(Campaign campaign) {
-        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_EXPENSES;
 
         return campaign.getLocalDate().equals(campaign.getLocalDate().with(TemporalAdjusters.lastDayOfMonth())) &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_EXPENSES) &&
                      unableToAffordExpenses(campaign);
     }
 }

@@ -79,10 +79,9 @@ public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if all conditions are met and the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseStratCon, List<AtBContract> activeContracts, LocalDate today) {
-        final String NAG_KEY = NAG_UNRESOLVED_STRATCON_CONTACTS;
 
         return isUseStratCon &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNRESOLVED_STRATCON_CONTACTS) &&
                      hasUnresolvedContacts(activeContracts, today);
     }
 }

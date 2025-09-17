@@ -2000,7 +2000,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             final Profession initialProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
             for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(person.getRankSystem(),
                   initialProfession)) {
-                final Rank rank = person.getRankSystem().getRank(rankDisplay.getRankNumeric());
+                final Rank rank = person.getRankSystem().getRank(rankDisplay.rankNumeric());
                 final Profession profession = initialProfession.getProfession(person.getRankSystem(), rank);
                 final int rankLevels = rank.getRankLevels().get(profession);
 
@@ -2010,10 +2010,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession) +
                                                                  Utilities.getRomanNumeralsFromArabicNumber(level,
                                                                        true));
-                        cbMenuItem.setSelected((person.getRankNumeric() == rankDisplay.getRankNumeric()) &&
+                        cbMenuItem.setSelected((person.getRankNumeric() == rankDisplay.rankNumeric()) &&
                                                      (person.getRankLevel() == level));
                         cbMenuItem.setActionCommand(makeCommand(CMD_RANK,
-                              String.valueOf(rankDisplay.getRankNumeric()),
+                              String.valueOf(rankDisplay.rankNumeric()),
                               String.valueOf(level)));
                         cbMenuItem.addActionListener(this);
                         submenu.add(cbMenuItem);
@@ -2021,8 +2021,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(menu, submenu);
                 } else {
                     cbMenuItem = new JCheckBoxMenuItem(rankDisplay.toString());
-                    cbMenuItem.setSelected(person.getRankNumeric() == rankDisplay.getRankNumeric());
-                    cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankDisplay.getRankNumeric())));
+                    cbMenuItem.setSelected(person.getRankNumeric() == rankDisplay.rankNumeric());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankDisplay.rankNumeric())));
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,7 @@ import mekhq.gui.utilities.JMoneyTextField;
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
-    private static final MMLogger logger = MMLogger.create(AddFundsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(AddFundsDialog.class);
 
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
@@ -105,7 +105,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

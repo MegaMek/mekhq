@@ -72,6 +72,10 @@ public class PersonnelReportDialog extends AbstractReportDialog {
         txtSupportPersonnel.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
         txtSupportPersonnel.setEditable(false);
 
+        return getTxtReport(txtCombatPersonnel, txtSupportPersonnel);
+    }
+
+    private static JTextPane getTxtReport(JTextPane txtCombatPersonnel, JTextPane txtSupportPersonnel) {
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
               txtCombatPersonnel, txtSupportPersonnel);
         splitPane.setName("personnelReportPane");

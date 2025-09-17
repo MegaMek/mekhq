@@ -144,13 +144,12 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to untreated injuries, {@code false} otherwise.
      */
     public static boolean checkNag(List<Person> activePersonnel, int baseBedCount, boolean isDoctorsUseAdministration) {
-        final String NAG_KEY = NAG_UNTREATED_PERSONNEL;
 
         int totalDoctorCapacity = calculateTotalDoctorCapacity(activePersonnel,
               isDoctorsUseAdministration,
               baseBedCount);
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNTREATED_PERSONNEL) &&
                      campaignHasUntreatedInjuries(activePersonnel, totalDoctorCapacity);
     }
 }

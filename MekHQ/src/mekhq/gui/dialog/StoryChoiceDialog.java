@@ -60,7 +60,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
     private JFrame frame;
     private JList<String> choiceList;
-    private List<String> choices;
+    private final List<String> choices;
 
     // region Constructors
     public StoryChoiceDialog(final JFrame parent, ChoiceStoryPoint sEvent) {
@@ -186,9 +186,6 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
             final Color background = new Color((isSelected
                                                       ? list.getSelectionBackground()
                                                       : list.getBackground()).getRGB());
-            // setOpaque(true);
-            // setForeground(foreground);
-            // setBackground(background);
 
             updateChoice(value, isSelected, getStoryPoint().getCampaign(), foreground, background);
 

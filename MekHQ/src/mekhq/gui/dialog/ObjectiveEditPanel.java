@@ -56,9 +56,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * UI for creating or editing a single scenario objective
  */
 public class ObjectiveEditPanel extends JDialog {
-    private JLabel lblShortDescription;
     private JTextArea txtShortDescription;
-    private JLabel lblObjectiveType;
     private JComboBox<ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
     private JTextField txtPercentage;
@@ -85,9 +83,9 @@ public class ObjectiveEditPanel extends JDialog {
 
     private JList<String> lstDetails;
 
-    private ScenarioTemplate currentScenarioTemplate;
-    private ScenarioObjective objective;
-    private ScenarioTemplateEditorDialog parent;
+    private final ScenarioTemplate currentScenarioTemplate;
+    private final ScenarioObjective objective;
+    private final ScenarioTemplateEditorDialog parent;
 
     public ObjectiveEditPanel(ScenarioTemplate template, ScenarioTemplateEditorDialog parent) {
         currentScenarioTemplate = template;
@@ -202,7 +200,7 @@ public class ObjectiveEditPanel extends JDialog {
      * Handles the "description" row.
      */
     private void addDescriptionUI(GridBagConstraints gbc) {
-        lblShortDescription = new JLabel("Short Description:");
+        JLabel lblShortDescription = new JLabel("Short Description:");
 
         JScrollPane txtScroll = new JScrollPaneWithSpeed();
         txtShortDescription = new JTextArea();
@@ -256,7 +254,7 @@ public class ObjectiveEditPanel extends JDialog {
     private void addObjectiveTypeUI(GridBagConstraints gbc) {
         JPanel objectivePanel = new JPanel();
 
-        lblObjectiveType = new JLabel("Objective Type:");
+        JLabel lblObjectiveType = new JLabel("Objective Type:");
         cboObjectiveType = new JComboBox<>();
         for (ObjectiveCriterion objectiveType : ObjectiveCriterion.values()) {
             cboObjectiveType.addItem(objectiveType);
@@ -480,7 +478,7 @@ public class ObjectiveEditPanel extends JDialog {
      * Event handler for the 'add' button for scenario effects
      */
     private void addEffect() {
-        int amount = 0;
+        int amount;
         try {
             amount = Integer.parseInt(txtAmount.getText());
             lblMagnitude.setForeground(UIManager.getColor("text"));
@@ -541,7 +539,11 @@ public class ObjectiveEditPanel extends JDialog {
     }
 
     private void addForce() {
-        objective.addForce(cboForceName.getSelectedItem().toString());
+        Object object = cboForceName.getSelectedItem();
+
+        if (object instanceof String string) {
+            objective.addForce(string);
+        }
 
         updateForceList();
         pack();
@@ -588,26 +590,34 @@ public class ObjectiveEditPanel extends JDialog {
     }
 
     private void setDirectionDropdownVisibility() {
-        switch ((ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
-            case PreventReachMapEdge:
-            case ReachMapEdge:
-                cboDirection.setVisible(true);
-                break;
-            default:
-                cboDirection.setVisible(false);
-                break;
+        Object object = cboObjectiveType.getSelectedItem();
+
+        if (object instanceof ObjectiveCriterion criterion) {
+            switch (criterion) {
+                case PreventReachMapEdge:
+                case ReachMapEdge:
+                    cboDirection.setVisible(true);
+                    break;
+                default:
+                    cboDirection.setVisible(false);
+                    break;
+            }
         }
     }
 
     private void updateTimeLimitUI() {
-        boolean enable = !cboTimeScaling.getSelectedItem().equals(TimeLimitType.None);
+        Object object = cboTimeScaling.getSelectedItem();
 
-        txtTimeLimit.setEnabled(enable);
-        cboTimeLimitDirection.setEnabled(enable);
+        if (object instanceof TimeLimitType timeLimit) {
+            boolean enable = !timeLimit.equals(TimeLimitType.None);
+
+            txtTimeLimit.setEnabled(enable);
+            cboTimeLimitDirection.setEnabled(enable);
+        }
     }
 
     private void saveObjectiveAndClose() {
-        int number = 0;
+        int number;
         int timeLimit = 0;
 
         try {

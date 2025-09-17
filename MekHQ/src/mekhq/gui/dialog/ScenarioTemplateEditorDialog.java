@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -79,15 +79,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author NickAragua
  */
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
-    private static final MMLogger logger = MMLogger.create(ScenarioTemplateEditorDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioTemplateEditorDialog.class);
 
     // this maps indexes in the destination zone drop down to CardinalEdge enum
     // values and special cases in the scenario force template
-    private static Map<Integer, Integer> destinationZoneMapping;
+    private static final Map<Integer, Integer> destinationZoneMapping;
 
     private final Dimension spinnerSize = new Dimension(55, 25);
 
-    private final static String ADD_FORCE_COMMAND = "ADDFORCE";
+    private final static String ADD_FORCE_COMMAND = "ADD_FORCE";
     private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
     private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
@@ -140,7 +140,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JList<ScenarioObjective> objectiveList;
     JScrollPane objectiveScrollPane;
     JButton btnRemoveObjective;
-    JList<String> lstMuls;
+    JList<String> listMULs;
 
     AbstractScrollablePanel globalPanel;
 
@@ -214,50 +214,49 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
     /**
      * Sets up text entry boxes in the top - briefing, scenario name, labels.
      *
-     * @param gbc
      */
-    private void setupTopFluff(GridBagConstraints gbc) {
+    private void setupTopFluff(GridBagConstraints gridBagConstraints) {
         JLabel lblScenarioName = new JLabel("Scenario Name:");
 
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.WEST;
-        globalPanel.add(lblScenarioName, gbc);
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        globalPanel.add(lblScenarioName, gridBagConstraints);
 
         txtScenarioName = new JTextField(80);
         txtScenarioName.setText(scenarioTemplate.name);
-        gbc.gridy++;
-        globalPanel.add(txtScenarioName, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(txtScenarioName, gridBagConstraints);
 
         JLabel lblScenarioBriefing = new JLabel("Short Briefing:");
-        gbc.gridy++;
-        globalPanel.add(lblScenarioBriefing, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(lblScenarioBriefing, gridBagConstraints);
 
         txtScenarioBriefing = new JTextArea(3, 80);
         txtScenarioBriefing.setEditable(true);
         txtScenarioBriefing.setLineWrap(true);
         txtScenarioBriefing.setText(scenarioTemplate.shortBriefing);
         JScrollPane scrScenarioBriefing = new JScrollPaneWithSpeed(txtScenarioBriefing);
-        gbc.gridy++;
-        globalPanel.add(scrScenarioBriefing, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(scrScenarioBriefing, gridBagConstraints);
 
         JLabel lblLongBriefing = new JLabel("Detailed Briefing:");
-        gbc.gridy++;
-        globalPanel.add(lblLongBriefing, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(lblLongBriefing, gridBagConstraints);
 
         txtLongBriefing = new JTextArea(5, 80);
         txtLongBriefing.setEditable(true);
         txtLongBriefing.setLineWrap(true);
         txtLongBriefing.setText(scenarioTemplate.detailedBriefing);
         JScrollPane scrLongBriefing = new JScrollPaneWithSpeed(txtLongBriefing);
-        gbc.gridy++;
-        globalPanel.add(scrLongBriefing, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(scrLongBriefing, gridBagConstraints);
     }
 
     private void setupObjectiveEditUI(GridBagConstraints gbc) {
@@ -270,20 +269,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.insets = new Insets(0, 0, 0, 5);
 
-        ScenarioTemplateEditorDialog parent = this;
-
-        JButton btnAddEditObjective = new JButton("Add/Edit Objective");
-        btnAddEditObjective.addActionListener(evt -> {
-            ObjectiveEditPanel oep;
-            if (objectiveList.getSelectedValue() != null) {
-                oep = new ObjectiveEditPanel(scenarioTemplate, objectiveList.getSelectedValue(), parent);
-            } else {
-                oep = new ObjectiveEditPanel(scenarioTemplate, parent);
-            }
-            oep.setModal(true);
-            oep.requestFocus();
-            oep.setVisible(true);
-        });
+        JButton btnAddEditObjective = getBtnAddEditObjective();
 
         objectiveList = new JList<>();
         objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList()
@@ -321,33 +307,49 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(pnlObjectiveEdit, gbc);
     }
 
+    private JButton getBtnAddEditObjective() {
+        ScenarioTemplateEditorDialog parent = this;
+
+        JButton btnAddEditObjective = new JButton("Add/Edit Objective");
+        btnAddEditObjective.addActionListener(evt -> {
+            ObjectiveEditPanel oep;
+            if (objectiveList.getSelectedValue() != null) {
+                oep = new ObjectiveEditPanel(scenarioTemplate, objectiveList.getSelectedValue(), parent);
+            } else {
+                oep = new ObjectiveEditPanel(scenarioTemplate, parent);
+            }
+            oep.setModal(true);
+            oep.requestFocus();
+            oep.setVisible(true);
+        });
+        return btnAddEditObjective;
+    }
+
     /**
      * Worker function that sets up top-level headers for the force template editor section.
      *
-     * @param gbc
      */
-    private void setupForceEditorHeaders(GridBagConstraints gbc) {
-        gbc.gridx = 0;
-        gbc.gridwidth = 1;
+    private void setupForceEditorHeaders(GridBagConstraints gridBagConstraints) {
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 1;
 
         JLabel lblForces = new JLabel("Participating Forces:");
-        gbc.gridy++;
-        globalPanel.add(lblForces, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(lblForces, gridBagConstraints);
 
         JButton btnHideShow = new JButton("Hide/Show");
         btnHideShow.addActionListener(evt -> toggleForcePanelVisibility());
 
-        gbc.gridx++;
-        int previousAnchor = gbc.anchor;
-        gbc.anchor = GridBagConstraints.WEST;
-        globalPanel.add(btnHideShow, gbc);
-        gbc.anchor = previousAnchor;
+        gridBagConstraints.gridx++;
+        int previousAnchor = gridBagConstraints.anchor;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        globalPanel.add(btnHideShow, gridBagConstraints);
+        gridBagConstraints.anchor = previousAnchor;
     }
 
     /**
      * Worker function that sets up UI elements for the force template editor.
      *
-     * @param externalGBC
      */
     private void setupForceEditor(GridBagConstraints externalGBC) {
         forcedPanel = new JPanel();
@@ -477,21 +479,19 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         forcedPanel.add(lblFixedMul, gbc);
 
-        lstMuls = new JList<>();
+        listMULs = new JList<>();
         DefaultListModel<String> mulModel = new DefaultListModel<>();
-        JScrollPane scrMulList = new JScrollPaneWithSpeed(lstMuls);
+        JScrollPane scrMulList = new JScrollPaneWithSpeed(listMULs);
         File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
 
         if (mulDir.exists() && mulDir.isDirectory()) {
-            for (String mul : Objects.requireNonNull(mulDir.list((d, s) -> {
-                return s.toLowerCase().endsWith(".mul");
-            }))) {
+            for (String mul : Objects.requireNonNull(mulDir.list((d, s) -> s.toLowerCase().endsWith(".mul")))) {
                 mulModel.addElement(mul);
             }
         }
 
-        lstMuls.setModel(mulModel);
-        lstMuls.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listMULs.setModel(mulModel);
+        listMULs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         gbc.gridx = 1;
         forcedPanel.add(scrMulList, gbc);
 
@@ -674,7 +674,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtForceName.setText(forceTemplate.getForceName());
         cboSyncDeploymentType.setSelectedIndex(forceTemplate.getSyncDeploymentType().ordinal());
         cboSyncForceName.setSelectedItem(forceTemplate.getSyncedForceName());
-        lstMuls.setSelectedValue(forceTemplate.getFixedMul(), true);
+        listMULs.setSelectedValue(forceTemplate.getFixedMul(), true);
 
         int[] deploymentZones = new int[forceTemplate.getDeploymentZones().size()];
         for (int x = 0; x < forceTemplate.getDeploymentZones().size(); x++) {
@@ -721,10 +721,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Worker function called when initializing to place the map parameters.
      *
-     * @param gbc
      */
-    private void setupMapParameters(GridBagConstraints gbc) {
-        gbc.gridx = 0;
+    private void setupMapParameters(GridBagConstraints gridBagConstraints) {
+        gridBagConstraints.gridx = 0;
 
         JPanel pnlMapParameters = new JPanel();
         pnlMapParameters.setLayout(new GridBagLayout());
@@ -910,29 +909,28 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         btnRemoveModifier.addActionListener(evt -> removeModifierHandler());
         pnlMapParameters.add(btnRemoveModifier, localGbc);
 
-        gbc.gridy++;
-        globalPanel.add(pnlMapParameters, gbc);
+        gridBagConstraints.gridy++;
+        globalPanel.add(pnlMapParameters, gridBagConstraints);
     }
 
     /**
      * Worker function that sets up the buttons on the bottom of the dialog
      *
-     * @param gbc
      */
-    private void setupBottomButtons(GridBagConstraints gbc) {
-        gbc.gridx = 0;
-        gbc.gridy++;
+    private void setupBottomButtons(GridBagConstraints gridBagConstraints) {
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
 
         JButton btnSave = new JButton("Save");
         btnSave.setActionCommand(SAVE_TEMPLATE_COMMAND);
         btnSave.addActionListener(this);
-        globalPanel.add(btnSave, gbc);
+        globalPanel.add(btnSave, gridBagConstraints);
 
-        gbc.gridx++;
+        gridBagConstraints.gridx++;
         JButton btnLoad = new JButton("Load");
         btnLoad.setActionCommand(LOAD_TEMPLATE_COMMAND);
         btnLoad.addActionListener(this);
-        globalPanel.add(btnLoad, gbc);
+        globalPanel.add(btnLoad, gridBagConstraints);
     }
 
     /**
@@ -1071,24 +1069,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblMultiplier, gbc);
             }
 
-            JLabel lblDeploymentZones = new JLabel();
-            StringBuilder dzBuilder = new StringBuilder();
-
-            if (!sft.getDeploymentZones().isEmpty()) {
-                dzBuilder.append("<html>");
-                for (int zone : sft.getDeploymentZones()) {
-                    dzBuilder.append(ScenarioForceTemplate.DEPLOYMENT_ZONES[zone]);
-                    dzBuilder.append("<br/>");
-                }
-                dzBuilder.append("</html>");
-            } else {
-                dzBuilder.append(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType()
-                                                                                         .ordinal()]);
-                dzBuilder.append(" as ");
-                dzBuilder.append(sft.getSyncedForceName());
-            }
-
-            lblDeploymentZones.setText(dzBuilder.toString());
+            JLabel lblDeploymentZones = getLblDeploymentZones(sft);
             gbc.gridx++;
             panForceList.add(lblDeploymentZones, gbc);
 
@@ -1155,6 +1136,28 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
     }
 
+    private static JLabel getLblDeploymentZones(ScenarioForceTemplate sft) {
+        JLabel lblDeploymentZones = new JLabel();
+        StringBuilder dzBuilder = new StringBuilder();
+
+        if (!sft.getDeploymentZones().isEmpty()) {
+            dzBuilder.append("<html>");
+            for (int zone : sft.getDeploymentZones()) {
+                dzBuilder.append(ScenarioForceTemplate.DEPLOYMENT_ZONES[zone]);
+                dzBuilder.append("<br/>");
+            }
+            dzBuilder.append("</html>");
+        } else {
+            dzBuilder.append(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType()
+                                                                                     .ordinal()]);
+            dzBuilder.append(" as ");
+            dzBuilder.append(sft.getSyncedForceName());
+        }
+
+        lblDeploymentZones.setText(dzBuilder.toString());
+        return lblDeploymentZones;
+    }
+
     /**
      * Event handler for when the Add force button is pressed. Adds a new force with the currently selected parameters
      * to the scenario template.
@@ -1208,7 +1211,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
 
-        sft.setFixedMul(lstMuls.getSelectedValue());
+        sft.setFixedMul(listMULs.getSelectedValue());
 
         // if we have picked "None" for synchronization, then set explicit deployment
         // zones.

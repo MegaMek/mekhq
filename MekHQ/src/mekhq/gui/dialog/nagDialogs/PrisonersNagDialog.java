@@ -63,7 +63,7 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      *
      * @param campaign       The {@link Campaign} instance providing access to force and personnel data.
      * @param specialization The {@link AdministratorSpecialization} used as an optional criterion for selecting the
-     *                       speaker (may be {@code null}).
+     *                       speaker (maybe {@code null}).
      *
      * @return The {@link Person} designated as the speaker, favoring commanders from "SECURITY" forces, or a fallback
      *       speaker if no suitable individual is found. Returns {@code null} only if the fallback mechanism cannot
@@ -139,8 +139,8 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean hasActiveContract, boolean hasPrisoners) {
-        final String NAG_KEY = NAG_PRISONERS;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasPrisoners(hasActiveContract, hasPrisoners);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_PRISONERS) &&
+                     hasPrisoners(hasActiveContract, hasPrisoners);
     }
 }

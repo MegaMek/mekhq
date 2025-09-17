@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,7 +52,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 
 public class TOETransferHandler extends TransferHandler {
-    private static final MMLogger logger = MMLogger.create(TOETransferHandler.class);
+    private static final MMLogger LOGGER = MMLogger.create(TOETransferHandler.class);
 
     private final CampaignGUI gui;
 
@@ -145,9 +145,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            logger.error("UnsupportedFlavor: " + ufe.getMessage());
+            LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
         } catch (IOException ioe) {
-            logger.error("I/O error: " + ioe.getMessage());
+            LOGGER.error("I/O error: {}", ioe.getMessage());
         }
 
         if ((force != null) && (superForce != null) && force.isAncestorOf(superForce)) {
@@ -183,9 +183,9 @@ public class TOETransferHandler extends TransferHandler {
                 }
             }
         } catch (UnsupportedFlavorException ufe) {
-            logger.error("UnsupportedFlavor: " + ufe.getMessage());
+            LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
         } catch (IOException ioe) {
-            logger.error("I/O error: " + ioe.getMessage());
+            LOGGER.error("I/O error: {}", ioe.getMessage());
         }
 
         // Get drop location info.

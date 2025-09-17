@@ -69,7 +69,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @since 4/7/2012
  */
 public class BombsDialog extends JDialog implements ActionListener {
-    private static final MMLogger logger = MMLogger.create(BombsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(BombsDialog.class);
 
     private BombChoicePanel bombPanel;
     private final IBomber bomber;
@@ -159,9 +159,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         maxAvailable.clear();
 
         // Start with available bombs from warehouse
-        for (Map.Entry<BombTypeEnum, Integer> entry : availableBombs.entrySet()) {
-            maxAvailable.put(entry.getKey(), entry.getValue());
-        }
+        maxAvailable.putAll(availableBombs);
 
         // Add current bomb choices to maximums
         for (Map.Entry<BombTypeEnum, Integer> entry : initialBombChoices.entrySet()) {
@@ -196,7 +194,7 @@ public class BombsDialog extends JDialog implements ActionListener {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -284,7 +282,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         } else {
             // No existing entry and removing bombs - do nothing
             // (deltaCount < 0 with no existing partId means we can't remove anything)
-            logger.warn("Attempted to remove bombs of type {} with no existing warehouse entry.", bombType);
+            LOGGER.warn("Attempted to remove bombs of type {} with no existing warehouse entry.", bombType);
         }
     }
 
@@ -310,12 +308,12 @@ public class BombsDialog extends JDialog implements ActionListener {
             AmmoType ammoType = (AmmoType) EquipmentType.get(bombType.getInternalName());
             if (ammoType != null) {
                 AmmoStorage excessBombs = new AmmoStorage(0, ammoType, count, campaign);
-                campaign.getQuartermaster().addPart(excessBombs, 0);
+                campaign.getQuartermaster().addPart(excessBombs, 0, false);
             } else {
-                logger.error("Could not find AmmoType for bomb: {}", bombType.getInternalName());
+                LOGGER.error("Could not find AmmoType for bomb: {}", bombType.getInternalName());
             }
         } catch (Exception ex) {
-            logger.error("Failed to create warehouse entry for bomb type: {}", bombType.getInternalName(), ex);
+            LOGGER.error("Failed to create warehouse entry for bomb type: {}", bombType.getInternalName(), ex);
         }
     }
 }

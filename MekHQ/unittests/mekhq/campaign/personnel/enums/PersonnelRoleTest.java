@@ -686,7 +686,7 @@ class PersonnelRoleTest {
         // Valid inputs
         assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MEKWARRIOR"));
         assertEquals(PersonnelRole.GROUND_VEHICLE_DRIVER, PersonnelRole.fromString("GROUND_VEHICLE_DRIVER"));
-        assertEquals(PersonnelRole.ASTECH, PersonnelRole.fromString("ASTECH"));
+        assertEquals(PersonnelRole.ASTECH, PersonnelRole.fromString("AS_TECH"));
 
         // Valid inputs with variations in casing
         assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MekWarrior"));

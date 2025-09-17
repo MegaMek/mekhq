@@ -369,12 +369,12 @@ class PersonnelFilterTest {
     }
 
     @Test
-    void testIsAstech() {
+    void testIsAsTech() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.ASTECH) {
-                assertTrue(personnelFilter.isAstech());
+            if (personnelFilter == PersonnelFilter.AS_TECH) {
+                assertTrue(personnelFilter.isAsTech());
             } else {
-                assertFalse(personnelFilter.isAstech());
+                assertFalse(personnelFilter.isAsTech());
             }
         }
     }

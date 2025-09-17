@@ -51,7 +51,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private StoryArcSelectionPane selectionPanel;
     private JTextPane descriptionPane;
-    private boolean startNew;
+    private final boolean startNew;
     //endregion Variable Declarations
 
     //region Constructors

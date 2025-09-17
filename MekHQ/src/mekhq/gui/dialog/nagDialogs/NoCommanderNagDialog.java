@@ -81,8 +81,7 @@ public class NoCommanderNagDialog extends ImmersiveDialogNag {
      *       otherwise.
      */
     public static boolean checkNag(@Nullable Person flaggedCommander) {
-        final String NAG_KEY = NAG_NO_COMMANDER;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasNoCommander(flaggedCommander);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_NO_COMMANDER) && hasNoCommander(flaggedCommander);
     }
 }

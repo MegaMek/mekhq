@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javax.swing.*;
 
 import megamek.client.bot.princess.BehaviorSettings;
@@ -76,15 +75,15 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeBotForceDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(CustomizeBotForceDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomizeBotForceDialog.class);
 
-    private JFrame frame;
+    private final JFrame frame;
     private BotForce botForce;
-    private Campaign campaign;
+    private final Campaign campaign;
     private Camouflage camo;
-    private Player player;
+    private final Player player;
     private BehaviorSettings behavior;
-    private BotForceRandomizer randomizer;
+    private final BotForceRandomizer randomizer;
     private boolean useRandomUnits;
     private List<Entity> fixedEntities;
 
@@ -133,7 +132,7 @@ public class CustomizeBotForceDialog extends JDialog {
         try {
             behavior = botForce.getBehaviorSettings().getCopy();
         } catch (PrincessException ex) {
-            logger.error("Error copying princess behaviors", ex);
+            LOGGER.error("Error copying princess behaviors", ex);
         }
         useRandomUnits = botForce.getBotForceRandomizer() != null;
         if (useRandomUnits) {
@@ -141,7 +140,7 @@ public class CustomizeBotForceDialog extends JDialog {
         } else {
             randomizer = new BotForceRandomizer();
         }
-        fixedEntities = botForce.getFixedEntityListDirect().stream().collect(Collectors.toList());
+        fixedEntities = new ArrayList<>(botForce.getFixedEntityListDirect());
         initComponents();
         setLocationRelativeTo(parent);
         pack();
@@ -433,9 +432,8 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(choiceUnitType, gbc);
 
         // leave out none as a skill option
-        ArrayList<SkillLevel> skills = Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone())
-                                             .collect(Collectors.toCollection(() -> new ArrayList<>()));
-        choiceSkillLevel = new MMComboBox("choiceSkillLevel", skills.toArray());
+        choiceSkillLevel = new MMComboBox<>("choiceSkillLevel",
+              Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone()).toList());
         choiceSkillLevel.setSelectedItem(randomizer.getSkill());
         choiceSkillLevel.setEnabled(useRandomUnits);
         gbc.gridx = 0;
@@ -472,7 +470,7 @@ public class CustomizeBotForceDialog extends JDialog {
         for (int i = EntityWeightClass.WEIGHT_LIGHT; i <= EntityWeightClass.WEIGHT_ASSAULT; i++) {
             weightClassModel.addElement(EntityWeightClass.getClassName(i));
         }
-        choiceFocalWeightClass = new MMComboBox("choiceFocalWeightClass", weightClassModel);
+        choiceFocalWeightClass = new MMComboBox<>("choiceFocalWeightClass", weightClassModel);
         if (randomizer.getFocalWeightClass() < EntityWeightClass.WEIGHT_LIGHT
                   || randomizer.getFocalWeightClass() > EntityWeightClass.WEIGHT_ASSAULT) {
             choiceFocalWeightClass.setSelectedIndex(0);
@@ -596,7 +594,7 @@ public class CustomizeBotForceDialog extends JDialog {
             try {
                 parser = new MULParser(units.get(), campaign.getGameOptions());
             } catch (Exception ex) {
-                logger.error("Could not parse BotForce entities", ex);
+                LOGGER.error("Could not parse BotForce entities", ex);
                 return;
             }
             fixedEntities = Collections.list(parser.getEntities().elements());
@@ -612,13 +610,13 @@ public class CustomizeBotForceDialog extends JDialog {
             try {
                 EntityListFile.saveTo(saveUnits.get(), (ArrayList<Entity>) fixedEntities);
             } catch (Exception ex) {
-                logger.error("Could not save BotForce to file", ex);
+                LOGGER.error("Could not save BotForce to file", ex);
             }
         }
     }
 
     private void deleteUnits(ActionEvent evt) {
-        fixedEntities = new ArrayList<Entity>();
+        fixedEntities = new ArrayList<>();
         refreshFixedEntityPanel();
     }
 
@@ -648,17 +646,21 @@ public class CustomizeBotForceDialog extends JDialog {
         botForce.setFixedEntityList(fixedEntities);
         useRandomUnits = chkUseRandomUnits.isSelected();
         if (useRandomUnits) {
-            randomizer.setFactionCode(choiceFaction.getSelectedItem().getFaction().getShortName());
-            randomizer.setForceMultiplier((double) spnForceMultiplier.getValue());
-            randomizer.setPercentConventional((int) spnPercentConventional.getValue());
-            randomizer.setBaChance((int) spnBaChance.getValue());
-            randomizer.setLanceSize((int) spnLanceSize.getValue());
-            randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
-            randomizer.setSkill(choiceSkillLevel.getSelectedItem());
-            randomizer.setQuality(choiceQuality.getSelectedIndex());
-            randomizer.setUnitType(choiceUnitType.getSelectedIndex());
-            randomizer.setBalancingMethod(choiceBalancingMethod.getSelectedItem());
-            botForce.setBotForceRandomizer(randomizer);
+            FactionDisplay selectedFaction = choiceFaction.getSelectedItem();
+
+            if (selectedFaction != null) {
+                randomizer.setFactionCode(selectedFaction.getFaction().getShortName());
+                randomizer.setForceMultiplier((double) spnForceMultiplier.getValue());
+                randomizer.setPercentConventional((int) spnPercentConventional.getValue());
+                randomizer.setBaChance((int) spnBaChance.getValue());
+                randomizer.setLanceSize((int) spnLanceSize.getValue());
+                randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
+                randomizer.setSkill(choiceSkillLevel.getSelectedItem());
+                randomizer.setQuality(choiceQuality.getSelectedIndex());
+                randomizer.setUnitType(choiceUnitType.getSelectedIndex());
+                randomizer.setBalancingMethod(choiceBalancingMethod.getSelectedItem());
+                botForce.setBotForceRandomizer(randomizer);
+            }
         } else {
             botForce.setBotForceRandomizer(null);
         }

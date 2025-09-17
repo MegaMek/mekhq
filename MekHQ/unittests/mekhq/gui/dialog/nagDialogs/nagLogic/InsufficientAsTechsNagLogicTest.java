@@ -32,20 +32,30 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-public class InsufficientAstechsNagLogic {
-    /**
-     * Determines whether additional astechs are needed in the campaign.
-     *
-     * <p>This method checks if the number of astechs required is greater than zero. If so, this
-     * indicates a need for additional astechs to meet the campaign's requirements. Otherwise, no additional astechs are
-     * required.</p>
-     *
-     * @param asTechsNeeded The number of astechs currently required to meet the campaign's needs.
-     *
-     * @return {@code true} if the number of required astechs ({@code asTechsNeeded}) is greater than zero;
-     *       {@code false} otherwise.
-     */
-    public static boolean hasAsTechsNeeded(int asTechsNeeded) {
-        return asTechsNeeded > 0;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechsNagLogic.hasAsTechsNeeded;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import mekhq.gui.dialog.nagDialogs.InsufficientAsTechsNagDialog;
+import org.junit.jupiter.api.Test;
+
+/**
+ * This class contains test cases for the {@link InsufficientAsTechsNagDialog} class. It tests the different
+ * combinations of Astech requirements and verifies the behavior of the {@code checkAstechsNeededCount()} method.
+ */
+class InsufficientAsTechsNagLogicTest {
+    @Test
+    void noAsTechsNeeded() {
+        assertFalse(hasAsTechsNeeded(0));
+    }
+
+    @Test
+    void oneAsTechNeeded() {
+        assertTrue(hasAsTechsNeeded(1));
+    }
+
+    @Test
+    void negativeAsTechsNeeded() {
+        assertFalse(hasAsTechsNeeded(-1));
     }
 }

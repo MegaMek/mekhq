@@ -50,10 +50,10 @@ import megamek.client.ui.dialogs.customMek.QuirksPanel;
 import megamek.client.ui.panels.DialogOptionComponentYPanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.units.Entity;
 import megamek.common.equipment.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.WeaponQuirks;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -63,7 +63,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @since 3/26/2012
  */
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
-    private static final MMLogger logger = MMLogger.create(QuirksDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(QuirksDialog.class);
 
     private QuirksPanel quirksPanel;
     private final HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
@@ -114,7 +114,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

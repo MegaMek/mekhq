@@ -73,13 +73,13 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class PartsReportDialog extends JDialog {
 
     private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
-    private JButton topUpButton, topUpGMButton, resetRequestedStockButton;
+    private JButton topUpGMButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
 
-    private Campaign campaign;
-    private CampaignGUI gui;
+    private final Campaign campaign;
+    private final CampaignGUI gui;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.PartsReportDialog", MekHQ.getMHQOptions().getLocale());
@@ -243,7 +243,7 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0, false);
                 refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
@@ -260,7 +260,7 @@ public class PartsReportDialog extends JDialog {
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 while (quantity > 0) {
-                    campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                    campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0, false);
                     --quantity;
                 }
                 refreshOverviewSpecificPart(row, partInUse, partToBuy);
@@ -290,7 +290,7 @@ public class PartsReportDialog extends JDialog {
         topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
 
 
-        topUpButton = new JButton();
+        JButton topUpButton = new JButton();
         topUpButton.setText(resourceMap.getString("topUpBtn.text"));
         topUpButton.setIcon(null);
         topUpButton.setFocusPainted(false);
@@ -308,7 +308,7 @@ public class PartsReportDialog extends JDialog {
         topUpGMButton.setMargin(new Insets(10, 20, 10, 20));
         topUpGMButton.addActionListener(evt -> topUpGM());
 
-        resetRequestedStockButton = new JButton();
+        JButton resetRequestedStockButton = new JButton();
         resetRequestedStockButton.setText(resourceMap.getString("resetRequestedStockBtn.text"));
         resetRequestedStockButton.setIcon(null);
         resetRequestedStockButton.setFocusPainted(false);
@@ -327,7 +327,7 @@ public class PartsReportDialog extends JDialog {
               PartQuality.QUALITY_F.toName(reverse)
         };
 
-        ignoreSparesUnderQualityCB = new JComboBox<String>(qualities);
+        ignoreSparesUnderQualityCB = new JComboBox<>(qualities);
         ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
         ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
         JLabel ignorePartsUnderLabel = new JLabel(resourceMap.getString("lblIgnoreSparesUnderQuality.text"));
@@ -431,7 +431,7 @@ public class PartsReportDialog extends JDialog {
     }
 
     private Set<PartInUse> getPartsInUseFromTable() {
-        Set<PartInUse> partsInUse = new HashSet<PartInUse>();
+        Set<PartInUse> partsInUse = new HashSet<>();
         for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
             partsInUse.add(overviewPartsModel.getPartInUse(row));
         }
@@ -440,13 +440,13 @@ public class PartsReportDialog extends JDialog {
 
     private void topUp() {
         campaign.stockUpPartsInUse(getPartsInUseFromTable());
-        storePartInUseRequestedStockMap(); // This is nescessary to prevent request stock values from resetting when topping up
+        storePartInUseRequestedStockMap(); // This is necessary to prevent request stock values from resetting when topping up
         refreshOverviewPartsInUse();
     }
 
     private void topUpGM() {
         campaign.stockUpPartsInUseGM(getPartsInUseFromTable());
-        storePartInUseRequestedStockMap(); // This is nescessary to prevent request stock values from resetting when topping up
+        storePartInUseRequestedStockMap(); // This is necessary to prevent request stock values from resetting when topping up
         refreshOverviewPartsInUse();
     }
 
@@ -456,8 +456,11 @@ public class PartsReportDialog extends JDialog {
         if (ignoreSparesUnderQualityCB == null) {
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
         } else {
-            campaign.setIgnoreSparesUnderQuality(getMinimumQuality(ignoreSparesUnderQualityCB.getSelectedItem()
-                                                                         .toString()));
+            Object object = ignoreSparesUnderQualityCB.getSelectedItem();
+
+            if (object instanceof String string) {
+                campaign.setIgnoreSparesUnderQuality(getMinimumQuality(string));
+            }
         }
 
         Map<String, Double> stockMap = new LinkedHashMap<>();
@@ -471,16 +474,6 @@ public class PartsReportDialog extends JDialog {
     private void storePartInUseRequestedStock(PartInUse partInUse) {
         Map<String, Double> stockMap = campaign.getPartsInUseRequestedStockMap();
         stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
-    }
-
-    private Map<String, Double> getCurrentRequestedStockMap() {
-        Map<String, Double> stockMap = new LinkedHashMap<>();
-        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
-            PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
-        }
-
-        return stockMap;
     }
 
     private void onClose() {

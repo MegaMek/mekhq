@@ -131,17 +131,20 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
             // Intentionally letting this throw an NPE if towingEnt is null, it
             // shouldn't happen and is more clear that something's wrong than doing nothing.
-            Unit oldTransport = towingEnt.towTrailer(unit, null, transporterType);
+            if (towingEnt != null) {
+                Unit oldTransport = towingEnt.towTrailer(unit, null, transporterType);
 
-            if (oldTransport != null) {
-                campaign.updateTransportInTransports(TOW_TRANSPORT, oldTransport);
-                MekHQ.triggerEvent(new UnitChangedEvent(oldTransport));
-            }
-            if (!towingEnt.equals(transport)) {
-                transport.getTransportedUnitsSummary(TOW_TRANSPORT)
-                      .recalculateTransportCapacity(transport.getEntity().getTransports());
-                campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
-                MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
+                if (oldTransport != null) {
+                    campaign.updateTransportInTransports(TOW_TRANSPORT, oldTransport);
+                    MekHQ.triggerEvent(new UnitChangedEvent(oldTransport));
+                }
+
+                if (!towingEnt.equals(transport)) {
+                    transport.getTransportedUnitsSummary(TOW_TRANSPORT)
+                          .recalculateTransportCapacity(transport.getEntity().getTransports());
+                    campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
+                    MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
+                }
             }
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
 

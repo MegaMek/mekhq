@@ -53,7 +53,7 @@ import mekhq.io.FileType;
  * This is a standard menu that takes a unit and lets the user export their icon with the camouflage applied to it.
  */
 public class ExportUnitSpriteMenu extends JScrollableMenu {
-    private static final MMLogger logger = MMLogger.create(ExportUnitSpriteMenu.class);
+    private static final MMLogger LOGGER = MMLogger.create(ExportUnitSpriteMenu.class);
 
     // region Constructors
     public ExportUnitSpriteMenu(final JFrame frame, final Campaign campaign, final Unit unit) {
@@ -136,7 +136,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         // Get the Sprite
         final Image sprite = unit.getImage(this, camouflage, showDamage);
         if (sprite == null) {
-            logger.error("Null sprite");
+            LOGGER.error("Null sprite");
             return;
         }
 
@@ -144,7 +144,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         try {
             ImageIO.write((BufferedImage) sprite, "png", file);
         } catch (Exception ex) {
-            logger.error("Failed to export to file", ex);
+            LOGGER.error("Failed to export to file", ex);
         }
     }
 }

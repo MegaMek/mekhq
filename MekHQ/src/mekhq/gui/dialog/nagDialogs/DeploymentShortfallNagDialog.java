@@ -79,8 +79,8 @@ public class DeploymentShortfallNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to deployment shortfalls; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseAtB, Campaign campaign) {
-        final String NAG_KEY = NAG_SHORT_DEPLOYMENT;
-
-        return isUseAtB && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasDeploymentShortfall(campaign);
+        return isUseAtB &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_SHORT_DEPLOYMENT) &&
+                     hasDeploymentShortfall(campaign);
     }
 }

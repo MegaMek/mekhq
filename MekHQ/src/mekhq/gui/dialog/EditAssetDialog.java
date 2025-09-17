@@ -59,12 +59,10 @@ import mekhq.gui.utilities.JMoneyTextField;
  * @author Taharqa
  */
 public class EditAssetDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditAssetDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditAssetDialog.class);
 
     private final Asset asset;
 
-    private JButton btnClose;
-    private JButton btnOK;
     private JTextField txtName;
     private JMoneyTextField assetValueField;
     private JMoneyTextField assetIncomeField;
@@ -174,7 +172,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(choiceSchedule, gridBagConstraints);
 
-        btnOK = new JButton();
+        JButton btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setActionCommand(resourceMap.getString("btnOK.actionCommand"));
         btnOK.setName("btnOK");
@@ -187,7 +185,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnClose = new JButton();
+        JButton btnClose = new JButton();
         btnClose.setText(resourceMap.getString("btnClose.text"));
         btnClose.setActionCommand(resourceMap.getString("btnClose.actionCommand"));
         btnClose.setName("btnClose");
@@ -212,7 +210,7 @@ public class EditAssetDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
