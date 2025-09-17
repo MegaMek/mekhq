@@ -1173,7 +1173,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(optionRemoveStrategicForceOverride);
             }
 
-            if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces) &&
+            if (StaticChecks.areAllForcesUnDeployed(gui.getCampaign(), forces) &&
                       StaticChecks.areAllStandardForces(forces)) {
                 menu = new JMenu("Deploy Force");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -69,7 +69,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
-import mekhq.gui.stratcon.CampaignManagementDialog;
+import mekhq.gui.stratCon.CampaignManagementDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
@@ -78,12 +78,12 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author NickAragua
  */
-public class StratconTab extends CampaignGuiTab {
+public class StratConTab extends CampaignGuiTab {
     private static final String OBJECTIVE_FAILED = "x";
     private static final String OBJECTIVE_COMPLETED = "&#10003;";
     private static final String OBJECTIVE_IN_PROGRESS = "o";
 
-    private StratconPanel stratconPanel;
+    private StratConPanel stratconPanel;
     private JPanel infoPanel;
     private DefaultListModel<TrackDropdownItem> listModel = new DefaultListModel<>();
     private JList<TrackDropdownItem> listCurrentTrack;
@@ -98,9 +98,9 @@ public class StratconTab extends CampaignGuiTab {
     //region Constructors
 
     /**
-     * Creates an instance of the StratconTab.
+     * Creates an instance of the StratConTab.
      */
-    public StratconTab(CampaignGUI gui, String tabName) {
+    public StratConTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
     }
     //endregion Constructors
@@ -135,11 +135,11 @@ public class StratconTab extends CampaignGuiTab {
 
         setLayout(new BorderLayout());
 
-        stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
+        stratconPanel = new StratConPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
         scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(StratConPanel.HEX_X_RADIUS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(StratConPanel.HEX_Y_RADIUS);
 
         this.add(scrollPane, BorderLayout.CENTER);
 
@@ -238,7 +238,7 @@ public class StratconTab extends CampaignGuiTab {
 
         // Add a spacer to push all components upward (top alignment)
         constraints.gridx = 0;
-        constraints.gridy = gridY++;
+        constraints.gridy = gridY;
         constraints.weighty = 1.0;
         constraints.fill = GridBagConstraints.VERTICAL;
         infoPanel.add(new JPanel(), constraints); // Invisible filler component
@@ -450,7 +450,7 @@ public class StratconTab extends CampaignGuiTab {
                               .append("aintain control of designated facility");
 
                         if (!campaignState.allowEarlyVictory()) {
-                            sb.append(" until " + campaignState.getContract().getEndingDate());
+                            sb.append(" until ").append(campaignState.getContract().getEndingDate());
                         }
                         break;
                     case AnyScenarioVictory:

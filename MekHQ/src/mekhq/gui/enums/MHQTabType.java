@@ -145,7 +145,7 @@ public enum MHQTabType {
             case INFIRMARY -> new InfirmaryTab(gui, toString());
             case FINANCES -> new FinancesTab(gui, toString());
             case MEK_LAB -> new MekLabTab(gui, toString());
-            case STRAT_CON -> new StratconTab(gui, toString());
+            case STRAT_CON -> new StratConTab(gui, toString());
         };
     }
 

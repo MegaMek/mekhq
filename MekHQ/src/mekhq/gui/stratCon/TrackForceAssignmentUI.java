@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,7 +31,7 @@
  * affiliated with Microsoft.
  */
 
-package mekhq.gui.stratcon;
+package mekhq.gui.stratCon;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -50,7 +50,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConCoords;
 import mekhq.campaign.stratCon.StratConRulesManager;
-import mekhq.gui.StratconPanel;
+import mekhq.gui.StratConPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -64,14 +64,14 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
-    private JList<Force> availableForceList = new JList<>();
-    private JButton btnConfirm = new JButton();
-    private StratconPanel ownerPanel;
+    private final JList<Force> availableForceList = new JList<>();
+    private final JButton btnConfirm;
+    private final StratConPanel ownerPanel;
 
     /**
      * Constructor, given a parent StratCon panel.
      */
-    public TrackForceAssignmentUI(StratconPanel parent) {
+    public TrackForceAssignmentUI(StratConPanel parent) {
         ownerPanel = parent;
         btnConfirm = new JButton("Confirm");
         btnConfirm.setActionCommand(CMD_CONFIRM);

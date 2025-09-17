@@ -57,7 +57,7 @@ import mekhq.utilities.ReportingUtilities;
 /**
  * A table model for displaying scenarios
  */
-public class ScenarioTableModel extends DataTableModel {
+public class ScenarioTableModel extends DataTableModel<Scenario> {
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -74,7 +74,7 @@ public class ScenarioTableModel extends DataTableModel {
 
     //region Constructors
     public ScenarioTableModel(Campaign c) {
-        data = new ArrayList<Scenario>();
+        data = new ArrayList<>();
         campaign = c;
     }
     //endregion Constructors
@@ -113,7 +113,7 @@ public class ScenarioTableModel extends DataTableModel {
     }
 
     public Scenario getScenario(int row) {
-        return (row < getRowCount()) ? (Scenario) data.get(row) : null;
+        return (row < getRowCount()) ? data.get(row) : null;
     }
 
     @Override

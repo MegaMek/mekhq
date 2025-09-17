@@ -70,7 +70,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.gui.view.Paperdoll;
+import mekhq.gui.view.PaperDoll;
 
 public class MedicalViewDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(MedicalViewDialog.class);
@@ -82,10 +82,10 @@ public class MedicalViewDialog extends JDialog {
     private final Campaign campaign;
     private final Person person;
 
-    private Paperdoll defaultMaleDoll;
-    private Paperdoll defaultFemaleDoll;
+    private PaperDoll defaultMaleDoll;
+    private PaperDoll defaultFemaleDoll;
     private JPanel dollWrapper;
-    private Paperdoll doll;
+    private PaperDoll doll;
     private JPanel injuryPanel;
     private JTextArea notesArea;
 
@@ -108,7 +108,7 @@ public class MedicalViewDialog extends JDialog {
                                                          .getIconPackage()
                                                          .getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file
             // path
-            defaultMaleDoll = new Paperdoll(fis);
+            defaultMaleDoll = new PaperDoll(fis);
         } catch (IOException e) {
             LOGGER.error("", e);
         }
@@ -117,7 +117,7 @@ public class MedicalViewDialog extends JDialog {
                                                          .getIconPackage()
                                                          .getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file
             // path
-            defaultFemaleDoll = new Paperdoll(fis);
+            defaultFemaleDoll = new PaperDoll(fis);
         } catch (IOException e) {
             LOGGER.error("", e);
         }

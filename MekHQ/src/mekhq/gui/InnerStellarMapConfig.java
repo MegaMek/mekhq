@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,19 +30,42 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.sorter;
-
-import java.util.Comparator;
+package mekhq.gui;
 
 /**
- * A comparator for skills levels (e.g. Regular, Veteran, etc)
+ * All the configuration behavior of InterStellarMap is saved here.
  *
- * @author Dylan Myers
+ * @author Imi (immanuel.scholz@gmx.de)
  */
-public class TaskSorter implements Comparator<String> {
-    // Nothing compare to make the filtering work
-    @Override
-    public int compare(String s0, String s1) {
-        return 0;
-    }
+public final class InnerStellarMapConfig {
+    /**
+     * Whether to scale planet dots on zoom or not
+     */
+    int minDotSize = 3;
+    int maxDotSize = 25;
+    /**
+     * The scaling maximum dimension
+     */
+    int reverseScaleMax = 100;
+    /**
+     * The scaling minimum dimension
+     */
+    int reverseScaleMin = 2;
+    /**
+     * Threshold to not show planet names. 0 means show always
+     */
+    double showPlanetNamesThreshold = 3.0;
+    /**
+     * The actual scale factor. 1.0 for default, higher means bigger.
+     */
+    double scale = 0.5;
+    /**
+     * The scrolling offset
+     */
+    double centerX = 0.0;
+    double centerY = 0.0;
+    /**
+     * The current selected Planet-id
+     */
+    int planetID;
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,10 +34,6 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
-import static mekhq.campaign.mission.enums.CombatRole.PATROL;
-import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -75,9 +71,7 @@ public class LanceAssignmentView extends JPanel {
     private JTable tblRequiredLances;
     private JTable tblAssignments;
     private JPanel panRequiredLances;
-    private JPanel panAssignments;
     private JComboBox<AtBContract> cbContract;
-    private JComboBox<CombatRole> cbRole;
 
     public LanceAssignmentView(Campaign c) {
         campaign = c;
@@ -94,19 +88,7 @@ public class LanceAssignmentView extends JPanel {
             }
         });
 
-        cbRole = new JComboBox<>(CombatRole.values());
-        cbRole.setName("cbRole");
-        cbRole.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                  final boolean isSelected, final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof CombatRole) {
-                    list.setToolTipText(wordWrap(((CombatRole) value).getToolTipText()));
-                }
-                return this;
-            }
-        });
+        JComboBox<CombatRole> cbRole = getCbRole();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -215,7 +197,7 @@ public class LanceAssignmentView extends JPanel {
         panRequiredLances.add(tblRequiredLances);
         add(panRequiredLances);
 
-        panAssignments = new JPanel();
+        JPanel panAssignments = new JPanel();
         panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));
         panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder("Current Assignments"));
         panAssignments.add(tblAssignments.getTableHeader());
@@ -224,6 +206,23 @@ public class LanceAssignmentView extends JPanel {
 
         refresh();
         tblAssignments.getModel().addTableModelListener(assignmentTableListener);
+    }
+
+    private JComboBox<CombatRole> getCbRole() {
+        JComboBox<CombatRole> cbRole = new JComboBox<>(CombatRole.values());
+        cbRole.setName("cbRole");
+        cbRole.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof CombatRole) {
+                    list.setToolTipText(wordWrap(((CombatRole) value).getToolTipText()));
+                }
+                return this;
+            }
+        });
+        return cbRole;
     }
 
     public void refresh() {
@@ -239,8 +238,9 @@ public class LanceAssignmentView extends JPanel {
                 combatTeam.setContract(defaultContract);
             }
         }
-        ((DataTableModel) tblRequiredLances.getModel()).setData(activeContracts);
-        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getAllCombatTeams());
+
+        ((DataTableModel<AtBContract>) tblRequiredLances.getModel()).setData(activeContracts);
+        ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getAllCombatTeams());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
     }
 
@@ -286,188 +286,3 @@ public class LanceAssignmentView extends JPanel {
     };
 }
 
-class RequiredLancesTableModel extends DataTableModel {
-    public static final int COL_CONTRACT = 0;
-    public static final int COL_TOTAL = 1;
-    public static final int COL_FIGHT = 2;
-    public static final int COL_DEFEND = 3;
-    public static final int COL_SCOUT = 4;
-    public static final int COL_TRAINING = 5;
-    public static final int COL_NUM = 6;
-
-    private final Campaign campaign;
-
-    public RequiredLancesTableModel(final Campaign campaign) {
-        this.campaign = campaign;
-        data = new ArrayList<AtBContract>();
-        columnNames = new String[] { "Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(), PATROL.toString(),
-                                     TRAINING.toString() };
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COL_NUM;
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        return columnNames[column];
-    }
-
-    public int getColumnWidth(int col) {
-        if (col == COL_CONTRACT) {
-            return 100;
-        } else {
-            return 20;
-        }
-    }
-
-    public int getAlignment(int col) {
-        if (col == COL_CONTRACT) {
-            return SwingConstants.LEFT;
-        } else {
-            return SwingConstants.CENTER;
-        }
-    }
-
-    @Override
-    public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
-    public AtBContract getRow(int row) {
-        return (AtBContract) data.get(row);
-    }
-
-    @Override
-    public Object getValueAt(int row, int column) {
-        if (row >= getRowCount()) {
-            return "";
-        }
-        if (COL_CONTRACT == column) {
-            return ((AtBContract) data.get(row)).getName();
-        }
-        if (data.get(row) instanceof AtBContract contract) {
-            if (column == COL_TOTAL) {
-                int t = 0;
-                for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-                    AtBContract assignedContract = combatTeam.getContract(campaign);
-                    boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
-                    CombatRole role = combatTeam.getRole();
-                    boolean isRoleSuitable = (isCadreDuty && role.isTraining()) || role.isCombatRole();
-                    boolean isDeploymentEligible = combatTeam.isEligible(campaign);
-
-                    if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
-                        t += combatTeam.getSize(campaign);
-                    }
-                }
-                if (t < contract.getRequiredCombatElements()) {
-                    return t + "/" + contract.getRequiredCombatElements();
-                }
-                return Integer.toString(contract.getRequiredCombatElements());
-            } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
-                int t = 0;
-                for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-                    if (data.get(row).equals(combatTeam.getContract(campaign)) &&
-                              (combatTeam.getRole() ==
-                                     combatTeam.getContract(campaign).getContractType().getRequiredCombatRole()) &&
-                              combatTeam.isEligible(campaign)) {
-                        t += combatTeam.getSize(campaign);
-                    }
-                }
-                int required = Math.max(contract.getRequiredCombatElements() / 2, 1);
-                if (t < required) {
-                    return t + "/" + required;
-                }
-                return Integer.toString(required);
-            }
-        }
-        return "";
-    }
-}
-
-class LanceAssignmentTableModel extends DataTableModel {
-    public static final int COL_FORCE = 0;
-    public static final int COL_WEIGHT_CLASS = 1;
-    public static final int COL_CONTRACT = 2;
-    public static final int COL_ROLE = 3;
-    public static final int COL_NUM = 4;
-
-    private final Campaign campaign;
-
-    public LanceAssignmentTableModel(Campaign campaign) {
-        this.campaign = campaign;
-        data = new ArrayList<>();
-        columnNames = new String[] { "Force", "Weight Class", "Mission", "Role" };
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COL_NUM;
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        return columnNames[column];
-    }
-
-    public int getColumnWidth(int col) {
-        return switch (col) {
-            case COL_FORCE, COL_CONTRACT -> 100;
-            case COL_WEIGHT_CLASS -> 5;
-            default -> 50;
-        };
-    }
-
-    @Override
-    public Class<?> getColumnClass(int c) {
-        return switch (c) {
-            case COL_FORCE -> Force.class;
-            case COL_CONTRACT -> AtBContract.class;
-            case COL_ROLE -> CombatRole.class;
-            default -> String.class;
-        };
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return col > COL_WEIGHT_CLASS;
-    }
-
-    public CombatTeam getRow(int row) {
-        return (CombatTeam) data.get(row);
-    }
-
-    @Override
-    public Object getValueAt(int row, int column) {
-        final String[] WEIGHT_CODES = { "Ultra-Light", "Light", "Medium", "Heavy", "Assault", "Super Heavy" };
-
-        if (row >= getRowCount()) {
-            return "";
-        }
-        return switch (column) {
-            case COL_FORCE -> campaign.getForce(((CombatTeam) data.get(row)).getForceId());
-            case COL_WEIGHT_CLASS -> WEIGHT_CODES[((CombatTeam) data.get(row)).getWeightClass(campaign)];
-            case COL_CONTRACT -> campaign.getMission(((CombatTeam) data.get(row)).getMissionId());
-            case COL_ROLE -> ((CombatTeam) data.get(row)).getRole();
-            default -> "?";
-        };
-    }
-
-    @Override
-    public void setValueAt(Object value, int row, int col) {
-        if (col == COL_CONTRACT) {
-            ((CombatTeam) data.get(row)).setContract((AtBContract) value);
-        } else if (col == COL_ROLE) {
-            if (value instanceof CombatRole) {
-                ((CombatTeam) data.get(row)).setRole((CombatRole) value);
-            }
-        }
-        fireTableDataChanged();
-    }
-}

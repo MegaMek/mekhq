@@ -71,8 +71,8 @@ import mekhq.utilities.MHQXMLUtility;
 /**
  * A component allowing to display a "paper doll" image, with overlays for body locations.
  */
-public class Paperdoll extends Component {
-    private static final MMLogger logger = MMLogger.create(Paperdoll.class);
+public class PaperDoll extends Component {
+    private static final MMLogger LOGGER = MMLogger.create(PaperDoll.class);
 
     public static final int DEFAULT_WIDTH = 256;
     public static final int DEFAULT_HEIGHT = 768;
@@ -80,17 +80,17 @@ public class Paperdoll extends Component {
     private transient ActionListener listener;
 
     private Image base;
-    private Map<BodyLocation, Path2D> locShapes;
-    private Map<BodyLocation, Color> locColors;
-    private Map<BodyLocation, Map<String, Image>> locOverlays;
-    private Map<BodyLocation, String> locTags;
+    private final Map<BodyLocation, Path2D> locShapes;
+    private final Map<BodyLocation, Color> locColors;
+    private final Map<BodyLocation, Map<String, Image>> locOverlays;
+    private final Map<BodyLocation, String> locTags;
     private Color highlightColor;
 
     private transient BodyLocation hoverLoc;
     private transient double scale;
 
     // TODO: Make this work with any enum, not just BodyLocation
-    public Paperdoll(InputStream is) {
+    public PaperDoll(InputStream is) {
         locShapes = new EnumMap<>(BodyLocation.class);
         locColors = new EnumMap<>(BodyLocation.class);
         locOverlays = new EnumMap<>(BodyLocation.class);
@@ -99,7 +99,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
         highlightColor = null;
@@ -131,7 +131,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch (InterruptedException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);
@@ -264,8 +264,7 @@ public class Paperdoll extends Component {
 
     @Override
     public void processEvent(AWTEvent e) {
-        if (e instanceof MouseEvent) {
-            final MouseEvent event = (MouseEvent) e;
+        if (e instanceof MouseEvent event) {
             if ((event.getID() == MouseEvent.MOUSE_MOVED) || (event.getID() == MouseEvent.MOUSE_ENTERED)) {
                 BodyLocation oldHoverLoc = hoverLoc;
                 hoverLoc = locationUnderPoint(event.getX(), event.getY());
@@ -330,7 +329,7 @@ public class Paperdoll extends Component {
 
     private static class XMLPoint2DAdapter extends XmlAdapter<String, Point2D> {
         @Override
-        public Point2D unmarshal(String v) throws Exception {
+        public Point2D unmarshal(String v) {
             if ((null == v) || v.isEmpty()) {
                 return null;
             }
@@ -347,7 +346,7 @@ public class Paperdoll extends Component {
         }
 
         @Override
-        public String marshal(Point2D v) throws Exception {
+        public String marshal(Point2D v) {
             return (null != v) ? String.format(Locale.ROOT, "%.3f,%.3f", v.getX(), v.getY()) : null;
         }
 

@@ -334,7 +334,7 @@ public class MRMSDialog extends JDialog {
         TableRowSorter<UnitTableModel> unitSorter = new TableRowSorter<>(unitTableModel);
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
-        unitSorter.setComparator(UnitTableModel.COL_RSTATUS, Comparator.naturalOrder());
+        unitSorter.setComparator(UnitTableModel.COL_MODE, Comparator.naturalOrder());
 
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_STATUS, SortOrder.DESCENDING));
@@ -357,7 +357,7 @@ public class MRMSDialog extends JDialog {
             if ((i != UnitTableModel.COL_NAME) &&
                       (i != UnitTableModel.COL_TYPE) &&
                       (i != UnitTableModel.COL_STATUS) &&
-                      (i != UnitTableModel.COL_RSTATUS)) {
+                      (i != UnitTableModel.COL_MODE)) {
                 ((XTableColumnModel) unitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }

@@ -88,7 +88,7 @@ import mekhq.gui.view.PersonViewPanel;
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTab.class);
 
     public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(700);
 
@@ -303,7 +303,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             personnelTable.setName("personnelTable");
             preferences.manage(new JTablePreference(personnelTable));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -420,8 +420,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
-    private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
-    private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
+    private final ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
+    private final ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {

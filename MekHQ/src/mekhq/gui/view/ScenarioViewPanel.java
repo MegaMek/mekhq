@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,11 +78,9 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ScenarioViewPanel extends JScrollablePanel {
-    private JFrame frame;
 
-    private Scenario scenario;
-    private Campaign campaign;
-    private ForceStub forces;
+    private final Scenario scenario;
+    private final Campaign campaign;
     private List<BotForceStub> botStubs;
 
     private JPanel pnlInfo;
@@ -93,28 +91,28 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JPanel pnlForces;
     private JPanel pnlOtherForces;
     private JPanel pnlReport;
-    private JTextPane txtDesc;
 
-    private StubTreeModel forceModel;
+    private final StubTreeModel forceModel;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
+    public ScenarioViewPanel(JFrame frame, Campaign campaign, Scenario scenario) {
         super();
-        this.frame = f;
-        this.scenario = s;
-        this.campaign = c;
-        this.forces = s.getStatus().isCurrent() ? new ForceStub(s.getForces(c), c) : s.getForceStub();
+        this.scenario = scenario;
+        this.campaign = campaign;
+        ForceStub forces = scenario.getStatus().isCurrent() ?
+                                 new ForceStub(scenario.getForces(campaign), campaign) :
+                                 scenario.getForceStub();
         forceModel = new StubTreeModel(forces);
 
         botStubs = new ArrayList<>();
-        if (s.getStatus().isCurrent()) {
-            for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.getBotForce(i).generateStub(campaign));
+        if (scenario.getStatus().isCurrent()) {
+            for (int i = 0; i < scenario.getNumBots(); i++) {
+                botStubs.add(scenario.getBotForce(i).generateStub(this.campaign));
             }
         } else {
-            botStubs = s.getBotForcesStubs();
+            botStubs = scenario.getBotForcesStubs();
         }
 
         initComponents();
@@ -182,7 +180,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlInfo.add(lblStatus, BorderLayout.PAGE_START);
 
         if (null != scenario.getDescription() && !scenario.getDescription().isEmpty()) {
-            txtDesc = new JTextPane();
+            JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
@@ -551,8 +549,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class StubTreeModel implements TreeModel {
-        private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<>();
+        private final ForceStub rootForce;
+        private final Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;

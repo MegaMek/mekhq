@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -111,7 +111,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 public class MekLabTab extends CampaignGuiTab {
-    private static final MMLogger logger = MMLogger.create(MekLabTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(MekLabTab.class);
     protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekLabTab");
 
     CampaignGUI campaignGUI;
@@ -126,30 +126,26 @@ public class MekLabTab extends CampaignGuiTab {
     private JPanel summaryPane;
     private JLabel lblName;
 
-    private JPanel refitPanel;
     private JLabel lblRefit;
     private JLabel lblTime;
     private JLabel lblCost;
 
     private JButton btnRefit;
     private JButton btnSaveForLater;
-    private JButton btnClear;
-    private JButton btnRemove;
 
-    private JPanel statPanel;
     private JLabel lblMove;
     private JLabel lblBV;
     private JLabel lblHeat;
     private JLabel lblTons;
 
     private JPanel shoppingPanel;
-    private MegaMekLabFileSaver fileSaver;
+    private final MegaMekLabFileSaver fileSaver;
 
     // region Constructors
     public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
-        this.fileSaver = new MegaMekLabFileSaver(logger, resources.getString("dialog.saveAs.title"));
+        this.fileSaver = new MegaMekLabFileSaver(LOGGER, resources.getString("dialog.saveAs.title"));
         this.repaint();
     }
     // endregion Constructors
@@ -161,7 +157,7 @@ public class MekLabTab extends CampaignGuiTab {
         // path
         CConfig.load();
         UnitUtil.loadFonts();
-        logger.info("Starting MegaMekLab version: " + MMLConstants.VERSION);
+        LOGGER.info("Starting MegaMekLab version: {}", MMLConstants.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -184,9 +180,9 @@ public class MekLabTab extends CampaignGuiTab {
             MekSummaryCache.refreshUnitData(false);
         });
 
-        btnClear = new JButton("Clear Changes");
+        JButton btnClear = new JButton("Clear Changes");
         btnClear.addActionListener(evt -> resetUnit());
-        btnRemove = new JButton("Remove from Lab");
+        JButton btnRemove = new JButton("Remove from Lab");
         btnRemove.addActionListener(evt -> clearUnit());
 
         setLayout(new BorderLayout());
@@ -196,7 +192,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         summaryPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        refitPanel = new JPanel();
+        JPanel refitPanel = new JPanel();
         refitPanel.setLayout(new BoxLayout(refitPanel, BoxLayout.PAGE_AXIS));
         refitPanel.setBorder(BorderFactory.createTitledBorder("Refit Statistics"));
 
@@ -207,7 +203,7 @@ public class MekLabTab extends CampaignGuiTab {
         refitPanel.add(lblTime);
         refitPanel.add(lblCost);
 
-        statPanel = new JPanel();
+        JPanel statPanel = new JPanel();
         statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
         statPanel.setBorder(BorderFactory.createTitledBorder("Unit Statistics"));
         lblMove = new JLabel();
@@ -271,7 +267,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -288,11 +284,13 @@ public class MekLabTab extends CampaignGuiTab {
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         labPanel = getCorrectLab(entity);
-        labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
-        refreshRefitSummary();
-        add(summaryPane, BorderLayout.LINE_START);
-        add(labPanel, BorderLayout.CENTER);
-        labPanel.refreshAll();
+        if (labPanel != null) {
+            labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
+            refreshRefitSummary();
+            add(summaryPane, BorderLayout.LINE_START);
+            add(labPanel, BorderLayout.CENTER);
+            labPanel.refreshAll();
+        }
     }
 
     public void clearUnit() {
@@ -306,9 +304,7 @@ public class MekLabTab extends CampaignGuiTab {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
 
         if (mekSummary == null) {
-            logger.error(String.format(
-                  "Cannot reset unit %s as it cannot be found in the cache.",
-                  unit.getEntity().getDisplayName()));
+            LOGGER.error("Cannot reset unit {} as it cannot be found in the cache.", unit.getEntity().getDisplayName());
             return;
         }
 
@@ -316,7 +312,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName()).getEntity();
         } catch (EntityLoadingException ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -388,10 +384,10 @@ public class MekLabTab extends CampaignGuiTab {
             // } else if (entity.getWeight() > testEntity.calculateWeight()) {
             // Taharqa: We are now going to allow users to build underweight
             // units, we will just give
-            // them an are you sure warning pop up
+            // them and are you sure warning pop up
             // btnRefit.setEnabled(false);
             // btnRefit.setToolTipText("Unit is underweight.");
-        } else if (sb.length() > 0) {
+        } else if (!sb.isEmpty()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText(sb.toString());
             btnSaveForLater.setEnabled(true);
@@ -481,8 +477,8 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         for (Mounted<?> mounted : entity.getWeaponList()) {
-            WeaponType wtype = (WeaponType) mounted.getType();
-            double weaponHeat = wtype.getHeat();
+            WeaponType weaponType = (WeaponType) mounted.getType();
+            double weaponHeat = weaponType.getHeat();
 
             // only count non-damaged equipment
             if (mounted.isMissing() || mounted.isHit() || mounted.isDestroyed() || mounted.isBreached()) {
@@ -490,25 +486,25 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // one shot weapons count 1/4
-            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) ||
-                      wtype.hasFlag(WeaponType.F_ONE_SHOT)) {
+            if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) ||
+                      weaponType.hasFlag(WeaponType.F_ONE_SHOT)) {
                 weaponHeat *= 0.25;
             }
 
             // double heat for ultras
-            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) ||
-                      (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
+            if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) ||
+                      (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
                 weaponHeat *= 2;
             }
 
             // Six times heat for RAC
-            if (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ROTARY) {
+            if (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ROTARY) {
                 weaponHeat *= 6;
             }
 
             // half heat for streaks
-            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
-                      || (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_STREAK)) {
+            if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
+                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_STREAK)) {
                 weaponHeat *= 0.5;
             }
             heat += weaponHeat;

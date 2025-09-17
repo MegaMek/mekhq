@@ -31,7 +31,7 @@
  * affiliated with Microsoft.
  */
 
-package mekhq.gui.stratcon;
+package mekhq.gui.stratCon;
 
 import java.util.ArrayList;
 import java.util.Collection;

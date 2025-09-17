@@ -54,37 +54,19 @@ public class PrisonerStatusSorter implements Comparator<PrisonerStatus> {
 
         int o1Order, o2Order;
 
-        switch (o1) {
-            case FREE:
-                o1Order = 0;
-                break;
-            case PRISONER_DEFECTOR:
-                o1Order = 1;
-                break;
-            case PRISONER:
-                o1Order = 2;
-                break;
-            case BONDSMAN:
-            default:
-                o1Order = 3;
-                break;
-        }
+        o1Order = switch (o1) {
+            case FREE -> 0;
+            case PRISONER_DEFECTOR -> 1;
+            case PRISONER -> 2;
+            default -> 3;
+        };
 
-        switch (o2) {
-            case FREE:
-                o2Order = 0;
-                break;
-            case PRISONER_DEFECTOR:
-                o2Order = 1;
-                break;
-            case PRISONER:
-                o2Order = 2;
-                break;
-            case BONDSMAN:
-            default:
-                o2Order = 3;
-                break;
-        }
+        o2Order = switch (o2) {
+            case FREE -> 0;
+            case PRISONER_DEFECTOR -> 1;
+            case PRISONER -> 2;
+            default -> 3;
+        };
 
         return o2Order - o1Order;
     }

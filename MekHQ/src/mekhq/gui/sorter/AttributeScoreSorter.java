@@ -46,7 +46,7 @@ import megamek.logging.MMLogger;
  * {@link mekhq.gui.enums.PersonnelTableModelColumn}.</p>
  */
 public class AttributeScoreSorter implements Comparator<String> {
-    private static final MMLogger logger = MMLogger.create(AttributeScoreSorter.class);
+    private static final MMLogger LOGGER = MMLogger.create(AttributeScoreSorter.class);
 
     private final String DIVIDER_STRING = " / ";
 
@@ -89,7 +89,7 @@ public class AttributeScoreSorter implements Comparator<String> {
             return result;
             // This means the strings are malformed and can't be split into two parts using the divider
         } catch (ArrayIndexOutOfBoundsException e) {
-            logger.error("Error parsing attribute score string: {} or {}", firstString, secondString);
+            LOGGER.error("Error parsing attribute score string: {} or {}", firstString, secondString);
 
             return 1; // By default, malformed strings go last
         }

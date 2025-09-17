@@ -79,11 +79,8 @@ import mekhq.gui.view.UnitViewPanel;
  */
 public final class TOETab extends CampaignGuiTab {
     private JTree orgTree;
-    private JSplitPane splitOrg;
     private JPanel panForceView;
     private JTabbedPane tabUnit;
-
-    private OrgTreeModel orgModel;
 
     private int tabUnitLastSelectedIndex;
 
@@ -134,7 +131,7 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.setPreferredSize(dimension);
         panForceView.setLayout(new BorderLayout());
 
-        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, panForceView);
+        JSplitPane splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
         splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> refreshForceView());
@@ -174,55 +171,36 @@ public final class TOETab extends CampaignGuiTab {
         if (null == node || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
             return;
         }
-        if (node instanceof Unit) {
-            Unit u = ((Unit) node);
+        if (node instanceof Unit unit) {
             tabUnit = new JTabbedPane();
-            int crewSize = u.getCrew().size();
+            int crewSize = unit.getCrew().size();
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
-                crewPanel.getAccessibleContext().setAccessibleName("Crew for " + u.getName());
+                crewPanel.getAccessibleContext().setAccessibleName("Crew for " + unit.getName());
                 final JScrollPane scrollPerson = new JScrollPaneWithSpeed();
                 scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
-                model.setData(u);
+                model.setData(unit);
                 /* For units with multiple crew members, present a horizontal list above the PersonViewPanel.
                  * This custom version of JList was the only way I could figure out how to limit the JList
                  * to a single row with a horizontal scrollbar.
                  */
-                final JList<Person> crewList = new JList<>(model) {
-                    @Override
-                    public Dimension getPreferredScrollableViewportSize() {
-                        Dimension d = super.getPreferredScrollableViewportSize();
-                        d.width = scrollPerson.getPreferredSize().width;
-                        return d;
-                    }
-                };
-                crewList.setCellRenderer(model.getRenderer());
-                crewList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-                crewList.setVisibleRowCount(1);
-                crewList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                crewList.addListSelectionListener(e -> {
-                    if (null != model.getElementAt(crewList.getSelectedIndex())) {
-                        scrollPerson.setViewportView(new PersonViewPanel(model.getElementAt(crewList.getSelectedIndex()),
-                              getCampaign(), getCampaignGui()));
-                    }
-                });
-                crewList.setSelectedIndex(0);
+                final JList<Person> crewList = getCrewList(model, scrollPerson);
                 if (crewSize > 1) {
                     JScrollPaneWithSpeed crewScrollPane = new JScrollPaneWithSpeed(crewList);
                     crewScrollPane.setBorder(null);
                     crewPanel.add(crewScrollPane, BorderLayout.NORTH);
                 }
                 String name = "Crew";
-                if (u.usesSoloPilot()) {
+                if (unit.usesSoloPilot()) {
                     name = "Pilot";
                 }
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
                 SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
-            final JScrollPane scrollUnit = new JScrollPaneWithSpeed(new UnitViewPanel(u, getCampaign()));
+            final JScrollPane scrollUnit = new JScrollPaneWithSpeed(new UnitViewPanel(unit, getCampaign()));
             scrollUnit.setBorder(null);
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
@@ -243,7 +221,30 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.updateUI();
     }
 
-    private ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
+    private JList<Person> getCrewList(CrewListModel model, JScrollPane scrollPerson) {
+        final JList<Person> crewList = new JList<>(model) {
+            @Override
+            public Dimension getPreferredScrollableViewportSize() {
+                Dimension d = super.getPreferredScrollableViewportSize();
+                d.width = scrollPerson.getPreferredSize().width;
+                return d;
+            }
+        };
+        crewList.setCellRenderer(model.getRenderer());
+        crewList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        crewList.setVisibleRowCount(1);
+        crewList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        crewList.addListSelectionListener(e -> {
+            if (null != model.getElementAt(crewList.getSelectedIndex())) {
+                scrollPerson.setViewportView(new PersonViewPanel(model.getElementAt(crewList.getSelectedIndex()),
+                      getCampaign(), getCampaignGui()));
+            }
+        });
+        crewList.setSelectedIndex(0);
+        return crewList;
+    }
+
+    private final ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {

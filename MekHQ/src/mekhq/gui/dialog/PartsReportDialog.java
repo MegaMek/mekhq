@@ -136,13 +136,13 @@ public class PartsReportDialog extends JDialog {
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL_BULK, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GM_ADD, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GM_ADD_BULK, false);
         // Numeric columns
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_REQUSTED_STOCK, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_REQUESTED_STOCK, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
         // Default starting sort
@@ -273,9 +273,9 @@ public class PartsReportDialog extends JDialog {
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sell, PartsInUseTableModel.COL_BUTTON_SELL);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sellInBulk,
               PartsInUseTableModel.COL_BUTTON_SELL_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GMADD);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GM_ADD);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
-              PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
+              PartsInUseTableModel.COL_BUTTON_GM_ADD_BULK);
 
 
         JScrollPane tableScroll = new JScrollPaneWithSpeed(overviewPartsInUseTable);
@@ -416,10 +416,10 @@ public class PartsReportDialog extends JDialog {
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
                                                                                              .getColumn(
-                                                                                                   PartsInUseTableModel.COL_BUTTON_GMADD)
+                                                                                                   PartsInUseTableModel.COL_BUTTON_GM_ADD)
                                                                                              .getCellRenderer();
         column.setEnabled(campaign.isGM());
-        column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK)
+        column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GM_ADD_BULK)
                                                            .getCellRenderer();
         column.setEnabled(campaign.isGM());
         topUpGMButton.setEnabled(campaign.isGM());

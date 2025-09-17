@@ -47,8 +47,8 @@ import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
-import megamek.common.units.Entity;
 import megamek.common.TechConstants;
+import megamek.common.units.Entity;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -64,25 +64,11 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitViewPanel extends JScrollablePanel {
-    private Unit unit;
-    private Entity entity;
-    private Campaign campaign;
+    private final Unit unit;
+    private final Entity entity;
+    private final Campaign campaign;
 
-    private JLabel lblImage;
-    private JTextPane txtReadout;
-    private JTextPane txtFluff;
     private JPanel pnlStats;
-    private JLabel lblType;
-    private JLabel lblTech;
-    private JLabel txtTech;
-    private JLabel lblTonnage;
-    private JLabel txtTonnage;
-    private JLabel lblBV;
-    private JLabel txtBV;
-    private JLabel lblCost;
-    private JLabel txtCost;
-    private JLabel lblQuirk;
-    private JLabel txtQuirk;
 
     public UnitViewPanel(Unit u, Campaign c) {
         super();
@@ -95,8 +81,8 @@ public class UnitViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
-        txtReadout = new JTextPane();
-        txtFluff = new JTextPane();
+        JTextPane txtReadout = new JTextPane();
+        JTextPane txtFluff = new JTextPane();
         pnlStats = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
@@ -106,6 +92,7 @@ public class UnitViewPanel extends JScrollablePanel {
 
         int compWidth = 1;
         Image image = FluffImageHelper.getFluffImage(entity);
+        JLabel lblImage;
         if (null != image) {
             // fluff image exists so use custom ImgLabel to get full mek porn
             lblImage = new ImgLabel(image);
@@ -151,15 +138,15 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        EntityReadout mview = EntityReadout.createReadout(entity, false, true);
+        EntityReadout entityReadout = EntityReadout.createReadout(entity, false, true);
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
         txtReadout.setText("<div style='font: 12pt monospaced'>" +
-                                 mview.getBasicSection(ViewFormatting.HTML) +
+                                 entityReadout.getBasicSection(ViewFormatting.HTML) +
                                  "<br>" +
-                                 mview.getLoadoutSection(ViewFormatting.HTML) +
+                                 entityReadout.getLoadoutSection(ViewFormatting.HTML) +
                                  "</div>");
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
@@ -195,17 +182,17 @@ public class UnitViewPanel extends JScrollablePanel {
     }
 
     private void fillStats(ResourceBundle resourceMap) {
-        lblType = new JLabel();
-        lblTech = new JLabel();
-        txtTech = new JLabel();
-        lblTonnage = new JLabel();
-        txtTonnage = new JLabel();
-        lblBV = new JLabel();
-        txtBV = new JLabel();
-        lblCost = new JLabel();
-        txtCost = new JLabel();
-        lblQuirk = new JLabel();
-        txtQuirk = new JLabel();
+        JLabel lblType = new JLabel();
+        JLabel lblTech = new JLabel();
+        JLabel txtTech = new JLabel();
+        JLabel lblTonnage = new JLabel();
+        JLabel txtTonnage = new JLabel();
+        JLabel lblBV = new JLabel();
+        JLabel txtBV = new JLabel();
+        JLabel lblCost = new JLabel();
+        JLabel txtCost = new JLabel();
+        JLabel lblQuirk = new JLabel();
+        JLabel txtQuirk = new JLabel();
 
         pnlStats.setLayout(new GridBagLayout());
 

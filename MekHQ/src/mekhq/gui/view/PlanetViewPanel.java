@@ -71,11 +71,11 @@ import org.apache.commons.lang3.StringUtils;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PlanetViewPanel extends JScrollablePanel {
-    private PlanetarySystem system;
-    private Campaign campaign;
-    private int planetPos;
+    private final PlanetarySystem system;
+    private final Campaign campaign;
+    private final int planetPos;
 
-    private Image planetIcon = null;
+    private final Image planetIcon = null;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
           MekHQ.getMHQOptions().getLocale());

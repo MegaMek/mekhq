@@ -54,11 +54,11 @@ import mekhq.campaign.market.unitMarket.UnitMarketOffer;
  *
  * @author Neoancient
  */
-public class UnitMarketTableModel extends DataTableModel {
+public class UnitMarketTableModel extends DataTableModel<UnitMarketOffer> {
     //region Variable Declarations
     public static final int COL_MARKET = 0;
-    public static final int COL_UNITTYPE = 1;
-    public static final int COL_WEIGHTCLASS = 2;
+    public static final int COL_UNIT_TYPE = 1;
+    public static final int COL_WEIGHT_CLASS = 2;
     public static final int COL_UNIT = 3;
     public static final int COL_PRICE = 4;
     public static final int COL_PERCENT = 5;
@@ -77,35 +77,21 @@ public class UnitMarketTableModel extends DataTableModel {
     //endregion Constructors
 
     public int getColumnWidth(final int column) {
-        switch (column) {
-            case COL_MARKET:
-            case COL_PRICE:
-                return 90;
-            case COL_UNITTYPE:
-                return 15;
-            case COL_UNIT:
-                return 175;
-            case COL_WEIGHTCLASS:
-                return 50;
-            default:
-                return 20;
-        }
+        return switch (column) {
+            case COL_MARKET, COL_PRICE -> 90;
+            case COL_UNIT_TYPE -> 15;
+            case COL_UNIT -> 175;
+            case COL_WEIGHT_CLASS -> 50;
+            default -> 20;
+        };
     }
 
     public int getAlignment(final int column) {
-        switch (column) {
-            case COL_PRICE:
-            case COL_PERCENT:
-            case COL_DELIVERY:
-                return SwingConstants.RIGHT;
-            case COL_MARKET:
-            case COL_UNITTYPE:
-            case COL_WEIGHTCLASS:
-            case COL_UNIT:
-                return SwingConstants.LEFT;
-            default:
-                return SwingConstants.CENTER;
-        }
+        return switch (column) {
+            case COL_PRICE, COL_PERCENT, COL_DELIVERY -> SwingConstants.RIGHT;
+            case COL_MARKET, COL_UNIT_TYPE, COL_WEIGHT_CLASS, COL_UNIT -> SwingConstants.LEFT;
+            default -> SwingConstants.CENTER;
+        };
     }
 
     public Optional<UnitMarketOffer> getOffer(final int row) {
@@ -119,25 +105,17 @@ public class UnitMarketTableModel extends DataTableModel {
     }
 
     private Object getValueFor(final UnitMarketOffer offer, final int column) {
-        switch (column) {
-            case COL_MARKET:
-                return offer.getMarketType();
-            case COL_UNITTYPE:
-                return UnitType.getTypeName(offer.getUnitType());
-            case COL_WEIGHTCLASS:
-                return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
-                      offer.getUnit().getUnitType(), offer.getUnit().isSupport());
-            case COL_UNIT:
-                return offer.getUnit().getName();
-            case COL_PRICE:
-                return offer.getPrice().toAmountAndSymbolString();
-            case COL_PERCENT:
-                return offer.getPercent() + "%";
-            case COL_DELIVERY:
-                return offer.getTransitDuration();
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_MARKET -> offer.getMarketType();
+            case COL_UNIT_TYPE -> UnitType.getTypeName(offer.getUnitType());
+            case COL_WEIGHT_CLASS -> EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
+                  offer.getUnit().getUnitType(), offer.getUnit().isSupport());
+            case COL_UNIT -> offer.getUnit().getName();
+            case COL_PRICE -> offer.getPrice().toAmountAndSymbolString();
+            case COL_PERCENT -> offer.getPercent() + "%";
+            case COL_DELIVERY -> offer.getTransitDuration();
+            default -> "?";
+        };
     }
 
     public TableCellRenderer getRenderer() {

@@ -38,7 +38,6 @@ import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyArc.StoryArc;
@@ -48,7 +47,6 @@ import mekhq.gui.utilities.MarkdownRenderer;
 public class StoryChoicePanel extends AbstractMHQPanel {
 
     JLabel lblChoice;
-    JTextPane txtChoice;
 
     public StoryChoicePanel(final JFrame frame) {
         super(frame, "StoryChoicePanel");
@@ -59,8 +57,6 @@ public class StoryChoicePanel extends AbstractMHQPanel {
     protected void initialize() {
         setLayout(new GridLayout(0, 1));
         lblChoice = new JLabel();
-        // txtChoice.setEditable(false);
-        // txtChoice.setContentType("text/html");
         lblChoice.setText("");
         add(lblChoice);
     }

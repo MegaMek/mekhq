@@ -59,6 +59,7 @@ import javax.swing.SwingUtilities;
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -76,7 +77,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
-    private Mission mission;
+    private final Mission mission;
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
@@ -108,26 +109,6 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtSalvageValueMerc;
     private JLabel lblSalvageValueEmployer;
     private JLabel txtSalvageValueEmployer;
-    private JLabel lblSalvagePct1;
-    private JLabel lblSalvagePct2;
-
-    /* AtB Contract Parameters */
-    private JLabel lblEnemy;
-    private JLabel txtEnemy;
-    private JLabel lblAllyRating;
-    private JLabel txtAllyRating;
-    private JLabel lblEnemyRating;
-    private JLabel txtEnemyRating;
-    private JLabel lblSalvagePct;
-    private JLabel txtSalvagePct;
-    private JLabel lblMorale;
-    private JLabel txtMorale;
-    private JLabel lblScore;
-    private JLabel txtScore;
-    private JLabel lblSharePct;
-    private JLabel txtSharePct;
-    private JLabel lblCargoRequirement;
-    private JLabel txtCargoRequirement;
 
     protected JTable scenarioTable;
 
@@ -552,8 +533,8 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
             i++;
         }
-        lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
-        lblSalvagePct2 = new JLabel();
+        JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
+        JLabel lblSalvagePct2 = new JLabel();
 
         if (contract.isSalvageExchange()) {
             lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)");
@@ -563,15 +544,7 @@ public class MissionViewPanel extends JScrollablePanel {
             lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));
             int maxSalvagePct = contract.getSalvagePct();
 
-            int currentSalvagePct = 0;
-            if (contract.getSalvagedByUnit().plus(contract.getSalvagedByUnit()).isPositive()) {
-                currentSalvagePct = contract.getSalvagedByUnit()
-                                          .multipliedBy(100)
-                                          .dividedBy(contract.getSalvagedByUnit()
-                                                           .plus(contract.getSalvagedByEmployer()))
-                                          .getAmount()
-                                          .intValue();
-            }
+            int currentSalvagePct = getCurrentSalvagePct(contract, contract.getSalvagedByUnit());
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
@@ -616,6 +589,18 @@ public class MissionViewPanel extends JScrollablePanel {
 
     }
 
+    private static int getCurrentSalvagePct(Contract contract, Money contract1) {
+        int currentSalvagePct = 0;
+        if (contract.getSalvagedByUnit().plus(contract1).isPositive()) {
+            currentSalvagePct = contract.getSalvagedByUnit()
+                                      .multipliedBy(100)
+                                      .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
+                                      .getAmount()
+                                      .intValue();
+        }
+        return currentSalvagePct;
+    }
+
     private void fillStatsAtBContract() {
         AtBContract contract = (AtBContract) mission;
         Campaign campaign = gui.getCampaign();
@@ -627,8 +612,9 @@ public class MissionViewPanel extends JScrollablePanel {
         txtLocation = new JLabel();
         lblEmployer = new JLabel();
         txtEmployer = new JLabel();
-        lblEnemy = new JLabel();
-        txtEnemy = new JLabel();
+        /* AtB Contract Parameters */
+        JLabel lblEnemy = new JLabel();
+        JLabel txtEnemy = new JLabel();
         lblType = new JLabel();
         txtType = new JLabel();
         lblStartDate = new JLabel();
@@ -641,18 +627,18 @@ public class MissionViewPanel extends JScrollablePanel {
         txtCommand = new JLabel();
         lblBLC = new JLabel();
         txtBLC = new JLabel();
-        lblAllyRating = new JLabel();
-        txtAllyRating = new JLabel();
-        lblEnemyRating = new JLabel();
-        txtEnemyRating = new JLabel();
-        lblMorale = new JLabel();
-        txtMorale = new JLabel();
-        lblSharePct = new JLabel();
-        txtSharePct = new JLabel();
-        lblCargoRequirement = new JLabel();
-        txtCargoRequirement = new JLabel();
-        lblScore = new JLabel();
-        txtScore = new JLabel();
+        JLabel lblAllyRating = new JLabel();
+        JLabel txtAllyRating = new JLabel();
+        JLabel lblEnemyRating = new JLabel();
+        JLabel txtEnemyRating = new JLabel();
+        JLabel lblMorale = new JLabel();
+        JLabel txtMorale = new JLabel();
+        JLabel lblSharePct = new JLabel();
+        JLabel txtSharePct = new JLabel();
+        JLabel lblCargoRequirement = new JLabel();
+        JLabel txtCargoRequirement = new JLabel();
+        JLabel lblScore = new JLabel();
+        JLabel txtScore = new JLabel();
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -955,8 +941,8 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
         }
-        lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
-        txtSalvagePct = new JLabel();
+        JLabel lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
+        JLabel txtSalvagePct = new JLabel();
         txtSalvagePct.setName("txtSalvagePct");
 
         if (contract.isSalvageExchange()) {
@@ -967,15 +953,7 @@ public class MissionViewPanel extends JScrollablePanel {
             lblSalvagePct.setText(resourceMap.getString("lblSalvagePct.text"));
             int maxSalvagePct = contract.getSalvagePct();
 
-            int currentSalvagePct = 0;
-            if (contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).isPositive()) {
-                currentSalvagePct = contract.getSalvagedByUnit()
-                                          .multipliedBy(100)
-                                          .dividedBy(contract.getSalvagedByUnit()
-                                                           .plus(contract.getSalvagedByEmployer()))
-                                          .getAmount()
-                                          .intValue();
-            }
+            int currentSalvagePct = getCurrentSalvagePct(contract, contract.getSalvagedByEmployer());
 
             txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");
         }
@@ -1103,7 +1081,7 @@ public class MissionViewPanel extends JScrollablePanel {
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;

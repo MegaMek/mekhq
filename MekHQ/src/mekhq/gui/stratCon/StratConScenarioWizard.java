@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.stratcon;
+package mekhq.gui.stratCon;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
@@ -72,7 +72,6 @@ import javax.swing.event.ListSelectionListener;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.rolls.TargetRoll;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
@@ -86,7 +85,7 @@ import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.StratconPanel;
+import mekhq.gui.StratConPanel;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
@@ -97,7 +96,7 @@ import org.apache.commons.math3.util.Pair;
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
-public class StratconScenarioWizard extends JDialog {
+public class StratConScenarioWizard extends JDialog {
     private StratConScenario currentScenario;
     private final Campaign campaign;
     private StratConTrackState currentTrackState;
@@ -120,20 +119,17 @@ public class StratconScenarioWizard extends JDialog {
 
     private JPanel contentPanel;
     private JButton btnCommit;
-    private JButton btnCancel;
 
-    private static final MMLogger logger = MMLogger.create(StratconScenarioWizard.class);
+    private final StratConPanel parent;
 
-    private final StratconPanel parent;
-
-    public StratconScenarioWizard(Campaign campaign, StratconPanel parent) {
+    public StratConScenarioWizard(Campaign campaign, StratConPanel parent) {
         this.campaign = campaign;
         this.parent = parent;
         this.setModalityType(ModalityType.APPLICATION_MODAL);
     }
 
     /**
-     * Configures and sets the current Stratcon scenario, updating the associated track and campaign states as well as
+     * Configures and sets the current StratCon scenario, updating the associated track and campaign states as well as
      * preparing the available forces and units for the scenario.
      *
      * @param scenario       the {@link StratConScenario} to be set as the current scenario.
@@ -403,7 +399,7 @@ public class StratconScenarioWizard extends JDialog {
                 availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 // Add a listener to handle changes to the selected force
                 availableForceList.addListSelectionListener(e -> {
-                    availableForceSelectorChanged(e, selectedForceInfo, isPrimaryForce);
+                    availableForceSelectorChanged(e, selectedForceInfo, false);
                     btnCommit.setEnabled(true);
                 });
 
@@ -598,7 +594,7 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that builds an "html-enabled" string indicating the brief status of a force
+     * Worker function that builds a "html-enabled" string indicating the brief status of a force
      */
     private String buildForceStatus(Force f, boolean hideForceCost) {
         StringBuilder sb = new StringBuilder();
@@ -619,7 +615,7 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that builds an "html-enabled" string indicating the brief status of an individual unit
+     * Worker function that builds a "html-enabled" string indicating the brief status of an individual unit
      */
     private String buildUnitStatus(Unit u) {
         StringBuilder sb = new StringBuilder();
@@ -714,7 +710,7 @@ public class StratconScenarioWizard extends JDialog {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
 
-        btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
+        JButton btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
         btnCancel.setActionCommand("CANCEL_CLICK");
         btnCancel.addActionListener(evt -> {
             wasCanceled = true;
@@ -747,7 +743,7 @@ public class StratconScenarioWizard extends JDialog {
             contentPanel.add(new JLabel(instructions), constraints);
         }
 
-        // Allign and add cancel button to the content panel
+        // Align and add cancel button to the content panel
         constraints.gridy++;
         constraints.gridheight = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.WEST;
@@ -935,39 +931,50 @@ public class StratconScenarioWizard extends JDialog {
      * method updates the provided status label to display detailed information about the selected forces and refreshes
      * the UI to reflect the changes.
      *
-     * @param e                the {@link ListSelectionEvent} representing the user's selection action. This event
-     *                         contains the source list and the selection details.
-     * @param forceStatusLabel the {@link JLabel} used to display the status of the selected forces.
-     * @param isPrimaryForce   a boolean flag indicating whether the selected forces are part of the primary force:
-     *                                                <ul>
-     *                                                  <li>{@code true}: Displays details relevant to the primary force (e.g., leadership, roles).</li>
-     *                                                  <li>{@code false}: Displays details relevant to reinforcement forces (e.g., support point requirements).</li>
-     *                                                </ul>
+     * @param listSelectionEvent the {@link ListSelectionEvent} representing the user's selection action. This event
+     *                           contains the source list and the selection details.
+     * @param forceStatusLabel   the {@link JLabel} used to display the status of the selected forces.
+     * @param isPrimaryForce     a boolean flag indicating whether the selected forces are part of the primary force:
+     *                                                  <ul>
+     *                                                    <li>{@code true}: Displays details relevant to the primary force (listSelectionEvent.g., leadership, roles).</li>
+     *                                                    <li>{@code false}: Displays details relevant to reinforcement forces (listSelectionEvent.g., support point requirements).</li>
+     *                                                  </ul>
      *
-     *                         <p>Behavior and Process:</p>
-     *                         <ul>
-     *                           <li>Verifies that the event source is a {@link JList}. If the source is not a {@code JList}, the method returns immediately.</li>
-     *                           <li>Retrieves the list of selected forces from the {@code JList}.</li>
-     *                           <li>Builds an HTML-formatted string with status details for each selected force using the
-     *                               {@link #buildForceStatus(Force, boolean)} method.</li>
-     *                           <li>Updates the provided status label with the constructed HTML string, effectively updating the displayed information.</li>
-     *                           <li>Refreshes the UI by calling {@link #pack()} to ensure the dialog adjusts properly to any layout changes.</li>
-     *                         </ul>
+     *                           <p>Behavior and Process:</p>
+     *                           <ul>
+     *                             <li>Verifies that the event source is a {@link JList}. If the source is not a {@code JList}, the method returns immediately.</li>
+     *                             <li>Retrieves the list of selected forces from the {@code JList}.</li>
+     *                             <li>Builds an HTML-formatted string with status details for each selected force using the
+     *                                 {@link #buildForceStatus(Force, boolean)} method.</li>
+     *                             <li>Updates the provided status label with the constructed HTML string, effectively updating the displayed information.</li>
+     *                             <li>Refreshes the UI by calling {@link #pack()} to ensure the dialog adjusts properly to any layout changes.</li>
+     *                           </ul>
      *
-     *                         <p>Roles and Responsibilities:</p>
-     *                         <ul>
-     *                           <li>Processes the user's selection of forces in the UI and dynamically updates the status display accordingly.</li>
-     *                           <li>Ensures that the appropriate details (based on whether the forces are primary or reinforcements) are shown in the UI.</li>
-     *                           <li>Maintains a responsive UI by packing the dialog after the update, adjusting its layout if necessary.</li>
-     *                         </ul>
+     *                           <p>Roles and Responsibilities:</p>
+     *                           <ul>
+     *                             <li>Processes the user's selection of forces in the UI and dynamically updates the status display accordingly.</li>
+     *                             <li>Ensures that the appropriate details (based on whether the forces are primary or reinforcements) are shown in the UI.</li>
+     *                             <li>Maintains a responsive UI by packing the dialog after the update, adjusting its layout if necessary.</li>
+     *                           </ul>
      */
-    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean isPrimaryForce) {
-        if (!(e.getSource() instanceof JList<?>)) {
+    private void availableForceSelectorChanged(ListSelectionEvent listSelectionEvent, JLabel forceStatusLabel,
+          boolean isPrimaryForce) {
+        Object source = listSelectionEvent.getSource();
+        Vector<Force> forceList = new Vector<>();
+
+        if (source instanceof JList<?> objectList) {
+            for (Object item : objectList.getSelectedValuesList()) {
+                if (item instanceof Force force) {
+                    forceList.add(force);
+                }
+            }
+        }
+
+        if (forceList.isEmpty()) {
             return;
         }
 
-        JList<Force> sourceList = (JList<Force>) e.getSource();
-
+        JList<Force> sourceList = new JList<>(forceList);
         StringBuilder statusBuilder = new StringBuilder();
         statusBuilder.append("<html>");
 
@@ -995,11 +1002,23 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel,
           JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
-        if (!(event.getSource() instanceof JList<?>)) {
+        Object source = event.getSource();
+        Vector<Unit> unitVector = new Vector<>();
+
+        if (source instanceof JList<?> objectList) {
+            for (Object item : objectList.getSelectedValuesList()) {
+                if (item instanceof Unit unit) {
+                    unitVector.add(unit);
+                }
+            }
+        }
+
+        if (unitVector.isEmpty()) {
             return;
         }
 
-        JList<Unit> changedList = (JList<Unit>) event.getSource();
+        JList<Unit> changedList = new JList<>(unitVector);
+
         ListSelectionListener[] listeners = (((JList<?>) event.getSource()).getListSelectionListeners());
         ((JList<?>) event.getSource()).removeListSelectionListener(listeners[0]);
 
@@ -1094,8 +1113,6 @@ public class StratconScenarioWizard extends JDialog {
     /**
      * Worker function that de-selects duplicate units.
      *
-     * @param listToProcess
-     * @param selectedUnits
      */
     private void unselectDuplicateUnits(JList<Unit> listToProcess, List<Unit> selectedUnits) {
         for (Unit selectedUnit : selectedUnits) {

@@ -42,7 +42,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 public class PersonTitleStringSorter implements Comparator<String> {
-    private static final MMLogger logger = MMLogger.create(PersonTitleStringSorter.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonTitleStringSorter.class);
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -102,7 +102,7 @@ public class PersonTitleStringSorter implements Comparator<String> {
             return getPersonTitleSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
                   getCampaign().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
-            logger.error(String.format("s0: %s, s1: %s", s0, s1), e);
+            LOGGER.error("s0: {}, s1: {}", s0, s1, e);
             return 0;
         }
     }

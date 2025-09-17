@@ -69,7 +69,7 @@ import mekhq.gui.model.RankTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class RankSystemsPane extends AbstractMHQScrollPane {
-    private static final MMLogger logger = MMLogger.create(RankSystemsPane.class);
+    private static final MMLogger LOGGER = MMLogger.create(RankSystemsPane.class);
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -326,7 +326,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             final TableColumn column = getRanksTable().getColumnModel().getColumn(i);
             column.setPreferredWidth(getRanksTableModel().getColumnWidth(i));
             column.setCellRenderer(getRanksTableModel().getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
+            if (i == RankTableModel.COL_PAY_MULTI) {
                 column.setCellEditor(new SpinnerCellEditor(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1), true));
             }
         }
@@ -413,7 +413,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // shouldn't be null)
         setSelectedRankSystem(getRankSystemModel().getSelectedItem());
         if (getSelectedRankSystem() == null) {
-            logger.error("The selected rank system is null. Not changing the ranks, just returning.");
+            LOGGER.error("The selected rank system is null. Not changing the ranks, just returning.");
             getComboRankSystemType().setEnabled(false);
             return;
         }
@@ -424,7 +424,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             final TableColumn column = getRanksTable().getColumnModel().getColumn(i);
             column.setPreferredWidth(getRanksTableModel().getColumnWidth(i));
             column.setCellRenderer(getRanksTableModel().getRenderer());
-            if (i == RankTableModel.COL_PAYMULT) {
+            if (i == RankTableModel.COL_PAY_MULTI) {
                 column.setCellEditor(new SpinnerCellEditor(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1), true));
             }
         }
@@ -495,7 +495,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         setSelectedRankSystem(null);
         Ranks.reinitializeRankSystems(getCampaign());
 
-        // Then collect all of the campaign-type rank systems into a set, so we don't
+        // Then collect all the campaign-type rank systems into a set, so we don't
         // just throw
         // them away
         final Set<RankSystem> campaignRankSystems = new HashSet<>();
@@ -512,11 +512,11 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             getRankSystemModel().addElement(new RankSystem(rankSystem));
         }
 
-        // Revalidate all of the Campaign Rank Systems before adding, as we need to
+        // Revalidate all the Campaign Rank Systems before adding, as we need to
         // ensure no duplicate keys
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystem rankSystem : campaignRankSystems) {
-            // Validating against the core ranks is fine here, as we know all of the rank
+            // Validating against the core ranks is fine here, as we know all the rank
             // systems
             // we want to check against have been loaded there
             if (rankValidator.validate(rankSystem, true)) {

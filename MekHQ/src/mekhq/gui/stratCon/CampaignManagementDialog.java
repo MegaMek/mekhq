@@ -31,7 +31,7 @@
  * affiliated with Microsoft.
  */
 
-package mekhq.gui.stratcon;
+package mekhq.gui.stratCon;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,7 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConTrackState;
-import mekhq.gui.StratconTab;
+import mekhq.gui.StratConTab;
 
 /**
  * This class handles the UI for campaign VP/SP management
@@ -58,7 +58,7 @@ import mekhq.gui.StratconTab;
 public class CampaignManagementDialog extends JDialog {
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
-    private final StratconTab parent;
+    private final StratConTab parent;
     private JButton btnRemoveCVP;
     private JButton btnGMRemoveSP;
     private JButton btnGMAddVP;
@@ -68,7 +68,7 @@ public class CampaignManagementDialog extends JDialog {
     final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
           MekHQ.getMHQOptions().getLocale());
 
-    public CampaignManagementDialog(StratconTab parent) {
+    public CampaignManagementDialog(StratConTab parent) {
         this.parent = parent;
         this.setTitle("Manage SP/CVP");
         initializeUI();

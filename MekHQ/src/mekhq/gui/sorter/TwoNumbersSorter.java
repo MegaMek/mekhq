@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  */
 public final class TwoNumbersSorter implements Comparator<String> {
     private static final Comparator<String> NUM_SORTER = new FormattedNumberSorter();
-    private static final Pattern NUM_PATTERN = Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)\\]\\s*$");
+    private static final Pattern NUM_PATTERN = Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)]\\s*$");
 
     @Override
     public int compare(String s1, String s2) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,31 +78,31 @@ import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.stratCon.StratConTrackState;
-import mekhq.gui.stratcon.StratconScenarioWizard;
-import mekhq.gui.stratcon.TrackForceAssignmentUI;
+import mekhq.gui.stratCon.StratConScenarioWizard;
+import mekhq.gui.stratCon.TrackForceAssignmentUI;
 import mekhq.utilities.ReportingUtilities;
 
 /**
- * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
+ * This panel handles AtB-StratCon GUI interactions with a specific scenario track.
  *
  * @author NickAragua
  */
-public class StratconPanel extends JPanel implements ActionListener {
-    private static final MMLogger logger = MMLogger.create(StratconPanel.class);
+public class StratConPanel extends JPanel implements ActionListener {
+    private static final MMLogger logger = MMLogger.create(StratConPanel.class);
 
     public static final int HEX_X_RADIUS = 42;
     public static final int HEX_Y_RADIUS = 36;
 
-    private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
-    private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
-    private static final String RCLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
-    private static final String RCLICK_COMMAND_STICKY_FORCE = "StickyForce";
-    private static final String RCLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
-    private static final String RCLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
-    private static final String RCLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
-    private static final String RCLICK_COMMAND_ADD_FACILITY = "AddFacility";
-    private static final String RCLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
-    private static final String RCLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
+    private static final String RIGHT_CLICK_COMMAND_MANAGE_FORCES = "ManageForces";
+    private static final String RIGHT_CLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
+    private static final String RIGHT_CLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
+    private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE = "StickyForce";
+    private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
+    private static final String RIGHT_CLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
+    private static final String RIGHT_CLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
+    private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
+    private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
+    private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
 
     /**
      * What to do when drawing a hex
@@ -125,8 +125,6 @@ public class StratconPanel extends JPanel implements ActionListener {
         DryRun
     }
 
-    private final float scale = 1f;
-
     private StratConTrackState currentTrack;
     private StratConCampaignState campaignState;
     private final Campaign campaign;
@@ -135,19 +133,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private Point clickedPoint;
     private JPopupMenu rightClickMenu;
-    private JMenuItem menuItemManageForceAssignments;
-    private JMenuItem menuItemManageScenario;
     private JMenuItem menuItemGMReveal;
-    private JMenuItem menuItemRemoveFacility;
-    private JMenuItem menuItemSwitchOwner;
-    private JMenu menuItemAddFacility;
 
     // data structure holding how many unit/scenario/base icons have been drawn in
     // the hex
     // used to control how low the text description goes.
     private final Map<StratConCoords, Integer> numIconsInHex = new HashMap<>();
 
-    private final StratconScenarioWizard scenarioWizard;
+    private final StratConScenarioWizard scenarioWizard;
     private final TrackForceAssignmentUI assignmentUI;
 
     private final JLabel infoArea;
@@ -157,12 +150,12 @@ public class StratconPanel extends JPanel implements ActionListener {
     private boolean commitForces = false;
 
     /**
-     * Constructs a StratconPanel instance, given a parent campaign GUI and a pointer to an info area.
+     * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
      */
-    public StratconPanel(CampaignGUI gui, JLabel infoArea) {
+    public StratConPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
 
-        scenarioWizard = new StratconScenarioWizard(campaign, this);
+        scenarioWizard = new StratConScenarioWizard(campaign, this);
         this.infoArea = infoArea;
 
         assignmentUI = new TrackForceAssignmentUI(this);
@@ -202,9 +195,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         // display "Manage Force Assignment" if there is not a force already on the hex
         // except if there is already a non-cloaked scenario here.
         if (StratConRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
-            menuItemManageForceAssignments = new JMenuItem();
+            JMenuItem menuItemManageForceAssignments = new JMenuItem();
             menuItemManageForceAssignments.setText("Manage Deployment");
-            menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
+            menuItemManageForceAssignments.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
         }
@@ -214,14 +207,14 @@ public class StratconPanel extends JPanel implements ActionListener {
             AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
             if (backingScenario != null && !backingScenario.isCloaked()) {
-                menuItemManageScenario = new JMenuItem();
+                JMenuItem menuItemManageScenario = new JMenuItem();
 
                 if (scenario.getCurrentState().equals(UNRESOLVED)) {
                     menuItemManageScenario.setText("Manage Deployment");
-                    menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
+                    menuItemManageScenario.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_FORCES);
                 } else {
                     menuItemManageScenario.setText("Manage Reinforcements");
-                    menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
+                    menuItemManageScenario.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_SCENARIO);
                 }
 
                 menuItemManageScenario.addActionListener(this);
@@ -235,8 +228,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 JCheckBoxMenuItem stickyForceItem = new JCheckBoxMenuItem();
                 stickyForceItem.setText(String.format("%s - remain deployed", forceName));
-                stickyForceItem.setActionCommand(RCLICK_COMMAND_STICKY_FORCE);
-                stickyForceItem.putClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID, forceID);
+                stickyForceItem.setActionCommand(RIGHT_CLICK_COMMAND_STICKY_FORCE);
+                stickyForceItem.putClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID, forceID);
                 stickyForceItem.addActionListener(this);
                 stickyForceItem.setSelected(currentTrack.getStickyForces().contains(forceID));
                 rightClickMenu.add(stickyForceItem);
@@ -248,24 +241,24 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             menuItemGMReveal = new JMenuItem();
             menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector (GM)" : "Reveal Sector (GM)");
-            menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
+            menuItemGMReveal.setActionCommand(RIGHT_CLICK_COMMAND_REVEAL_TRACK);
             menuItemGMReveal.addActionListener(this);
             rightClickMenu.add(menuItemGMReveal);
 
             if (currentTrack.getFacility(coords) != null) {
-                menuItemRemoveFacility = new JMenuItem();
+                JMenuItem menuItemRemoveFacility = new JMenuItem();
                 menuItemRemoveFacility.setText("Remove Facility (GM)");
-                menuItemRemoveFacility.setActionCommand(RCLICK_COMMAND_REMOVE_FACILITY);
+                menuItemRemoveFacility.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_FACILITY);
                 menuItemRemoveFacility.addActionListener(this);
                 rightClickMenu.add(menuItemRemoveFacility);
 
-                menuItemSwitchOwner = new JMenuItem();
+                JMenuItem menuItemSwitchOwner = new JMenuItem();
                 menuItemSwitchOwner.setText("Switch Owner (GM)");
-                menuItemSwitchOwner.setActionCommand(RCLICK_COMMAND_CAPTURE_FACILITY);
+                menuItemSwitchOwner.setActionCommand(RIGHT_CLICK_COMMAND_CAPTURE_FACILITY);
                 menuItemSwitchOwner.addActionListener(this);
                 rightClickMenu.add(menuItemSwitchOwner);
             } else {
-                menuItemAddFacility = new JMenu();
+                JMenu menuItemAddFacility = new JMenu();
                 menuItemAddFacility.setText("Add Facility (GM)");
 
                 JMenu menuItemAddAlliedFacility = new JMenu();
@@ -275,8 +268,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                 for (StratConFacility facility : StratConFacilityFactory.getAlliedFacilities()) {
                     JMenuItem facilityItem = new JMenuItem();
                     facilityItem.setText(facility.getDisplayableName());
-                    facilityItem.setActionCommand(RCLICK_COMMAND_ADD_FACILITY);
-                    facilityItem.putClientProperty(RCLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_FACILITY);
+                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, facility);
                     facilityItem.addActionListener(this);
                     menuItemAddAlliedFacility.add(facilityItem);
                 }
@@ -288,8 +281,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                 for (StratConFacility facility : StratConFacilityFactory.getHostileFacilities()) {
                     JMenuItem facilityItem = new JMenuItem();
                     facilityItem.setText(facility.getDisplayableName());
-                    facilityItem.setActionCommand(RCLICK_COMMAND_ADD_FACILITY);
-                    facilityItem.putClientProperty(RCLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_FACILITY);
+                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, facility);
                     facilityItem.addActionListener(this);
                     menuItemAddHostileFacility.add(facilityItem);
                 }
@@ -300,13 +293,13 @@ public class StratconPanel extends JPanel implements ActionListener {
             if (scenario != null) {
                 JMenuItem removeScenarioItem = new JMenuItem();
                 removeScenarioItem.setText("Remove Scenario (GM)");
-                removeScenarioItem.setActionCommand(RCLICK_COMMAND_REMOVE_SCENARIO);
+                removeScenarioItem.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_SCENARIO);
                 removeScenarioItem.addActionListener(this);
                 rightClickMenu.add(removeScenarioItem);
 
                 JMenuItem resetDeploymentItem = new JMenuItem();
                 resetDeploymentItem.setText("Reset Deployment (GM)");
-                resetDeploymentItem.setActionCommand(RCLICK_COMMAND_RESET_DEPLOYMENT);
+                resetDeploymentItem.setActionCommand(RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT);
                 resetDeploymentItem.addActionListener(this);
                 rightClickMenu.add(resetDeploymentItem);
             }
@@ -380,9 +373,8 @@ public class StratconPanel extends JPanel implements ActionListener {
      */
     private boolean drawHexes(Graphics2D g2D, DrawHexType drawHexType) {
         Polygon graphHex = generateGraphHex();
-        int xRadius = HEX_X_RADIUS;
-        int yRadius = HEX_Y_RADIUS;
-        graphHex.translate(xRadius, yRadius); // I don't remember why, but omitting this causes facilities etc to appear
+        graphHex.translate(HEX_X_RADIUS,
+              HEX_Y_RADIUS); // I don't remember why, but omitting this causes facilities etc. to appear
         // displaced
         boolean pointFound = false;
 
@@ -522,13 +514,6 @@ public class StratconPanel extends JPanel implements ActionListener {
         return pointFound;
     }
 
-    /**
-     * Returns true if the image with the given key has been loaded and cached already.
-     */
-    private boolean imageLoaded(String imageKey) {
-        return imageCache.containsKey(imageKey);
-    }
-
     private BufferedImage getFacilityImage(StratConFacility facility) {
         String imageKeyPrefix = facility.getOwner() == Allied ?
                                       StratConBiomeManifest.FACILITY_ALLIED :
@@ -546,28 +531,22 @@ public class StratconPanel extends JPanel implements ActionListener {
             return imageCache.get(imageKey);
         }
 
-        String imageName = null;
-
-        switch (imageType) {
-            case TerrainTile:
-                imageName = StratConBiomeManifest.getInstance().getBiomeImage(imageKey);
-                break;
-            case Facility:
-                imageName = StratConBiomeManifest.getInstance().getFacilityImage(imageKey);
-                break;
-        }
+        String imageName = switch (imageType) {
+            case TerrainTile -> StratConBiomeManifest.getInstance().getBiomeImage(imageKey);
+            case Facility -> StratConBiomeManifest.getInstance().getFacilityImage(imageKey);
+        };
 
         if (imageName == null) {
             return null;
         }
 
         File biomeImageFile = new File(imageName);
-        BufferedImage image = null;
+        BufferedImage image;
 
         try {
             image = ImageIO.read(biomeImageFile);
         } catch (Exception e) {
-            logger.error("Unable to load image: " + imageName + " with ID '" + imageKey + '\'');
+            logger.error("Unable to load image: {} with ID '{}'", imageName, imageKey);
             return null;
         }
 
@@ -609,7 +588,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 // if there's a scenario here that has a deployment/battle date
                 // or if there's a scenario here and the hex has been revealed
-                // or if there's a scenario here and we've gm-revealed everything
+                // or if there's a scenario here, and we've gm-revealed everything
                 if ((scenario != null) &&
                           ((scenario.getDeploymentDate() != null) ||
                                  (scenario.isStrategicObjective() &&
@@ -713,14 +692,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
-                        String forceName = "";
+                        String forceName;
                         try {
                             Force force = campaign.getForce(forceID);
                             forceName = force.getName();
                         } catch (Exception e) {
                             // If we can't successfully fetch the Force, there is no point trying
                             // to draw it on the map.
-                            logger.error(String.format("Failed to fetch force from ID %s", forceID));
+                            logger.error("Failed to fetch force from ID {}", forceID);
                             continue;
                         }
 
@@ -770,9 +749,9 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         double startX = marker.getBounds().getMaxX();
         double startY = marker.getBounds().getMinY();
-        double midPointX = startX + HEX_X_RADIUS / 4;
-        double midPointY = startY - HEX_Y_RADIUS / 4 + g2D.getFontMetrics().getHeight() * verticalOffsetIndex;
-        double endPointX = midPointX + HEX_X_RADIUS / 2;
+        double midPointX = startX + HEX_X_RADIUS / 4.0;
+        double midPointY = startY - HEX_Y_RADIUS / 4.0 + g2D.getFontMetrics().getHeight() * verticalOffsetIndex;
+        double endPointX = midPointX + HEX_X_RADIUS / 2.0;
 
         g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
         g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
@@ -809,7 +788,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     /**
      * Returns the translation that we need to make to render the "next downward" hex.
      *
-     * @return Two dimensional array with the first element being the x vector and the second being the y vector
+     * @return Two-dimensional array with the first element being the x vector and the second being the y vector
      */
     private int[] getDownwardYVector() {
         return new int[] { 0, HEX_Y_RADIUS * 2 };
@@ -821,11 +800,10 @@ public class StratconPanel extends JPanel implements ActionListener {
      *
      * @param evenColumn Whether the column we're currently in is odd or even
      *
-     * @return Two dimensional array with the first element being the x vector and the second being the y vector
+     * @return Two-dimensional array with the first element being the x vector and the second being the y vector
      */
     private int[] getRightAndUpVector(boolean evenColumn) {
         int yRadius = HEX_Y_RADIUS;
-        int xRadius = HEX_X_RADIUS;
 
         int yTranslation = currentTrack.getHeight() * yRadius * 2;
         if (evenColumn) {
@@ -834,7 +812,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             yTranslation -= yRadius;
         }
 
-        return new int[] { (int) Math.floor(xRadius * 1.5), -yTranslation };
+        return new int[] { (int) Math.floor(HEX_X_RADIUS * 1.5), -yTranslation };
     }
 
     /**
@@ -842,6 +820,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      */
     private void performInitialTransform(Graphics2D g2D) {
         g2D.translate(0, HEX_Y_RADIUS);
+        float scale = 1f;
         g2D.scale(scale, scale);
     }
 
@@ -853,7 +832,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * <p>
      * Side effects: the dry run sets the boardState clicked hex coordinates.
      *
-     * @return Whether or not the clicked point was found on the hex board
+     * @return Whether the clicked point was found on the hex board
      */
     private boolean detectClickedHex() {
         Graphics2D g2D = (Graphics2D) getGraphics();
@@ -1019,26 +998,26 @@ public class StratconPanel extends JPanel implements ActionListener {
      *
      * <p>The supported commands and their effects are as follows:</p>
      * <ul>
-     *   <li><b>{@code RCLICK_COMMAND_MANAGE_FORCES}:</b> Displays the force management UI for the selected coordinates.
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_FORCES}:</b> Displays the force management UI for the selected coordinates.
      *       <ul>
      *           <li>If no scenario exists at the selected coordinates, the force management UI is directly displayed.</li>
      *           <li>If a scenario exists, it only displays the UI if the scenario is unresolved.</li>
      *       </ul>
      *   </li>
-     *   <li><b>{@code RCLICK_COMMAND_MANAGE_SCENARIO}:</b> Displays the scenario wizard with the current scenario at the
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_SCENARIO}:</b> Displays the scenario wizard with the current scenario at the
      *       selected coordinates if the scenario's state is {@code PRIMARY_FORCES_COMMITTED}.</li>
-     *   <li><b>{@code RCLICK_COMMAND_REVEAL_TRACK}:</b> Toggles the "GM revealed" state for the current track and updates
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_REVEAL_TRACK}:</b> Toggles the "GM revealed" state for the current track and updates
      *       the menu text to reflect the state ("Hide Track" or "Reveal Track").</li>
-     *   <li><b>{@code RCLICK_COMMAND_STICKY_FORCE}:</b> Toggles the sticky force assignment for a given force ID at the
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_STICKY_FORCE}:</b> Toggles the sticky force assignment for a given force ID at the
      *       selected track. When toggled:</li>
      *           <li>-- If selected, the force is added to the track as sticky.</li>
      *           <li>-- If deselected, the force is removed from the track's sticky forces.</li>
-     *   <li><b>{@code RCLICK_COMMAND_REMOVE_FACILITY}:</b> Deletes the facility present at the selected coordinates.</li>
-     *   <li><b>{@code RCLICK_COMMAND_CAPTURE_FACILITY}:</b> Changes the ownership of the facility at the selected coordinates
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_FACILITY}:</b> Deletes the facility present at the selected coordinates.</li>
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_CAPTURE_FACILITY}:</b> Changes the ownership of the facility at the selected coordinates
      *       to a different faction or player, as per the rules defined in {@link StratConRulesManager}.</li>
-     *   <li><b>{@code RCLICK_COMMAND_ADD_FACILITY}:</b> Adds a new facility to the selected coordinates. The facility's
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_ADD_FACILITY}:</b> Adds a new facility to the selected coordinates. The facility's
      *       properties (visibility, type, etc.) are copied from the provided source facility.</li>
-     *   <li><b>{@code RCLICK_COMMAND_REMOVE_SCENARIO}:</b> Deletes the currently selected scenario from the campaign.</li>
+     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_SCENARIO}:</b> Deletes the currently selected scenario from the campaign.</li>
      * </ul>
      *
      * @param evt the {@link ActionEvent} representing the user's action. Contains information about the triggering
@@ -1055,8 +1034,8 @@ public class StratconPanel extends JPanel implements ActionListener {
      *            </ul>
      *
      *            <p><b>General Information:</b> If no valid {@link StratConCoords} are selected at the time of the event,
-     *            the method will terminate with no further action. Certain commands (e.g., {@code RCLICK_COMMAND_REVEAL_TRACK},
-     *            {@code RCLICK_COMMAND_ADD_FACILITY}) require valid coordinates or source properties to execute successfully.</p>
+     *            the method will terminate with no further action. Certain commands (e.g., {@code RIGHT_CLICK_COMMAND_REVEAL_TRACK},
+     *            {@code RIGHT_CLICK_COMMAND_ADD_FACILITY}) require valid coordinates or source properties to execute successfully.</p>
      *
      *            <p>If no specific actions from the above list are matched (no corresponding `case`), the method performs no effect.</p>
      */
@@ -1070,7 +1049,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         boolean isPrimaryForce = false;
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
-            case RCLICK_COMMAND_MANAGE_FORCES:
+            case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
                 if (selectedScenario == null) {
                     assignmentUI.display(campaign, campaignState, selectedCoords);
                     assignmentUI.setVisible(true);
@@ -1109,7 +1088,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 setCommitForces(false);
                 break;
-            case RCLICK_COMMAND_MANAGE_SCENARIO:
+            case RIGHT_CLICK_COMMAND_MANAGE_SCENARIO:
                 // It's possible a scenario may have been placed when deploying the force, so we
                 // need to recheck
                 selectedScenario = currentTrack.getScenario(selectedCoords);
@@ -1123,13 +1102,13 @@ public class StratconPanel extends JPanel implements ActionListener {
                     scenarioWizard.setVisible(true);
                 }
                 break;
-            case RCLICK_COMMAND_REVEAL_TRACK:
+            case RIGHT_CLICK_COMMAND_REVEAL_TRACK:
                 currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
                 menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
                 break;
-            case RCLICK_COMMAND_STICKY_FORCE:
+            case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
-                int forceID = (int) source.getClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID);
+                int forceID = (int) source.getClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID);
 
                 if (source.isSelected()) {
                     currentTrack.addStickyForce(forceID);
@@ -1138,27 +1117,28 @@ public class StratconPanel extends JPanel implements ActionListener {
                 }
 
                 break;
-            case RCLICK_COMMAND_REMOVE_FACILITY:
+            case RIGHT_CLICK_COMMAND_REMOVE_FACILITY:
                 currentTrack.removeFacility(selectedCoords);
                 break;
-            case RCLICK_COMMAND_CAPTURE_FACILITY:
+            case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
                 StratConRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
                 break;
-            case RCLICK_COMMAND_ADD_FACILITY:
+            case RIGHT_CLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();
-                StratConFacility facility = (StratConFacility) eventSource.getClientProperty(RCLICK_COMMAND_ADD_FACILITY);
+                StratConFacility facility = (StratConFacility) eventSource.getClientProperty(
+                      RIGHT_CLICK_COMMAND_ADD_FACILITY);
                 StratConFacility newFacility = facility.clone();
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
                 break;
-            case RCLICK_COMMAND_REMOVE_SCENARIO:
+            case RIGHT_CLICK_COMMAND_REMOVE_SCENARIO:
                 StratConScenario scenario = getSelectedScenario();
 
                 if (scenario != null) {
                     campaign.removeScenario(scenario.getBackingScenario());
                 }
                 break;
-            case RCLICK_COMMAND_RESET_DEPLOYMENT:
+            case RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT:
                 StratConScenario scenarioToReset = getSelectedScenario();
 
                 if (scenarioToReset != null) {
