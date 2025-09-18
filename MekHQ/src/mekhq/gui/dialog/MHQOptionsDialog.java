@@ -1438,9 +1438,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMHQOptions().setAutosaveBeforeScenariosValue(checkSaveBeforeScenarios.isSelected());
         MekHQ.getMHQOptions().setAutosaveBeforeMissionEndValue(checkSaveBeforeContractEnd.isSelected());
-        MekHQ.getMHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
+        MekHQ.getMHQOptions().setMaximumNumberOfAutoSavesValue((Integer) spinnerSavedGamesCount.getValue());
 
-        MekHQ.getMHQOptions().setNewDayAstechPoolFill(chkNewDayAsTechPoolFill.isSelected());
+        MekHQ.getMHQOptions().setNewDayAsTechPoolFill(chkNewDayAsTechPoolFill.isSelected());
         MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
         MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
         MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
@@ -1464,16 +1464,16 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER, optionNoCommanderNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED, optionContractEndedNag.isSelected());
         MekHQ.getMHQOptions()
-              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAsTechsNag.isSelected());
+              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS, optionInsufficientAsTechsNag.isSelected());
         MekHQ.getMHQOptions()
-              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME,
+              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME,
                     optionInsufficientAsTechTimeNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
         MekHQ.getMHQOptions()
-              .setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS,
+              .setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
                     optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
@@ -1600,9 +1600,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionSaveYearly.setSelected(MekHQ.getMHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeScenarios.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeScenariosValue());
         checkSaveBeforeContractEnd.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeMissionEndValue());
-        spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue());
+        spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutoSavesValue());
 
-        chkNewDayAsTechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
+        chkNewDayAsTechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAsTechPoolFill());
         chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
         chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
@@ -1628,15 +1628,15 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionNoCommanderNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER));
         optionContractEndedNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED));
         optionInsufficientAsTechsNag.setSelected(MekHQ.getMHQOptions()
-                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS));
+                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS));
         optionInsufficientAsTechTimeNag.setSelected(MekHQ.getMHQOptions()
-                                                          .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME));
+                                                          .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME));
         optionInsufficientMedicsNag.setSelected(MekHQ.getMHQOptions()
                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
         optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions()
                                                    .getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions()
-                                                              .getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
+                                                              .getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions()
                                                         .getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
         optionInvalidFactionNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));

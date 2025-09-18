@@ -61,24 +61,26 @@ import org.w3c.dom.NodeList;
 public class KFBoom extends Part {
     private static final MMLogger LOGGER = MMLogger.create(KFBoom.class);
 
-    static final TechAdvancement TA_KF_BOOM = new TechAdvancement(TechBase.ALL)
-                                                    .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
-                                                    .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
-                                                    .setAvailability(AvailabilityValue.D,
-                                                          AvailabilityValue.C,
-                                                          AvailabilityValue.C,
-                                                          AvailabilityValue.C)
-                                                    .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
-                                                              .setAdvancement(2458, 2470, 2500)
-                                                              .setPrototypeFactions(Faction.TH)
-                                                              .setProductionFactions(Faction.TH)
-                                                              .setTechRating(TechRating.C)
-                                                              .setAvailability(AvailabilityValue.F,
-                                                                    AvailabilityValue.X,
-                                                                    AvailabilityValue.X,
-                                                                    AvailabilityValue.X)
-                                                              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    public static final TechAdvancement TA_KF_BOOM = new TechAdvancement(TechBase.ALL)
+                                                           .setAdvancement(2458, 2470, 2500)
+                                                           .setPrototypeFactions(Faction.TH)
+                                                           .setProductionFactions(Faction.TH)
+                                                           .setTechRating(TechRating.C)
+                                                           .setAvailability(AvailabilityValue.D,
+                                                                 AvailabilityValue.C,
+                                                                 AvailabilityValue.C,
+                                                                 AvailabilityValue.C)
+                                                           .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
+                                                                     .setAdvancement(2458, 2470, 2500)
+                                                                     .setPrototypeFactions(Faction.TH)
+                                                                     .setProductionFactions(Faction.TH)
+                                                                     .setTechRating(TechRating.C)
+                                                                     .setAvailability(AvailabilityValue.F,
+                                                                           AvailabilityValue.X,
+                                                                           AvailabilityValue.X,
+                                                                           AvailabilityValue.X)
+                                                                     .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int boomType;
 

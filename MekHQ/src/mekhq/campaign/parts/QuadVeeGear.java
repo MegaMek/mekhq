@@ -56,20 +56,21 @@ import org.w3c.dom.Node;
  * @author Neoancient
  */
 public class QuadVeeGear extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
-                                                          .setTechRating(TechRating.F)
-                                                          .setAvailability(AvailabilityValue.X,
-                                                                AvailabilityValue.X,
-                                                                AvailabilityValue.X,
-                                                                AvailabilityValue.F)
-                                                          .setClanAdvancement(3130,
-                                                                3135,
-                                                                DATE_NONE,
-                                                                DATE_NONE,
-                                                                DATE_NONE)
-                                                          .setClanApproximate(true).setPrototypeFactions(Faction.CHH)
-                                                          .setProductionFactions(Faction.CHH)
-                                                          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
+                                                                 .setTechRating(TechRating.F)
+                                                                 .setAvailability(AvailabilityValue.X,
+                                                                       AvailabilityValue.X,
+                                                                       AvailabilityValue.X,
+                                                                       AvailabilityValue.F)
+                                                                 .setClanAdvancement(3130,
+                                                                       3135,
+                                                                       DATE_NONE,
+                                                                       DATE_NONE,
+                                                                       DATE_NONE)
+                                                                 .setClanApproximate(true)
+                                                                 .setPrototypeFactions(Faction.CHH)
+                                                                 .setProductionFactions(Faction.CHH)
+                                                                 .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     public QuadVeeGear() {
         this(0, null);

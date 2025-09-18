@@ -94,7 +94,7 @@ class BloodGroupTest {
             cumulativeChance += bloodGroup.getChance();
         }
 
-        assertEquals(cumulativeChance, 100);
+        assertEquals(100, cumulativeChance);
     }
 
     @Test

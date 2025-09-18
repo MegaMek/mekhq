@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
@@ -90,7 +89,7 @@ public class WarehouseTest {
 
         // forEachPart should have our part
         warehouse.forEachPart(p -> {
-            // There should only be one part in the warehouse
+            // There should only be one part in the warehouse,
             // and it should be our part
             assertEquals(mockPart, p);
         });
@@ -105,9 +104,7 @@ public class WarehouseTest {
         assertNull(warehouse.getPart(mockId));
 
         // We should not run over any part once removed
-        warehouse.forEachPart(p -> {
-            assertTrue(false);
-        });
+        warehouse.forEachPart(p -> fail());
 
         // getParts should no longer contain anything
         assertTrue(warehouse.getParts().isEmpty());
@@ -134,7 +131,7 @@ public class WarehouseTest {
 
         // forEachPart should have our part
         warehouse.forEachPart(p -> {
-            // There should only be one part in the warehouse
+            // There should only be one part in the warehouse,
             // and it should be our part
             assertEquals(mockPart, p);
         });
@@ -485,7 +482,7 @@ public class WarehouseTest {
         assertEquals(mockArmor, addedArmor);
         assertTrue(addedArmor.isSpare());
 
-        // Double check the math from above.
+        // Double-check the math from above.
         assertEquals(3.0, addedArmor.getTonnage(), 0.000001);
         assertEquals(48, ((Armor) addedArmor).getAmount());
     }
@@ -531,7 +528,7 @@ public class WarehouseTest {
         assertEquals(mockAmmoStorage, addedAmmo);
         assertTrue(addedAmmo.isSpare());
 
-        // Double check the math from above.
+        // Double-check the math from above.
         assertEquals(3.0, addedAmmo.getTonnage(), 0.000001);
         assertEquals(60, ((AmmoStorage) addedAmmo).getShots());
     }
@@ -707,7 +704,7 @@ public class WarehouseTest {
             assertEquals(mockSpareArmor, addedArmor);
             assertTrue(addedArmor.isSpare());
 
-            // Double check the math from above.
+            // Double-check the math from above.
             assertEquals(2.0, addedArmor.getTonnage(), 0.000001);
             assertEquals(32, ((Armor) addedArmor).getAmount());
 
@@ -753,7 +750,7 @@ public class WarehouseTest {
             assertEquals(mockSpareArmor, addedArmor);
             assertTrue(addedArmor.isSpare());
 
-            // Double check the math from above.
+            // Double-check the math from above.
             assertEquals(2.0, addedArmor.getTonnage(), 0.000001);
             assertEquals(32, ((Armor) addedArmor).getAmount());
 
@@ -873,7 +870,7 @@ public class WarehouseTest {
         assertTrue(spareParts.contains(mockSpareAmmo));
 
         // Test: streamSpareParts
-        spareParts = warehouse.streamSpareParts().collect(Collectors.toList());
+        spareParts = warehouse.streamSpareParts().toList();
         assertEquals(4, spareParts.size());
         assertTrue(spareParts.contains(mockSparePart));
         assertTrue(spareParts.contains(mockSparePartUnderRepair));
@@ -938,9 +935,7 @@ public class WarehouseTest {
         List<Part> spareParts = warehouse.getSpareParts();
         assertEquals(4, spareParts.size());
 
-        warehouse.forEachSparePart(spare -> {
-            assertTrue(spareParts.contains(spare));
-        });
+        warehouse.forEachSparePart(spare -> assertTrue(spareParts.contains(spare)));
     }
 
     @Test
@@ -953,12 +948,11 @@ public class WarehouseTest {
 
         // Spare
         Part mockSparePart = spy(new MekLocation());
-        Part addedPart = warehouse.addPart(mockSparePart, true);
+        Part addedPart;
         assertEquals(mockSparePart, warehouse.findSparePart(spare -> spare.getId() == mockSparePart.getId()));
 
         Part mockUnitPart = spy(new MekLocation());
         mockUnitPart.setUnit(createMockUnit());
-        addedPart = warehouse.addPart(mockUnitPart, true);
         assertNull(warehouse.findSparePart(spare -> spare.getId() == mockUnitPart.getId()));
 
         // Spare (being repaired)

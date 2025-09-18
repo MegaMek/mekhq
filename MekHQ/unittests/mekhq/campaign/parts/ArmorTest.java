@@ -79,7 +79,6 @@ public class ArmorTest {
     /**
      * For best results, don't use these directly, clone them first and use the clones!
      *
-     * @return
      */
     public static Stream<Armor> armorParameter() {
         return Stream.of(new Armor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, false, mockCampaign),

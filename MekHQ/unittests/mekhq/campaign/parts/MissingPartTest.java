@@ -332,7 +332,7 @@ public class MissingPartTest {
         assertEquals(startingQuantity - 1, leftArm.getQuantity());
 
         // Use the replacement part
-        replacement.decrementQuantity();
+        replacement.changeQuantity(-1);
 
         // Cancel the reservation
         missingPart.cancelReservation();

@@ -72,11 +72,11 @@ public class StratConScenarioFactory {
         dynamicScenarioUnitTypeMap.clear();
 
         // load dynamic scenarios
-        AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize(MHQConstants.STRATCON_SCENARIO_MANIFEST);
+        AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize(MHQConstants.STRAT_CON_SCENARIO_MANIFEST);
 
         // load user-specified scenario list
         AtBScenarioManifest userManifest = AtBScenarioManifest
-                                                 .Deserialize(MHQConstants.STRATCON_USER_SCENARIO_MANIFEST);
+                                                 .Deserialize(MHQConstants.STRAT_CON_USER_SCENARIO_MANIFEST);
 
         if (scenarioManifest != null) {
             loadScenariosFromManifest(scenarioManifest);
@@ -99,7 +99,7 @@ public class StratConScenarioFactory {
 
         for (int key : manifest.scenarioFileNames.keySet()) {
             String fileName = manifest.scenarioFileNames.get(key).trim();
-            String filePath = Paths.get(MHQConstants.STRATCON_SCENARIO_TEMPLATE_PATH,
+            String filePath = Paths.get(MHQConstants.STRAT_CON_SCENARIO_TEMPLATE_PATH,
                   manifest.scenarioFileNames.get(key).trim()).toString();
 
             try {

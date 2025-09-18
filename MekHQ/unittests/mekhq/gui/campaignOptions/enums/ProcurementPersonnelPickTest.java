@@ -42,20 +42,20 @@ import org.junit.jupiter.api.Test;
 
 class ProcurementPersonnelPickTest {
     @Test
-    public void testFromString_Validpick() {
+    public void testFromStringValidPick() {
         ProcurementPersonnelPick pick = ProcurementPersonnelPick.fromString(LOGISTICS.name());
         assertEquals(LOGISTICS, pick);
     }
 
     @Test
-    public void testFromString_Invalidpick() {
+    public void testFromStringInvalidPick() {
         ProcurementPersonnelPick pick = ProcurementPersonnelPick.fromString("INVALID_pick");
 
         assertEquals(NONE, pick);
     }
 
     @Test
-    public void testFromString_Nullpick() {
+    public void testFromStringNullPick() {
         ProcurementPersonnelPick pick = ProcurementPersonnelPick.fromString(null);
 
         assertEquals(NONE, pick);

@@ -33,6 +33,7 @@
 package mekhq.campaign.parts;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
@@ -95,11 +96,11 @@ public class TotalBuyCostTest {
         ShoppingList testShoppingList = new ShoppingList();
         mockCampaign.setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
-        IAcquisitionWork shoppinglistItem = part.getAcquisitionWork();
-        Money partValue = shoppinglistItem.getBuyCost();
+        IAcquisitionWork shoppingListItem = part.getAcquisitionWork();
+        Money partValue = shoppingListItem.getBuyCost();
         assertFalse(partValue.isZero());
-        testShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
-        assertTrue(testShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
+        testShoppingList.addShoppingItemWithoutChecking(shoppingListItem);
+        assertEquals(testShoppingList.getTotalBuyCost().getAmount(), partValue.getAmount());
     }
 
     @Test
@@ -107,18 +108,16 @@ public class TotalBuyCostTest {
         ShoppingList testShoppingList = new ShoppingList();
         mockCampaign.setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
-        IAcquisitionWork shoppinglistItem = part.getAcquisitionWork();
-        Money partValue = shoppinglistItem.getBuyCost();
+        IAcquisitionWork shoppingListItem = part.getAcquisitionWork();
+        Money partValue = shoppingListItem.getBuyCost();
         assertFalse(partValue.isZero());
-        shoppinglistItem.incrementQuantity();
-        testShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
-        assertTrue(testShoppingList.getTotalBuyCost()
-                         .getAmount()
-                         .equals(partValue.getAmount().multiply(BigDecimal.valueOf(2))));
-        shoppinglistItem.incrementQuantity();
-        assertTrue(testShoppingList.getTotalBuyCost()
-                         .getAmount()
-                         .equals(partValue.getAmount().multiply(BigDecimal.valueOf(3))));
+        shoppingListItem.incrementQuantity();
+        testShoppingList.addShoppingItemWithoutChecking(shoppingListItem);
+        assertEquals(testShoppingList.getTotalBuyCost()
+                           .getAmount(), partValue.getAmount().multiply(BigDecimal.valueOf(2)));
+        shoppingListItem.incrementQuantity();
+        assertEquals(testShoppingList.getTotalBuyCost()
+                           .getAmount(), partValue.getAmount().multiply(BigDecimal.valueOf(3)));
     }
 
     @Test
@@ -126,23 +125,21 @@ public class TotalBuyCostTest {
         ShoppingList testShoppingList = new ShoppingList();
         mockCampaign.setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
-        IAcquisitionWork shoppinglistItem = part.getAcquisitionWork();
-        shoppinglistItem.incrementQuantity();
-        shoppinglistItem.incrementQuantity();
-        Money partValue = shoppinglistItem.getBuyCost();
+        IAcquisitionWork shoppingListItem = part.getAcquisitionWork();
+        shoppingListItem.incrementQuantity();
+        shoppingListItem.incrementQuantity();
+        Money partValue = shoppingListItem.getBuyCost();
         assertFalse(partValue.isZero());
-        Money partTotalValue = shoppinglistItem.getTotalBuyCost();
-        assertTrue(partValue.multipliedBy(3).compareTo(partTotalValue) == 0);
-        testShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
-        assertTrue(testShoppingList.getTotalBuyCost()
-                         .getAmount()
-                         .equals(partValue.getAmount().multiply(BigDecimal.valueOf(3))));
-        shoppinglistItem.decrementQuantity();
-        assertTrue(testShoppingList.getTotalBuyCost()
-                         .getAmount()
-                         .equals(partValue.getAmount().multiply(BigDecimal.valueOf(2))));
-        shoppinglistItem.decrementQuantity();
-        assertTrue(testShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
+        Money partTotalValue = shoppingListItem.getTotalBuyCost();
+        assertEquals(0, partValue.multipliedBy(3).compareTo(partTotalValue));
+        testShoppingList.addShoppingItemWithoutChecking(shoppingListItem);
+        assertEquals(testShoppingList.getTotalBuyCost()
+                           .getAmount(), partValue.getAmount().multiply(BigDecimal.valueOf(3)));
+        shoppingListItem.decrementQuantity();
+        assertEquals(testShoppingList.getTotalBuyCost()
+                           .getAmount(), partValue.getAmount().multiply(BigDecimal.valueOf(2)));
+        shoppingListItem.decrementQuantity();
+        assertEquals(testShoppingList.getTotalBuyCost().getAmount(), partValue.getAmount());
     }
 
     @Test
@@ -151,14 +148,14 @@ public class TotalBuyCostTest {
         mockCampaign.setShoppingList(testShoppingList);
         Part partA = new MekSensor(1, mockCampaign);
         Part partB = new MekCockpit(2, Mek.COCKPIT_SMALL, false, mockCampaign);
-        IAcquisitionWork shoppinglistItemA = partA.getAcquisitionWork();
-        IAcquisitionWork shoppinglistItemB = partB.getAcquisitionWork();
-        Money partValueA = shoppinglistItemA.getBuyCost();
-        Money partValueB = shoppinglistItemB.getBuyCost();
+        IAcquisitionWork shoppingListItemA = partA.getAcquisitionWork();
+        IAcquisitionWork shoppingListItemB = partB.getAcquisitionWork();
+        Money partValueA = shoppingListItemA.getBuyCost();
+        Money partValueB = shoppingListItemB.getBuyCost();
         Money partTotalValue = partValueA.plus(partValueB);
-        testShoppingList.addShoppingItem(shoppinglistItemA, 1, mockCampaign);
-        testShoppingList.addShoppingItem(shoppinglistItemB, 1, mockCampaign);
-        assertTrue(testShoppingList.getTotalBuyCost().getAmount().equals(partTotalValue.getAmount()));
+        testShoppingList.addShoppingItem(shoppingListItemA, 1, mockCampaign);
+        testShoppingList.addShoppingItem(shoppingListItemB, 1, mockCampaign);
+        assertEquals(testShoppingList.getTotalBuyCost().getAmount(), partTotalValue.getAmount());
 
 
     }

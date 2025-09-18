@@ -90,6 +90,15 @@ class EventEffectsManagerTest {
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
+        String report = getReport(MAGNITUDE, mockCampaign);
+
+        // Assert
+        // Because we're mocking campaign we can't check whether Prisoner Capacity was actually
+        // changed. So we check to see if the change is reflected in the report, instead.
+        assertTrue(report.contains("5"));
+    }
+
+    private static String getReport(int MAGNITUDE, Campaign mockCampaign) {
         EventResult eventResult = new EventResult(PRISONER_CAPACITY, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
               List.of(eventResult),
@@ -99,11 +108,7 @@ class EventEffectsManagerTest {
         // Act
         EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
         String report = effectsManager.getEventReport();
-
-        // Assert
-        // Because we're mocking campaign we can't check whether Prisoner Capacity was actually
-        // changed. So we check to see if the change is reflected in the report, instead.
-        assertTrue(report.contains("5"));
+        return report;
     }
 
     @Test
@@ -633,10 +638,9 @@ class EventEffectsManagerTest {
         new EventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
-        int expectedSupportPoints = MAGNITUDE;
         int actualSupportPoints = contract.getStratconCampaignState().getSupportPoints();
 
-        assertEquals(expectedSupportPoints, actualSupportPoints);
+        assertEquals(MAGNITUDE, actualSupportPoints);
     }
 
     @Test
@@ -756,10 +760,9 @@ class EventEffectsManagerTest {
         new EventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
-        Faction expectedFaction = employerFaction;
         Faction actualFaction = prisoner.getOriginFaction();
 
-        assertEquals(expectedFaction, actualFaction);
+        assertEquals(employerFaction, actualFaction);
     }
 
     @Test

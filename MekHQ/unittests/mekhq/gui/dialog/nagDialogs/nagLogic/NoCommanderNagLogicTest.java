@@ -50,8 +50,6 @@ import org.junit.jupiter.api.Test;
  * related to commander assignment.
  */
 class NoCommanderNagLogicTest {
-    // Mock objects for the tests
-    private Campaign campaign;
     private Person commander;
     private Person commanderNull;
 
@@ -62,7 +60,8 @@ class NoCommanderNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        //  for the tests
+        Campaign campaign = mock(Campaign.class);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);

@@ -126,7 +126,7 @@ public class ReportingUtilities {
     /**
      * Returns the hex color code used for an amazing status or messages.
      *
-     * @return the hex color string representing a amazing color
+     * @return the hex color string representing an amazing color
      *
      * @author Illiani
      * @since 0.50.06

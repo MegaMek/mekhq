@@ -46,8 +46,8 @@ import org.mockito.ArgumentMatchers;
 
 public class FactionBordersTest {
 
-    private Faction factionUs = createFaction("us", false);
-    private Faction factionThem = createFaction("them", false);
+    private final Faction factionUs = createFaction("us", false);
+    private final Faction factionThem = createFaction("them", false);
 
     private Faction createFaction(final String key, final boolean periphery) {
         Faction faction = mock(Faction.class);
@@ -81,10 +81,10 @@ public class FactionBordersTest {
 
         List<PlanetarySystem> border = us.getBorderSystems(them, 1.1);
 
-        assertEquals(border.size(), 2);
+        assertEquals(2, border.size());
         for (PlanetarySystem p : border) {
-            assertEquals(Math.abs(p.getX()), 1, RegionPerimeter.EPSILON);
-            assertEquals(p.getY(), 0, RegionPerimeter.EPSILON);
+            assertEquals(1, Math.abs(p.getX()), RegionPerimeter.EPSILON);
+            assertEquals(0, p.getY(), RegionPerimeter.EPSILON);
         }
     }
 }

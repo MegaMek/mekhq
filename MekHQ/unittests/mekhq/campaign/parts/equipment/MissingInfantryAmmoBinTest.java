@@ -382,7 +382,7 @@ public class MissingInfantryAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         missingAmmoBin.setUnit(unit);
-        quartermaster.addPart(missingAmmoBin, 0);
+        quartermaster.addPart(missingAmmoBin, 0, false);
 
         // Attempt to fix the missing ammo bin
         missingAmmoBin.fix();

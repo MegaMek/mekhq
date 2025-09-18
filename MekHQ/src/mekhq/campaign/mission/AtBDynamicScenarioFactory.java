@@ -363,7 +363,7 @@ public class AtBDynamicScenarioFactory {
      */
     public static int generateFixedForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
           ScenarioForceTemplate forceTemplate) {
-        File mulFile = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
+        File mulFile = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
         if (!mulFile.exists()) {
             LOGGER.error("MUL file {} does not exist", mulFile.getAbsolutePath());
             return 0;

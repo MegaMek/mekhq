@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS;
+import static mekhq.MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.determineUnresolvedContacts;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.hasUnresolvedContacts;
@@ -48,7 +48,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
     public UnresolvedStratConContactsNagDialog(final Campaign campaign) {
-        super(campaign, COMMAND, NAG_UNRESOLVED_STRATCON_CONTACTS, "UnresolvedStratConContactsNagDialog");
+        super(campaign, COMMAND, NAG_UNRESOLVED_STRAT_CON_CONTACTS, "UnresolvedStratConContactsNagDialog");
     }
 
     @Override
@@ -81,7 +81,7 @@ public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
     public static boolean checkNag(boolean isUseStratCon, List<AtBContract> activeContracts, LocalDate today) {
 
         return isUseStratCon &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNRESOLVED_STRATCON_CONTACTS) &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNRESOLVED_STRAT_CON_CONTACTS) &&
                      hasUnresolvedContacts(activeContracts, today);
     }
 }

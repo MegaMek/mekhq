@@ -41,11 +41,10 @@ import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.util.UUID;
 
-import megamek.common.units.Entity;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Portrait;
-import megamek.logging.MMLogger;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -66,7 +65,6 @@ import org.junit.jupiter.api.Test;
  */
 
 class CargoCapacityTest {
-    MMLogger logger = MMLogger.create(CargoCapacityTest.class);
 
     private Campaign mockCampaign;
     private CampaignOptions mockCampaignOptions;

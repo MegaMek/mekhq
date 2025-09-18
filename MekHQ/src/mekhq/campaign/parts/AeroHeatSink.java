@@ -58,9 +58,9 @@ import org.w3c.dom.NodeList;
 public class AeroHeatSink extends Part {
     private int type;
 
-    static final TechAdvancement TA_SINGLE = EquipmentType.get("Heat Sink").getTechAdvancement();
-    static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
-    static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
+    public static final TechAdvancement TA_SINGLE = EquipmentType.get("Heat Sink").getTechAdvancement();
+    public static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
+    public static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
 
     // To differentiate Clan double heat sinks, which aren't defined in Aero
     public static final int CLAN_HEAT_DOUBLE = 2;

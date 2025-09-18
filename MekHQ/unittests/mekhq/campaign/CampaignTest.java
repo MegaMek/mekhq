@@ -36,6 +36,7 @@ package mekhq.campaign;
 import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -244,26 +245,26 @@ public class CampaignTest {
     }
 
     @Test
-    void testIniative() {
+    void testInitiative() {
         Campaign campaign = new Campaign();
 
         campaign.applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
-        assertTrue(campaign.getInitiativeBonus() == 6);
-        assertTrue(campaign.getInitiativeMaxBonus() == 6);
+        assertEquals(6, campaign.getInitiativeBonus());
+        assertEquals(6, campaign.getInitiativeMaxBonus());
         // Should not be able to increment over max of 6
         campaign.initiativeBonusIncrement(true);
-        assertFalse(campaign.getInitiativeBonus() == 7);
+        assertNotEquals(7, campaign.getInitiativeBonus());
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 6);
+        assertEquals(6, campaign.getInitiativeBonus());
         // But should be able to decrease below max
         campaign.initiativeBonusIncrement(false);
-        assertEquals(campaign.getInitiativeBonus(), 5);
-        // After setting lower Max Bonus any appied bonus thats less then max should set
+        assertEquals(5, campaign.getInitiativeBonus());
+        // After setting lower Max Bonus any applied bonus that's less than max should set
         // bonus to max
         campaign.setInitiativeMaxBonus(3);
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 3);
+        assertEquals(3, campaign.getInitiativeBonus());
 
     }
 
@@ -456,7 +457,7 @@ public class CampaignTest {
         }
 
         /**
-         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
+         * {@link Campaign# getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
          * testing
          */
         @Nested
@@ -491,7 +492,7 @@ public class CampaignTest {
             }
 
             /**
-             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
+             * @return parts that are not explicitly handled by {@link Campaign# getDefaultStockPercent(Part)}
              */
             public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
                 return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());

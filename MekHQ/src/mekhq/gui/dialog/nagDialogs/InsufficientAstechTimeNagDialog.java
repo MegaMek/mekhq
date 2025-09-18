@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME;
+import static mekhq.MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechTimeNagLogic.getAsTechTimeDeficit;
@@ -55,7 +55,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
  *
  * <p>The {@code InsufficientAstechTimeNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
  * designed to alert players when there is not enough astech time available to complete required tasks efficiently. It
- * uses predefined values, including the {@code NAG_INSUFFICIENT_ASTECH_TIME} constant, and does not provide a specific
+ * uses predefined values, including the {@code NAG_INSUFFICIENT_AS_TECH_TIME} constant, and does not provide a specific
  * speaker specialization, relying instead on a default fallback mechanism.</p>
  */
 public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
@@ -64,7 +64,7 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
      * dialog.
      *
      * <p>This constructor initializes the dialog with preconfigured parameters, such as the
-     * {@code NAG_INSUFFICIENT_ASTECH_TIME} constant for managing dialog suppression and the
+     * {@code NAG_INSUFFICIENT_AS_TECH_TIME} constant for managing dialog suppression and the
      * {@code "InsufficientAstechTimeNagDialog"} message key for retrieving localized dialog content. No specific
      * speaker is provided, triggering fallback logic to determine the appropriate speaker for the dialog.</p>
      *
@@ -72,7 +72,7 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public InsufficientAstechTimeNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INSUFFICIENT_ASTECH_TIME, "InsufficientAstechTimeNagDialog");
+        super(campaign, null, NAG_INSUFFICIENT_AS_TECH_TIME, "InsufficientAstechTimeNagDialog");
     }
 
     /**
@@ -195,7 +195,7 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
      */
     public static boolean checkNag(Collection<Unit> units, int possibleAstechPoolMinutes, boolean isOvertimeAllowed,
           int possibleAstechPoolOvertime) {
-        final String NAG_KEY = NAG_INSUFFICIENT_ASTECH_TIME;
+        final String NAG_KEY = NAG_INSUFFICIENT_AS_TECH_TIME;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
                      hasAsTechTimeDeficit(units,

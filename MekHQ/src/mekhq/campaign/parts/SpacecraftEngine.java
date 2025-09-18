@@ -64,14 +64,14 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SpacecraftEngine extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-                                                          .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
-                                                          .setTechRating(TechRating.D)
-                                                          .setAvailability(AvailabilityValue.C,
-                                                                AvailabilityValue.D,
-                                                                AvailabilityValue.C,
-                                                                AvailabilityValue.C)
-                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                                 .setTechRating(TechRating.D)
+                                                                 .setAvailability(AvailabilityValue.C,
+                                                                       AvailabilityValue.D,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     double engineTonnage;
     boolean clan;

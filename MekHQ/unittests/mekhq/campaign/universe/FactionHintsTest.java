@@ -110,8 +110,8 @@ public class FactionHintsTest {
 
         LocalDate now = LocalDate.of(3005, 1, 1);
 
-        assertEquals(hints.getCurrentWar(f1, f2, now), WAR_NAME);
-        assertEquals(hints.getCurrentWar(f2, f1, now), WAR_NAME);
+        assertEquals(WAR_NAME, hints.getCurrentWar(f1, f2, now));
+        assertEquals(WAR_NAME, hints.getCurrentWar(f2, f1, now));
         // This test will fail if run between 3000 and 3010
         assertNull(hints.getCurrentWar(f1, f2, LocalDate.now()));
     }
@@ -145,7 +145,7 @@ public class FactionHintsTest {
         assertTrue(hints.getContainedFactions(outer, now).contains(inner));
         assertEquals(hints.getContainedFactionHost(inner, now), outer);
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
-        assertEquals(hints.getAltLocationFraction(outer, inner, now), 0.5, RegionPerimeter.EPSILON);
+        assertEquals(0.5, hints.getAltLocationFraction(outer, inner, now), RegionPerimeter.EPSILON);
     }
 
     @Test

@@ -103,10 +103,9 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (getClass() == part.getClass())
-                     && getType() == ((ProtoMekArmor) part).getType()
-                     && isClanTechBase() == part.isClanTechBase()
-                     && Objects.equals(getRefitUnit(), part.getRefitUnit());
+        return (part instanceof ProtoMekArmor protoMekArmor)
+                     && isClanTechBase() == protoMekArmor.isClanTechBase()
+                     && Objects.equals(getRefitUnit(), protoMekArmor.getRefitUnit());
     }
 
     @Override

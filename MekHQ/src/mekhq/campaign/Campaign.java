@@ -6043,7 +6043,7 @@ public class Campaign implements ITechManager {
         turnoverRetirementInformation.clear();
 
         // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAsTechs()) {
+        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill() && requiresAdditionalAsTechs()) {
             fillAsTechPool();
         }
 
@@ -8666,7 +8666,7 @@ public class Campaign implements ITechManager {
 
     public int getAsTechNeed() {
         return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) *
-                      MHQConstants.ASTECH_TEAM_SIZE) -
+                      MHQConstants.AS_TECH_TEAM_SIZE) -
                      getNumberAsTechs();
     }
 
@@ -8741,24 +8741,24 @@ public class Campaign implements ITechManager {
         }
 
         int availableHelp = (int) floor(((double) asTechPoolMinutes) / minutes);
-        if (isOvertimeAllowed() && (availableHelp < MHQConstants.ASTECH_TEAM_SIZE)) {
+        if (isOvertimeAllowed() && (availableHelp < MHQConstants.AS_TECH_TEAM_SIZE)) {
             // if we are less than fully staffed, then determine whether
             // we should dip into overtime or just continue as short-staffed
             final int shortMod = getShorthandedMod(availableHelp, false);
             final int remainingMinutes = asTechPoolMinutes - availableHelp * minutes;
             final int extraHelp = (remainingMinutes + asTechPoolOvertime) / minutes;
-            final int helpNeeded = MHQConstants.ASTECH_TEAM_SIZE - availableHelp;
+            final int helpNeeded = MHQConstants.AS_TECH_TEAM_SIZE - availableHelp;
             if (alreadyOvertime && (shortMod > 0)) {
                 // then add whatever we can
                 availableHelp += extraHelp;
             } else if (shortMod > 3) {
                 // only dip in if we can bring ourselves up to full
                 if (extraHelp >= helpNeeded) {
-                    availableHelp = MHQConstants.ASTECH_TEAM_SIZE;
+                    availableHelp = MHQConstants.AS_TECH_TEAM_SIZE;
                 }
             }
         }
-        return Math.min(Math.min(availableHelp, MHQConstants.ASTECH_TEAM_SIZE), getNumberAsTechs());
+        return Math.min(Math.min(availableHelp, MHQConstants.AS_TECH_TEAM_SIZE), getNumberAsTechs());
     }
 
     public int getShorthandedMod(int availableHelp, boolean medicalStaff) {

@@ -60,14 +60,14 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AeroSensor extends Part {
-    final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-                                                          .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
-                                                          .setTechRating(TechRating.C)
-                                                          .setAvailability(AvailabilityValue.C,
-                                                                AvailabilityValue.C,
-                                                                AvailabilityValue.C,
-                                                                AvailabilityValue.C)
-                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                                 .setTechRating(TechRating.C)
+                                                                 .setAvailability(AvailabilityValue.C,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private boolean largeCraft;
 

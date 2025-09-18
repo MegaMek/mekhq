@@ -117,10 +117,9 @@ public class PrisonerEventManagerTest {
 
         // Act
         int actualValue = eventManager.degradeTemporaryCapacity();
-        int expectedValue = DEFAULT_TEMPORARY_CAPACITY;
 
         // Assert
-        assertEquals(expectedValue, actualValue);
+        assertEquals(DEFAULT_TEMPORARY_CAPACITY, actualValue);
         assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
@@ -177,10 +176,9 @@ public class PrisonerEventManagerTest {
 
         // Act
         int actualValue = eventManager.degradeTemporaryCapacity();
-        int expectedValue = DEFAULT_TEMPORARY_CAPACITY;
 
         // Assert
-        assertEquals(expectedValue, actualValue);
+        assertEquals(DEFAULT_TEMPORARY_CAPACITY, actualValue);
         assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 

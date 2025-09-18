@@ -291,10 +291,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, mockFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -327,10 +326,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -365,10 +363,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = BECOMING_BONDSMAN;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(BECOMING_BONDSMAN, actualStatus);
     }
 
     @Test
@@ -398,10 +395,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, mockFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -434,10 +430,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -472,10 +467,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = BECOMING_BONDSMAN;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(BECOMING_BONDSMAN, actualStatus);
     }
 
     @Test
@@ -499,10 +493,8 @@ class CapturePrisonersTest {
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
-        int expectedTargetNumber = DEFECTION_CHANCE;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(DEFECTION_CHANCE, defectionChance);
     }
 
     @Test
@@ -530,9 +522,8 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = (int) round(DEFECTION_CHANCE * MERCENARY_MULTIPLIER);
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(expectedTargetNumber, defectionChance);
     }
 
     @Test
@@ -558,10 +549,8 @@ class CapturePrisonersTest {
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
-        int expectedTargetNumber = DEFECTION_CHANCE;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(DEFECTION_CHANCE, defectionChance);
     }
 
     @Test
@@ -587,9 +576,8 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = DEFECTION_CHANCE * CLAN_DEZGRA_MULTIPLIER;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(expectedTargetNumber, defectionChance);
     }
 
 

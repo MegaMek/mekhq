@@ -107,14 +107,6 @@ public class ContractMarketMethodTest {
     }
     //endregion Boolean Comparison Methods
 
-/*
-    @Test
-    public void testGetContractMarket() {
-        assertInstanceOf(DisabledContractMarket.class, ContractMarketMethod.NONE.getContractMarket());
-        assertInstanceOf(AtBMonthlyContractMarket.class, ContractMarketMethod.ATB_MONTHLY.getContractMarket());
-    }
-*/
-
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("ContractMarketMethod.NONE.text"),

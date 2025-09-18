@@ -138,7 +138,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            LOGGER.error("RAT collection {} not found in " + MHQConstants.RATINFO_DIR, name);
+            LOGGER.error("RAT collection {} not found in " + MHQConstants.RAT_INFO_DIR, name);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -149,7 +149,7 @@ public class RATManager extends AbstractUnitGenerator {
                 LOGGER.error("", e);
             }
         }
-        File f = new File(MHQConstants.RATINFO_DIR, fileNames.get(name));
+        File f = new File(MHQConstants.RAT_INFO_DIR, fileNames.get(name));
 
         Document xmlDoc;
         DocumentBuilder db;
@@ -228,7 +228,7 @@ public class RATManager extends AbstractUnitGenerator {
     public static void populateCollectionNames() {
         allCollections = new HashMap<>();
 
-        File dir = new File(MHQConstants.RATINFO_DIR);
+        File dir = new File(MHQConstants.RAT_INFO_DIR);
         if (!dir.isDirectory()) {
             LOGGER.error("RatInfo directory not found");
             return;

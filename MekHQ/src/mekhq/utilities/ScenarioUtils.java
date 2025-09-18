@@ -32,7 +32,7 @@
  */
 package mekhq.utilities;
 
-import static mekhq.MHQConstants.MAPGEN_PATH;
+import static mekhq.MHQConstants.MAP_GEN_PATH;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -118,7 +118,7 @@ public class ScenarioUtils {
                 mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
             }
         } else {
-            File mapgenFile = new MegaMekFile(new File(MAPGEN_PATH), mapName + ".xml").getFile();
+            File mapgenFile = new MegaMekFile(new File(MAP_GEN_PATH), mapName + ".xml").getFile();
             try (InputStream is = new FileInputStream(mapgenFile)) {
                 mapSettings = MapSettings.getInstance(is);
             } catch (IOException ex) {

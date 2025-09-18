@@ -92,10 +92,9 @@ class RandomDependentsTest {
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);
         int actualValue = randomDependents.prepareData();
-        int expectedValue = NUMBER_OF_NON_DEPENDENTS;
 
         // Assert
-        assertEquals(expectedValue, actualValue);
+        assertEquals(NUMBER_OF_NON_DEPENDENTS, actualValue);
     }
 
     @Test

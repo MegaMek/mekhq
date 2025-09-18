@@ -70,7 +70,7 @@ import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
 import mekhq.utilities.ReportingUtilities;
 
 public class MRMSService {
-    private static final MMLogger logger = MMLogger.create(MRMSService.class);
+    private static final MMLogger LOGGER = MMLogger.create(MRMSService.class);
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
           MekHQ.getMHQOptions().getLocale());
@@ -556,7 +556,7 @@ public class MRMSService {
         boolean scrappingLimbMode = false;
 
         /*
-         * Pre checking for hips/shoulders on repairable meks. If we have a bad
+         * Pre-checking for hips/shoulders on repairable meks. If we have a bad
          * hip or shoulder, we're not going to do anything until we get those
          * parts out of the location and scrap it. Once we're at a happy place,
          * we'll proceed.
@@ -1217,7 +1217,7 @@ public class MRMSService {
             }
 
             if (increaseTime) {
-                // If we've reached our TN, kick out. Otherwise we'll loop
+                // If we've reached our TN, kick out. Otherwise, we'll loop
                 // around again
                 if (targetRoll.getValue() <= mrmsOption.getTargetNumberPreferred()) {
                     debugLog(
@@ -1247,7 +1247,7 @@ public class MRMSService {
             msg = String.format(msg, replacements);
         }
 
-        logger.debug(msg);
+        LOGGER.debug(msg);
     }
 
     private static class WorkTimeCalculation {
@@ -1279,12 +1279,7 @@ public class MRMSService {
         }
     }
 
-    private static class TechSorter implements Comparator<Person> {
-        private IPartWork partWork;
-
-        public TechSorter(IPartWork _part) {
-            this.partWork = _part;
-        }
+    private record TechSorter(IPartWork partWork) implements Comparator<Person> {
 
         @Override
         public int compare(Person tech1, Person tech2) {
@@ -1423,7 +1418,7 @@ public class MRMSService {
     }
 
     public static class MRMSPartSet {
-        private Map<MRMSPartAction.STATUS, List<MRMSPartAction>> partActionsByStatus = new HashMap<>();
+        private final Map<MRMSPartAction.STATUS, List<MRMSPartAction>> partActionsByStatus = new HashMap<>();
 
         public void addPartAction(MRMSPartAction partAction) {
             if (partAction == null) {
@@ -1457,7 +1452,7 @@ public class MRMSService {
                 return false;
             }
 
-            return partActionsByStatus.size() <= 1;
+            return partActionsByStatus.size() == 1;
         }
     }
 

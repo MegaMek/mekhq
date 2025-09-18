@@ -195,8 +195,6 @@ public class AttributesTest {
         final Phenotype phenotype = Phenotype.GENERAL;
         final PersonnelOptions options = new PersonnelOptions();
 
-        final int attributeCap = phenotype.getAttributeCap(CHARISMA);
-
         attributes.setAttributeScore(phenotype, options, CHARISMA, MAXIMUM_ATTRIBUTE_SCORE + 1);
         assertEquals(phenotype.getAttributeCap(CHARISMA), attributes.getAttributeScore(CHARISMA));
 

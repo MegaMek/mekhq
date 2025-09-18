@@ -65,16 +65,17 @@ import org.w3c.dom.NodeList;
 public class TankLocation extends Part {
     private static final MMLogger LOGGER = MMLogger.create(TankLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL).setAdvancement(2460, 2470, 2510)
-                                                          .setApproximate(true, false, false)
-                                                          .setPrototypeFactions(Faction.TH)
-                                                          .setProductionFactions(Faction.TH)
-                                                          .setTechRating(TechRating.D)
-                                                          .setAvailability(AvailabilityValue.A,
-                                                                AvailabilityValue.A,
-                                                                AvailabilityValue.A,
-                                                                AvailabilityValue.A)
-                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setAdvancement(2460, 2470, 2510)
+                                                                 .setApproximate(true, false, false)
+                                                                 .setPrototypeFactions(Faction.TH)
+                                                                 .setProductionFactions(Faction.TH)
+                                                                 .setTechRating(TechRating.D)
+                                                                 .setAvailability(AvailabilityValue.A,
+                                                                       AvailabilityValue.A,
+                                                                       AvailabilityValue.A,
+                                                                       AvailabilityValue.A)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected int loc;
     protected int damage;

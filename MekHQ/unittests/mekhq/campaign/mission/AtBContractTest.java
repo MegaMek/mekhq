@@ -43,10 +43,10 @@ import java.util.Vector;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.units.Entity;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.units.UnitType;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -82,8 +82,8 @@ public class AtBContractTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         // TODO: fix this in the production code
-        RandomCallsignGenerator.getInstance(); // Required in this codepath to generate a random merc company name
-        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
+        RandomCallsignGenerator.getInstance(); // Required in this code path to generate a random merc company name
+        RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
         try {
             Factions.setInstance(Factions.loadDefault());
             Systems.setInstance(Systems.loadDefault());
@@ -638,14 +638,14 @@ public class AtBContractTest {
             int forceId = getNextForceId();
             Force mockCompany = mock(Force.class);
 
-            Vector<Object> subforces = new Vector<>();
-            subforces.add(getMockLanceForce(formationSize));
-            subforces.add(getMockLanceForce(formationSize));
-            subforces.add(getMockLanceForce(formationSize));
+            Vector<Object> subForces = new Vector<>();
+            subForces.add(getMockLanceForce(formationSize));
+            subForces.add(getMockLanceForce(formationSize));
+            subForces.add(getMockLanceForce(formationSize));
 
             Vector<UUID> mockUUIDs = new Vector<>();
-            for (Object subforce : subforces) {
-                if (subforce instanceof Force force) {
+            for (Object subForce : subForces) {
+                if (subForce instanceof Force force) {
                     mockUUIDs.addAll(force.getAllUnits(true));
                 }
             }
@@ -653,7 +653,7 @@ public class AtBContractTest {
             when(mockCompany.getId()).thenReturn(forceId);
             when(mockCompany.isForceType(ForceType.STANDARD)).thenReturn(true);
             when(mockCompany.getFormationLevel()).thenReturn(FormationLevel.COMPANY);
-            when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subforces);
+            when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subForces);
             when(mockCompany.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
 
             return mockCompany;
