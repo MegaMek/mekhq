@@ -46,7 +46,7 @@ import megamek.logging.MMLogger;
 import mekhq.io.AwardFileFactory;
 
 public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
-    private static final MMLogger logger = MMLogger.create(MHQStaticDirectoryManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(MHQStaticDirectoryManager.class);
 
     // region Variable Declarations
     private static AbstractDirectory forceIconDirectory;
@@ -55,9 +55,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     private static AbstractDirectory userStorySplashDirectory;
     private static AbstractDirectory userStoryPortraitDirectory;
 
-    // Re-parsing Prevention Variables: They are True at startup and when the
+    // Reparsing Prevention Variables: They are True at startup and when the
     // specified directory
-    // should be re-parsed, and are used to avoid re-parsing the directory
+    // should be reparsed, and are used to avoid reparsing the directory
     // repeatedly when there's
     // an error.
     private static boolean parseForceIconDirectory = true;
@@ -76,7 +76,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // region Initialization
 
     /**
-     * This initializes all of the directories under this manager
+     * This initializes all the directories under this manager
      */
     public static void initialize() {
         MMStaticDirectoryManager.initialize();
@@ -94,7 +94,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         // Read in and parse MekHQ's force icon folder only when first called or when
         // refreshed
         if (parseForceIconDirectory) {
-            // Set parseForceIconDirectory to false to avoid parsing repeatedly when
+            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseForceIconDirectory = false;
             try {
@@ -108,7 +108,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 }
 
             } catch (Exception e) {
-                logger.error("Could not parse the force icon directory!", e);
+                LOGGER.error("Could not parse the force icon directory!", e);
             }
         }
     }
@@ -122,7 +122,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         // Read in and parse MekHQ's award icon folder only when first called or when
         // refreshed
         if (parseAwardIconDirectory) {
-            // Set parseAwardIconDirectory to false to avoid parsing repeatedly when
+            // Set parseAwardIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseAwardIconDirectory = false;
             try {
@@ -135,13 +135,13 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     awardIconDirectory.merge(userAwardIcons);
                 }
             } catch (Exception e) {
-                logger.error("Could not parse the award icon directory!", e);
+                LOGGER.error("Could not parse the award icon directory!", e);
             }
         }
     }
 
     /**
-     * Parses MekHQ's storyarcs icon folder when first called or when it was refreshed.
+     * Parses MekHQ's story arcs icon folder when first called or when it was refreshed.
      *
      * @see #refreshStorySplash()
      */
@@ -149,7 +149,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         // Read in and parse MekHQ's force icon folder only when first called or when
         // refreshed
         if (parseStorySplashDirectory) {
-            // Set parseForceIconDirectory to false to avoid parsing repeatedly when
+            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseStorySplashDirectory = false;
             try {
@@ -158,7 +158,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     storySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
-                logger.error("Could not parse the storyarc icon directory!", e);
+                LOGGER.error("Could not parse the storyarc icon directory!", e);
             }
         }
     }
@@ -170,7 +170,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         // Read in and parse MekHQ's force icon folder only when first called or when
         // refreshed
         if (parseUserStoryPortraitDirectory) {
-            // Set parseForceIconDirectory to false to avoid parsing repeatedly when
+            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseUserStoryPortraitDirectory = false;
             try {
@@ -179,19 +179,19 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     userStoryPortraitDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
-                logger.error("Could not parse the storyarc portrait directory!", e);
+                LOGGER.error("Could not parse the storyarc portrait directory!", e);
             }
         }
     }
 
     /**
-     * Parses the user's Story Arc storyarcs directory when first called or when it was refreshed
+     * Parses the user's Story Arc story arcs directory when first called or when it was refreshed
      */
     public static void initializeUserStorySplash(String path) {
         // Read in and parse MekHQ's force icon folder only when first called or when
         // refreshed
         if (parseUserStorySplashDirectory) {
-            // Set parseForceIconDirectory to false to avoid parsing repeatedly when
+            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseUserStorySplashDirectory = false;
             try {
@@ -200,7 +200,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     userStorySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
-                logger.error("Could not parse the storyarc splash image directory!", e);
+                LOGGER.error("Could not parse the story arc splash image directory!", e);
             }
         }
     }
@@ -231,7 +231,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all story icon filenames found in MekHQ's storyarc icon folder.
+     * Returns an AbstractDirectory object containing all story icon filenames found in MekHQ's story arc icon folder.
      *
      * @return an AbstractDirectory object with the story icon folders and filenames. May be null if the directory
      *       cannot be parsed.
@@ -242,7 +242,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all story portrait filenames found in the user's storyarc
+     * Returns an AbstractDirectory object containing all story portrait filenames found in the user's story arc
      * portraits folder.
      *
      * @return an AbstractDirectory object with the story portrait folders and filenames. May be null if the directory
@@ -254,7 +254,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all story arc image filenames found in the user's storyarc
+     * Returns an AbstractDirectory object containing all story arc image filenames found in the user's story arc
      * folder.
      *
      * @return an AbstractDirectory object with the story portrait folders and filenames. May be null if the directory

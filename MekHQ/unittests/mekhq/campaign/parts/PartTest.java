@@ -137,7 +137,7 @@ public class PartTest {
 
         int quantity = part.getQuantity();
 
-        part.incrementQuantity();
+        part.changeQuantity(1);
 
         assertEquals(quantity + 1, part.getQuantity());
     }
@@ -155,12 +155,12 @@ public class PartTest {
         // Setting the quantity specifically should work.
         assertEquals(2, part.getQuantity());
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should now be 1
         assertEquals(1, part.getQuantity());
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should now be 0...
         assertEquals(0, part.getQuantity());
@@ -179,12 +179,12 @@ public class PartTest {
 
         part.setQuantity(1);
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should now be 0...
         assertEquals(0, part.getQuantity());
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should still be 0...
         assertEquals(0, part.getQuantity());
@@ -207,7 +207,7 @@ public class PartTest {
         part.setQuantity(1);
 
         // Remove the part by decrementing its quantity to 0.
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
         verify(mockWarehouse, times(3)).removePart(partCaptor.capture());
@@ -361,7 +361,7 @@ public class PartTest {
         assertFalse(part.getChildParts().contains(childPart1));
         verify(childPart1, times(1)).setParentPart(eq(null));
 
-        // Now remove al lthe remaining parts
+        // Now remove al the remaining parts
         part.removeAllChildParts();
 
         assertFalse(part.hasChildParts());

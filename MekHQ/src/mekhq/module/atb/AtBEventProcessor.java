@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -74,10 +75,8 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Neoancient
  */
-public class AtBEventProcessor {
-    private static final MMLogger logger = MMLogger.create(AtBEventProcessor.class);
-
-    private final Campaign campaign;
+public record AtBEventProcessor(Campaign campaign) {
+    private static final MMLogger LOGGER = MMLogger.create(AtBEventProcessor.class);
 
     public AtBEventProcessor(Campaign campaign) {
         this.campaign = campaign;
@@ -170,7 +169,6 @@ public class AtBEventProcessor {
     /**
      * Listens for new personnel to be added to the market and determines which should come with units.
      *
-     * @param ev
      */
     @Subscribe
     public void handlePersonnelMarket(MarketNewPersonnelEvent ev) {
@@ -239,24 +237,22 @@ public class AtBEventProcessor {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MekSummaryCache.getInstance().getMek(name);
-                logger.info("looking for Clan infantry " + name);
+                LOGGER.info("looking for Clan infantry {}", name);
             }
             try {
                 en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                logger.error("Unable to load entity: " +
-                                   ms.getSourceFile() +
-                                   ": " +
-                                   ms.getEntryName() +
-                                   ": " +
-                                   ex.getMessage(), ex);
+                LOGGER.error("Unable to load entity: {}: {}: {}",
+                      ms.getSourceFile(),
+                      ms.getEntryName(),
+                      ex.getMessage(),
+                      ex);
             }
         } else {
-            logger.error("Personnel market could not find " +
-                               UnitType.getTypeName(unitType) +
-                               " for recruit from faction " +
-                               faction);
+            LOGGER.error("Personnel market could not find {} for recruit from faction {}",
+                  UnitType.getTypeName(unitType),
+                  faction);
             return;
         }
 
@@ -327,9 +323,9 @@ public class AtBEventProcessor {
                     return clan;
                 }
             } else {
-                String faction = RandomFactionGenerator.getInstance().getEmployer();
+                Faction faction = RandomFactionGenerator.getInstance().getEmployerFaction();
                 if (faction != null) {
-                    return faction;
+                    return faction.getShortName();
                 }
             }
         }

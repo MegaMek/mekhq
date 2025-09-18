@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -111,7 +111,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.w3c.dom.Node;
 
 public class Utilities {
-    private static final MMLogger logger = MMLogger.create(Utilities.class);
+    private static final MMLogger LOGGER = MMLogger.create(Utilities.class);
 
     private Utilities() {
         throw new IllegalStateException("Utilities - Utility Class");
@@ -154,11 +154,9 @@ public class Utilities {
 
         final Vector<AmmoType> munitions = AmmoType.getMunitionsFor(currentAmmoType.getAmmoType());
         if (munitions == null) {
-            String message = String.format(
-                  "Cannot getMunitions for %s because of a null munitions list for ammo type %d",
+            LOGGER.error("Cannot getMunitions for {} because of a null munitions list for ammo type {}",
                   entity.getDisplayName(),
                   currentAmmoType.getAmmoType());
-            logger.error(message);
             return Collections.emptyList();
         }
 
@@ -185,12 +183,12 @@ public class Utilities {
                 continue;
             }
 
-            // Only Protos can use Proto-specific ammo
+            // Only ProtoMeks can use Proto-specific ammo
             if (ammoType.hasFlag(AmmoType.F_PROTOMEK) && !(entity instanceof ProtoMek)) {
                 continue;
             }
 
-            // When dealing with machine guns, Protos can only use proto-specific machine
+            // When dealing with machine guns, ProtoMeks can only use proto-specific machine
             // gun ammo
             if ((entity instanceof ProtoMek) &&
                       ammoType.hasFlag(AmmoType.F_MG) &&
@@ -279,7 +277,7 @@ public class Utilities {
                 continue;
             }
 
-            // Weight of the two units must match or we continue, but BA weight gets checked
+            // Weight of the two units must match, or we continue, but BA weight gets checked
             // differently
             if (en instanceof BattleArmor battleArmor) {
                 if (battleArmor.getTroopers() != (int) summary.getTWWeight()) {
@@ -300,7 +298,7 @@ public class Utilities {
                 String message = String.format(
                       "Could not determine tech progression for %s, including among available refits.",
                       summary.getName());
-                logger.warn(message);
+                LOGGER.warn(message);
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
@@ -573,8 +571,8 @@ public class Utilities {
             else {
                 // Generate drivers for multi-crewed vehicles and vessels
 
-                // Uggh, BA are a nightmare. The getTotalDriverNeeds will adjust for
-                // missing/destroyed suits
+                // BA are a nightmare. The getTotalDriverNeeds will adjust for
+                // missing/destroyed suits,
                 // but we can't change that because lots of other stuff needs that to be right,
                 // so we will hack
                 // it here to make it the starting squad size
@@ -792,7 +790,7 @@ public class Utilities {
                     eligiblePeople.remove(person);
                     person = ObjectUtility.getRandomItem(eligiblePeople);
 
-                    // if we can't drop anyone's skill any lower or raise it any higher then forget
+                    // if we can't drop anyone's skill any lower or raise it any higher than forget
                     // it
                     if (person == null) {
                         return;
@@ -819,7 +817,7 @@ public class Utilities {
      * @param person      the person to be renamed, if applicable
      * @param oldCrew     the crew object they were a part of
      * @param crewIndex   the index of the person in the crew
-     * @param crewOptions whether or not to run the populateOptionsFromCrew for this person
+     * @param crewOptions whether to run the populateOptionsFromCrew for this person
      */
     private static void migrateCrewData(Person person, Crew oldCrew, int crewIndex, boolean crewOptions) {
         if (crewOptions) {
@@ -1077,9 +1075,9 @@ public class Utilities {
                 fos.write(buf, 0, len);
             }
 
-            logger.info(String.format("Copied file %s to file %s", inFile.getPath(), outFile.getPath()));
+            LOGGER.info("Copied file {} to file {}", inFile.getPath(), outFile.getPath());
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -1115,7 +1113,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {
-            logger.error("Error exporting JTable", ioe);
+            LOGGER.error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1249,7 +1247,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            logger.error(String.format("Exception trying to parse %s - ignoring.", file.getPath()), ex);
+                            LOGGER.error(ex, "Exception trying to parse {} - ignoring.", file.getPath());
                         }
                     }
                 }
@@ -1313,7 +1311,6 @@ public class Utilities {
     public static void loadPlayerTransports(int trnId, Set<Integer> toLoad, Client client, boolean loadDropShips,
           boolean loadSmallCraft, boolean loadFighters, boolean loadGround) {
         if (!loadDropShips && !loadSmallCraft && !loadFighters && !loadGround) {
-            // Nothing to do. Get outta here!
             return;
         }
         Entity transport = client.getEntity(trnId);
@@ -1374,7 +1371,6 @@ public class Utilities {
         Set<Entity> alreadyTransportedEntities = new HashSet<>();
 
         if (!loadTactical) {
-            // Nothing to do. Get outta here!
             return;
         }
         Entity transport = client.getEntity(trnId);
@@ -1446,7 +1442,7 @@ public class Utilities {
         try {
             Thread.sleep(500);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -1465,7 +1461,6 @@ public class Utilities {
           boolean isAlreadyReset) {
         Set<Entity> alreadyTransportedEntities = new HashSet<>();
         if (!towTrailers) {
-            // Nothing to do. Get outta here!
             return;
         }
         Entity tractor = client.getEntity(tractorId);
@@ -1501,7 +1496,7 @@ public class Utilities {
         try {
             Thread.sleep(500);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -1599,7 +1594,6 @@ public class Utilities {
     /**
      * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
      *
-     * @throws EntityLoadingException
      */
     public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
         MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);

@@ -70,11 +70,11 @@ public class StratConContractDefinition {
 
     private static ContractDefinitionManifest getContractDefinitionManifest() {
         if (definitionManifest == null) {
-            definitionManifest = ContractDefinitionManifest.Deserialize(MHQConstants.STRATCON_CONTRACT_MANIFEST);
+            definitionManifest = ContractDefinitionManifest.Deserialize(MHQConstants.STRAT_CON_CONTRACT_MANIFEST);
 
             // load user-specified modifier list
             ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest
-                                                                  .Deserialize(MHQConstants.STRATCON_USER_CONTRACT_MANIFEST);
+                                                                  .Deserialize(MHQConstants.STRAT_CON_USER_CONTRACT_MANIFEST);
             if (userDefinitionList != null) {
                 definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
             }
@@ -88,7 +88,7 @@ public class StratConContractDefinition {
      */
     public static StratConContractDefinition getContractDefinition(final AtBContractType atbContractType) {
         if (!loadedDefinitions.containsKey(atbContractType)) {
-            String filePath = Paths.get(MHQConstants.STRATCON_CONTRACT_PATH,
+            String filePath = Paths.get(MHQConstants.STRAT_CON_CONTRACT_PATH,
                   getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
             StratConContractDefinition def = Deserialize(new File(filePath));
 

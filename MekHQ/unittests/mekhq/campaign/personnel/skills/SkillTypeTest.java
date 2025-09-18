@@ -220,7 +220,7 @@ class SkillTypeTest {
         if (firstAttribute != NONE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
-                        firstAttribute.toString() +
+                        firstAttribute +
                         " for Skill: " +
                         skillType.getName());
         }
@@ -229,7 +229,7 @@ class SkillTypeTest {
         if (secondAttribute != NONE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
-                        secondAttribute.toString() +
+                        secondAttribute +
                         " for Skill: " +
                         skillType.getName());
         }
@@ -255,7 +255,7 @@ class SkillTypeTest {
         if (firstAttribute != NONE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
-                        firstAttribute.toString() +
+                        firstAttribute +
                         " for Skill: " +
                         skillType.getName());
         }
@@ -264,7 +264,7 @@ class SkillTypeTest {
         if (secondAttribute != NONE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
-                        secondAttribute.toString() +
+                        secondAttribute +
                         " for Skill: " +
                         skillType.getName());
         }

@@ -56,11 +56,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
-import megamek.common.equipment.Mounted;
-import megamek.common.units.ProtoMek;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -362,7 +362,7 @@ public class AmmoBinTest {
 
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
-        // Create an ammobin with a non-standard munition type ...
+        // Create an ammo bin with a non-standard munition type ...
         int equipmentNum = 42;
         AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, 0, false, false, mockCampaign);
 

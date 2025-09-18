@@ -238,7 +238,7 @@ public class RefitTest {
                     .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                     .count());
 
-        // All of the new parts should be from the old unit
+        // All the new parts should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().allMatch(p -> p.getUnit().equals(oldUnit)));
 
@@ -333,7 +333,7 @@ public class RefitTest {
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(Part::getName).collect(Collectors.toList());
+        List<String> shoppingList = refit.getShoppingList().stream().map(Part::getName).toList();
         List<String> serializedShoppingList = deserialized.getShoppingList()
                                                     .stream()
                                                     .map(Part::getName)
@@ -351,16 +351,16 @@ public class RefitTest {
         assertTrue(serializedShoppingList.isEmpty());
 
         // Do the same for their descriptions, which include the quantities...
-        List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
+        List<String> shoppingListDescriptions = Arrays.asList(refit.getShoppingListDescription());
         // ... except the second list needs to be mutable.
-        List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
+        List<String> serializedShoppingListDescriptions = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
 
-        assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
-        for (String desc : shoppingListDescs) {
-            assertTrue(serializedShoppingListDescs.remove(desc));
+        assertEquals(shoppingListDescriptions.size(), serializedShoppingListDescriptions.size());
+        for (String desc : shoppingListDescriptions) {
+            assertTrue(serializedShoppingListDescriptions.remove(desc));
         }
 
-        assertTrue(serializedShoppingListDescs.isEmpty());
+        assertTrue(serializedShoppingListDescriptions.isEmpty());
     }
 
     @Test
@@ -426,7 +426,7 @@ public class RefitTest {
                     .filter(p -> (p instanceof AmmoBin) && p.getName().equals("SRM 6 Ammo Bin"))
                     .count());
 
-        // All of the new parts should be from the old unit
+        // All the new parts should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().allMatch(p -> p.getUnit().equals(oldUnit)));
 
@@ -527,7 +527,7 @@ public class RefitTest {
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(Part::getName).collect(Collectors.toList());
+        List<String> shoppingList = refit.getShoppingList().stream().map(Part::getName).toList();
         List<String> serializedShoppingList = deserialized.getShoppingList()
                                                     .stream()
                                                     .map(Part::getName)
@@ -545,16 +545,16 @@ public class RefitTest {
         assertTrue(serializedShoppingList.isEmpty());
 
         // Do the same for their descriptions, which include the quantities...
-        List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
+        List<String> shoppingListDescriptions = Arrays.asList(refit.getShoppingListDescription());
         // ... except the second list needs to be mutable.
-        List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
+        List<String> serializedShoppingListDescriptions = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
 
-        assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
-        for (String desc : shoppingListDescs) {
-            assertTrue(serializedShoppingListDescs.remove(desc));
+        assertEquals(shoppingListDescriptions.size(), serializedShoppingListDescriptions.size());
+        for (String desc : shoppingListDescriptions) {
+            assertTrue(serializedShoppingListDescriptions.remove(desc));
         }
 
-        assertTrue(serializedShoppingListDescs.isEmpty());
+        assertTrue(serializedShoppingListDescriptions.isEmpty());
     }
 
     @Test
@@ -614,7 +614,7 @@ public class RefitTest {
         // + 1 facing change @ 120 mins ea
         // + 5 adds @ 120 mins ea
         // + 16 armor changes @ 5 mins ea
-        // x 8*0.5 = 4 (Class D with kit, camops)
+        // x 8*0.5 = 4 (Class D with kit, CamOps)
         assertEquals(((120.0 * 9.0) + (5.0 * 16.0)) * 4.0, refit.getActualTime(), 0.1);
 
         // Cost?
@@ -635,7 +635,7 @@ public class RefitTest {
                     .count());
         assertEquals(10, removedParts.stream().filter(p -> (p instanceof Armor)).count());
 
-        // All of the new parts should be from the old unit
+        // All the new parts should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().allMatch(p -> p.getUnit().equals(oldUnit)));
 
@@ -656,7 +656,7 @@ public class RefitTest {
 
         // We should have 16 points of standard armor on order
         assertNotNull(refit.getNewArmorSupplies());
-        assertEquals(refit.getNewArmorSupplies().getType(), EquipmentType.T_ARMOR_STANDARD);
+        assertEquals(EquipmentType.T_ARMOR_STANDARD, refit.getNewArmorSupplies().getType());
         assertEquals(16, refit.getNewArmorSupplies().getAmountNeeded());
     }
 
@@ -746,7 +746,7 @@ public class RefitTest {
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(Part::getName).collect(Collectors.toList());
+        List<String> shoppingList = refit.getShoppingList().stream().map(Part::getName).toList();
         List<String> serializedShoppingList = deserialized.getShoppingList()
                                                     .stream()
                                                     .map(Part::getName)
@@ -764,16 +764,16 @@ public class RefitTest {
         assertTrue(serializedShoppingList.isEmpty());
 
         // Do the same for their descriptions, which include the quantities...
-        List<String> shoppingListDescs = Arrays.asList(refit.getShoppingListDescription());
+        List<String> shoppingListDescriptions = Arrays.asList(refit.getShoppingListDescription());
         // ... except the second list needs to be mutable.
-        List<String> serializedShoppingListDescs = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
+        List<String> serializedShoppingListDescriptions = new ArrayList<>(Arrays.asList(deserialized.getShoppingListDescription()));
 
-        assertEquals(shoppingListDescs.size(), serializedShoppingListDescs.size());
-        for (String desc : shoppingListDescs) {
-            assertTrue(serializedShoppingListDescs.remove(desc));
+        assertEquals(shoppingListDescriptions.size(), serializedShoppingListDescriptions.size());
+        for (String desc : shoppingListDescriptions) {
+            assertTrue(serializedShoppingListDescriptions.remove(desc));
         }
 
-        assertTrue(serializedShoppingListDescs.isEmpty());
+        assertTrue(serializedShoppingListDescriptions.isEmpty());
 
         // Make sure the new armor is serialized/deserialized properly
         assertNotNull(deserialized.getNewArmorSupplies());
@@ -822,7 +822,7 @@ public class RefitTest {
                     .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                     .count());
 
-        // All of the new parts (except ammo bins) should be from the old unit
+        // All the new parts (except ammo bins) should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().filter(p -> !(p instanceof AmmoBin)).allMatch(p -> p.getUnit().equals(oldUnit)));
 
@@ -880,7 +880,7 @@ public class RefitTest {
                               .count());
         assertEquals(0, removedParts.stream().filter(p -> (p instanceof Armor)).count());
 
-        // All of the new parts should be from the old unit
+        // All the new parts should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().allMatch(p -> p.getUnit().equals(oldUnit)));
 

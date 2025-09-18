@@ -44,8 +44,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import megamek.common.units.Aero;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Aero;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
@@ -63,9 +63,6 @@ public class MissingHeatSinkTest {
         EquipmentType.initializeTypes();
     }
 
-    /**
-     * https://github.com/MegaMek/mekhq/issues/2365
-     */
     @Test
     public void missingHeatSinkSelectsCorrectPartDuringRepair() {
         Campaign mockCampaign = mock(Campaign.class);

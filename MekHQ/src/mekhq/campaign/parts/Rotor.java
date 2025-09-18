@@ -51,17 +51,17 @@ import mekhq.campaign.parts.missing.MissingRotor;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Rotor extends TankLocation {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-                                                          .setAdvancement(2460, 2470, 2510)
-                                                          .setApproximate(true, false, false)
-                                                          .setPrototypeFactions(Faction.TH)
-                                                          .setProductionFactions(Faction.TH)
-                                                          .setTechRating(TechRating.D)
-                                                          .setAvailability(AvailabilityValue.C,
-                                                                AvailabilityValue.D,
-                                                                AvailabilityValue.C,
-                                                                AvailabilityValue.C)
-                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setAdvancement(2460, 2470, 2510)
+                                                                 .setApproximate(true, false, false)
+                                                                 .setPrototypeFactions(Faction.TH)
+                                                                 .setProductionFactions(Faction.TH)
+                                                                 .setTechRating(TechRating.D)
+                                                                 .setAvailability(AvailabilityValue.C,
+                                                                       AvailabilityValue.D,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public Rotor() {
         this(0, null);

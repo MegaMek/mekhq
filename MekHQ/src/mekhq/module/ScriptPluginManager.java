@@ -53,7 +53,7 @@ import mekhq.module.api.MekHQModule;
  * @author Neoancient
  */
 public class ScriptPluginManager {
-    private static final MMLogger logger = MMLogger.create(ScriptPluginManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScriptPluginManager.class);
 
     private static ScriptPluginManager instance;
 
@@ -91,7 +91,7 @@ public class ScriptPluginManager {
     private void addModule(File script, String extension) {
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         if (null == engine) {
-            logger.warn("Could not find script engine for extension " + extension);
+            LOGGER.warn("Could not find script engine for extension {}", extension);
             return;
         }
         try (Reader fileReader = new FileReader(script)) {
@@ -103,7 +103,7 @@ public class ScriptPluginManager {
                 }
             }
         } catch (Exception e) {
-            logger.error("While parsing script " + script.getName(), e);
+            LOGGER.error("While parsing script {}", script.getName(), e);
         }
     }
 
@@ -111,10 +111,10 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            logger.info("Engine: " + engine.getEngineName());
-            logger.info("\tVersion: " + engine.getEngineVersion());
-            logger.info("\tAlias: " + engine.getNames());
-            logger.info("\tLanguage name: " + engine.getLanguageName() + "\n");
+            LOGGER.info("Engine: {}", engine.getEngineName());
+            LOGGER.info("\tVersion: {}", engine.getEngineVersion());
+            LOGGER.info("\tAlias: {}", engine.getNames());
+            LOGGER.info("\tLanguage name: {}\n", engine.getLanguageName());
         }
     }
 }

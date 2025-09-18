@@ -82,11 +82,11 @@ public class StratConFacilityFactory {
 
         // load dynamic scenarios
         StratConFacilityManifest facilityManifest = StratConFacilityManifest
-                                                          .deserialize(MHQConstants.STRATCON_FACILITY_MANIFEST);
+                                                          .deserialize(MHQConstants.STRAT_CON_FACILITY_MANIFEST);
 
         // load user-specified scenario list
         StratConFacilityManifest userManifest = StratConFacilityManifest
-                                                      .deserialize(MHQConstants.STRATCON_USER_FACILITY_MANIFEST);
+                                                      .deserialize(MHQConstants.STRAT_CON_USER_FACILITY_MANIFEST);
 
         if (facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
@@ -108,7 +108,7 @@ public class StratConFacilityFactory {
         }
 
         for (String fileName : manifest.facilityFileNames) {
-            String filePath = Paths.get(MHQConstants.STRATCON_FACILITY_PATH, fileName.trim()).toString();
+            String filePath = Paths.get(MHQConstants.STRAT_CON_FACILITY_PATH, fileName.trim()).toString();
 
             try {
                 StratConFacility facility = StratConFacility.deserialize(filePath);

@@ -221,13 +221,13 @@ public class AtBScenarioModifier implements Cloneable {
         loadManifest();
         loadScenarioModifiers();
 
-        initializeSpecificManifest(MHQConstants.STRATCON_REQUIRED_HOSTILE_FACILITY_MODS,
+        initializeSpecificManifest(MHQConstants.STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS,
               requiredHostileFacilityModifierKeys);
-        initializeSpecificManifest(MHQConstants.STRATCON_HOSTILE_FACILITY_MODS, hostileFacilityModifierKeys);
-        initializeSpecificManifest(MHQConstants.STRATCON_ALLIED_FACILITY_MODS, alliedFacilityModifierKeys);
-        initializeSpecificManifest(MHQConstants.STRATCON_GROUND_MODS, groundBattleModifierKeys);
-        initializeSpecificManifest(MHQConstants.STRATCON_AIR_MODS, airBattleModifierKeys);
-        initializeSpecificManifest(MHQConstants.STRATCON_PRIMARY_PLAYER_FORCE_MODS, primaryPlayerForceModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRAT_CON_HOSTILE_FACILITY_MODS, hostileFacilityModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRAT_CON_ALLIED_FACILITY_MODS, alliedFacilityModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRAT_CON_GROUND_MODS, groundBattleModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRAT_CON_AIR_MODS, airBattleModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRAT_CON_PRIMARY_PLAYER_FORCE_MODS, primaryPlayerForceModifierKeys);
 
         initializePositiveNegativeManifests(groundBattleModifierKeys, positiveGroundBattleModifierKeys,
               negativeGroundBattleModifierKeys);

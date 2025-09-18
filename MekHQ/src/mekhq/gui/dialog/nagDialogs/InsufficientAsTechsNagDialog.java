@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_INSUFFICIENT_ASTECHS;
+import static mekhq.MHQConstants.NAG_INSUFFICIENT_AS_TECHS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechsNagLogic.hasAsTechsNeeded;
@@ -52,7 +52,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
  *
  * <p>The {@link InsufficientAsTechsNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
  * designed to alert players when there is a shortage of AsTechs required for efficient operations. It uses predefined
- * values, including the {@code NAG_INSUFFICIENT_ASTECHS} constant, and no specific speaker specialization is provided,
+ * values, including the {@code NAG_INSUFFICIENT_AS_TECHS} constant, and no specific speaker specialization is provided,
  * relying on a default fallback mechanism.</p>
  */
 public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
@@ -61,7 +61,7 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      * Constructs a new {@code InsufficientAsTechsNagDialog} instance to display the insufficient AsTechs nag dialog.
      *
      * <p>This constructor initializes the dialog with preconfigured parameters, such as the
-     * {@code NAG_INSUFFICIENT_ASTECHS} constant, to manage dialog suppression and the
+     * {@code NAG_INSUFFICIENT_AS_TECHS} constant, to manage dialog suppression and the
      * {@code "InsufficientAsTechsNagDialog"} message key for retrieving localized dialog content. No specialized
      * speaker is provided, triggering the fallback logic to determine the appropriate speaker for the dialog.</p>
      *
@@ -69,7 +69,7 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public InsufficientAsTechsNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INSUFFICIENT_ASTECHS, "InsufficientAsTechsNagDialog");
+        super(campaign, null, NAG_INSUFFICIENT_AS_TECHS, "InsufficientAsTechsNagDialog");
     }
 
     /**
@@ -173,6 +173,6 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs, {@code false} otherwise.
      */
     public static boolean checkNag(int asTechsNeeded) {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_ASTECHS) && hasAsTechsNeeded(asTechsNeeded);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_AS_TECHS) && hasAsTechsNeeded(asTechsNeeded);
     }
 }

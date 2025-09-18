@@ -40,8 +40,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
-import java.io.IOException;
-
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
@@ -63,7 +61,7 @@ class AtBDynamicScenarioFactoryTest {
     Game game = new Game();
 
     @BeforeAll
-    public static void setUpBeforeClass() throws IOException, DOMException {
+    public static void setUpBeforeClass() throws DOMException {
         EquipmentType.initializeTypes();
     }
 
@@ -87,8 +85,8 @@ class AtBDynamicScenarioFactoryTest {
     }
 
     @Test
-    public void testCreateEntityWithCrewNoCallsigns() {
-        // Auto-generated callsigns disabled
+    public void testCreateEntityWithCrewNoCallSigns() {
+        // Auto-generated call signs disabled
         Faction faction = new Faction();
         Entity entity = getShadowHawk();
 
@@ -107,12 +105,12 @@ class AtBDynamicScenarioFactoryTest {
 
     @Test
     public void testCreateEntityWithCrew_allPossible() {
-        // Auto-generated callsigns enabled for all
+        // Auto-generated call signs enabled for all
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.ULTRA_GREEN);
 
-        // Auto-generated callsigns disabled
+        // Auto-generated call signs disabled
         Faction faction = new Faction();
         Entity entity = getShadowHawk();
 
@@ -124,7 +122,7 @@ class AtBDynamicScenarioFactoryTest {
 
     @Test
     public void testCreateEntityWithCrew_RegularPlus() {
-        // Auto-generated callsigns enabled for pilots above a certain skill
+        // Auto-generated call signs enabled for pilots above a certain skill
         // VETERAN will always be >= REGULAR even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
@@ -148,7 +146,7 @@ class AtBDynamicScenarioFactoryTest {
 
     @Test
     public void testCreateEntityWithCrew_HeroicPlus() {
-        // Auto-generated callsigns enabled for pilots above a certain skill
+        // Auto-generated call signs enabled for pilots above a certain skill
         // VETERAN will always be < HEROIC even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
         when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);

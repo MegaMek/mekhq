@@ -63,14 +63,14 @@ public class AeroLifeSupport extends Part {
     private Money cost;
     private boolean fighter;
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-                                                          .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
-                                                          .setTechRating(TechRating.C)
-                                                          .setAvailability(AvailabilityValue.C,
-                                                                AvailabilityValue.C,
-                                                                AvailabilityValue.C,
-                                                                AvailabilityValue.C)
-                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                                 .setTechRating(TechRating.C)
+                                                                 .setAvailability(AvailabilityValue.C,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public AeroLifeSupport() {
         this(0, Money.zero(), false, null);

@@ -745,7 +745,7 @@ class MekLocationTest {
         // Fix the RT ...
         doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_RIGHT_TORSO);
 
-        // ... now the RARM can be fixed.
+        // ... now the RIGHT_ARM can be fixed.
         assertNull(mekLocation.checkFixable());
 
         location = Mek.LOC_LEFT_ARM;
@@ -758,7 +758,7 @@ class MekLocationTest {
         // Fix the LT ...
         doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_LEFT_TORSO);
 
-        // ... now the LARM can be fixed.
+        // ... now the LEFT_ARM can be fixed.
         assertNull(mekLocation.checkFixable());
     }
 
@@ -1850,7 +1850,7 @@ class MekLocationTest {
         mekLocation.setBlownOff(true);
         mekLocation.setUnit(unit);
 
-        // Setup the critical slots
+        // Set up the critical slots
         doReturn(3).when(entity).getNumberOfCriticalSlots((location));
         doReturn(null).when(entity).getCritical((location), (0)); // empty
         CriticalSlot mockSlot = mock(CriticalSlot.class);
@@ -1887,7 +1887,7 @@ class MekLocationTest {
         mekLocation.setBreached(true);
         mekLocation.setUnit(unit);
 
-        // Setup the critical slots
+        // Set up the critical slots
         doReturn(3).when(entity).getNumberOfCriticalSlots((location));
         doReturn(null).when(entity).getCritical((location), (0)); // empty
         CriticalSlot mockSlot = mock(CriticalSlot.class);

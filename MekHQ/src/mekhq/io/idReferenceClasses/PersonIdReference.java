@@ -46,7 +46,7 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 
 public class PersonIdReference extends Person {
-    private static final MMLogger logger = MMLogger.create(PersonIdReference.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonIdReference.class);
 
     // region Constructors
     public PersonIdReference(final String text) {
@@ -75,8 +75,9 @@ public class PersonIdReference extends Person {
         if (person.getGenealogy().getSpouse() instanceof PersonIdReference) {
             final Person spouse = campaign.getPerson(person.getGenealogy().getSpouse().getId());
             if (spouse == null) {
-                logger.warn("Failed to find the spouse for " + person.getFullTitle()
-                                  + " with id " + person.getGenealogy().getSpouse().getId());
+                LOGGER.warn("Failed to find the spouse for {} with id {}",
+                      person.getFullTitle(),
+                      person.getGenealogy().getSpouse().getId());
             }
             person.getGenealogy().setSpouse(spouse);
         }
@@ -91,7 +92,7 @@ public class PersonIdReference extends Person {
                 }
                 final Person ex = campaign.getPerson(formerSpouse.getFormerSpouse().getId());
                 if (ex == null) {
-                    logger.warn("Failed to find a person with id " + formerSpouse.getFormerSpouse().getId());
+                    LOGGER.warn("Failed to find a person with id {}", formerSpouse.getFormerSpouse().getId());
                     unknownPersonnel.add(formerSpouse.getFormerSpouse());
                 } else {
                     formerSpouse.setFormerSpouse(ex);
@@ -124,7 +125,7 @@ public class PersonIdReference extends Person {
                                                   ? campaign.getPerson(familyMemberReference.getId())
                                                   : familyMemberReference;
                 if (familyMember == null) {
-                    logger.warn("Failed to find a person with id " + familyMemberReference.getId());
+                    LOGGER.warn("Failed to find a person with id {}", familyMemberReference.getId());
                 } else {
                     person.getGenealogy().getFamily().putIfAbsent(entry.getKey(), new ArrayList<>());
                     person.getGenealogy().getFamily().get(entry.getKey()).add(familyMember);

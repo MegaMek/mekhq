@@ -482,7 +482,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         listMULs = new JList<>();
         DefaultListModel<String> mulModel = new DefaultListModel<>();
         JScrollPane scrMulList = new JScrollPaneWithSpeed(listMULs);
-        File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
+        File mulDir = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY);
 
         if (mulDir.exists() && mulDir.isDirectory()) {
             for (String mul : Objects.requireNonNull(mulDir.list((d, s) -> s.toLowerCase().endsWith(".mul")))) {

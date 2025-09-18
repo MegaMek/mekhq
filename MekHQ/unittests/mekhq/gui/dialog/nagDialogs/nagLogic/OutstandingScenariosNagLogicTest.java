@@ -57,8 +57,6 @@ import org.junit.jupiter.api.Test;
  */
 class OutstandingScenariosNagLogicTest {
     private Campaign campaign;
-    private CampaignOptions campaignOptions;
-    private AtBContract contract;
     private AtBScenario scenario1, scenario2;
     private LocalDate today;
 
@@ -72,8 +70,8 @@ class OutstandingScenariosNagLogicTest {
     @BeforeEach
     void init() {
         campaign = mock(Campaign.class);
-        campaignOptions = mock(CampaignOptions.class);
-        contract = mock(AtBContract.class);
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        AtBContract contract = mock(AtBContract.class);
         scenario1 = mock(AtBScenario.class);
         scenario2 = mock(AtBScenario.class);
         today = LocalDate.of(3025, 1, 1);

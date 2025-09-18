@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -430,7 +430,7 @@ public class MekHQ implements GameListener {
     /**
      * @param campaignGUI the {@link CampaignGUI} to set
      */
-    public void setCampaigngui(CampaignGUI campaignGUI) {
+    public void setCampaignGUI(CampaignGUI campaignGUI) {
         this.campaignGUI = campaignGUI;
     }
 
@@ -853,7 +853,7 @@ public class MekHQ implements GameListener {
             if (resolveDialog.wasAborted()) {
                 postAbortedAutoResolve(autoResolveConcludedEvent, scenario, tracker);
             } else {
-                // If the autoresolve is not aborted, follow with the PostScenario Handler as normal
+                // If the auto resolve is not aborted, follow with the PostScenario Handler as normal
                 PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
             }
         } catch (Exception ex) {

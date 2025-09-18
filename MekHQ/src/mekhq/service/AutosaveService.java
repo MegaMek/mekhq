@@ -56,7 +56,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
 public class AutosaveService implements IAutosaveService {
-    private static final MMLogger logger = MMLogger.create(AutosaveService.class);
+    private static final MMLogger LOGGER = MMLogger.create(AutosaveService.class);
 
     // region Constructors
     public AutosaveService() {
@@ -111,10 +111,10 @@ public class AutosaveService implements IAutosaveService {
                     writer.flush();
                 }
             } else {
-                logger.error("Unable to perform an autosave because of a null or empty file name");
+                LOGGER.error("Unable to perform an autosave because of a null or empty file name");
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -130,14 +130,14 @@ public class AutosaveService implements IAutosaveService {
                                                    .collect(Collectors.toList());
 
             // Delete older autosave files if needed
-            final int maxNumberAutosaves = MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue();
+            final int maxNumberAutoSaves = MekHQ.getMHQOptions().getMaximumNumberOfAutoSavesValue();
 
             int index = 0;
-            while ((autosaveFiles.size() >= maxNumberAutosaves) && (autosaveFiles.size() > index)) {
+            while ((autosaveFiles.size() >= maxNumberAutoSaves) && (autosaveFiles.size() > index)) {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    logger.error("Unable to delete file {}", autosaveFiles.get(index).getName());
+                    LOGGER.error("Unable to delete file {}", autosaveFiles.get(index).getName());
                     index++;
                 }
             }

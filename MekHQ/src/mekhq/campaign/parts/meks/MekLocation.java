@@ -296,7 +296,7 @@ public class MekLocation extends Part {
      *
      * @param percent The percent armor remaining, expressed as a fraction.
      */
-    protected void setPercent(double percent) {
+    public void setPercent(double percent) {
         this.percent = MathUtility.clamp(percent, 0.0, 1.0);
     }
 
@@ -573,7 +573,7 @@ public class MekLocation extends Part {
      *
      * @param breached A value indicating whether the location is breached.
      */
-    protected void setBreached(boolean breached) {
+    public void setBreached(boolean breached) {
         this.breached = breached;
     }
 
@@ -589,7 +589,7 @@ public class MekLocation extends Part {
      *
      * @param blownOff A value indicating whether the location is blown off.
      */
-    protected void setBlownOff(boolean blownOff) {
+    public void setBlownOff(boolean blownOff) {
         this.blownOff = blownOff;
     }
 

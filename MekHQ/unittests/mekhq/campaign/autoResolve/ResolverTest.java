@@ -127,7 +127,7 @@ public class ResolverTest {
     private static int team1 = 0;
     private static int team2 = 0;
     private static int draws = 0;
-    private static Board BOARD = BoardUtilities.generateRandom(MapSettings.getInstance());
+    private static final Board BOARD = BoardUtilities.generateRandom(MapSettings.getInstance());
 
     public enum TeamArrangement {
         BALANCED,

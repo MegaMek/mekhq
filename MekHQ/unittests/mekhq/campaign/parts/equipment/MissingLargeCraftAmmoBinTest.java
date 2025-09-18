@@ -242,7 +242,7 @@ public class MissingLargeCraftAmmoBinTest {
         when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
         missingAmmoBin.setUnit(unit);
         missingAmmoBin.setBay(bayNum);
-        quartermaster.addPart(missingAmmoBin, 0);
+        quartermaster.addPart(missingAmmoBin, 0, false);
 
         // Attempt to fix the missing ammo bin
         missingAmmoBin.fix();

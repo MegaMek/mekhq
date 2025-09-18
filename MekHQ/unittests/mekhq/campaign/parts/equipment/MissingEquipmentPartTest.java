@@ -1264,7 +1264,7 @@ public class MissingEquipmentPartTest {
 
         // We're not the same if our sticker prices differ;
 
-        // Setup a type with variable costs
+        // Set up a type with variable costs
         doReturn(true).when(type).hasFlag(eq(MiscType.F_OFF_ROAD));
         doReturn((double) EquipmentType.COST_VARIABLE).when(type).getRawCost();
 

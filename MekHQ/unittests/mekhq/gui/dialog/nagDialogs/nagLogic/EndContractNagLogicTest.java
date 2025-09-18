@@ -42,7 +42,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.dialog.nagDialogs.EndContractNagDialog;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +53,6 @@ import org.junit.jupiter.api.Test;
  */
 public class EndContractNagLogicTest {
     // Mock objects for the tests
-    private Campaign campaign;
     private LocalDate today;
     private AtBContract contract1, contract2;
 
@@ -67,7 +65,6 @@ public class EndContractNagLogicTest {
         System.setProperty("java.awt.headless", "true");
 
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
         today = LocalDate.now();
         contract1 = mock(AtBContract.class);
         contract2 = mock(AtBContract.class);

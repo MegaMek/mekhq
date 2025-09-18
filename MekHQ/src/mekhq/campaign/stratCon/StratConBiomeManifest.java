@@ -159,9 +159,9 @@ public class StratConBiomeManifest {
 
     private static StratConBiomeManifest load() {
         StratConBiomeManifest resultingManifest;
-        File inputFile = new File(MHQConstants.STRATCON_BIOME_MANIFEST_PATH);
+        File inputFile = new File(MHQConstants.STRAT_CON_BIOME_MANIFEST_PATH);
         if (!inputFile.exists()) {
-            logger.warn("Specified file {} does not exist", MHQConstants.STRATCON_BIOME_MANIFEST_PATH);
+            logger.warn("Specified file {} does not exist", MHQConstants.STRAT_CON_BIOME_MANIFEST_PATH);
             return null;
         }
 

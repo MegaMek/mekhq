@@ -1182,7 +1182,7 @@ public class EquipmentPartTest {
             assertEquals(1, equipmentPart.getHits());
             assertTrue(warehouse.getParts().contains(equipmentPart));
 
-            // Restore thte first location
+            // Restore the first location
             doReturn(0).when(entity)
                   .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
 
@@ -1422,7 +1422,7 @@ public class EquipmentPartTest {
 
         // We're not the same if our sticker prices differ;
 
-        // Setup a type with variable costs
+        // Set up a type with variable costs
         doReturn(true).when(type).hasFlag(eq(MiscType.F_OFF_ROAD));
         doReturn((double) EquipmentType.COST_VARIABLE).when(type).getRawCost();
 
@@ -1518,7 +1518,7 @@ public class EquipmentPartTest {
         // Add the part to the warehouse
         warehouse.addPart(equipmentPart);
 
-        // Remove the part (not salvage), its the only weapon in the bay
+        // Remove the part (not salvage), it's the only weapon in the bay
         equipmentPart.remove(false);
 
         // Ensure we destroyed the bay

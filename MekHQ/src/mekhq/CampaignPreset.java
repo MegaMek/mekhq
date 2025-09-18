@@ -104,7 +104,7 @@ public class CampaignPreset {
      */
     private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
-    private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
+    private static final MMLogger LOGGER = MMLogger.create(CampaignPreset.class);
 
     // region Variable Declarations
     private final boolean userData;
@@ -309,7 +309,7 @@ public class CampaignPreset {
 
     /**
      * Retrieves a combined list of all campaign presets from the default directory, the old user data directory, and
-     * the modern (user-difined) user data directory. The campaign presets are sourced, merged, and sorted in natural
+     * the modern (user-defined) user data directory. The campaign presets are sourced, merged, and sorted in natural
      * order before being returned.
      *
      * <p>The method performs the following steps:</p>
@@ -361,7 +361,7 @@ public class CampaignPreset {
               PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
         } catch (Exception ex) {
-            logger.error("writeToFile() Exception", ex);
+            LOGGER.error("writeToFile() Exception", ex);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
                   MekHQ.getMHQOptions().getLocale());
             JOptionPane.showMessageDialog(frame,
@@ -459,7 +459,7 @@ public class CampaignPreset {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return null;
         }
 
@@ -473,19 +473,19 @@ public class CampaignPreset {
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {
         if (version.isHigherThan(MHQConstants.VERSION)) {
-            logger.error("Cannot parse Campaign Preset from newer version {} in the current version {}",
+            LOGGER.error("Cannot parse Campaign Preset from newer version {} in the current version {}",
                   version,
                   MHQConstants.VERSION);
             return null;
         }
 
         if (version.isLowerThan(LAST_MILESTONE)) {
-            logger.error("Campaign Presets from {} are incompatible with version {}.", version, MHQConstants.VERSION);
+            LOGGER.error("Campaign Presets from {} are incompatible with version {}.", version, MHQConstants.VERSION);
             return null;
         }
 
         if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
-            logger.error("Campaign Presets from {} are incompatible with version {}.",
+            LOGGER.error("Campaign Presets from {} are incompatible with version {}.",
                   version,
                   LAST_COMPATIBLE_VERSION);
             return null;
@@ -559,7 +559,7 @@ public class CampaignPreset {
                             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                                 String message = String.format("Unknown node type not loaded in Skill Type nodes: %s",
                                       wn2.getNodeName());
-                                logger.error(message);
+                                LOGGER.error(message);
                                 continue;
                             }
 
@@ -578,7 +578,7 @@ public class CampaignPreset {
                                 String message = String.format(
                                       "Unknown node type not loaded in Special Ability nodes: %s",
                                       wn2.getNodeName());
-                                logger.error(message);
+                                LOGGER.error(message);
                                 continue;
                             }
 
@@ -593,7 +593,7 @@ public class CampaignPreset {
                 }
             }
         } catch (Exception ex) {
-            logger.error("parseFromXML() Error", ex);
+            LOGGER.error("parseFromXML() Error", ex);
             return null;
         }
         return preset;

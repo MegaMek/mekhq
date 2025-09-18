@@ -211,7 +211,7 @@ public class MissingMekLocation extends MissingPart {
             return (mekLoc.getLoc() == loc)
                          && (mekLoc.getUnitTonnage() == getUnitTonnage())
                          && (mekLoc.isTsm() == tsm)
-                         && (mekLoc.clan == clan)
+                         && (mekLoc.isClan() == clan)
                          && (mekLoc.getStructureType() == structureType)
                          && (!isArm() || (mekLoc.forQuad() == forQuad));
         } else {

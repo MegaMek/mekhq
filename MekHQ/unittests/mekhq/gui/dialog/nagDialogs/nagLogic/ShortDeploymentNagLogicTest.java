@@ -55,7 +55,6 @@ import org.junit.jupiter.api.Test;
 public class ShortDeploymentNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
-    private CurrentLocation location;
     private LocalDate monday, sunday;
     private AtBContract contract;
 
@@ -68,7 +67,7 @@ public class ShortDeploymentNagLogicTest {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
 
-        location = mock(CurrentLocation.class);
+        CurrentLocation location = mock(CurrentLocation.class);
 
         monday = LocalDate.of(2024, 10, 7);
         sunday = LocalDate.of(2024, 10, 6);
