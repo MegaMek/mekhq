@@ -68,6 +68,7 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
+import megamek.common.net.packets.InvalidPacketDataException;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -624,7 +625,8 @@ public class AtBGameThread extends GameThread {
         return useDropship;
     }
 
-    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
+    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException,
+                                                                               InvalidPacketDataException{
         var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
