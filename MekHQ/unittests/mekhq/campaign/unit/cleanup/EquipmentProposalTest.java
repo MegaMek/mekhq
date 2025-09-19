@@ -96,7 +96,7 @@ class EquipmentProposalTest {
         assertEquals(mockMounted, proposal.getEquipment(equipmentNum));
         assertFalse(proposal.getEquipment().isEmpty());
 
-        for (Entry<Integer, Mounted> entry : proposal.getEquipment()) {
+        for (Entry<Integer, Mounted<?>> entry : proposal.getEquipment()) {
             assertEquals(equipmentNum, (int) entry.getKey());
             assertEquals(mockMounted, entry.getValue());
         }
