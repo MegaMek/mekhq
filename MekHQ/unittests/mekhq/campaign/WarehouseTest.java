@@ -66,9 +66,16 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class WarehouseTest {
+
+    @BeforeAll
+    static void beforeAll() {
+        EquipmentType.initializeTypes();
+    }
+
     @Test
     public void testWarehouseSimplePartActions() {
         Warehouse warehouse = new Warehouse();
@@ -948,7 +955,7 @@ public class WarehouseTest {
 
         // Spare
         Part mockSparePart = spy(new MekLocation());
-        Part addedPart;
+        Part addedPart = warehouse.addPart(mockSparePart, true);;
         assertEquals(mockSparePart, warehouse.findSparePart(spare -> spare.getId() == mockSparePart.getId()));
 
         Part mockUnitPart = spy(new MekLocation());
