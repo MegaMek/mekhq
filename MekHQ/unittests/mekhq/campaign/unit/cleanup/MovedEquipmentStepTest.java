@@ -163,7 +163,7 @@ public class MovedEquipmentStepTest {
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
         doAnswer(ans -> {
-            return Collections.singletonMap(0, mockMount).entrySet();
+            return Collections.singletonMap(1, mockMount).entrySet();
         }).when(mockProposal).getEquipment();
         EquipmentPart mockPart = mock(EquipmentPart.class);
         when(mockPart.getType()).thenReturn(mockType);
@@ -172,7 +172,7 @@ public class MovedEquipmentStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(0));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(1));
     }
 
     @Test
@@ -182,7 +182,7 @@ public class MovedEquipmentStepTest {
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
         doAnswer(ans -> {
-            return Collections.singletonMap(0, mockMount).entrySet();
+            return Collections.singletonMap(1, mockMount).entrySet();
         }).when(mockProposal).getEquipment();
         MissingEquipmentPart mockMissingPart = mock(MissingEquipmentPart.class);
         when(mockMissingPart.getType()).thenReturn(mockType);
@@ -191,6 +191,6 @@ public class MovedEquipmentStepTest {
 
         step.visit(mockProposal, mockMissingPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(0));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(1));
     }
 }
