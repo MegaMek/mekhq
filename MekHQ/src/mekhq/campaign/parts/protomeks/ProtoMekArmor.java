@@ -159,7 +159,10 @@ public class ProtoMekArmor extends Armor {
     @Override
     protected int changeAmountAvailableSingle(int amount) {
         ProtoMekArmor armor = (ProtoMekArmor) campaign.getWarehouse()
-                                                    .findSparePart(part -> isSamePartType(part) && part.isPresent());
+                                                    .findSparePart(part -> (part instanceof Armor) &&
+                                                                     part.isPresent() &&
+                                                                     Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
+                                                                     isSameType((Armor) part));
 
         if (null != armor) {
             int amountRemaining = armor.getAmount() + amount;
@@ -187,7 +190,6 @@ public class ProtoMekArmor extends Armor {
         return (part instanceof ProtoMekArmor protoMekArmor) &&
                      protoMekArmor.isPresent() &&
                      !protoMekArmor.isReservedForRefit() &&
-                     isClanTechBase() == protoMekArmor.isClanTechBase() &&
-                     (getType() == (protoMekArmor).getType());
+                     isSameType(protoMekArmor);
     }
 }
