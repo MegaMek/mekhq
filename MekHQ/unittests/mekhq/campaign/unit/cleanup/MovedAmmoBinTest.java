@@ -146,6 +146,6 @@ class MovedAmmoBinTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(1)).proposeMapping(mockPart, 1);
+        verify(mockProposal, times(1)).proposeMapping(mockPart, 0);
     }
 }

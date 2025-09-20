@@ -172,7 +172,7 @@ public class MovedEquipmentStepTest {
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(1));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(0));
     }
 
     @Test
@@ -191,6 +191,6 @@ public class MovedEquipmentStepTest {
 
         step.visit(mockProposal, mockMissingPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(1));
+        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(0));
     }
 }
