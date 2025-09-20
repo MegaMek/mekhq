@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -71,6 +72,7 @@ public record LifePath(
       Map<Integer, Set<UUID>> requirementsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes,
+      Map<Integer, Integer> requirementsFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits,
       Map<Integer, Map<String, Integer>> requirementsSkills,
       Map<Integer, Map<SkillSubType, Integer>> requirementsMetaSkills,
@@ -80,18 +82,21 @@ public record LifePath(
       Map<Integer, Set<UUID>> exclusionsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes,
+      Map<Integer, Integer> exclusionsFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits,
       Map<Integer, Map<String, Integer>> exclusionsSkills,
       Map<Integer, Map<SkillSubType, Integer>> exclusionsMetaSkills,
       Map<Integer, Map<String, Integer>> exclusionsAbilities,
       // Fixed XP
       Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes,
+      Map<Integer, Integer> fixedXPFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits,
       Map<Integer, Map<String, Integer>> fixedXPSkills,
       Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills,
       Map<Integer, Map<String, Integer>> fixedXPAbilities,
       // Flexible XP
       Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes,
+      Map<Integer, Integer> flexibleXPFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits,
       Map<Integer, Map<String, Integer>> flexibleXPSkills,
       Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills,
@@ -144,6 +149,26 @@ public record LifePath(
             if (randomWeight == null) { // Added in 50.07
                 LOGGER.warn("{} - {}: Random weight is null, setting to 1.0", id, name);
                 randomWeight = 1.0;
+            }
+
+            if (requirementsFlexibleAttribute == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: requirementsFlexibleAttribute is null, assigning empty map", id, name);
+                requirementsFlexibleAttribute = new HashMap<>();
+            }
+
+            if (exclusionsFlexibleAttribute == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: exclusionsFlexibleAttribute is null, assigning empty map", id, name);
+                exclusionsFlexibleAttribute = new HashMap<>();
+            }
+
+            if (fixedXPFlexibleAttribute == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: fixedXPFlexibleAttribute is null, assigning empty map", id, name);
+                fixedXPFlexibleAttribute = new HashMap<>();
+            }
+
+            if (flexibleXPFlexibleAttribute == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: flexibleXPFlexibleAttribute is null, assigning empty map", id, name);
+                flexibleXPFlexibleAttribute = new HashMap<>();
             }
         }
 
@@ -281,11 +306,14 @@ public record LifePath(
             throw new IllegalArgumentException("flexibleXPPickCount must be a non-negative integer");
         }
 
-        int groupCount = 0;
-        groupCount += flexibleXPAttributes.size();
-        groupCount += flexibleXPTraits.size();
-        groupCount += flexibleXPSkills.size();
-        groupCount += flexibleXPAbilities.size();
+        int groupCount = java.util.stream.Stream.of(
+              flexibleXPAttributes.size(),
+              flexibleXPFlexibleAttribute.size(),
+              flexibleXPTraits.size(),
+              flexibleXPSkills.size(),
+              flexibleXPAbilities.size()
+        ).mapToInt(Integer::intValue).max().orElse(0);
+
         if (flexibleXPPickCount > groupCount) {
             throw new IllegalArgumentException(
                   "flexibleXPPickCount must be less than or equal to the total number of flexible XP award groups");

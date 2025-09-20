@@ -68,6 +68,7 @@ public class LifePathTab {
     private Map<Integer, Set<UUID>> storedLifePaths = new HashMap<>();
     private Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
     private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
+    private Map<Integer, Integer> storedFlexibleAttributes = new HashMap<>();
     private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
     private Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills = new HashMap<>();
@@ -106,6 +107,21 @@ public class LifePathTab {
 
     public void setAttributes(Map<Integer, Map<SkillAttribute, Integer>> storedAttributes) {
         this.storedAttributes = storedAttributes;
+    }
+
+    /**
+     * Retrieves the mapping of stored flexible attributes.
+     *
+     * <p><b>Warning:</b> the returned {@link Integer} can be {@code null}.</p>
+     *
+     * @return a map where the key represents an identifier and the value represents its associated attribute.
+     */
+    public Map<Integer, Integer> getFlexibleAttribute() {
+        return storedFlexibleAttributes;
+    }
+
+    public void setFlexibleAttribute(Map<Integer, Integer> storedFlexibleAttribute) {
+        this.storedFlexibleAttributes = storedFlexibleAttribute;
     }
 
     public Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> getTraits() {
@@ -330,6 +346,18 @@ public class LifePathTab {
         storedAttributes.clear();
         storedAttributes.putAll(tempAttributes);
 
+        storedFlexibleAttributes.remove(selectedIndex);
+        Map<Integer, Integer> tempFlexibleAttributes = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : storedFlexibleAttributes.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempFlexibleAttributes.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempFlexibleAttributes.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedFlexibleAttributes.clear();
+        storedFlexibleAttributes.putAll(tempFlexibleAttributes);
+
         storedTraits.remove(selectedIndex);
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> tempTraits = new HashMap<>();
         for (Map.Entry<Integer, Map<LifePathEntryDataTraitLookup, Integer>> entry : storedTraits.entrySet()) {
@@ -407,6 +435,9 @@ public class LifePathTab {
         Map<SkillAttribute, Integer> currentAttributes = new HashMap<>(storedAttributes.get(selectedIndex));
         storedAttributes.put(newIndex, currentAttributes);
 
+        Integer currentFlexibleAttributes = storedFlexibleAttributes.get(selectedIndex);
+        storedFlexibleAttributes.put(newIndex, currentFlexibleAttributes);
+
         Map<LifePathEntryDataTraitLookup, Integer> currentTraits = new HashMap<>(storedTraits.get(selectedIndex));
         storedTraits.put(newIndex, currentTraits);
 
@@ -462,6 +493,7 @@ public class LifePathTab {
 
         // Attributes
         storedAttributes.put(index, new HashMap<>());
+        storedFlexibleAttributes.put(index, null);
 
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addAttribute.label");
@@ -593,8 +625,9 @@ public class LifePathTab {
             int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathAttributePicker picker = new LifePathAttributePicker(storedAttributes.get(currentIndex),
-                  tabType);
+                  storedFlexibleAttributes.get(currentIndex), tabType);
             storedAttributes.put(currentIndex, picker.getSelectedAttributeScores());
+            storedFlexibleAttributes.put(currentIndex, picker.getFlexibleAttribute());
             standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
@@ -786,6 +819,19 @@ public class LifePathTab {
             }
         }
 
+        Integer workingFlexibleAttributes = storedFlexibleAttributes.get(index);
+        if (workingFlexibleAttributes != null && !storedFlexibleAttributes.isEmpty()) {
+            appendBreaker(individualProgressText);
+
+            int counter = 0;
+
+            individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleAttribute.label"));
+            individualProgressText.append(workingFlexibleAttributes >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
+            individualProgressText.append(workingFlexibleAttributes);
+            individualProgressText.append(TEXT_TRAIL);
+            counter++;
+        }
+
         // Traits
         Map<LifePathEntryDataTraitLookup, Integer> workingTraits = storedTraits.get(index);
         if (workingTraits != null && !workingTraits.isEmpty()) {
@@ -914,6 +960,7 @@ public class LifePathTab {
         storedLifePaths.clear();
         storedCategories.clear();
         storedAttributes.clear();
+        storedFlexibleAttributes.clear();
         storedTraits.clear();
         storedSkills.clear();
         storedMetaSkills.clear();

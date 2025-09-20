@@ -88,7 +88,7 @@ public class LifePathValidator {
     }
 
     public static int getMaximumGroupSize(int flexibleAbilitiesCount, int flexibleAttributesCount,
-          int flexibleSkillsCount, int flexibleMetaSkillsCount, int flexibleTraitsCount) {
+          int flexibleSkillsCount, int flexibleMetaSkillsCount, int flexibleTraitsCount, int size) {
         return Math.max(flexibleAbilitiesCount,
               Math.max(flexibleAttributesCount,
                     Math.max(flexibleSkillsCount,
