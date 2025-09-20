@@ -1711,7 +1711,7 @@ class MekLocationTest {
         verify(mockWarehouse, times(1)).removePart((mekLocation));
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
-        verify(mockQuartermaster, times(1)).addPart(partCaptor.capture(), eq(0));
+        verify(mockQuartermaster, times(1)).addPart(partCaptor.capture(), eq(0), eq(false));
 
         Part part = partCaptor.getValue();
         assertInstanceOf(MissingMekLocation.class, part);
