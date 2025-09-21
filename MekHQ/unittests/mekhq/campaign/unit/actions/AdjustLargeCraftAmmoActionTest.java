@@ -78,7 +78,7 @@ public class AdjustLargeCraftAmmoActionTest {
         action.execute(campaign, unit);
 
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt(), false);
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class AdjustLargeCraftAmmoActionTest {
         action.execute(campaign, unit);
 
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt(), false);
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class AdjustLargeCraftAmmoActionTest {
         verify(unit, times(1)).addPart(partCaptor.capture());
 
         Part addedPart = partCaptor.getValue();
-        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0), false);
+        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0), eq(false));
 
         assertInstanceOf(LargeCraftAmmoBin.class, addedPart);
 
@@ -190,7 +190,7 @@ public class AdjustLargeCraftAmmoActionTest {
 
         // Ensure we didn't add any new parts
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt(), false);
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
 
         // Ensure we updated the part's type
         verify(ammoBin, times(1)).changeMunition(eq(ammoType0));
@@ -243,7 +243,7 @@ public class AdjustLargeCraftAmmoActionTest {
         verify(unit, times(1)).addPart(partCaptor.capture());
 
         Part addedPart = partCaptor.getValue();
-        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0), false);
+        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0), eq(false));
 
         assertInstanceOf(LargeCraftAmmoBin.class, addedPart);
 
@@ -288,7 +288,7 @@ public class AdjustLargeCraftAmmoActionTest {
 
         // Ensure we didn't add any new parts
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt(), false);
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
 
         // Ensure we updated the part's type
         verify(ammoBin, times(1)).changeMunition(eq(ammoType0));

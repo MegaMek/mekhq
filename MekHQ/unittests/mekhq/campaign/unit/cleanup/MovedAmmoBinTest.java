@@ -136,7 +136,7 @@ class MovedAmmoBinTest {
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
         doAnswer(ans -> {
-            return Collections.singletonMap(0, mockMount).entrySet();
+            return Collections.singletonMap(1, mockMount).entrySet();
         }).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
