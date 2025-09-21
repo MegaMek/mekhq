@@ -1,0 +1,4 @@
+The class address of parts is stored in the campaign save. That means you cannot reorganize the classes in the parts
+directory without breaking the save. To account for this, please see Part#fixForRenamedClasses. There you can update
+the class references. Once a campaign is loaded, the fixForRenamedClasses method will be called automatically rectifying
+the issue. - Illiani, Sep 21 2025
