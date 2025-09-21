@@ -484,7 +484,7 @@ test {
     dependsOn(checkstyleMain)
 
     minHeapSize = "1024m"
-    maxHeapSize = "10240m"
+    maxHeapSize = "8192m"
     // report is always generated after tests run
     finalizedBy jacocoTestReport
 }
