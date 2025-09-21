@@ -83,6 +83,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.eras.EraFlag;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.MULParser;
@@ -132,7 +133,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
-import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.utilities.EntityUtilities;
 
 /**

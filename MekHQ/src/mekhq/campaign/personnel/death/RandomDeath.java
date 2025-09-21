@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.personnel.death;
 
+import static megamek.common.eras.EraFlag.*;
 import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
-import static mekhq.campaign.universe.enums.EraFlag.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
@@ -51,6 +51,7 @@ import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.eras.EraFlag;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -63,7 +64,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.utilities.MHQXMLUtility;
@@ -429,7 +429,7 @@ public class RandomDeath {
             return ERA_MULTIPLIER_STAR_LEAGUE;
         }
 
-        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOS_TECH)
+        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOSTECH)
                   || flags.contains(LATE_SUCCESSION_WARS_RENAISSANCE)) {
             return ERA_MULTIPLIER_SUCCESSION_WARS;
         }
