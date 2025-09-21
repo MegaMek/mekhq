@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.death;
 
+import static megamek.common.eras.EraFlag.STAR_LEAGUE;
 import static mekhq.campaign.personnel.enums.AgeGroup.ADULT;
 import static mekhq.campaign.personnel.enums.AgeGroup.BABY;
 import static mekhq.campaign.personnel.enums.AgeGroup.CHILD;
@@ -39,7 +40,6 @@ import static mekhq.campaign.personnel.enums.AgeGroup.ELDER;
 import static mekhq.campaign.personnel.enums.AgeGroup.PRETEEN;
 import static mekhq.campaign.personnel.enums.AgeGroup.TEENAGER;
 import static mekhq.campaign.personnel.enums.AgeGroup.TODDLER;
-import static mekhq.campaign.universe.enums.EraFlag.STAR_LEAGUE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
