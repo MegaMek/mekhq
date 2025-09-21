@@ -2704,7 +2704,7 @@ public class StratConRulesManager {
                 continue;
             }
 
-            for (UUID id : force.getUnits()) {
+            for (UUID id : force.getAllUnits(true)) {
                 Unit unit = campaign.getUnit(id);
                 if ((unit == null) || (unit.getEntity() == null)) {
                     continue;
