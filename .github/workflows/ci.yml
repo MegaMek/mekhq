@@ -121,9 +121,9 @@ jobs:
         run: |
           echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
 
-      - name: Test
+      - name: Test All
         working-directory: mekhq
-        run: ./gradlew test  --stacktrace --scan
+        run: ./gradlew testAll  --stacktrace --scan
         env:
           mm.profile: dev
 
