@@ -1,3 +1,5 @@
+import org.codehaus.groovy.runtime.GStringImpl
+
 import java.time.LocalDateTime
 
 plugins {
@@ -45,12 +47,12 @@ ext {
             '-Dsun.awt.disablegrab=true'
     ]
 
-    fileStagingDir = "${layout.buildDirectory.get()}/files"
-    atlasedImages = "${fileStagingDir}/atlasedImages.txt"
-    scriptsDir = "${projectDir}/scripts"
+    fileStagingDir = "${layout.buildDirectory.get()}/files" as GStringImpl
+    atlasedImages = "${fileStagingDir}/atlasedImages.txt" as GStringImpl
+    scriptsDir = "${projectDir}/scripts" as GStringImpl
 
-    mmDir = "${rootDir}/../megamek"
-    mmlDir = "${rootDir}/../megameklab"
+    mmDir = "${rootDir}/../megamek" as GStringImpl
+    mmlDir = "${rootDir}/../megameklab" as GStringImpl
 }
 
 dependencies {
@@ -165,7 +167,7 @@ tasks.register("stageLicenseFiles", Sync) {
     from "../"
     into "${layout.buildDirectory.get()}/licenses"
 
-    includes = [
+    include = [
             'LICENSE',
             'LICENSE.code',
             'LICENSE.assets',
@@ -198,7 +200,9 @@ tasks.register('deleteAtlasedImages') {
     description = 'Removes images from the staging directory that have been incorporated into atlases.'
     doLast {
         if (file(atlasedImages).exists()) {
-            ant.delete dir: fileStagingDir, includesfile: atlasedImages
+            ant.delete {
+                fileset(dir: fileStagingDir, includesfile: atlasedImages)
+            }
             ant.delete file: atlasedImages
         }
     }
@@ -371,7 +375,7 @@ distributions {
 
             from(jar)
 
-            duplicatesStrategy = 'exclude'
+            duplicatesStrategy = 'exclude' as Distribution
         }
     }
 }
