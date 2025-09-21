@@ -38,8 +38,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
-import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

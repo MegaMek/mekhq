@@ -37,12 +37,12 @@ import static mekhq.campaign.mission.enums.AtBEventType.*;
 import java.util.ResourceBundle;
 
 import megamek.common.compute.Compute;
+import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.universe.enums.EraFlag;
 
 public enum AtBContractType {
     // TODO: Missing CamOps Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
