@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,26 +49,18 @@ import mekhq.utilities.ReportingUtilities;
 /**
  * A table model for displaying doctors
  */
-public class DocTableModel extends DataTableModel {
+public class DocTableModel extends DataTableModel<Person> {
     private final Campaign campaign;
 
     public DocTableModel(Campaign c) {
         columnNames = new String[] { "Doctors" };
-        data = new ArrayList<Person>();
+        data = new ArrayList<>();
         campaign = c;
     }
 
     @Override
     public Object getValueAt(int row, int col) {
-        return getDoctorDescription((Person) data.get(row));
-    }
-
-    /**
-     * @deprecated Use {@link #getDoctorDescription(Person)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    private String getDocDesc(Person doc) {
-        return getDoctorDescription(doc);
+        return getDoctorDescription(data.get(row));
     }
 
     /**
@@ -112,7 +104,7 @@ public class DocTableModel extends DataTableModel {
     }
 
     public Person getDoctorAt(int row) {
-        return (Person) data.get(row);
+        return data.get(row);
     }
 
     public Campaign getCampaign() {

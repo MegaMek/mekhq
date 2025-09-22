@@ -35,7 +35,17 @@ package mekhq.campaign.unit.actions;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -46,16 +56,13 @@ import mekhq.campaign.unit.Unit;
 /**
  * Hires a full complement of personnel for a unit.
  */
-public class HirePersonnelUnitAction implements IUnitAction {
-    private final boolean isGM;
-
+public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
     /**
      * Initializes a new instance of the HirePersonnelUnitAction class.
      *
-     * @param isGM A boolean value indicating whether or not GM mode should be used to complete the action.
+     * @param isGM A boolean value indicating whether GM mode should be used to complete the action.
      */
-    public HirePersonnelUnitAction(boolean isGM) {
-        this.isGM = isGM;
+    public HirePersonnelUnitAction {
     }
 
     @Override
@@ -74,18 +81,11 @@ public class HirePersonnelUnitAction implements IUnitAction {
             } else if (unit.getEntity() instanceof Aero) {
                 person = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
-                switch (unit.getEntity().getMovementMode()) {
-                    case VTOL:
-                        person = campaign.newPerson(PersonnelRole.VTOL_PILOT);
-                        break;
-                    case NAVAL:
-                    case HYDROFOIL:
-                    case SUBMARINE:
-                        person = campaign.newPerson(PersonnelRole.NAVAL_VEHICLE_DRIVER);
-                        break;
-                    default:
-                        person = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
-                }
+                person = switch (unit.getEntity().getMovementMode()) {
+                    case VTOL -> campaign.newPerson(PersonnelRole.VTOL_PILOT);
+                    case NAVAL, HYDROFOIL, SUBMARINE -> campaign.newPerson(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                    default -> campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                };
             } else if (unit.getEntity() instanceof ProtoMek) {
                 person = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
@@ -165,10 +165,9 @@ public class HirePersonnelUnitAction implements IUnitAction {
         // the unit has an artillery weapon
         if (campaign.getCampaignOptions().isUseArtillery() && (unit.getEntity() != null)
                   && unit.getEntity().getWeaponList().stream()
-                           .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
+                           .anyMatch(weapon -> (weapon.getType() != null)
                                                      &&
-                                                     (((WeaponType) weapon.getType()).getDamage() ==
-                                                            WeaponType.DAMAGE_ARTILLERY))) {
+                                                     (weapon.getType().getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
             final Set<Person> gunners = unit.getGunners();
             if (!gunners.isEmpty() &&
                       gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {

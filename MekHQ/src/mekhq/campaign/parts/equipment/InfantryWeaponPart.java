@@ -35,7 +35,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.EquipmentType;
+import megamek.common.equipment.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InfantryWeaponPart extends EquipmentPart {
-    private static final MMLogger logger = MMLogger.create(InfantryWeaponPart.class);
+    private static final MMLogger LOGGER = MMLogger.create(InfantryWeaponPart.class);
 
     private boolean primary;
 
@@ -101,7 +101,7 @@ public class InfantryWeaponPart extends EquipmentPart {
                     primary = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
         restore();

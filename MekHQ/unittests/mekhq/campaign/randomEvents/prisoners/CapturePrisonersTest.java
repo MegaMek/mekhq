@@ -33,8 +33,8 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import static java.lang.Math.round;
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.randomEvents.prisoners.CapturePrisoners.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
@@ -50,9 +50,9 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Set;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.MapSettings;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.MapSettings;
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -291,10 +291,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, mockFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -327,10 +326,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -365,10 +363,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = BECOMING_BONDSMAN;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(BECOMING_BONDSMAN, actualStatus);
     }
 
     @Test
@@ -398,10 +395,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, mockFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -434,10 +430,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -472,10 +467,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = BECOMING_BONDSMAN;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(BECOMING_BONDSMAN, actualStatus);
     }
 
     @Test
@@ -499,10 +493,8 @@ class CapturePrisonersTest {
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
-        int expectedTargetNumber = DEFECTION_CHANCE;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(DEFECTION_CHANCE, defectionChance);
     }
 
     @Test
@@ -530,9 +522,8 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = (int) round(DEFECTION_CHANCE * MERCENARY_MULTIPLIER);
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(expectedTargetNumber, defectionChance);
     }
 
     @Test
@@ -558,10 +549,8 @@ class CapturePrisonersTest {
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
-        int expectedTargetNumber = DEFECTION_CHANCE;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(DEFECTION_CHANCE, defectionChance);
     }
 
     @Test
@@ -587,9 +576,8 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = DEFECTION_CHANCE * CLAN_DEZGRA_MULTIPLIER;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(expectedTargetNumber, defectionChance);
     }
 
 
@@ -606,7 +594,7 @@ class CapturePrisonersTest {
      */
     private AvailabilityValue getPartAvailability(LocalDate today, boolean isActiveProbe) {
         int year = today.getYear();
-        ITechnology.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
+        megamek.common.enums.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
 
         if (isActiveProbe) {
             return createBeagleActiveProbe().calcYearAvailability(year, false, techFaction);

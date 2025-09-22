@@ -81,7 +81,7 @@ public enum PersonnelFilter {
     MECHANIC("PersonnelFilter.MECHANIC.text", "PersonnelFilter.MECHANIC.toolTipText", false, true),
     AERO_TECH("PersonnelFilter.AERO_TECH.text", "PersonnelFilter.AERO_TECH.toolTipText", false, true),
     BA_TECH("PersonnelFilter.BA_TECH.text", "PersonnelFilter.BA_TECH.toolTipText", false, true),
-    ASTECH("PersonnelFilter.ASTECH.text", "PersonnelFilter.ASTECH.toolTipText", false, true),
+    AS_TECH("PersonnelFilter.ASTECH.text", "PersonnelFilter.ASTECH.toolTipText", false, true),
     MEDICAL("PersonnelFilter.MEDICAL.text", "PersonnelFilter.MEDICAL.toolTipText", true, false),
     DOCTOR("PersonnelFilter.DOCTOR.text", "PersonnelFilter.DOCTOR.toolTipText", false, true),
     MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText", false, true),
@@ -278,8 +278,8 @@ public enum PersonnelFilter {
         return this == BA_TECH;
     }
 
-    public boolean isAstech() {
-        return this == ASTECH;
+    public boolean isAsTech() {
+        return this == AS_TECH;
     }
 
     public boolean isMedical() {
@@ -477,8 +477,8 @@ public enum PersonnelFilter {
             case BA_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                              person.getPrimaryRole().isBATech() :
                                              person.hasRole(PersonnelRole.BA_TECH));
-            case ASTECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                            person.getPrimaryRole().isAstech() : person.hasRole(PersonnelRole.ASTECH));
+            case AS_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+                                             person.getPrimaryRole().isAstech() : person.hasRole(PersonnelRole.ASTECH));
             case MEDICAL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                              person.getPrimaryRole().isMedicalStaff() :
                                              (person.getPrimaryRole().isMedicalStaff() ||

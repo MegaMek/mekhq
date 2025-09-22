@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map.Entry;
 
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -96,7 +96,7 @@ class EquipmentProposalTest {
         assertEquals(mockMounted, proposal.getEquipment(equipmentNum));
         assertFalse(proposal.getEquipment().isEmpty());
 
-        for (Entry<Integer, Mounted> entry : proposal.getEquipment()) {
+        for (Entry<Integer, Mounted<?>> entry : proposal.getEquipment()) {
             assertEquals(equipmentNum, (int) entry.getKey());
             assertEquals(mockMounted, entry.getValue());
         }

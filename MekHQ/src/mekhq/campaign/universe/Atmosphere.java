@@ -34,12 +34,12 @@ package mekhq.campaign.universe;
 
 public enum Atmosphere {
     NONE("None"),
-    TAINTEDPOISON("Tainted (Poisonous)"),
-    TAINTEDCAUSTIC("Tainted (Caustic)"),
-    TAINTEDFLAME("Tainted (Flammable)"),
-    TOXICPOISON("Toxic (Poisonous)"),
-    TOXICCAUSTIC("Toxic (Caustic)"),
-    TOXICFLAME("Toxic (Flammable)"),
+    TAINTED_POISON("Tainted (Poisonous)"),
+    TAINTED_CAUSTIC("Tainted (Caustic)"),
+    TAINTED_FLAME("Tainted (Flammable)"),
+    TOXIC_POISON("Toxic (Poisonous)"),
+    TOXIC_CAUSTIC("Toxic (Caustic)"),
+    TOXIC_FLAME("Toxic (Flammable)"),
     BREATHABLE("Breathable");
 
     public final String name;
@@ -56,27 +56,27 @@ public enum Atmosphere {
     }
 
     public boolean isTaintedPoison() {
-        return this == TAINTEDPOISON;
+        return this == TAINTED_POISON;
     }
 
     public boolean isTaintedCaustic() {
-        return this == TAINTEDCAUSTIC;
+        return this == TAINTED_CAUSTIC;
     }
 
     public boolean isTaintedFlame() {
-        return this == TAINTEDFLAME;
+        return this == TAINTED_FLAME;
     }
 
     public boolean isToxicPoison() {
-        return this == TOXICPOISON;
+        return this == TOXIC_POISON;
     }
 
     public boolean isToxicCaustic() {
-        return this == TOXICCAUSTIC;
+        return this == TOXIC_CAUSTIC;
     }
 
     public boolean isToxicFlame() {
-        return this == TOXICFLAME;
+        return this == TOXIC_FLAME;
     }
 
     public boolean isBreathable() {

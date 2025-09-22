@@ -90,10 +90,9 @@ public class OutstandingScenariosNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
     public static boolean checkNag(Campaign campaign) {
-        final String NAG_KEY = NAG_OUTSTANDING_SCENARIOS;
 
         return campaign.getCampaignOptions().isUseAtB() &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_OUTSTANDING_SCENARIOS) &&
                      hasOutStandingScenarios(campaign);
     }
 }

@@ -40,7 +40,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 public class CrimeRating {
-    private static final MMLogger logger = MMLogger.create(CrimeRating.class);
+    private static final MMLogger LOGGER = MMLogger.create(CrimeRating.class);
 
     /**
      * Calculates the crime rating for a given campaign.
@@ -58,7 +58,7 @@ public class CrimeRating {
         int adjustedCrimeRating = campaign.getAdjustedCrimeRating();
         crimeRating.put("total", adjustedCrimeRating);
 
-        logger.debug("Crime Rating = {}",
+        LOGGER.debug("Crime Rating = {}",
               crimeRating.entrySet().stream()
                     .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
                     .collect(Collectors.joining()));

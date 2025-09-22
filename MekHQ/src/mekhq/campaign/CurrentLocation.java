@@ -33,7 +33,7 @@
  */
 package mekhq.campaign;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
@@ -49,8 +49,8 @@ import java.util.Objects;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.TransitCompleteEvent;
+import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
@@ -82,7 +82,7 @@ public class CurrentLocation {
     // keep track of jump path
     private JumpPath jumpPath;
     private double rechargeTime;
-    // I would like to keep track of distance, but I ain't too good with fyziks
+    // I would like to keep track of distance, but I ain't too good with physics
     private double transitTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
@@ -248,7 +248,7 @@ public class CurrentLocation {
     }
 
     /**
-     * Gets a value indicating whether or not the JumpShip is currently recharging.
+     * Gets a value indicating whether the JumpShip is currently recharging.
      *
      * @param campaign The campaign object which owns the JumpShip.
      *
@@ -464,7 +464,7 @@ public class CurrentLocation {
                     PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
                     if (null == p) {
                         // Whoops, we can't find your planet man, back to Earth
-                        logger.error("Couldn't find planet named " + wn2.getTextContent());
+                        logger.error("Couldn't find planet named {}", wn2.getTextContent());
                         p = c.getSystemByName("Terra");
                         if (null == p) {
                             // If that doesn't work then give the first planet we have

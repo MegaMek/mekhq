@@ -52,9 +52,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
@@ -357,7 +357,7 @@ public class PrisonerEventManager {
      * @param isSuccessful {@code true} if the player's response to the event was successful, {@code false} otherwise
      * @param choiceIndex  the index of the response option chosen by the player
      * @param event        the {@link PrisonerEvent} associated with the dialog
-     * @param eventReport  additional report or commentary to display in the dialog (may be {@code null})
+     * @param eventReport  additional report or commentary to display in the dialog (maybe {@code null})
      *
      * @author Illiani
      * @since 0.50.06

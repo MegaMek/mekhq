@@ -45,28 +45,28 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentTypeLookup;
-import megamek.common.ITechnology.TechBase;
-import megamek.common.Infantry;
+import megamek.common.enums.TechBase;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.EventSpy;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.PartArrivedEvent;
-import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.events.parts.PartArrivedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.InfantryAmmoStorage;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -86,7 +86,7 @@ public class QuartermasterTest {
         when(mockPart.getUnit()).thenReturn(mockUnit);
 
         // Add a part on a test unit...
-        quartermaster.addPart(mockPart, 0);
+        quartermaster.addPart(mockPart, 0, false);
 
         // ...and verify we never put it in the warehouse.
         verify(mockWarehouse, times(0)).addPart(eq(mockPart), anyBoolean());
@@ -102,7 +102,7 @@ public class QuartermasterTest {
         MissingPart mockPart = mock(MissingPart.class);
 
         // Add a spare missing part...
-        quartermaster.addPart(mockPart, 0);
+        quartermaster.addPart(mockPart, 0, false);
 
         // ...and verify we never put it in the warehouse.
         verify(mockWarehouse, times(0)).addPart(eq(mockPart), anyBoolean());
@@ -119,7 +119,7 @@ public class QuartermasterTest {
         doReturn(mockPart).when(mockWarehouse).addPart(eq(mockPart), eq(true));
 
         // Add a spare missing part...
-        quartermaster.addPart(mockPart, -10);
+        quartermaster.addPart(mockPart, -10, false);
 
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
         verify(mockPart, times(1)).setDaysToArrival(captor.capture());
@@ -138,7 +138,7 @@ public class QuartermasterTest {
         doReturn(mockPart).when(mockWarehouse).addPart(eq(mockPart), eq(true));
 
         // Add a part...
-        quartermaster.addPart(mockPart, 1);
+        quartermaster.addPart(mockPart, 1, false);
 
         // ...and ensure it is added to the warehouse (with merging!)
         verify(mockWarehouse, times(1)).addPart(eq(mockPart), eq(true));
@@ -157,7 +157,7 @@ public class QuartermasterTest {
         doReturn(mockPart).when(mockWarehouse).addPart(eq(mockPart), eq(true));
 
         // Add a part on an actual unit...
-        quartermaster.addPart(mockPart, 0);
+        quartermaster.addPart(mockPart, 0, false);
 
         // ...and ensure it is added to the warehouse (with merging!)
         verify(mockWarehouse, times(1)).addPart(eq(mockPart), eq(true));
@@ -175,7 +175,7 @@ public class QuartermasterTest {
         when(mockPart.getUnit()).thenReturn(mockUnit);
 
         // Add a missing part on an actual unit...
-        quartermaster.addPart(mockPart, 0);
+        quartermaster.addPart(mockPart, 0, false);
 
         // ...and ensure it is added to the warehouse (with merging!)
         verify(mockWarehouse, times(1)).addPart(eq(mockPart), eq(true));
@@ -212,7 +212,7 @@ public class QuartermasterTest {
         // Arrive a part...
         quartermaster.arrivePart(mockPart);
 
-        // ...and ensure it is is now 'present'.
+        // ...and ensure it is now 'present'.
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
         verify(mockPart, times(1)).setDaysToArrival(captor.capture());
 
@@ -1540,7 +1540,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartOnlyDepodsOmniPoddedParts() {
+    public void remotePartFromPodOnlyDepodsOmniPoddedParts() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1550,13 +1550,13 @@ public class QuartermasterTest {
         when(mockOmniPart.isOmniPodded()).thenReturn(false);
         when(mockOmniPart.getQuantity()).thenReturn(1);
 
-        quartermaster.depodPart(mockOmniPart, 1);
+        quartermaster.remotePartFromPod(mockOmniPart, 1);
 
-        verify(mockOmniPart, times(0)).decrementQuantity();
+        verify(mockOmniPart, times(0)).changeQuantity(-1);
     }
 
     @Test
-    public void depodPartDoesNotDepodZeroParts() {
+    public void depodPartDoesNotRemoteZeroPartsFromPod() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1566,13 +1566,13 @@ public class QuartermasterTest {
         when(mockOmniPart.isOmniPodded()).thenReturn(true);
         when(mockOmniPart.getQuantity()).thenReturn(1);
 
-        quartermaster.depodPart(mockOmniPart, 0);
+        quartermaster.remotePartFromPod(mockOmniPart, 0);
 
-        verify(mockOmniPart, times(0)).decrementQuantity();
+        verify(mockOmniPart, times(0)).changeQuantity(-1);
     }
 
     @Test
-    public void depodPartDoesNotDepodNegativeParts() {
+    public void depodPartDoesNotRemoteNegativePartsFromPod() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1582,13 +1582,13 @@ public class QuartermasterTest {
         when(mockOmniPart.isOmniPodded()).thenReturn(true);
         when(mockOmniPart.getQuantity()).thenReturn(1);
 
-        quartermaster.depodPart(mockOmniPart, -10);
+        quartermaster.remotePartFromPod(mockOmniPart, -10);
 
-        verify(mockOmniPart, times(0)).decrementQuantity();
+        verify(mockOmniPart, times(0)).changeQuantity(-1);
     }
 
     @Test
-    public void depodPartAddsPartAndCorrectOmniPod() {
+    public void remotePartAddsPartFromPodAndCorrectOmniPod() {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
         when(mockCampaignOptions.getDamagedPartsValueMultiplier()).thenReturn(1d);
@@ -1614,7 +1614,7 @@ public class QuartermasterTest {
         when(mockOmniPartClone.getTechBase()).thenReturn(TechBase.ALL);
 
         // ...and depod that part...
-        quartermaster.depodPart(mockOmniPart, 1);
+        quartermaster.remotePartFromPod(mockOmniPart, 1);
 
         // ...giving us a clone of the part...
         verify(mockWarehouse, times(1)).addPart(eq(mockOmniPartClone), eq(true));
@@ -1625,7 +1625,7 @@ public class QuartermasterTest {
         verify(mockWarehouse, times(2)).addPart(omniPodCaptor.capture(), eq(true));
 
         // ...and decrementing the number of the original parts.
-        verify(mockOmniPart, times(1)).decrementQuantity();
+        verify(mockOmniPart, times(1)).changeQuantity(-1);
 
         // The second call contains the omnipod.
         Part omniPod = omniPodCaptor.getAllValues().get(1);
@@ -1639,7 +1639,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartAddsCorrectNumberOfPartAndOmniPod() {
+    public void remotePartAddsCorrectNumberOfPartFromPodAndOmniPod() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1653,14 +1653,14 @@ public class QuartermasterTest {
 
         // ...and depod four of that part...
         int quantity = 4;
-        quartermaster.depodPart(mockOmniPart, quantity);
+        quartermaster.remotePartFromPod(mockOmniPart, quantity);
 
         // ...giving us four clones of the part and its omnipod...
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
         verify(mockWarehouse, times(2 * quantity)).addPart(partCaptor.capture(), eq(true));
 
         // ...and decrementing the number of the original parts.
-        verify(mockOmniPart, times(quantity)).decrementQuantity();
+        verify(mockOmniPart, times(quantity)).changeQuantity(-1);
 
         // There should then be 4 of the parts and 4 of their omnipods
         List<Part> addedParts = partCaptor.getAllValues();
@@ -1669,7 +1669,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartAddsCorrectNumberOfPartAndOmniPodIfLessOnHand() {
+    public void remotePartAddsCorrectNumberOfPartFromPodAndOmniPodIfLessOnHand() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1684,14 +1684,14 @@ public class QuartermasterTest {
 
         // ...and try to depod four of that part...
         int quantity = 4;
-        quartermaster.depodPart(mockOmniPart, quantity);
+        quartermaster.remotePartFromPod(mockOmniPart, quantity);
 
         // ...giving us only two clones of the part and its omnipod...
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
         verify(mockWarehouse, times(2 * warehouseQuantity)).addPart(partCaptor.capture(), eq(true));
 
         // ...and decrementing the number of the original parts.
-        verify(mockOmniPart, times(warehouseQuantity)).decrementQuantity();
+        verify(mockOmniPart, times(warehouseQuantity)).changeQuantity(-1);
 
         // There should then be two of the parts and two of their omnipods
         List<Part> addedParts = partCaptor.getAllValues();
@@ -1714,14 +1714,14 @@ public class QuartermasterTest {
         when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
 
         // ...and depod all of that part...
-        quartermaster.depodPart(mockOmniPart);
+        quartermaster.remotePartFromPod(mockOmniPart);
 
         // ...giving us four clones of the part and its omnipod...
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
         verify(mockWarehouse, times(2 * quantity)).addPart(partCaptor.capture(), eq(true));
 
         // ...and decrementing the number of the original parts.
-        verify(mockOmniPart, times(quantity)).decrementQuantity();
+        verify(mockOmniPart, times(quantity)).changeQuantity(-1);
 
         // There should then be 4 of the parts and 4 of their omnipods
         List<Part> addedParts = partCaptor.getAllValues();
@@ -1730,7 +1730,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartRaisesChangedEventIfSomeRemain() {
+    public void remotePartFromPodRaisesChangedEventIfSomeRemain() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1744,7 +1744,7 @@ public class QuartermasterTest {
 
         try (EventSpy eventSpy = new EventSpy()) {
             // ...and depod some of that part...
-            quartermaster.depodPart(mockOmniPart, 5);
+            quartermaster.remotePartFromPod(mockOmniPart, 5);
 
             // ...and since some remain, we should receive a PartChangedEvent.
             assertNotNull(eventSpy.findEvent(PartChangedEvent.class, e -> e.getPart() == mockOmniPart));
@@ -1752,7 +1752,7 @@ public class QuartermasterTest {
     }
 
     @Test
-    public void depodPartDoesNotRaiseChangedEventIfNoneRemain() {
+    public void remotePartFromPodDoesNotRaiseChangedEventIfNoneRemain() {
         Campaign mockCampaign = mock(Campaign.class);
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
@@ -1766,7 +1766,7 @@ public class QuartermasterTest {
 
         try (EventSpy eventSpy = new EventSpy()) {
             // ...and depod all of that part...
-            quartermaster.depodPart(mockOmniPart);
+            quartermaster.remotePartFromPod(mockOmniPart);
 
             // ...and since none remain, we should NOT receive a PartChangedEvent.
             assertNull(eventSpy.findEvent(PartChangedEvent.class, e -> e.getPart() == mockOmniPart));
@@ -1790,7 +1790,7 @@ public class QuartermasterTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        // Setup an empty warehouse
+        // Set up an empty warehouse
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -1829,7 +1829,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         AmmoStorage inTransit = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
         inTransit.setDaysToArrival(10);
@@ -1872,7 +1872,7 @@ public class QuartermasterTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         AmmoType otherAmmoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoStorage otherAmmo = new AmmoStorage(0, otherAmmoType, otherAmmoType.getShots(), mockCampaign);
@@ -1920,7 +1920,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo on hand
+        // Set up a warehouse with ammo on hand
         Warehouse warehouse = new Warehouse();
         int originalShots = 1;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -1960,7 +1960,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo on hand plus other junk
+        // Set up a warehouse with ammo on hand plus other junk
         Warehouse warehouse = new Warehouse();
         int originalShots = 1;
         AmmoStorage existingInTransit = new AmmoStorage(0, ammoType, originalShots + 5, mockCampaign);
@@ -2006,7 +2006,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 1;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -2044,7 +2044,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 1;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -2080,7 +2080,7 @@ public class QuartermasterTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        // Setup an empty warehouse
+        // Set up an empty warehouse
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2107,7 +2107,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         AmmoStorage inTransit = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -2149,7 +2149,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -2191,7 +2191,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -2229,7 +2229,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
@@ -2258,7 +2258,7 @@ public class QuartermasterTest {
 
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
 
-        // Setup a warehouse with ammo in transit and available
+        // Set up a warehouse with ammo in transit and available
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         AmmoStorage inTransit = new AmmoStorage(0, ammoType, originalShots + 1, mockCampaign);
@@ -2295,7 +2295,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2355,7 +2355,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2394,7 +2394,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType("ISLRM5 Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISLRM20 Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2434,7 +2434,7 @@ public class QuartermasterTest {
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
         AmmoType incompatibleAmmoType = getAmmoType("ISSRM2 Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2499,7 +2499,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISSRM2 Inferno Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2551,7 +2551,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType("ISLRM5 Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISLRM20 Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2593,7 +2593,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
         AmmoType compatibleAmmoType = getAmmoType("ISLRM5 Ammo");
 
-        // Setup a warehouse with compatible ammo types
+        // Set up a warehouse with compatible ammo types
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2630,7 +2630,7 @@ public class QuartermasterTest {
     public void addInfantryAmmoNoSpareFound() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        // Setup an empty warehouse
+        // Set up an empty warehouse
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2671,7 +2671,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         InfantryAmmoStorage inTransit = new InfantryAmmoStorage(0,
               ammoType,
@@ -2718,7 +2718,7 @@ public class QuartermasterTest {
     public void addInfantryAmmoNoSpareFoundBecauseWrongWeaponType() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon otherWeaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_TAG);
@@ -2774,7 +2774,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 1;
         InfantryAmmoStorage existing = new InfantryAmmoStorage(0, ammoType, originalShots, weaponType, mockCampaign);
@@ -2814,7 +2814,7 @@ public class QuartermasterTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        // Setup an empty warehouse
+        // Set up an empty warehouse
         Warehouse warehouse = new Warehouse();
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2843,7 +2843,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         InfantryAmmoStorage inTransit = new InfantryAmmoStorage(0, ammoType, originalShots, weaponType, mockCampaign);
@@ -2887,7 +2887,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         InfantryAmmoStorage existing = new InfantryAmmoStorage(0, ammoType, originalShots, weaponType, mockCampaign);
@@ -2930,7 +2930,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         InfantryAmmoStorage existing = new InfantryAmmoStorage(0, ammoType, originalShots, weaponType, mockCampaign);
@@ -2960,7 +2960,7 @@ public class QuartermasterTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        // Setup a warehouse with ammo in transit
+        // Set up a warehouse with ammo in transit
         Warehouse warehouse = new Warehouse();
         int originalShots = 100;
         InfantryAmmoStorage existing = new InfantryAmmoStorage(0, ammoType, originalShots, weaponType, mockCampaign);

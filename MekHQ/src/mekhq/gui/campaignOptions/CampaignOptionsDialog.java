@@ -143,7 +143,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * {@code null}), the options from the preset are automatically applied to the dialog upon creation. </p>
      *
      * @param campaign the {@link Campaign} instance whose options will be displayed and edited
-     * @param preset   an optional {@link CampaignPreset} to apply initial settings (may be {@code null})
+     * @param preset   an optional {@link CampaignPreset} to apply initial settings (maybe {@code null})
      */
     public CampaignOptionsDialog(final Campaign campaign, @Nullable CampaignPreset preset) {
         super(null,

@@ -38,7 +38,7 @@ import javax.swing.JFrame;
 
 /**
  * This is the default Scrollable Panel implementation, designed to be used as a basic implementation of
- * AbstractMHQScrollablePanel for inline scrollable panels that can then be used within a scrollpane. It handles the
+ * AbstractMHQScrollablePanel for inline scrollable panels that can then be used within a scroll pane. It handles the
  * frame while ignoring preferences and resources.
  */
 public final class DefaultMHQScrollablePanel extends AbstractMHQScrollablePanel {

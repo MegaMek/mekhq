@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,9 +40,9 @@ import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import megamek.common.Aero;
-import megamek.common.Tank;
-import megamek.common.VTOL;
+import megamek.common.units.Aero;
+import megamek.common.units.Tank;
+import megamek.common.units.VTOL;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;

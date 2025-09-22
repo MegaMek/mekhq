@@ -42,7 +42,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 
 public class ScenarioKillAwards {
-    private static final MMLogger logger = MMLogger.create(ScenarioKillAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioKillAwards.class);
 
     /**
      * This function loops through Scenario Kill Awards, checking whether the person is eligible to receive each type of
@@ -59,7 +59,7 @@ public class ScenarioKillAwards {
         int killsNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();
-        List<Award> eligibleAwardsBestable = new ArrayList<>();
+        List<Award> bestEligibleAwards = new ArrayList<>();
         Award bestAward = new Award();
 
         for (Award award : awards) {
@@ -67,22 +67,22 @@ public class ScenarioKillAwards {
                 try {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
-                    logger.warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
+                    LOGGER.warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
                           award.getName(), award.getSet(), award.getQty());
                     continue;
                 }
 
                 if (killCount >= killsNeeded) {
-                    eligibleAwardsBestable.add(award);
+                    bestEligibleAwards.add(award);
                 }
             }
         }
 
-        if (!eligibleAwardsBestable.isEmpty()) {
+        if (!bestEligibleAwards.isEmpty()) {
             if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
                 int rollingQty = 0;
 
-                for (Award award : eligibleAwardsBestable) {
+                for (Award award : bestEligibleAwards) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();
                         bestAward = award;
@@ -91,7 +91,7 @@ public class ScenarioKillAwards {
 
                 eligibleAwards.add(bestAward);
             } else {
-                eligibleAwards.addAll(eligibleAwardsBestable);
+                eligibleAwards.addAll(bestEligibleAwards);
             }
         }
 

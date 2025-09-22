@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -202,7 +202,7 @@ public class Contract extends Mission {
     }
 
     public String getTransportCompString() {
-        return String.valueOf(transportComp) + "%";
+        return transportComp + "%";
     }
 
     public void setTransportComp(int s) {
@@ -214,7 +214,7 @@ public class Contract extends Mission {
     }
 
     public String getStraightSupportString() {
-        return String.valueOf(straightSupport) + "%";
+        return straightSupport + "%";
     }
 
     public void setStraightSupport(int s) {
@@ -242,7 +242,7 @@ public class Contract extends Mission {
     }
 
     public String getBattleLossCompString() {
-        return String.valueOf(battleLossComp) + "%";
+        return battleLossComp + "%";
     }
 
     public void setBattleLossComp(int s) {
@@ -254,7 +254,7 @@ public class Contract extends Mission {
     }
 
     public String getSalvagePctString() {
-        return String.valueOf(salvagePct) + "%";
+        return salvagePct + "%";
     }
 
     public void setSalvagePct(int s) {
@@ -321,7 +321,7 @@ public class Contract extends Mission {
         return mrbcFee;
     }
 
-    public int getMrbcFeePercentage() {
+    public int getMRBCFeePercentage() {
         return MRBC_FEE_PERCENTAGE;
     }
 
@@ -703,7 +703,7 @@ public class Contract extends Mission {
                               .plus(transportAmount)
                               .plus(transitAmount)
                               .plus(supportAmount)
-                              .multipliedBy(getMrbcFeePercentage())
+                              .multipliedBy(getMRBCFeePercentage())
                               .dividedBy(100);
         } else {
             feeAmount = Money.zero();

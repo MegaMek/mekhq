@@ -44,15 +44,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.Game;
 import megamek.common.Player;
+import megamek.common.game.Game;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
-import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.RestoreUnitAction.IEntityCopyFactory;
 import org.junit.jupiter.api.Test;

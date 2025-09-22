@@ -49,7 +49,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.TechConstants;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.MekBay;
+import megamek.common.units.Aero;
+import megamek.common.units.BipedMek;
+import megamek.common.units.Crew;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -152,9 +163,9 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getActivePersonnel(true)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getActivePersonnel(false)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getNumberMedics()).thenCallRealMethod();
-        when(mockCampaign.getNumberAstechs()).thenCallRealMethod();
-        when(mockCampaign.getNumberPrimaryAstechs()).thenCallRealMethod();
-        when(mockCampaign.getNumberSecondaryAstechs()).thenCallRealMethod();
+        when(mockCampaign.getNumberAsTechs()).thenCallRealMethod();
+        when(mockCampaign.getNumberPrimaryAsTechs()).thenCallRealMethod();
+        when(mockCampaign.getNumberSecondaryAsTechs()).thenCallRealMethod();
 
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.isUseQuirks()).thenReturn(false);
@@ -169,7 +180,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Entity mockWaspE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockWaspE).getMovementMode();
         doReturn(mockWaspE).when(mockWasp).getEntity();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockWaspE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockWaspE).getTechLevel();
         doReturn(20.0).when(mockWaspE).getWeight();
         Person waspPilot = mock(Person.class);
         mockPersonnelList.add(waspPilot);
@@ -182,7 +193,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockStinger = mock(Unit.class);
         Entity mockStingerE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockStingerE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockStingerE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockStingerE).getTechLevel();
         doReturn(20.0).when(mockStingerE).getWeight();
         doReturn(mockStingerE).when(mockStinger).getEntity();
         Person stingerPilot = mock(Person.class);
@@ -214,7 +225,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Entity mockShrekE = mock(Tank.class);
         doReturn(EntityMovementMode.TRACKED).when(mockShrekE).getMovementMode();
         doReturn(80.0).when(mockShrekE).getWeight();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockShrekE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockShrekE).getTechLevel();
         doReturn(mockShrekE).when(mockShrek).getEntity();
         Person shrekCommander = mock(Person.class);
         mockPersonnelList.add(shrekCommander);
@@ -228,7 +239,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Entity mockShrek2E = mock(Tank.class);
         doReturn(EntityMovementMode.TRACKED).when(mockShrek2E).getMovementMode();
         doReturn(80.0).when(mockShrek2E).getWeight();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockShrek2E).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockShrek2E).getTechLevel();
         doReturn(mockShrek2E).when(mockShrek2).getEntity();
         Person shrek2Commander = mock(Person.class);
         mockPersonnelList.add(shrek2Commander);
@@ -269,7 +280,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockLightning = mock(Unit.class);
         Entity mockLightingE = mock(Aero.class);
         doReturn(EntityMovementMode.AEROSPACE).when(mockLightingE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockLightingE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockLightingE).getTechLevel();
         doReturn(50.0).when(mockLightingE).getWeight();
         doReturn(mockLightingE).when(mockLightning).getEntity();
         Person lightningPilot = mock(Person.class);
@@ -283,7 +294,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockLightning2 = mock(Unit.class);
         Entity mockLighting2E = mock(Aero.class);
         doReturn(EntityMovementMode.AEROSPACE).when(mockLighting2E).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockLighting2E).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockLighting2E).getTechLevel();
         doReturn(50.0).when(mockLighting2E).getWeight();
         doReturn(mockLighting2E).when(mockLightning2).getEntity();
         Person lightning2Pilot = mock(Person.class);
@@ -297,7 +308,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockUnion = mock(Unit.class);
         Entity mockUnionE = mock(Dropship.class);
         doReturn(EntityMovementMode.SPHEROID).when(mockUnionE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockUnionE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockUnionE).getTechLevel();
         doReturn(3600.0).when(mockUnionE).getWeight();
         doReturn(mockUnionE).when(mockUnion).getEntity();
         Person unionCommander = mock(Person.class);
@@ -315,7 +326,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Unit mockInvader = mock(Unit.class);
         Entity mockInvaderE = mock(Jumpship.class);
         doReturn(EntityMovementMode.AEROSPACE).when(mockLightingE).getMovementMode();
-        doReturn(TechConstants.T_INTRO_BOXSET).when(mockInvaderE).getTechLevel();
+        doReturn(TechConstants.T_INTRO_BOX_SET).when(mockInvaderE).getTechLevel();
         doReturn(152000.0).when(mockInvaderE).getWeight();
         doReturn(mockInvaderE).when(mockInvader).getEntity();
         Person invaderCommander = mock(Person.class);
@@ -411,7 +422,7 @@ public class FieldManualMercRevDragoonsRatingTest {
               mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 165;
-        when(mockCampaign.getAstechPool()).thenReturn(6);
+        when(mockCampaign.getAsTechPool()).thenReturn(6);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
 
         // Add a mekwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.
@@ -506,39 +517,41 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(BigDecimal.ZERO).when(testRating).getTransportPercent();
         doReturn(4).when(testRating).getHeavyVeeCount();
         doReturn(4).when(testRating).getLightVeeCount();
-        String expected = "Transportation      -10\n" +
-                                "    DropShip Capacity:       0%\n" +
-                                "        #BattleMek Bays:              0 needed /   0 available\n" +
-                                "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
-                                "        #Small Craft Bays:            0 needed /   0 available\n" +
-                                "        #ProtoMek Bays:               0 needed /   0 available\n" +
-                                "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                                "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)\n" +
-                                "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
-                                "        #Battle Armor Bays:           0 needed /   0 available\n" +
-                                "        #Infantry Bays:               0 needed /   0 available\n" +
-                                "    JumpShip?                No\n" +
-                                "    WarShip w/out Collar?    No\n" +
-                                "    WarShip w/ Collar?       No";
+        String expected = """
+              Transportation      -10
+                  DropShip Capacity:       0%
+                      #BattleMek Bays:              0 needed /   0 available
+                      #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)
+                      #Small Craft Bays:            0 needed /   0 available
+                      #ProtoMek Bays:               0 needed /   0 available
+                      #Super Heavy Vehicle Bays:    0 needed /   0 available
+                      #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)
+                      #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)
+                      #Battle Armor Bays:           0 needed /   0 available
+                      #Infantry Bays:               0 needed /   0 available
+                  JumpShip?                No
+                  WarShip w/out Collar?    No
+                  WarShip w/ Collar?       No""";
         assertEquals(expected, testRating.getTransportationDetails());
         // Add some heavy vee bays.
         doReturn(0).when(testRating).getTransportValue();
         doReturn(BigDecimal.valueOf(100)).when(testRating).getTransportPercent();
         doReturn(8).when(testRating).getHeavyVeeBayCount();
-        expected = "Transportation        0\n" +
-                         "    DropShip Capacity:      100%\n" +
-                         "        #BattleMek Bays:              0 needed /   0 available\n" +
-                         "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
-                         "        #Small Craft Bays:            0 needed /   0 available\n" +
-                         "        #ProtoMek Bays:               0 needed /   0 available\n" +
-                         "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                         "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)\n" +
-                         "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)\n" +
-                         "        #Battle Armor Bays:           0 needed /   0 available\n" +
-                         "        #Infantry Bays:               0 needed /   0 available\n" +
-                         "    JumpShip?                No\n" +
-                         "    WarShip w/out Collar?    No\n" +
-                         "    WarShip w/ Collar?       No";
+        expected = """
+              Transportation        0
+                  DropShip Capacity:      100%
+                      #BattleMek Bays:              0 needed /   0 available
+                      #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)
+                      #Small Craft Bays:            0 needed /   0 available
+                      #ProtoMek Bays:               0 needed /   0 available
+                      #Super Heavy Vehicle Bays:    0 needed /   0 available
+                      #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)
+                      #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)
+                      #Battle Armor Bays:           0 needed /   0 available
+                      #Infantry Bays:               0 needed /   0 available
+                  JumpShip?                No
+                  WarShip w/out Collar?    No
+                  WarShip w/ Collar?       No""";
         assertEquals(expected, testRating.getTransportationDetails());
     }
 

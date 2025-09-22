@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import megamek.logging.MMLogger;
@@ -45,7 +46,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 
 public class SkillAwards {
-    private static final MMLogger logger = MMLogger.create(SkillAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(SkillAwards.class);
 
     /**
      * This function loops through Skill Awards, checking whether the person is eligible to receive each type of award
@@ -62,7 +63,7 @@ public class SkillAwards {
             try {
                 requiredSkillLevel = award.getQty();
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid qty value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid qty value {}",
                       award.getName(),
                       award.getSet(),
                       award.getQty());
@@ -296,7 +297,7 @@ public class SkillAwards {
                 break;
 
             default:
-                logger.warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
+                LOGGER.warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
 
                 // this treats the malformed Skill as if a Person was untrained
                 return -1;
@@ -326,8 +327,12 @@ public class SkillAwards {
             }
         }
 
-        // IntelliJ's NPE warning here is a false-positive. The code doesn't allow
-        // skillLevels to be empty.
-        return Arrays.stream(skillLevels).max().getAsInt();
+        // IntelliJ's NPE warning here was related to the OptionalInt and not the stream or skillsLevels.
+        OptionalInt maxSkill = Arrays.stream(skillLevels).max();
+        if (maxSkill.isPresent()) {
+            return maxSkill.getAsInt();
+        } else {
+            return -1;
+        }
     }
 }

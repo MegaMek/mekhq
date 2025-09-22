@@ -107,8 +107,8 @@ public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
      *       {@code false} otherwise.
      */
     public static boolean checkNag(List<Loan> loans, LocalDate today, Money currentFunds) {
-        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && unableToAffordLoans(loans, today, currentFunds);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT) &&
+                     unableToAffordLoans(loans, today, currentFunds);
     }
 }

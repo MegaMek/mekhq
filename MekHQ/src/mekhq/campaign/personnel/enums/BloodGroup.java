@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
@@ -84,7 +84,7 @@ public enum BloodGroup {
     }
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
-    ;
+
 
     /**
      * Gets the chance value for this blood group.

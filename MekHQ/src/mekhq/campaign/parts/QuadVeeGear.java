@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,13 +35,19 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.QuadVee;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Entity;
+import megamek.common.units.QuadVee;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingQuadVeeGear;
 import org.w3c.dom.Node;
 
 /**
@@ -50,20 +56,21 @@ import org.w3c.dom.Node;
  * @author Neoancient
  */
 public class QuadVeeGear extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
-                                                          .setTechRating(TechRating.F)
-                                                          .setAvailability(AvailabilityValue.X,
-                                                                AvailabilityValue.X,
-                                                                AvailabilityValue.X,
-                                                                AvailabilityValue.F)
-                                                          .setClanAdvancement(3130,
-                                                                3135,
-                                                                DATE_NONE,
-                                                                DATE_NONE,
-                                                                DATE_NONE)
-                                                          .setClanApproximate(true).setPrototypeFactions(Faction.CHH)
-                                                          .setProductionFactions(Faction.CHH)
-                                                          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
+                                                                 .setTechRating(TechRating.F)
+                                                                 .setAvailability(AvailabilityValue.X,
+                                                                       AvailabilityValue.X,
+                                                                       AvailabilityValue.X,
+                                                                       AvailabilityValue.F)
+                                                                 .setClanAdvancement(3130,
+                                                                       3135,
+                                                                       DATE_NONE,
+                                                                       DATE_NONE,
+                                                                       DATE_NONE)
+                                                                 .setClanApproximate(true)
+                                                                 .setPrototypeFactions(Faction.CHH)
+                                                                 .setProductionFactions(Faction.CHH)
+                                                                 .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     public QuadVeeGear() {
         this(0, null);
@@ -84,7 +91,7 @@ public class QuadVeeGear extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
-            hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+            hits = unit.getHitCriticalSlots(CriticalSlot.TYPE_SYSTEM,
                   QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
@@ -143,13 +150,13 @@ public class QuadVeeGear extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);

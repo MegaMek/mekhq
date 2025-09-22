@@ -80,7 +80,7 @@ public class CampaignController {
     }
 
     /**
-     * Gets a value indicating whether or not the local Campaign is hosting this session.
+     * Gets a value indicating whether the local Campaign is hosting this session.
      *
      * @return {@code true} if the local campaign is hosting this session, otherwise {@code false}.
      */
@@ -92,12 +92,6 @@ public class CampaignController {
      * Advances the local {@link Campaign} to the next day.
      */
     public void advanceDay() {
-        if (isHost) {
-            if (getLocalCampaign().newDay()) {
-                // TODO: notifyDayChangedEvent();
-            }
-        } else {
-            // TODO: requestNewDay();
-        }
+        getLocalCampaign().newDay();
     }
 }

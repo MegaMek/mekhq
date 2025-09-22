@@ -43,11 +43,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.missing.MissingMekLocation;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -62,12 +65,12 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a not-suitable parts to the warehouse
-        Part leftArmForRefit = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        Part leftArmForRefit = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         leftArmForRefit.setRefitUnit(mock(Unit.class));
         warehouse.addPart(leftArmForRefit);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Add a person to do the work
@@ -92,11 +95,11 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a suitable parts to the warehouse
-        Part leftArm = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        Part leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         warehouse.addPart(leftArm);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Find the replacement part for overnight work, without anyone to do the work
@@ -116,17 +119,17 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a suitable parts to the warehouse
-        Part leftArm = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        Part leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         warehouse.addPart(leftArm);
 
         // Add a not-suitable parts to the warehouse
-        Part leftArmForRefit = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        Part leftArmForRefit = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         leftArmForRefit.setRefitUnit(mock(Unit.class));
         warehouse.addPart(leftArmForRefit);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Add a person to do the work
@@ -154,19 +157,19 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a few suitable parts to the warehouse
-        MekLocation leftArm = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MekLocation leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         int startingQuantity = 3;
         leftArm.setQuantity(startingQuantity);
         warehouse.addPart(leftArm);
 
         // Add a not-suitable parts to the warehouse
-        MekLocation leftArmForRefit = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MekLocation leftArmForRefit = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         leftArmForRefit.setRefitUnit(mock(Unit.class));
         warehouse.addPart(leftArmForRefit);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Add a person to do the work
@@ -201,11 +204,11 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a suitable parts to the warehouse
-        Part leftArm = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        Part leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         warehouse.addPart(leftArm);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Add a person to do the work
@@ -243,7 +246,7 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a few suitable parts to the warehouse
-        MekLocation leftArm = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MekLocation leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         int startingQuantity = 3;
         leftArm.setQuantity(startingQuantity);
@@ -251,12 +254,12 @@ public class MissingPartTest {
         warehouse.addPart(leftArm);
 
         // Add a not-suitable parts to the warehouse
-        MekLocation leftArmForRefit = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MekLocation leftArmForRefit = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         leftArmForRefit.setRefitUnit(mock(Unit.class));
         warehouse.addPart(leftArmForRefit);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Add a person to do the work
@@ -295,19 +298,19 @@ public class MissingPartTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Add a few suitable parts to the warehouse
-        MekLocation leftArm = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MekLocation leftArm = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         int startingQuantity = 3;
         leftArm.setQuantity(startingQuantity);
         warehouse.addPart(leftArm);
 
         // Add a not-suitable parts to the warehouse
-        MekLocation leftArmForRefit = new MekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MekLocation leftArmForRefit = new MekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, false, false, mockCampaign);
         leftArmForRefit.setRefitUnit(mock(Unit.class));
         warehouse.addPart(leftArmForRefit);
 
-        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
+        MissingPart missingPart = new MissingMekLocation(Mek.LOC_LEFT_ARM, 20, EquipmentType.T_STRUCTURE_STANDARD,
               false, false, false, mockCampaign);
 
         // Add a person to do the work
@@ -329,7 +332,7 @@ public class MissingPartTest {
         assertEquals(startingQuantity - 1, leftArm.getQuantity());
 
         // Use the replacement part
-        replacement.decrementQuantity();
+        replacement.changeQuantity(-1);
 
         // Cancel the reservation
         missingPart.cancelReservation();

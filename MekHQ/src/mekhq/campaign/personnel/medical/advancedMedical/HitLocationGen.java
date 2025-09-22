@@ -47,7 +47,7 @@ import mekhq.campaign.personnel.BodyLocation;
  */
 public class HitLocationGen {
     // Roll tables
-    private static NavigableMap<Integer, BodyLocation> GENERIC_RANDOM_HIT_TABLE = new TreeMap<>();
+    private static final NavigableMap<Integer, BodyLocation> GENERIC_RANDOM_HIT_TABLE = new TreeMap<>();
 
     static {
         GENERIC_RANDOM_HIT_TABLE.put(10, BodyLocation.HEAD);
@@ -70,7 +70,7 @@ public class HitLocationGen {
         GENERIC_RANDOM_HIT_TABLE.put(200, BodyLocation.HEAD);
     }
 
-    private static NavigableMap<Integer, BodyLocation> MEK_RANDOM_HIT_TABLE = new TreeMap<>();
+    private static final NavigableMap<Integer, BodyLocation> MEK_RANDOM_HIT_TABLE = new TreeMap<>();
 
     static {
         MEK_RANDOM_HIT_TABLE.put(25, BodyLocation.HEAD);
@@ -94,10 +94,11 @@ public class HitLocationGen {
     private static BodyLocation queryRandomTable(NavigableMap<Integer, BodyLocation> table,
           IntUnaryOperator rnd, Function<BodyLocation, Boolean> validCheck) {
         validCheck = ObjectUtility.nonNull(validCheck, (loc) -> true);
-        Entry<Integer, BodyLocation> entry = null;
+        Entry<Integer, BodyLocation> entry;
         do {
             entry = table.ceilingEntry(rnd.applyAsInt(table.lastKey()) + 1);
         } while ((null == entry) || !validCheck.apply(entry.getValue()));
+
         return entry.getValue();
     }
 

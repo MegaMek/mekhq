@@ -52,9 +52,9 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPath {
-    private static final MMLogger logger = MMLogger.create(JumpPath.class);
+    private static final MMLogger LOGGER = MMLogger.create(JumpPath.class);
 
-    private List<PlanetarySystem> path;
+    private final List<PlanetarySystem> path;
 
     public JumpPath() {
         path = new ArrayList<>();
@@ -146,7 +146,7 @@ public class JumpPath {
      * <p>
      * Used in Legacy AtB tests.
      */
-    @Deprecated(since = "0.50.07", forRemoval = false)
+    @Deprecated(since = "0.50.07")
     public double getTotalTime(LocalDate when, double currentTransit) {
         return getTotalTime(when, currentTransit, false);
     }
@@ -225,12 +225,12 @@ public class JumpPath {
                     if (null != p) {
                         retVal.addSystem(p);
                     } else {
-                        logger.error("Couldn't find planet named " + wn2.getTextContent());
+                        LOGGER.error("Couldn't find planet named {}", wn2.getTextContent());
                     }
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

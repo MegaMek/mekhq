@@ -82,7 +82,8 @@ public class TrainingCombatTeams {
     private static final MMLogger logger = MMLogger.create(TrainingCombatTeams.class);
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
-    private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
+    private static final ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
+          MekHQ.getMHQOptions().getLocale());
 
     /**
      * Processes all training combat teams in the campaign.
@@ -137,7 +138,7 @@ public class TrainingCombatTeams {
         Person commander = combatTeam.getCommander(campaign);
 
         if (commander == null) {
-            logger.info(String.format("Failed to fetch commander for Combat Team: %s", combatTeam.getForceId()));
+            logger.info("Failed to fetch commander for Combat Team: {}", combatTeam.getForceId());
             return;
         }
 

@@ -34,18 +34,21 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.FuelType;
-import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.enums.FuelType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingSVEngine;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -57,14 +60,14 @@ import org.w3c.dom.NodeList;
  * same fuel type.
  */
 public class SVEnginePart extends Part {
-    private static final MMLogger logger = MMLogger.create(SVEnginePart.class);
+    private static final MMLogger LOGGER = MMLogger.create(SVEnginePart.class);
 
     private double engineTonnage;
     private int etype;
     private TechRating techRating;
     private FuelType fuelType;
 
-    private TechAdvancement techAdvancement;
+    private final TechAdvancement techAdvancement;
 
     /**
      * Constructor used during campaign deserialization
@@ -195,7 +198,7 @@ public class SVEnginePart extends Part {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -230,13 +233,13 @@ public class SVEnginePart extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -315,11 +318,6 @@ public class SVEnginePart extends Part {
     @Override
     public @Nullable String checkFixable() {
         return null;
-    }
-
-    @Override
-    public boolean isMountedOnDestroyedLocation() {
-        return false;
     }
 
     @Override

@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.MekSummary;
 import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekSummary;
 import megamek.logging.MMLogger;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -54,8 +54,8 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
     private static final MMLogger logger = MMLogger.create(AbstractUnitGenerator.class);
 
     private Map<Integer, String> ratRatingMappings = null;
-    private TreeSet<Integer> turretRatYears = new TreeSet<>();
-    private Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
+    private final TreeSet<Integer> turretRatYears = new TreeSet<>();
+    private final Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
 
     /**
      * Worker function to initialize the mapping between a numeric quality rating level and an alphabetic one (such as
@@ -86,7 +86,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
      */
     @Override
     public List<MekSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear) {
-        int ratYear;
+        Integer ratYear;
 
         // less dirty hack
         // we loop through the names of available turret RATs

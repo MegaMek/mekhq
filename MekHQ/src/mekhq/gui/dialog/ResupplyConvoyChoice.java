@@ -55,7 +55,7 @@ public class ResupplyConvoyChoice {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ResupplyConvoyChoice";
 
     /** Type of response chosen in the dialog. */
-    private ConvoyResponseType responseType = ConvoyResponseType.CANCEL;
+    private final ConvoyResponseType responseType;
 
     /**
      * Enum representing the possible responses to the resupply convoy dialog.

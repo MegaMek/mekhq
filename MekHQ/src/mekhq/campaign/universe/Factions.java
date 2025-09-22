@@ -53,7 +53,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 public class Factions {
-    private static final MMLogger logger = MMLogger.create(Factions.class);
+    private static final MMLogger LOGGER = MMLogger.create(Factions.class);
 
     // region Variable Declarations
     private static Factions instance;
@@ -145,9 +145,9 @@ public class Factions {
         return new ArrayList<>(factions.keySet());
     }
 
-    public Faction getFaction(String sname) {
+    public Faction getFaction(String name) {
         Faction defaultFaction = new Faction();
-        return factions.getOrDefault(sname, defaultFaction);
+        return factions.getOrDefault(name, defaultFaction);
     }
 
     public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
@@ -184,7 +184,7 @@ public class Factions {
 
             if (fRec == null) {
                 String message = String.format("Could not locate faction record for %s", faction);
-                logger.error(message);
+                LOGGER.error(message);
             }
         }
 
@@ -195,9 +195,9 @@ public class Factions {
      * Loads the default Factions data.
      */
     public static Factions loadDefault() {
-        logger.info("Starting load of faction data from XML...");
+        LOGGER.info("Starting load of faction data from XML...");
         Factions factions = load();
-        logger.info(String.format("Loaded a total of %d factions", factions.factions.size()));
+        LOGGER.info("Loaded a total of {} factions", factions.factions.size());
         return factions;
     }
 

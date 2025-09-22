@@ -33,7 +33,6 @@
 package mekhq.utilities;
 
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -42,9 +41,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
-import megamek.common.BombType.BombTypeEnum;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.BombLoadout;
+import megamek.common.equipment.enums.BombType.BombTypeEnum;
+import megamek.common.loaders.MULParser;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.Campaign;
@@ -54,7 +55,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class MHQXMLUtility extends MMXMLUtility {
-    private static final MMLogger logger = MMLogger.create(MHQXMLUtility.class);
+    private static final MMLogger LOGGER = MMLogger.create(MHQXMLUtility.class);
 
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 
@@ -67,7 +68,7 @@ public class MHQXMLUtility extends MMXMLUtility {
     public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
         DocumentBuilderFactory dbf = UNSAFE_DOCUMENT_BUILDER_FACTORY;
         if (null == dbf) {
-            // At worst we may do this twice if multiple threads
+            // At worst, we may do this twice if multiple threads
             // hit this method. It is Ok to have more than one
             // instance of the builder factory, as long as it is
             // XXE safe.
@@ -108,7 +109,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      * then
      * TODO : re-factored out of EntityListFile.
      * <p>
-     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
+     * Contents copied from megamek.common.units.EntityListFile.saveTo(...) Modified
      * to support saving to/from XML for our purposes in MekHQ
      *
      * @param tgtEnt The entity to serialize to XML.
@@ -138,8 +139,10 @@ public class MHQXMLUtility extends MMXMLUtility {
             retVal.append("\" " + MULParser.ATTR_QUIRKS + "=\"").append(escape(tgtEnt.getQuirkList("::")));
         }
         if (tgtEnt.getC3Master() != null) {
-            retVal.append("\" " + MULParser.ATTR_C3MASTERIS + "=\"")
-                  .append(tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId()).getC3UUIDAsString());
+            Entity entity = tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId());
+            if (entity != null) {
+                retVal.append("\" " + MULParser.ATTR_C3_MASTER_IS + "=\"").append(entity.getC3UUIDAsString());
+            }
         }
         if (tgtEnt.hasC3() || tgtEnt.hasC3i() || tgtEnt.hasNavalC3()) {
             retVal.append("\" " + MULParser.ATTR_C3UUID + "=\"").append(tgtEnt.getC3UUIDAsString());
@@ -168,11 +171,11 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         if (tgtEnt.isOffBoard()) {
             retVal.append("\" " + MULParser.ATTR_OFFBOARD + "=\"");
-            retVal.append(String.valueOf(tgtEnt.isOffBoard()));
+            retVal.append(tgtEnt.isOffBoard());
             retVal.append("\" " + MULParser.ATTR_OFFBOARD_DISTANCE + "=\"");
-            retVal.append(String.valueOf(tgtEnt.getOffBoardDistance()));
+            retVal.append(tgtEnt.getOffBoardDistance());
             retVal.append("\" " + MULParser.ATTR_OFFBOARD_DIRECTION + "=\"");
-            retVal.append(String.valueOf(tgtEnt.getOffBoardDirection().getValue()));
+            retVal.append(tgtEnt.getOffBoardDirection().getValue());
         }
 
         retVal.append("\">\n");
@@ -181,21 +184,19 @@ public class MHQXMLUtility extends MMXMLUtility {
         // Since tank movement can be affected by damage other than equipment
         // damage...
         // And thus can't necessarily be calculated.
-        if (tgtEnt instanceof Tank) {
-            Tank tentity = (Tank) tgtEnt;
-            retVal.append(getMovementString(tentity, indentLvl + 1));
+        if (tgtEnt instanceof Tank tankEntity) {
+            retVal.append(getMovementString(tankEntity, indentLvl + 1));
 
-            if (tentity.isTurretLocked(Tank.LOC_TURRET)) {
-                retVal.append(getTurretLockedString(tentity, indentLvl + 1));
+            if (tankEntity.isTurretLocked(Tank.LOC_TURRET)) {
+                retVal.append(getTurretLockedString(tankEntity, indentLvl + 1));
             }
 
             // Crits
-            retVal.append(getTankCritString(tentity, indentLvl + 1));
+            retVal.append(getTankCritString(tankEntity, indentLvl + 1));
         }
 
-        // add a bunch of stuff for aeros
-        if (tgtEnt instanceof Aero) {
-            Aero a = (Aero) tgtEnt;
+        // add a bunch of stuff for aerospace
+        if (tgtEnt instanceof Aero a) {
 
             // SI
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
@@ -215,8 +216,7 @@ public class MHQXMLUtility extends MMXMLUtility {
             // TODO: dropship docking collars, bays
 
             // Large craft stuff
-            if (a instanceof Jumpship) {
-                Jumpship j = (Jumpship) a;
+            if (a instanceof Jumpship j) {
 
                 // KF integrity
                 retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
@@ -248,10 +248,7 @@ public class MHQXMLUtility extends MMXMLUtility {
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_NC3 + ">\n");
-            Iterator<Entity> nc3List = list.iterator();
-            while (nc3List.hasNext()) {
-                final Entity nc3Entity = nc3List.next();
-
+            for (Entity nc3Entity : list) {
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
                           .append("<" + MULParser.ELE_NC3LINK + " " + MULParser.ATTR_LINK + "=\"");
@@ -266,13 +263,10 @@ public class MHQXMLUtility extends MMXMLUtility {
         if (tgtEnt.hasC3i()) {
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_C3I + ">\n");
 
-            Iterator<Entity> c3iList = list.iterator();
-            while (c3iList.hasNext()) {
-                final Entity C3iEntity = c3iList.next();
-
+            for (Entity C3iEntity : list) {
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                          .append("<" + MULParser.ELE_C3ILINK + " " + MULParser.ATTR_LINK + "=\"")
+                          .append("<" + MULParser.ELE_C3I_LINK + " " + MULParser.ATTR_LINK + "=\"")
                           .append(C3iEntity.getC3UUIDAsString())
                           .append("\"/>\n");
                 }
@@ -323,15 +317,15 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...) Modified to support saving to/from XML
-     * for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getAeroCritString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param a The Aero unit to generate a crit string for.
      *
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
-        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_AEROCRIT + "";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_AERO_CRIT;
         String critVal = "";
 
         // crits
@@ -397,25 +391,25 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTurretLockedString(...) Modified to support saving to/from
-     * XML for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getTurretLockedString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param e The tank to generate a turret-locked string for.
      *
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
-        String retval = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TURRETLOCK + " "
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TURRET_LOCK + " "
                               + MULParser.ATTR_DIRECTION + "=\"";
-        retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
-        retval = retval.concat("\"/>\n");
+        retVal = retVal.concat(Integer.toString(e.getSecondaryFacing()));
+        retVal = retVal.concat("\"/>\n");
 
-        return retval;
+        return retVal;
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getMovementString(...) Modified to support saving to/from XML
-     * for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getMovementString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param e The tank to generate a movement string for.
      *
@@ -427,7 +421,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // This can throw an NPE for no obvious reason.
         // Okay, fine. If the tank doesn't even *have* an object related to this...
-        // Lets assume it's fully mobile, as any other fact hasn't been recorded.
+        // Let's assume it's fully mobile, as any other fact hasn't been recorded.
         try {
             im = e.isImmobile();
         } catch (NullPointerException ex) {
@@ -444,9 +438,9 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // save any motive hits
         retVal = retVal.concat(
-              MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_MDAMAGE + "=\"");
+              MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_DAMAGE + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
-        retVal = retVal.concat("\" " + MULParser.ATTR_MPENALTY + "=\"");
+        retVal = retVal.concat("\" " + MULParser.ATTR_PENALTY + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
         retVal = retVal.concat("\"/>\n");
 
@@ -454,8 +448,8 @@ public class MHQXMLUtility extends MMXMLUtility {
     }
 
     /**
-     * Contents copied from megamek.common.EntityListFile.getTankCritString(...) Modified to support saving to/from XML
-     * for our purposes in MekHQ
+     * Contents copied from megamek.common.units.EntityListFile.getTankCritString(...) Modified to support saving
+     * to/from XML for our purposes in MekHQ
      *
      * @param e The tank to generate a movement string for.
      *
@@ -463,7 +457,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      */
     private static String getTankCritString(Tank e, int indentLvl) {
 
-        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TANKCRIT + "";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TANK_CRIT;
         String critVal = "";
 
         // crits
@@ -512,17 +506,17 @@ public class MHQXMLUtility extends MMXMLUtility {
         String retVal = MHQXMLUtility.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
         StringBuilder crew = new StringBuilder(MHQXMLUtility.indentStr(indentLvl + 1));
-        crew.append("<" + MULParser.ELE_CREW + " " + MULParser.ATTR_CREWTYPE + "=\"")
+        crew.append("<" + MULParser.ELE_CREW + " " + MULParser.ATTR_CREW_TYPE + "=\"")
               .append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
               .append("\" " + MULParser.ATTR_SIZE + "=\"").append(tgtEnt.getCrew().getSize());
         if (tgtEnt.getCrew().getInitBonus() != 0) {
-            crew.append("\" " + MULParser.ATTR_INITB + "=\"").append(tgtEnt.getCrew().getInitBonus());
+            crew.append("\" " + MULParser.ATTR_INIT_B + "=\"").append(tgtEnt.getCrew().getInitBonus());
         }
         if (tgtEnt.getCrew().getCommandBonus() != 0) {
-            crew.append("\" " + MULParser.ATTR_COMMANDB + "=\"").append(tgtEnt.getCrew().getCommandBonus());
+            crew.append("\" " + MULParser.ATTR_COMMAND_B + "=\"").append(tgtEnt.getCrew().getCommandBonus());
         }
         if (tgtEnt instanceof Mek) {
-            crew.append("\" " + MULParser.ATTR_AUTOEJECT + "=\"").append(((Mek) tgtEnt).isAutoEject());
+            crew.append("\" " + MULParser.ATTR_AUTO_EJECT + "=\"").append(((Mek) tgtEnt).isAutoEject());
         }
         crew.append("\" " + MULParser.ATTR_EJECTED + "=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
 
@@ -546,7 +540,7 @@ public class MHQXMLUtility extends MMXMLUtility {
             }
 
             if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
-                crew.append("\" " + MULParser.ATTR_HITS + "=\"" + MULParser.VALUE_DEAD + "");
+                crew.append("\" " + MULParser.ATTR_HITS + "=\"" + MULParser.VALUE_DEAD);
             } else if (tgtEnt.getCrew().getHits(pos) > 0) {
                 crew.append("\" " + MULParser.ATTR_HITS + "=\"").append(tgtEnt.getCrew().getHits(pos));
             }
@@ -593,7 +587,7 @@ public class MHQXMLUtility extends MMXMLUtility {
                 if (campaign != null) {
                     entity.setGame(campaign.getGame());
                 }
-                logger.trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                LOGGER.trace("Returning {} from getEntityFromXmlString(String)...", entity);
                 return entity;
             default:
                 throw new IllegalArgumentException(

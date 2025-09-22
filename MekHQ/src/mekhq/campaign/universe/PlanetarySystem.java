@@ -341,7 +341,7 @@ public class PlanetarySystem {
     }
 
     public Boolean isNadirCharge(LocalDate when) {
-        return (null == getSourcedNadirCharge(when) ? false : getSourcedNadirCharge(when).getValue());
+        return (null != getSourcedNadirCharge(when) && getSourcedNadirCharge(when).getValue());
     }
 
     public SourceableValue<Boolean> getSourcedNadirCharge(LocalDate when) {
@@ -349,7 +349,7 @@ public class PlanetarySystem {
     }
 
     public boolean isZenithCharge(LocalDate when) {
-        return (null == getSourcedZenithCharge(when) ? false : getSourcedZenithCharge(when).getValue());
+        return (null != getSourcedZenithCharge(when) && getSourcedZenithCharge(when).getValue());
     }
 
     public SourceableValue<Boolean> getSourcedZenithCharge(LocalDate when) {
@@ -560,7 +560,7 @@ public class PlanetarySystem {
         return new ArrayList<>(events.values());
     }
 
-    private interface EventGetter<T> {
+    protected interface EventGetter<T> {
         T get(PlanetarySystemEvent e);
     }
 

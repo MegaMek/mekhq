@@ -42,7 +42,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 
 public class TimeAwards {
-    private static final MMLogger logger = MMLogger.create(TimeAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(TimeAwards.class);
 
     /**
      * This function loops through Time Awards, checking whether the person is eligible to receive each type of award
@@ -57,14 +57,14 @@ public class TimeAwards {
         long yearsOfService;
 
         List<Award> eligibleAwards = new ArrayList<>();
-        List<Award> eligibleAwardsBestable = new ArrayList<>();
+        List<Award> bestEligibleAwards = new ArrayList<>();
         Award bestAward = new Award();
 
         for (Award award : awards) {
             try {
                 requiredYearsOfService = award.getQty();
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid qty value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid qty value {}",
                       award.getName(), award.getSet(), award.getQty());
                 continue;
             }
@@ -72,7 +72,7 @@ public class TimeAwards {
             try {
                 isCumulative = award.isStackable();
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid stackable value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid stackable value {}",
                       award.getName(), award.getSet(), award.getQty());
                 continue;
             }
@@ -81,7 +81,7 @@ public class TimeAwards {
                 try {
                     yearsOfService = campaign.getPerson(person).getYearsInService(campaign);
                 } catch (Exception e) {
-                    logger.error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set.",
+                    LOGGER.error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set.",
                           campaign.getPerson(person).getFullName(), award.getName(), award.getSet());
                     continue;
                 }
@@ -92,16 +92,16 @@ public class TimeAwards {
                 }
 
                 if (yearsOfService >= requiredYearsOfService) {
-                    eligibleAwardsBestable.add(award);
+                    bestEligibleAwards.add(award);
                 }
             }
         }
 
-        if (!eligibleAwardsBestable.isEmpty()) {
+        if (!bestEligibleAwards.isEmpty()) {
             if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
                 int rollingQty = 0;
 
-                for (Award award : eligibleAwardsBestable) {
+                for (Award award : bestEligibleAwards) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();
                         bestAward = award;
@@ -110,7 +110,7 @@ public class TimeAwards {
 
                 eligibleAwards.add(bestAward);
             } else {
-                eligibleAwards.addAll(eligibleAwardsBestable);
+                eligibleAwards.addAll(bestEligibleAwards);
             }
         }
 

@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.lifeEvents;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -60,10 +60,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * @since 0.50.05
  */
-public class CommandersDayAnnouncement {
-    private static String RESOURCE_BUNDLE = "mekhq.resources.CommandersDayAnnouncement";
-
-    private final Campaign campaign;
+public record CommandersDayAnnouncement(Campaign campaign) {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandersDayAnnouncement";
 
     private final static int COMMANDERS_DAY_MONTH = 6;
     private final static int COMMANDERS_DAY_DAY = 16;

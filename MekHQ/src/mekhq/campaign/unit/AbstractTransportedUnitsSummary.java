@@ -41,9 +41,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
-import megamek.common.Entity;
-import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Transporter;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -54,9 +54,9 @@ import mekhq.campaign.unit.enums.TransporterType;
 public abstract class AbstractTransportedUnitsSummary implements ITransportedUnitsSummary {
     private static final MMLogger logger = MMLogger.create(AbstractTransportedUnitsSummary.class);
     protected Unit transport;
-    private Set<Unit> transportedUnits = new HashSet<>();
+    private final Set<Unit> transportedUnits = new HashSet<>();
     private Map<TransporterType, Double> transportCapacity = new HashMap<>();
-    private CampaignTransportType campaignTransportType;
+    private final CampaignTransportType campaignTransportType;
 
     AbstractTransportedUnitsSummary(Unit transport, CampaignTransportType campaignTransportType) {
         this.transport = transport;
@@ -187,7 +187,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     /**
-     * Gets a value indicating whether or not this unit is transporting units.
+     * Gets a value indicating whether this unit is transporting units.
      *
      * @return true if the unit has any transported units
      */
@@ -246,23 +246,19 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         transportCapacity = new HashMap<>();
     }
 
-    protected Set<Entity> clearTransportedEntities() {
-        Set<Entity> transportedEntities = new HashSet<>();
+    protected void clearTransportedEntities() {
         if (transport.getEntity() != null) {
             if (transport.getEntity().hasUnloadedUnitsFromBays()) {
                 for (Entity transportedEntity : transport.getEntity().getUnitsUnloadableFromBays()) {
                     transport.getEntity().unload(transportedEntity);
-                    transportedEntities.add(transportedEntity);
                 }
             } // We can't just use Entity::getUnloadableUnits(); getUnloadableFromBays() throws NPE in that flow
             for (Entity transportedEntity : transport.getEntity().getUnitsUnloadableFromNonBays()) {
                 transport.getEntity().unload(transportedEntity);
-                transportedEntities.add(transportedEntity);
             }
 
             transport.getEntity().resetTransporter();
         }
-        return transportedEntities;
     }
 
     protected void loadTransportedEntities() {
@@ -304,9 +300,9 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
             if (transport.getEntity().canLoad(transportedEntity, false)) {
                 transport.getEntity().load(transportedEntity, false);
             } else {
-                logger.error(String.format("Could not load entity %s onto unit %s",
+                logger.error("Could not load entity {} onto unit {}",
                       transportedEntity.getDisplayName(),
-                      transport.getName()));
+                      transport.getName());
             }
         }
     }

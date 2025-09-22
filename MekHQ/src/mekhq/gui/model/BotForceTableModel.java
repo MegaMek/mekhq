@@ -49,7 +49,7 @@ public class BotForceTableModel extends AbstractTableModel {
     // region Variable Declarations
     protected String[] columnNames;
     protected List<BotForce> data;
-    private Campaign campaign;
+    private final Campaign campaign;
 
     public static final int COL_NAME = 0;
     public static final int COL_IFF = 1;
@@ -76,20 +76,14 @@ public class BotForceTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Name";
-            case COL_IFF:
-                return "IFF";
-            case COL_FIXED:
-                return "Fixed";
-            case COL_RANDOM:
-                return "Random";
-            case COL_DEPLOYMENT:
-                return "Deployment";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_NAME -> "Name";
+            case COL_IFF -> "IFF";
+            case COL_FIXED -> "Fixed";
+            case COL_RANDOM -> "Random";
+            case COL_DEPLOYMENT -> "Deployment";
+            default -> "?";
+        };
     }
 
     @Override
@@ -101,21 +95,15 @@ public class BotForceTableModel extends AbstractTableModel {
             botForce = getBotForceAt(row);
         }
 
-        switch (col) {
-            case COL_NAME:
-                return botForce.getName();
-            case COL_IFF:
-                return (botForce.getTeam() == 1) ? "Allied" : "Enemy (Team " + botForce.getTeam() + ")";
-            case COL_FIXED:
-                return botForce.getFixedEntityList().size() + " Units, BV: " + botForce.getFixedBV();
-            case COL_RANDOM:
-                return ((null == botForce.getBotForceRandomizer()) ? ""
-                              : botForce.getBotForceRandomizer().getShortDescription());
-            case COL_DEPLOYMENT:
-                return Utilities.getDeploymentString(botForce);
-            default:
-                return "?";
-        }
+        return switch (col) {
+            case COL_NAME -> botForce.getName();
+            case COL_IFF -> (botForce.getTeam() == 1) ? "Allied" : "Enemy (Team " + botForce.getTeam() + ")";
+            case COL_FIXED -> botForce.getFixedEntityList().size() + " Units, BV: " + botForce.getFixedBV();
+            case COL_RANDOM -> ((null == botForce.getBotForceRandomizer()) ? ""
+                                      : botForce.getBotForceRandomizer().getShortDescription());
+            case COL_DEPLOYMENT -> Utilities.getDeploymentString(botForce);
+            default -> "?";
+        };
     }
 
     @Override
@@ -137,26 +125,19 @@ public class BotForceTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int col) {
-        switch (col) {
-            case COL_NAME:
-                return 80;
-            case COL_DEPLOYMENT:
-                return 20;
-            default:
-                return 30;
-        }
+        return switch (col) {
+            case COL_NAME -> 80;
+            case COL_DEPLOYMENT -> 20;
+            default -> 30;
+        };
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            case COL_NAME:
-            case COL_IFF:
-                return SwingConstants.LEFT;
-            case COL_DEPLOYMENT:
-                return SwingConstants.CENTER;
-            default:
-                return SwingConstants.RIGHT;
-        }
+        return switch (col) {
+            case COL_NAME, COL_IFF -> SwingConstants.LEFT;
+            case COL_DEPLOYMENT -> SwingConstants.CENTER;
+            default -> SwingConstants.RIGHT;
+        };
     }
 
     public String getTooltip(int row, int col) {
@@ -167,13 +148,11 @@ public class BotForceTableModel extends AbstractTableModel {
             botForce = getBotForceAt(row);
         }
 
-        switch (col) {
-            case COL_RANDOM:
-                return ((null == botForce.getBotForceRandomizer()) ? ""
-                              : botForce.getBotForceRandomizer().getDescription(campaign));
-            default:
-                return null;
+        if (col == COL_RANDOM) {
+            return ((null == botForce.getBotForceRandomizer()) ? ""
+                          : botForce.getBotForceRandomizer().getDescription(campaign));
         }
+        return null;
     }
 
     // fill table with values

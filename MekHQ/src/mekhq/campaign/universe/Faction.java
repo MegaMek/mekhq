@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.universe;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 
 import java.awt.Color;
 import java.nio.file.Path;
@@ -65,17 +65,16 @@ public class Faction {
 
     private Faction2 faction2;
 
-    private String shortName;
-    private String fullName;
+    private final String shortName;
+    private final String fullName;
     private NavigableMap<Integer, String> nameChanges = new TreeMap<>();
-    private String[] altNames;
     private String[] alternativeFactionCodes;
     private String startingPlanet;
-    private NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
+    private final NavigableMap<LocalDate, String> planetChanges = new TreeMap<>();
     private String nameGenerator;
     private int[] eraMods;
     private Color color;
-    private String currencyCode = ""; // Currency of the faction, if any
+    private final String currencyCode = ""; // Currency of the faction, if any
     private String layeredForceIconBackgroundCategory;
     private String layeredForceIconBackgroundFilename;
     private String layeredForceIconLogoCategory;
@@ -552,7 +551,7 @@ public class Faction {
 
     /**
      * Returns the size of the lowest formation type (e.g., lance). If this faction gives the size directly
-     * (formationBaseSize:) this value is returned. Otherwise the fallback Factions are called recursively. When there
+     * (formationBaseSize) this value is returned. Otherwise, the fallback Factions are called recursively. When there
      * is no callback Faction, 5 is returned for a clan faction and 4 otherwise.
      * <p>
      * This means that the Word of Blake Faction will give a value of 6 and WoB subcommands do not have to give any
@@ -566,9 +565,9 @@ public class Faction {
 
     /**
      * Returns the grouping multiplier for accumulated formations such as company, galaxy or level 3. If this faction
-     * gives the value directly (formationGrouping:) this value is returned. Otherwise the fallback Factions are called
+     * gives the value directly (formationGrouping) this value is returned. Otherwise, the fallback Factions are called
      * recursively. When there is no callback Faction, 5 is returned for a clan faction and 3 otherwise (3 lances form a
-     * company, 3 companies form a battalion etc)
+     * company, 3 companies form a battalion etc.)
      * <p>
      * This means that the Word of Blake Faction will give a value of 6 and WoB subcommands do not have to give any
      * value as long as their fallback Faction is WoB.

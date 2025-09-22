@@ -60,7 +60,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 
 public class KillAwards {
-    private static final MMLogger logger = MMLogger.create(KillAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(KillAwards.class);
 
     /**
      * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
@@ -99,7 +99,7 @@ public class KillAwards {
                 if (validOptions.contains(award.getRange().toLowerCase())) {
                     awardScope = award.getRange().toLowerCase();
                 } else {
-                    logger.warn("Award {} from the {} set has invalid range value {}. Skipping",
+                    LOGGER.warn("Award {} from the {} set has invalid range value {}. Skipping",
                           award.getName(), award.getSet(), award.getRange());
                     continue;
                 }
@@ -112,7 +112,7 @@ public class KillAwards {
                 try {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
-                    logger.warn("Award {} from the {} set has invalid range qty {}. Skipping",
+                    LOGGER.warn("Award {} from the {} set has invalid range qty {}. Skipping",
                           award.getName(), award.getSet(), award.getQty());
                     continue;
                 }
@@ -124,7 +124,7 @@ public class KillAwards {
                 if ((awardDepth.isNone()) && (awardScope.equalsIgnoreCase("lifetime"))) {
                     killCount.add(campaign.getKillsFor(person).size());
                 } else if ((!awardDepth.isNone()) && (awardScope.equalsIgnoreCase("lifetime"))) {
-                    logger.warn(
+                    LOGGER.warn(
                           "Award {} from the {} set has a invalid combination: range value {} with size {}. Skipping",
                           award.getName(), award.getSet(), award.getRange(), award.getSize());
                     continue;
@@ -221,7 +221,7 @@ public class KillAwards {
                                     Force originNode = campaign.getForce(originForce);
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
-                                    logger.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
+                                    LOGGER.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
                                           originForce, e.getMessage(), e.getStackTrace());
                                     temporaryKills.addAll(killData.get(forceId));
                                 }
@@ -391,7 +391,7 @@ public class KillAwards {
             case "corps" -> CORPS;
             case "army" -> ARMY;
             default -> {
-                logger.warn("Award {} from the {} set has invalid size value {}",
+                LOGGER.warn("Award {} from the {} set has invalid size value {}",
                       award.getName(),
                       award.getSet(),
                       award.getSize());

@@ -62,7 +62,16 @@ import megamek.common.preference.IPreferenceChangeListener;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OvertimeModeEvent;
+import mekhq.campaign.events.parts.PartWorkEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonLogEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonRemovedEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
+import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -79,7 +88,7 @@ import mekhq.gui.view.PersonViewPanel;
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTab.class);
 
     public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(700);
 
@@ -294,7 +303,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             personnelTable.setName("personnelTable");
             preferences.manage(new JTablePreference(personnelTable));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -411,8 +420,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
-    private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
-    private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
+    private final ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
+    private final ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {

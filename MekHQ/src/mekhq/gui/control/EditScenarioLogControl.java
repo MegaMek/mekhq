@@ -54,16 +54,14 @@ import mekhq.gui.model.LogTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class EditScenarioLogControl extends JPanel {
-    private JFrame parent;
-    private Campaign campaign;
-    private Person person;
-    private LogTableModel logModel;
+    private final JFrame parent;
+    private final Campaign campaign;
+    private final Person person;
+    private final LogTableModel logModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JTable logsTable;
-    private JScrollPane scrollLogsTable;
 
     public EditScenarioLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
@@ -82,28 +80,28 @@ public class EditScenarioLogControl extends JPanel {
         setName(resourceMap.getString("control.name"));
         this.setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
 
-        btnAdd = new JButton();
+        JButton btnAdd = new JButton();
         btnAdd.setText(resourceMap.getString("btnAdd.text"));
         btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addEntry());
-        panBtns.add(btnAdd);
+        panButtons.add(btnAdd);
 
         btnEdit = new JButton();
         btnEdit.setText(resourceMap.getString("btnEdit.text"));
         btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editEntry());
-        panBtns.add(btnEdit);
+        panButtons.add(btnEdit);
 
         btnDelete = new JButton();
         btnDelete.setText(resourceMap.getString("btnDelete.text"));
         btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteEntry());
-        panBtns.add(btnDelete);
-        this.add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDelete);
+        this.add(panButtons, BorderLayout.PAGE_START);
 
         logsTable = new JTable(logModel);
         logsTable.setName(resourceMap.getString("logsTable.name"));
@@ -118,7 +116,7 @@ public class EditScenarioLogControl extends JPanel {
         logsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         logsTable.getSelectionModel().addListSelectionListener(this::logTableValueChanged);
 
-        scrollLogsTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollLogsTable = new JScrollPaneWithSpeed();
         scrollLogsTable.setName(resourceMap.getString("scrollLogsTable.name"));
         scrollLogsTable.setViewportView(logsTable);
         this.add(scrollLogsTable, BorderLayout.CENTER);

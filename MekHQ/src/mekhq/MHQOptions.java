@@ -569,12 +569,12 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
+                               .getInt(MHQConstants.STRAT_CON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
     }
 
     public void setStratConHexCoordForeground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-              .putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
+              .putInt(MHQConstants.STRAT_CON_HEX_COORD_FOREGROUND, value.getRGB());
     }
 
     public Color getFontColorNegative() {
@@ -806,23 +806,23 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_BEFORE_MISSION_END, value);
     }
 
-    public int getMaximumNumberOfAutosavesValue() {
+    public int getMaximumNumberOfAutoSavesValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
                      .getInt(MHQConstants.MAXIMUM_NUMBER_SAVES_KEY, MHQConstants.DEFAULT_NUMBER_SAVES);
     }
 
-    public void setMaximumNumberOfAutosavesValue(int value) {
+    public void setMaximumNumberOfAutoSavesValue(int value) {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putInt(MHQConstants.MAXIMUM_NUMBER_SAVES_KEY, value);
     }
     // endregion Autosave
 
     // region New Day
-    public boolean getNewDayAstechPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_ASTECH_POOL_FILL, true);
+    public boolean getNewDayAsTechPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_AS_TECH_POOL_FILL, true);
     }
 
-    public void setNewDayAstechPoolFill(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_ASTECH_POOL_FILL, value);
+    public void setNewDayAsTechPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_AS_TECH_POOL_FILL, value);
     }
 
     public boolean getNewDayMedicPoolFill() {
@@ -887,7 +887,7 @@ public final class MHQOptions extends SuiteOptions {
      * Sets a hint indicating that the campaign should be gzipped, if possible. This allows the Save dialog to present
      * the user with the correct file type on subsequent saves.
      *
-     * @param value A value indicating whether or not the campaign should be gzipped if possible.
+     * @param value A value indicating whether the campaign should be gzipped if possible.
      */
     public void setPreferGzippedOutput(boolean value) {
         userPreferences.node(MHQConstants.XML_SAVES_NODE).putBoolean(MHQConstants.PREFER_GZIPPED_CAMPAIGN_FILE, value);

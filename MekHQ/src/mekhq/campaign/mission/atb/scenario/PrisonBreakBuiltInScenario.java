@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,11 +35,11 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -55,8 +55,8 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class PrisonBreakBuiltInScenario extends AtBScenario {
-    private static String GUARD_FORCE_ID = "Guards";
-    private static String PRISONER_FORCE_ID = "Prisoners";
+    private static final String GUARD_FORCE_ID = "Guards";
+    private static final String PRISONER_FORCE_ID = "Prisoners";
 
     @Override
     public boolean isSpecialScenario() {
@@ -65,7 +65,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return PRISONBREAK;
+        return PRISON_BREAK;
     }
 
     @Override

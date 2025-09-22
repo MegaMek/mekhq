@@ -34,13 +34,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.BayType;
-import megamek.common.Entity;
-import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
+import megamek.common.bays.BayType;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingCubicle;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,7 +52,6 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class Cubicle extends Part {
-    private static final MMLogger logger = MMLogger.create(Cubicle.class);
 
     private BayType bayType;
 
@@ -105,13 +105,13 @@ public class Cubicle extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             parentPart.removeChildPart(this);
             parentPart.addChildPart(missing);
             parentPart.updateConditionFromPart();

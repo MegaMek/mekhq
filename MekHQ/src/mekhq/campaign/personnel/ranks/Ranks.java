@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.personnel.ranks;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +44,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,7 +69,8 @@ import org.w3c.dom.NodeList;
  * custom one there.
  */
 public class Ranks {
-    private static final MMLogger logger = MMLogger.create(Ranks.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Ranks";
+    private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
     // region Variable Declarations
     public static final String DEFAULT_SYSTEM_CODE = "SSLDF";
@@ -119,24 +123,29 @@ public class Ranks {
             file = new File(path);
         }
         int indent = 0;
-        try (OutputStream fos = new FileOutputStream(file);
-              OutputStream bos = new BufferedOutputStream(fos);
-              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-              PrintWriter pw = new PrintWriter(osw)) {
+        try (OutputStream fileOutputStream = new FileOutputStream(file);
+              OutputStream outputStream = new BufferedOutputStream(fileOutputStream);
+              OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+              PrintWriter writer = new PrintWriter(osw)) {
             // Then save it out to that file.
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystems", "version", MHQConstants.VERSION);
+            writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+            String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
+            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Ranks.legalStatement", year);
+            writer.println(legalStatement.trim());
+
+            MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rankSystems", "version", MHQConstants.VERSION);
             for (final RankSystem rankSystem : rankSystems) {
-                rankSystem.writeToXML(pw, indent, true);
+                rankSystem.writeToXML(writer, indent, true);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystems");
+            MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "rankSystems");
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
     public static void initializeRankSystems() {
-        logger.info("Starting Rank Systems XML load...");
+        LOGGER.info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystemType type : RankSystemType.values()) {
@@ -162,12 +171,12 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            logger.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
+            LOGGER.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
                                + " system. Initialization failure, shutting MekHQ down.");
-            System.exit(-1);
+            java.lang.System.exit(-1);
         }
 
-        logger.info("Completed Rank System XML Load");
+        LOGGER.info("Completed Rank System XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {
@@ -190,7 +199,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return new ArrayList<>();
         }
 

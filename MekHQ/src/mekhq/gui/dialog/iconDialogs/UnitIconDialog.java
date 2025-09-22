@@ -82,8 +82,8 @@ public class UnitIconDialog extends StandardForceIconDialog {
     }
 
     /**
-     * This is used to override the selected UnitIcon, to allow it to be specified outside of the possible selections.
-     * The primary use is in setting up a non-existent UnitIcon.
+     * This is used to override the selected UnitIcon, to allow it to be specified outside the possible selections. The
+     * primary use is in setting up a non-existent UnitIcon.
      *
      * @return the current selected item override, which is null when there isn't an override.
      */

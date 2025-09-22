@@ -35,7 +35,7 @@ package mekhq.campaign.personnel;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -64,9 +64,9 @@ public class RandomDependents {
     private final boolean isUseRandomDependentRemoval;
     private final LocalDate currentDay;
 
-    private List<Person> activeDependents = new ArrayList<>();
-    private int activeNonDependents;
-    private int dependentCapacity;
+    private final List<Person> activeDependents = new ArrayList<>();
+    private final int activeNonDependents;
+    private final int dependentCapacity;
 
     final static double DEPENDENT_CAPACITY_MULTIPLIER = 0.05;
 

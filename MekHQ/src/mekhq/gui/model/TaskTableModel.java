@@ -44,12 +44,12 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.IconPackage;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.work.IPartWork;
@@ -60,11 +60,11 @@ import mekhq.gui.RepairTaskInfo;
 /**
  * A table model for displaying work items
  */
-public class TaskTableModel extends DataTableModel {
-    private static Map<String, Person> techCache = new HashMap<>();
+public class TaskTableModel extends DataTableModel<IPartWork> {
+    private static final Map<String, Person> techCache = new HashMap<>();
 
-    private CampaignGUI gui;
-    private ITechWorkPanel panel;
+    private final CampaignGUI gui;
+    private final ITechWorkPanel panel;
 
     private interface REPAIR_STATE { // TODO : Enum Swapover
         int AVAILABLE = 0;
@@ -76,25 +76,25 @@ public class TaskTableModel extends DataTableModel {
 
     public TaskTableModel(CampaignGUI gui, ITechWorkPanel panel) {
         columnNames = new String[] { "Tasks" };
-        data = new ArrayList<IPartWork>();
+        data = new ArrayList<>();
         this.gui = gui;
         this.panel = panel;
     }
 
     @Override
     public Object getValueAt(int row, int col) {
-        return ((IPartWork) data.get(row)).getDesc();
+        return data.get(row).getDesc();
     }
 
     public IPartWork getTaskAt(int row) {
-        return (IPartWork) data.get(row);
+        return data.get(row);
     }
 
     public IPartWork[] getTasksAt(int[] rows) {
         IPartWork[] tasks = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {
             int row = rows[i];
-            tasks[i] = (IPartWork) data.get(row);
+            tasks[i] = data.get(row);
         }
         return tasks;
     }

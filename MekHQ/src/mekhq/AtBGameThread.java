@@ -59,15 +59,16 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.CommanderGUI;
 import megamek.client.ui.clientGUI.ILocalBots;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Infantry;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
 import megamek.common.Player;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Minefield;
+import megamek.common.loaders.MapSettings;
+import megamek.common.units.Entity;
+import megamek.common.units.IAero;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
+import megamek.common.net.packets.InvalidPacketDataException;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -88,7 +89,7 @@ import mekhq.utilities.ScenarioUtils;
  * @author Neoancient
  */
 public class AtBGameThread extends GameThread {
-    private static final MMLogger logger = MMLogger.create(AtBGameThread.class);
+    private static final MMLogger LOGGER = MMLogger.create(AtBGameThread.class);
 
     private final AtBScenario scenario;
     private final BehaviorSettings autoResolveBehaviorSettings;
@@ -140,12 +141,12 @@ public class AtBGameThread extends GameThread {
             swingGui.initialize();
         }
 
-        controller.clientgui = swingGui;
+        controller.clientGUI = swingGui;
 
         try {
             client.connect();
         } catch (Exception ex) {
-            logger.error("MegaMek client failed to connect to server", ex);
+            LOGGER.error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -159,11 +160,11 @@ public class AtBGameThread extends GameThread {
                   (i < MekHQ.getMHQOptions().getStartGameClientRetryCount()) && client.getGame().getPhase().isUnknown();
                   i++) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
-                logger.warn("Client has not finished initialization, and is currently in an unknown phase.");
+                LOGGER.warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                logger.info("Thread in lounge");
+                LOGGER.info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
@@ -205,23 +206,7 @@ public class AtBGameThread extends GameThread {
                  * or player chose to deploy a DropShip), do not use deployment
                  * delay for slower scout units.
                  */
-                boolean useDropship = false;
-                if (scenario.getCombatRole().isPatrol()) {
-                    for (Entity en : scenario.getAlliesPlayer()) {
-                        if (en.getUnitType() == UnitType.DROPSHIP) {
-                            useDropship = true;
-                            break;
-                        }
-                    }
-                    if (!useDropship) {
-                        for (Unit unit : units) {
-                            if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-                                useDropship = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+                boolean useDropship = isUseDropship();
 
                 PotentialTransportsMap potentialTransports = new PotentialTransportsMap(CampaignTransportType.values());
 
@@ -234,7 +219,7 @@ public class AtBGameThread extends GameThread {
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
                     if (unit.hasShipTransportedUnits()) {
-                        // Store this unit as a potential transport to load
+                        // Store this unit as potential transport to load
                         potentialTransports.putNewTransport(SHIP_TRANSPORT, unit.getId());
                     }
                     if (unit.hasTacticalTransportedUnits()) {
@@ -357,7 +342,7 @@ public class AtBGameThread extends GameThread {
                         botClient.startPrecognition();
                     } catch (Exception e) {
                         Sentry.captureException(e);
-                        logger.error(String.format("Could not connect with Bot name %s", bf.getName()), e);
+                        LOGGER.error("Could not connect with Bot name {}", bf.getName(), e);
                     }
 
                     getLocalBots().put(name, botClient);
@@ -609,7 +594,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            logger.error("", ex);
+            LOGGER.error("", ex);
         } finally {
             disconnectGuiSilently();
             client.die();
@@ -619,7 +604,29 @@ public class AtBGameThread extends GameThread {
         }
     }
 
-    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
+    private boolean isUseDropship() {
+        boolean useDropship = false;
+        if (scenario.getCombatRole().isPatrol()) {
+            for (Entity en : scenario.getAlliesPlayer()) {
+                if (en.getUnitType() == UnitType.DROPSHIP) {
+                    useDropship = true;
+                    break;
+                }
+            }
+            if (!useDropship) {
+                for (Unit unit : units) {
+                    if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                        useDropship = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return useDropship;
+    }
+
+    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException,
+                                                                               InvalidPacketDataException{
         var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
@@ -630,8 +637,7 @@ public class AtBGameThread extends GameThread {
             botClient.startPrecognition();
             Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
         } catch (Exception e) {
-            Sentry.captureException(e);
-            logger.error(String.format("Could not connect with Bot name %s", botName), e);
+            LOGGER.error(e, "Could not connect with Bot name {}", botName);
         }
 
         var retryCount = MekHQ.getMHQOptions().getStartGameBotClientRetryCount();
@@ -643,7 +649,7 @@ public class AtBGameThread extends GameThread {
             }
         }
         if (retryCount <= 0) {
-            logger.error(String.format("Could not connect with Bot name %s", botName));
+            LOGGER.error("Could not connect with Bot name {}", botName);
         }
         botClient.getLocalPlayer().setName(botName);
         botClient.getLocalPlayer().setStartingPos(player.getStartingPos());
@@ -671,8 +677,6 @@ public class AtBGameThread extends GameThread {
     /**
      * wait for the server to add the bot client, then send starting position, camo, and entities
      *
-     * @param botClient
-     * @param botForce
      */
     private void configureBot(BotClient botClient, BotForce botForce, Scenario scenario) {
         try {
@@ -689,7 +693,7 @@ public class AtBGameThread extends GameThread {
             }
 
             if (botClient.getLocalPlayer() == null) {
-                logger.error(String.format("Could not configure bot %s", botClient.getName()));
+                LOGGER.error("Could not configure bot {}", botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
 
@@ -713,7 +717,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -738,7 +742,7 @@ public class AtBGameThread extends GameThread {
         }
 
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));
-        comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
+        comp = comp.thenComparing((Entity::getRunMP), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
 

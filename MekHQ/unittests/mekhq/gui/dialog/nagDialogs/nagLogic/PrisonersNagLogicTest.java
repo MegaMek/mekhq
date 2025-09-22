@@ -35,11 +35,8 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
-import mekhq.campaign.Campaign;
 import mekhq.gui.dialog.nagDialogs.PrisonersNagDialog;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -48,17 +45,6 @@ import org.junit.jupiter.api.Test;
  */
 class PrisonersNagLogicTest {
     // Mock objects for the tests
-    private Campaign campaign;
-
-    /**
-     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
-     * behaviors.
-     */
-    @BeforeEach
-    void init() {
-        // Initialize the mock objects
-        campaign = mock(Campaign.class);
-    }
 
     @Test
     void activeContract() {

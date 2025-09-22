@@ -59,7 +59,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
  */
 @Deprecated(since = "0.50.07", forRemoval = true)
 public class SelectPresetDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(SelectPresetDialog.class);
 
     private int returnState;
     public static final int PRESET_SELECTION_CANCELLED = 0;
@@ -119,7 +119,7 @@ public class SelectPresetDialog extends JDialog {
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());
 
         if (campaignPresets.isEmpty()) {
-            logger.errorDialog("Error", "No campaign presets found");
+            LOGGER.errorDialog("Error", "No campaign presets found");
         }
 
         JComboBox<CampaignPreset> comboBox = new JComboBox<>();
@@ -202,6 +202,19 @@ public class SelectPresetDialog extends JDialog {
 
         add(outerPanel, BorderLayout.CENTER);
 
+        JPanel buttonPanel = getButtonPanel(includePresetSelectOption, includeCustomizePresetOption, comboBox);
+
+        add(buttonPanel, BorderLayout.PAGE_END);
+
+        pack();
+        setAlwaysOnTop(true);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private JPanel getButtonPanel(boolean includePresetSelectOption, boolean includeCustomizePresetOption,
+          JComboBox<CampaignPreset> comboBox) {
         JPanel buttonPanel = new JPanel();
 
         RoundedJButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");
@@ -228,14 +241,7 @@ public class SelectPresetDialog extends JDialog {
             dispose();
         });
         buttonPanel.add(buttonCancel);
-
-        add(buttonPanel, BorderLayout.PAGE_END);
-
-        pack();
-        setAlwaysOnTop(true);
-        setResizable(false);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        return buttonPanel;
     }
 
     /**

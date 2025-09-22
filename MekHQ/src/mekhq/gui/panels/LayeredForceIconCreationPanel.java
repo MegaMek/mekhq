@@ -63,7 +63,7 @@ import mekhq.gui.baseComponents.AbstractMHQPanel;
  * ForcePieceIconChooser for every potential LayeredForceIconLayer layer.
  */
 public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
-    private static final MMLogger logger = MMLogger.create(LayeredForceIconCreationPanel.class);
+    private static final MMLogger LOGGER = MMLogger.create(LayeredForceIconCreationPanel.class);
 
     // region Variable Declarations
     private LayeredForceIcon forceIcon;
@@ -183,7 +183,7 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         try {
             setPreferences();
         } catch (Exception ex) {
-            logger.error(
+            LOGGER.error(
                   "Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.",
                   ex);
         }
@@ -237,7 +237,7 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             final BufferedImage image = (BufferedImage) getForceIcon().getImage();
             ImageIO.write(image, "png", file);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 

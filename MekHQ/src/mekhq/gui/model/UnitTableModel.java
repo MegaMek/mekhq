@@ -40,15 +40,15 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.SpaceStation;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.SpaceStation;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -61,11 +61,11 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  *
  * @author Jay lawson
  */
-public class UnitTableModel extends DataTableModel {
+public class UnitTableModel extends DataTableModel<Unit> {
     //region Variable Declarations
     public static final int COL_NAME = 0;
     public static final int COL_TYPE = 1;
-    public static final int COL_WCLASS = 2;
+    public static final int COL_WEIGHT_CLASS = 2;
     public static final int COL_TECH = 3;
     public static final int COL_WEIGHT = 4;
     public static final int COL_COST = 5;
@@ -84,22 +84,17 @@ public class UnitTableModel extends DataTableModel {
     public static final int COL_PARTS = 18;
     public static final int COL_SITE = 19;
     public static final int COL_QUIRKS = 20;
-    public static final int COL_RSTATUS = 21;
+    public static final int COL_MODE = 21;
     public static final int COL_SHIP_TRANSPORT = 22;
     public static final int COL_TAC_TRANSPORT = 23;
     public static final int N_COL = 24;
 
-    private Campaign campaign;
+    private final Campaign campaign;
     //endregion Variable Declarations
 
     public UnitTableModel(Campaign c) {
-        data = new ArrayList<Unit>();
+        data = new ArrayList<>();
         campaign = c;
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
     }
 
     @Override
@@ -112,7 +107,7 @@ public class UnitTableModel extends DataTableModel {
         return switch (column) {
             case COL_NAME -> "Name";
             case COL_TYPE -> "Type";
-            case COL_WCLASS -> "Class";
+            case COL_WEIGHT_CLASS -> "Class";
             case COL_TECH -> "Tech";
             case COL_WEIGHT -> "Weight";
             case COL_COST -> "Value";
@@ -131,7 +126,7 @@ public class UnitTableModel extends DataTableModel {
             case COL_PARTS -> "# Parts";
             case COL_SITE -> "Site";
             case COL_QUIRKS -> "Quirks";
-            case COL_RSTATUS -> "Mode";
+            case COL_MODE -> "Mode";
             case COL_SHIP_TRANSPORT -> "Ship Transport";
             case COL_TAC_TRANSPORT -> "Tactical Transport";
             default -> "?";
@@ -141,8 +136,8 @@ public class UnitTableModel extends DataTableModel {
     public int getColumnWidth(final int columnId) {
         return switch (columnId) {
             case COL_NAME, COL_TECH, COL_PILOT, COL_FORCE, COL_TECH_CRW -> 150;
-            case COL_TYPE, COL_WCLASS, COL_SITE -> 50;
-            case COL_COST, COL_STATUS, COL_RSTATUS, COL_CREW -> 40;
+            case COL_TYPE, COL_WEIGHT_CLASS, COL_SITE -> 50;
+            case COL_COST, COL_STATUS, COL_MODE, COL_CREW -> 40;
             case COL_PARTS -> 10;
             default -> 20;
         };
@@ -152,7 +147,7 @@ public class UnitTableModel extends DataTableModel {
         return switch (col) {
             case COL_WEIGHT, COL_COST, COL_MAINTAIN, COL_MAINTAIN_CYCLE, COL_BV, COL_REPAIR, COL_PARTS ->
                   SwingConstants.RIGHT;
-            case COL_QUALITY, COL_CREW, COL_QUIRKS, COL_RSTATUS -> SwingConstants.CENTER;
+            case COL_QUALITY, COL_CREW, COL_QUIRKS, COL_MODE -> SwingConstants.CENTER;
             default -> SwingConstants.LEFT;
         };
     }
@@ -254,13 +249,8 @@ public class UnitTableModel extends DataTableModel {
         return getValueAt(0, c).getClass();
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
     public Unit getUnit(int i) {
-        return (i < data.size()) ? (Unit) data.get(i) : null;
+        return (i < data.size()) ? data.get(i) : null;
     }
 
     @Override
@@ -278,7 +268,7 @@ public class UnitTableModel extends DataTableModel {
         return switch (col) {
             case COL_NAME -> unit.getName();
             case COL_TYPE -> unit.getTypeDisplayableNameWithOmni();
-            case COL_WCLASS -> entity.getWeightClassName();
+            case COL_WEIGHT_CLASS -> entity.getWeightClassName();
             case COL_TECH -> TechConstants.getLevelDisplayableName(entity.getTechLevel());
             case COL_WEIGHT -> entity.getWeight();
             case COL_COST -> unit.getSellValue().toAmountAndSymbolString();
@@ -321,7 +311,7 @@ public class UnitTableModel extends DataTableModel {
             case COL_PARTS -> unit.getPartsNeeded().size();
             case COL_SITE -> Unit.getSiteName(unit.getSite());
             case COL_QUIRKS -> entity.countQuirks();
-            case COL_RSTATUS -> unit.isSalvage() ? "Strip" : "Repair";
+            case COL_MODE -> unit.isSalvage() ? "Strip" : "Repair";
             case COL_SHIP_TRANSPORT -> (unit.getTransportShipAssignment() != null) ?
                                              unit.getTransportShipAssignment().getTransportShip().getName() : "-";
             case COL_TAC_TRANSPORT -> (unit.getTacticalTransportAssignment() != null) ?
@@ -374,7 +364,7 @@ public class UnitTableModel extends DataTableModel {
 
             Unit u = getUnit(actualRow);
             switch (actualCol) {
-                case COL_WCLASS: {
+                case COL_WEIGHT_CLASS: {
                     String desc = "<html><b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
                     if (!((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship))) {

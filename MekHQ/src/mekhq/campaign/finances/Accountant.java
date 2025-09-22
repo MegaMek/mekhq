@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import megamek.common.Engine;
-import megamek.common.Entity;
+import megamek.common.equipment.Engine;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
@@ -65,7 +65,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * Provides accounting for a Campaign.
  */
 public record Accountant(Campaign campaign) {
-    private static final MMLogger logger = MMLogger.create(Accountant.class);
+    private static final MMLogger LOGGER = MMLogger.create(Accountant.class);
 
     final public static int HOUSING_PRISONER_OR_DEPENDENT = 228;
     final public static int HOUSING_ENLISTED = 312;
@@ -97,7 +97,6 @@ public record Accountant(Campaign campaign) {
     private Money getTheoreticalPayroll(boolean noInfantry) {
         Money salaries = Money.zero();
         for (Person person : campaign().getSalaryEligiblePersonnel()) {
-            // Optionized infantry (Unofficial)
             if (!(noInfantry && person.getPrimaryRole().isSoldier())) {
                 salaries = salaries.plus(person.getSalary(campaign()));
             }
@@ -106,7 +105,7 @@ public record Accountant(Campaign campaign) {
         // And pay our pool
         salaries = salaries.plus(campaign().getCampaignOptions()
                                        .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
-                                       .doubleValue() * campaign().getAstechPool());
+                                       .doubleValue() * campaign().getAsTechPool());
         salaries = salaries.plus(campaign().getCampaignOptions()
                                        .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
                                        campaign().getMedicPool());
@@ -237,13 +236,13 @@ public record Accountant(Campaign campaign) {
             expenses += officerFoodUsage * FOOD_OFFICER;
         }
 
-        logger.debug("prisonerOrDependentHousingUsage: {}", prisonerOrDependentHousingUsage);
-        logger.debug("enlistedHousingUsage: {}", enlistedHousingUsage);
-        logger.debug("officerHousingUsage: {}", officerHousingUsage);
-        logger.debug("prisonerOrDependentFoodUsage: {}", prisonerOrDependentFoodUsage);
-        logger.debug("enlistedFoodUsage: {}", enlistedFoodUsage);
-        logger.debug("officerFoodUsage: {}", officerFoodUsage);
-        logger.debug("expenses: {}", expenses);
+        LOGGER.debug("prisonerOrDependentHousingUsage: {}", prisonerOrDependentHousingUsage);
+        LOGGER.debug("enlistedHousingUsage: {}", enlistedHousingUsage);
+        LOGGER.debug("officerHousingUsage: {}", officerHousingUsage);
+        LOGGER.debug("prisonerOrDependentFoodUsage: {}", prisonerOrDependentFoodUsage);
+        LOGGER.debug("enlistedFoodUsage: {}", enlistedFoodUsage);
+        LOGGER.debug("officerFoodUsage: {}", officerFoodUsage);
+        LOGGER.debug("expenses: {}", expenses);
 
         return Money.of(expenses).multipliedBy(barrackCostMultiplier);
     }
@@ -330,8 +329,7 @@ public record Accountant(Campaign campaign) {
      * <p>
      * This can be used to ensure salaries are not double counted.
      *
-     * @param includeSalaries A value indicating whether or not salaries should be included in peacetime cost
-     *                        calculations.
+     * @param includeSalaries A value indicating whether salaries should be included in peacetime cost calculations.
      *
      * @return The peacetime costs of the campaign, optionally including salaries.
      */
@@ -362,7 +360,7 @@ public record Accountant(Campaign campaign) {
             Entity entity = unit.getEntity();
 
             if (entity == null) {
-                logger.info("(getMonthlyFuel) entity is null for {}", unit);
+                LOGGER.info("(getMonthlyFuel) entity is null for {}", unit);
                 continue;
             }
 
@@ -371,7 +369,7 @@ public record Accountant(Campaign campaign) {
             Engine engine = entity.getEngine();
 
             if (engine == null) {
-                logger.debug("(getMonthlyFuel) engine is null for {}", unit);
+                LOGGER.debug("(getMonthlyFuel) engine is null for {}", unit);
                 continue;
             }
 
@@ -565,7 +563,7 @@ public record Accountant(Campaign campaign) {
         payRollSummary.put(null,
               Money.of((campaign().getCampaignOptions()
                               .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() *
-                              campaign().getAstechPool()) +
+                              campaign().getAsTechPool()) +
                              (campaign().getCampaignOptions()
                                     .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
                                     campaign().getMedicPool())));

@@ -35,12 +35,11 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
+import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
-import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -54,10 +53,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.ITechnology;
-import megamek.common.Mek;
-import megamek.logging.MMLogger;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
@@ -72,6 +69,8 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -95,8 +94,6 @@ public class Resupply {
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
-    private final ITechnology.Faction employerTechCode;
-    private final boolean employerIsClan;
     private List<Part> ammoBinPool;
     private double focusAmmo;
     private List<Part> armorPool;
@@ -105,8 +102,8 @@ public class Resupply {
     private double focusParts;
     private boolean usePlayerConvoy;
     private Map<Force, Double> playerConvoys;
-    private int targetCargoTonnage;
-    private int targetCargoTonnagePlayerConvoy;
+    private final int targetCargoTonnage;
+    private final int targetCargoTonnagePlayerConvoy;
     private double totalPlayerCargoCapacity;
     private int negotiatorSkill;
     private List<Part> convoyContents;
@@ -117,8 +114,6 @@ public class Resupply {
     public static final int CARGO_MINIMUM_WEIGHT = 4;
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
-
-    private static final MMLogger logger = MMLogger.create(Resupply.class);
 
     /**
      * Enum representing the various types of resupply methods available during a campaign.
@@ -145,11 +140,6 @@ public class Resupply {
         targetCargoTonnagePlayerConvoy = targetCargoTonnage * CARGO_MULTIPLIER;
 
         currentYear = campaign.getGameYear();
-
-        Faction enemyFaction = contract.getEnemy();
-        employerIsClan = enemyFaction.isClan();
-
-        employerTechCode = getTechFaction(employerFaction);
 
         focusAmmo = 0.25;
         focusArmor = 0.25;
@@ -443,15 +433,7 @@ public class Resupply {
         }
 
         // Next, we determine the tonnage cap. This is the maximum tonnage the employer is willing to support.
-        final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
-        final int tonnageCap = contract.getRequiredCombatElements() * INDIVIDUAL_TONNAGE_ALLOWANCE;
-
-        // Then we determine the size of each individual 'drop'. This uses the lowest of
-        // unitTonnage and tonnageCap and divides that by 100
-        final double baseTonnage = min(unitTonnage, tonnageCap);
-
-        final int TONNAGE_DIVIDER = 125;
-        double dropSize = baseTonnage / TONNAGE_DIVIDER;
+        double dropSize = getDropSize(contract, unitTonnage);
 
         if (campaign.getCampaignOptions().isUseFactionStandingResupplySafe()) {
             FactionStandings standings = campaign.getFactionStandings();
@@ -461,6 +443,18 @@ public class Resupply {
         }
 
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
+    }
+
+    private static double getDropSize(AtBContract contract, double unitTonnage) {
+        final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
+        final int tonnageCap = contract.getRequiredCombatElements() * INDIVIDUAL_TONNAGE_ALLOWANCE;
+
+        // Then we determine the size of each individual 'drop'. This uses the lowest of
+        // unitTonnage and tonnageCap and divides that by 100
+        final double baseTonnage = min(unitTonnage, tonnageCap);
+
+        final int TONNAGE_DIVIDER = 125;
+        return baseTonnage / TONNAGE_DIVIDER;
     }
 
     /**
@@ -632,7 +626,7 @@ public class Resupply {
      * @return {@code true} if the part is ineligible due to its location or extinction, {@code false} otherwise.
      */
     private boolean checkMekLocation(Part part) {
-        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CT);
+        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CENTER_TORSO);
     }
 
     /**
@@ -671,6 +665,7 @@ public class Resupply {
      * <p>When not performing a loot or smuggler resupply, all processed parts are marked as brand new.</p>
      *
      * @param partsInUse a set of {@link PartInUse} representing the parts currently needed
+     *
      * @return a map of {@link Part} to its {@link PartDetails}, with adjusted weights
      */
     private Map<Part, PartDetails> applyWarehouseWeightModifiers(Set<PartInUse> partsInUse) {

@@ -44,7 +44,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 
 public class OtherModifiers {
-    private static final MMLogger logger = MMLogger.create(OtherModifiers.class);
+    private static final MMLogger LOGGER = MMLogger.create(OtherModifiers.class);
 
     /**
      * Calculates the 'other modifiers' used by CamOps Reputation
@@ -70,7 +70,7 @@ public class OtherModifiers {
               "total", manualModifier - (inactiveYears * 5));
 
         // Log the calculated modifiers
-        logger.debug("Other Modifiers = {}",
+        LOGGER.debug("Other Modifiers = {}",
               modifierMap.entrySet().stream()
                     .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
                     .collect(Collectors.joining()));

@@ -84,10 +84,9 @@ class PrisonerMissionEndEventTest {
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
 
         int actualValue = endEvent.determineGoodEventChance(true);
-        int expectedValue = GOOD_EVENT_CHANCE;
 
         // Assert
-        assertEquals(expectedValue, actualValue);
+        assertEquals(GOOD_EVENT_CHANCE, actualValue);
     }
 
     @Test

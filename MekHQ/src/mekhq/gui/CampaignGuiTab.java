@@ -48,7 +48,7 @@ import mekhq.gui.enums.MHQTabType;
  * @author Neoancient
  */
 public abstract class CampaignGuiTab extends JPanel {
-    private CampaignGUI gui;
+    private final CampaignGUI gui;
 
     protected String tabName;
 

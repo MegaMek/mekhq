@@ -53,7 +53,6 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class PersonnelTableModelColumnTest {
@@ -749,24 +748,6 @@ public class PersonnelTableModelColumnTest {
 
     //endregion Boolean Comparison Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetCellValue() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetDisplayText() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetToolTipText() {
-
-    }
-
     @Test
     public void testGetWidth() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
@@ -832,12 +813,6 @@ public class PersonnelTableModelColumnTest {
                     break;
             }
         }
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testIsVisible() {
-
     }
 
     @Test

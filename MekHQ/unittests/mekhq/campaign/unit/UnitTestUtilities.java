@@ -37,9 +37,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.*;
+import megamek.common.units.Entity;
 import megamek.common.util.BuildingBlock;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -77,48 +77,27 @@ public final class UnitTestUtilities {
             BuildingBlock bb = new BuildingBlock(in);
             if (bb.exists("UnitType")) {
                 String sType = bb.getDataAsString("UnitType")[0];
-                if (sType.equals("Tank") || sType.equals("Naval")
-                          || sType.equals("Surface") || sType.equals("Hydrofoil")) {
-                    loader = new BLKTankFile(bb);
-                } else if (sType.equals("Infantry")) {
-                    loader = new BLKInfantryFile(bb);
-                } else if (sType.equals("BattleArmor")) {
-                    loader = new BLKBattleArmorFile(bb);
-                } else if (sType.equals("ProtoMek")) {
-                    loader = new BLKProtoMekFile(bb);
-                } else if (sType.equals("Mek")) {
-                    loader = new BLKMekFile(bb);
-                } else if (sType.equals("VTOL")) {
-                    loader = new BLKVTOLFile(bb);
-                } else if (sType.equals("GunEmplacement")) {
-                    loader = new BLKGunEmplacementFile(bb);
-                } else if (sType.equals("SupportTank")) {
-                    loader = new BLKSupportTankFile(bb);
-                } else if (sType.equals("LargeSupportTank")) {
-                    loader = new BLKLargeSupportTankFile(bb);
-                } else if (sType.equals("SupportVTOL")) {
-                    loader = new BLKSupportVTOLFile(bb);
-                } else if (sType.equals("AeroSpaceFighter")) {
-                    loader = new BLKAeroSpaceFighterFile(bb);
-                } else if (sType.equals("Aero")) {
-                    loader = new BLKAeroSpaceFighterFile(bb);
-                } else if (sType.equals("FixedWingSupport")) {
-                    loader = new BLKFixedWingSupportFile(bb);
-                } else if (sType.equals("ConvFighter")) {
-                    loader = new BLKConvFighterFile(bb);
-                } else if (sType.equals("SmallCraft")) {
-                    loader = new BLKSmallCraftFile(bb);
-                } else if (sType.equals("Dropship")) {
-                    loader = new BLKDropshipFile(bb);
-                } else if (sType.equals("Jumpship")) {
-                    loader = new BLKJumpshipFile(bb);
-                } else if (sType.equals("Warship")) {
-                    loader = new BLKWarshipFile(bb);
-                } else if (sType.equals("SpaceStation")) {
-                    loader = new BLKSpaceStationFile(bb);
-                } else {
-                    throw new EntityLoadingException("Unknown UnitType: " + sType);
-                }
+                loader = switch (sType) {
+                    case "Tank", "Naval", "Surface", "Hydrofoil" -> new BLKTankFile(bb);
+                    case "Infantry" -> new BLKInfantryFile(bb);
+                    case "BattleArmor" -> new BLKBattleArmorFile(bb);
+                    case "ProtoMek" -> new BLKProtoMekFile(bb);
+                    case "Mek" -> new BLKMekFile(bb);
+                    case "VTOL" -> new BLKVTOLFile(bb);
+                    case "GunEmplacement" -> new BLKGunEmplacementFile(bb);
+                    case "SupportTank" -> new BLKSupportTankFile(bb);
+                    case "LargeSupportTank" -> new BLKLargeSupportTankFile(bb);
+                    case "SupportVTOL" -> new BLKSupportVTOLFile(bb);
+                    case "AeroSpaceFighter", "Aero" -> new BLKAeroSpaceFighterFile(bb);
+                    case "FixedWingSupport" -> new BLKFixedWingSupportFile(bb);
+                    case "ConvFighter" -> new BLKConvFighterFile(bb);
+                    case "SmallCraft" -> new BLKSmallCraftFile(bb);
+                    case "Dropship" -> new BLKDropshipFile(bb);
+                    case "Jumpship" -> new BLKJumpshipFile(bb);
+                    case "Warship" -> new BLKWarshipFile(bb);
+                    case "SpaceStation" -> new BLKSpaceStationFile(bb);
+                    default -> throw new EntityLoadingException("Unknown UnitType: " + sType);
+                };
             } else {
                 loader = new BLKMekFile(bb);
             }

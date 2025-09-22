@@ -1,4 +1,5 @@
-In order for the Against the Bot campaign system to be able to use custom random assignment tables (RATs), you will need to provide data to MekHQ detailing the contents of each RAT file. The RAT files themselves must be in the data/rat directory. The metadata, which describes to MekHQ how to use the custom files, must be in the data/universe/ratdata directory and end with ".xml". Each file is considered a separate collection, and its contents will appear as a listing in the RAT configuration section on the Against the Bot tab in Campaign Options in MekHQ.
+In order for the Against the Bot campaign system to be able to use custom random assignment tables (RATs), you will need
+ to provide data to MekHQ detailing the contents of each RAT file. The RAT files themselves must be in the data/rat directory. The metadata, which describes to MekHQ how to use the custom files, must be in the data/universe/ratdata directory and end with ".xml". Each file is considered a separate collection, and its contents will appear as a listing in the RAT configuration section on the Against the Bot tab in Campaign Options in MekHQ.
 
 The name of the file has no requirements beyond the .xml suffix, but should be descriptive of the contents. Note that xml is case sensitive.
 

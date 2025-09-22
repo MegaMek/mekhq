@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,13 +60,13 @@ import org.w3c.dom.Node;
  * @author NickAragua
  */
 public class ScenarioObjective {
-    private static final MMLogger logger = MMLogger.create(ScenarioObjective.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioObjective.class);
 
     public static final String FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES = "All Primary Player Forces";
     public static final String FORCE_SHORTCUT_ALL_ENEMY_FORCES = "All Enemy Forces";
 
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioObjective";
-    private static Map<ObjectiveCriterion, String> objectiveTypeMapping;
+    private static final Map<ObjectiveCriterion, String> objectiveTypeMapping;
 
     static {
         objectiveTypeMapping = new HashMap<>();
@@ -350,29 +350,23 @@ public class ScenarioObjective {
                                    (getDestinationEdge() != null)) ? getDestinationEdge().toString() : "";
         String amountString = fixedAmount != null ? fixedAmount.toString() : String.format("%d%%", percentage);
 
-        switch (getObjectiveCriterion()) {
-            case Destroy:
-            case ForceWithdraw:
-            case Capture:
-            case Preserve:
-                return String.format("<html>%s %s%s<span color='black'>%s%s</span></html>",
-                      getObjectiveCriterion().toString(), amountString,
-                      timeLimitString, buildEffects(true), buildEffects(false));
-            case ReachMapEdge:
-                return String.format("<html>Reach %s edge with %s%s<span color='black'>%s%s</span></html>", edgeString,
-                      amountString,
-                      timeLimitString, buildEffects(true), buildEffects(false));
-            case PreventReachMapEdge:
-                return String.format("<html>Prevent %s from reaching %s%s<span color='black'>%s%s</span></html>",
-                      amountString, edgeString,
-                      timeLimitString, buildEffects(true), buildEffects(false));
-            case Custom:
-                return String.format("<html>%s%s%s<span color='black'>%s%s</span></html>", getDescription(),
-                      amountString,
-                      timeLimitString, buildEffects(true), buildEffects(false));
-            default:
-                return "?";
-        }
+        return switch (getObjectiveCriterion()) {
+            case Destroy, ForceWithdraw, Capture, Preserve ->
+                  String.format("<html>%s %s%s<span color='black'>%s%s</span></html>",
+                        getObjectiveCriterion().toString(), amountString,
+                        timeLimitString, buildEffects(true), buildEffects(false));
+            case ReachMapEdge ->
+                  String.format("<html>Reach %s edge with %s%s<span color='black'>%s%s</span></html>", edgeString,
+                        amountString,
+                        timeLimitString, buildEffects(true), buildEffects(false));
+            case PreventReachMapEdge ->
+                  String.format("<html>Prevent %s from reaching %s%s<span color='black'>%s%s</span></html>",
+                        amountString, edgeString,
+                        timeLimitString, buildEffects(true), buildEffects(false));
+            case Custom -> String.format("<html>%s%s%s<span color='black'>%s%s</span></html>", getDescription(),
+                  amountString,
+                  timeLimitString, buildEffects(true), buildEffects(false));
+        };
     }
 
     private String buildEffects(boolean success) {
@@ -441,7 +435,7 @@ public class ScenarioObjective {
 
     /**
      * Whether this objective is applicable to a force template. This is the case if the objective's associated force
-     * names contain either the force template's name or any of the the force template's linked force names.
+     * names contain either the force template's name or any of the force template's linked force names.
      */
     public boolean isApplicableToForceTemplate(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario) {
         // no template = not applicable
@@ -468,7 +462,7 @@ public class ScenarioObjective {
                     } catch (Exception e) {
                         // We don't want this to silently fail, as it means there is something
                         // critically wrong with the forceTemplate
-                        logger.error(String.format("Failed to load %s.", forceTemplate.getForceName()));
+                        LOGGER.error("Failed to load {}.", forceTemplate.getForceName());
                     }
                 }
             }
@@ -551,7 +545,7 @@ public class ScenarioObjective {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(objectiveElement, pw);
         } catch (Exception ex) {
-            logger.error("Error Serializing Scenario Objective", ex);
+            LOGGER.error("Error Serializing Scenario Objective", ex);
         }
     }
 
@@ -571,7 +565,7 @@ public class ScenarioObjective {
             JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
             resultingObjective = templateElement.getValue();
         } catch (Exception ex) {
-            logger.error("Error Deserializing Scenario Objective", ex);
+            LOGGER.error("Error Deserializing Scenario Objective", ex);
         }
 
         return resultingObjective;

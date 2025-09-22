@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 - Carl Spain. All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,17 +41,17 @@ import javax.xml.parsers.DocumentBuilder;
 
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.event.Subscribe;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,7 +65,7 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class RATManager extends AbstractUnitGenerator {
-    private static final MMLogger logger = MMLogger.create(RATManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(RATManager.class);
 
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
     private final Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
@@ -138,7 +138,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            logger.error("RAT collection " + name + " not found in " + MHQConstants.RATINFO_DIR);
+            LOGGER.error("RAT collection {} not found in " + MHQConstants.RAT_INFO_DIR, name);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -146,10 +146,10 @@ public class RATManager extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
-        File f = new File(MHQConstants.RATINFO_DIR, fileNames.get(name));
+        File f = new File(MHQConstants.RAT_INFO_DIR, fileNames.get(name));
 
         Document xmlDoc;
         DocumentBuilder db;
@@ -158,7 +158,7 @@ public class RATManager extends AbstractUnitGenerator {
             db = MHQXMLUtility.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            logger.error("While loading RAT info from " + f.getName() + ": ", ex);
+            LOGGER.error("While loading RAT info from {}: ", f.getName(), ex);
             return false;
         }
 
@@ -183,16 +183,16 @@ public class RATManager extends AbstractUnitGenerator {
                             allRATs.get(name).put(era, new ArrayList<>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            logger.error("Could not parse year " + year + " in " + name);
+                            LOGGER.error("Could not parse year {} in {}", year, name);
                         }
                     } else {
-                        logger.error("year attribute not found for era in RAT collection " + name);
+                        LOGGER.error("year attribute not found for era in RAT collection {}", name);
                     }
                 }
             }
             return !allRATs.get(name).isEmpty();
         } else {
-            logger.error("source attribute not found for RAT data in " + f.getName());
+            LOGGER.error("source attribute not found for RAT data in {}", f.getName());
             return false;
         }
     }
@@ -223,57 +223,61 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Scans ratdata directory for list of available RATs that can be used by CampaignOptions to provide a list.
+     * Scans RatData directory for list of available RATs that can be used by CampaignOptions to provide a list.
      */
     public static void populateCollectionNames() {
         allCollections = new HashMap<>();
 
-        File dir = new File(MHQConstants.RATINFO_DIR);
+        File dir = new File(MHQConstants.RAT_INFO_DIR);
         if (!dir.isDirectory()) {
-            logger.error("Ratinfo directory not found");
+            LOGGER.error("RatInfo directory not found");
             return;
         }
 
-        for (File f : dir.listFiles()) {
-            if (!f.getName().endsWith(".xml")) {
-                continue;
-            }
-            Document xmlDoc;
-            try (FileInputStream fis = new FileInputStream(f)) {
-                xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(fis);
-            } catch (Exception ex) {
-                logger.error("While loading RAT info from " + f.getName() + ": ", ex);
-                continue;
-            }
-            Element elem = xmlDoc.getDocumentElement();
-            NodeList nl = elem.getChildNodes();
-            elem.normalize();
+        File[] files = dir.listFiles();
 
-            String name;
-            List<Integer> eras = new ArrayList<>();
+        if (files != null) {
+            for (File f : files) {
+                if (!f.getName().endsWith(".xml")) {
+                    continue;
+                }
+                Document xmlDoc;
+                try (FileInputStream fis = new FileInputStream(f)) {
+                    xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(fis);
+                } catch (Exception ex) {
+                    LOGGER.error("While loading RAT info from {}: ", f.getName(), ex);
+                    continue;
+                }
+                Element elem = xmlDoc.getDocumentElement();
+                NodeList nl = elem.getChildNodes();
+                elem.normalize();
 
-            if (elem.getAttributes().getNamedItem("source") != null) {
-                name = elem.getAttributes().getNamedItem("source").getTextContent();
-                for (int j = 0; j < nl.getLength(); j++) {
-                    Node eraNode = nl.item(j);
-                    if (eraNode.getNodeName().equalsIgnoreCase("era")) {
-                        String year = eraNode.getAttributes().getNamedItem("year").getTextContent();
-                        if (year != null) {
-                            try {
-                                eras.add(Integer.parseInt(year));
-                            } catch (NumberFormatException ex) {
-                                logger.error("Could not parse year " + year + " in " + f.getName());
+                String name;
+                List<Integer> eras = new ArrayList<>();
+
+                if (elem.getAttributes().getNamedItem("source") != null) {
+                    name = elem.getAttributes().getNamedItem("source").getTextContent();
+                    for (int j = 0; j < nl.getLength(); j++) {
+                        Node eraNode = nl.item(j);
+                        if (eraNode.getNodeName().equalsIgnoreCase("era")) {
+                            String year = eraNode.getAttributes().getNamedItem("year").getTextContent();
+                            if (year != null) {
+                                try {
+                                    eras.add(Integer.parseInt(year));
+                                } catch (NumberFormatException ex) {
+                                    LOGGER.error("Could not parse year {} in {}", year, f.getName());
+                                }
+                            } else {
+                                LOGGER.error("year attribute not found for era in {}", f.getName());
                             }
-                        } else {
-                            logger.error("year attribute not found for era in " + f.getName());
                         }
                     }
+                    fileNames.put(name, f.getName());
+                    Collections.sort(eras);
+                    allCollections.put(name, eras);
+                } else {
+                    LOGGER.error("source attribute not found for RAT data in {}", f.getName());
                 }
-                fileNames.put(name, f.getName());
-                Collections.sort(eras);
-                allCollections.put(name, eras);
-            } else {
-                logger.error("source attribute not found for RAT data in " + f.getName());
             }
         }
     }
@@ -356,7 +360,7 @@ public class RATManager extends AbstractUnitGenerator {
     public boolean isSupportedUnitType(final int unitType) {
         return (unitType == UnitType.MEK)
                      || (unitType == UnitType.TANK)
-                     || (unitType == UnitType.AEROSPACEFIGHTER)
+                     || (unitType == UnitType.AEROSPACE_FIGHTER)
                      || (unitType == UnitType.DROPSHIP)
                      || (unitType == UnitType.INFANTRY)
                      || (unitType == UnitType.BATTLE_ARMOR)
@@ -478,7 +482,7 @@ public class RATManager extends AbstractUnitGenerator {
         public static RAT createFromXml(Node node) {
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                logger.error("Name attribute missing");
+                LOGGER.error("Name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();
@@ -522,7 +526,7 @@ public class RATManager extends AbstractUnitGenerator {
                                     retVal.unitTypes.add(UnitType.CONV_FIGHTER);
                                     break;
                                 case "Aero":
-                                    retVal.unitTypes.add(UnitType.AEROSPACEFIGHTER);
+                                    retVal.unitTypes.add(UnitType.AEROSPACE_FIGHTER);
                                     break;
                                 case "Small Craft":
                                     retVal.unitTypes.add(UnitType.SMALL_CRAFT);

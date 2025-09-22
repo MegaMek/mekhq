@@ -174,7 +174,7 @@ public class AutoAwardsController {
      * @param campaign        the campaign
      * @param personnel       the personnel involved in the scenario, mapped by their UUID
      * @param scenarioKills   the kills made during the scenario, mapped by personnel UUID
-     * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIANHELP
+     * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIAN_HELP
      */
     public void PostScenarioController(Campaign campaign, HashMap<UUID, Integer> personnel,
           HashMap<UUID, List<Kill>> scenarioKills, boolean wasCivilianHelp) {
@@ -329,6 +329,12 @@ public class AutoAwardsController {
         }
 
         // Initialize a variable to hold the ending date of the last contract.
+
+        // Return the ending date of the last contract.
+        return getLastContractEndingDate(completedContracts);
+    }
+
+    private static LocalDate getLastContractEndingDate(List<AtBContract> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
@@ -347,8 +353,6 @@ public class AutoAwardsController {
                 lastContractEndingDate = endingDate;
             }
         }
-
-        // Return the ending date of the last contract.
         return lastContractEndingDate;
     }
 
@@ -996,7 +1000,7 @@ public class AutoAwardsController {
      *
      * @param personnel            the personnel to be processed
      * @param missionWasSuccessful true if the mission was successful, false otherwise
-     * @param wasCivilianHelp      true if the scenario (if relevant) was AtB Scenario type CIVILIANHELP
+     * @param wasCivilianHelp      true if the scenario (if relevant) was AtB Scenario type CIVILIAN_HELP
      * @param wasScenario          true if the award is for a scenario, false otherwise
      * @param scenarioKills        a map of personnel and their corresponding list of Kills
      *

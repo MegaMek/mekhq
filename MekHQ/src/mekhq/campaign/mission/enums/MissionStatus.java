@@ -132,7 +132,7 @@ public enum MissionStatus {
         }
 
         MMLogger.create(MissionStatus.class)
-              .error("Unable to parse " + text + " into a MissionStatus. Returning ACTIVE.");
+              .error("Unable to parse {} into a MissionStatus. Returning ACTIVE.", text);
         return ACTIVE;
     }
     // endregion File I/O

@@ -54,7 +54,7 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public class InjuryType {
     /** Modifier tag to use for injuries */
-    public static final String MODTAG_INJURY = "injury";
+    public static final String MOD_TAG_INJURY = "injury";
 
     // Registry methods
     private static final Map<String, InjuryType> REGISTRY = new HashMap<>();

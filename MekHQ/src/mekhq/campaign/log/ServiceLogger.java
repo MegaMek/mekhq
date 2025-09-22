@@ -36,7 +36,6 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -48,7 +47,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
  * @author Miguel Azevedo
  */
 public class ServiceLogger {
-    private static final MMLogger logger = MMLogger.create(ServiceLogger.class);
 
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());

@@ -115,7 +115,6 @@ public class GeneralTab {
     private JLabel lblIcon;
     private RoundedJButton btnIcon;
     private StandardForceIcon unitIcon;
-    private JLabel lblFurtherReading;
 
     /**
      * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
@@ -448,7 +447,7 @@ public class GeneralTab {
      * @return A {@link JPanel} containing additional informational components.
      */
     private JPanel createFurtherReadingPanel() {
-        lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
+        JLabel lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
 
         final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);

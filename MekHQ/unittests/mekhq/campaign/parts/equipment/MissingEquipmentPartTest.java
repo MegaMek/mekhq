@@ -49,7 +49,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.equipment.EquipmentFlag;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -244,7 +253,7 @@ public class MissingEquipmentPartTest {
         missingPart.setUnit(unit);
 
         assertTrue(missingPart.isPartForEquipmentNum(equipmentNum, location));
-        assertFalse(missingPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RWING));
+        assertFalse(missingPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RIGHT_WING));
         assertFalse(missingPart.isPartForEquipmentNum(equipmentNum - 1, location));
     }
 
@@ -401,7 +410,7 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -444,7 +453,7 @@ public class MissingEquipmentPartTest {
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
         String locationName = "Mek Right Torso";
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -492,7 +501,7 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -506,7 +515,7 @@ public class MissingEquipmentPartTest {
         assertFalse(missingPart.isInLocation(locationName));
 
         // Split the mount and have the second location be the one we want
-        when(mounted.getLocation()).thenReturn(Mek.LOC_RLEG);
+        when(mounted.getLocation()).thenReturn(Mek.LOC_RIGHT_LEG);
         when(mounted.isSplit()).thenReturn(true);
         when(mounted.getSecondLocation()).thenReturn(location);
 
@@ -783,7 +792,7 @@ public class MissingEquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_LARM;
+        int location = Mek.LOC_LEFT_ARM;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -797,7 +806,7 @@ public class MissingEquipmentPartTest {
 
         // Swap over to the secondary location
         doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
-        int secondLocation = Mek.LOC_LT;
+        int secondLocation = Mek.LOC_LEFT_TORSO;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(secondLocation));
@@ -850,7 +859,7 @@ public class MissingEquipmentPartTest {
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
         String locationName = "Mek Left Torso";
-        int location = Mek.LOC_LT;
+        int location = Mek.LOC_LEFT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -869,7 +878,7 @@ public class MissingEquipmentPartTest {
         assertNotNull(missingPart.checkFixable());
 
         String secondaryLocationName = "Mek Left Arm";
-        int secondaryLocation = Mek.LOC_LARM;
+        int secondaryLocation = Mek.LOC_LEFT_ARM;
         when(mounted.getSecondLocation()).thenReturn(secondaryLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(secondaryLocationName).when(entity).getLocationName(secondaryLocation);
@@ -1255,13 +1264,13 @@ public class MissingEquipmentPartTest {
 
         // We're not the same if our sticker prices differ;
 
-        // Setup a type with variable costs
+        // Set up a type with variable costs
         doReturn(true).when(type).hasFlag(eq(MiscType.F_OFF_ROAD));
         doReturn((double) EquipmentType.COST_VARIABLE).when(type).getRawCost();
 
         // Put the variable cost part back on a unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_CT;
+        int location = Mek.LOC_CENTER_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(cost * 10.0).when(type).getCost(eq(entity), anyBoolean(), eq(location), eq(size));

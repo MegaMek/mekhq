@@ -33,11 +33,11 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
+import megamek.common.compute.Compute;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 
@@ -92,7 +92,7 @@ public class JumpJet extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     * Copied from megamek.common.units.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      */
     @Override
     public Money getStickerPrice() {
@@ -131,7 +131,7 @@ public class JumpJet extends EquipmentPart {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
                       mounted.getLocation());
             }
             if (checkForDestruction
@@ -156,11 +156,6 @@ public class JumpJet extends EquipmentPart {
             return 0;
         }
         return -3;
-    }
-
-    @Override
-    public boolean needsFixing() {
-        return hits > 0;
     }
 
     @Override

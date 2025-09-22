@@ -49,10 +49,10 @@ import mekhq.campaign.personnel.skills.SkillType;
  * Represents a class which can generate new {@link Skill} objects for a {@link Person}.
  */
 public abstract class AbstractSkillGenerator {
-    private RandomSkillPreferences rskillPrefs;
+    private RandomSkillPreferences randomSkillPreferences;
 
     protected AbstractSkillGenerator(final RandomSkillPreferences randomSkillPreferences) {
-        this.rskillPrefs = randomSkillPreferences;
+        this.randomSkillPreferences = randomSkillPreferences;
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class AbstractSkillGenerator {
      * @return The {@link RandomSkillPreferences} to use.
      */
     public RandomSkillPreferences getSkillPreferences() {
-        return rskillPrefs;
+        return randomSkillPreferences;
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class AbstractSkillGenerator {
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
-        rskillPrefs = Objects.requireNonNull(skillPreferences);
+        randomSkillPreferences = Objects.requireNonNull(skillPreferences);
     }
 
     /**
@@ -98,14 +98,14 @@ public abstract class AbstractSkillGenerator {
      * @param primaryRole  The primary role of the person
      * @param expLvl       The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
      * @param bonus        The bonus to use for the default skills.
-     * @param rollModifier A roll modifier to apply to any randomizations.
+     * @param rollModifier A roll modifier to apply to any randomization's.
      */
     protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus,
           int rollModifier) {
         // For default skills, we just want the base skills, excluding any campaign option related supplementary
         // skills, such as artillery or admin for techs.
         for (String skillName : primaryRole.getSkillsForProfession()) {
-            addSkill(person, skillName, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+            addSkill(person, skillName, expLvl, randomSkillPreferences.randomizeSkill(), bonus, rollModifier);
         }
     }
 
@@ -114,9 +114,9 @@ public abstract class AbstractSkillGenerator {
     }
 
     protected void generateArtillerySkill(final Person person, final int bonus) {
-        final int experienceLevel = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
+        final int experienceLevel = Utilities.generateExpLevel(randomSkillPreferences.getArtilleryBonus());
         if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
-            addSkill(person, SkillType.S_ARTILLERY, experienceLevel, rskillPrefs.randomizeSkill(), bonus);
+            addSkill(person, SkillType.S_ARTILLERY, experienceLevel, randomSkillPreferences.randomizeSkill(), bonus);
         }
     }
 
@@ -131,9 +131,9 @@ public abstract class AbstractSkillGenerator {
                 continue;
             }
 
-            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillModifier());
+            int roleplaySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getRoleplaySkillModifier());
             if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), 0);
+                addSkill(person, skillType.getName(), roleplaySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
         }
     }

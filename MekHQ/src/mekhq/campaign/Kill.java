@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -182,7 +182,7 @@ public class Kill {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
+            // apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             logger.error("", ex);

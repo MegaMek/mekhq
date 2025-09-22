@@ -40,7 +40,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -48,10 +48,10 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- * A table model for displaying acquisitions. Unlike the other table models here, this one can apply to multiple tables
+ * A table model for displaying acquisitions. Unlike the other table models here, this one can apply to multiple tables,
  * and so we have to be more careful in its design
  */
-public class ProcurementTableModel extends DataTableModel {
+public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -143,46 +143,28 @@ public class ProcurementTableModel extends DataTableModel {
     }
 
     @Override
-    public boolean isCellEditable(final int row, final int column) {
-        return false;
-    }
-
-    @Override
     public Class<?> getColumnClass(final int column) {
         return getValueAt(0, column).getClass();
     }
 
     public Optional<IAcquisitionWork> getAcquisition(final int row) {
-        return ((row >= 0) && (row < data.size())) ? Optional.of((IAcquisitionWork) data.get(row)) : Optional.empty();
+        return ((row >= 0) && (row < data.size())) ? Optional.of(data.get(row)) : Optional.empty();
     }
 
     public int getColumnWidth(final int column) {
-        switch (column) {
-            case COL_NAME:
-                return 200;
-            case COL_COST:
-            case COL_TOTAL_COST:
-            case COL_TARGET:
-            case COL_NEXT:
-                return 40;
-            default:
-                return 15;
-        }
+        return switch (column) {
+            case COL_NAME -> 200;
+            case COL_COST, COL_TOTAL_COST, COL_TARGET, COL_NEXT -> 40;
+            default -> 15;
+        };
     }
 
     public int getAlignment(final int column) {
-        switch (column) {
-            case COL_COST:
-            case COL_TOTAL_COST:
-            case COL_QUEUE:
-                return SwingConstants.RIGHT;
-            case COL_TARGET:
-            case COL_NEXT:
-            case COL_TYPE:
-                return SwingConstants.CENTER;
-            default:
-                return SwingConstants.LEFT;
-        }
+        return switch (column) {
+            case COL_COST, COL_TOTAL_COST, COL_QUEUE -> SwingConstants.RIGHT;
+            case COL_TARGET, COL_NEXT, COL_TYPE -> SwingConstants.CENTER;
+            default -> SwingConstants.LEFT;
+        };
     }
 
     public String getTooltip(final int row, final int column) {
@@ -190,12 +172,10 @@ public class ProcurementTableModel extends DataTableModel {
     }
 
     private String getTooltipFor(final IAcquisitionWork shoppingItem, final int column) {
-        switch (column) {
-            case COL_TARGET:
-                return getCampaign().getTargetForAcquisition(shoppingItem).getDesc();
-            default:
-                return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
+        if (column == COL_TARGET) {
+            return getCampaign().getTargetForAcquisition(shoppingItem).getDesc();
         }
+        return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
     }
 
     private Campaign getCampaign() {

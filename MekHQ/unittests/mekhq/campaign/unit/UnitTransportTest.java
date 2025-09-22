@@ -46,7 +46,16 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Transporter;
+import megamek.common.game.Game;
+import megamek.common.units.Aero;
+import megamek.common.units.AeroSpaceFighter;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import org.junit.jupiter.api.BeforeAll;

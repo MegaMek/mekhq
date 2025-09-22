@@ -58,8 +58,8 @@ import javax.swing.text.NumberFormatter;
 import megamek.client.ui.GBC;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.UIUtil.TipButton;
-import megamek.common.IStartingPositions;
 import megamek.common.Player;
+import megamek.common.interfaces.IStartingPositions;
 import mekhq.MekHQ;
 
 public class EditDeploymentDialog extends JDialog {
@@ -185,7 +185,7 @@ public class EditDeploymentDialog extends JDialog {
 
         for (int i = 0; i < 11; i++) {
             butStartPos[i].setText(butText[i].toString());
-            if (butTT[i].length() > 0) {
+            if (!butTT[i].isEmpty()) {
                 butStartPos[i].setToolTipText(butTT[i].toString());
             }
         }

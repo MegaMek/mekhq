@@ -34,17 +34,17 @@ package mekhq.campaign.universe.generators.partGenerators;
 
 import java.util.List;
 
-import megamek.common.Mek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekCockpit;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLifeSupport;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 

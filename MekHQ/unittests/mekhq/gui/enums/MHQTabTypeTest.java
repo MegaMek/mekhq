@@ -245,7 +245,7 @@ public class MHQTabTypeTest {
                     assertInstanceOf(MekLabTab.class, tab);
                     break;
                 case STRAT_CON:
-                    assertInstanceOf(StratconTab.class, tab);
+                    assertInstanceOf(StratConTab.class, tab);
                     break;
                 default:
                     assertNull(tab);

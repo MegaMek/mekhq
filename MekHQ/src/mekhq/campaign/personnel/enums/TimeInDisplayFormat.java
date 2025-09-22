@@ -94,24 +94,20 @@ public enum TimeInDisplayFormat {
     //endregion Boolean Comparison Methods
 
     public String getDisplayFormattedOutput(final LocalDate initialDate, final LocalDate today) {
-        switch (this) {
-            case DAYS:
-                return String.format(getDisplayFormat(),
-                      Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today)));
-            case WEEKS:
-                return String.format(getDisplayFormat(),
-                      Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today)));
-            case MONTHS:
-                return String.format(getDisplayFormat(),
-                      Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today)));
-            case MONTHS_YEARS:
+        return switch (this) {
+            case DAYS -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today)));
+            case WEEKS -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today)));
+            case MONTHS -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today)));
+            case MONTHS_YEARS -> {
                 final Period period = Period.between(initialDate, today);
-                return String.format(getDisplayFormat(), period.getMonths(), period.getYears());
-            case YEARS:
-            default:
-                return String.format(getDisplayFormat(),
-                      Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
-        }
+                yield String.format(getDisplayFormat(), period.getMonths(), period.getYears());
+            }
+            default -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
+        };
     }
 
     @Override

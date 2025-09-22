@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,7 +57,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-public class PartsInUseTableModel extends DataTableModel {
+public class PartsInUseTableModel extends DataTableModel<PartInUse> {
     private static final DecimalFormat FORMATTER = new DecimalFormat();
 
     static {
@@ -70,53 +70,40 @@ public class PartsInUseTableModel extends DataTableModel {
     public static final int COL_IN_USE = 1;
     public static final int COL_STORED = 2;
     public static final int COL_TONNAGE = 3;
-    public static final int COL_REQUSTED_STOCK = 4;
+    public static final int COL_REQUESTED_STOCK = 4;
     public static final int COL_IN_TRANSFER = 5;
     public static final int COL_COST = 6;
     public static final int COL_BUTTON_BUY = 7;
     public static final int COL_BUTTON_BUY_BULK = 8;
     public static final int COL_BUTTON_SELL = 9;
     public static final int COL_BUTTON_SELL_BULK = 10;
-    public static final int COL_BUTTON_GMADD = 11;
-    public static final int COL_BUTTON_GMADD_BULK = 12;
+    public static final int COL_BUTTON_GM_ADD = 11;
+    public static final int COL_BUTTON_GM_ADD_BULK = 12;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
           MekHQ.getMHQOptions().getLocale());
 
     public PartsInUseTableModel() {
-        data = new ArrayList<PartInUse>();
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
+        data = new ArrayList<>();
     }
 
     @Override
     public int getColumnCount() {
-        return COL_BUTTON_GMADD_BULK + 1;
+        return COL_BUTTON_GM_ADD_BULK + 1;
     }
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_PART:
-                return resourceMap.getString("part.heading");
-            case COL_IN_USE:
-                return resourceMap.getString("inUse.heading");
-            case COL_STORED:
-                return resourceMap.getString("stored.heading");
-            case COL_TONNAGE:
-                return resourceMap.getString("storedTonnage.heading");
-            case COL_IN_TRANSFER:
-                return resourceMap.getString("ordered.heading");
-            case COL_COST:
-                return resourceMap.getString("cost.heading");
-            case COL_REQUSTED_STOCK:
-                return resourceMap.getString("requestedStock.heading");
-            default:
-                return EMPTY_CELL;
-        }
+        return switch (column) {
+            case COL_PART -> resourceMap.getString("part.heading");
+            case COL_IN_USE -> resourceMap.getString("inUse.heading");
+            case COL_STORED -> resourceMap.getString("stored.heading");
+            case COL_TONNAGE -> resourceMap.getString("storedTonnage.heading");
+            case COL_IN_TRANSFER -> resourceMap.getString("ordered.heading");
+            case COL_COST -> resourceMap.getString("cost.heading");
+            case COL_REQUESTED_STOCK -> resourceMap.getString("requestedStock.heading");
+            default -> EMPTY_CELL;
+        };
     }
 
     @Override
@@ -151,11 +138,11 @@ public class PartsInUseTableModel extends DataTableModel {
                 return resourceMap.getString("sell.text");
             case COL_BUTTON_SELL_BULK:
                 return resourceMap.getString("sellInBulk.text");
-            case COL_BUTTON_GMADD:
+            case COL_BUTTON_GM_ADD:
                 return resourceMap.getString("add.text");
-            case COL_BUTTON_GMADD_BULK:
+            case COL_BUTTON_GM_ADD_BULK:
                 return resourceMap.getString("addInBulk.text");
-            case COL_REQUSTED_STOCK:
+            case COL_REQUESTED_STOCK:
                 return partInUse.getRequestedStock() + "%";
             default:
                 return EMPTY_CELL;
@@ -169,27 +156,24 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        switch (col) {
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_SELL:
-            case COL_BUTTON_SELL_BULK:
-            case COL_BUTTON_GMADD:
-            case COL_BUTTON_GMADD_BULK:
-            case COL_REQUSTED_STOCK:
-                return true;
-            default:
-                return false;
-        }
+        return switch (col) {
+            case COL_BUTTON_BUY,
+                 COL_BUTTON_BUY_BULK,
+                 COL_BUTTON_SELL,
+                 COL_BUTTON_SELL_BULK,
+                 COL_BUTTON_GM_ADD,
+                 COL_BUTTON_GM_ADD_BULK,
+                 COL_REQUESTED_STOCK -> true;
+            default -> false;
+        };
     }
 
     public void setData(Set<PartInUse> data) {
         setData(new ArrayList<>(data));
     }
 
-    @SuppressWarnings("unchecked")
     public void updateRow(int row, PartInUse partInUse) {
-        ((ArrayList<PartInUse>) data).set(row, partInUse);
+        data.set(row, partInUse);
         fireTableRowsUpdated(row, row);
     }
 
@@ -197,28 +181,21 @@ public class PartsInUseTableModel extends DataTableModel {
         if ((row < 0) || (row >= data.size())) {
             return null;
         }
-        return (PartInUse) data.get(row);
+        return data.get(row);
     }
 
     public boolean isBuyable(int row) {
         return (row >= 0) && (row < data.size())
-                     && (null != ((PartInUse) data.get(row)).getPartToBuy());
+                     && (null != data.get(row).getPartToBuy());
     }
 
     public int getAlignment(int column) {
-        switch (column) {
-            case COL_PART:
-                return SwingConstants.LEFT;
-            case COL_IN_USE:
-            case COL_STORED:
-            case COL_TONNAGE:
-            case COL_IN_TRANSFER:
-            case COL_COST:
-            case COL_REQUSTED_STOCK:
-                return SwingConstants.RIGHT;
-            default:
-                return SwingConstants.CENTER;
-        }
+        return switch (column) {
+            case COL_PART -> SwingConstants.LEFT;
+            case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER, COL_COST, COL_REQUESTED_STOCK ->
+                  SwingConstants.RIGHT;
+            default -> SwingConstants.CENTER;
+        };
     }
 
     public int getPreferredWidth(int column) {
@@ -227,41 +204,38 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER -> 15;
             case COL_COST -> 40;
             case COL_BUTTON_BUY, COL_BUTTON_SELL -> 25;
-            case COL_BUTTON_GMADD -> 65;
-            case COL_BUTTON_BUY_BULK, COL_BUTTON_SELL_BULK -> 65;
-            case COL_REQUSTED_STOCK -> 45;
+            case COL_BUTTON_GM_ADD, COL_BUTTON_BUY_BULK, COL_BUTTON_SELL_BULK -> 65;
+            case COL_REQUESTED_STOCK -> 45;
             default -> 100;
         };
     }
 
     public boolean hasConstantWidth(int col) {
-        switch (col) {
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_SELL:
-            case COL_BUTTON_SELL_BULK:
-            case COL_BUTTON_GMADD:
-            case COL_BUTTON_GMADD_BULK:
-                return true;
-            default:
-                return false;
-        }
+        return switch (col) {
+            case COL_BUTTON_BUY,
+                 COL_BUTTON_BUY_BULK,
+                 COL_BUTTON_SELL,
+                 COL_BUTTON_SELL_BULK,
+                 COL_BUTTON_GM_ADD,
+                 COL_BUTTON_GM_ADD_BULK -> true;
+            default -> false;
+        };
     }
 
     public int getWidth(int col) {
-        switch (col) {
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_SELL:
-            case COL_BUTTON_SELL_BULK:
-            case COL_BUTTON_GMADD:
-            case COL_BUTTON_GMADD_BULK:
+        return switch (col) {
+            case COL_BUTTON_BUY,
+                 COL_BUTTON_BUY_BULK,
+                 COL_BUTTON_SELL,
+                 COL_BUTTON_SELL_BULK,
+                 COL_BUTTON_GM_ADD,
+                 COL_BUTTON_GM_ADD_BULK -> {
                 // Calculate from button width, respecting style
                 JButton btn = new JButton(getValueAt(0, col).toString());
-                return btn.getPreferredSize().width;
-            default:
-                return Integer.MAX_VALUE;
-        }
+                yield btn.getPreferredSize().width;
+            }
+            default -> Integer.MAX_VALUE;
+        };
     }
 
     public PartsInUseTableModel.Renderer getRenderer() {
@@ -282,13 +256,13 @@ public class PartsInUseTableModel extends DataTableModel {
     public static class ButtonColumn extends AbstractCellEditor
           implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
 
-        private JTable table;
-        private Action action;
-        private Border originalBorder;
+        private final JTable table;
+        private final Action action;
+        private final Border originalBorder;
         private Border focusBorder;
 
-        private JButton renderButton;
-        private JButton editButton;
+        private final JButton renderButton;
+        private final JButton editButton;
         private Object editorValue;
         private boolean isButtonColumnEditor;
         private boolean enabled;
@@ -427,7 +401,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        if (columnIndex == COL_REQUSTED_STOCK) {
+        if (columnIndex == COL_REQUESTED_STOCK) {
             try {
                 //Quick String parsing here, we ignore anything that isn't a number or a . so that a user can input a % symbol or not, it's added regardless
                 double newVal = Double.parseDouble(value.toString().replaceAll("[^0-9.]", ""));
@@ -436,7 +410,7 @@ public class PartsInUseTableModel extends DataTableModel {
                     partInUse.setRequestedStock(newVal);
                     fireTableCellUpdated(rowIndex, columnIndex);
                 }
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
 
             }
         } else {

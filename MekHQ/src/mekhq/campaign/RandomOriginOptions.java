@@ -46,7 +46,7 @@ import org.w3c.dom.NodeList;
  * @author Justin "Windchild" Bowen
  */
 public class RandomOriginOptions {
-    private static final MMLogger logger = MMLogger.create(RandomOriginOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(RandomOriginOptions.class);
 
     // region Variable Declarations
     private boolean randomizeOrigin;
@@ -67,7 +67,7 @@ public class RandomOriginOptions {
         try {
             setSpecifiedPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
         } catch (Exception ex) {
-            logger.error("Failed to load default specified planet. If this wasn't during automated testing this must " +
+            LOGGER.error("Failed to load default specified planet. If this wasn't during automated testing this must " +
                                "be investigated.", ex);
             setSpecifiedPlanet(new Planet("Terra"));
         }
@@ -272,7 +272,7 @@ public class RandomOriginOptions {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return null;
         }
 

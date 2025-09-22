@@ -796,7 +796,7 @@ public class Academy implements Comparable<Academy> {
 
         if (personnel.size() == 1) {
             for (String skillName : skillNames) {
-                String skillParsed = "";
+                String skillParsed;
                 if (skillName.equalsIgnoreCase("none")) {
                     tooltip.append(skillName).append("<br>");
                     continue;

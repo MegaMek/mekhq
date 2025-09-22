@@ -38,13 +38,29 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.TechConstants;
+import megamek.common.bays.BayType;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.ArmorType;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
-import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.Weapon;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.attacks.InfantryAttack;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -53,6 +69,19 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.parts.kfs.KFBoom;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekArmor;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 
 /**
  * This is a parts store which will contain one copy of every possible part that might be needed as well as a variety of
@@ -64,18 +93,18 @@ import mekhq.campaign.parts.equipment.MASC;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PartsStore {
-    private static final MMLogger logger = MMLogger.create(PartsStore.class);
-    private static int EXPECTED_SIZE = 50000;
+    private static final MMLogger LOGGER = MMLogger.create(PartsStore.class);
+    private static final int EXPECTED_SIZE = 50000;
 
-    private ArrayList<Part> parts;
-    private Map<String, Part> nameAndDetailMap;
+    private final ArrayList<Part> parts;
+    private final Map<String, Part> nameAndDetailMap;
 
-    public PartsStore(Campaign c) {
-        logger.debug("Creating PartsStore for campaign");
+    public PartsStore(Campaign campaign) {
+        LOGGER.debug("Creating PartsStore for campaign");
         parts = new ArrayList<>(EXPECTED_SIZE);
         nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
-        stock(c);
-        logger.debug("Finished creating PartsStore for campaign");
+        stock(campaign);
+        LOGGER.debug("Finished creating PartsStore for campaign");
     }
 
     public ArrayList<Part> getInventory() {
@@ -105,7 +134,7 @@ public class PartsStore {
             p.setBrandNew(true);
             sb.setLength(0);
             sb.append(p.getName());
-            if (!(p instanceof Armor)) { // ProtoMekArmor and BaArmor are derived from Armor
+            if (!(p instanceof Armor)) { // ProtoMekArmor and BAArmor are derived from Armor
                 String details = p.getDetails();
                 if (!details.isEmpty()) {
                     sb.append(" (").append(details).append(")");
@@ -121,13 +150,13 @@ public class PartsStore {
             if (!summary.getUnitType().equals("BattleArmor")) {
                 continue;
             }
-            // FIXME: I can't pull entity movement mode and quad shape off of meksummary
+            // FIXME: I can't pull entity movement mode and quad shape off of MekSummary
             // try loading the full entity, but this might take too long
             Entity newEntity = null;
             try {
                 newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             } catch (EntityLoadingException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
             if (null != newEntity) {
                 BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(),
@@ -138,72 +167,70 @@ public class PartsStore {
         }
     }
 
-    private void stockWeaponsAmmoAndEquipment(Campaign c) {
-        for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements(); ) {
-            EquipmentType et = e.nextElement();
-            if (!et.isHittable() &&
-                      !(et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_BA_MANIPULATOR))) {
+    private void stockWeaponsAmmoAndEquipment(Campaign campaign) {
+        for (Enumeration<EquipmentType> allTypes = EquipmentType.getAllTypes(); allTypes.hasMoreElements(); ) {
+            EquipmentType equipmentType = allTypes.nextElement();
+            if (!equipmentType.isHittable() &&
+                      !(equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_BA_MANIPULATOR))) {
                 continue;
             }
             // TODO: we are still adding a lot of non-hittable equipment
-            if (et instanceof AmmoType) {
-                AmmoType ammoType = (AmmoType) et;
-                if (ammoType.hasFlag(AmmoType.F_BATTLEARMOR)
-                          && (ammoType.getKgPerShot() > 0)) {
+            if (equipmentType instanceof AmmoType ammoType) {
+                if (ammoType.hasFlag(AmmoType.F_BATTLEARMOR) && (ammoType.getKgPerShot() > 0)) {
                     // BA ammo has one shot listed as the amount. Do it as 1 ton blocks if using
                     // kg/shot.
                     int shots = (int) Math.floor(1000.0 / ammoType.getKgPerShot());
-                    parts.add(new AmmoStorage(0, ammoType, shots, c));
+                    parts.add(new AmmoStorage(0, ammoType, shots, campaign));
                 } else {
-                    parts.add(new AmmoStorage(0, ammoType, ammoType.getShots(), c));
+                    parts.add(new AmmoStorage(0, ammoType, ammoType.getShots(), campaign));
                 }
-            } else if (et instanceof MiscType && (((MiscType) et).hasFlag(MiscType.F_HEAT_SINK)
-                                                        || ((MiscType) et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
-                Part p = new HeatSink(0, et, -1, false, c);
-                parts.add(p);
-                parts.add(new OmniPod(p, c));
-                parts.add(new HeatSink(0, et, -1, true, c));
-            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_JUMP_JET)) {
+            } else if (equipmentType instanceof MiscType
+                             && (equipmentType.hasFlag(MiscType.F_HEAT_SINK)
+                                       || equipmentType.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+                Part part = new HeatSink(0, equipmentType, -1, false, campaign);
+                parts.add(part);
+                parts.add(new OmniPod(part, campaign));
+                parts.add(new HeatSink(0, equipmentType, -1, true, campaign));
+            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_JUMP_JET)) {
                 // need to do it by rating and unit tonnage
                 for (int ton = 10; ton <= 100; ton += 5) {
-                    Part p = new JumpJet(ton, et, -1, false, c);
-                    parts.add(p);
-                    if (!et.hasFlag(MiscType.F_BA_EQUIPMENT)) {
-                        parts.add(new OmniPod(p, c));
-                        parts.add(new JumpJet(ton, et, -1, true, c));
+                    Part part = new JumpJet(ton, equipmentType, -1, false, campaign);
+                    parts.add(part);
+                    if (!equipmentType.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                        parts.add(new OmniPod(part, campaign));
+                        parts.add(new JumpJet(ton, equipmentType, -1, true, campaign));
                     }
                 }
-            } else if ((et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_TANK_EQUIPMENT)
-                              && ((MiscType) et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
-                             || et instanceof BayWeapon
-                             || et instanceof InfantryAttack) {
-                continue;
-            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_BA_EQUIPMENT)
-                             && !((MiscType) et).hasFlag(MiscType.F_BA_MANIPULATOR)) {
-                continue;
-            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_MASC)) {
-                if (et.hasSubType(MiscType.S_SUPERCHARGER)) {
+            } else if ((equipmentType instanceof MiscType
+                              && equipmentType.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                              && equipmentType.hasFlag(MiscType.F_CHASSIS_MODIFICATION))
+                             || equipmentType instanceof BayWeapon
+                             || equipmentType instanceof InfantryAttack) {
+            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_BA_EQUIPMENT)
+                             && !equipmentType.hasFlag(MiscType.F_BA_MANIPULATOR)) {
+            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_MASC)) {
+                if (equipmentType.hasSubType(MiscType.S_SUPERCHARGER)) {
                     for (int rating = 10; rating <= 400; rating += 5) {
                         // eton 0.5 to 10.5 inclusive
                         for (int i = 1; i <= 21; i++) {
                             double eton = i * 0.5;
                             double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
-                            double minweight = weight * 0.5;
-                            minweight = Math.ceil(
-                                  (TestEntity.ceilMaxHalf(minweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
-                            double maxweight = weight * 2.0;
-                            maxweight = Math.ceil(
-                                  (TestEntity.ceilMaxHalf(maxweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
-                            if (eton < minweight || eton > maxweight) {
+                            double minWeight = weight * 0.5;
+                            minWeight = Math.ceil(
+                                  (TestEntity.ceilMaxHalf(minWeight, Ceil.HALF_TON) / 10.0) * 2.0) / 2.0;
+                            double maxWeight = weight * 2.0;
+                            maxWeight = Math.ceil(
+                                  (TestEntity.ceilMaxHalf(maxWeight, Ceil.HALF_TON) / 10.0) * 2.0) / 2.0;
+                            if (eton < minWeight || eton > maxWeight) {
                                 continue;
                             }
-                            MASC sp = new MASC(0, et, -1, c, rating, false);
-                            sp.setEquipTonnage(eton);
-                            parts.add(sp);
-                            parts.add(new OmniPod(sp, c));
-                            sp = new MASC(0, et, -1, c, rating, true);
-                            sp.setEquipTonnage(eton);
-                            parts.add(sp);
+                            MASC masc = new MASC(0, equipmentType, -1, campaign, rating, false);
+                            masc.setEquipTonnage(eton);
+                            parts.add(masc);
+                            parts.add(new OmniPod(masc, campaign));
+                            masc = new MASC(0, equipmentType, -1, campaign, rating, true);
+                            masc.setEquipTonnage(eton);
+                            parts.add(masc);
                         }
                     }
                 } else {
@@ -213,66 +240,66 @@ public class PartsStore {
                             if (rating < ton || (rating % ton) != 0) {
                                 continue;
                             }
-                            Part p = new MASC(ton, et, -1, c, rating, false);
-                            parts.add(p);
-                            parts.add(new OmniPod(p, c));
-                            parts.add(new MASC(ton, et, -1, c, rating, true));
+                            Part part = new MASC(ton, equipmentType, -1, campaign, rating, false);
+                            parts.add(part);
+                            parts.add(new OmniPod(part, campaign));
+                            parts.add(new MASC(ton, equipmentType, -1, campaign, rating, true));
                         }
                     }
                 }
             } else {
-                boolean poddable = !et.isOmniFixedOnly();
-                if (et instanceof MiscType) {
-                    poddable &= et.hasFlag(MiscType.F_MEK_EQUIPMENT)
-                                      || et.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                                      || et.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
-                } else if (et instanceof WeaponType) {
-                    poddable &= (et.hasFlag(WeaponType.F_MEK_WEAPON)
-                                       || et.hasFlag(Weapon.F_TANK_WEAPON)
-                                       || et.hasFlag(WeaponType.F_AERO_WEAPON))
-                                      && !((WeaponType) et).isCapital();
+                boolean poddable = !equipmentType.isOmniFixedOnly();
+                if (equipmentType instanceof MiscType) {
+                    poddable &= equipmentType.hasFlag(MiscType.F_MEK_EQUIPMENT)
+                                      || equipmentType.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                                      || equipmentType.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+                } else if (equipmentType instanceof WeaponType) {
+                    poddable &= (equipmentType.hasFlag(WeaponType.F_MEK_WEAPON)
+                                       || equipmentType.hasFlag(Weapon.F_TANK_WEAPON)
+                                       || equipmentType.hasFlag(WeaponType.F_AERO_WEAPON))
+                                      && !((WeaponType) equipmentType).isCapital();
                 }
-                if (EquipmentPart.hasVariableTonnage(et)) {
-                    EquipmentPart epart;
-                    for (double ton = EquipmentPart.getStartingTonnage(et);
+                if (EquipmentPart.hasVariableTonnage(equipmentType)) {
+                    EquipmentPart equipmentPart;
+                    for (double ton = EquipmentPart.getStartingTonnage(equipmentType);
                           ton <= EquipmentPart
-                                       .getMaxTonnage(et);
-                          ton += EquipmentPart.getTonnageIncrement(et)) {
-                        epart = new EquipmentPart(0, et, -1, 1.0, false, c);
-                        epart.setEquipTonnage(ton);
-                        parts.add(epart);
+                                       .getMaxTonnage(equipmentType);
+                          ton += EquipmentPart.getTonnageIncrement(equipmentType)) {
+                        equipmentPart = new EquipmentPart(0, equipmentType, -1, 1.0, false, campaign);
+                        equipmentPart.setEquipTonnage(ton);
+                        parts.add(equipmentPart);
                         if (poddable) {
-                            epart = new EquipmentPart(0, et, -1, 1.0, true, c);
-                            epart.setEquipTonnage(ton);
-                            parts.add(epart);
-                            epart = new EquipmentPart(0, et, -1, 1.0, true, c);
-                            epart.setEquipTonnage(ton);
-                            parts.add(new OmniPod(epart, c));
+                            equipmentPart = new EquipmentPart(0, equipmentType, -1, 1.0, true, campaign);
+                            equipmentPart.setEquipTonnage(ton);
+                            parts.add(equipmentPart);
+                            equipmentPart = new EquipmentPart(0, equipmentType, -1, 1.0, true, campaign);
+                            equipmentPart.setEquipTonnage(ton);
+                            parts.add(new OmniPod(equipmentPart, campaign));
                         }
                         // TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
                     }
                 } else {
-                    Part p = new EquipmentPart(0, et, -1, 1.0, false, c);
+                    Part p = new EquipmentPart(0, equipmentType, -1, 1.0, false, campaign);
                     parts.add(p);
                     if (poddable) {
-                        parts.add(new EquipmentPart(0, et, -1, 1.0, true, c));
-                        parts.add(new OmniPod(new EquipmentPart(0, et, -1, 1.0, false, c), c));
+                        parts.add(new EquipmentPart(0, equipmentType, -1, 1.0, true, campaign));
+                        parts.add(new OmniPod(new EquipmentPart(0, equipmentType, -1, 1.0, false, campaign), campaign));
                     }
                 }
             }
         }
-        // lets throw aero heat sinks in here as well
-        AeroHeatSink hs = new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c);
-        parts.add(new OmniPod(hs, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, true, c));
+        // let's throw aero heat sinks in here as well
+        AeroHeatSink hs = new AeroHeatSink(0, Aero.HEAT_SINGLE, false, campaign);
+        parts.add(new OmniPod(hs, campaign));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, true, campaign));
 
-        hs = new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c);
-        parts.add(new OmniPod(hs, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
+        hs = new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, campaign);
+        parts.add(new OmniPod(hs, campaign));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, campaign));
 
-        hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c);
-        parts.add(new OmniPod(hs, c));
-        parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, c));
+        hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, campaign);
+        parts.add(new OmniPod(hs, campaign));
+        parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, campaign));
     }
 
     private void stockMekActuators(Campaign c) {
@@ -318,11 +345,11 @@ public class PartsStore {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        return TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        return TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
     }
 
     private void stockEngines(Campaign c) {
@@ -347,7 +374,7 @@ public class PartsStore {
                     if (engine.engineValid) {
                         parts.add(new EnginePart(ton, engine, c, false));
                     }
-                    if ((ton / 5) > getEngineTonnage(engine)) {
+                    if ((ton / 5.0) > getEngineTonnage(engine)) {
                         engine = new Engine(rating, i, Engine.TANK_ENGINE);
                         if (engine.engineValid) {
                             parts.add(new EnginePart(ton, engine, c, true));
@@ -358,7 +385,7 @@ public class PartsStore {
                         if (engine.engineValid) {
                             parts.add(new EnginePart(ton, engine, c, false));
                         }
-                        if ((ton / 5) > getEngineTonnage(engine)) {
+                        if ((ton / 5.0) > getEngineTonnage(engine)) {
                             engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
                             if (engine.engineValid) {
                                 parts.add(new EnginePart(ton, engine, c, true));
@@ -422,8 +449,8 @@ public class PartsStore {
         parts.add(new FireControlSystem(0, Money.zero(), c));
         parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_STANDARD));
         parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_NO_BOOM));
-        parts.add(new KfBoom(0, c, Dropship.BOOM_STANDARD));
-        parts.add(new KfBoom(0, c, Dropship.BOOM_PROTOTYPE));
+        parts.add(new KFBoom(0, c, Dropship.BOOM_STANDARD));
+        parts.add(new KFBoom(0, c, Dropship.BOOM_PROTOTYPE));
         parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_STANDARD));
         parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_NO_BOOM));
         parts.add(new GravDeck(0, 0, c, GravDeck.GRAV_DECK_TYPE_STANDARD));
@@ -431,9 +458,9 @@ public class PartsStore {
         parts.add(new GravDeck(0, 0, c, GravDeck.GRAV_DECK_TYPE_HUGE));
         parts.add(new LandingGear(0, c));
         parts.add(new BayDoor(0, c));
-        for (BayType btype : BayType.values()) {
-            if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                parts.add(new Cubicle(0, btype, c));
+        for (BayType bayType : BayType.values()) {
+            if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+                parts.add(new Cubicle(0, bayType, c));
             }
         }
     }
@@ -452,7 +479,7 @@ public class PartsStore {
         for (ArmorType armor : ArmorType.allArmorTypes()) {
             if (armor.hasFlag(MiscType.F_BA_EQUIPMENT)) {
                 amount = (int) (5 * armor.getWeightPerPoint());
-                parts.add(new BaArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
+                parts.add(new BAArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
             } else {
                 amount = (int) (5.0 * armor.getPointsPerTon());
                 parts.add(new Armor(0, armor.getArmorType(), amount, -1, false, armor.isClan(), c));
@@ -463,7 +490,7 @@ public class PartsStore {
     }
 
     private void stockMekLocations(Campaign c) {
-        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CLEG; loc++) {
+        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CENTER_LEG; loc++) {
             for (int ton = 20; ton <= 100; ton = ton + 5) {
                 for (int type = 0; type < EquipmentType.structureNames.length; type++) {
                     addMekLocation(c, loc, ton, type, false);
@@ -485,7 +512,7 @@ public class PartsStore {
         } else {
             parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
             parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
-            if (loc > Mek.LOC_LT) {
+            if (loc > Mek.LOC_LEFT_TORSO) {
                 parts.add(new MekLocation(loc, ton, type, clan, false, true, false, false, c));
                 parts.add(new MekLocation(loc, ton, type, clan, true, true, false, false, c));
             }
@@ -493,7 +520,7 @@ public class PartsStore {
     }
 
     private void stockProtomekLocations(Campaign c) {
-        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAINGUN; loc++) {
+        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAIN_GUN; loc++) {
             for (int ton = 2; ton <= 15; ton++) {
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, false, c));

@@ -32,20 +32,19 @@
  */
 package mekhq.campaign.market.procurement;
 
-import static megamek.common.ITechnology.AvailabilityValue;
-import static megamek.common.ITechnology.getTechEra;
 import static megamek.common.SimpleTechLevel.INTRO;
 import static megamek.common.SimpleTechLevel.STANDARD;
+import static megamek.common.interfaces.ITechnology.getTechEra;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Compute;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.Era;
-import megamek.common.ITechnology.TechBase;
 import megamek.common.SimpleTechLevel;
+import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Era;
 import megamek.common.enums.SkillLevel;
+import megamek.common.enums.TechBase;
 import megamek.logging.MMLogger;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -61,7 +60,7 @@ public class Procurement {
     private final int gameYear;
     private final Era techEra;
     private final Faction originFaction;
-    private final ITechnology.Faction factionTechCode;
+    private final megamek.common.enums.Faction factionTechCode;
     private static final MMLogger logger = MMLogger.create(Procurement.class);
 
     /**
@@ -91,7 +90,7 @@ public class Procurement {
      * @deprecated Use {@link #getTechFaction(Faction)} instead.
      */
     @Deprecated
-    public static ITechnology.Faction getFactionTechCode(Faction faction) {
+    public static megamek.common.enums.Faction getFactionTechCode(Faction faction) {
         return getTechFaction(faction);
     }
 
@@ -102,14 +101,14 @@ public class Procurement {
      *
      * @return returns corresponding faction.
      */
-    public static ITechnology.Faction getTechFaction(Faction faction) {
-        ITechnology.Faction result = ITechnology.Faction.fromMMAbbr(faction.getShortName());
-        if (result != ITechnology.Faction.NONE) {
+    public static megamek.common.enums.Faction getTechFaction(Faction faction) {
+        megamek.common.enums.Faction result = megamek.common.enums.Faction.fromMMAbbr(faction.getShortName());
+        if (result != megamek.common.enums.Faction.NONE) {
             return result;
         }
 
         // If the result faction is NONE, I check if I maybe got a not found in the ENUM.
-        if (result.getCodeMM().toUpperCase().equals(faction.getShortName().toUpperCase())) {
+        if (result.getCodeMM().equalsIgnoreCase(faction.getShortName())) {
             return result;
         }
 
@@ -117,13 +116,13 @@ public class Procurement {
 
         if (faction.isClan()) {
             logger.info("Returning: Clan");
-            return ITechnology.Faction.CLAN;
+            return megamek.common.enums.Faction.CLAN;
         } else if (faction.isPeriphery()) {
             logger.info("Returning: Periphery");
-            return ITechnology.Faction.PER;
+            return megamek.common.enums.Faction.PER;
         } else {
             logger.info("Returning: Inner Sphere");
-            return ITechnology.Faction.IS;
+            return megamek.common.enums.Faction.IS;
         }
     }
 
@@ -287,7 +286,7 @@ public class Procurement {
             return performTrulyExtinctCheck(part, availability, useHardExtinction);
         }
 
-        if (part.getTechBase() == ITechnology.TechBase.CLAN) {
+        if (part.getTechBase() == TechBase.CLAN) {
             availability = getClanBaseAvailability(part, availability);
             return performTrulyExtinctCheck(part, availability, useHardExtinction);
         }

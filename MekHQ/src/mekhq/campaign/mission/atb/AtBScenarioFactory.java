@@ -88,7 +88,8 @@ public class AtBScenarioFactory {
         return scenarioMap.get(type);
     }
 
-    public static AtBScenario createScenario(Campaign c, CombatTeam lance, int type, boolean attacker, LocalDate date) {
+    public static AtBScenario createScenario(Campaign campaign, CombatTeam lance, int type, boolean attacker,
+          LocalDate date) {
         List<Class<IAtBScenario>> classList = getScenarios(type);
         Class<IAtBScenario> selectedClass;
 
@@ -104,10 +105,10 @@ public class AtBScenarioFactory {
         }
 
         try {
-            AtBScenario s = (AtBScenario) selectedClass.newInstance();
-            s.initialize(c, lance, attacker, date);
+            AtBScenario atBScenario = (AtBScenario) selectedClass.getDeclaredConstructor().newInstance();
+            atBScenario.initialize(campaign, lance, attacker, date);
 
-            return s;
+            return atBScenario;
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -118,9 +119,9 @@ public class AtBScenarioFactory {
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
         if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-            logger.error(String.format(
-                  "Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.",
-                  scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
+            logger.error("Unable to register an AtBScenario of class '{}' because is does not have the '{}' annotation.",
+                  scenario.getClass().getName(),
+                  AtBScenarioEnabled.class.getName());
         } else {
             int type = scenario.getScenarioType();
             List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
@@ -184,7 +185,7 @@ public class AtBScenarioFactory {
                 // If we have a current base attack (attacker) scenario, no other scenarios
                 // should
                 // be generated for that contract
-                if ((scenario.getScenarioType() == AtBScenario.BASEATTACK)) {
+                if ((scenario.getScenarioType() == AtBScenario.BASE_ATTACK)) {
                     hasBaseAttack = true;
                     if (scenario.isAttacker()) {
                         hasBaseAttackAttacker = true;
@@ -195,7 +196,7 @@ public class AtBScenarioFactory {
             // endregion Current Scenarios
 
             // region Generate Scenarios
-            // Generate scenarios for combatTeamsTable based on their current situation
+            //  for combatTeamsTable based on their current situation
             if (!hasBaseAttackAttacker) {
                 for (CombatTeam combatTeam : combatTeamsTable.values()) {
                     // Don't generate scenarios for any combatTeamsTable already assigned, those assigned to a
@@ -222,7 +223,7 @@ public class AtBScenarioFactory {
 
                         // We care if the scenario is a Base Attack, as one must be generated if the
                         // current contract's morale is Unbreakable
-                        if (scenario.getScenarioType() == AtBScenario.BASEATTACK) {
+                        if (scenario.getScenarioType() == AtBScenario.BASE_ATTACK) {
                             hasBaseAttack = true;
 
                             // If a Base Attack (Attacker) scenario is generated, this is the only
@@ -274,7 +275,7 @@ public class AtBScenarioFactory {
                     if (!lList.isEmpty()) {
                         CombatTeam combatTeam = ObjectUtility.getRandomItem(lList);
                         AtBScenario atbScenario = AtBScenarioFactory.createScenario(campaign, combatTeam,
-                              AtBScenario.BASEATTACK, false, CombatTeam.getBattleDate(campaign.getLocalDate()));
+                              AtBScenario.BASE_ATTACK, false, CombatTeam.getBattleDate(campaign.getLocalDate()));
                         if (atbScenario != null) {
                             if ((combatTeam.getMissionId() == atbScenario.getMissionId())
                                       || (combatTeam.getMissionId() == CombatTeam.NO_MISSION)) {
@@ -310,10 +311,9 @@ public class AtBScenarioFactory {
                             logger.error("Unable to generate Base Attack scenario.");
                         }
                     } else {
-                        logger.warn("No combatTeamsTable assigned to mission " +
-                                          contract.getName()
-                                          +
-                                          ". Can't generate an Unbreakable Morale base defense mission for this force.");
+                        logger.warn(
+                              "No combatTeamsTable assigned to mission {}. Can't generate an Unbreakable Morale base defense mission for this force.",
+                              contract.getName());
                     }
                 }
             }
@@ -326,7 +326,7 @@ public class AtBScenarioFactory {
             if (hasBaseAttackAttacker) {
                 scenarios.removeIf(atbScenario -> !(atbScenario.isAttacker()
                                                           &&
-                                                          (atbScenario.getScenarioType() == AtBScenario.BASEATTACK)));
+                                                          (atbScenario.getScenarioType() == AtBScenario.BASE_ATTACK)));
             }
             // endregion Base Attack (Attacker) Generated
 

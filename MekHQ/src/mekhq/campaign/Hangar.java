@@ -52,7 +52,7 @@ import mekhq.utilities.MHQXMLUtility;
  * Represents a hangar which contains zero or more units.
  */
 public class Hangar {
-    private Map<UUID, Unit> units = new LinkedHashMap<>();
+    private final Map<UUID, Unit> units = new LinkedHashMap<>();
 
     /**
      * Adds a unit to the hangar.

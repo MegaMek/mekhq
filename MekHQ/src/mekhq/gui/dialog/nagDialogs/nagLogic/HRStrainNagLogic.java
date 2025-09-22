@@ -57,7 +57,7 @@ public class HRStrainNagLogic {
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public class AdminStrainNagLogic extends HRStrainNagLogic {
+    public static class AdminStrainNagLogic extends HRStrainNagLogic {
         public AdminStrainNagLogic() {}
     }
 }

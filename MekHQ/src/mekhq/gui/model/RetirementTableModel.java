@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2015-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,6 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 
 import java.awt.Component;
 import java.awt.Image;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,12 +48,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.EntityWeightClass;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -67,7 +66,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class RetirementTableModel extends AbstractTableModel {
-    private static final MMLogger logger = MMLogger.create(RetirementTableModel.class);
+    private static final MMLogger LOGGER = MMLogger.create(RetirementTableModel.class);
 
     public static final int COL_PERSON = 0;
     public static final int COL_ASSIGN = 1;
@@ -90,11 +89,11 @@ public class RetirementTableModel extends AbstractTableModel {
     private final Campaign campaign;
     private List<UUID> data;
     private Map<UUID, TargetRoll> targets;
-    private Map<UUID, Boolean> payBonus;
-    private Map<UUID, Integer> miscMods;
+    private final Map<UUID, Boolean> payBonus;
+    private final Map<UUID, Integer> miscMods;
     private int generalMod;
     private Map<UUID, UUID> unitAssignments;
-    private Map<UUID, Money> altPayout;
+    private final Map<UUID, Money> altPayout;
     boolean editPayout;
 
     public RetirementTableModel(Campaign c) {
@@ -175,7 +174,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         return retVal;
     }
@@ -280,10 +279,6 @@ public class RetirementTableModel extends AbstractTableModel {
                                  null != campaign.getUnit(unitAssignments.get(person.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getBuyCost());
                 }
-
-                // if the person is under contract, we don't check whether they need a unit or are owed a shortfall
-                LocalDate recruitmentDate = person.getRecruitment();
-
 
                 if (isBreakingContract(person,
                       campaign.getLocalDate(),

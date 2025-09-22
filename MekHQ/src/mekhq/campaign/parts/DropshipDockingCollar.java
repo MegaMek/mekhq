@@ -35,15 +35,21 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingDropshipDockingCollar;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -53,28 +59,28 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class DropshipDockingCollar extends Part {
-    private static final MMLogger logger = MMLogger.create(DropshipDockingCollar.class);
+    private static final MMLogger LOGGER = MMLogger.create(DropshipDockingCollar.class);
 
-    static final TechAdvancement TA_BOOM = new TechAdvancement(TechBase.ALL)
-                                                 .setAdvancement(2458, 2470, 2500)
-                                                 .setPrototypeFactions(Faction.TH)
-                                                 .setProductionFactions(Faction.TH)
-                                                 .setTechRating(TechRating.C)
-                                                 .setAvailability(AvailabilityValue.C,
-                                                       AvailabilityValue.C,
-                                                       AvailabilityValue.C,
-                                                       AvailabilityValue.C)
-                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TechBase.ALL)
-                                                    .setAdvancement(2304, 2350, 2364, 2520)
-                                                    .setPrototypeFactions(Faction.TA)
-                                                    .setProductionFactions(Faction.TH)
-                                                    .setTechRating(TechRating.B)
-                                                    .setAvailability(AvailabilityValue.C,
-                                                          AvailabilityValue.X,
-                                                          AvailabilityValue.X,
-                                                          AvailabilityValue.X)
-                                                    .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    public static final TechAdvancement TA_BOOM = new TechAdvancement(TechBase.ALL)
+                                                        .setAdvancement(2458, 2470, 2500)
+                                                        .setPrototypeFactions(Faction.TH)
+                                                        .setProductionFactions(Faction.TH)
+                                                        .setTechRating(TechRating.C)
+                                                        .setAvailability(AvailabilityValue.C,
+                                                              AvailabilityValue.C,
+                                                              AvailabilityValue.C,
+                                                              AvailabilityValue.C)
+                                                        .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TechBase.ALL)
+                                                           .setAdvancement(2304, 2350, 2364, 2520)
+                                                           .setPrototypeFactions(Faction.TA)
+                                                           .setProductionFactions(Faction.TH)
+                                                           .setTechRating(TechRating.B)
+                                                           .setAvailability(AvailabilityValue.C,
+                                                                 AvailabilityValue.X,
+                                                                 AvailabilityValue.X,
+                                                                 AvailabilityValue.X)
+                                                           .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int collarType;
 
@@ -161,13 +167,13 @@ public class DropshipDockingCollar extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -227,7 +233,7 @@ public class DropshipDockingCollar extends Part {
                     collarType = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
     }

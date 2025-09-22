@@ -43,13 +43,12 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -189,8 +188,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         final List<AmmoStorage> ammunition = generator.generateAmmunition(getCampaign(), units);
         units.addAll(generator.applyPhaseTwoToCampaign(getCampaign(), mothballedEntities, parts, armour, ammunition));
 
-        final Contract contract = null;
-        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
+        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, null);
 
         MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
               getCompanyGenerationOptionsPanel().getCampaign().getForces()));

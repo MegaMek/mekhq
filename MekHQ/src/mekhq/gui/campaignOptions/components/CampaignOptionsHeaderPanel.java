@@ -59,7 +59,7 @@ import megamek.client.ui.util.UIUtil;
 public class CampaignOptionsHeaderPanel extends JPanel {
     private static final String TIP_PANEL_NAME = "TipPanel";
 
-    private int tipPanelHeight = 0;
+    private final int tipPanelHeight;
 
     public int getTipPanelHeight() {
         return tipPanelHeight;
@@ -151,10 +151,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         JLabel lblTip = new JLabel();
         if (includeTipPanel) {
             // This stops the tip panel from bouncing around too much as new options are selected
-            StringBuilder lineBreaks = new StringBuilder();
-            for (int lineBreak = 0; lineBreak < tipPanelHeight; lineBreak++) {
-                lineBreaks.append("<br>");
-            }
+            String lineBreaks = "<br>".repeat(Math.max(0, tipPanelHeight));
 
             lblTip.setName("lbl" + name + TIP_PANEL_NAME);
             lblTip.setText("<html>" + lineBreaks + "</html>");

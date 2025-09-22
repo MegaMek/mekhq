@@ -57,18 +57,16 @@ import mekhq.campaign.personnel.SpecialAbility;
 
 /**
  * @author Taharqa
- * @deprecated no indicated uses outside of own class.
+ * @deprecated no indicated uses outside own class.
  */
 @Deprecated(since = "0.50.06", forRemoval = true)
 public class SelectUnusedAbilityDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(SelectUnusedAbilityDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(SelectUnusedAbilityDialog.class);
 
-    private JButton btnClose;
-    private JButton btnOK;
     private ButtonGroup group;
-    private Vector<String> choices;
+    private final Vector<String> choices;
     private boolean cancelled;
-    private Map<String, SpecialAbility> currentSPA;
+    private final Map<String, SpecialAbility> currentSPA;
 
     public SelectUnusedAbilityDialog(final JFrame frame, final Vector<String> unused,
           final Map<String, SpecialAbility> c) {
@@ -82,13 +80,13 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
 
     private void initComponents() {
-        btnOK = new JButton();
-        btnClose = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnClose = new JButton();
 
         group = new ButtonGroup();
 
-        int ncol = 2;
-        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (ncol * 1.0)), ncol));
+        int numCol = 2;
+        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (numCol * 1.0)), numCol));
 
         JRadioButton chk;
         for (String name : choices) {
@@ -129,7 +127,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -139,8 +137,8 @@ public class SelectUnusedAbilityDialog extends JDialog {
             String displayName = "";
             String desc = "";
 
-            PersonnelOptions poptions = new PersonnelOptions();
-            for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements(); ) {
+            PersonnelOptions personnelOptions = new PersonnelOptions();
+            for (Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
                 IOptionGroup group = i.nextElement();
 
                 if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
@@ -181,8 +179,8 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
 
     private String getDisplayName(String lookup) {
-        PersonnelOptions poptions = new PersonnelOptions();
-        for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements(); ) {
+        PersonnelOptions personnelOptions = new PersonnelOptions();
+        for (Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
             if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
@@ -200,8 +198,8 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
 
     private String getDesc(String lookup) {
-        PersonnelOptions poptions = new PersonnelOptions();
-        for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements(); ) {
+        PersonnelOptions personnelOptions = new PersonnelOptions();
+        for (Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
             if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {

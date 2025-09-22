@@ -72,7 +72,7 @@ import mekhq.gui.view.ContractPaymentBreakdown;
  * @author Taharqa
  */
 public class NewContractDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(NewContractDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewContractDialog.class);
 
     protected JFrame frame;
     protected Contract contract;
@@ -214,7 +214,7 @@ public class NewContractDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

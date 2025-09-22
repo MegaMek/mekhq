@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,16 +43,21 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
 import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Era;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.interfaces.ITechnology;
 import megamek.common.options.OptionsConstants;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -61,6 +66,12 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.missing.MissingMekActuator;
+import mekhq.campaign.parts.missing.MissingMekLocation;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingVeeStabilizer;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -90,7 +101,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class Part implements IPartWork, ITechnology {
-    private static final MMLogger logger = MMLogger.create(Part.class);
+    private static final MMLogger LOGGER = MMLogger.create(Part.class);
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -162,7 +173,7 @@ public abstract class Part implements IPartWork, ITechnology {
     /*
      * This will be unusual but in some circumstances certain parts will be linked
      * to other parts.
-     * These linked parts will be considered integral and subsidary to those other
+     * These linked parts will be considered integral and subsidiary to those other
      * parts and will
      * not show up independently. Currently (8/8/2015), we are only using this for
      * BA suits
@@ -584,7 +595,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     protected boolean isClanTechBase() {
-        return getTechBase() == ITechnology.TechBase.CLAN;
+        return getTechBase() == TechBase.CLAN;
     }
 
     public abstract void writeToXML(PrintWriter pw, int indent);
@@ -680,6 +691,82 @@ public abstract class Part implements IPartWork, ITechnology {
             // case "OldClassName" -> NewClassName.class.getSimpleName();
             case "VeeStabiliser" -> VeeStabilizer.class.getSimpleName();
             case "MissingVeeStabiliser" -> MissingVeeStabilizer.class.getSimpleName();
+            // <50.07 compatibility handlers
+            case "mekhq.campaign.parts.MekLocation" -> "mekhq.campaign.parts.meks.MekLocation";
+            case "mekhq.campaign.parts.MekGyro" -> "mekhq.campaign.parts.meks.MekGyro";
+            case "mekhq.campaign.parts.MekLifeSupport" -> "mekhq.campaign.parts.meks.MekLifeSupport";
+            case "mekhq.campaign.parts.MekSensor" -> "mekhq.campaign.parts.meks.MekSensor";
+            case "mekhq.campaign.parts.MekActuator" -> "mekhq.campaign.parts.meks.MekActuator";
+            case "mekhq.campaign.parts.MekCockpit" -> "mekhq.campaign.parts.meks.MekCockpit";
+            case "mekhq.campaign.parts.KfBoom" -> "mekhq.campaign.parts.kfs.KFBoom";
+            case "mekhq.campaign.parts.KFChargingSystem" -> "mekhq.campaign.parts.kfs.KFChargingSystem";
+            case "mekhq.campaign.parts.KFDriveCoil" -> "mekhq.campaign.parts.kfs.KFDriveCoil";
+            case "mekhq.campaign.parts.KFDriveController" -> "mekhq.campaign.parts.kfs.KFDriveController";
+            case "mekhq.campaign.parts.KFFieldInitiator" -> "mekhq.campaign.parts.kfs.KFFieldInitiator";
+            case "mekhq.campaign.parts.KFHeliumTank" -> "mekhq.campaign.parts.kfs.KFHeliumTank";
+            case "mekhq.campaign.parts.ProtoMekArmActuator" -> "mekhq.campaign.parts.protomeks.ProtoMekArmActuator";
+            case "mekhq.campaign.parts.ProtoMekArmor" -> "mekhq.campaign.parts.protomeks.ProtoMekArmor";
+            case "mekhq.campaign.parts.ProtoMekJumpJet" -> "mekhq.campaign.parts.protomeks.ProtoMekJumpJet";
+            case "mekhq.campaign.parts.ProtoMekLegActuator" -> "mekhq.campaign.parts.protomeks.ProtoMekLegActuator";
+            case "mekhq.campaign.parts.ProtoMekLocation" -> "mekhq.campaign.parts.protomeks.ProtoMekLocation";
+            case "mekhq.campaign.parts.ProtoMekSensor" -> "mekhq.campaign.parts.protomeks.ProtoMekSensor";
+
+            case "mekhq.campaign.parts.MissingAeroHeatSink" -> "mekhq.campaign.parts.missing.MissingAeroHeatSink";
+            case "mekhq.campaign.parts.MissingAeroLifeSupport" -> "mekhq.campaign.parts.missing.MissingAeroLifeSupport";
+            case "mekhq.campaign.parts.MissingAeroSensor" -> "mekhq.campaign.parts.missing.MissingAeroSensor";
+            case "mekhq.campaign.parts.MissingAvionics" -> "mekhq.campaign.parts.missing.MissingAvionics";
+            case "mekhq.campaign.parts.MissingBattleArmorSuit" -> "mekhq.campaign.parts.missing.MissingBattleArmorSuit";
+            case "mekhq.campaign.parts.MissingBayDoor" -> "mekhq.campaign.parts.missing.MissingBayDoor";
+            case "mekhq.campaign.parts.MissingCIC" -> "mekhq.campaign.parts.missing.MissingCIC";
+            case "mekhq.campaign.parts.MissingCubicle" -> "mekhq.campaign.parts.missing.MissingCubicle";
+            case "mekhq.campaign.parts.MissingDropshipDockingCollar" ->
+                  "mekhq.campaign.parts.missing.MissingDropshipDockingCollar";
+            case "mekhq.campaign.parts.MissingEnginePart" -> "mekhq.campaign.parts.missing.MissingEnginePart";
+            case "mekhq.campaign.parts.MissingFireControlSystem" ->
+                  "mekhq.campaign.parts.missing.MissingFireControlSystem";
+            case "mekhq.campaign.parts.MissingGravDeck" -> "mekhq.campaign.parts.missing.MissingGravDeck";
+            case "mekhq.campaign.parts.MissingInfantryArmorPart" ->
+                  "mekhq.campaign.parts.missing.MissingInfantryArmorPart";
+            case "mekhq.campaign.parts.MissingInfantryMotiveType" ->
+                  "mekhq.campaign.parts.missing.MissingInfantryMotiveType";
+            case "mekhq.campaign.parts.MissingJumpshipDockingCollar" ->
+                  "mekhq.campaign.parts.missing.MissingJumpshipDockingCollar";
+            case "mekhq.campaign.parts.MissingKFBoom" -> "mekhq.campaign.parts.missing.MissingKFBoom";
+            case "mekhq.campaign.parts.MissingKFChargingSystem" ->
+                  "mekhq.campaign.parts.missing.MissingKFChargingSystem";
+            case "mekhq.campaign.parts.MissingKFDriveCoil" -> "mekhq.campaign.parts.missing.MissingKFDriveCoil";
+            case "mekhq.campaign.parts.MissingKFDriveController" ->
+                  "mekhq.campaign.parts.missing.MissingKFDriveController";
+            case "mekhq.campaign.parts.MissingKFFieldInitiator" ->
+                  "mekhq.campaign.parts.missing.MissingKFFieldInitiator";
+            case "mekhq.campaign.parts.MissingKFHeliumTank" -> "mekhq.campaign.parts.missing.MissingKFHeliumTank";
+            case "mekhq.campaign.parts.MissingLandingGear" -> "mekhq.campaign.parts.missing.MissingLandingGear";
+            case "mekhq.campaign.parts.MissingLFBattery" -> "mekhq.campaign.parts.missing.MissingLFBattery";
+            case "mekhq.campaign.parts.MissingMekActuator" -> "mekhq.campaign.parts.missing.MissingMekActuator";
+            case "mekhq.campaign.parts.MissingMekCockpit" -> "mekhq.campaign.parts.missing.MissingMekCockpit";
+            case "mekhq.campaign.parts.MissingMekGyro" -> "mekhq.campaign.parts.missing.MissingMekGyro";
+            case "mekhq.campaign.parts.MissingMekLifeSupport" -> "mekhq.campaign.parts.missing.MissingMekLifeSupport";
+            case "mekhq.campaign.parts.MissingMekLocation" -> "mekhq.campaign.parts.missing.MissingMekLocation";
+            case "mekhq.campaign.parts.MissingMekSensor" -> "mekhq.campaign.parts.missing.MissingMekSensor";
+            case "mekhq.campaign.parts.MissingOmniPod" -> "mekhq.campaign.parts.missing.MissingOmniPod";
+            case "mekhq.campaign.parts.MissingPart" -> "mekhq.campaign.parts.missing.MissingPart";
+            case "mekhq.campaign.parts.MissingProtoMekArmActuator" ->
+                  "mekhq.campaign.parts.missing.MissingProtoMekArmActuator";
+            case "mekhq.campaign.parts.MissingProtoMekJumpJet" -> "mekhq.campaign.parts.missing.MissingProtoMekJumpJet";
+            case "mekhq.campaign.parts.MissingProtoMekLegActuator" ->
+                  "mekhq.campaign.parts.missing.MissingProtoMekLegActuator";
+            case "mekhq.campaign.parts.MissingProtoMekLocation" ->
+                  "mekhq.campaign.parts.missing.MissingProtoMekLocation";
+            case "mekhq.campaign.parts.MissingProtoMekSensor" -> "mekhq.campaign.parts.missing.MissingProtoMekSensor";
+            case "mekhq.campaign.parts.MissingQuadVeeGear" -> "mekhq.campaign.parts.missing.MissingQuadVeeGear";
+            case "mekhq.campaign.parts.MissingRotor" -> "mekhq.campaign.parts.missing.MissingRotor";
+            case "mekhq.campaign.parts.MissingSpacecraftEngine" ->
+                  "mekhq.campaign.parts.missing.MissingSpacecraftEngine";
+            case "mekhq.campaign.parts.MissingSVEngine" -> "mekhq.campaign.parts.missing.MissingSVEngine";
+            case "mekhq.campaign.parts.MissingThrusters" -> "mekhq.campaign.parts.missing.MissingThrusters";
+            case "mekhq.campaign.parts.MissingTurret" -> "mekhq.campaign.parts.missing.MissingTurret";
+            case "mekhq.campaign.parts.MissingVeeSensor" -> "mekhq.campaign.parts.missing.MissingVeeSensor";
+            case "mekhq.campaign.parts.MissingVeeStabilizer" -> "mekhq.campaign.parts.missing.MissingVeeStabilizer";
             default -> className;
         };
     }
@@ -765,11 +852,11 @@ public abstract class Part implements IPartWork, ITechnology {
                 retVal.setUnit(null);
             }
         } catch (ClassNotFoundException classNotFoundException) {
-            logger.error(classNotFoundException, "Could not find Part subclass with name {}, please check if this " +
-                                                       "class was not renamed, if thats the case, register its new " +
+            LOGGER.error(classNotFoundException, "Could not find Part subclass with name {}, please check if this " +
+                                                       "class was not renamed, if that's the case, register its new " +
                                                        "name in the function Part#fixForRenamedClasses", className);
         } catch (Exception ex) {
-            logger.error(ex, "Unexpected error {}", ex.getMessage());
+            LOGGER.error(ex, "Unexpected error {}", ex.getMessage());
         }
 
         return retVal;
@@ -917,7 +1004,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public TargetRoll getAllModsForMaintenance() {
-        // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts
+        // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts,
         // but we will make this user customizable
         final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
@@ -1015,7 +1102,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Sets the the team member who has reserved this part for work they are performing overnight.
+     * Sets the team member who has reserved this part for work they are performing overnight.
      *
      * @param tech The team member.
      */
@@ -1773,7 +1860,7 @@ public abstract class Part implements IPartWork, ITechnology {
             int id = replacementPart.getId();
             replacementPart = campaign.getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
-                logger.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
         }
 
@@ -1781,7 +1868,7 @@ public abstract class Part implements IPartWork, ITechnology {
             int id = parentPart.getId();
             parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
-                logger.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
         }
 
@@ -1792,7 +1879,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    logger.error("Part {} ('{}') references missing child part {}",
+                    LOGGER.error("Part {} ('{}') references missing child part {}",
                           getId(),
                           getName(),
                           childPart.getId());
@@ -1805,14 +1892,14 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                logger.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
             }
         }
         if (reservedBy instanceof PartPersonRef) {
             UUID id = reservedBy.getId();
             reservedBy = campaign.getPerson(id);
             if (reservedBy == null) {
-                logger.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
             }
         }
 
@@ -1820,7 +1907,7 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error("Part {} ('{}') references missing unit (reservation) {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing unit (reservation) {}", getId(), getName(), id);
             }
         }
 
@@ -1828,7 +1915,7 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = refitUnit.getId();
             refitUnit = campaign.getUnit(id);
             if (refitUnit == null) {
-                logger.error("Part {} ('{}') references missing refit unit {}", getId(), getName(), id);
+                LOGGER.error("Part {} ('{}') references missing refit unit {}", getId(), getName(), id);
             }
         }
     }

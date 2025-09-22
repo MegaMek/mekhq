@@ -33,13 +33,13 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
@@ -57,7 +57,7 @@ import mekhq.campaign.parts.PartInventory;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorAmmoBin extends AmmoBin {
-    private static final MMLogger logger = MMLogger.create(BattleArmorAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(BattleArmorAmmoBin.class);
 
     public BattleArmorAmmoBin() {
         this(0, null, -1, 0, false, null);
@@ -145,7 +145,8 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     /**
-     * Requisition ammo for this bin and remove it from the warehouse. Only allow Battle Armor Ammo bins to be loaded in
+     * Requisition ammo for this bin and remove it from the warehouse. Only allow Battle Armor Ammo bins to be loaded
+     * in
      * <code>getNumTroopers()</code> bins at a time.
      *
      * @see #getNumTroopers()
@@ -228,8 +229,8 @@ public class BattleArmorAmmoBin extends AmmoBin {
     protected int calculateShots() {
         int shots = (int) Math.floor(1000 / getType().getKgPerShot());
         if (shots <= 0) {
-            // FIXME: no idea what to do here, these really should be fixed on the MM side
-            // because presumably this is happening because KgperShot is -1 or 0
+            // FIXME: no idea what to do here, these really should be fixed on the MM side because presumably this is
+            //  happening because KgperShot is -1 or 0
             shots = 20;
         }
 
@@ -239,16 +240,6 @@ public class BattleArmorAmmoBin extends AmmoBin {
     @Override
     public String getAcquisitionExtraDesc() {
         return calculateShots() + " shots";
-    }
-
-    @Override
-    public String getAcquisitionBonus() {
-        String bonus = getAllAcquisitionMods().getValueAsString();
-        if (getAllAcquisitionMods().getValue() > -1) {
-            bonus = "+" + bonus;
-        }
-
-        return "(" + bonus + ")";
     }
 
     @Override
@@ -287,13 +278,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
          */
 
         if (type == null) {
-            logger.error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            LOGGER.error("Mounted.restore: could not restore equipment type \"{}\"", typeName);
             return;
         }
         try {
             equipTonnage = type.getTonnage(null);
         } catch (NullPointerException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 }

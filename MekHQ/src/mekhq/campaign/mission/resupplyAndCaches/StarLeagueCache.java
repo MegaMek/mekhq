@@ -32,15 +32,15 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
-import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
-import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
-import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
-import static megamek.common.Mek.LOC_CT;
-import static megamek.common.UnitType.AEROSPACEFIGHTER;
-import static megamek.common.UnitType.INFANTRY;
-import static megamek.common.UnitType.MEK;
-import static megamek.common.UnitType.TANK;
+import static megamek.common.units.EntityWeightClass.WEIGHT_ASSAULT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
+import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
+import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
+import static megamek.common.units.Mek.LOC_CENTER_TORSO;
+import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
+import static megamek.common.units.UnitType.INFANTRY;
+import static megamek.common.units.UnitType.MEK;
+import static megamek.common.units.UnitType.TANK;
 import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
@@ -67,22 +67,22 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -187,7 +187,7 @@ public class StarLeagueCache {
                 List<Part> parts = unit.getParts();
                 for (Part part : parts) {
                     if (part instanceof MekLocation) {
-                        if (((MekLocation) part).getLoc() == LOC_CT) {
+                        if (((MekLocation) part).getLoc() == LOC_CENTER_TORSO) {
                             continue;
                         }
                     }
@@ -202,8 +202,6 @@ public class StarLeagueCache {
                     }
 
                     Pair<Unit, Part> pair = new Pair<>(unit, part);
-                    //                    int weight = getDropWeight(pair.getValue());
-                    //                    partsPool.merge(part, weight, Integer::sum);
                 }
             }
         } catch (Exception exception) {
@@ -276,7 +274,7 @@ public class StarLeagueCache {
     }
 
     private List<MekSummary> getUnitSummaries(Map<Integer, List<Integer>> unitsPresent) {
-        final List<Integer> potentialUnitTypes = List.of(INFANTRY, TANK, MEK, AEROSPACEFIGHTER);
+        final List<Integer> potentialUnitTypes = List.of(INFANTRY, TANK, MEK, AEROSPACE_FIGHTER);
 
         List<MekSummary> unitSummaries = new ArrayList<>();
         for (int unitType : potentialUnitTypes) {
@@ -322,7 +320,7 @@ public class StarLeagueCache {
             case 1 -> INFANTRY;
             case 2, 3 -> TANK;
             case 4, 5 -> MEK;
-            case 6 -> AEROSPACEFIGHTER;
+            case 6 -> AEROSPACE_FIGHTER;
             default -> throw new IllegalStateException("Unexpected value in getCompanyUnitType: "
                                                              + roll);
         };
@@ -406,7 +404,7 @@ public class StarLeagueCache {
                 case WEIGHT_ASSAULT -> new int[] { WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT, WEIGHT_ASSAULT };
                 default -> throw new IllegalStateException("Unexpected weight: " + weight);
             };
-            default -> throw new IllegalStateException("Unexpected value in getlanceWeights(): " + roll);
+            default -> throw new IllegalStateException("Unexpected value in getUnitWeights(): " + roll);
         }
 
         for (int outcome : rollOutcome) {
@@ -416,8 +414,8 @@ public class StarLeagueCache {
         return unitWeights;
     }
 
-    public void createDudDialog(StratconTrackState track, StratconScenario scenario) {
-        StratconCoords stratconCoords = scenario.getCoords();
+    public void createDudDialog(StratConTrackState track, StratConScenario scenario) {
+        StratConCoords stratconCoords = scenario.getCoords();
 
         // Dialog dimensions and representative
         final int DIALOG_WIDTH = 400;
@@ -451,11 +449,6 @@ public class StarLeagueCache {
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
-        //        JLabel description = new JLabel(
-        //            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-        //                UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
-        //        description.setHorizontalAlignment(JLabel.CENTER);
-
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
               String.format(resources.getString("dialogBorderTitle.text"), "PLACEHOLDER")));
@@ -513,11 +506,6 @@ public class StarLeagueCache {
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
-        //        JLabel description = new JLabel(
-        //            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-        //                UIUtil.scaleForGUI(DIALOG_WIDTH), getProposalText(proposal)));
-        //        description.setHorizontalAlignment(JLabel.CENTER);
-
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
               String.format(resources.getString("dialogBorderTitle.text"),
@@ -628,32 +616,6 @@ public class StarLeagueCache {
         double roundedValue = Math.ceil(proposalValue / 1_000_000) * 1_000_000;
         return Money.of(roundedValue);
     }
-
-    //    private String getProposalText(Money proposal) {
-    //        String commanderTitle = getCommanderTitle(campaign, true);
-    //
-    //        return String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"),
-    //            commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"),
-    //            proposal.toAmountAndSymbolString());
-    //    }
-
-    //    private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
-    //        final String DUD_FORWARD = "dud";
-    //        final String DUD_AFTERWARD = ".text";
-    //
-    //        String commanderTitle = getCommanderTitle(campaign, false);
-    //        String gridReference = track.toString() + '-' + stratconCoords.toBTString();
-    //
-    //        int roll = Compute.d6(1);
-    //        if ((roll <= 2) || !(Objects.equals(originFaction.getShortName(), "SL"))) {
-    //            return String.format(resources.getString(DUD_FORWARD + "Generic" +
-    //                Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference,
-    //                originFaction.getFullName(campaign.getGameYear()));
-    //        } else {
-    //            return String.format(resources.getString(DUD_FORWARD + "StarLeague"
-    //                + Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference);
-    //        }
-    //    }
 
     @Nullable
     private ImageIcon getSpeakerIcon(boolean isAnon) {

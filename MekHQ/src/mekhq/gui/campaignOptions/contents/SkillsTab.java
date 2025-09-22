@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2040-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -549,7 +549,7 @@ public class SkillsTab {
     /**
      * Loads skill values into the UI components from the campaign options.
      * <p>
-     * The method populates the spinners, labels, and comboboxes for all skills with their corresponding properties
+     * The method populates the spinners, labels, and combo boxes for all skills with their corresponding properties
      * (e.g., target numbers, costs, and milestones) retrieved from the campaign's configuration.
      * </p>
      *

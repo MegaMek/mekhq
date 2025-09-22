@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 
 /**
  * A comparator for unit types
@@ -44,7 +44,7 @@ import megamek.common.UnitType;
 public class UnitTypeSorter implements Comparator<String> {
     @Override
     public int compare(String compare0, String compare1) {
-        // lets find the weight class integer for each name
+        // let's find the weight class integer for each name
         int sort0 = 0;
         int sort1 = 0;
 

@@ -51,7 +51,7 @@ import mekhq.gui.dialog.helpDialogs.AutoResolveBehaviorSettingsHelpDialog;
 
 public class AutoResolveBehaviorSettingsDialog
       extends BotConfigDialog {
-    private final static MMLogger logger = MMLogger.create(AutoResolveBehaviorSettingsDialog.class);
+    private final static MMLogger LOGGER = MMLogger.create(AutoResolveBehaviorSettingsDialog.class);
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.AutoResolveBehaviorSettingsDialog",
@@ -117,7 +117,7 @@ public class AutoResolveBehaviorSettingsDialog
             // This should never happen, but if it does, it is not a critical error.
             // We set the auto resolve behavior setting, ignore that its description
             // could not be set, log the error and continue.
-            logger.error("Could not set description for auto resolve behavior settings", e);
+            LOGGER.error("Could not set description for auto resolve behavior settings", e);
             campaign.setAutoResolveBehaviorSettings(autoResolveBehaviorSettings);
             return;
         }

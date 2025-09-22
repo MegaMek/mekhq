@@ -76,13 +76,9 @@ public class SystemsTab {
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
-    private JPanel pnlReputationGeneralOptions;
-    private JLabel lblReputation;
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JCheckBox chkResetCriminalRecord;
 
-    private JPanel pnlReputationSanityOptions;
-    private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -91,10 +87,8 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
-    private JLabel lblRegardMultiplier;
     private JSpinner spnRegardMultiplier;
 
-    private JPanel pnlFactionStandingModifiersPanel;
     private JCheckBox chkUseFactionStandingNegotiation;
     private JCheckBox chkUseFactionStandingResupply;
     private JCheckBox chkUseFactionStandingCommandCircuit;
@@ -109,7 +103,6 @@ public class SystemsTab {
     // A Time of War Tab
     private CampaignOptionsHeaderPanel atowHeader;
 
-    private JPanel pnlATOWAttributes;
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
     private JCheckBox chkRandomizeTraits;
@@ -145,8 +138,8 @@ public class SystemsTab {
               10);
 
         // Contents
-        pnlReputationGeneralOptions = createReputationGeneralPanel();
-        pnlReputationSanityOptions = createReputationSanityPanel();
+        JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
+        JPanel pnlReputationSanityOptions = createReputationSanityPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ReputationTab", true);
@@ -179,14 +172,14 @@ public class SystemsTab {
      */
     private JPanel createReputationGeneralPanel() {
         // Contents
-        lblReputation = new CampaignOptionsLabel("Reputation");
+        JLabel lblReputation = new CampaignOptionsLabel("Reputation");
         lblReputation.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
         unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
         unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblReputation.tooltip")));
         unitRatingMethodCombo.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
 
-        lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
+        JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
               "ManualUnitRatingModifier"));
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
@@ -279,12 +272,12 @@ public class SystemsTab {
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
 
-        lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
+        JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
-        pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
+        JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingTab", true);
@@ -417,7 +410,7 @@ public class SystemsTab {
               9);
 
         // Contents
-        pnlATOWAttributes = createATOWAttributesPanel();
+        JPanel pnlATOWAttributes = createATOWAttributesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ATimeOfWarTab", true);

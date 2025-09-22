@@ -40,7 +40,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +50,6 @@ import org.junit.jupiter.api.Test;
  * unit states and verifies the behavior of the {@code checkHanger()} method.
  */
 class UnmaintainedUnitsNagLogicTest {
-    private Hangar hangar;
     private Unit mockUnit1, mockUnit2;
 
     /**
@@ -61,7 +59,7 @@ class UnmaintainedUnitsNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        // Mock objects for the tests
+        //  for the tests
         mockUnit1 = mock(Unit.class);
         mockUnit2 = mock(Unit.class);
     }

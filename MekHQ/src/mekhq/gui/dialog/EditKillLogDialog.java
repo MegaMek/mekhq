@@ -59,9 +59,6 @@ public class EditKillLogDialog extends JDialog {
     private final Campaign campaign;
     private final Person person;
 
-    private EditKillLogControl editKillLogControl;
-    private JButton btnOK;
-
     public EditKillLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
         Objects.requireNonNull(campaign);
@@ -85,10 +82,10 @@ public class EditKillLogDialog extends JDialog {
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
 
-        editKillLogControl = new EditKillLogControl(frame, campaign, person);
+        EditKillLogControl editKillLogControl = new EditKillLogControl(frame, campaign, person);
         getContentPane().add(editKillLogControl, BorderLayout.CENTER);
 
-        btnOK = new JButton();
+        JButton btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(x -> this.setVisible(false));

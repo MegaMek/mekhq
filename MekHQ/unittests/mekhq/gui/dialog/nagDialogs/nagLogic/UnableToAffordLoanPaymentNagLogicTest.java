@@ -54,8 +54,6 @@ import org.junit.jupiter.api.Test;
  * scenarios related to the {@code getTotalPaymentsDue} and {@code isUnableToAffordLoanPayment} methods
  */
 class UnableToAffordLoanPaymentNagLogicTest {
-    // Mock objects for the tests
-    private Campaign campaign;
     private LocalDate today;
     private Finances finances;
     private Loan firstLoan, secondLoan;
@@ -67,7 +65,8 @@ class UnableToAffordLoanPaymentNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        //  for the tests
+        Campaign campaign = mock(Campaign.class);
         today = LocalDate.now();
         finances = mock(Finances.class);
         firstLoan = mock(Loan.class);

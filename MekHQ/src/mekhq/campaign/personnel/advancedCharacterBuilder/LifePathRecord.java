@@ -200,7 +200,6 @@ public record LifePathRecord(UUID id, String source, Version version, String nam
                 LifePathCategory category = LifePathCategory.fromLookupName(rawCategory);
                 if (category == null) {
                     LOGGER.warn("Unknown life path category: {}", rawCategory);
-                    continue;
                 } else {
                     categories.add(category);
                 }

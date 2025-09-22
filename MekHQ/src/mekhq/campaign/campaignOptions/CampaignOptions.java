@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +56,7 @@ import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.autoresolve.AutoResolveMethod;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -79,7 +79,7 @@ import org.w3c.dom.Node;
  * @author natit
  */
 public class CampaignOptions {
-    private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(CampaignOptions.class);
     private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
     // region Magic Numbers
     public static final int TECH_INTRO = 0;
@@ -213,7 +213,7 @@ public class CampaignOptions {
     private boolean variableTechLevel;
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
-    // endregion Tech Limits Tab
+    // endregion Techlimits Tab
 
     // region Personnel Tab
     // General Personnel
@@ -471,7 +471,7 @@ public class CampaignOptions {
     private boolean payForFood;
     private boolean payForHousing;
     private boolean useLoanLimits;
-    private boolean usePercentageMaint; // Unofficial
+    private boolean usePercentageMaintenance; // Unofficial
     private boolean infantryDontCount; // Unofficial
     private boolean usePeacetimeCost;
     private boolean useExtendedPartsModifier;
@@ -561,11 +561,14 @@ public class CampaignOptions {
     private PersonnelMarketStyle personnelMarketStyle;
     private boolean usePersonnelHireHiringHallOnly;
     private boolean personnelMarketReportRefresh;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+
+    @Deprecated(since = "0.50.06")
     private String personnelMarketName;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+
+    @Deprecated(since = "0.50.06")
     private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+
+    @Deprecated(since = "0.50.06")
     private double personnelMarketDylansWeight;
 
     // Unit Market
@@ -617,7 +620,7 @@ public class CampaignOptions {
     private int opForLanceTypeMixed;
     private int opForLanceTypeVehicles;
     private boolean opForUsesVTOLs;
-    private boolean allowOpForAeros;
+    private boolean allowOpForAerospace;
     private int opForAeroChance;
     private boolean allowOpForLocalUnits;
     private int opForLocalUnitChance;
@@ -640,7 +643,7 @@ public class CampaignOptions {
     private boolean autoResolveVictoryChanceEnabled;
     private int autoResolveNumberOfScenarios;
     private boolean autoResolveExperimentalPacarGuiEnabled;
-    private boolean autoGenerateOpForCallsigns;
+    private boolean autoGenerateOpForCallSigns;
     private SkillLevel minimumCallsignSkillLevel;
     // endregion Against the Bot Tab
 
@@ -777,7 +780,7 @@ public class CampaignOptions {
         variableTechLevel = false;
         factionIntroDate = false;
         useAmmoByType = false;
-        // endregion Tech Limits Tab
+        // endregion Techlimits Tab
 
         // region Personnel Tab
         // General Personnel
@@ -1097,7 +1100,7 @@ public class CampaignOptions {
         payForFood = false;
         payForHousing = false;
         useLoanLimits = false;
-        usePercentageMaint = false;
+        usePercentageMaintenance = false;
         infantryDontCount = false;
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
@@ -1262,7 +1265,7 @@ public class CampaignOptions {
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
         setOpForUsesVTOLs(true);
-        setAllowOpForAeros(false);
+        setAllowOpForAerospace(false);
         setOpForAeroChance(5);
         setAllowOpForLocalUnits(false);
         setOpForLocalUnitChance(5);
@@ -1280,7 +1283,7 @@ public class CampaignOptions {
         setScenarioModMax(3);
         setScenarioModChance(25);
         setScenarioModBV(50);
-        autoGenerateOpForCallsigns = true;
+        autoGenerateOpForCallSigns = true;
         minimumCallsignSkillLevel = SkillLevel.VETERAN;
         useFactionStandingNegotiation = true;
         useFactionStandingResupply = true;
@@ -3422,12 +3425,12 @@ public class CampaignOptions {
         this.useLoanLimits = useLoanLimits;
     }
 
-    public boolean isUsePercentageMaint() {
-        return usePercentageMaint;
+    public boolean isUsePercentageMaintenance() {
+        return usePercentageMaintenance;
     }
 
-    public void setUsePercentageMaint(final boolean usePercentageMaint) {
-        this.usePercentageMaint = usePercentageMaint;
+    public void setUsePercentageMaintenance(final boolean usePercentageMaintenance) {
+        this.usePercentageMaintenance = usePercentageMaintenance;
     }
 
     public boolean isInfantryDontCount() {
@@ -4879,12 +4882,12 @@ public class CampaignOptions {
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
     }
 
-    public boolean isAllowOpForAeros() {
-        return allowOpForAeros;
+    public boolean isAllowOpForAerospace() {
+        return allowOpForAerospace;
     }
 
-    public void setAllowOpForAeros(final boolean allowOpForAeros) {
-        this.allowOpForAeros = allowOpForAeros;
+    public void setAllowOpForAerospace(final boolean allowOpForAerospace) {
+        this.allowOpForAerospace = allowOpForAerospace;
     }
 
     public boolean isAllowOpForLocalUnits() {
@@ -4987,7 +4990,7 @@ public class CampaignOptions {
             try {
                 weights[i] = Integer.parseInt(values[i]);
             } catch (Exception ex) {
-                logger.error(ex, "Unknown Exception: migrateMarriageSurnameWeights47");
+                LOGGER.error(ex, "Unknown Exception: migrateMarriageSurnameWeights47");
                 weights[i] = 0;
             }
         }
@@ -5182,8 +5185,7 @@ public class CampaignOptions {
      * Determines if faction standing batchall restriction is enabled.
      *
      * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()}
-     * as
-     * that also verifies that Faction Standing is enabled.</p>
+     * as that also verifies that Faction Standing is enabled.</p>
      *
      * @return {@code true} if faction standing batchall restriction is enabled, {@code false} otherwise.
      */
@@ -5357,12 +5359,12 @@ public class CampaignOptions {
         this.regardMultiplier = regardMultiplier;
     }
 
-    public boolean isAutoGenerateOpForCallsigns() {
-        return autoGenerateOpForCallsigns;
+    public boolean isAutoGenerateOpForCallSigns() {
+        return autoGenerateOpForCallSigns;
     }
 
-    public void setAutoGenerateOpForCallsigns(boolean autoGenerateOpForCallsigns) {
-        this.autoGenerateOpForCallsigns = autoGenerateOpForCallsigns;
+    public void setAutoGenerateOpForCallSigns(boolean autoGenerateOpForCallSigns) {
+        this.autoGenerateOpForCallSigns = autoGenerateOpForCallSigns;
     }
 
     public SkillLevel getMinimumCallsignSkillLevel() {
@@ -5395,7 +5397,7 @@ public class CampaignOptions {
         useImplants = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
         useQuirks = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
         allowCanonOnly = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
-        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECHLEVEL).stringValue());
+        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECH_LEVEL).stringValue());
     }
 
     /**
@@ -5422,6 +5424,6 @@ public class CampaignOptions {
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
 
-        gameOptions.getOption(ALLOWED_TECHLEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
+        gameOptions.getOption(ALLOWED_TECH_LEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
     }
 }

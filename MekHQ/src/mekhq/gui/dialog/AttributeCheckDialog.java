@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
@@ -211,7 +211,7 @@ public class AttributeCheckDialog {
 
 
     /**
-     * Displays the results of the Attribute check in a results dialog.
+     * Displays the results of the Attribute check in a results' dialog.
      *
      * @param results the results text to display
      *

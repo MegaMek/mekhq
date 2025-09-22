@@ -35,16 +35,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingFireControlSystem;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -104,8 +106,6 @@ public class FireControlSystem extends Part {
             }
             if (isSalvaging()) {
                 time *= 10;
-            } else if (hits == 1) {
-                time *= 1;
             } else if (hits == 2) {
                 time *= 2;
             }
@@ -163,13 +163,13 @@ public class FireControlSystem extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -205,9 +205,9 @@ public class FireControlSystem extends Part {
     public void calculateCost() {
         if (null != unit) {
             if (unit.getEntity() instanceof SmallCraft) {
-                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcsWithGuns());
             } else if (unit.getEntity() instanceof Jumpship) {
-                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcsWithGuns());
             }
         }
     }

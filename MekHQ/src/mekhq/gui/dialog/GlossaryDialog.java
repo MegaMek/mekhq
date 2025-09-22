@@ -68,9 +68,9 @@ public class GlossaryDialog extends JDialog {
 
     private final JDialog parent;
 
-    private int CENTER_WIDTH = UIUtil.scaleForGUI(800);
-    private int CENTER_HEIGHT = UIUtil.scaleForGUI(400);
-    private int PADDING = UIUtil.scaleForGUI(10);
+    private final int CENTER_WIDTH = UIUtil.scaleForGUI(800);
+    private final int CENTER_HEIGHT = UIUtil.scaleForGUI(400);
+    private final int PADDING = UIUtil.scaleForGUI(10);
 
     private final String GLOSSARY_BUNDLE = "mekhq.resources.Glossary";
 
@@ -203,17 +203,7 @@ public class GlossaryDialog extends JDialog {
         setTitle(title);
 
         // Create a JEditorPane for the message
-        JEditorPane editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setFocusable(false);
-        editorPane.setBorder(BorderFactory.createEmptyBorder());
-
-        // Use inline CSS to set font family, size, and other style properties
-        String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<div style='width: %s; %s'>" +
-                                               "<h1 style='text-align: center;'>%s</h1>" +
-                                               "%s</div>", CENTER_WIDTH, fontStyle, title, description));
+        JEditorPane editorPane = getEditorPane(title, description);
         setFontScaling(editorPane, false, 1.1);
         editorPane.addHyperlinkListener(e -> {
             if (e.getEventType() == EventType.ACTIVATED) {
@@ -245,9 +235,7 @@ public class GlossaryDialog extends JDialog {
         // Create a panel for the image and editorPane
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
-        if (imageIcon != null) {
-            contentPanel.add(imageLabel, BorderLayout.NORTH);
-        }
+        contentPanel.add(imageLabel, BorderLayout.NORTH);
         contentPanel.add(scrollPaneContainer, BorderLayout.CENTER);
 
         add(contentPanel, BorderLayout.NORTH);
@@ -271,6 +259,21 @@ public class GlossaryDialog extends JDialog {
         setLocationRelativeTo(null);
         setModal(true);
         setVisible(true);
+    }
+
+    private JEditorPane getEditorPane(String title, String description) {
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setFocusable(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
+
+        // Use inline CSS to set font family, size, and other style properties
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s'>" +
+                                               "<h1 style='text-align: center;'>%s</h1>" +
+                                               "%s</div>", CENTER_WIDTH, fontStyle, title, description));
+        return editorPane;
     }
 
     /**

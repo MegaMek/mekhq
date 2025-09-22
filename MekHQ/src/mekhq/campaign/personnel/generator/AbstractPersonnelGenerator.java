@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 
 import java.time.LocalDate;
 import java.util.Objects;

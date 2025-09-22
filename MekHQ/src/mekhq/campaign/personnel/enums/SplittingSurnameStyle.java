@@ -147,9 +147,10 @@ public enum SplittingSurnameStyle {
             case WEIGHTED:
             default:
                 MMLogger.create(SplittingSurnameStyle.class)
-                      .error(String.format(
-                            "Splitting Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
-                            surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
+                      .error("Splitting Surname Style {} is not defined, and cannot be used for \"{}\" and \"{}\"",
+                            surnameStyle.name(),
+                            origin.getFullName(),
+                            spouse.getFullName());
                 break;
         }
     }

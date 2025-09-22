@@ -35,7 +35,9 @@ package mekhq.campaign.unit;
 
 import java.util.HashMap;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.*;
 import mekhq.campaign.Hangar;
 
 /**
@@ -43,8 +45,8 @@ import mekhq.campaign.Hangar;
  */
 public class HangarStatistics {
     private final Hangar hangar;
-    private long LIGHT_VEHICLE_BIT = 1L << 62;
-    private long SUPER_HEAVY_BIT = 1L << 63;
+    private final long LIGHT_VEHICLE_BIT = 1L << 62;
+    private final long SUPER_HEAVY_BIT = 1L << 63;
 
     public HangarStatistics(Hangar hangar) {
         this.hangar = hangar;
@@ -65,9 +67,6 @@ public class HangarStatistics {
     /**
      * Tally all used bay types and return a hashmap of ETYPE : Count
      *
-     * @param inTransit
-     *
-     * @return
      */
     public HashMap<Long, Integer> tallyBaysByType(boolean inTransit) {
         HashMap<Long, Integer> hashMap = new HashMap<>();
@@ -99,7 +98,8 @@ public class HangarStatistics {
             } else if (en instanceof ConvFighter) {
                 hashMap.put(Entity.ETYPE_CONV_FIGHTER, hashMap.getOrDefault(Entity.ETYPE_CONV_FIGHTER, 0) + 1);
             } else if (en instanceof AeroSpaceFighter) {
-                hashMap.put(Entity.ETYPE_AEROSPACEFIGHTER, hashMap.getOrDefault(Entity.ETYPE_AEROSPACEFIGHTER, 0) + 1);
+                hashMap.put(Entity.ETYPE_AEROSPACE_FIGHTER,
+                      hashMap.getOrDefault(Entity.ETYPE_AEROSPACE_FIGHTER, 0) + 1);
             } else if ((en instanceof Infantry) && !(en instanceof BattleArmor)) {
                 hashMap.put(Entity.ETYPE_INFANTRY, hashMap.getOrDefault(Entity.ETYPE_INFANTRY, 0) + 1);
             } else if (en instanceof BattleArmor) {
@@ -146,7 +146,7 @@ public class HangarStatistics {
         }
 
         // Okay to do an equality check here because this is the hash key, not the entity's ETYPE value.
-        if (type == Entity.ETYPE_AEROSPACEFIGHTER) {
+        if (type == Entity.ETYPE_AEROSPACE_FIGHTER) {
             return Math.min(getTotalASFBays(), num);
         }
 

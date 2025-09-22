@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -69,8 +70,6 @@ public class EditInjuryEntryDialog extends JDialog {
 
     private Injury injury;
 
-    private JButton btnClose;
-    private JButton btnOK;
     private JTextArea txtDays;
     private JComboBox<BodyLocationChoice> ddLocation;
     private JComboBox<InjuryTypeChoice> ddType;
@@ -79,11 +78,7 @@ public class EditInjuryEntryDialog extends JDialog {
     private JComboBox<String> ddPermanent;
     private JComboBox<String> ddWorkedOn;
     private JComboBox<String> ddExtended;
-    private JPanel panBtn;
-    private JPanel panMain;
 
-    private BodyLocationChoice[] locations;
-    private InjuryTypeChoice[] types;
     private FilterableComboBoxModel<InjuryTypeChoice> ddTypeModel;
 
     public EditInjuryEntryDialog(final JFrame frame, final boolean modal, final Injury injury) {
@@ -97,7 +92,7 @@ public class EditInjuryEntryDialog extends JDialog {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
-        locations = new BodyLocationChoice[BodyLocation.values().length];
+        BodyLocationChoice[] locations = new BodyLocationChoice[BodyLocation.values().length];
         int i = 0;
         for (BodyLocation loc : BodyLocation.values()) {
             locations[i] = new BodyLocationChoice(loc);
@@ -112,7 +107,10 @@ public class EditInjuryEntryDialog extends JDialog {
             }
         }
 
-        types = InjuryType.getAllTypes().stream().map(InjuryTypeChoice::new).toArray(InjuryTypeChoice[]::new);
+        InjuryTypeChoice[] types = InjuryType.getAllTypes()
+                                         .stream()
+                                         .map(InjuryTypeChoice::new)
+                                         .toArray(InjuryTypeChoice[]::new);
 
         ddType = new JComboBox<>(types);
         ddTypeModel = new FilterableComboBoxModel<>(ddType.getModel());
@@ -136,10 +134,10 @@ public class EditInjuryEntryDialog extends JDialog {
         ddPermanent = new JComboBox<>(tf);
         ddWorkedOn = new JComboBox<>(tf);
         ddExtended = new JComboBox<>(tf);
-        btnOK = new JButton();
-        btnClose = new JButton();
-        panBtn = new JPanel();
-        panMain = new JPanel();
+        JButton btnOK = new JButton();
+        JButton btnClose = new JButton();
+        JPanel panBtn = new JPanel();
+        JPanel panMain = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -357,6 +355,7 @@ public class EditInjuryEntryDialog extends JDialog {
     private record BodyLocationChoice(BodyLocation loc) {
 
         @Override
+        @Nonnull
         public String toString() {
             return loc.locationName();
         }
@@ -365,6 +364,7 @@ public class EditInjuryEntryDialog extends JDialog {
     private record InjuryTypeChoice(InjuryType type) {
 
         @Override
+        @Nonnull
         public String toString() {
             return type.getName(BodyLocation.GENERIC, 1);
         }

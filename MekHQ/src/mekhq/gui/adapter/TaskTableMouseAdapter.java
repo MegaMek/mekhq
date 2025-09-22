@@ -41,11 +41,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartModeChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartModeChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -56,9 +56,9 @@ import mekhq.gui.model.TaskTableModel;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
-    private CampaignGUI gui;
-    private JTable taskTable;
-    private TaskTableModel taskModel;
+    private final CampaignGUI gui;
+    private final JTable taskTable;
+    private final TaskTableModel taskModel;
     //endregion Variable Declaration
 
     //region Constructors

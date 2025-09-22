@@ -46,9 +46,9 @@ import java.util.stream.Stream;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartNewEvent;
+import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -58,7 +58,7 @@ import mekhq.utilities.MHQXMLUtility;
  * Stores parts for a Campaign.
  */
 public class Warehouse {
-    private static final MMLogger logger = MMLogger.create(Warehouse.class);
+    private static final MMLogger LOGGER = MMLogger.create(Warehouse.class);
 
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
 
@@ -160,7 +160,7 @@ public class Warehouse {
      *
      * @param part The part to remove.
      *
-     * @return A value indicating whether or not the part was removed.
+     * @return A value indicating whether the part was removed.
      */
     public boolean removePart(Part part) {
         Objects.requireNonNull(part);
@@ -193,7 +193,7 @@ public class Warehouse {
      * @param part     The part to remove.
      * @param quantity The amount of the part to remove.
      *
-     * @return A value indicating whether or not the part was removed.
+     * @return A value indicating whether the part was removed.
      */
     public boolean removePart(Part part, int quantity) {
         Objects.requireNonNull(part);
@@ -212,9 +212,8 @@ public class Warehouse {
         if (quantity >= part.getQuantity()) {
             removePart(part);
         } else {
-            while (quantity > 0) {
-                part.decrementQuantity();
-                quantity--;
+            if (quantity > 0) {
+                part.changeQuantity(quantity);
             }
 
             MekHQ.triggerEvent(new PartChangedEvent(part));
@@ -284,7 +283,7 @@ public class Warehouse {
      */
     public @Nullable Part checkForExistingSparePart(Part part) {
         if (part == null) {
-            logger.error(new NullPointerException("Part is null"), "checkForExistingSparePart(Part): Part is null");
+            LOGGER.error(new NullPointerException("Part is null"), "checkForExistingSparePart(Part): Part is null");
             return null;
         }
 
@@ -316,7 +315,7 @@ public class Warehouse {
      */
     public @Nullable Part checkForExistingSparePart(Part part, boolean includeNewnessCheck) {
         if (part == null) {
-            logger.error(new NullPointerException("Part is null"),
+            LOGGER.error(new NullPointerException("Part is null"),
                   "checkForExistingSparePart(Part, boolean): Part is null");
             return null;
         }

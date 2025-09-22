@@ -98,21 +98,15 @@ public enum FinancialYearDuration {
     // endregion Boolean Comparison Methods
 
     public boolean isEndOfFinancialYear(final LocalDate today) {
-        switch (this) {
-            case SEMIANNUAL:
-                return (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
-            case BIENNIAL:
-                return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
-            case QUINQUENNIAL:
-                return (today.getDayOfYear() == 1) && (today.getYear() % 5 == 0);
-            case DECENNIAL:
-                return (today.getDayOfYear() == 1) && (today.getYear() % 10 == 0);
-            case FOREVER:
-                return false;
-            case ANNUAL:
-            default:
-                return today.getDayOfYear() == 1;
-        }
+        return switch (this) {
+            case SEMIANNUAL ->
+                  (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
+            case BIENNIAL -> (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
+            case QUINQUENNIAL -> (today.getDayOfYear() == 1) && (today.getYear() % 5 == 0);
+            case DECENNIAL -> (today.getDayOfYear() == 1) && (today.getYear() % 10 == 0);
+            case FOREVER -> false;
+            default -> today.getDayOfYear() == 1;
+        };
     }
 
     /**
@@ -125,33 +119,28 @@ public enum FinancialYearDuration {
      */
     public String getExportFilenameDateString(final LocalDate tomorrow) {
         final int year = tomorrow.getYear() - 1;
-        switch (this) {
-            case SEMIANNUAL:
+        return switch (this) {
+            case SEMIANNUAL -> {
                 final boolean isStartOfYear = tomorrow.getDayOfYear() == 1;
-                return isStartOfYear ?
-                             String.format("%d %s - %s",
-                                   year,
-                                   Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                                         .replaceAll("[.]", ""),
-                                   Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                                         .replaceAll("[.]", "")) :
-                             String.format("%d %s - %s",
-                                   year + 1,
-                                   Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                                         .replaceAll("[.]", ""),
-                                   Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                                         .replaceAll("[.]", ""));
-            case BIENNIAL:
-                return String.format("%d - %d", year - 1, year);
-            case QUINQUENNIAL:
-                return String.format("%d - %d", year - 4, year);
-            case DECENNIAL:
-                return String.format("%d - %d", year - 9, year);
-            case FOREVER:
-            case ANNUAL:
-            default:
-                return Integer.toString(year);
-        }
+                yield isStartOfYear ?
+                            String.format("%d %s - %s",
+                                  year,
+                                  Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                        .replaceAll("[.]", ""),
+                                  Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                        .replaceAll("[.]", "")) :
+                            String.format("%d %s - %s",
+                                  year + 1,
+                                  Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                        .replaceAll("[.]", ""),
+                                  Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                        .replaceAll("[.]", ""));
+            }
+            case BIENNIAL -> String.format("%d - %d", year - 1, year);
+            case QUINQUENNIAL -> String.format("%d - %d", year - 4, year);
+            case DECENNIAL -> String.format("%d - %d", year - 9, year);
+            default -> Integer.toString(year);
+        };
     }
 
     /**
@@ -166,9 +155,9 @@ public enum FinancialYearDuration {
     public static FinancialYearDuration parseFromString(final String text) {
         try {
             return valueOf(text);
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
             MMLogger.create(FinancialYearDuration.class)
-                  .error(ignored, "Unable to parse {} into a FinancialYearDuration. Returning ANNUAL.", text);
+                  .error(ex, "Unable to parse {} into a FinancialYearDuration. Returning ANNUAL.", text);
             return ANNUAL;
 
         }

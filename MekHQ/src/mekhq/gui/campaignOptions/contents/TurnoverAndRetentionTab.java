@@ -144,8 +144,6 @@ public class TurnoverAndRetentionTab {
     private JSpinner spnManagementSkillPenalty;
     //end Turnover Tab
 
-    //start Fatigue Tab
-    private CampaignOptionsHeaderPanel fatigueHeader;
     private JCheckBox chkUseFatigue;
     private JLabel lblFatigueRate;
     private JSpinner spnFatigueRate;
@@ -270,7 +268,8 @@ public class TurnoverAndRetentionTab {
      */
     public JPanel createFatigueTab() {
         // Header
-        fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
+        //start Fatigue Tab
+        CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
               getImageDirectory() + "logo_clan_mongoose.png",
               true, true, 7);
 

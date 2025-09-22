@@ -41,7 +41,7 @@ import megamek.common.util.fileUtils.ImageFileFactory;
 import megamek.common.util.fileUtils.ItemFile;
 
 /**
- * FIXME : I am a bandaid that allows award pngs to be loaded despite having features not supported by Java.
+ * FIXME : I am a band aid that allows award pngs to be loaded despite having features not supported by Java.
  * FIXME : I should be removed when that is fixed.
  */
 public class AwardFileFactory extends ImageFileFactory {

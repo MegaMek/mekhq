@@ -56,7 +56,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
+ * This class is responsible to control the awards. It loads one instance of each award, then it creates a copy of it
  * once it needs to be awarded to someone.
  *
  * @author Miguel Azevedo
@@ -69,7 +69,7 @@ public class AwardsFactory {
     /**
      * Here is where the blueprints are stored, mapped by set and name.
      */
-    private Map<String, Map<String, Award>> awardsMap;
+    private final Map<String, Map<String, Award>> awardsMap;
 
     private AwardsFactory() {
         awardsMap = new HashMap<>();

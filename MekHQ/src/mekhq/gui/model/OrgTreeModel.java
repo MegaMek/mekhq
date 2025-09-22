@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,9 +42,9 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
 public class OrgTreeModel implements TreeModel {
-    private Force rootForce;
-    private Vector<TreeModelListener> listeners = new Vector<>();
-    private Campaign campaign;
+    private final Force rootForce;
+    private final Vector<TreeModelListener> listeners = new Vector<>();
+    private final Campaign campaign;
 
     public OrgTreeModel(Campaign c) {
         campaign = c;

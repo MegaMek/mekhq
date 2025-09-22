@@ -32,8 +32,8 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import static mekhq.campaign.stratcon.StratconCampaignState.getStratconScenarioFromAtBScenario;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import static mekhq.campaign.stratCon.StratConCampaignState.getStratConScenarioFromAtBScenario;
+import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -44,8 +44,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 
 public class OutstandingScenariosNagLogic {
     final static String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
@@ -99,7 +99,7 @@ public class OutstandingScenariosNagLogic {
                 }
 
                 if (scenario.getHasTrack()) {
-                    StratconScenario stratconScenario = getStratconScenarioFromAtBScenario(campaign, scenario);
+                    StratConScenario stratconScenario = getStratConScenarioFromAtBScenario(campaign, scenario);
 
                     if (stratconScenario != null) {
                         // Skip if the scenario is unresolved
@@ -124,7 +124,7 @@ public class OutstandingScenariosNagLogic {
                             addendum = ""; // No additional label if neither condition is true
                         }
 
-                        StratconTrackState track = stratconScenario.getTrackForScenario(campaign, null);
+                        StratConTrackState track = stratconScenario.getTrackForScenario(campaign, null);
 
                         // Append formatted unresolved scenario information
                         activeScenarios.append(getFormattedTextAt(RESOURCE_BUNDLE,

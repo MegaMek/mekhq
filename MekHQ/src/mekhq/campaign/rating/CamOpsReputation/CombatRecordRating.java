@@ -47,7 +47,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 
 public class CombatRecordRating {
-    private static final MMLogger logger = MMLogger.create(CombatRecordRating.class);
+    private static final MMLogger LOGGER = MMLogger.create(CombatRecordRating.class);
 
     /**
      * Calculates the combat record rating for the provided campaign.
@@ -135,7 +135,7 @@ public class CombatRecordRating {
         combatRecord.put("total", combatRecordRating);
 
         // post a log to aid debugging
-        logger.debug("Combat Record Rating = {}",
+        LOGGER.debug("Combat Record Rating = {}",
               combatRecord.keySet().stream()
                     .map(key -> String.format("%s: %d", key, combatRecord.get(key)))
                     .collect(Collectors.joining("\n")));

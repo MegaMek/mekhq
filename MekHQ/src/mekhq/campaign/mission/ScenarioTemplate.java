@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -58,8 +58,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 
 /**
@@ -69,11 +67,10 @@ import org.w3c.dom.Node;
  */
 @XmlRootElement(name = "ScenarioTemplate")
 public class ScenarioTemplate implements Cloneable {
-    private static final MMLogger logger = MMLogger.create(ScenarioTemplate.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioTemplate.class);
 
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
-    private static final Logger log = LogManager.getLogger(ScenarioTemplate.class);
 
     public String name;
     @XmlElement(name = "stratConScenarioType")
@@ -132,9 +129,7 @@ public class ScenarioTemplate implements Cloneable {
             template.scenarioForces.put(sft.getForceName(), sft.clone());
         }
 
-        for (String mod : scenarioModifiers) {
-            template.scenarioModifiers.add(mod);
-        }
+        template.scenarioModifiers.addAll(scenarioModifiers);
 
         for (ScenarioObjective obj : scenarioObjectives) {
             template.scenarioObjectives.add(new ScenarioObjective(obj));
@@ -153,7 +148,7 @@ public class ScenarioTemplate implements Cloneable {
         try {
             this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            logger.error("Invalid ScenarioType: " + scenarioType, e);
+            LOGGER.error(e, "Invalid ScenarioType: {}", scenarioType);
             this.stratConScenarioType = ScenarioType.NONE;
         }
     }
@@ -168,7 +163,7 @@ public class ScenarioTemplate implements Cloneable {
     }
 
     public List<ScenarioForceTemplate> getAllScenarioForces() {
-        return scenarioForces.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(scenarioForces.values());
     }
 
     @XmlElementWrapper(name = "scenarioForces")
@@ -277,7 +272,7 @@ public class ScenarioTemplate implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -296,7 +291,7 @@ public class ScenarioTemplate implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -310,7 +305,7 @@ public class ScenarioTemplate implements Cloneable {
     public static ScenarioTemplate Deserialize(String filePath) {
         File inputFile = new File(filePath);
         if (!inputFile.exists()) {
-            logger.error(String.format("Cannot deserialize file %s, does not exist", filePath));
+            LOGGER.error("Cannot deserialize file {}, does not exist", filePath);
             return null;
         }
 
@@ -336,7 +331,7 @@ public class ScenarioTemplate implements Cloneable {
                 resultingTemplate = templateElement.getValue();
             }
         } catch (Exception e) {
-            logger.error("Error Deserializing Scenario Template", e);
+            LOGGER.error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;
@@ -358,7 +353,7 @@ public class ScenarioTemplate implements Cloneable {
             JAXBElement<ScenarioTemplate> templateElement = unmarshaller.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch (Exception e) {
-            logger.error("Error Deserializing Scenario Template", e);
+            LOGGER.error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;
@@ -370,7 +365,7 @@ public class ScenarioTemplate implements Cloneable {
             try {
                 return ScenarioType.valueOf(value.trim().toUpperCase());
             } catch (IllegalArgumentException iae) {
-                MMLogger.create(ScenarioTypeAdapter.class).error("Error Invalid ScenarioType in XML: " + value);
+                MMLogger.create(ScenarioTypeAdapter.class).error("Error Invalid ScenarioType in XML: {}", value);
                 return ScenarioType.NONE; // Default for invalid values
             }
         }

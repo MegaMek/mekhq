@@ -54,9 +54,9 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
-import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -86,7 +86,7 @@ import mekhq.gui.view.ContractSummaryPanel;
  * @author Neoancient
  */
 public class ContractMarketDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(ContractMarketDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(ContractMarketDialog.class);
 
     /* Save these settings between instantiations */
     private static boolean payMRBC = true;
@@ -145,7 +145,7 @@ public class ContractMarketDialog extends JDialog {
      *
      * @param campaign the campaign to check retainer contracts for
      *
-     * @return the number of available retainer contracts
+     * @return the list of available retainer contracts
      */
     private static List<String> getPossibleRetainerContracts(Campaign campaign) {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
@@ -196,7 +196,7 @@ public class ContractMarketDialog extends JDialog {
         JPanel panelTable = new JPanel();
         JPanel panelFees = new JPanel();
         JPanel panelRetainer = new JPanel();
-        JPanel panelOKBtns = new JPanel();
+        JPanel panelOKButtons = new JPanel();
         contractView = null;
         JButton btnGenerate = new JButton();
         JButton btnRemove = new JButton();
@@ -474,7 +474,7 @@ public class ContractMarketDialog extends JDialog {
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
 
-        panelOKBtns.setLayout(new GridBagLayout());
+        panelOKButtons.setLayout(new GridBagLayout());
 
         btnGenerate.setText(resourceMap.getString("btnGenerate.text"));
         btnGenerate.setName("btnGenerate");
@@ -515,7 +515,7 @@ public class ContractMarketDialog extends JDialog {
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
         btnGenerate.setEnabled(campaign.isGM());
-        panelOKBtns.add(btnGenerate, new GridBagConstraints());
+        panelOKButtons.add(btnGenerate, new GridBagConstraints());
 
         btnRemove.setText(resourceMap.getString("btnRemove.text"));
         btnRemove.setName("btnRemove");
@@ -527,19 +527,19 @@ public class ContractMarketDialog extends JDialog {
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(
                   tableContracts.getSelectedRow()));
         });
-        panelOKBtns.add(btnRemove, new GridBagConstraints());
+        panelOKButtons.add(btnRemove, new GridBagConstraints());
 
         btnAccept.setText(resourceMap.getString("btnAccept.text"));
         btnAccept.setName("btnAccept");
         btnAccept.addActionListener(this::acceptContract);
-        panelOKBtns.add(btnAccept, new GridBagConstraints());
+        panelOKButtons.add(btnAccept, new GridBagConstraints());
 
         btnClose.setText(resourceMap.getString("btnClose.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        panelOKBtns.add(btnClose, new GridBagConstraints());
+        panelOKButtons.add(btnClose, new GridBagConstraints());
 
-        getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
+        getContentPane().add(panelOKButtons, BorderLayout.PAGE_END);
 
         pack();
     }
@@ -569,7 +569,7 @@ public class ContractMarketDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

@@ -38,8 +38,8 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
-import megamek.common.Entity;
-import megamek.common.MiscType;
+import megamek.common.units.Entity;
+import megamek.common.equipment.MiscType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscMounted;
 import mekhq.campaign.Campaign;

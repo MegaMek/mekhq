@@ -48,7 +48,7 @@ import megamek.logging.MMLogger;
 
 /** Static method only helper class for stars */
 public final class StarUtil {
-    private static final MMLogger logger = MMLogger.create(StarUtil.class);
+    private static final MMLogger LOGGER = MMLogger.create(StarUtil.class);
 
     // A bunch of important astronomical constants
     /**
@@ -175,7 +175,7 @@ public final class StarUtil {
           StarType.SPECTRAL_F, StarType.SPECTRAL_F, StarType.SPECTRAL_F,
           StarType.SPECTRAL_F, StarType.SPECTRAL_F, StarType.SPECTRAL_F };
 
-    private static final int[] LIFEFRIENDLY_SPECTRAL_TYPE = new int[] {
+    private static final int[] LIFE_FRIENDLY_SPECTRAL_TYPE = new int[] {
           StarType.SPECTRAL_M, StarType.SPECTRAL_M, StarType.SPECTRAL_M,
           StarType.SPECTRAL_K, StarType.SPECTRAL_K,
           StarType.SPECTRAL_G, StarType.SPECTRAL_G, StarType.SPECTRAL_F,
@@ -359,12 +359,12 @@ public final class StarUtil {
                 }
                 planetIconDataLoaded = true;
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
 
         if (!PLANET_ICON_DATA.containsKey(ObjectUtility.nonNull(planet.getIcon(), "default"))) {
-            logger.error("no planet icon " + planet.getIcon());
+            LOGGER.error("no planet icon {}", planet.getIcon());
         }
         return PLANET_ICON_DATA.get(ObjectUtility.nonNull(planet.getIcon(), "default"));
     }
@@ -386,7 +386,7 @@ public final class StarUtil {
                 }
                 starIconDataLoaded = true;
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
         return STAR_ICON_DATA.get(ObjectUtility.nonNull(system.getIcon(), "default"));
@@ -448,7 +448,7 @@ public final class StarUtil {
         try {
             spectralSubClass = Integer.parseInt(spectralType.replaceAll("\\D", ""));
         } catch (NumberFormatException e) {
-            logger.info("Failed to fetch spectralSubClass from spectralType: " + spectralType);
+            LOGGER.info("Failed to fetch spectralSubClass from spectralType: {}", spectralType);
         }
 
         return spectralClass + spectralSubClass;

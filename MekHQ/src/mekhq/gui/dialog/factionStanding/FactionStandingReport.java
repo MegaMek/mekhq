@@ -63,8 +63,8 @@ import javax.swing.border.Border;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
-import megamek.utilities.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -587,7 +587,7 @@ public class FactionStandingReport extends JDialog {
      * @param faction       the faction object
      * @param factionRegard the regard value for this faction
      *
-     * @return a HTML string for displaying faction details, standing, and description
+     * @return an HTML string for displaying faction details, standing, and description
      *
      * @author Illiani
      * @since 0.50.07

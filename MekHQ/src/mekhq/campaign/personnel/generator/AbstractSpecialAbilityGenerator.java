@@ -44,7 +44,7 @@ import mekhq.campaign.personnel.skills.SkillType;
  */
 public abstract class AbstractSpecialAbilityGenerator {
 
-    private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
+    private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
 
     /**
      * Gets the {@link RandomSkillPreferences}.
@@ -52,7 +52,7 @@ public abstract class AbstractSpecialAbilityGenerator {
      * @return The {@link RandomSkillPreferences} to use.
      */
     public RandomSkillPreferences getSkillPreferences() {
-        return rskillPrefs;
+        return randomSkillPreferences;
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class AbstractSpecialAbilityGenerator {
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
-        rskillPrefs = Objects.requireNonNull(skillPreferences);
+        randomSkillPreferences = Objects.requireNonNull(skillPreferences);
     }
 
     /**
@@ -71,7 +71,7 @@ public abstract class AbstractSpecialAbilityGenerator {
      * @param person   The {@link Person} to add special abilities.
      * @param expLvl   The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
      *
-     * @return A value indicating whether or not a special ability was assigned.
+     * @return A value indicating whether a special ability was assigned.
      */
     public abstract boolean generateSpecialAbilities(Campaign campaign, Person person, int expLvl);
 }

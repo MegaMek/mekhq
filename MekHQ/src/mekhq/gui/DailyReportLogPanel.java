@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.utilities.FastJScrollPane;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.Utilities;
 
 /**
@@ -109,7 +109,7 @@ public class DailyReportLogPanel extends JPanel {
 
         logPanel.setViewportView(getTxtLog());
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
-        logPanel.setBorder(new EmptyBorder(2,5,2,2));
+        logPanel.setBorder(new EmptyBorder(2, 5, 2, 2));
         add(logPanel, BorderLayout.CENTER);
     }
     //endregion Initialization

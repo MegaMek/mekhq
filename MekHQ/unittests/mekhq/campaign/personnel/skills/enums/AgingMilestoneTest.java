@@ -53,7 +53,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class AgingMilestoneTest {
-    private static LocalDate today = LocalDate.of(3150, 1, 1);
+    private static final LocalDate today = LocalDate.of(3150, 1, 1);
     private static Campaign mockCampaign;
 
     @BeforeAll

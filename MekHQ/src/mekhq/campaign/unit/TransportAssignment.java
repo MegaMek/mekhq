@@ -34,23 +34,23 @@ package mekhq.campaign.unit;
 
 import java.util.Optional;
 
-import megamek.common.Bay;
-import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.Bay;
+import megamek.common.equipment.Transporter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
 /**
- * Represents an assignment on a transport. Currently only used by TACTICAL_TRANSPORT but this could be used by other
+ * Represents an assignment on transport. Currently only used by TACTICAL_TRANSPORT but this could be used by other
  * transport types.
  *
  * @see TacticalTransportedUnitsSummary
  * @see CampaignTransportType#TACTICAL_TRANSPORT
  */
 public class TransportAssignment implements ITransportAssignment {
-    protected final MMLogger logger = MMLogger.create(this.getClass());
+    protected final static MMLogger LOGGER = MMLogger.create(TransportAssignment.class);
 
     Unit transport;
     Transporter transportedLocation;
@@ -88,7 +88,6 @@ public class TransportAssignment implements ITransportAssignment {
     /**
      * The transport that is assigned
      *
-     * @return
      */
     @Override
     public Unit getTransport() {
@@ -104,12 +103,10 @@ public class TransportAssignment implements ITransportAssignment {
      * Change the transport assignment to have a new transport
      *
      * @param newTransport transport, or null if none
-     *
-     * @return true if a unit was provided, false if it was null
      */
-    protected boolean setTransport(Unit newTransport) {
+    protected void setTransport(Unit newTransport) {
         this.transport = newTransport;
-        return hasTransport();
+        hasTransport();
     }
 
     @Override
@@ -122,9 +119,9 @@ public class TransportAssignment implements ITransportAssignment {
         return transporterType != null;
     }
 
-    protected boolean setTransporterType(TransporterType transporterType) {
+    protected void setTransporterType(TransporterType transporterType) {
         this.transporterType = transporterType;
-        return hasTransporterType();
+        hasTransporterType();
     }
 
     @Override
@@ -144,12 +141,9 @@ public class TransportAssignment implements ITransportAssignment {
 
     /**
      * Set where this unit should be transported
-     *
-     * @return true if a location was provided, false if it was null
      */
-    protected boolean setTransportedLocation(@Nullable Transporter transportedLocation) {
+    protected void setTransportedLocation(@Nullable Transporter transportedLocation) {
         this.transportedLocation = transportedLocation;
-        return hasTransportedLocation();
     }
 
     /**
@@ -171,7 +165,7 @@ public class TransportAssignment implements ITransportAssignment {
      * @param campaign Campaign we need to fix references for
      * @param unit     the unit that needs references fixed
      *
-     * @see Unit#fixReferences(Campaign campaign)
+     * @see Unit#fixReferences(Campaign)
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
@@ -185,15 +179,17 @@ public class TransportAssignment implements ITransportAssignment {
                     setTransport(transport);
                 } else {
                     setTransport(transport);
-                    logger.warn(
-                          String.format("Unit %s ('%s') is missing a transportedLocation " +
-                                              "and transporterType for tactical transport %s",
-                                unit.getId(), unit.getName(), getTransport().getId()));
+                    LOGGER.warn("Unit {} ('{}') is missing a transportedLocation " +
+                                      "and transporterType for tactical transport {}",
+                          unit.getId(),
+                          unit.getName(),
+                          getTransport().getId());
                 }
             } else {
-                logger.error(
-                      String.format("Unit %s ('%s') references missing transport %s",
-                            unit.getId(), unit.getName(), getTransport().getId()));
+                LOGGER.error("Unit {} ('{}') references missing transport {}",
+                      unit.getId(),
+                      unit.getName(),
+                      getTransport().getId());
 
                 unit.setTacticalTransportAssignment(null);
             }

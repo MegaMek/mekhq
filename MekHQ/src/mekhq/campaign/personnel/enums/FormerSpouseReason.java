@@ -87,7 +87,7 @@ public enum FormerSpouseReason {
         }
 
         MMLogger.create(FormerSpouseReason.class)
-              .error("Unable to parse " + text + " into a FormerSpouseReason. Returning WIDOWED.");
+              .error("Unable to parse {} into a FormerSpouseReason. Returning WIDOWED.", text);
         return WIDOWED;
     }
     // endregion File I/O

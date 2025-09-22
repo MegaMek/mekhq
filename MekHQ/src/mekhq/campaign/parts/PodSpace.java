@@ -37,18 +37,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.Mek;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
+import megamek.common.units.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -83,7 +84,8 @@ public class PodSpace implements IPartWork {
         this.unit = unit;
         if (unit != null) {
             this.campaign = unit.getCampaign();
-            //We don't need a LOC_WINGS podspace, but we do need one for the fuselage equipment, which is stored at LOC_NONE.
+            //We don't need a LOC_WINGS Pod space, but we do need one for the fuselage equipment, which is stored at
+            // LOC_NONE.
             if ((unit.getEntity() instanceof Aero) && (location == Aero.LOC_WINGS)) {
                 this.location = -1;
             }
@@ -545,7 +547,7 @@ public class PodSpace implements IPartWork {
     }
 
     /**
-     * This is the value of the part that may be affected by characteristics and campaign options (Note: Pod Space, an
+     * This is the value of the part that may be affected by characteristics and campaign options Note: Pod Space, an
      * abstraction, does not have value or price.
      *
      * @return the part's actual value
@@ -557,7 +559,7 @@ public class PodSpace implements IPartWork {
 
     /**
      * This is the value of the part that may be affected by characteristics and campaign options but which ignores
-     * damage (Note: Pod Space, an abstraction, does not have value or price.
+     * damage Note: Pod Space, an abstraction, does not have value or price.
      *
      * @return the part's actual value
      */

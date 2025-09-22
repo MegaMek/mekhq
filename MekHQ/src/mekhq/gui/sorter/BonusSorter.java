@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,7 +42,7 @@ import megamek.logging.MMLogger;
  * @author Jay Lawson
  */
 public class BonusSorter implements Comparator<String> {
-    private static final MMLogger logger = MMLogger.create(BonusSorter.class);
+    private static final MMLogger LOGGER = MMLogger.create(BonusSorter.class);
 
     @Override
     public int compare(String s0, String s1) {
@@ -57,7 +57,7 @@ public class BonusSorter implements Comparator<String> {
                 try {
                     t0 = temp[0].contains("-") ? 0 : Integer.parseInt(temp[0]);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                     t0 = 0;
                 }
 
@@ -65,7 +65,7 @@ public class BonusSorter implements Comparator<String> {
                 try {
                     t1 = temp[1].contains("-") ? 0 : Integer.parseInt(temp[1]);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                     t1 = 0;
                 }
                 i0 = t0 + t1;
@@ -74,7 +74,7 @@ public class BonusSorter implements Comparator<String> {
             try {
                 i0 = s0.equals("-") ? 90 : Integer.parseInt(s0);
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
                 i0 = 90;
             }
         }
@@ -88,7 +88,7 @@ public class BonusSorter implements Comparator<String> {
                 try {
                     t0 = temp[0].contains("-") ? 0 : Integer.parseInt(temp[0]);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                     t0 = 0;
                 }
 
@@ -96,7 +96,7 @@ public class BonusSorter implements Comparator<String> {
                 try {
                     t1 = temp[1].contains("-") ? 0 : Integer.parseInt(temp[1]);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                     t1 = 0;
                 }
                 i1 = t0 + t1;
@@ -105,7 +105,7 @@ public class BonusSorter implements Comparator<String> {
             try {
                 i1 = s1.equals("-") ? 90 : Integer.parseInt(s1);
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
                 i1 = 90;
             }
         }

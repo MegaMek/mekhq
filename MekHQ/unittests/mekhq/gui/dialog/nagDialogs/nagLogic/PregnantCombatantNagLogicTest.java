@@ -44,7 +44,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -57,9 +56,6 @@ import org.junit.jupiter.api.Test;
  * related to the {@code isPregnantCombatant} method
  */
 class PregnantCombatantNagLogicTest {
-    // Mock objects for the tests
-    private Campaign campaign;
-    private Mission mission;
     private Person personNotPregnant;
     private Person personPregnant;
     private Unit unit;
@@ -71,7 +67,8 @@ class PregnantCombatantNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        //  for the tests
+        Campaign campaign = mock(Campaign.class);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);

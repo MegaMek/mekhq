@@ -161,10 +161,9 @@ public class FactionStandingSlider extends JSlider {
         int y = getHeight() / 2;
         int handleWidth = HANDLE_WIDTH;
         int handleTop = y - HANDLE_HEIGHT / 2;
-        int arc = handleWidth;
 
         graphics2D.setColor(SLIDER_GRAY);
-        graphics2D.fillRoundRect(x, handleTop, handleWidth, HANDLE_HEIGHT, arc, arc);
+        graphics2D.fillRoundRect(x, handleTop, handleWidth, HANDLE_HEIGHT, handleWidth, handleWidth);
 
         JLabel htmlLabel = new JLabel(label);
         htmlLabel.setForeground(SLIDER_GRAY);

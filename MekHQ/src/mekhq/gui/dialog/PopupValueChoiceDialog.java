@@ -59,13 +59,13 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     // Variable Declarations
     private JButton btnDone;
     private JSpinner value;
-    private SpinnerNumberModel model;
+    private final SpinnerNumberModel model;
 
     /**
      * This was originally set up as a text entry dialog, but there is really no reason to use it instead of the pre-fab
-     * inputdialog that comes with java and it was actually causing problems because it uses a textpane instead of a
-     * textfield. Since it is currently only called by the set xp command in MekHQView, I am going to refactor it into a
-     * numeric value setter using a spinner.
+     * input dialog that comes with java, and it was actually causing problems because it uses a text pane instead of a
+     * text field. Since it is currently only called by the set xp command in MekHQView, I am going to refactor it into
+     * a numeric value setter using a spinner.
      */
     public PopupValueChoiceDialog(final JFrame frame, final boolean modal, final String title,
           final int current, final int min) {

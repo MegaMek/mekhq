@@ -34,8 +34,8 @@ package mekhq.utilities;
 
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.UnitType;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;

@@ -103,7 +103,7 @@ public class ReplacementLimbDialog {
      *
      * <p>The behavior of the button creation is determined by the following conditions:</p>
      * <ul>
-     *     <li>If sufficient funds are unavailable, or if there is no qualified doctor and it is not planetside,
+     *     <li>If sufficient funds are unavailable, or if there is no qualified doctor, and it is not planetside,
      *         only an "Understood" button is created.</li>
      *     <li>Otherwise, both "Decline" and "Accept" buttons are created.</li>
      * </ul>

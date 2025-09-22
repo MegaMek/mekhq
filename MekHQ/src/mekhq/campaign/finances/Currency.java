@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,19 +41,19 @@ import org.joda.money.CurrencyUnit;
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class Currency {
-    private CurrencyUnit wrapped;
+    private final CurrencyUnit wrapped;
 
     private String code; // COMES FROM CURRENCIES.XML
     private int decimalCode; // COMES FROM CURRENCIES.XML
     private int decimalPlaces; // COMES FROM CURRENCIES.XML
 
-    private String name; // COMES FROM CURRENCIES.XML
-    private String symbol; // COMES FROM CURRENCIES.XML
-    private boolean isDefault; // COMES FROM CURRENCIES.XML
-    private boolean isBackup; // COMES FROM CURRENCIES.XML
+    private final String name; // COMES FROM CURRENCIES.XML
+    private final String symbol; // COMES FROM CURRENCIES.XML
+    private final boolean isDefault; // COMES FROM CURRENCIES.XML
+    private final boolean isBackup; // COMES FROM CURRENCIES.XML
 
-    private int startYear; // COMES FROM FACTIONS.XML
-    private int endYear; // COMES FROM FACTIONS.XML
+    private final int startYear; // COMES FROM FACTIONS.XML
+    private final int endYear; // COMES FROM FACTIONS.XML
 
     public Currency(String code, int numericCurrencyCode, int decimalPlaces, String name,
           String symbol, int startYear, int endYear, boolean isDefault,

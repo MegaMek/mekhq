@@ -57,7 +57,20 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.ProcurementEvent;
+import mekhq.campaign.events.ReportEvent;
+import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.assets.AssetEvent;
+import mekhq.campaign.events.loans.LoanEvent;
+import mekhq.campaign.events.missions.MissionEvent;
+import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.scenarios.ScenarioEvent;
+import mekhq.campaign.events.transactions.TransactionEvent;
+import mekhq.campaign.events.units.UnitEvent;
+import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
@@ -93,7 +106,6 @@ import mekhq.utilities.ReportingUtilities;
  * Collates important information about the campaign and displays it, along with some actionable buttons
  */
 public final class CommandCenterTab extends CampaignGuiTab {
-    private JPanel panCommand;
 
     // basic info panel
     private JPanel panInfo;
@@ -101,7 +113,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblRating;
     private JLabel lblExperience;
     private JLabel lblPersonnel;
-    private JLabel lblMorale;
     private JLabel lblHRCapacity;
     private JLabel lblMissionSuccess;
     private JLabel lblComposition;
@@ -120,13 +131,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // procurement table
     private JPanel panProcurement;
     private JTable procurementTable;
-    private JPanel panTotalCost;
     private JLabel procurementTotalCostLabel;
     private ProcurementTableModel procurementModel;
-    private RoundedJButton btnGetUnit;
-    private RoundedJButton btnGetParts;
-    private RoundedJButton btnNeededParts;
-    private RoundedJButton btnPartsReport;
     private RoundedJButton btnPauseProcurement;
     private RoundedJButton btnResumeProcurement;
     private RoundedJButton btnMRMSDialog;
@@ -135,10 +141,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // available reports
     private JPanel panReports;
     private RoundedJButton btnUnitRating;
-    private RoundedJButton btnFactionStanding;
 
-    //icon panel
-    private JPanel panIcon;
     private JLabel lblIcon;
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
@@ -164,14 +167,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        panCommand = new JPanel(new GridBagLayout());
+        JPanel panCommand = new JPanel(new GridBagLayout());
 
         initInfoPanel();
         initLogPanel();
         initReportsPanel();
         initProcurementPanel();
         initObjectivesPanel();
-        panIcon = new JPanel(new BorderLayout());
+        //icon panel
+        JPanel panIcon = new JPanel(new BorderLayout());
         lblIcon = new JLabel();
         lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
         panIcon.add(lblIcon, BorderLayout.CENTER);
@@ -267,11 +271,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         } else {
             // This seems to be overwritten completely and immediately by refresh
-            StringBuilder experienceString = new StringBuilder(64);
-            experienceString.append("<html><b>")
-                  .append(SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
-                  .append("</b></html>");
-            lblExperience.setText(experienceString.toString());
+            String experienceString = "<html><b>" +
+                                            SkillType.getColoredExperienceLevelName(getCampaign().getReputation()
+                                                                                          .getAverageSkillLevel()) +
+                                            "</b></html>";
+            lblExperience.setText(experienceString);
         }
 
         lblExperienceHead.setLabelFor(lblExperience);
@@ -387,7 +391,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(1, 5, 1, 5);
@@ -436,13 +440,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
         JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1, 0, 5));
         panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
 
-        btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
+        RoundedJButton btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
         btnNeededParts.addActionListener(evt -> new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(
               true));
         panProcurementButtons.add(btnNeededParts);
 
-        btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
+        RoundedJButton btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
@@ -466,7 +470,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurementButtons.add(btnResumeProcurement);
         /* shopping table */
         procurementTotalCostLabel = new JLabel();
-        refreshProcurmentTotalCost();
+        refreshProcurementTotalCost();
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
         procurementTable.getAccessibleContext().setAccessibleName("Pending Procurements");
@@ -501,7 +505,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.incrementItem(procurementTable.convertRowIndexToModel(row));
                     }
                 }
-                refreshProcurmentTotalCost();
+                refreshProcurementTotalCost();
             }
         });
 
@@ -517,7 +521,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.decrementItem(row);
                     }
                 }
-                refreshProcurmentTotalCost();
+                refreshProcurementTotalCost();
             }
         });
 
@@ -585,7 +589,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
         panReports.add(btnUnitRating);
 
-        btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
+        RoundedJButton btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
         btnFactionStanding.addActionListener(evt -> {
             FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
                   getCampaign());
@@ -634,11 +638,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             campaign.getUnitRating().reInitialize();
             lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
         } else if (unitRatingMethod.isCampaignOperations()) {
-            StringBuilder experienceString = new StringBuilder(64);
-            experienceString.append("<html><b>")
-                  .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
-                  .append("</b></html>");
-            lblExperience.setText(experienceString.toString());
+            String experienceString = "<html><b>" +
+                                            SkillType.getColoredExperienceLevelName(campaign.getReputation()
+                                                                                          .getAverageSkillLevel()) +
+                                            "</b></html>";
+            lblExperience.setText(experienceString);
         }
 
         campaignSummary.updateInformation();
@@ -743,13 +747,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void refreshProcurementList() {
         procurementModel.setData(getCampaign().getShoppingList().getShoppingList());
-        refreshProcurmentTotalCost();
+        refreshProcurementTotalCost();
     }
 
     /**
      * refresh the total cost of procurement
      */
-    private void refreshProcurmentTotalCost() {
+    private void refreshProcurementTotalCost() {
 
         String formatString, totalCostString;
         Money totalCost, funds;
@@ -782,9 +786,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panLog.appendLog(getCampaign().fetchAndClearNewReports());
     }
 
-    private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
-    private ActionScheduler basicInfoScheduler = new ActionScheduler(this::refreshBasicInfo);
-    private ActionScheduler objectivesScheduler = new ActionScheduler(this::refreshObjectives);
+    private final ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
+    private final ActionScheduler basicInfoScheduler = new ActionScheduler(this::refreshBasicInfo);
+    private final ActionScheduler objectivesScheduler = new ActionScheduler(this::refreshObjectives);
 
     @Subscribe
     public void handle(UnitRefitEvent ev) {

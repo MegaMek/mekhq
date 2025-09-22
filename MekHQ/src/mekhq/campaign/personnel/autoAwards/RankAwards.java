@@ -43,7 +43,7 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 
 public class RankAwards {
-    private static final MMLogger logger = MMLogger.create(RankAwards.class);
+    private static final MMLogger LOGGER = MMLogger.create(RankAwards.class);
 
     // region Enum Declarations
     enum RankAwardsEnums {
@@ -80,7 +80,7 @@ public class RankAwards {
             try {
                 requiredRankNumeric = award.getQty();
             } catch (Exception e) {
-                logger.warn("Award {} from the {} set has an invalid qty value {}",
+                LOGGER.warn("Award {} from the {} set has an invalid qty value {}",
                       award.getName(),
                       award.getSet(),
                       award.getQty());
@@ -99,7 +99,7 @@ public class RankAwards {
             }
 
             if (!matchFound) {
-                logger.warn("Award {} from the {} set has the invalid range {}",
+                LOGGER.warn("Award {} from the {} set has the invalid range {}",
                       award.getName(),
                       award.getSet(),
                       award.getRange());

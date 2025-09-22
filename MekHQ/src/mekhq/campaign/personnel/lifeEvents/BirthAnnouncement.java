@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.lifeEvents;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.FEMALE;
 import static megamek.common.enums.Gender.MALE;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
@@ -62,7 +62,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * event, incorporating campaign context and personalized pronoun and title handling for both parent and child.</p>
  */
 public class BirthAnnouncement {
-    private static String RESOURCE_BUNDLE = "mekhq.resources.BirthAnnouncement";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.BirthAnnouncement";
 
     private final Campaign campaign;
     private final Person parent;
@@ -165,7 +165,7 @@ public class BirthAnnouncement {
         // {15} Baby Weight
         // {16} Baby Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
-        // {17} Faction Lance-Level label (lance, star, etc)
+        // {17} Faction Lance-Level label (lance, star, etc.)
         // {18} Baby Count
         return getFormattedTextAt(RESOURCE_BUNDLE,
               resourceKey,
