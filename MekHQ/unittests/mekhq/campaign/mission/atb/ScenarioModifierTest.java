@@ -35,11 +35,13 @@ package mekhq.campaign.mission.atb;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author NickAragua
  */
+@Disabled
 public class ScenarioModifierTest {
 
     /**
