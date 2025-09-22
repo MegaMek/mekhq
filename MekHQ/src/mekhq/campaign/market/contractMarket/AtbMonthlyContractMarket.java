@@ -289,11 +289,15 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 int retries = MAXIMUM_GENERATION_RETRIES;
                 AtBContract contract = null;
                 while ((retries > 0) && (contract == null)) {
+                    Faction employer = RandomFactionGenerator.getInstance().getEmployerFaction();
+                    if (employer == null) {
+                        retries--;
+                        continue;
+                    }
+
+                    String employerCode = employer.getShortName();
                     // Send only 1 retry down because we're handling retries in our loop
-                    contract = generateAtBContract(campaign,
-                          RandomFactionGenerator.getInstance().getEmployerFaction().getShortName(),
-                          unitRatingMod,
-                          1);
+                    contract = generateAtBContract(campaign, employerCode, unitRatingMod, 1);
 
                     // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
                     // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
