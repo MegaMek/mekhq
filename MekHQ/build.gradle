@@ -480,6 +480,12 @@ run {
 }
 
 test {
+    jvmArgs '-Dsentry.dsn=""'
+    testLogging {
+        showStandardStreams = true
+        exceptionFormat "full"
+    }
+
     useJUnitPlatform()
     dependsOn(checkstyleMain)
 
