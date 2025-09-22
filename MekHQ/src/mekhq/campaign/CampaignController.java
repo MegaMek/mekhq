@@ -92,5 +92,6 @@ public class CampaignController {
      * Advances the local {@link Campaign} to the next day.
      */
     public void advanceDay() {
+        getLocalCampaign().newDay();
     }
 }

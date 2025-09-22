@@ -691,6 +691,82 @@ public abstract class Part implements IPartWork, ITechnology {
             // case "OldClassName" -> NewClassName.class.getSimpleName();
             case "VeeStabiliser" -> VeeStabilizer.class.getSimpleName();
             case "MissingVeeStabiliser" -> MissingVeeStabilizer.class.getSimpleName();
+            // <50.07 compatibility handlers
+            case "mekhq.campaign.parts.MekLocation" -> "mekhq.campaign.parts.meks.MekLocation";
+            case "mekhq.campaign.parts.MekGyro" -> "mekhq.campaign.parts.meks.MekGyro";
+            case "mekhq.campaign.parts.MekLifeSupport" -> "mekhq.campaign.parts.meks.MekLifeSupport";
+            case "mekhq.campaign.parts.MekSensor" -> "mekhq.campaign.parts.meks.MekSensor";
+            case "mekhq.campaign.parts.MekActuator" -> "mekhq.campaign.parts.meks.MekActuator";
+            case "mekhq.campaign.parts.MekCockpit" -> "mekhq.campaign.parts.meks.MekCockpit";
+            case "mekhq.campaign.parts.KfBoom" -> "mekhq.campaign.parts.kfs.KFBoom";
+            case "mekhq.campaign.parts.KFChargingSystem" -> "mekhq.campaign.parts.kfs.KFChargingSystem";
+            case "mekhq.campaign.parts.KFDriveCoil" -> "mekhq.campaign.parts.kfs.KFDriveCoil";
+            case "mekhq.campaign.parts.KFDriveController" -> "mekhq.campaign.parts.kfs.KFDriveController";
+            case "mekhq.campaign.parts.KFFieldInitiator" -> "mekhq.campaign.parts.kfs.KFFieldInitiator";
+            case "mekhq.campaign.parts.KFHeliumTank" -> "mekhq.campaign.parts.kfs.KFHeliumTank";
+            case "mekhq.campaign.parts.ProtoMekArmActuator" -> "mekhq.campaign.parts.protomeks.ProtoMekArmActuator";
+            case "mekhq.campaign.parts.ProtoMekArmor" -> "mekhq.campaign.parts.protomeks.ProtoMekArmor";
+            case "mekhq.campaign.parts.ProtoMekJumpJet" -> "mekhq.campaign.parts.protomeks.ProtoMekJumpJet";
+            case "mekhq.campaign.parts.ProtoMekLegActuator" -> "mekhq.campaign.parts.protomeks.ProtoMekLegActuator";
+            case "mekhq.campaign.parts.ProtoMekLocation" -> "mekhq.campaign.parts.protomeks.ProtoMekLocation";
+            case "mekhq.campaign.parts.ProtoMekSensor" -> "mekhq.campaign.parts.protomeks.ProtoMekSensor";
+
+            case "mekhq.campaign.parts.MissingAeroHeatSink" -> "mekhq.campaign.parts.missing.MissingAeroHeatSink";
+            case "mekhq.campaign.parts.MissingAeroLifeSupport" -> "mekhq.campaign.parts.missing.MissingAeroLifeSupport";
+            case "mekhq.campaign.parts.MissingAeroSensor" -> "mekhq.campaign.parts.missing.MissingAeroSensor";
+            case "mekhq.campaign.parts.MissingAvionics" -> "mekhq.campaign.parts.missing.MissingAvionics";
+            case "mekhq.campaign.parts.MissingBattleArmorSuit" -> "mekhq.campaign.parts.missing.MissingBattleArmorSuit";
+            case "mekhq.campaign.parts.MissingBayDoor" -> "mekhq.campaign.parts.missing.MissingBayDoor";
+            case "mekhq.campaign.parts.MissingCIC" -> "mekhq.campaign.parts.missing.MissingCIC";
+            case "mekhq.campaign.parts.MissingCubicle" -> "mekhq.campaign.parts.missing.MissingCubicle";
+            case "mekhq.campaign.parts.MissingDropshipDockingCollar" ->
+                  "mekhq.campaign.parts.missing.MissingDropshipDockingCollar";
+            case "mekhq.campaign.parts.MissingEnginePart" -> "mekhq.campaign.parts.missing.MissingEnginePart";
+            case "mekhq.campaign.parts.MissingFireControlSystem" ->
+                  "mekhq.campaign.parts.missing.MissingFireControlSystem";
+            case "mekhq.campaign.parts.MissingGravDeck" -> "mekhq.campaign.parts.missing.MissingGravDeck";
+            case "mekhq.campaign.parts.MissingInfantryArmorPart" ->
+                  "mekhq.campaign.parts.missing.MissingInfantryArmorPart";
+            case "mekhq.campaign.parts.MissingInfantryMotiveType" ->
+                  "mekhq.campaign.parts.missing.MissingInfantryMotiveType";
+            case "mekhq.campaign.parts.MissingJumpshipDockingCollar" ->
+                  "mekhq.campaign.parts.missing.MissingJumpshipDockingCollar";
+            case "mekhq.campaign.parts.MissingKFBoom" -> "mekhq.campaign.parts.missing.MissingKFBoom";
+            case "mekhq.campaign.parts.MissingKFChargingSystem" ->
+                  "mekhq.campaign.parts.missing.MissingKFChargingSystem";
+            case "mekhq.campaign.parts.MissingKFDriveCoil" -> "mekhq.campaign.parts.missing.MissingKFDriveCoil";
+            case "mekhq.campaign.parts.MissingKFDriveController" ->
+                  "mekhq.campaign.parts.missing.MissingKFDriveController";
+            case "mekhq.campaign.parts.MissingKFFieldInitiator" ->
+                  "mekhq.campaign.parts.missing.MissingKFFieldInitiator";
+            case "mekhq.campaign.parts.MissingKFHeliumTank" -> "mekhq.campaign.parts.missing.MissingKFHeliumTank";
+            case "mekhq.campaign.parts.MissingLandingGear" -> "mekhq.campaign.parts.missing.MissingLandingGear";
+            case "mekhq.campaign.parts.MissingLFBattery" -> "mekhq.campaign.parts.missing.MissingLFBattery";
+            case "mekhq.campaign.parts.MissingMekActuator" -> "mekhq.campaign.parts.missing.MissingMekActuator";
+            case "mekhq.campaign.parts.MissingMekCockpit" -> "mekhq.campaign.parts.missing.MissingMekCockpit";
+            case "mekhq.campaign.parts.MissingMekGyro" -> "mekhq.campaign.parts.missing.MissingMekGyro";
+            case "mekhq.campaign.parts.MissingMekLifeSupport" -> "mekhq.campaign.parts.missing.MissingMekLifeSupport";
+            case "mekhq.campaign.parts.MissingMekLocation" -> "mekhq.campaign.parts.missing.MissingMekLocation";
+            case "mekhq.campaign.parts.MissingMekSensor" -> "mekhq.campaign.parts.missing.MissingMekSensor";
+            case "mekhq.campaign.parts.MissingOmniPod" -> "mekhq.campaign.parts.missing.MissingOmniPod";
+            case "mekhq.campaign.parts.MissingPart" -> "mekhq.campaign.parts.missing.MissingPart";
+            case "mekhq.campaign.parts.MissingProtoMekArmActuator" ->
+                  "mekhq.campaign.parts.missing.MissingProtoMekArmActuator";
+            case "mekhq.campaign.parts.MissingProtoMekJumpJet" -> "mekhq.campaign.parts.missing.MissingProtoMekJumpJet";
+            case "mekhq.campaign.parts.MissingProtoMekLegActuator" ->
+                  "mekhq.campaign.parts.missing.MissingProtoMekLegActuator";
+            case "mekhq.campaign.parts.MissingProtoMekLocation" ->
+                  "mekhq.campaign.parts.missing.MissingProtoMekLocation";
+            case "mekhq.campaign.parts.MissingProtoMekSensor" -> "mekhq.campaign.parts.missing.MissingProtoMekSensor";
+            case "mekhq.campaign.parts.MissingQuadVeeGear" -> "mekhq.campaign.parts.missing.MissingQuadVeeGear";
+            case "mekhq.campaign.parts.MissingRotor" -> "mekhq.campaign.parts.missing.MissingRotor";
+            case "mekhq.campaign.parts.MissingSpacecraftEngine" ->
+                  "mekhq.campaign.parts.missing.MissingSpacecraftEngine";
+            case "mekhq.campaign.parts.MissingSVEngine" -> "mekhq.campaign.parts.missing.MissingSVEngine";
+            case "mekhq.campaign.parts.MissingThrusters" -> "mekhq.campaign.parts.missing.MissingThrusters";
+            case "mekhq.campaign.parts.MissingTurret" -> "mekhq.campaign.parts.missing.MissingTurret";
+            case "mekhq.campaign.parts.MissingVeeSensor" -> "mekhq.campaign.parts.missing.MissingVeeSensor";
+            case "mekhq.campaign.parts.MissingVeeStabilizer" -> "mekhq.campaign.parts.missing.MissingVeeStabilizer";
             default -> className;
         };
     }
