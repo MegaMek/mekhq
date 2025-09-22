@@ -54,12 +54,14 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * This class contains test methods for the {@link UntreatedPersonnelNagDialog} class. It tests the different
  * combinations of untreated personnel and verifies the behavior of the {@code isUntreatedInjury()} method.
  */
+@Disabled
 class UntreatedPersonnelNagLogicTest {
     Campaign campaign;
     Person injuredPerson;

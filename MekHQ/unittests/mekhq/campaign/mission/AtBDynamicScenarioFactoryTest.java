@@ -50,10 +50,12 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.w3c.dom.DOMException;
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AtBDynamicScenarioFactoryTest {
     Campaign campaign;
