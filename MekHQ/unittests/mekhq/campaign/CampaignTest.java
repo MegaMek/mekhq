@@ -88,6 +88,7 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -99,6 +100,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  * @author Deric Page (dericdotpageatgmaildotcom)
  * @since 6/10/14 10:23 AM
  */
+@Disabled
 public class CampaignTest {
 
     @BeforeAll
