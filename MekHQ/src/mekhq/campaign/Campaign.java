@@ -502,93 +502,83 @@ public class Campaign implements ITechManager {
 
     private final IAutosaveService autosaveService;
 
-    public Campaign() {
-        this(Systems.getInstance());
-    }
+    public Campaign(Game game,
+          Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
+          Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
+          CurrentLocation startLocation, ReputationController reputationController,
+          FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
+          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
+          RetirementDefectionTracker retDefTracker, AutosaveService autosave,
+          BehaviorSettings behaviorSettings,
+          PersonnelMarket persMarket, AtbMonthlyContractMarket atbMonthlyContractMarket,
+          DisabledUnitMarket disabledUnitMarket,
+          DisabledRandomDivorce disabledRandomDivorce, DisabledRandomMarriage disabledRandomMarriage,
+          DisabledRandomProcreation disabledRandomProcreation) {
 
-    public Campaign(Systems systems) {
-        this(systems.getInstance().getSystems().get("Galatea"));
-    }
-
-    public Campaign(PlanetarySystem startSystem) {
+        // Essential state
         id = UUID.randomUUID();
-        game = new Game();
-        player = new Player(0, "self");
-        game.addPlayer(0, player);
-        currentDay = LocalDate.ofYearDay(3067, 1);
+        this.game = game;
+        this.player = player;
+        this.game.addPlayer(0, this.player);
+        this.name = name;
+        currentDay = date;
         campaignStartDate = null;
-        campaignOptions = new CampaignOptions();
-        try {
-            setFaction(Factions.getInstance().getDefaultFaction());
-        } catch (Exception ex) {
-            LOGGER.error("Unable to set faction to default faction. If this wasn't during automated testing this must" +
-                               " be investigated.", ex);
-            setFaction(new Faction());
-        }
-        techFaction = megamek.common.enums.Faction.MERC;
-        CurrencyManager.getInstance().setCampaign(this);
-        try {
-            location = new CurrentLocation(startSystem, 0);
-        } catch (Exception ex) {
-            String message = String.format(
-                  "Unable to set location to {}. If this wasn't during automated testing this must be investigated.",
-                  startSystem
-            );
-            LOGGER.error("Unable to set location to default galatea system. If this wasn't during automated testing " +
-                               "this must be investigated.", ex);
-            PlanetarySystem fallbackSystem = new PlanetarySystem("Galatea");
-            location = new CurrentLocation(fallbackSystem, 0);
-        }
+        campaignOptions = campaignOpts;
+        this.gameOptions = gameOptions;
+        game.setOptions(gameOptions);
+        this.techFaction = techFaction;
+        location = startLocation;
+        reputation = reputationController;
+        this.factionStandings = factionStandings;
+        forces = force;
+        forceIds.put(0, forces);
+        this.finances = finances;
+        randomEventLibraries = randomEvents;
+        factionStandingUltimatumsLibrary = ultimatums;
+        retirementDefectionTracker = retDefTracker;
+        autosaveService = autosave;
+        autoResolveBehaviorSettings = behaviorSettings;
+
+
+        // Members that take `this` as an argument (XXX: refactor to allow lazy linking)
+        partsStore = new PartsStore(this);
+        newPersonnelMarket = new NewPersonnelMarket(this);
+        randomDeath = new RandomDeath(this);
+        campaignSummary = new CampaignSummary(this);
+        quartermaster = new Quartermaster(this);
+
+        // Primary init, sets state from passed values
+        setFaction(faction);
+        setRankSystemDirect(rankSystem);
+        setPersonnelMarket(persMarket);
+        setContractMarket(atbMonthlyContractMarket);
+        setUnitMarket(disabledUnitMarket);
+        setDivorce(disabledRandomDivorce);
+        setMarriage(disabledRandomMarriage);
+        setProcreation(disabledRandomProcreation);
+
+        // Starting config / default values
+        shoppingList = new ShoppingList();
         isAvoidingEmptySystems = true;
         isOverridingCommandCircuitRequirements = false;
-        currentReport = new ArrayList<>();
-        currentReportHTML = "";
-        newReports = new ArrayList<>();
-        name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputation = new ReputationController();
-        factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
         initiativeBonus = 0;
         initiativeMaxBonus = 1;
-        setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
-        forces = new Force(name);
-        forceIds.put(0, forces);
         combatTeams = new Hashtable<>();
-        finances = new Finances();
         asTechPool = 0;
         medicPool = 0;
-        resetAsTechMinutes();
-        partsStore = new PartsStore(this);
-        gameOptions = new GameOptions();
-        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
-        game.setOptions(gameOptions);
         customs = new ArrayList<>();
-        shoppingList = new ShoppingList();
-        newPersonnelMarket = new NewPersonnelMarket(this);
-        news = new News(getGameYear(), id.getLeastSignificantBits());
-        setPersonnelMarket(new PersonnelMarket());
-        setContractMarket(new AtbMonthlyContractMarket());
-        setUnitMarket(new DisabledUnitMarket());
-        randomDeath = new RandomDeath(this);
-        setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
-        setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
-        setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         personnelWhoAdvancedInXP = new ArrayList<>();
-        retirementDefectionTracker = new RetirementDefectionTracker();
         turnoverRetirementInformation = new ArrayList<>();
         atbConfig = null;
-        autosaveService = new AutosaveService();
         hasActiveContract = false;
-        campaignSummary = new CampaignSummary(this);
-        quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -596,20 +586,15 @@ public class Campaign implements ITechManager {
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
-        // Library initialization
-        try {
-            randomEventLibraries = new RandomEventLibraries();
-        } catch (Exception ex) {
-            LOGGER.error("Unable to initialize RandomEventLibraries. If this wasn't during automated testing this " +
-                               "must be investigated.", ex);
-        }
+        // Reports
+        currentReport = new ArrayList<>();
+        currentReportHTML = "";
+        newReports = new ArrayList<>();
 
-        try {
-            factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
-        } catch (Exception ex) {
-            LOGGER.error("Unable to initialize FactionStandingUltimatumsLibrary. If this wasn't during automated " +
-                               "testing this must be investigated.", ex);
-        }
+        // Secondary initialization from passed / derived values
+        news = new News(getGameYear(), id.getLeastSignificantBits());
+        resetAsTechMinutes();
+        currencyManager.setCampaign(this);
     }
 
     /**

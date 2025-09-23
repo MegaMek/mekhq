@@ -231,7 +231,7 @@ public class ResolverTest {
     }
 
     Campaign createCampaign() {
-        var campaign = new Campaign();
+        var campaign = createCampaign();
         campaign.setName("Test Player");
         var reputationController = mock(ReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);

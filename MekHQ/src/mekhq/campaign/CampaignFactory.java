@@ -35,21 +35,54 @@ package mekhq.campaign;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.zip.GZIPInputStream;
 
 import megamek.Version;
+import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.bot.princess.BehaviorSettingsFactory;
+import megamek.common.Player;
 import megamek.common.annotations.Nullable;
+import megamek.common.game.Game;
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
+import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.CampaignHasProblemOnLoad;
+import mekhq.service.AutosaveService;
+
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 
 /**
  * Defines a factory API that enables {@link Campaign} instances to be created from its detected format.
  */
 public class CampaignFactory {
+    private static final MMLogger LOGGER = MMLogger.create(CampaignFactory.class);
     private MekHQ app;
 
     public enum CampaignProblemType {
@@ -118,6 +151,100 @@ public class CampaignFactory {
         Campaign campaign = parser.parse();
 
         return checkForLoadProblems(campaign);
+    }
+
+    public static @Nullable Campaign createCampaign() {
+        Campaign campaign = null;
+
+        Game game = new Game();
+        Systems systems = Systems.getInstance();
+        PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
+
+        RandomEventLibraries randomEvents = null;
+        FactionStandingUltimatumsLibrary ultimatums = null;
+
+        String name = randomMercenaryCompanyNameGenerator(null);
+        Player player = new Player(0, "self");
+        LocalDate date = LocalDate.ofYearDay(3067, 1);
+
+        CampaignOptions campaignOptions = new CampaignOptions();
+        GameOptions gameOptions = new GameOptions();
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(date.getYear());
+        Faction faction = new Faction();
+
+        CurrencyManager currencyManager = CurrencyManager.getInstance();
+        megamek.common.enums.Faction techFaction = megamek.common.enums.Faction.MERC;
+
+        CurrentLocation location;
+        ReputationController reputationController = new ReputationController();
+        FactionStandings factionStandings = new FactionStandings();
+
+        RankSystem rankSystem = Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE);
+        Force force = new Force(name);
+        Finances finances = new Finances();
+
+        RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
+
+        AutosaveService autosave = new AutosaveService();
+
+        BehaviorSettings behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
+
+        // Set up markets
+        // TODO: Replace PersonnelMarket due to deprecation
+        PersonnelMarket personnelMarket = new PersonnelMarket();
+        AtbMonthlyContractMarket atbMonthlyContractMarket = new AtbMonthlyContractMarket();
+        DisabledUnitMarket disabledUnitMarket = new DisabledUnitMarket();
+
+        // Set up Randomizers based on campaignOptions
+        DisabledRandomDivorce disabledRandomDivorce = new DisabledRandomDivorce(campaignOptions);
+        DisabledRandomMarriage disabledRandomMarriage = new DisabledRandomMarriage(campaignOptions);
+        DisabledRandomProcreation disabledRandomProcreation = new DisabledRandomProcreation(campaignOptions);
+
+        try {
+            randomEvents = new RandomEventLibraries();
+        } catch (Exception ex) {
+            LOGGER.error("Unable to initialize RandomEventLibraries. If this wasn't during automated testing this " +
+                               "must be investigated.", ex);
+        }
+
+        try {
+            ultimatums = new FactionStandingUltimatumsLibrary();
+        } catch (Exception ex) {
+            LOGGER.error("Unable to initialize FactionStandingUltimatumsLibrary. If this wasn't during automated " +
+                               "testing this must be investigated.", ex);
+        }
+
+        try {
+            faction = Factions.getInstance().getDefaultFaction();
+        } catch (Exception ex) {
+            LOGGER.error("Unable to set faction to default faction. If this wasn't during automated testing this must" +
+                               " be investigated.", ex);
+        }
+
+        // A starting CurrentLocation is required
+        try {
+            location = new CurrentLocation(starterSystem, 0);
+        } catch (Exception ex) {
+            String message = String.format(
+                  "Unable to set location to %s. If this wasn't during automated testing this must be investigated.",
+                  starterSystem
+            );
+            LOGGER.error(message, ex);
+            return campaign;
+        }
+
+        try {
+            campaign = new Campaign(game, player, name, date, campaignOptions, gameOptions,
+                  faction, techFaction, currencyManager, location, reputationController,
+                  factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
+                  retirementDefectionTracker, autosave, behaviorSettings,
+                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
+                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+        } catch (Exception e) {
+            LOGGER.error("Unable to create campaign.", e);
+        }
+
+        return campaign;
     }
 
     /**

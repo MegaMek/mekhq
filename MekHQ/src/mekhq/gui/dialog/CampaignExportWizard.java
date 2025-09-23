@@ -462,7 +462,7 @@ public class CampaignExportWizard extends JDialog {
 
         Campaign destinationCampaign;
         if (newCampaign) {
-            destinationCampaign = new Campaign();
+            destinationCampaign = CampaignFactory.createCampaign();
             destinationCampaign.setApp(sourceCampaign.getApp());
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
             destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());

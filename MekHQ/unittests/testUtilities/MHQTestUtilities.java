@@ -42,6 +42,7 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignFactory;
 
 public final class MHQTestUtilities {
     private static final String TEST_RESOURCES_DIR = "testresources/";
@@ -52,7 +53,7 @@ public final class MHQTestUtilities {
     public static final String TEST_MTF = ".mtf";
 
     public static Campaign getTestCampaign() {
-        return new Campaign();
+        return CampaignFactory.createCampaign();
     }
 
     public static InputStream ParseBase64XmlFile(String base64) {

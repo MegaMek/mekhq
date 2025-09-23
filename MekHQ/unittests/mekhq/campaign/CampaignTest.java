@@ -201,7 +201,7 @@ public class CampaignTest {
     @ParameterizedTest
     @EnumSource(value = CampaignTransportType.class)
     void testTransportShips(CampaignTransportType campaignTransportType) {
-        Campaign campaign = spy(new Campaign());
+        Campaign campaign = spy(CampaignFactory.createCampaign());
 
         // New campaigns have no transports
         assertTrue(campaign.getTransports(campaignTransportType).isEmpty());
@@ -246,7 +246,7 @@ public class CampaignTest {
 
     @Test
     void testInitiative() {
-        Campaign campaign = new Campaign();
+        Campaign campaign = CampaignFactory.createCampaign();
 
         campaign.applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
@@ -276,7 +276,7 @@ public class CampaignTest {
         public static void beforeAll() {
             // beforeEach MUST refresh Campaign Options!
             // It is very time-consuming recreating Campaign for each test, let's try to reuse it
-            campaign = new Campaign();
+            campaign = CampaignFactory.createCampaign();
         }
 
         @Nested
