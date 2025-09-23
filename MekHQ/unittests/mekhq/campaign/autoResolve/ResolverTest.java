@@ -72,6 +72,7 @@ import megamek.common.units.CrewType;
 import megamek.common.units.Entity;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -231,7 +232,7 @@ public class ResolverTest {
     }
 
     Campaign createCampaign() {
-        var campaign = createCampaign();
+        var campaign = CampaignFactory.createCampaign();
         campaign.setName("Test Player");
         var reputationController = mock(ReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
