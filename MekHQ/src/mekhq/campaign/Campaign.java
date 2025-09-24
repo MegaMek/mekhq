@@ -502,18 +502,49 @@ public class Campaign implements ITechManager {
 
     private final IAutosaveService autosaveService;
 
+    public Campaign(CampaignConfiguration campConf) {
+        this(
+            campConf.getGame(),
+            campConf.getPlayer(),
+            campConf.getName(),
+            campConf.getDate(),
+            campConf.getCampaignOpts(),
+            campConf.getGameOptions(),
+            campConf.getfaction(),
+            campConf.getTechFaction(),
+            campConf.getCurrencyManager(),
+            campConf.getStartLocation(),
+            campConf.getReputationController(),
+            campConf.getFactionStandings(),
+            campConf.getRankSystem(),
+            campConf.getforce(),
+            campConf.getfinances(),
+            campConf.getRandomEvents(),
+            campConf.getUltimatums(),
+            campConf.getRetDefTracker(),
+            campConf.getAutosave(),
+            campConf.getBehaviorSettings(),
+            campConf.getPersonnelMarket(),
+            campConf.getAtBMonthlyContractMarket(),
+            campConf.getUnitMarket(),
+            campConf.getDivorce(),
+            campConf.getMarriage(),
+            campConf.getProcreation()
+        );
+    }
+
     public Campaign(Game game,
           Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
           CurrentLocation startLocation, ReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
-          RetirementDefectionTracker retDefTracker, AutosaveService autosave,
+          RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
           BehaviorSettings behaviorSettings,
-          PersonnelMarket persMarket, AtbMonthlyContractMarket atbMonthlyContractMarket,
-          DisabledUnitMarket disabledUnitMarket,
-          DisabledRandomDivorce disabledRandomDivorce, DisabledRandomMarriage disabledRandomMarriage,
-          DisabledRandomProcreation disabledRandomProcreation) {
+          PersonnelMarket persMarket, AbstractContractMarket atbMonthlyContractMarket,
+          AbstractUnitMarket unitMarket,
+          AbstractDivorce divorce, AbstractMarriage marriage,
+          AbstractProcreation procreation) {
 
         // Essential state
         id = UUID.randomUUID();
@@ -522,7 +553,6 @@ public class Campaign implements ITechManager {
         this.game.addPlayer(0, this.player);
         this.name = name;
         currentDay = date;
-        campaignStartDate = null;
         campaignOptions = campaignOpts;
         this.gameOptions = gameOptions;
         game.setOptions(gameOptions);
@@ -539,8 +569,8 @@ public class Campaign implements ITechManager {
         autosaveService = autosave;
         autoResolveBehaviorSettings = behaviorSettings;
 
-
-        // Members that take `this` as an argument (XXX: refactor to allow lazy linking)
+        // Members that take `this` as an argument
+        // (TODO Sleet01: refactor to allow lazy linking / setting post-instantiation)
         partsStore = new PartsStore(this);
         newPersonnelMarket = new NewPersonnelMarket(this);
         randomDeath = new RandomDeath(this);
@@ -552,12 +582,13 @@ public class Campaign implements ITechManager {
         setRankSystemDirect(rankSystem);
         setPersonnelMarket(persMarket);
         setContractMarket(atbMonthlyContractMarket);
-        setUnitMarket(disabledUnitMarket);
-        setDivorce(disabledRandomDivorce);
-        setMarriage(disabledRandomMarriage);
-        setProcreation(disabledRandomProcreation);
+        setUnitMarket(unitMarket);
+        setDivorce(divorce);
+        setMarriage(marriage);
+        setProcreation(procreation);
 
         // Starting config / default values
+        campaignStartDate = null;
         shoppingList = new ShoppingList();
         isAvoidingEmptySystems = true;
         isOverridingCommandCircuitRequirements = false;
