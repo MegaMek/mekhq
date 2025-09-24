@@ -153,8 +153,8 @@ public class CampaignFactory {
         return checkForLoadProblems(campaign);
     }
 
-    public static @Nullable Campaign createCampaign() {
-        Campaign campaign = null;
+    public static @Nullable CampaignConfiguration createCampaignConfiguration() {
+        CampaignConfiguration campaignConfig = null;
 
         Game game = new Game();
         Systems systems = Systems.getInstance();
@@ -230,16 +230,33 @@ public class CampaignFactory {
                   starterSystem
             );
             LOGGER.error(message, ex);
-            return campaign;
+            return null;
         }
 
         try {
-            campaign = new Campaign(game, player, name, date, campaignOptions, gameOptions,
+            campaignConfig = new CampaignConfiguration(game, player, name, date, campaignOptions, gameOptions,
                   faction, techFaction, currencyManager, location, reputationController,
                   factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
                   retirementDefectionTracker, autosave, behaviorSettings,
                   personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
                   disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+        } catch (Exception e) {
+            LOGGER.error("Unable to create campaign.", e);
+        }
+
+        return campaignConfig;
+    }
+
+    public static @Nullable Campaign createCampaign() {
+        Campaign campaign = null;
+        CampaignConfiguration campaignConfig = createCampaignConfiguration();
+
+        if (campaignConfig == null) {
+            LOGGER.error("Unable to create campaign configuration.");
+            return null;
+        }
+        try {
+            campaign = new Campaign(campaignConfig);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }
