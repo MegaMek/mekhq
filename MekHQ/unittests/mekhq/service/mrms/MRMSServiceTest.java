@@ -105,11 +105,6 @@ public class MRMSServiceTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
-        }
 
         mockFaction = Mockito.mock(Faction.class);
         when(mockFaction.getShortName()).thenReturn("Faction");

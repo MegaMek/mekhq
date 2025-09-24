@@ -63,6 +63,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.mission.TestSystems;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Cubicle;
@@ -85,7 +86,6 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -94,6 +94,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import testUtilities.MHQTestUtilities;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -101,15 +102,19 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 public class CampaignTest {
 
+    private TestSystems systems;
+
     @BeforeAll
     public static void setup() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-        }
+        TestSystems.getInstance();
+    }
+
+    @BeforeEach
+    public void before() {
+        // Reset TestSystems
+        systems = TestSystems.getInstance();
     }
 
     @Test
@@ -201,7 +206,7 @@ public class CampaignTest {
     @ParameterizedTest
     @EnumSource(value = CampaignTransportType.class)
     void testTransportShips(CampaignTransportType campaignTransportType) {
-        Campaign campaign = spy(CampaignFactory.createCampaign());
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
 
         // New campaigns have no transports
         assertTrue(campaign.getTransports(campaignTransportType).isEmpty());

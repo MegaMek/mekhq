@@ -153,40 +153,27 @@ public class CampaignFactory {
         return checkForLoadProblems(campaign);
     }
 
-    public static @Nullable CampaignConfiguration createCampaignConfiguration() {
+    public static @Nullable CampaignConfiguration createPartialCampaignConfiguration(CampaignOptions options) {
         CampaignConfiguration campaignConfig = null;
 
-        Game game = new Game();
-        Systems systems = Systems.getInstance();
-        PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
+        String name = randomMercenaryCompanyNameGenerator(null);
+        LocalDate date = LocalDate.ofYearDay(3067, 1);
+        Faction faction = new Faction();
 
+        megamek.common.enums.Faction techFaction = megamek.common.enums.Faction.MERC;
+        CurrencyManager currencyManager = CurrencyManager.getInstance();
+        ReputationController reputationController = new ReputationController();
+
+        FactionStandings factionStandings = new FactionStandings();
+        RankSystem rankSystem = Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE);
+        Force force = new Force(name);
+
+        Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
         FactionStandingUltimatumsLibrary ultimatums = null;
 
-        String name = randomMercenaryCompanyNameGenerator(null);
-        Player player = new Player(0, "self");
-        LocalDate date = LocalDate.ofYearDay(3067, 1);
-
-        CampaignOptions campaignOptions = new CampaignOptions();
-        GameOptions gameOptions = new GameOptions();
-        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(date.getYear());
-        Faction faction = new Faction();
-
-        CurrencyManager currencyManager = CurrencyManager.getInstance();
-        megamek.common.enums.Faction techFaction = megamek.common.enums.Faction.MERC;
-
-        CurrentLocation location;
-        ReputationController reputationController = new ReputationController();
-        FactionStandings factionStandings = new FactionStandings();
-
-        RankSystem rankSystem = Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE);
-        Force force = new Force(name);
-        Finances finances = new Finances();
-
         RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
-
         AutosaveService autosave = new AutosaveService();
-
         BehaviorSettings behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
 
         // Set up markets
@@ -196,9 +183,9 @@ public class CampaignFactory {
         DisabledUnitMarket disabledUnitMarket = new DisabledUnitMarket();
 
         // Set up Randomizers based on campaignOptions
-        DisabledRandomDivorce disabledRandomDivorce = new DisabledRandomDivorce(campaignOptions);
-        DisabledRandomMarriage disabledRandomMarriage = new DisabledRandomMarriage(campaignOptions);
-        DisabledRandomProcreation disabledRandomProcreation = new DisabledRandomProcreation(campaignOptions);
+        DisabledRandomDivorce disabledRandomDivorce = new DisabledRandomDivorce(options);
+        DisabledRandomMarriage disabledRandomMarriage = new DisabledRandomMarriage(options);
+        DisabledRandomProcreation disabledRandomProcreation = new DisabledRandomProcreation(options);
 
         try {
             randomEvents = new RandomEventLibraries();
@@ -221,7 +208,35 @@ public class CampaignFactory {
                                " be investigated.", ex);
         }
 
+        try {
+            campaignConfig = new CampaignConfiguration(name, date, options,
+                  faction, techFaction, currencyManager, reputationController,
+                  factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
+                  retirementDefectionTracker, autosave, behaviorSettings,
+                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
+                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+        } catch (Exception e) {
+            LOGGER.error("Unable to create campaign.", e);
+        }
+
+        return campaignConfig;
+    }
+
+    /**
+     * Factory function to configure and instantiate a Campaign.  Analogous to calling
+     * `new Campaign()` previously.
+     * @return campaignConfig CampaignConfiguration with all of the default values set
+     */
+    public static @Nullable CampaignConfiguration createCampaignConfiguration() {
+
+        Game game = new Game();
+        Player player = new Player(0, "self");
+
+        Systems systems = Systems.getInstance();
+
         // A starting CurrentLocation is required
+        PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
+        CurrentLocation location;
         try {
             location = new CurrentLocation(starterSystem, 0);
         } catch (Exception ex) {
@@ -233,13 +248,19 @@ public class CampaignFactory {
             return null;
         }
 
+        // For simplicity, createPartialCampaignConfiguration needs a CampaignOptions instance.
+        CampaignOptions campaignOptions = new CampaignOptions();
+        CampaignConfiguration campaignConfig = CampaignFactory.createPartialCampaignConfiguration(campaignOptions);
+
+        GameOptions gameOptions = new GameOptions();
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaignConfig.getDate().getYear());
+
+
         try {
-            campaignConfig = new CampaignConfiguration(game, player, name, date, campaignOptions, gameOptions,
-                  faction, techFaction, currencyManager, location, reputationController,
-                  factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
-                  retirementDefectionTracker, autosave, behaviorSettings,
-                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
-                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+            campaignConfig.setGame(game);
+            campaignConfig.setPlayer(player);
+            campaignConfig.setGameOptions(gameOptions);
+            campaignConfig.setLocation(location);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }

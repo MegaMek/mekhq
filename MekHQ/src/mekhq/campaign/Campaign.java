@@ -56,7 +56,6 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
@@ -110,7 +109,6 @@ import javax.swing.JOptionPane;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -189,11 +187,9 @@ import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -228,7 +224,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
-import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
@@ -250,13 +245,10 @@ import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
-import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
@@ -306,7 +298,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
-import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
@@ -403,6 +394,7 @@ public class Campaign implements ITechManager {
 
     private Finances finances;
 
+    private Systems systemsInstance;
     private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
@@ -513,7 +505,8 @@ public class Campaign implements ITechManager {
             campConf.getfaction(),
             campConf.getTechFaction(),
             campConf.getCurrencyManager(),
-            campConf.getStartLocation(),
+            campConf.getSystemsInstance(),
+            campConf.getLocation(),
             campConf.getReputationController(),
             campConf.getFactionStandings(),
             campConf.getRankSystem(),
@@ -536,7 +529,7 @@ public class Campaign implements ITechManager {
     public Campaign(Game game,
           Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
-          CurrentLocation startLocation, ReputationController reputationController,
+          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
@@ -557,6 +550,7 @@ public class Campaign implements ITechManager {
         this.gameOptions = gameOptions;
         game.setOptions(gameOptions);
         this.techFaction = techFaction;
+        this.systemsInstance = systemsInstance;
         location = startLocation;
         reputation = reputationController;
         this.factionStandings = factionStandings;
@@ -4062,7 +4056,7 @@ public class Campaign implements ITechManager {
 
         // find planets within a certain radius - the function will weed out dead
         // planets
-        List<PlanetarySystem> systems = Systems.getInstance()
+        List<PlanetarySystem> systems = this.systemsInstance
                                               .getShoppingSystems(getCurrentSystem(),
                                                     getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                                                     currentDate);
@@ -4990,7 +4984,7 @@ public class Campaign implements ITechManager {
             addReport(article.getHeadlineForReport());
         }
 
-        for (NewsItem article : Systems.getInstance().getPlanetaryNews(getLocalDate())) {
+        for (NewsItem article : this.systemsInstance.getPlanetaryNews(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
     }
@@ -7637,26 +7631,26 @@ public class Campaign implements ITechManager {
 
     public ArrayList<PlanetarySystem> getSystems() {
         ArrayList<PlanetarySystem> systems = new ArrayList<>();
-        for (String key : Systems.getInstance().getSystems().keySet()) {
-            systems.add(Systems.getInstance().getSystems().get(key));
+        for (String key : this.systemsInstance.getSystems().keySet()) {
+            systems.add(this.systemsInstance.getSystems().get(key));
         }
         return systems;
     }
 
     public PlanetarySystem getSystemById(String id) {
-        return Systems.getInstance().getSystemById(id);
+        return this.systemsInstance.getSystemById(id);
     }
 
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<>();
-        for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
+        for (PlanetarySystem key : this.systemsInstance.getSystems().values()) {
             systemNames.add(key.getPrintableName(getLocalDate()));
         }
         return systemNames;
     }
 
     public PlanetarySystem getSystemByName(String name) {
-        return Systems.getInstance().getSystemByName(name, getLocalDate());
+        return this.systemsInstance.getSystemByName(name, getLocalDate());
     }
 
     // region Ranks
@@ -7802,8 +7796,7 @@ public class Campaign implements ITechManager {
         Map<String, Double> scoreG = new HashMap<>(); // Path costs from start
 
         // Precompute heuristics
-        Systems systemsInstance = Systems.getInstance();
-        Map<String, PlanetarySystem> allSystems = systemsInstance.getSystems();
+        Map<String, PlanetarySystem> allSystems = this.systemsInstance.getSystems();
 
         for (Entry<String, PlanetarySystem> entry : allSystems.entrySet()) {
             scoreH.put(entry.getKey(), end.getDistanceTo(entry.getValue()));
@@ -9028,7 +9021,7 @@ public class Campaign implements ITechManager {
     public void setStartingSystem(final @Nullable Planet planet) {
         PlanetarySystem startingSystem;
         if (planet == null) {
-            final Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+            final Map<String, PlanetarySystem> systemList = this.systemsInstance.getSystems();
             startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
             if (startingSystem == null) {
@@ -10759,7 +10752,7 @@ public class Campaign implements ITechManager {
             startingFaction = factions.getDefaultFaction();
             startingSystem = startingFaction.getStartingPlanet(this, currentDay);
             if (startingSystem == null) {
-                startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+                startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
             }
         }
 
@@ -10844,7 +10837,7 @@ public class Campaign implements ITechManager {
         }
 
         // Fallback if no startingSystem
-        startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+        startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
         return startingSystem != null ? startingSystem.getPrimaryPlanet() : null;
     }
 }
