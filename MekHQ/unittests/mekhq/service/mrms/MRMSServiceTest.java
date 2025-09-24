@@ -84,7 +84,8 @@ import org.mockito.Mockito;
 /**
  * JUnit Tests for {@link MRMSService}
  */
-@Disabled
+
+@Disabled("Disabled for runtime / resource consumption but may need review.")
 public class MRMSServiceTest {
     static MMLogger LOGGER = MMLogger.create(MRMSServiceTest.class);
 
@@ -107,11 +108,6 @@ public class MRMSServiceTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
-        }
 
         mockFaction = Mockito.mock(Faction.class);
         when(mockFaction.getShortName()).thenReturn("Faction");
