@@ -171,9 +171,17 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            LOGGER.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
-                               + " system. Initialization failure, shutting MekHQ down.");
-            java.lang.System.exit(-1);
+            LOGGER.fatalDialog(new NullPointerException(),
+                  """
+                        Error: Unable to Load the default rank system (SSLDF).\
+                        
+                        
+                        This is likely due to a missing ranks directory\
+                        
+                        
+                        Please report to the MegaMek Team""",
+                  "Unable to Load Rank Systems");
+            return;
         }
 
         LOGGER.info("Completed Rank System XML Load");
