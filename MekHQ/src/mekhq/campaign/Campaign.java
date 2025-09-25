@@ -401,7 +401,7 @@ public class Campaign implements ITechManager {
 
     private final News news;
 
-    private final PartsStore partsStore;
+    private PartsStore partsStore;
 
     private final List<String> customs;
 
@@ -443,7 +443,7 @@ public class Campaign implements ITechManager {
     private FactionStandings factionStandings;
     private int initiativeBonus;
     private int initiativeMaxBonus;
-    private final CampaignSummary campaignSummary;
+    private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
     private BehaviorSettings autoResolveBehaviorSettings;
@@ -502,6 +502,10 @@ public class Campaign implements ITechManager {
             campConf.getDate(),
             campConf.getCampaignOpts(),
             campConf.getGameOptions(),
+            campConf.getPartsStore(),
+            campConf.getNewPersonnelMarket(),
+            campConf.getRandomDeath(),
+            campConf.getCampaignSummary(),
             campConf.getfaction(),
             campConf.getTechFaction(),
             campConf.getCurrencyManager(),
@@ -528,6 +532,8 @@ public class Campaign implements ITechManager {
 
     public Campaign(Game game,
           Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
+          PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
+          RandomDeath randomDeath, CampaignSummary campaignSummary,
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
           Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
@@ -562,14 +568,14 @@ public class Campaign implements ITechManager {
         retirementDefectionTracker = retDefTracker;
         autosaveService = autosave;
         autoResolveBehaviorSettings = behaviorSettings;
+        this.partsStore = partsStore;
+        this.newPersonnelMarket = newPersonnelMarket;
+        this.randomDeath = randomDeath;
+        this.campaignSummary = campaignSummary;
 
         // Members that take `this` as an argument
         // (TODO Sleet01: refactor to allow lazy linking / setting post-instantiation)
-        partsStore = new PartsStore(this);
-        newPersonnelMarket = new NewPersonnelMarket(this);
-        randomDeath = new RandomDeath(this);
-        campaignSummary = new CampaignSummary(this);
-        quartermaster = new Quartermaster(this);
+        this.quartermaster = new Quartermaster(this);
 
         // Primary init, sets state from passed values
         setFaction(faction);
@@ -619,7 +625,13 @@ public class Campaign implements ITechManager {
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
         resetAsTechMinutes();
+
+        // These classes require a Campaign reference to operate/initialize
         currencyManager.setCampaign(this);
+        this.partsStore.stock(this);
+        this.newPersonnelMarket.setCampaign(this);
+        this.randomDeath.setCampaign(this);
+        this.campaignSummary.setCampaign(this);
     }
 
     /**
@@ -893,12 +905,18 @@ public class Campaign implements ITechManager {
 
     public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
         this.newPersonnelMarket = newPersonnelMarket;
+        this.newPersonnelMarket.setCampaign(this);
     }
     // endregion Markets
 
     // region Personnel Modules
     public void resetRandomDeath() {
-        this.randomDeath = new RandomDeath(this);
+        setRandomDeath(new RandomDeath());
+    }
+
+    public void setRandomDeath(RandomDeath randomDeath) {
+        this.randomDeath = randomDeath;
+        this.randomDeath.setCampaign(this);
     }
 
     public AbstractDivorce getDivorce() {
@@ -1302,6 +1320,11 @@ public class Campaign implements ITechManager {
 
     public CampaignSummary getCampaignSummary() {
         return campaignSummary;
+    }
+
+    public void setCampaignSummary(CampaignSummary campaignSummary) {
+        this.campaignSummary = campaignSummary;
+        this.campaignSummary.setCampaign(this);
     }
 
     public News getNews() {
@@ -8922,6 +8945,11 @@ public class Campaign implements ITechManager {
 
     public PartsStore getPartsStore() {
         return partsStore;
+    }
+
+    public void setPartsStore(PartsStore partsStore) {
+        this.partsStore = partsStore;
+        this.partsStore.stock(this);
     }
 
     public void addCustom(String name) {

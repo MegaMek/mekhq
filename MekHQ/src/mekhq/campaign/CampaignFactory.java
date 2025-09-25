@@ -56,9 +56,12 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
+import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
@@ -255,15 +258,24 @@ public class CampaignFactory {
         GameOptions gameOptions = new GameOptions();
         gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaignConfig.getDate().getYear());
 
+        // Instantiate default parts store, new-style personnel market, random death manager, and campaign summary
+        // object.
+        // Note: Campaign is responsible for correctly initializing these objects now!
+        PartsStore partsStore = new PartsStore();
+        NewPersonnelMarket newPersonnelMarket = new NewPersonnelMarket();
+        RandomDeath randomDeath = new RandomDeath();
+        CampaignSummary campaignSummary = new CampaignSummary();
 
-        try {
-            campaignConfig.setGame(game);
-            campaignConfig.setPlayer(player);
-            campaignConfig.setGameOptions(gameOptions);
-            campaignConfig.setLocation(location);
-        } catch (Exception e) {
-            LOGGER.error("Unable to create campaign.", e);
-        }
+
+        // Assign remaining values to CampaignConfig
+        campaignConfig.setGame(game);
+        campaignConfig.setPlayer(player);
+        campaignConfig.setGameOptions(gameOptions);
+        campaignConfig.setLocation(location);
+        campaignConfig.setPartsStore(partsStore);
+        campaignConfig.setNewPersonnelMarket(newPersonnelMarket);
+        campaignConfig.setRandomDeath(randomDeath);
+        campaignConfig.setCampaignSummary(campaignSummary);
 
         return campaignConfig;
     }

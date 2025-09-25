@@ -67,8 +67,8 @@ public class PersonnelMarketCamOpsStrict extends PersonnelMarketCamOpsRevised {
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketCamOpsStrict(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketCamOpsStrict() {
+        super();
 
         setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_STRICT);
 

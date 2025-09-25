@@ -85,7 +85,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

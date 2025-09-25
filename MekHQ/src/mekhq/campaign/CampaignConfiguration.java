@@ -8,10 +8,13 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -75,6 +78,11 @@ public class CampaignConfiguration {
     private BehaviorSettings autoResolveBehaviorSettings;
 
     private IAutosaveService autosaveService;
+
+    private PartsStore partsStore;
+    private NewPersonnelMarket newPersonnelMarket;
+    private RandomDeath randomDeath;
+    private CampaignSummary campaignSummary;
 
     // Bare constructor for test purposes.
     public CampaignConfiguration() {
@@ -166,6 +174,10 @@ public class CampaignConfiguration {
      * @param date LocalDate start date
      * @param campaignOpts CampaignOptions instance
      * @param gameOptions GameOptions instance, for MegaMek
+     * @param partsStore PartsStore instance (Campaign or user must initialize with campaign reference!)
+     * @param newPersonnelMarket NewPersonnelMarket instance (Campaign or user must initialize with campaign reference!)
+     * @param randomDeath RandomDeath instance (Campaign or user must initialize with campaign reference!)
+     * @param campaignSummary CampaignSummary instance (Campaign or user must initialize with campaign reference!)
      * @param faction Faction instance
      * @param techFaction Faction enum value describing tech base
      * @param currencyManager Default
@@ -195,6 +207,10 @@ public class CampaignConfiguration {
           LocalDate date,
           CampaignOptions campaignOpts,
           GameOptions gameOptions,
+          PartsStore partsStore,
+          NewPersonnelMarket newPersonnelMarket,
+          RandomDeath randomDeath,
+          CampaignSummary campaignSummary,
           Faction faction,
           megamek.common.enums.Faction techFaction,
           CurrencyManager currencyManager,
@@ -223,6 +239,10 @@ public class CampaignConfiguration {
         this.currentDay = date;
         this.campaignOptions = campaignOpts;
         this.gameOptions = gameOptions;
+        this.partsStore = partsStore;
+        this.newPersonnelMarket = newPersonnelMarket;
+        this.randomDeath = randomDeath;
+        this.campaignSummary = campaignSummary;
         this.faction = faction;
         this.techFaction = techFaction;
         this.currencyManager = currencyManager;
@@ -268,6 +288,22 @@ public class CampaignConfiguration {
 
     public GameOptions getGameOptions() {
         return this.gameOptions;
+    }
+
+    public PartsStore getPartsStore() {
+        return this.partsStore;
+    }
+
+    public NewPersonnelMarket getNewPersonnelMarket() {
+        return this.newPersonnelMarket;
+    }
+
+    public RandomDeath getRandomDeath() {
+        return this.randomDeath;
+    }
+
+    public CampaignSummary getCampaignSummary() {
+        return this.campaignSummary;
     }
 
     public Faction getfaction() {
@@ -460,5 +496,21 @@ public class CampaignConfiguration {
 
     public void setAutosaveService(IAutosaveService autosaveService) {
         this.autosaveService = autosaveService;
+    }
+
+    public void setPartsStore(PartsStore partsStore) {
+        this.partsStore = partsStore;
+    }
+
+    public void setNewPersonnelMarket(NewPersonnelMarket newPersonnelMarket) {
+        this.newPersonnelMarket = newPersonnelMarket;
+    }
+
+    public void setRandomDeath(RandomDeath randomDeath) {
+        this.randomDeath = randomDeath;
+    }
+
+    public void setCampaignSummary(CampaignSummary campaignSummary) {
+        this.campaignSummary = campaignSummary;
     }
 }

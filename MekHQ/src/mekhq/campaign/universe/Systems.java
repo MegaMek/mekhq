@@ -350,6 +350,16 @@ public class Systems {
                     }
                 }
             }
+        } else {
+            if (dir.isFile()) {
+                try (FileInputStream fis = new FileInputStream(dir)) {
+                    loadPlanetarySystem(fis, mapper);
+                } catch (Exception ex) {
+                    // Ignore this dir then
+                    logger.error(ex, "Exception trying to parse {} - ignoring.", dir.getPath());
+                }
+            }
+
         }
     }
 

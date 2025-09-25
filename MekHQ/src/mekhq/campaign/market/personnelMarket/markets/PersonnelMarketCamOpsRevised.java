@@ -83,8 +83,8 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketCamOpsRevised(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketCamOpsRevised() {
+        super();
 
         setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_REVISED);
 

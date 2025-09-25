@@ -93,12 +93,12 @@ public class RandomDeath {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomDeath";
     private static final MMLogger LOGGER = MMLogger.create(RandomDeath.class);
 
-    private final Campaign campaign;
-    private final CampaignOptions campaignOptions;
-    private final Map<AgeGroup, Boolean> enabledAgeGroups;
-    private final boolean enableRandomDeathSuicideCause;
+    private Campaign campaign;
+    private CampaignOptions campaignOptions;
+    private Map<AgeGroup, Boolean> enabledAgeGroups;
+    private boolean enableRandomDeathSuicideCause;
     private Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
-    private final double randomDeathMultiplier;
+    private double randomDeathMultiplier;
 
     // Base Chances
     private final List<RandomDeathChance> deathChances = List.of(
@@ -151,7 +151,10 @@ public class RandomDeath {
      *
      * @param campaign The current campaign.
      */
-    public RandomDeath(final Campaign campaign) {
+    public RandomDeath() {
+    }
+
+    public void setCampaign(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 

@@ -105,8 +105,11 @@ public class CampaignSummary {
     /**
      * @param c a {@link Campaign} for which a summary is desired
      */
-    public CampaignSummary(Campaign c) {
-        this.campaign = c;
+    public CampaignSummary() {
+    }
+
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
         updateInformation();
     }
 
