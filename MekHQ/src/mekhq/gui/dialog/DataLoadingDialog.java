@@ -285,7 +285,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
             // region progress 1
             setProgress(1);
-            Factions.setInstance(Factions.loadDefault());
+            Factions.setInstance(Factions.loadDefault(false));
             // endregion Progress 1
 
             // region progress 2

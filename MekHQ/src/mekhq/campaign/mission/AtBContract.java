@@ -340,7 +340,7 @@ public class AtBContract extends Contract {
         } else {
             // Log if no files were found in the directory
             logger.warn("No files in directory {} - using default camouflage", camouflageDirectory);
-            return null;
+            return new Camouflage(); // return no camouflage
         }
     }
 

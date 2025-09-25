@@ -52,20 +52,18 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@Disabled
 class FactionStandingsTest {
     private static Factions factions;
 
     @BeforeEach
     void setUp() {
         try {
-            Factions.setInstance(Factions.loadDefault());
+            Factions.setInstance(Factions.loadDefault(true));
             factions = Factions.getInstance();
         } catch (Exception ignored) {
         }
