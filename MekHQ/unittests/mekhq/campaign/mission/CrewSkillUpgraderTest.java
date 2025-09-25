@@ -48,10 +48,8 @@ import megamek.common.options.PilotOptions;
 import megamek.common.units.*;
 import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 class CrewSkillUpgraderTest {
 
     @BeforeAll

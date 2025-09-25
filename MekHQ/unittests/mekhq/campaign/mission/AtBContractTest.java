@@ -66,14 +66,12 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@Disabled
 public class AtBContractTest {
     private AtBContract contract;
     private Campaign campaign;

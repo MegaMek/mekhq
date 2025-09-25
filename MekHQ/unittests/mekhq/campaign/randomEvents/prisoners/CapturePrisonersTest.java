@@ -61,7 +61,6 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -74,7 +73,6 @@ import org.junit.jupiter.api.Test;
  * such as Campaign Operations and MekHQ. Additionally, scenarios regarding prisoner defection are also tested for
  * various factions and conditions.</p>
  */
-@Disabled
 class CapturePrisonersTest {
     private static Factions factions;
 
