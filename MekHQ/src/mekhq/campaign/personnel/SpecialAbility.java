@@ -84,6 +84,8 @@ public class SpecialAbility {
 
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLAN_PILOT = "clanperson";
+    private static String SPA_DIRECTORY = "data/universe/defaultspa.xml";
+    private static String TEST_DIRECTORY = "testresources/data/universe/defaultspa_test.xml";
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
     private static final Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
@@ -407,13 +409,13 @@ public class SpecialAbility {
         }
     }
 
-    public static void initializeSPA() {
+    public static void initializeSPA(boolean useTestDirectory) {
         if (!getDefaultSpecialAbilities().isEmpty()) {
             return;
         }
 
         Document xmlDoc;
-        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
+        try (InputStream is = new FileInputStream(useTestDirectory ? TEST_DIRECTORY : SPA_DIRECTORY)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             LOGGER.error("", ex);

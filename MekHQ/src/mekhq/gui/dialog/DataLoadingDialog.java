@@ -280,7 +280,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             RATManager.populateCollectionNames();
             SkillType.initializeTypes();
             sort(SkillType.getSkillList()); // sort all skills alphabetically
-            SpecialAbility.initializeSPA();
+            SpecialAbility.initializeSPA(false);
             // endregion Progress 0
 
             // region progress 1
