@@ -120,7 +120,8 @@ public class RandomDeathTest {
         when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
         when(mockedCampaign.getLocalDate()).thenReturn(mockedToday);
 
-        randomDeath = new RandomDeath(mockedCampaign);
+        randomDeath = new RandomDeath();
+        randomDeath.setCampaign(mockedCampaign);
     }
 
     @Test
@@ -208,7 +209,7 @@ public class RandomDeathTest {
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
-        RandomDeath realRandomDeath = new RandomDeath(mockedCampaign) {
+        RandomDeath realRandomDeath = new RandomDeath() {
             @Override
             protected int randomInt(int bound) {
                 return 1000; // Simulate rolling a 1000
@@ -216,6 +217,7 @@ public class RandomDeathTest {
         };
 
         RandomDeath randomDeath = spy(realRandomDeath);
+        randomDeath.setCampaign(mockedCampaign);
 
         // Ensure mocked methods return valid results
         doReturn(1000.0).when(randomDeath).getBaseDeathChance(mockedPerson);
@@ -255,7 +257,7 @@ public class RandomDeathTest {
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
-        RandomDeath realRandomDeath = new RandomDeath(mockedCampaign) {
+        RandomDeath realRandomDeath = new RandomDeath() {
             @Override
             protected int randomInt(int bound) {
                 return 1; // Simulate rolling a 1
@@ -263,6 +265,7 @@ public class RandomDeathTest {
         };
 
         RandomDeath randomDeath = spy(realRandomDeath); // Spy on the real object
+        randomDeath.setCampaign(mockedCampaign);
 
         // Ensure mocked methods return valid results
         doReturn(1000.0).when(randomDeath).getBaseDeathChance(mockedPerson);

@@ -102,8 +102,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketMekHQ(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketMekHQ() {
+        super();
 
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
