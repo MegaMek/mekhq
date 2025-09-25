@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
+import java.util.zip.DataFormatException;
 
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
@@ -104,7 +105,7 @@ public class CampaignTest {
     private TestSystems systems;
 
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws DataFormatException {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
     }

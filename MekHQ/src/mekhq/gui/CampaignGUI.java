@@ -63,6 +63,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.zip.DataFormatException;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;

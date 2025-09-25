@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.zip.DataFormatException;
 
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.autoResolve.Resolver;
@@ -167,7 +168,7 @@ public class ResolverTest {
     }
 
     @BeforeAll
-    public static void setupClass() throws IOException {
+    public static void setupClass() throws IOException, DataFormatException {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();

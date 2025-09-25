@@ -41,6 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.MekHQ;
@@ -68,7 +69,7 @@ class UntreatedPersonnelNagLogicTest {
      * Sets up the necessary dependencies and configurations before running the test methods.
      */
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws DataFormatException {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
         Ranks.initializeRankSystems();

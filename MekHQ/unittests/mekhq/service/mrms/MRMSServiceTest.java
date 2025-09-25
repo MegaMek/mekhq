@@ -47,6 +47,7 @@ import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
@@ -99,7 +100,7 @@ public class MRMSServiceTest {
     IPartWork lastPartWork;
 
     @BeforeAll
-    public static void beforeAll() {
+    public static void beforeAll() throws DataFormatException {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();

@@ -45,9 +45,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
+import java.util.zip.DataFormatException;
+
 public class StripUnitActionTest {
     @BeforeAll
-    public static void beforeAll() {
+    public static void beforeAll() throws DataFormatException {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         try {
