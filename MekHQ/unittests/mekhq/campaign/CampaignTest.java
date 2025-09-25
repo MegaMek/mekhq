@@ -249,7 +249,7 @@ public class CampaignTest {
 
     @Test
     void testInitiative() {
-        Campaign campaign = CampaignFactory.createCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
 
         campaign.applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
@@ -279,7 +279,7 @@ public class CampaignTest {
         public static void beforeAll() {
             // beforeEach MUST refresh Campaign Options!
             // It is very time-consuming recreating Campaign for each test, let's try to reuse it
-            campaign = CampaignFactory.createCampaign();
+            campaign = MHQTestUtilities.getTestCampaign();
         }
 
         @Nested

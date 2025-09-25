@@ -123,7 +123,7 @@ jobs:
 
       - name: Test All
         working-directory: mekhq
-        run: ./gradlew testAll  --stacktrace --scan
+        run: ./gradlew testAll  --stacktrace --scan -i --continue
         env:
           mm.profile: dev
 
