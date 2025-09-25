@@ -74,6 +74,7 @@ import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
@@ -281,6 +282,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             SkillType.initializeTypes();
             sort(SkillType.getSkillList()); // sort all skills alphabetically
             SpecialAbility.initializeSPA(false);
+            AtBScenarioModifier.initializeScenarioModifiers(false);
             // endregion Progress 0
 
             // region progress 1
