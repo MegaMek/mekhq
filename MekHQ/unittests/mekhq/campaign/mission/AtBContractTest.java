@@ -83,7 +83,7 @@ public class AtBContractTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         // TODO: fix this in the production code
-        RandomCallsignGenerator.getInstance(); // Required in this code path to generate a random merc company name
+        RandomCallsignGenerator.getInstance(true); // Required in this code path to generate a random merc company name
         RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
         try {
             Factions.setInstance(Factions.loadDefault(true));
