@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -144,7 +145,7 @@ public class Ranks {
         }
     }
 
-    public static void initializeRankSystems() {
+    public static void initializeRankSystems() throws DataFormatException {
         LOGGER.info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
         final RankValidator rankValidator = new RankValidator();
@@ -188,7 +189,12 @@ public class Ranks {
 
     public static void reinitializeRankSystems(final Campaign campaign) {
         // Initialization is set up so that it will clear what exists
-        initializeRankSystems();
+        try {
+            initializeRankSystems();
+        } catch (DataFormatException e) {
+            LOGGER.error("Something bad happened!!", e);
+        }
+
         // Then, we need to check and fix any issues that may arise from the file load
         final RankValidator rankValidator = new RankValidator();
         rankValidator.checkAssignedRankSystems(campaign);
