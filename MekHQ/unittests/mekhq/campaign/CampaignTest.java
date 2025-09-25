@@ -107,7 +107,6 @@ public class CampaignTest {
     public static void setup() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
-        TestSystems.getInstance();
     }
 
     @BeforeEach

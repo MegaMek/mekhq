@@ -69,7 +69,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import org.junit.jupiter.api.BeforeAll;

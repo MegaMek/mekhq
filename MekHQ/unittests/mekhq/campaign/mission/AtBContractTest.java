@@ -87,7 +87,7 @@ public class AtBContractTest {
         RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
         try {
             Factions.setInstance(Factions.loadDefault(true));
-            Systems.setInstance(Systems.loadDefault());
+            Systems.setInstance(TestSystems.loadDefault());
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
