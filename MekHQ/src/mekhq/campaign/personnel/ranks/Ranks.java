@@ -171,9 +171,16 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            LOGGER.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
-                               + " system. Initialization failure, shutting MekHQ down.");
-            java.lang.System.exit(-1);
+            LOGGER.error("Error: Unable to Load the default rank system {}. This is likely due to a missing ranks " +
+                               "directory Please report to the MegaMek Team.", DEFAULT_SYSTEM_CODE);
+
+            // In the event that we have failed to load any Rank Systems we're going to load in an empty placeholder
+            // System. This ensures that we do not have a null RankSystems array and also don't have to deal with
+            // adding null handlers across the entire mhq codebase. This placeholder was made necessary due to the
+            // major data overhaul that occurred in 2025. - Illiani, Sep 25 2025
+            getRankSystems().put(DEFAULT_SYSTEM_CODE,
+                  new RankSystem(DEFAULT_SYSTEM_CODE, "Unknown", "", RankSystemType.DEFAULT));
+            return;
         }
 
         LOGGER.info("Completed Rank System XML Load");
