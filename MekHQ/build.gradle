@@ -485,6 +485,7 @@ test {
 
     minHeapSize = "1024m"
     maxHeapSize = "8192m"
+    jvmArgs = ["-XX:MaxMetaspaceSize=1024m"]
 
     testLogging {
         events "failed"
