@@ -83,7 +83,6 @@ import org.mockito.Mockito;
  * JUnit Tests for {@link MRMSService}
  */
 public class MRMSServiceTest {
-    static MMLogger LOGGER = MMLogger.create(MRMSServiceTest.class);
 
     static int DEFAULT_TARGET_NUMBER = 6;
 
