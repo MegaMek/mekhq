@@ -69,7 +69,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import org.junit.jupiter.api.BeforeAll;
@@ -85,7 +84,6 @@ import org.mockito.Mockito;
  * JUnit Tests for {@link MRMSService}
  */
 
-@Disabled("Disabled for runtime / resource consumption but may need review.")
 public class MRMSServiceTest {
     static MMLogger LOGGER = MMLogger.create(MRMSServiceTest.class);
 
