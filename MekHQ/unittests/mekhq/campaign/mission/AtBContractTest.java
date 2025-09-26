@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Stream;
-import java.util.zip.DataFormatException;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.enums.SkillLevel;
@@ -80,7 +79,7 @@ public class AtBContractTest {
     private CampaignOptions options;
 
     @BeforeAll
-    public static void initSingletons() throws DataFormatException {
+    public static void initSingletons() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         // TODO: fix this in the production code
