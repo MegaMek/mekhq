@@ -837,8 +837,9 @@ public class CampaignOptionsUnmarshaller {
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));
             case "scenarioModBV" -> campaignOptions.setScenarioModBV(parseInt(nodeContents));
             case "autoConfigMunitions" -> campaignOptions.setAutoConfigMunitions(parseBoolean(nodeContents));
-            case "autoGenerateOpForCallsigns" -> campaignOptions.setAutoGenerateOpForCallSigns(parseBoolean(
-                  nodeContents));
+            case "autoGenerateOpForCallsigns", "autoGenerateOpForCallSigns" ->
+                  campaignOptions.setAutoGenerateOpForCallSigns(parseBoolean(
+                        nodeContents));
             case "minimumCallsignSkillLevel" -> campaignOptions.setMinimumCallsignSkillLevel(SkillLevel.parseFromString(
                   nodeContents));
             case "trackFactionStanding" -> campaignOptions.setTrackFactionStanding(parseBoolean(nodeContents));
