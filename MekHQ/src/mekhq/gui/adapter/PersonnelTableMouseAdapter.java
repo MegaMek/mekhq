@@ -3477,10 +3477,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
                 int cost = (int) round(getCampaignOptions().getEdgeCost() * xpCostMultiplier);
 
-                if ((cost >= 0) && (person.getXP() >= cost)) {
+                if (cost >= 0) {
                     menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));
                     menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
                     menuItem.addActionListener(this);
+                    menuItem.setEnabled(person.getXP() >= cost);
                     edgeMenu.add(menuItem);
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, edgeMenu);
