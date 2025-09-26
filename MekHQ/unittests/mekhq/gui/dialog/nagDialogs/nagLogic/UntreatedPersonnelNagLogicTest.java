@@ -41,7 +41,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.zip.DataFormatException;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.MekHQ;
@@ -53,7 +52,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -70,7 +68,7 @@ class UntreatedPersonnelNagLogicTest {
      * Sets up the necessary dependencies and configurations before running the test methods.
      */
     @BeforeAll
-    public static void setup() throws DataFormatException {
+    public static void setup() {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
         Ranks.initializeRankSystems();

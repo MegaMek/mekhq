@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.zip.DataFormatException;
 
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.autoResolve.Resolver;
@@ -73,7 +72,6 @@ import megamek.common.units.CrewType;
 import megamek.common.units.Entity;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -168,7 +166,7 @@ public class ResolverTest {
     }
 
     @BeforeAll
-    public static void setupClass() throws IOException, DataFormatException {
+    public static void setupClass() throws IOException {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();
