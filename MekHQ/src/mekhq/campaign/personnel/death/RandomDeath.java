@@ -149,7 +149,6 @@ public class RandomDeath {
      * enabling or disabling suicide causes, and retrieving the base random death chances. The death causes map is also
      * initialized by reading relevant files.</p>
      *
-     * @param campaign The current campaign.
      */
     public RandomDeath() {
     }

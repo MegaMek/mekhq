@@ -130,8 +130,6 @@ public class NewPersonnelMarket {
     /**
      * Creates a new Personnel Market instance bound to a campaign.
      *
-     * @param campaign the parent {@link Campaign} instance to associate with this personnel market
-     *
      * @author Illiani
      * @since 0.50.06
      */
