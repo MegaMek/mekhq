@@ -1654,6 +1654,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_INTEREST);
                     person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_SCIENCE);
                     person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_SECURITY);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
