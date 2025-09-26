@@ -103,11 +103,15 @@ public class CampaignSummary {
     private int nDS;
 
     /**
-     * @param c a {@link Campaign} for which a summary is desired
+     * Create a CampaignSummary
      */
     public CampaignSummary() {
     }
 
+    /**
+     * Link this CampaignSummary to a Campaign instance and update state with information from it.
+     * @param campaign Campaign to link
+     */
     public void setCampaign(Campaign campaign) {
         this.campaign = campaign;
         updateInformation();

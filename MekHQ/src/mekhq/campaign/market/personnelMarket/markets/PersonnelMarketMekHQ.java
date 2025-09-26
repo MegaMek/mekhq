@@ -96,8 +96,6 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      *
      * <p>Initializes data and behaviors for compatibility.</p>
      *
-     * @param campaign the parent campaign instance
-     *
      * @author Illiani
      * @since 0.50.06
      */

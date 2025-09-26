@@ -78,8 +78,6 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
      *
      * <p>Initializes market styles and loads relevant personnel market libraries.</p>
      *
-     * @param campaign the parent campaign instance
-     *
      * @author Illiani
      * @since 0.50.06
      */
