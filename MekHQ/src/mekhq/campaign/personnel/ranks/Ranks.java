@@ -189,6 +189,7 @@ public class Ranks {
     public static void reinitializeRankSystems(final Campaign campaign) {
         // Initialization is set up so that it will clear what exists
         initializeRankSystems();
+
         // Then, we need to check and fix any issues that may arise from the file load
         final RankValidator rankValidator = new RankValidator();
         rankValidator.checkAssignedRankSystems(campaign);

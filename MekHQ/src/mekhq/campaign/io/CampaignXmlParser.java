@@ -82,6 +82,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
 import mekhq.campaign.Warehouse;
@@ -165,7 +166,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     public Campaign parse() throws CampaignXmlParseException, NullEntityException {
         LOGGER.info("Starting load of campaign file from XML...");
         // Initialize variables.
-        Campaign campaign = new Campaign();
+        Campaign campaign = CampaignFactory.createCampaign();
         campaign.setApp(app);
 
         Document xmlDoc;

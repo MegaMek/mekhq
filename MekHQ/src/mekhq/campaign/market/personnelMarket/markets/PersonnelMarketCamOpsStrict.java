@@ -62,13 +62,11 @@ public class PersonnelMarketCamOpsStrict extends PersonnelMarketCamOpsRevised {
      *
      * <p>Initializes and loads the appropriate market entry libraries.</p>
      *
-     * @param campaign the parent campaign instance
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketCamOpsStrict(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketCamOpsStrict() {
+        super();
 
         setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_STRICT);
 

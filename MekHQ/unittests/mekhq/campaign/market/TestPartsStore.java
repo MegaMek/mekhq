@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,32 +30,26 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.atb;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+package mekhq.campaign.market;
 
-import org.junit.jupiter.api.Test;
+import mekhq.campaign.Campaign;
 
 /**
- * @author NickAragua
+ * Test-only PartsStore that does not stock by default.
  */
-public class ScenarioModifierTest {
-
-    /**
-     * Tests that the initial loading of the scenario modifier manifest works.
-     */
-    @Test
-    public void testLoadScenarioModifierManifest() {
-        assertNotNull(AtBScenarioModifier.getScenarioFileNames());
-        assertNotEquals(0, AtBScenarioModifier.getScenarioFileNames().size());
+public class TestPartsStore extends PartsStore{
+    public TestPartsStore() {
+        super();
     }
 
-    /**
-     * Tests that loading scenario modifiers from the manifest works.
-     */
-    @Test
-    public void testLoadScenarioModifiersFromManifest() {
-        assertNotNull(AtBScenarioModifier.getScenarioModifiers());
+    @Override
+    public void stock(Campaign campaign) {
+        // Does nothing
+    }
+
+    public void reallyStock(Campaign campaign) {
+        // runs the real stock(); high memory and CPU time use.
+        super.stock(campaign);
     }
 }

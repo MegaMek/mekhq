@@ -35,24 +35,74 @@ package testUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Base64;
 
+import megamek.common.Player;
+import megamek.common.game.Game;
 import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignConfiguration;
+import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.TestPartsStore;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.mission.TestSystems;
+import mekhq.campaign.personnel.death.RandomDeath;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 public final class MHQTestUtilities {
     private static final String TEST_RESOURCES_DIR = "testresources/";
     private static final String TEST_DATA_DIR = TEST_RESOURCES_DIR + "data/";
 
     public static final String TEST_UNIT_DATA_DIR = TEST_DATA_DIR + "mekfiles/";
+    public static final String TEST_CANON_SYSTEMS_DIR = TEST_DATA_DIR + "universe/planetary_systems/canon_systems/";
     public static final String TEST_BLK = ".blk";
     public static final String TEST_MTF = ".mtf";
 
+
+    public static CampaignConfiguration buildTestConfigWithSystems(Systems systems) {
+        CampaignOptions options = new CampaignOptions();
+        CampaignConfiguration campaignConfiguration = CampaignFactory.createPartialCampaignConfiguration(options);
+
+        campaignConfiguration.setSystemsInstance(systems);
+        // Finalize config and set up game instance
+        Game game = new Game();
+        campaignConfiguration.setGame(game);
+
+        Player player = new Player(0, "TestPlayer");
+        campaignConfiguration.setPlayer(player);
+
+        LocalDate date = LocalDate.ofYearDay(3067, 1);
+        campaignConfiguration.setCurrentDay(date);
+
+        // We need one planetary system at least; load Galatea and get its location
+        systems.load(TEST_CANON_SYSTEMS_DIR + "Galatea.yml");
+        PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
+        campaignConfiguration.setLocation(new CurrentLocation(starterSystem, 0));
+
+        PartsStore partsStore = new TestPartsStore();
+        NewPersonnelMarket newPersonnelMarket = new NewPersonnelMarket();
+        RandomDeath randomDeath = new RandomDeath();
+        CampaignSummary campaignSummary = new CampaignSummary();
+
+        campaignConfiguration.setPartsStore(partsStore);
+        campaignConfiguration.setNewPersonnelMarket(newPersonnelMarket);
+        campaignConfiguration.setRandomDeath(randomDeath);
+        campaignConfiguration.setCampaignSummary(campaignSummary);
+
+        return campaignConfiguration;
+    }
+
     public static Campaign getTestCampaign() {
-        return new Campaign();
+        return new Campaign(buildTestConfigWithSystems(TestSystems.getInstance()));
     }
 
     public static InputStream ParseBase64XmlFile(String base64) {

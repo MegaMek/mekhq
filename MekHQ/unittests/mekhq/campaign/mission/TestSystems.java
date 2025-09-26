@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,32 +30,34 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.atb;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+package mekhq.campaign.mission;
 
-import org.junit.jupiter.api.Test;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
-/**
- * @author NickAragua
- */
-public class ScenarioModifierTest {
+public class TestSystems extends Systems {
 
-    /**
-     * Tests that the initial loading of the scenario modifier manifest works.
-     */
-    @Test
-    public void testLoadScenarioModifierManifest() {
-        assertNotNull(AtBScenarioModifier.getScenarioFileNames());
-        assertNotEquals(0, AtBScenarioModifier.getScenarioFileNames().size());
+    private static TestSystems systems;
+
+    public static TestSystems getInstance() {
+        if (systems == null) {
+            systems = new TestSystems();
+        }
+
+        return systems;
     }
 
-    /**
-     * Tests that loading scenario modifiers from the manifest works.
-     */
-    @Test
-    public void testLoadScenarioModifiersFromManifest() {
-        assertNotNull(AtBScenarioModifier.getScenarioModifiers());
+    public static void setInstance(TestSystems instance) {
+        systems = instance;
     }
+
+    public TestSystems() {
+        super();
+    }
+
+    public void addPlanetarySystem(PlanetarySystem system) {
+        systemList.put(system.getId(), system);
+    }
+
 }

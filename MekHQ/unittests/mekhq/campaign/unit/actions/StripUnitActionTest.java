@@ -42,11 +42,9 @@ import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
-@Disabled
 public class StripUnitActionTest {
     @BeforeAll
     public static void beforeAll() {

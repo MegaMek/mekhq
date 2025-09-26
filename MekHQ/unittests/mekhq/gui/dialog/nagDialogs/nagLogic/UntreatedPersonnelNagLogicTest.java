@@ -43,25 +43,21 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * This class contains test methods for the {@link UntreatedPersonnelNagDialog} class. It tests the different
  * combinations of untreated personnel and verifies the behavior of the {@code isUntreatedInjury()} method.
  */
-@Disabled
 class UntreatedPersonnelNagLogicTest {
     Campaign campaign;
     Person injuredPerson;
@@ -76,11 +72,6 @@ class UntreatedPersonnelNagLogicTest {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
         Ranks.initializeRankSystems();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            MMLogger.create(UntreatedPersonnelNagLogicTest.class).error("", ex);
-        }
     }
 
     /**
