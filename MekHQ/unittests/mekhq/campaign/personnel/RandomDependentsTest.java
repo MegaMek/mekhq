@@ -73,7 +73,6 @@ class RandomDependentsTest {
         for (int i = 0; i < NUMBER_OF_DEPENDENTS; i++) {
             Person dependent = new Person(mockCampaign);
             dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-            dependent.setEmployed(false);
 
             activeDependents.add(dependent);
         }
