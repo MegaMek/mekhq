@@ -2729,7 +2729,7 @@ public class Person {
     }
 
     public boolean isEmployed() {
-        return status == PersonnelStatus.CAMP_FOLLOWER;
+        return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
     public boolean isMarriageable() {
