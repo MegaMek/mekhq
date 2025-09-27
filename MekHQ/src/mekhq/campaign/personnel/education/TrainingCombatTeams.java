@@ -84,7 +84,7 @@ import mekhq.utilities.ReportingUtilities;
  *     combat team.</li>
  *     <li>{@link #performTraining(Campaign, Force, Person, Map, int)}: Handles training for individual
  *     trainees in a force.</li>
- *     <li>{@link #processEducationTime(Person, Person, List, int, double)} Updates a trainee's education progression
+ *     <li>{@link #processEducationTime(Person, Person, List, int, double, boolean, LocalDate)}  Updates a trainee's education progression
  *     and improves skills.</li>
  *     <li>{@link #createSkillsList(Campaign, Set)}: Collects the skill levels of educators to
  *     determine skills eligible for training.</li>
