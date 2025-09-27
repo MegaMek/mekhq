@@ -6736,7 +6736,7 @@ public class Person {
             return;
         }
 
-        if (!isEmployed()) {
+        if (isEmployed()) {
             LocalDate estimatedJoinDate = null;
             for (LogEntry logEntry : getPersonalLog()) {
                 if (estimatedJoinDate == null) {
