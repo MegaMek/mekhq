@@ -836,7 +836,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         lblExtraIncome.setText(resourceMap.getString("lblExtraIncome.text"));
         lblExtraIncome.setName("lblExtraIncome");
 
-        textExtraIncome.setText(Integer.toString(person.getBloodmark()));
+        textExtraIncome.setText(Integer.toString(person.getExtraIncomeTraitLevel()));
         textExtraIncome.setName("textExtraIncome");
 
         gridBagConstraints = new GridBagConstraints();
