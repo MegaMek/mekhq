@@ -262,7 +262,7 @@ class ExtraIncomeTest {
         person.setDateOfBirth(TODAY.minusYears(30));
 
         String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
-        assertEquals("", result, "Expected empty string for child commander extra income");
+        assertEquals("", result, "Expected empty string for adult non-commander extra income");
     }
 
     @Test
