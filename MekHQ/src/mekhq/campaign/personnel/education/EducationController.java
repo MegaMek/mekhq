@@ -1608,7 +1608,14 @@ public class EducationController {
                 person.awardXP(campaign, curriculumXpRate);
             } else {
                 updateSkill(person, educationLevel, skill);
-                PerformanceLogger.improvedSkill(isLogSkillGain, person, campaign.getLocalDate(), skill, educationLevel);
+
+                String skillParsed = Academy.skillParser(skill);
+                int actualSkillLevel = person.hasSkill(skillParsed) ? person.getSkill(skillParsed).getLevel() : 0;
+                PerformanceLogger.improvedSkill(isLogSkillGain,
+                      person,
+                      campaign.getLocalDate(),
+                      skill,
+                      actualSkillLevel);
             }
         }
     }
