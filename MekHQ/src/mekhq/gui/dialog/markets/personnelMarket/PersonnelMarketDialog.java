@@ -581,6 +581,8 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
+        LOGGER.info(applicant.getFullTitle());
+
         currentApplicants.add(applicant);
 
         // Refresh the table view (notify the model of data changes)
@@ -593,7 +595,11 @@ public class PersonnelMarketDialog extends JDialog {
         int rowCount = model.getRowCount();
         if (rowCount > 0) {
             if (rowCount == 1) { // Only 1 applicant in the table
-                tablePanel.getTable().setRowSelectionInterval(0, 0); // Select the first (and only) row
+                SwingUtilities.invokeLater(() -> {
+                    if (tablePanel.getTable().getRowCount() > 0) {
+                        tablePanel.getTable().setRowSelectionInterval(0, 0);
+                    }
+                });
             }
             personViewPanel.setVisible(true);
         }
