@@ -55,14 +55,20 @@ public class EducationLevelSorter implements Comparator<String> {
 
     @Override
     public int compare(String firstString, String secondString) {
+        int firstOrder;
+        int secondOrder;
         try {
-            int firstOrder = EducationLevel.fromString(firstString).getOrder();
-            int secondOrder = EducationLevel.fromString(secondString).getOrder();
-            return Integer.compare(firstOrder, secondOrder);
+            firstOrder = EducationLevel.fromString(firstString).getOrder();
         } catch (Exception e) {
-            LOGGER.error("Error comparing education levels: {} or {}", firstString, secondString, e);
-            // malformed/non-matching strings go last
-            return 1;
+            LOGGER.error("Error parsing education level: {}", firstString, e);
+            firstOrder = Integer.MAX_VALUE;
         }
+        try {
+            secondOrder = EducationLevel.fromString(secondString).getOrder();
+        } catch (Exception e) {
+            LOGGER.error("Error parsing education level: {}", secondString, e);
+            secondOrder = Integer.MAX_VALUE;
+        }
+        return Integer.compare(firstOrder, secondOrder);
     }
 }
