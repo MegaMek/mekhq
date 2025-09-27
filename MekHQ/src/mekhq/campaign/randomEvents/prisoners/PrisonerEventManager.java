@@ -615,7 +615,7 @@ public class PrisonerEventManager {
         }
 
         // Build the report
-        String key = getFormattedTextAt(RESOURCE_BUNDLE, hasBackfired ? "execute.backfired" : "execute.successful");
+        String key = hasBackfired ? "execute.backfired" : "execute.successful";
 
         String messageColor = hasBackfired ?
                                     spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
