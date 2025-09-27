@@ -107,6 +107,7 @@ public class PrisonerEventManager {
     public static final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 5;
     public static final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
     public static final double PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER = 0.05;
+    public static final double PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER = 0.25;
     public static final int PRISONER_CAPACITY_CAM_OPS_MULTIPLIER = 3;
 
     // Fixed Dialog Options
@@ -739,6 +740,7 @@ public class PrisonerEventManager {
                 }
             }
 
+            otherUnitMultiplier = min(PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER, otherUnitMultiplier);
             prisonerCapacity = (int) round(prisonerCapacity * otherUnitMultiplier);
         }
 
