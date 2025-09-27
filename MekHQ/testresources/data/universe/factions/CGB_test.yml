@@ -1,0 +1,104 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+key: CGB
+name: Clan Ghost Bear
+nameChanges:
+  3060: Ghost Bear Dominion
+capital: Arcadia (Clan)
+capitalChanges:
+  3060: Alshain
+yearsActive:
+  - start: 2807
+    end: 3103
+successor: RD
+tags:
+  - PLAYABLE
+  - MAJOR
+  - CLAN
+  - BATCHALL
+color:
+  red: 191
+  green: 232
+  blue: 255
+logo: Clan/Clan Ghost Bear.png
+background: Clan/Clan Ghost Bear.png
+camos: Clans/Ghost Bear
+nameGenerator: Clan
+ratingLevels:
+  - Provisional Garrison
+  - Solahma
+  - Second Line
+  - Front Line
+  - Keshik
+fallBackFactions:
+  - CLAN.IS
+postInvasionHonorRating: LIBERAL
+factionLeaders:
+  - title: "Khan"
+    firstName: "Sandra"
+    surname: "Tseng"
+    gender: "FEMALE"
+    startYear: 2810
+    endYear: 2848
+  - title: "Khan"
+    firstName: "Toramano"
+    surname: "Tseng"
+    gender: "MALE"
+    startYear: 2848
+    endYear: 2868 #Unofficial: we don't have a canon endYear
+  - title: "Khan"
+    firstName: "Kilbourne"
+    surname: "Jorgensson"
+    gender: "MALE"
+    startYear: 2902
+    endYear: 2921
+  - title: "Khan"
+    firstName: "Nadia"
+    surname: "Winson"
+    gender: "FEMALE"
+    startYear: 3000
+    endYear: 3009
+  - title: "Khan"
+    firstName: "Nornian"
+    surname: "Tseng"
+    gender: "MALE"
+    startYear: 3028 #Unofficial: we don't have a canon startYear
+    endYear: 3048
+  - title: "Khan"
+    firstName: "Karl"
+    surname: "Bourjon"
+    gender: "MALE"
+    startYear: 3048
+    endYear: 3050
+  - title: "Khan"
+    firstName: "Bjorn"
+    surname: "Jorgensson"
+    gender: "MALE"
+    startYear: 3050
+    endYear: 3073
+  - title: "Khan"
+    firstName: "Aletha"
+    surname: "Kabrinski"
+    gender: "FEMALE"
+    startYear: 3073
+    endYear: 3093 #Unofficial: we don't have a canon endYear
+  - title: "Khan"
+    firstName: "Dalia"
+    surname: "Bekker"
+    gender: "FEMALE"
+    startYear: 3126

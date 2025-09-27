@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe;
 
+import static mekhq.MHQConstants.FACTION_HINTS_FILE;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -46,7 +48,6 @@ import javax.xml.parsers.DocumentBuilder;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -59,6 +60,9 @@ import org.w3c.dom.NodeList;
  */
 public class FactionHints {
     private static final MMLogger LOGGER = MMLogger.create(FactionHints.class);
+
+    private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replaceAll("factionhints",
+          "factionhints_test");
 
     private final Set<Faction> neutralFactions;
 
@@ -81,18 +85,32 @@ public class FactionHints {
     }
 
     /**
-     * Factory that loads the default data
+     * Generates the default set of {@link FactionHints} by loading relevant data using the main data directory.
      *
+     * @return A {@link FactionHints} object containing the loaded data.
      */
     public static FactionHints defaultFactionHints() {
+        return defaultFactionHints(false);
+    }
+
+    /**
+     * Generates the default set of {@link FactionHints} by loading relevant data. This can be configured to use either
+     * the main data directory or a test data directory based on the input parameter.
+     *
+     * @param useTestDirectory A boolean indicating whether to load data from a test directory. If {@code true}, test
+     *                         data will be used; otherwise, the main data will be loaded.
+     *
+     * @return A {@link FactionHints} object containing the loaded data.
+     */
+    public static FactionHints defaultFactionHints(boolean useTestDirectory) {
         FactionHints hints = new FactionHints();
-        hints.loadData();
+        hints.loadData(useTestDirectory);
         return hints;
     }
 
-    private void loadData() {
+    private void loadData(boolean useTestDirectory) {
         try {
-            loadFactionHints();
+            loadFactionHints(useTestDirectory);
         } catch (DOMException e) {
             LOGGER.error("", e);
         }
@@ -430,11 +448,12 @@ public class FactionHints {
         }
     }
 
-    private void loadFactionHints() throws DOMException {
+    private void loadFactionHints(boolean useTestDirectory) throws DOMException {
         LOGGER.info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(MHQConstants.FACTION_HINTS_FILE)) {
+        String directory = useTestDirectory ? TEST_DIR : FACTION_HINTS_FILE;
+        try (InputStream is = new FileInputStream(directory)) {
             DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
