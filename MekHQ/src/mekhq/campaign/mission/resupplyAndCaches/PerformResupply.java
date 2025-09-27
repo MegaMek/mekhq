@@ -171,8 +171,8 @@ public class PerformResupply {
             // won't use player convoys.
             if (!isGuerrilla && !isPirate) {
                 ResupplyConvoyChoice convoyChoice = new ResupplyConvoyChoice(resupply.getCampaign(), isIndependent,
-                      resupply.getPlayerConvoys().size(), resupply.getTargetCargoTonnagePlayerConvoy(),
-                      resupply.getTargetCargoTonnage(), contract.getMoraleLevel().toString());
+                      resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTargetCargoTonnage(),
+                      resupply.getTotalPlayerCargoCapacity(), contract.getMoraleLevel().toString());
 
                 ResupplyConvoyChoice.ConvoyResponseType responseType = convoyChoice.getResponseType();
                 if (CANCEL.equals(responseType)) {
