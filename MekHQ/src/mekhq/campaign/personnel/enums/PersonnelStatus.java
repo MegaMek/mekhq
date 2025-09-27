@@ -90,7 +90,8 @@ public enum PersonnelStatus {
     SEPPUKU(NotificationSeverity.NEGATIVE, true, true),
     BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false),
     IMPRISONED(NotificationSeverity.NEGATIVE, false, false),
-    DISHONORABLY_DISCHARGED(NotificationSeverity.NEGATIVE, false, false);
+    DISHONORABLY_DISCHARGED(NotificationSeverity.NEGATIVE, false, false),
+    CAMP_FOLLOWER(NotificationSeverity.WARNING, true, false);
 
     /**
      * Represents the severity levels of a status.
@@ -498,6 +499,15 @@ public enum PersonnelStatus {
      */
     public boolean isDishonorablyDischarged() {
         return this == DISHONORABLY_DISCHARGED;
+    }
+
+    /**
+     * Checks if the character has the {@link #CAMP_FOLLOWER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #CAMP_FOLLOWER} personnel status {@code false} otherwise.
+     */
+    public boolean isCampFollower() {
+        return this == CAMP_FOLLOWER;
     }
 
     /**
