@@ -91,7 +91,7 @@ class AtBDynamicScenarioFactoryTest {
         Entity entity = getShadowHawk();
 
         SkillLevel skill = SkillLevel.VETERAN;
-        createEntityWithCrew(faction, skill, campaign, entity);
+        createEntityWithCrew(faction, skill, campaign, entity, true);
 
         assertTrue(entity.getCrew().getNickname(0).isEmpty());
     }
@@ -115,7 +115,7 @@ class AtBDynamicScenarioFactoryTest {
         Entity entity = getShadowHawk();
 
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        createEntityWithCrew(faction, skill, campaign, entity);
+        createEntityWithCrew(faction, skill, campaign, entity, true);
 
         assertFalse(entity.getCrew().getNickname(0).isEmpty());
     }
@@ -135,12 +135,12 @@ class AtBDynamicScenarioFactoryTest {
 
         // First crew, scrub, gets no callsign
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        createEntityWithCrew(faction, skill, campaign, entity1);
+        createEntityWithCrew(faction, skill, campaign, entity1, true);
         assertTrue(entity1.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets a callsign
         skill = SkillLevel.VETERAN;
-        createEntityWithCrew(faction, skill, campaign, entity2);
+        createEntityWithCrew(faction, skill, campaign, entity2, true);
         assertFalse(entity2.getCrew().getNickname(0).isEmpty());
     }
 
@@ -159,17 +159,17 @@ class AtBDynamicScenarioFactoryTest {
 
         // First crew, scrub, gets no callsign
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        createEntityWithCrew(faction, skill, campaign, entity1);
+        createEntityWithCrew(faction, skill, campaign, entity1, true);
         assertTrue(entity1.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets no callsign
         skill = SkillLevel.VETERAN;
-        createEntityWithCrew(faction, skill, campaign, entity2);
+        createEntityWithCrew(faction, skill, campaign, entity2, true);
         assertTrue(entity2.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets a callsign
         skill = SkillLevel.LEGENDARY;
-        createEntityWithCrew(faction, skill, campaign, entity3);
+        createEntityWithCrew(faction, skill, campaign, entity3, true);
         assertFalse(entity3.getCrew().getNickname(0).isEmpty());
     }
 }

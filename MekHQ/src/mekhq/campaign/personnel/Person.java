@@ -378,7 +378,6 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
-    private boolean employed;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -597,7 +596,6 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
-        setEmployed(true);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -1133,7 +1131,7 @@ public class Person {
     public String getFormatedRoleDescriptions(LocalDate today) {
         StringBuilder description = new StringBuilder("<html>");
 
-        if (!employed) {
+        if (!isEmployed()) {
             description.append("\u25CF ");
         }
 
@@ -1826,7 +1824,9 @@ public class Person {
      * @param recruitment the date the entity was recruited, or {@code null} to unset
      */
     public void setRecruitment(final @Nullable LocalDate recruitment) {
-        employed = recruitment != null;
+        if (recruitment == null) {
+            status = PersonnelStatus.CAMP_FOLLOWER;
+        }
 
         this.recruitment = recruitment;
     }
@@ -2735,11 +2735,7 @@ public class Person {
     }
 
     public boolean isEmployed() {
-        return employed;
-    }
-
-    public void setEmployed(final boolean employed) {
-        this.employed = employed;
+        return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
     public boolean isMarriageable() {
@@ -3270,7 +3266,6 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employed", employed);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
@@ -3810,13 +3805,6 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("employed")) {
-                    // Fixes a <50.07 bug
-                    if (!person.isCivilian()) { // Non-civilians are always employed
-                        person.setEmployed(true);
-                    } else {
-                        person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    }
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
@@ -3943,7 +3931,7 @@ public class Person {
             return Money.zero();
         }
 
-        if (!employed) {
+        if (!isEmployed()) {
             return Money.zero();
         }
 
@@ -6812,7 +6800,7 @@ public class Person {
             return;
         }
 
-        if (employed) {
+        if (isEmployed()) {
             LocalDate estimatedJoinDate = null;
             for (LogEntry logEntry : getPersonalLog()) {
                 if (estimatedJoinDate == null) {

@@ -46,7 +46,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +61,11 @@ class RandomDependentsTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Hangar mockHangar = mock(Hangar.class);
+        Warehouse mockWarehouse = mock(Warehouse.class);
         Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -73,7 +80,7 @@ class RandomDependentsTest {
         for (int i = 0; i < NUMBER_OF_DEPENDENTS; i++) {
             Person dependent = new Person(mockCampaign);
             dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-            dependent.setEmployed(false);
+            dependent.changeStatus(mockCampaign, currentDay, PersonnelStatus.CAMP_FOLLOWER);
 
             activeDependents.add(dependent);
         }

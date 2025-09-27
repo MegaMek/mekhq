@@ -44,11 +44,11 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
-import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -70,6 +70,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -1202,8 +1203,7 @@ public enum PersonnelTableModelColumn {
             };
             case PERSONALITY -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
-                case AGGRESSION, AMBITION, GREED, SOCIAL ->
-                      campaign.getCampaignOptions().isUseRandomPersonalities();
+                case AGGRESSION, AMBITION, GREED, SOCIAL -> campaign.getCampaignOptions().isUseRandomPersonalities();
                 default -> false;
             };
             case TRAITS -> switch (this) {
@@ -1241,6 +1241,7 @@ public enum PersonnelTableModelColumn {
     public Comparator<?> getComparator(final Campaign campaign) {
         return switch (this) {
             case RANK -> new PersonRankStringSorter(campaign);
+            case EDUCATION -> new EducationLevelSorter();
             case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                   new DateStringComparator();
             case SKILL_LEVEL -> new LevelSorter();

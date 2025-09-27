@@ -1061,9 +1061,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
               "chkUseSpecifiedFactionToAssignRanks.toolTipText"));
         getChkUseSpecifiedFactionToAssignRanks().setName("chkUseSpecifiedFactionToAssignRanks");
 
-        setChkAssignMekWarriorsCallSigns(new JCheckBox(resources.getString("chkAssignMekWarriorsCallsigns.text")));
+        setChkAssignMekWarriorsCallSigns(new JCheckBox(resources.getString("chkAssignMekWarriorsCallSigns.text")));
         getChkAssignMekWarriorsCallSigns().setToolTipText(resources.getString(
-              "chkAssignMekWarriorsCallsigns.toolTipText"));
+              "chkAssignMekWarriorsCallSigns.toolTipText"));
         getChkAssignMekWarriorsCallSigns().setName("chkAssignMekWarriorsCallSigns");
 
         setChkAssignFounderFlag(new JCheckBox(resources.getString("chkAssignFounderFlag.text")));

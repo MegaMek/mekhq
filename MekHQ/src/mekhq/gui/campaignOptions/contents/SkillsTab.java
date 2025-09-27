@@ -112,7 +112,7 @@ public class SkillsTab {
     private JLabel lblEdgeCost;
     private JSpinner spnEdgeCost;
 
-    private static final MMLogger logger = MMLogger.create(SkillsTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(SkillsTab.class);
 
     /**
      * Constructs a new `SkillsTab` instance and initializes the necessary data structures for managing skill
@@ -231,8 +231,9 @@ public class SkillsTab {
         }
 
         // Content
-        pnlEdgeCost = createEdgeCostPanel();
-        pnlEdgeCost.setVisible(category == COMBAT_GUNNERY);
+        if (category == COMBAT_GUNNERY) {
+            pnlEdgeCost = createEdgeCostPanel();
+        }
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel(panelName, true);
@@ -262,10 +263,12 @@ public class SkillsTab {
         layout.gridy = 0;
         panel.add(headerPanel, layout);
 
-        layout.gridwidth = 2;
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlEdgeCost, layout);
+        if (category == COMBAT_GUNNERY) {
+            layout.gridwidth = 2;
+            layout.gridx = 0;
+            layout.gridy++;
+            panel.add(pnlEdgeCost, layout);
+        }
 
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -571,7 +574,7 @@ public class SkillsTab {
 
             // Skip outdated or missing skills
             if (allTargetNumbers.get(skillName) == null) {
-                logger.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
+                LOGGER.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
                 continue;
             }
 
@@ -681,7 +684,7 @@ public class SkillsTab {
             }
 
             if (type == null) {
-                logger.info("(applyCampaignOptionsToCampaign) Skipping outdated or missing skill: {}", skillName);
+                LOGGER.info("(applyCampaignOptionsToCampaign) Skipping outdated or missing skill: {}", skillName);
                 continue;
             }
 

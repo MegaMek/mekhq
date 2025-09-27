@@ -95,6 +95,7 @@ public enum PersonnelFilter {
     ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false,
           true),
     DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
+    CAMP_FOLLOWER("PersonnelFilter.CAMP_FOLLOWER.text", "PersonnelFilter.CAMP_FOLLOWER.toolTipText"),
     // endregion Standard Personnel Filters
 
     // region Expanded Personnel Tab Filters
@@ -318,6 +319,10 @@ public enum PersonnelFilter {
         return this == DEPENDENT;
     }
 
+    public boolean isCampFollower() {
+        return this == CAMP_FOLLOWER;
+    }
+
     public boolean isFounder() {
         return this == FOUNDER;
     }
@@ -503,6 +508,7 @@ public enum PersonnelFilter {
                                                       person.getPrimaryRole().isAdministratorHR() :
                                                       person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isCivilian()));
+            case CAMP_FOLLOWER -> ((!dead) && (active && person.getStatus().isCampFollower()));
             case BACKGROUND_CHARACTER -> person.getStatus().isBackground();
             case FOUNDER -> ((!dead) && (person.isFounder()));
             case KIDS -> ((!dead) && (!status.isLeft()) && (person.isChild(currentDate)));

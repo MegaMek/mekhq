@@ -1091,6 +1091,8 @@ public class NewPersonnelMarket {
     private String generatePersonnelReport(Campaign campaign) {
         StringBuilder report = new StringBuilder(getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report"));
 
+        int civilians = 0;
+
         // Define the experience levels and tie them to their respective constants.
         final int[] expLevels = {
               EXP_ULTRA_GREEN, EXP_GREEN, EXP_REGULAR,
@@ -1109,6 +1111,11 @@ public class NewPersonnelMarket {
 
         // Tally applicants per experience level
         for (Person applicant : currentApplicants) {
+            if (applicant.isCivilian()) {
+                civilians++;
+                continue;
+            }
+
             int experienceLevel = applicant.getExperienceLevel(campaign, false);
             for (int i = 0; i < expLevels.length; i++) {
                 if (experienceLevel == expLevels[i]) {
@@ -1126,6 +1133,14 @@ public class NewPersonnelMarket {
                       .append(getFormattedTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.experienceLevel",
                             applicantCounts[i], colors[i], names[i], CLOSING_SPAN_TAG, pluralizer));
             }
+        }
+
+        if (civilians > 0) {
+            int pluralizer = civilians > 1 ? 1 : 0;
+            report.append("<br>")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.experienceLevel",
+                        civilians, "", getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.civilians"), "",
+                        pluralizer));
         }
 
         return report.toString();

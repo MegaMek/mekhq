@@ -244,6 +244,8 @@ public class ResolveScenarioTracker {
         int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
 
+        sanitizeAllEntityExternalIds();
+
         for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {
@@ -481,6 +483,42 @@ public class ResolveScenarioTracker {
             }
         }
         checkStatusOfPersonnel();
+    }
+
+    /**
+     * Ensures that every entity in all relevant victory event collections has a proper unique external ID assigned. If
+     * a UUID is missing ("-1"), a new one is generated and set.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void sanitizeAllEntityExternalIds() {
+        sanitizeEntityEnumeration(victoryEvent.getEntities());
+        sanitizeEntityEnumeration(victoryEvent.getGraveyardEntities());
+        sanitizeEntityEnumeration(victoryEvent.getWreckedEntities());
+        sanitizeEntityEnumeration(victoryEvent.getRetreatedEntities());
+        sanitizeEntityEnumeration(victoryEvent.getDevastatedEntities());
+    }
+
+    /**
+     * Ensures each entity in the given enumeration has a UUID assigned. If not set, a new UUID is created and
+     * assigned.
+     *
+     * @param entities Enumeration of entities to sanitize
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void sanitizeEntityEnumeration(Enumeration<Entity> entities) {
+        String UNSET_UUID = "-1";
+
+        while (entities.hasMoreElements()) {
+            Entity entity = entities.nextElement();
+            if (UNSET_UUID.equals(entity.getExternalIdAsString())) {
+                String uuid = UUID.randomUUID().toString();
+                entity.setExternalIdAsString(uuid);
+            }
+        }
     }
 
     /**

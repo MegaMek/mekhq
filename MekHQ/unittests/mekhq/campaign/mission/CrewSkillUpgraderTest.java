@@ -55,7 +55,7 @@ class CrewSkillUpgraderTest {
     @BeforeAll
     static void setUpAll() {
         EquipmentType.initializeTypes();
-        SpecialAbility.initializeSPA();
+        SpecialAbility.initializeSPA(true);
     }
 
     boolean allSPAsFalse(Crew crew) {

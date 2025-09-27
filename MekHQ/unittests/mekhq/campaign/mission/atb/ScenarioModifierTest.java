@@ -32,15 +32,21 @@
  */
 package mekhq.campaign.mission.atb;
 
+import static mekhq.campaign.mission.atb.AtBScenarioModifier.initializeScenarioModifiers;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author NickAragua
  */
 public class ScenarioModifierTest {
+    @BeforeAll
+    public static void setUpClass() {
+        initializeScenarioModifiers(true);
+    }
 
     /**
      * Tests that the initial loading of the scenario modifier manifest works.

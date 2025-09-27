@@ -63,7 +63,7 @@ class FactionStandingsTest {
     @BeforeEach
     void setUp() {
         try {
-            Factions.setInstance(Factions.loadDefault());
+            Factions.setInstance(Factions.loadDefault(true));
             factions = Factions.getInstance();
         } catch (Exception ignored) {
         }
@@ -93,7 +93,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
 
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.updateClimateRegard(campaignFaction, today, 1.0);
+        factionStandings.updateClimateRegard(campaignFaction, today, 1.0, true);
 
         // Act
         double actualRegard = factionStandings.getRegardForFaction(targetFaction, true);

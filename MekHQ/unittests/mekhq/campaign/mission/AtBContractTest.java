@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -82,10 +83,10 @@ public class AtBContractTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         // TODO: fix this in the production code
-        RandomCallsignGenerator.getInstance(); // Required in this code path to generate a random merc company name
+        RandomCallsignGenerator.getInstance(true); // Required in this code path to generate a random merc company name
         RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
         try {
-            Factions.setInstance(Factions.loadDefault());
+            Factions.setInstance(Factions.loadDefault(true));
             Systems.setInstance(Systems.loadDefault());
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
@@ -278,7 +279,7 @@ public class AtBContractTest {
     @Test
     public void getEnemyNameReturnsCorrectValueWhenMerc() {
         String name = "Testing Merc";
-        contract.setEnemyCode("MERC");
+        contract.setEnemyCode(MERCENARY_FACTION_CODE);
         contract.setEnemyBotName(name);
         assertEquals(name, contract.getEnemyName(3025));
     }

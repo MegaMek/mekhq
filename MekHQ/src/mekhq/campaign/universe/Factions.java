@@ -194,9 +194,9 @@ public class Factions {
     /**
      * Loads the default Factions data.
      */
-    public static Factions loadDefault() {
+    public static Factions loadDefault(boolean isForTesting) {
         LOGGER.info("Starting load of faction data from XML...");
-        Factions factions = load();
+        Factions factions = load(isForTesting);
         LOGGER.info("Loaded a total of {} factions", factions.factions.size());
         return factions;
     }
@@ -205,10 +205,10 @@ public class Factions {
      * Loads Factions data from a file.
      *
      */
-    public static Factions load() {
+    public static Factions load(boolean isForTesting) {
         // Factions are populated from the new unified factions list instead of loading them directly
         Factions factionsObject = new Factions();
-        Factions2.getInstance().getFactions().stream()
+        Factions2.getInstance(isForTesting).getFactions().stream()
               .map(Faction::new)
               .forEach(f -> factionsObject.factions.put(f.getShortName(), f));
         return factionsObject;

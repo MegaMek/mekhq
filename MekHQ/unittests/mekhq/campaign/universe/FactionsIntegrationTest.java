@@ -47,7 +47,7 @@ import org.w3c.dom.DOMException;
 public class FactionsIntegrationTest {
     @Test
     public void loadDefaultTest() throws DOMException {
-        Factions factions = Factions.loadDefault();
+        Factions factions = Factions.loadDefault(true);
 
         assertNotNull(factions);
 

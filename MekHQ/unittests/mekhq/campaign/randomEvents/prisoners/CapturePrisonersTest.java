@@ -78,7 +78,7 @@ class CapturePrisonersTest {
 
     @BeforeAll
     public static void setup() {
-        Factions.setInstance(Factions.loadDefault());
+        Factions.setInstance(Factions.loadDefault(true));
         factions = Factions.getInstance();
     }
 
