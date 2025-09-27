@@ -932,28 +932,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Initializes the unit generator based on the method chosen in campaignOptions. Called when the unit generator is
-     * first used or when the method has been changed in campaignOptions.
+     * Initializes the unit generator. Called when the unit generator is first used or when the method has been changed
+     * in {@link CampaignOptions}..
      */
     public void initUnitGenerator() {
-        if (unitGenerator != null && unitGenerator instanceof RATManager) {
-            MekHQ.unregisterHandler(unitGenerator);
-        }
-        if (campaignOptions.isUseStaticRATs()) {
-            RATManager rm = new RATManager();
-            while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    LOGGER.error("", e);
-                }
-            }
-            rm.setSelectedRATs(campaignOptions.getRATs());
-            rm.setIgnoreRatEra(campaignOptions.isIgnoreRATEra());
-            unitGenerator = rm;
-        } else {
-            unitGenerator = new RATGeneratorConnector(getGameYear());
-        }
+        unitGenerator = new RATGeneratorConnector(getGameYear());
     }
 
     /**

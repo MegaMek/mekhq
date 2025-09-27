@@ -63,7 +63,9 @@ import org.w3c.dom.NodeList;
  * unit type, and weight class. May be restricted to a certain subset of all available RATs.
  *
  * @author Neoancient
+ * @deprecated No longer in use
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class RATManager extends AbstractUnitGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RATManager.class);
 
