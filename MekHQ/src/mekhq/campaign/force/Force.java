@@ -886,6 +886,19 @@ public class Force {
         }
     }
 
+    /**
+     * Returns a vector containing all children of this force, including sub-forces and units, sorted by commander
+     * rank.
+     *
+     * <p>This method gathers all subordinate objects belonging to this force: first, it adds all sub-forces, then it
+     * adds all units under this force (with crewed units before uncrewed units), finally sorting crewed units by their
+     * commander's numeric rank in descending order.</p>
+     *
+     * @param campaign The {@link Campaign} instance used to look up unit and personnel data.
+     *
+     * @return A {@link Vector} of all child objects, including sub-forces and units, sorted such that crewed units
+     *       appear before unmanned units, and crewed units are ordered by their commander's rank descending.
+     */
     public Vector<Object> getAllChildren(Campaign campaign) {
         Vector<Object> children = new Vector<>(subForces);
         // add any units
