@@ -135,6 +135,7 @@ public class SkillType {
     public static final String S_LEADER = "Leadership";
     public static final String S_STRATEGY = "Strategy";
     public static final String S_TACTICS = "Tactics/Any";
+    public static final String S_TRAINING = "Training";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
@@ -207,7 +208,6 @@ public class SkillType {
     public static final String S_STREETWISE = "Streetwise/Any" + RP_ONLY_TAG;
     public static final String S_SURVIVAL = "Survival/Any" + RP_ONLY_TAG;
     public static final String S_TRACKING = "Tracking/Any" + RP_ONLY_TAG;
-    public static final String S_TRAINING = "Training" + RP_ONLY_TAG;
     public static final String S_CAREER_ANY = "Career/Any" + RP_ONLY_TAG;
     public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
     public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                               Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                               SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                               SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                      </pre>
+     *                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                               </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1007,7 +1007,53 @@ public class SkillType {
     }
 
     public static @Nullable SkillType getType(String skillName) {
+        skillName = updateSkillName(skillName);
         return lookupHash.get(skillName);
+    }
+
+    /**
+     * Updates and standardizes a skill name to the canonical MekHQ format.
+     *
+     * <p>This method performs a hardcoded normalization of certain legacy or alternate skill names to the
+     * standardized format currently expected by MekHQ and related projects. It should be used when loading or
+     * converting saved data or user input, especially from earlier campaign versions which might use deprecated or
+     * inconsistent skill naming.</p>
+     *
+     * <p>This method does <b>not</b> use any static map of names to allow for clear and explicit version migration.
+     * Each mapping is specified as a {@code switch} case for traceability and maintainability. New canonicalization
+     * rules or campaign migration steps should be added here rather than attempting to use a static collection or
+     * dynamic mapping.</p>
+     *
+     * <p>If a provided skill name does not match any known legacy format, it is returned as-is.</p>
+     *
+     * @param skillName The skill name to normalize. Case-insensitive.
+     *
+     * @return The standardized skill name if a rule exists, or the original input name if not matched.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static String updateSkillName(String skillName) {
+        // When updating skill names do NOT use the static, it must be a hardcoded switch otherwise it won't work
+        String temporarySkillName = skillName.toLowerCase();
+        skillName = switch (temporarySkillName) {
+            // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
+            case "anti-mech" -> "Anti-Mek (Climbing)"; // <50.07
+            case "medtech" -> "MedTech/Any"; // <50.07
+            case "communications (rp only)" -> "Communications/Any" + RP_ONLY_TAG; // <50.07
+            case "sleight of hand (rp only)" -> "Sleight of Hand/Any" + RP_ONLY_TAG; // <50.07
+            case "protocols (rp only)" -> "Protocols/Any" + RP_ONLY_TAG; // <50.07
+            case "survival" -> "Survival/Any" + RP_ONLY_TAG; // <50.07
+            case "languages (rp only)" -> "Language/Any" + RP_ONLY_TAG; // <50.07
+            case "hyperspace navigation" -> "Navigation/Any"; // <50.07
+            case "streetwise (rp only)" -> "Streetwise/Any" + RP_ONLY_TAG; // <50.07
+            case "doctor" -> "Surgery/Any"; // <50.07
+            case "tactics" -> "Tactics/Any"; // <50.07
+            case "tracking (rp only)" -> "Tracking/Any" + RP_ONLY_TAG; // <50.07
+            case "training (rp only)" -> "Training"; // <50.07
+            default -> skillName;
+        };
+        return skillName;
     }
 
     public static String getDrivingSkillFor(Entity en) {
@@ -1146,22 +1192,7 @@ public class SkillType {
                     String name = wn2.getTextContent().trim();
 
                     //Start <50.07 compatibility handler.
-                    skillType.name = switch (name.toLowerCase()) {
-                        // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
-                        case "anti-mech" -> S_ANTI_MEK;
-                        case "medtech" -> S_MEDTECH;
-                        case "communications (rp only)" -> S_COMMUNICATIONS;
-                        case "sleight of hand (rp only)" -> S_SLEIGHT_OF_HAND;
-                        case "protocols (rp only)" -> S_PROTOCOLS;
-                        case "survival" -> S_SURVIVAL;
-                        case "languages (rp only)" -> S_LANGUAGES;
-                        case "hyperspace navigation" -> S_NAVIGATION;
-                        case "streetwise (rp only)" -> S_STREETWISE;
-                        case "doctor" -> S_SURGERY;
-                        case "tactics" -> S_TACTICS;
-                        case "tracking (rp only)" -> S_TRACKING;
-                        default -> name;
-                    };
+                    skillType.name = updateSkillName(name);
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
                     skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);
                 } else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
@@ -1384,7 +1415,7 @@ public class SkillType {
             case S_STREETWISE -> createStreetwise();
             case S_SURVIVAL -> createSurvival();
             case S_TRACKING -> createTracking();
-            case S_TRAINING -> createTraining();
+            case S_TRAINING, "Training (RP Only)" -> createTraining();
             case S_CAREER_ANY -> createCareer();
             case S_SWIMMING -> createSwimming();
             case S_ZERO_G_OPERATIONS -> createZeroGOperations();
@@ -3065,7 +3096,7 @@ public class SkillType {
         return new SkillType(S_TRAINING,
               9,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               CHARISMA,
               null,

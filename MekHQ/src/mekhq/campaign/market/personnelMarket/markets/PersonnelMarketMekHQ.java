@@ -39,7 +39,6 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
-import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -304,8 +303,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         int dependentsCount = d6();
 
         for (int roll = 0; roll < dependentsCount; roll++) {
-            String applicantOriginFaction = getRandomItem(getApplicantOriginFactions()).getShortName();
-            Person applicant = getCampaign().newPerson(DEPENDENT, applicantOriginFaction, Gender.RANDOMIZE);
+            Faction applicantOriginFaction = getRandomItem(getApplicantOriginFactions());
+            Person applicant = getCampaign().newDependent(Gender.RANDOMIZE, applicantOriginFaction,
+                  null);
             if (applicant == null) {
                 continue;
             }
