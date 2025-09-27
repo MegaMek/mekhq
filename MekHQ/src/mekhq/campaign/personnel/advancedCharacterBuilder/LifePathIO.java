@@ -37,10 +37,19 @@ import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +72,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.io.FileType;
 
 public class LifePathIO {
-    final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathIO";
+    final static String PRIMARY_RESOURCE_BUNDLE = "mekhq.resources.LifePathIO";
+    final static String LEGAL_NOTICE_RESOURCE_BUNDLE = "mekhq.resources.Legal";
     private static final MMLogger LOGGER = MMLogger.create(LifePathIO.class);
 
     public static Map<UUID, LifePath> loadAllLifePaths(Campaign campaign) {
@@ -100,10 +110,9 @@ public class LifePathIO {
           boolean silentlyUpgrade) {
         Map<UUID, LifePath> lifePathMap = new HashMap<>();
         Map<UUID, String> outOfDateLifePaths = new HashMap<>();
+        Map<UUID, String> outOfDateLifePathsWithLegalStatements = new HashMap<>();
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             Path startPath = Paths.get(directoryPath);
             if (Files.exists(startPath)) {
                 try (Stream<Path> paths = Files.walk(startPath)) {
@@ -118,7 +127,27 @@ public class LifePathIO {
 
                     for (File file : jsonFiles) {
                         try {
-                            LifePath record = objectMapper.readValue(file, LifePath.class);
+                            // PREPROCESS: Skip legal comment lines
+                            StringBuilder jsonBuilder = new StringBuilder();
+                            try (BufferedReader reader = new BufferedReader(
+                                  new InputStreamReader(
+                                        new FileInputStream(file), StandardCharsets.UTF_8))) {
+                                String line;
+                                boolean inJson = false;
+                                while ((line = reader.readLine()) != null) {
+                                    if (!inJson) {
+                                        if (line.trim().startsWith("{")) {
+                                            inJson = true;
+                                            jsonBuilder.append(line).append('\n');
+                                        }
+                                    } else {
+                                        jsonBuilder.append(line).append('\n');
+                                    }
+                                }
+                            }
+                            String json = jsonBuilder.toString();
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            LifePath record = objectMapper.readValue(json, LifePath.class);
                             UUID id = record.id();
                             if (id != null) {
                                 if (lifePathMap.containsKey(id)) {
@@ -130,6 +159,12 @@ public class LifePathIO {
                                 if (record.version().isLowerThan(MHQConstants.VERSION)) {
                                     outOfDateLifePaths.put(id, file.getParent());
                                     LOGGER.info("LifePath [{}] is out of date.", record.name());
+
+                                    if (fileHasLegalStatement(file)) {
+                                        outOfDateLifePathsWithLegalStatements.put(id, file.getPath());
+                                    }
+
+                                    outOfDateLifePathsWithLegalStatements.put(id, file.getPath());
                                 }
 
                                 LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
@@ -149,13 +184,13 @@ public class LifePathIO {
         }
 
         if (!outOfDateLifePaths.isEmpty()) {
-            boolean isUpgrade = silentlyUpgrade || triggerConfirmationDialog(campaign, directoryPath,
-                  outOfDateLifePaths);
-
+            boolean isUpgrade = silentlyUpgrade ||
+                                      triggerConfirmationDialog(campaign, directoryPath, outOfDateLifePaths);
             if (isUpgrade) {
                 for (Map.Entry<UUID, String> entry : outOfDateLifePaths.entrySet()) {
+                    boolean includeLegalStatement = outOfDateLifePathsWithLegalStatements.containsKey(entry.getKey());
                     LifePath record = lifePathMap.get(entry.getKey());
-                    writeToJSONWithoutDialog(record, entry.getValue());
+                    writeToJSONWithoutDialog(record, entry.getValue(), includeLegalStatement);
                 }
             }
         }
@@ -163,13 +198,29 @@ public class LifePathIO {
         return lifePathMap;
     }
 
+    private static boolean fileHasLegalStatement(File file) {
+        try (BufferedReader reader = new BufferedReader(
+              new InputStreamReader(new FileInputStream(file), java.nio.charset.StandardCharsets.UTF_8))) {
+            for (int i = 0; i < 10; i++) { // Only scan first 10 lines for performance
+                String line = reader.readLine();
+                if (line == null) {break;}
+                if (line.contains("MegaMek Data (C)")) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            // Optionally log error
+        }
+        return false;
+    }
+
     private static boolean triggerConfirmationDialog(Campaign campaign, String directoryPath,
           Map<UUID, String> outOfDateLifePaths) {
-        String message = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.notice",
+        String message = getFormattedTextAt(PRIMARY_RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.notice",
               outOfDateLifePaths.size(), directoryPath);
-        String cancelOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.cancel");
-        String confirmOption = getTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.confirm");
-        String warning = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.warning");
+        String cancelOption = getTextAt(PRIMARY_RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.cancel");
+        String confirmOption = getTextAt(PRIMARY_RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.button.confirm");
+        String warning = getFormattedTextAt(PRIMARY_RESOURCE_BUNDLE, "LifePathIO.upgradeDialog.warning");
 
         boolean isUpgrade = false;
         boolean dialogConfirmed = false;
@@ -222,7 +273,7 @@ public class LifePathIO {
 
         Optional<File> fileOpt = GUI.fileDialogOpen(
               null,
-              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.load"),
+              getTextAt(PRIMARY_RESOURCE_BUNDLE, "LifePathBuilderDialog.io.load"),
               FileType.JSON,
               userDirectory
         );
@@ -230,8 +281,30 @@ public class LifePathIO {
         if (fileOpt.isPresent()) {
             File file = fileOpt.get();
             try {
+                // PREPROCESS: Skip legal notice lines starting with '#'
+                StringBuilder jsonBuilder = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(
+                      new InputStreamReader(
+                            new FileInputStream(file), StandardCharsets.UTF_8))) {
+                    String line;
+                    boolean inJson = false;
+                    while ((line = reader.readLine()) != null) {
+                        // Skip comment and blank lines until JSON starts
+                        if (!inJson) {
+                            if (line.trim().startsWith("{")) {
+                                inJson = true;
+                                jsonBuilder.append(line).append('\n');
+                            }
+                        } else {
+                            jsonBuilder.append(line).append('\n');
+                        }
+                    }
+                }
+
+                String json = jsonBuilder.toString();
                 ObjectMapper objectMapper = new ObjectMapper();
-                LifePath record = objectMapper.readValue(file, LifePath.class);
+                LifePath record = objectMapper.readValue(json, LifePath.class);
+
                 LOGGER.info("Loaded LifePathRecord from: {}", file.getAbsolutePath());
                 return Optional.of(record);
             } catch (Exception e) {
@@ -244,7 +317,7 @@ public class LifePathIO {
         return Optional.empty();
     }
 
-    public static void writeToJSONWithoutDialog(LifePath record, String directory) {
+    public static void writeToJSONWithoutDialog(LifePath record, String directory, boolean includeLegalStatement) {
         String baseName = record.name();
         if (baseName == null || baseName.isBlank()) {
             baseName = "unnamed_life_path";
@@ -263,24 +336,49 @@ public class LifePathIO {
 
         // File path
         File file = new File(dir, baseName + ".json");
-        saveAction(record, file);
+        saveAction(record, file, includeLegalStatement);
     }
 
-    public static void saveAction(LifePath record, File file) {
+    public static void saveAction(LifePath record, File file, boolean includeLegalStatement) {
+        String legalStatement = getLegalStatement();
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
-            DefaultIndenter indenter = new DefaultIndenter("    ", DefaultIndenter.SYS_LF); // 4 spaces
+            DefaultIndenter indenter = new DefaultIndenter("    ", DefaultIndenter.SYS_LF);
             printer.indentObjectsWith(indenter);
             printer.indentArraysWith(indenter);
-            objectMapper.writer(printer).writeValue(file, record);
+            String jsonContent = objectMapper.writer(printer).writeValueAsString(record);
+
+            // Always open the file in OVERWRITE mode (default):
+            try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                  new FileOutputStream(file, false), StandardCharsets.UTF_8))) {
+                if (includeLegalStatement) {
+                    writer.write(legalStatement);
+                    writer.write(System.lineSeparator()); // Twinned line seps ensures a clean start to the file
+                    writer.write(System.lineSeparator());
+                }
+
+                writer.write(jsonContent);
+                writer.flush();
+            }
+
             LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
         } catch (Exception e) {
             LOGGER.error("Failed to write LifePathRecord JSON: {}", e.getMessage());
         }
     }
 
-    public static void writeToJSONWithDialog(LifePath record) {
+    private static String getLegalStatement() {
+        String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
+        String legalStatement = getFormattedTextAt(LEGAL_NOTICE_RESOURCE_BUNDLE, "Legal.mmData.legalStatement", year);
+        legalStatement = legalStatement.replaceAll("-->", "");
+        legalStatement = legalStatement.replaceAll("<!--", "");
+        legalStatement = legalStatement.trim();
+        return legalStatement;
+    }
+
+    public static void writeToJSONWithDialog(LifePath record, boolean includeLegalStatement) {
         String baseName = record.name();
         if (baseName.isBlank()) {
             baseName = "unnamed_life_path";
@@ -300,7 +398,7 @@ public class LifePathIO {
 
         Optional<File> dialogFile = GUI.fileDialogSave(
               null,
-              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.io.save"),
+              getTextAt(PRIMARY_RESOURCE_BUNDLE, "LifePathBuilderDialog.io.save"),
               FileType.JSON,
               userDirectory,
               baseName
@@ -314,7 +412,7 @@ public class LifePathIO {
                 file = new File(file.getParent(), name + ".json");
             }
             // Write the record
-            LifePathIO.saveAction(record, file);
+            LifePathIO.saveAction(record, file, includeLegalStatement);
         } else {
             LOGGER.info("Save operation cancelled by user.");
         }

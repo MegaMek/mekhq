@@ -408,7 +408,7 @@ public class LifePathBuilderDialog extends JDialog {
             LifePath record = buildLifePathFromBuilderWizard();
 
             if (record != null) {
-                LifePathIO.writeToJSONWithDialog(record);
+                LifePathIO.writeToJSONWithDialog(record, basicInfoTab.isIncludeLegalStatement());
             }
         });
         pnlButtons.add(btnSave);

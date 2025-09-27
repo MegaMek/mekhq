@@ -76,6 +76,7 @@ public class LifePathTabBasicInformation {
     private final JSpinner spnMaximumYear;
     private final JSpinner spnRandomWeight;
     private final JCheckBox chkPlayerRestricted;
+    private final JCheckBox chkLegalStatement;
     private Set<ATOWLifeStage> lifeStages = new HashSet<>();
     private Set<LifePathCategory> categories = new HashSet<>();
 
@@ -172,6 +173,14 @@ public class LifePathTabBasicInformation {
 
     public void setPlayerRestricted(boolean isPlayerRestricted) {
         chkPlayerRestricted.setSelected(isPlayerRestricted);
+    }
+
+    public boolean isIncludeLegalStatement() {
+        return chkLegalStatement.isSelected();
+    }
+
+    public void setIncludeLegalStatement(boolean isIncludeLegalStatement) {
+        chkLegalStatement.setSelected(isIncludeLegalStatement);
     }
 
     LifePathTabBasicInformation(LifePathBuilderDialog parent, EnhancedTabbedPane tabMain) {
@@ -342,8 +351,6 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.randomWeight.tooltip");
         JLabel lblRandomWeight = new JLabel(titleRandomWeight);
         spnRandomWeight = new JSpinner(new SpinnerNumberModel(1.0, 0.001, 10.0, 0.001));
-        Dimension randomWeightSize = new Dimension(DERIVED_WIDTH - lblRandomWeight.getWidth(),
-              spnAge.getPreferredSize().height);
         spnRandomWeight.setPreferredSize(maximumYearSize);
         spnRandomWeight.setMaximumSize(maximumYearSize);
         lblRandomWeight.addMouseListener(
@@ -366,6 +373,21 @@ public class LifePathTabBasicInformation {
         );
         chkPlayerRestricted.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPlayerRestricted)
+        );
+
+        // Include Legal Statement
+        final String titleLegalStatement = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.titleLegalStatement.label");
+        final String tooltipLegalStatement = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.basic.titleLegalStatement.tooltip");
+        JLabel lblLegalStatement = new JLabel(titleLegalStatement);
+        chkLegalStatement = new JCheckBox();
+        chkLegalStatement.setSelected(true); // TODO set to false once bulk of official Life Paths are made
+        lblLegalStatement.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipLegalStatement)
+        );
+        chkLegalStatement.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipLegalStatement)
         );
 
         // Manage Life Stages
@@ -418,6 +440,7 @@ public class LifePathTabBasicInformation {
                                     .addComponent(lblMaximumYear)
                                     .addComponent(lblRandomWeight)
                                     .addComponent(lblPlayerRestricted)
+                                    .addComponent(lblLegalStatement)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                     .addComponent(nameScroll)
@@ -440,6 +463,9 @@ public class LifePathTabBasicInformation {
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(chkPlayerRestricted)
+                                    )
+                                    .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(chkLegalStatement)
                                     )
                                     .addGroup(layout.createSequentialGroup()
                                                     .addComponent(btnManageLifeStages)
@@ -488,6 +514,10 @@ public class LifePathTabBasicInformation {
                                     .addComponent(chkPlayerRestricted)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblLegalStatement)
+                                    .addComponent(chkLegalStatement)
+                    )
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(btnManageLifeStages)
                                     .addGap(PADDING)
                                     .addComponent(btnManageCategories)
@@ -521,6 +551,7 @@ public class LifePathTabBasicInformation {
         setMaximumYear(9999);
         setRandomWeight(1.0);
         setPlayerRestricted(false);
+        setIncludeLegalStatement(true); // TODO set to false once bulk of official Life Paths are made
 
         parent.updateTxtProgress();
     }
