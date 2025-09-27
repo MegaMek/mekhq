@@ -53,8 +53,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.util.JTextAreaWithCharacterLimit;
-import megamek.common.EnhancedTabbedPane;
-import megamek.utilities.FastJScrollPane;
+import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;

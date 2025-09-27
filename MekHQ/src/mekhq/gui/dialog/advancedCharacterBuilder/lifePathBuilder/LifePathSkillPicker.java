@@ -61,9 +61,9 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.EnhancedTabbedPane;
+import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
-import megamek.utilities.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.SkillType;

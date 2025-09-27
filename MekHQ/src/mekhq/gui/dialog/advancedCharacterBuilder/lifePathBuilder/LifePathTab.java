@@ -28,9 +28,9 @@ import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.common.EnhancedTabbedPane;
+import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
-import megamek.utilities.FastJScrollPane;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
