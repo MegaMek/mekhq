@@ -443,12 +443,14 @@ public enum PersonalityQuirk {
      * @return a sorted {@link List} of {@link PersonalityQuirk} objects by their label.
      */
     public static List<PersonalityQuirk> personalityQuirksSortedAlphabetically() {
-        List<PersonalityQuirk> quirks = new ArrayList<>(List.of(PersonalityQuirk.values()));
+        List<PersonalityQuirk> quirks = new ArrayList<>();
+        for (PersonalityQuirk quirk : PersonalityQuirk.values()) {
+            if (quirk != PersonalityQuirk.NONE) {
+                quirks.add(quirk);
+            }
+        }
         quirks.sort(Comparator.comparing(PersonalityQuirk::getLabel));
-
-        quirks.remove(PersonalityQuirk.NONE);
         quirks.add(0, PersonalityQuirk.NONE);
-
         return quirks;
     }
     // endregion Getters
