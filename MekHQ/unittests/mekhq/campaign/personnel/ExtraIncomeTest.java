@@ -91,11 +91,11 @@ class ExtraIncomeTest {
                             " had identical trait levels");
             } else {
                 assertEquals(extraIncome.getLookupKey(), otherExtraIncome.getLookupKey(),
-                      "Expected trait levels to be the same: " +
+                      "Expected lookup keys to be the same: " +
                             extraIncome.getLookupKey() +
                             " and " +
                             otherExtraIncome.getLookupKey() +
-                            " had different trait levels");
+                            " had different lookup keys");
             }
         }
     }
@@ -262,7 +262,7 @@ class ExtraIncomeTest {
         person.setDateOfBirth(TODAY.minusYears(30));
 
         String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
-        assertEquals("", result, "Expected empty string for child commander extra income");
+        assertEquals("", result, "Expected empty string for adult non-commander extra income");
     }
 
     @Test
