@@ -56,23 +56,23 @@ public class AssignmentLogger {
 
     public static void assignedTo(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("assignedTo.text");
-        person.addPersonalLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
+        person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
     public static void reassignedTo(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("reassignedTo.text");
-        person.addPersonalLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
+        person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
     public static void removedFrom(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("removedFrom.text");
-        person.addPersonalLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
+        person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
     public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
         if (force != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
-            person.addPersonalLogEntry(new AssignmentLogEntry(date,
+            person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
                               force.getFullName() :
@@ -91,7 +91,7 @@ public class AssignmentLogger {
 
         if ((oldForce != null) && (newForce != null)) {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
-            person.addPersonalLogEntry(new AssignmentLogEntry(date,
+            person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
                               oldForce.getFullName() :
@@ -109,7 +109,7 @@ public class AssignmentLogger {
     public static void removedFromTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
         if (force != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
-            person.addPersonalLogEntry(new AssignmentLogEntry(date,
+            person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
                               force.getFullName() :

@@ -3498,15 +3498,15 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            // <50.05 compatibility handler
+                            // <50.05 compatibility handlerw
                             LogEntryType logEntryType = logEntry.getType();
                             String logEntryDescription = logEntry.getDesc();
                             if (logEntryType == MEDICAL) {
                                 person.addMedicalLogEntry(logEntry);
                             } else if (logEntryType == SERVICE) {
-                                // < 50.05 compatibility handler
+                                // < 50.07 compatibility handler
                                 List<String> assignmentTargetStrings = List.of("Assigned to",
-                                      "Reassigned from",
+                                      "Reassigned to",
                                       "Removed from",
                                       "Added to");
 
