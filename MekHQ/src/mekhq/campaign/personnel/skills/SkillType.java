@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                               </pre>
+     *                                               Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                               SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                               SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                      </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1143,10 +1143,10 @@ public class SkillType {
                     // skillType.name = wn2.getTextContent();
 
                     // The above code can be uncommented once these handlers have been removed
-                    String name = wn2.getTextContent().trim().toLowerCase();
+                    String name = wn2.getTextContent().trim();
 
                     //Start <50.07 compatibility handler.
-                    skillType.name = switch (name) {
+                    skillType.name = switch (name.toLowerCase()) {
                         // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
                         case "anti-mech" -> S_ANTI_MEK;
                         case "medtech" -> S_MEDTECH;
@@ -1160,7 +1160,7 @@ public class SkillType {
                         case "doctor" -> S_SURGERY;
                         case "tactics" -> S_TACTICS;
                         case "tracking (rp only)" -> S_TRACKING;
-                        default -> wn2.getTextContent().trim();
+                        default -> name;
                     };
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
                     skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);

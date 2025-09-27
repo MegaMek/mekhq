@@ -360,7 +360,7 @@ public class FactionStandings {
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.defaultFactionHints(false);
 
         boolean isMercenary = campaignFaction.isMercenaryOrganization();
         boolean isPirate = campaignFaction.isPirate();
@@ -833,8 +833,35 @@ public class FactionStandings {
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
           final double regardMultiplier) {
+        return updateClimateRegard(campaignFaction, today, regardMultiplier, false);
+    }
+
+    /**
+     * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
+     * specified campaign faction and all other factions for the given date.
+     *
+     * <p>The method iterates over all factions and assigns a regard value based on alliances, wars, rivalry, and
+     * whether the faction is untracked or invalid for the specified year.</p>
+     *
+     * <p>Existing climateRegard entries are removed.</p>
+     *
+     * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
+     * regard standings for all relevant factions.</p>
+     *
+     * @param campaignFaction  the {@link Faction} representing the campaign's primary faction
+     * @param today            the {@link LocalDate} to use for validating factions and determining relationships
+     * @param regardMultiplier the regard multiplier set in campaign options
+     * @param useTestDirectory {@code true} if called from within a Unit Test
+     *
+     * @return an HTML-formatted {@link String} report of faction climate regard changes
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
+          final double regardMultiplier, boolean useTestDirectory) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.defaultFactionHints(useTestDirectory);
         boolean isPirate = campaignFaction.isPirate();
 
         // Clear any existing climate regard entries

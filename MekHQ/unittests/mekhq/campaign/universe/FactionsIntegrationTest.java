@@ -41,15 +41,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.universe.FactionTag;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
 
-@Disabled
 public class FactionsIntegrationTest {
     @Test
     public void loadDefaultTest() throws DOMException {
-        Factions factions = Factions.loadDefault();
+        Factions factions = Factions.loadDefault(true);
 
         assertNotNull(factions);
 

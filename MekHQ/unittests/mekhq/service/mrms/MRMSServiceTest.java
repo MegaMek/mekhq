@@ -74,7 +74,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -84,7 +83,6 @@ import org.mockito.Mockito;
 /**
  * JUnit Tests for {@link MRMSService}
  */
-@Disabled
 public class MRMSServiceTest {
     static MMLogger LOGGER = MMLogger.create(MRMSServiceTest.class);
 

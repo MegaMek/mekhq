@@ -48,16 +48,14 @@ import megamek.common.options.PilotOptions;
 import megamek.common.units.*;
 import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 class CrewSkillUpgraderTest {
 
     @BeforeAll
     static void setUpAll() {
         EquipmentType.initializeTypes();
-        SpecialAbility.initializeSPA();
+        SpecialAbility.initializeSPA(true);
     }
 
     boolean allSPAsFalse(Crew crew) {
