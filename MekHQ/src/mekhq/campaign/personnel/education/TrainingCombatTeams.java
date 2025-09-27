@@ -154,7 +154,7 @@ public class TrainingCombatTeams {
         // If the force is empty, we skip it
         Vector<UUID> units = force.getUnits(); // We only want units in the direct force, not child forces
         if (units.isEmpty()) {
-            LOGGER.info("No units in force for campaign {}", campaign.getName());
+            LOGGER.info("No units in force '{}' for campaign '{}'", force.getName(), campaign.getName());
             return;
         }
 
