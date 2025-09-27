@@ -36,7 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -85,5 +87,19 @@ public class LifePathCategoryTest {
     public void testFromLookupName_NullLookup() {
         LifePathCategory result = LifePathCategory.fromLookupName(null);
         assertNull(result, "Null lookup should return null.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(LifePathCategory.class)
+    void testGetDisplayName_isValidKey(LifePathCategory category) {
+        assertTrue(MHQInternationalization.isResourceKeyValid(category.getDisplayName()),
+              "Invalid key for " + category.name());
+    }
+
+    @ParameterizedTest
+    @EnumSource(LifePathCategory.class)
+    void testGetDescription_isValidKey(LifePathCategory category) {
+        assertTrue(MHQInternationalization.isResourceKeyValid(category.getDescription()),
+              "Invalid key for " + category.name());
     }
 }
