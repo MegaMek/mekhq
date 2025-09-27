@@ -57,6 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
@@ -270,11 +271,9 @@ public class TrainingCombatTeams {
 
                 // We piggyback on the education module here. If the character ever enters actual education, this
                 // will be overwritten.
-                String report = processEducationTime(commander,
-                      trainee,
-                      skillsBeingTrained,
-                      marginOfSuccess,
-                      xpCostMultiplier);
+                String report = processEducationTime(commander, trainee, skillsBeingTrained, marginOfSuccess,
+                      xpCostMultiplier, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
+                      campaign.getLocalDate());
 
                 if (!StringUtility.isNullOrBlank(report)) {
                     campaign.addReport(report);
@@ -314,7 +313,7 @@ public class TrainingCombatTeams {
      *                           threshold is met.
      */
     private static String processEducationTime(Person educator, Person trainee, List<Skill> skillsBeingTrained,
-          int marginOfSuccess, double trainingMultiplier) {
+          int marginOfSuccess, double trainingMultiplier, boolean isLogSkillChange, LocalDate today) {
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
         final int WEEK_DURATION = 7; // days
         final int EDUCATION_TIME_MULTIPLIER = 35; // days
@@ -355,14 +354,18 @@ public class TrainingCombatTeams {
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {
                 trainee.setEduEducationTime(newEducationTime - educationTimeReduction);
-                targetSkill.setLevel(currentSkillLevel + 1);
+                int newSkillLevel = currentSkillLevel + 1;
+                targetSkill.setLevel(newSkillLevel);
+                String skillName = targetSkill.getType().getName();
+
+                PerformanceLogger.improvedSkill(isLogSkillChange, trainee, today, skillName, newSkillLevel);
 
                 return String.format(resources.getString("learnedNewSkill.text"),
                       educator.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
-                      targetSkill.getType().getName(),
+                      skillName,
                       targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes()));
             }
         }
