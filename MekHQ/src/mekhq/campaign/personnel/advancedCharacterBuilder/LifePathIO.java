@@ -156,11 +156,19 @@ public class LifePathIO {
                                 }
                                 lifePathMap.put(id, record);
 
-                                if (record.version().isLowerThan(MHQConstants.VERSION)) {
+                                // Set these booleans to 'true' to resave every Life Path in the data directory.
+                                // Useful for when we make a change and don't want to manually resave everything. The
+                                // second boolean bypasses the 'check for legal statement' conditional and causes all
+                                // Life Paths in the data directory to be resaved with a legal statement. Note that
+                                // both booleans need to be true for this statement inclusion to occur.
+                                boolean overrideUpgradeRequirements = false;
+                                boolean overrideLegalStatementRequirements = false;
+
+                                if (record.version().isLowerThan(MHQConstants.VERSION) || overrideUpgradeRequirements) {
                                     outOfDateLifePaths.put(id, file.getParent());
                                     LOGGER.info("LifePath [{}] is out of date.", record.name());
 
-                                    if (fileHasLegalStatement(file)) {
+                                    if (fileHasLegalStatement(file) || overrideLegalStatementRequirements) {
                                         outOfDateLifePathsWithLegalStatements.put(id, file.getPath());
                                     }
 
@@ -412,7 +420,7 @@ public class LifePathIO {
                 file = new File(file.getParent(), name + ".json");
             }
             // Write the record
-            LifePathIO.saveAction(record, file, includeLegalStatement);
+            saveAction(record, file, includeLegalStatement);
         } else {
             LOGGER.info("Save operation cancelled by user.");
         }
