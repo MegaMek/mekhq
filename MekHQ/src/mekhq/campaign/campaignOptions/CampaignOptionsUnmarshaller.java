@@ -46,7 +46,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.autoresolve.AutoResolveMethod;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -448,7 +448,7 @@ public class CampaignOptionsUnmarshaller {
             }
             case "useRandomPersonalities" -> campaignOptions.setUseRandomPersonalities(parseBoolean(nodeContents));
             case "useRandomPersonalityReputation" -> campaignOptions.setUseRandomPersonalityReputation(parseBoolean(
-                        nodeContents));
+                  nodeContents));
             case "useSimulatedRelationships" -> campaignOptions.setUseSimulatedRelationships(parseBoolean(
                   nodeContents));
             case "familyDisplayLevel" ->
@@ -671,7 +671,7 @@ public class CampaignOptionsUnmarshaller {
             case "payForFood" -> campaignOptions.setPayForFood(parseBoolean(nodeContents));
             case "payForHousing" -> campaignOptions.setPayForHousing(parseBoolean(nodeContents));
             case "useLoanLimits" -> campaignOptions.setLoanLimits(parseBoolean(nodeContents));
-            case "usePercentageMaint" -> campaignOptions.setUsePercentageMaint(parseBoolean(nodeContents));
+            case "usePercentageMaint" -> campaignOptions.setUsePercentageMaintenance(parseBoolean(nodeContents));
             case "infantryDontCount" -> campaignOptions.setUseInfantryDontCount(parseBoolean(nodeContents));
             case "usePeacetimeCost" -> campaignOptions.setUsePeacetimeCost(parseBoolean(nodeContents));
             case "useExtendedPartsModifier" -> campaignOptions.setUseExtendedPartsModifier(parseBoolean(
@@ -722,7 +722,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "personnelMarketName" -> {
                 String marketName = nodeContents;
-                // Backwards compatibility with saves from before these rules moved to Camops
+                // Backwards compatibility with saves from before these rules moved to CamOps
                 if (marketName.equals("Strat Ops")) {
                     marketName = "Campaign Ops";
                 }
@@ -828,7 +828,7 @@ public class CampaignOptionsUnmarshaller {
             case "usePlanetaryConditions" -> campaignOptions.setUsePlanetaryConditions(parseBoolean(nodeContents));
             case "restrictPartsByMission" -> campaignOptions.setRestrictPartsByMission(parseBoolean(nodeContents));
             case "allowOpForLocalUnits" -> campaignOptions.setAllowOpForLocalUnits(parseBoolean(nodeContents));
-            case "allowOpForAeros" -> campaignOptions.setAllowOpForAeros(parseBoolean(nodeContents));
+            case "allowOpForAeros" -> campaignOptions.setAllowOpForAerospace(parseBoolean(nodeContents));
             case "opForAeroChance" -> campaignOptions.setOpForAeroChance(parseInt(nodeContents));
             case "opForLocalUnitChance" -> campaignOptions.setOpForLocalUnitChance(parseInt(nodeContents));
             case "fixedMapChance" -> campaignOptions.setFixedMapChance(parseInt(nodeContents));
@@ -837,8 +837,9 @@ public class CampaignOptionsUnmarshaller {
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));
             case "scenarioModBV" -> campaignOptions.setScenarioModBV(parseInt(nodeContents));
             case "autoConfigMunitions" -> campaignOptions.setAutoConfigMunitions(parseBoolean(nodeContents));
-            case "autoGenerateOpForCallsigns" -> campaignOptions.setAutoGenerateOpForCallsigns(parseBoolean(
-                  nodeContents));
+            case "autoGenerateOpForCallsigns", "autoGenerateOpForCallSigns" ->
+                  campaignOptions.setAutoGenerateOpForCallSigns(parseBoolean(
+                        nodeContents));
             case "minimumCallsignSkillLevel" -> campaignOptions.setMinimumCallsignSkillLevel(SkillLevel.parseFromString(
                   nodeContents));
             case "trackFactionStanding" -> campaignOptions.setTrackFactionStanding(parseBoolean(nodeContents));

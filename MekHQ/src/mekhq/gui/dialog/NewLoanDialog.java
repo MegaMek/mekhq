@@ -67,32 +67,23 @@ import mekhq.campaign.finances.enums.FinancialTerm;
  * @author Taharqa
  */
 public class NewLoanDialog extends JDialog implements ActionListener, ChangeListener {
-    private static final MMLogger logger = MMLogger.create(NewLoanDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewLoanDialog.class);
 
-    private NumberFormatter numberFormatter;
-    private JFrame frame;
-    private Loan loan;
-    private Campaign campaign;
-    private int rating;
-    private Money maxCollateralValue;
+    private final NumberFormatter numberFormatter;
+    private final JFrame frame;
+    private final Loan loan;
+    private final Campaign campaign;
+    private final int rating;
+    private final Money maxCollateralValue;
 
-    private JPanel panMain;
     private JPanel panInfo;
-    private JPanel panBtn;
-    private JButton btnCancel;
-    private JButton btnAdd;
     private JTextField txtName;
     private JTextField txtNumber;
 
-    private JButton btnPlusHundredMillion;
     private JButton btnMinusHundredMillion;
-    private JButton btnPlusTenMillion;
     private JButton btnMinusTenMillion;
-    private JButton btnPlusMillion;
     private JButton btnMinusMillion;
-    private JButton btnPlusHundredK;
     private JButton btnMinusHundredK;
-    private JButton btnPlusTenK;
     private JButton btnMinusTenK;
 
     private JFormattedTextField txtPrincipal;
@@ -133,9 +124,9 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
 
     private void initComponents() {
 
-        panMain = new JPanel();
+        JPanel panMain = new JPanel();
         panInfo = new JPanel();
-        panBtn = new JPanel();
+        JPanel panBtn = new JPanel();
         lblAPR = new JLabel();
         lblCollateralPct = new JLabel();
         lblYears = new JLabel();
@@ -240,15 +231,15 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         txtPrincipal.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
         txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
         txtPrincipal.setEditable(false);
-        btnPlusHundredMillion = new JButton(resourceMap.getString("btnPlus100mil.text"));
+        JButton btnPlusHundredMillion = new JButton(resourceMap.getString("btnPlus100mil.text"));
         btnMinusHundredMillion = new JButton(resourceMap.getString("btnMinus100mil.text"));
-        btnPlusTenMillion = new JButton(resourceMap.getString("btnPlus10mil.text"));
+        JButton btnPlusTenMillion = new JButton(resourceMap.getString("btnPlus10mil.text"));
         btnMinusTenMillion = new JButton(resourceMap.getString("btnMinus10mil.text"));
-        btnPlusMillion = new JButton(resourceMap.getString("btnPlus1mil.text"));
+        JButton btnPlusMillion = new JButton(resourceMap.getString("btnPlus1mil.text"));
         btnMinusMillion = new JButton(resourceMap.getString("btnMinus1mil.text"));
-        btnPlusHundredK = new JButton(resourceMap.getString("btnPlus100k.text"));
+        JButton btnPlusHundredK = new JButton(resourceMap.getString("btnPlus100k.text"));
         btnMinusHundredK = new JButton(resourceMap.getString("btnMinus100k.text"));
-        btnPlusTenK = new JButton(resourceMap.getString("btnPlus10k.text"));
+        JButton btnPlusTenK = new JButton(resourceMap.getString("btnPlus10k.text"));
         btnMinusTenK = new JButton(resourceMap.getString("btnMinus10k.text"));
         checkMinusButtons();
         btnPlusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(100_000_000)));
@@ -386,12 +377,12 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(panInfo, gridBagConstraints);
 
-        btnAdd = new JButton(resourceMap.getString("btnOkay.text"));
+        JButton btnAdd = new JButton(resourceMap.getString("btnOkay.text"));
         btnAdd.setName("btnOK");
         btnAdd.addActionListener(evt -> addLoan());
         panBtn.add(btnAdd);
 
-        btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
         btnCancel.setName("btnClose");
         btnCancel.addActionListener(evt -> cancel());
         gridBagConstraints.gridx = 1;
@@ -415,7 +406,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -577,7 +568,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 

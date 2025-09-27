@@ -1,14 +1,14 @@
 /*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -32,7 +32,7 @@
  */
 package mekhq.utilities;
 
-import static mekhq.MHQConstants.MAPGEN_PATH;
+import static mekhq.MHQConstants.MAP_GEN_PATH;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import io.sentry.Sentry;
-import megamek.common.Board;
-import megamek.common.MapSettings;
+import megamek.common.board.Board;
+import megamek.common.loaders.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
@@ -118,7 +118,7 @@ public class ScenarioUtils {
                 mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
             }
         } else {
-            File mapgenFile = new MegaMekFile(new File(MAPGEN_PATH), mapName + ".xml").getFile();
+            File mapgenFile = new MegaMekFile(new File(MAP_GEN_PATH), mapName + ".xml").getFile();
             try (InputStream is = new FileInputStream(mapgenFile)) {
                 mapSettings = MapSettings.getInstance(is);
             } catch (IOException ex) {

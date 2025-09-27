@@ -49,7 +49,7 @@ import javax.swing.WindowConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MekSummaryCache;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
@@ -58,22 +58,16 @@ import mekhq.campaign.parts.Refit;
  * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(RefitNameDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(RefitNameDialog.class);
 
-    private JFrame frame;
     private final Refit refit;
     private boolean cancelled;
 
-    private JButton btnCancel;
-    private JButton btnOK;
-    private JLabel lblChassis;
     private JTextField txtChassis;
-    private JLabel lblModel;
     private JTextField txtModel;
 
     public RefitNameDialog(final JFrame frame, final boolean modal, final Refit refit) {
         super(frame, modal);
-        this.frame = frame;
         this.refit = refit;
         cancelled = false;
         initComponents();
@@ -84,11 +78,11 @@ public class RefitNameDialog extends JDialog {
     private void initComponents() {
 
         txtChassis = new JTextField();
-        lblChassis = new JLabel();
+        JLabel lblChassis = new JLabel();
         txtModel = new JTextField();
-        lblModel = new JLabel();
-        btnOK = new JButton();
-        btnCancel = new JButton();
+        JLabel lblModel = new JLabel();
+        JButton btnOK = new JButton();
+        JButton btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -178,7 +172,7 @@ public class RefitNameDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

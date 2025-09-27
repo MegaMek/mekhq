@@ -49,7 +49,7 @@ import mekhq.MekHQ;
  * @since Jan 6, 2010, 10:46:02 PM
  */
 public class MissionTypeDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(MissionTypeDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MissionTypeDialog.class);
 
     private boolean contract;
     private boolean mission;
@@ -101,7 +101,7 @@ public class MissionTypeDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

@@ -95,10 +95,10 @@ import mekhq.gui.panes.RankSystemsPane;
  * This class serves as the backbone for displaying and managing the "Biography" tab in the campaign options dialog.
  */
 public class BiographyTab {
-    private Campaign campaign;
-    private GeneralTab generalTab;
-    private CampaignOptions campaignOptions;
-    private RandomOriginOptions randomOriginOptions;
+    private final Campaign campaign;
+    private final GeneralTab generalTab;
+    private final CampaignOptions campaignOptions;
+    private final RandomOriginOptions randomOriginOptions;
 
     //start General Tab
     private CampaignOptionsHeaderPanel generalHeader;
@@ -845,7 +845,7 @@ public class BiographyTab {
      *
      * <p>This method first stores the currently selected planetary system and planet. It then
      * restores the list of available planetary systems by repopulating the `comboSpecifiedSystem`. Finally, it
-     * reselects the previously selected planetary system and planet in their respective combo boxes.</p>
+     * re-selects the previously selected planetary system and planet in their respective combo boxes.</p>
      *
      * <p>The method ensures that the user selection persists even after the combo boxes are refreshed.
      * Any exceptions during the selection process are caught and ignored. As if we can't restore the selection, that's
@@ -1232,7 +1232,7 @@ public class BiographyTab {
      * <li>Setting the dropout chance for children.</li>
      * </p>
      *
-     * @return A {@code JPanel} for managing dropout chance settings.
+     * @return A {@code JPanel} for managing dropout change settings.
      */
     private JPanel createDropoutChancePanel() {
         // Contents

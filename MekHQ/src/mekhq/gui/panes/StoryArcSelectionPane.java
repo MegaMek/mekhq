@@ -43,17 +43,19 @@ import javax.swing.ListSelectionModel;
 import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.storyarc.StoryArcStub;
+import megamek.logging.MMLogger;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;
 
 public class StoryArcSelectionPane extends AbstractMHQScrollPane {
+    private final static MMLogger LOGGER = MMLogger.create(StoryArcSelectionPane.class);
     //region Variable Declarations
     private JList<StoryArcStub> storyArcStubs;
 
     //should this be loading story arcs that require starting a new campaign?
-    private boolean startNew;
+    private final boolean startNew;
     //endregion Variable Declarations
 
     //region Constructors
@@ -101,7 +103,7 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
         try {
             setPreferences();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e, "Unable to set Preferences");
         }
     }
 

@@ -81,7 +81,7 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  * options and labels.
  */
 public class EquipmentAndSuppliesTab {
-    private CampaignOptions campaignOptions;
+    private final CampaignOptions campaignOptions;
 
     //start Acquisition Tab
     private CampaignOptionsHeaderPanel acquisitionHeader;
@@ -159,8 +159,6 @@ public class EquipmentAndSuppliesTab {
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
 
-    //start Tech Limits Tab
-    private CampaignOptionsHeaderPanel techLimitsHeader;
     private JCheckBox limitByYearBox;
     private JCheckBox disallowExtinctStuffBox;
     private JCheckBox allowClanPurchasesBox;
@@ -712,15 +710,12 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
         i = 0;
-        for (PlanetaryRating rating : PlanetaryRating.values()) {
-            String modifierLabel = rating.getName();
-            spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(
-                  0, -12, 12, 1));
+        for (PlanetaryRating ignored : PlanetaryRating.values()) {
+            spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             spnPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "IndustryLabel"));
             setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
-            spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(
-                  0, -12, 12, 1));
+            spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "OutputLabel"));
             setSpinnerWidth(spnPlanetAcquireOutputBonus[i]);
@@ -790,7 +785,7 @@ public class EquipmentAndSuppliesTab {
     }
 
     private int getSpinnerHeight() {
-        int spinnerHeight = 0;
+        int spinnerHeight;
         if (spnPlanetAcquireIndustryBonus != null &&
                   spnPlanetAcquireIndustryBonus.length > 0 &&
                   spnPlanetAcquireIndustryBonus[0] != null) {
@@ -994,7 +989,8 @@ public class EquipmentAndSuppliesTab {
      */
     public JPanel createTechLimitsTab() {
         // Header
-        techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
+        //start Tech Limits Tab
+        CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
               getImageDirectory() + "logo_clan_ghost_bear.png",
               3);
 
@@ -1151,7 +1147,7 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
 
-        // Tech Limits
+        // Techlimits
         options.setLimitByYear(limitByYearBox.isSelected());
         options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
         options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
@@ -1232,7 +1228,7 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
 
-        // Tech Limits
+        // Techlimits
         limitByYearBox.setSelected(options.isLimitByYear());
         disallowExtinctStuffBox.setSelected(options.isDisallowExtinctStuff());
         allowClanPurchasesBox.setSelected(options.isAllowClanPurchases());

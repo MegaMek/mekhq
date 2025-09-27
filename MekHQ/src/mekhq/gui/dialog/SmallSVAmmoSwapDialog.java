@@ -50,7 +50,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
@@ -61,7 +61,7 @@ import mekhq.campaign.unit.Unit;
  * Configures amount of standard and inferno ammo available to small support vehicle weapons.
  */
 public class SmallSVAmmoSwapDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(SmallSVAmmoSwapDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(SmallSVAmmoSwapDialog.class);
 
     private final List<WeaponRow> rows = new ArrayList<>();
     private boolean canceled = true;
@@ -114,7 +114,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

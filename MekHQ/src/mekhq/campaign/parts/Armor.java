@@ -37,22 +37,24 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.ITechnology;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
 import megamek.common.equipment.ArmorType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
+import megamek.common.units.Warship;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
@@ -65,7 +67,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Armor extends Part implements IAcquisitionWork {
-    private static final MMLogger logger = MMLogger.create(Armor.class);
+    private static final MMLogger LOGGER = MMLogger.create(Armor.class);
 
     protected int type;
     protected int amount;
@@ -290,7 +292,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public double getArmorWeight(int points) {
-        // from megamek.common.Entity.getArmorWeight()
+        // from megamek.common.units.Entity.getArmorWeight()
 
         // this roundabout method is actually necessary to avoid rounding
         // weirdness. Yeah, it's dumb.
@@ -338,7 +340,7 @@ public class Armor extends Part implements IAcquisitionWork {
                     clan = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -629,9 +631,9 @@ public class Armor extends Part implements IAcquisitionWork {
         }
 
         if (amountRemaining > 0) {
-            logger.warn("Still trying to add armor but that shouldn't have been a problem!");
+            LOGGER.warn("Still trying to add armor but that shouldn't have been a problem!");
         } else if (amount < 0) {
-            logger.warn("Still trying to remove armor but no more armor is in the warehouse!");
+            LOGGER.warn("Still trying to remove armor but no more armor is in the warehouse!");
         }
     }
 
@@ -729,12 +731,12 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

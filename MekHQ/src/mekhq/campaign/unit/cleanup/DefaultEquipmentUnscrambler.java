@@ -35,7 +35,7 @@ package mekhq.campaign.unit.cleanup;
 import java.util.Arrays;
 import java.util.List;
 
-import megamek.common.BattleArmor;
+import megamek.common.battleArmor.BattleArmor;
 import mekhq.campaign.unit.Unit;
 
 public class DefaultEquipmentUnscrambler extends EquipmentUnscrambler {

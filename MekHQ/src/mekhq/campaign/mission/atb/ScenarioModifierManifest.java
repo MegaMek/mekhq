@@ -54,7 +54,7 @@ import mekhq.utilities.MHQXMLUtility;
  */
 @XmlRootElement(name = "scenarioModifierManifest")
 class ScenarioModifierManifest {
-    private static final MMLogger logger = MMLogger.create(ScenarioModifierManifest.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioModifierManifest.class);
 
     @XmlElementWrapper(name = "modifiers")
     @XmlElement(name = "modifier")
@@ -75,7 +75,7 @@ class ScenarioModifierManifest {
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
             if (!xmlFile.exists()) {
-                logger.warn(String.format("Specified file %s does not exist", fileName));
+                LOGGER.warn("Specified file {} does not exist", fileName);
                 return null;
             }
 
@@ -86,7 +86,7 @@ class ScenarioModifierManifest {
                 resultingList = templateElement.getValue();
             }
         } catch (Exception ex) {
-            logger.error("Error Deserializing Scenario Modifier List", ex);
+            LOGGER.error("Error Deserializing Scenario Modifier List", ex);
         }
 
         return resultingList;

@@ -43,7 +43,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,13 +55,13 @@ import org.w3c.dom.NodeList;
  * @author NickAragua
  */
 public class MothballInfo {
-    private static final MMLogger logger = MMLogger.create(MothballInfo.class);
+    private static final MMLogger LOGGER = MMLogger.create(MothballInfo.class);
 
     private UUID techId;
     private int forceId;
-    private List<UUID> driverIds = new ArrayList<>();
-    private List<UUID> gunnerIds = new ArrayList<>();
-    private List<UUID> vesselCrewIds = new ArrayList<>();
+    private final List<UUID> driverIds = new ArrayList<>();
+    private final List<UUID> gunnerIds = new ArrayList<>();
+    private final List<UUID> vesselCrewIds = new ArrayList<>();
     private UUID techOfficerId;
     private UUID navigatorId;
 
@@ -189,7 +189,7 @@ public class MothballInfo {
             boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
             if (isUseStratCon) {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    StratconCampaignState campaignState = contract.getStratconCampaignState();
+                    StratConCampaignState campaignState = contract.getStratconCampaignState();
 
                     if (campaignState != null) {
                         if (campaignState.isForceDeployedHere(forceId)) {
@@ -267,7 +267,7 @@ public class MothballInfo {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

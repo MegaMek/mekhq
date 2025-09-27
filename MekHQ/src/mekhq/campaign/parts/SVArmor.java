@@ -32,15 +32,16 @@
  */
 package mekhq.campaign.parts;
 
-import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
+import static megamek.common.equipment.EquipmentType.T_ARMOR_SV_BAR_2;
 
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.ArmorType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -52,7 +53,7 @@ import org.w3c.dom.Node;
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
 public class SVArmor extends Armor {
-    private static final MMLogger logger = MMLogger.create(SVArmor.class);
+    private static final MMLogger LOGGER = MMLogger.create(SVArmor.class);
 
     private int bar;
     private TechRating techRating;
@@ -176,9 +177,11 @@ public class SVArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
-        });
+        SVArmor armor = (SVArmor) campaign.getWarehouse()
+                                        .findSparePart(part -> isSamePartType(part) &&
+                                                                     part.isPresent() &&
+                                                                     Objects.equals(getRefitUnit(),
+                                                                           part.getRefitUnit()));
 
         if (null != armor) {
             int amountRemaining = armor.getAmount() + amount;
@@ -215,7 +218,7 @@ public class SVArmor extends Armor {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }

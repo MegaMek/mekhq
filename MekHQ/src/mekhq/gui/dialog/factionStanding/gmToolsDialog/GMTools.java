@@ -92,7 +92,7 @@ public class GMTools extends JDialog {
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
 
-    private Campaign campaign;
+    private final Campaign campaign;
     private ImageIcon campaignIcon;
     private final Faction campaignFaction;
     private final LocalDate today;

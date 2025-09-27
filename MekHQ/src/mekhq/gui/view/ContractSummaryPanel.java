@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,7 +78,6 @@ public class ContractSummaryPanel extends JPanel {
     private int cmdRerolls;
     private int logRerolls;
     private int tranRerolls;
-    private final ContractMarketMethod method;
 
     private JPanel mainPanel;
 
@@ -107,7 +106,7 @@ public class ContractSummaryPanel extends JPanel {
         this.contract = contract;
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
-        this.method = campaign.getCampaignOptions().getContractMarketMethod();
+        ContractMarketMethod method = campaign.getCampaignOptions().getContractMarketMethod();
         if (allowRerolls) {
             if (method == ContractMarketMethod.CAM_OPS) {
                 cmdRerolls = 1;

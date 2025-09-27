@@ -183,8 +183,6 @@ public class AdvancementTab {
     private JSpinner spnRoleplaySkillsModifier;
     //end Skill Randomization Tab
 
-    //start Recruitment Bonus Tab
-    private CampaignOptionsHeaderPanel recruitmentBonusesHeader;
     private JPanel pnlRecruitmentBonusesCombat;
     private JLabel[] lblRecruitmentBonusCombat;
     private JSpinner[] spnRecruitmentBonusCombat;
@@ -1057,7 +1055,8 @@ public class AdvancementTab {
      */
     public JPanel recruitmentBonusesTab() {
         // Header
-        recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
+        //start Recruitment Bonus Tab
+        CampaignOptionsHeaderPanel recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
               getImageDirectory() + "logo_calderon_protectorate.png",
               true,
               false,

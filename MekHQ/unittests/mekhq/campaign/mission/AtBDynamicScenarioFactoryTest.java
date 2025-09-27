@@ -40,13 +40,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
-import java.io.IOException;
-
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Game;
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.game.Game;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
@@ -63,7 +61,7 @@ class AtBDynamicScenarioFactoryTest {
     Game game = new Game();
 
     @BeforeAll
-    public static void setUpBeforeClass() throws IOException, DOMException {
+    public static void setUpBeforeClass() throws DOMException {
         EquipmentType.initializeTypes();
     }
 
@@ -73,7 +71,7 @@ class AtBDynamicScenarioFactoryTest {
         campaign = mock(Campaign.class);
         CampaignOptions options = mock(CampaignOptions.class);
         when(options.getNonBinaryDiceSize()).thenReturn(60);
-        when(options.isAutoGenerateOpForCallsigns()).thenReturn(false);
+        when(options.isAutoGenerateOpForCallSigns()).thenReturn(false);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.VETERAN);
         when(options.isUseTactics()).thenReturn(false);
         when(options.isUseInitiativeBonus()).thenReturn(false);
@@ -87,13 +85,13 @@ class AtBDynamicScenarioFactoryTest {
     }
 
     @Test
-    public void testCreateEntityWithCrewNoCallsigns() {
-        // Auto-generated callsigns disabled
+    public void testCreateEntityWithCrewNoCallSigns() {
+        // Auto-generated call signs disabled
         Faction faction = new Faction();
         Entity entity = getShadowHawk();
 
         SkillLevel skill = SkillLevel.VETERAN;
-        createEntityWithCrew(faction, skill, campaign, entity);
+        createEntityWithCrew(faction, skill, campaign, entity, true);
 
         assertTrue(entity.getCrew().getNickname(0).isEmpty());
     }
@@ -107,27 +105,27 @@ class AtBDynamicScenarioFactoryTest {
 
     @Test
     public void testCreateEntityWithCrew_allPossible() {
-        // Auto-generated callsigns enabled for all
+        // Auto-generated call signs enabled for all
         CampaignOptions options = campaign.getCampaignOptions();
-        when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
+        when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.ULTRA_GREEN);
 
-        // Auto-generated callsigns disabled
+        // Auto-generated call signs disabled
         Faction faction = new Faction();
         Entity entity = getShadowHawk();
 
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        createEntityWithCrew(faction, skill, campaign, entity);
+        createEntityWithCrew(faction, skill, campaign, entity, true);
 
         assertFalse(entity.getCrew().getNickname(0).isEmpty());
     }
 
     @Test
     public void testCreateEntityWithCrew_RegularPlus() {
-        // Auto-generated callsigns enabled for pilots above a certain skill
+        // Auto-generated call signs enabled for pilots above a certain skill
         // VETERAN will always be >= REGULAR even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
-        when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
+        when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
         // Two mekwarriors, both alike in dignity (but not in exp or pay grade)
@@ -137,21 +135,21 @@ class AtBDynamicScenarioFactoryTest {
 
         // First crew, scrub, gets no callsign
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        createEntityWithCrew(faction, skill, campaign, entity1);
+        createEntityWithCrew(faction, skill, campaign, entity1, true);
         assertTrue(entity1.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets a callsign
         skill = SkillLevel.VETERAN;
-        createEntityWithCrew(faction, skill, campaign, entity2);
+        createEntityWithCrew(faction, skill, campaign, entity2, true);
         assertFalse(entity2.getCrew().getNickname(0).isEmpty());
     }
 
     @Test
     public void testCreateEntityWithCrew_HeroicPlus() {
-        // Auto-generated callsigns enabled for pilots above a certain skill
+        // Auto-generated call signs enabled for pilots above a certain skill
         // VETERAN will always be < HEROIC even with randomization
         CampaignOptions options = campaign.getCampaignOptions();
-        when(options.isAutoGenerateOpForCallsigns()).thenReturn(true);
+        when(options.isAutoGenerateOpForCallSigns()).thenReturn(true);
         when(options.getMinimumCallsignSkillLevel()).thenReturn(SkillLevel.HEROIC);
 
         Faction faction = new Faction();
@@ -161,17 +159,17 @@ class AtBDynamicScenarioFactoryTest {
 
         // First crew, scrub, gets no callsign
         SkillLevel skill = SkillLevel.ULTRA_GREEN;
-        createEntityWithCrew(faction, skill, campaign, entity1);
+        createEntityWithCrew(faction, skill, campaign, entity1, true);
         assertTrue(entity1.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets no callsign
         skill = SkillLevel.VETERAN;
-        createEntityWithCrew(faction, skill, campaign, entity2);
+        createEntityWithCrew(faction, skill, campaign, entity2, true);
         assertTrue(entity2.getCrew().getNickname(0).isEmpty());
 
         // 2nd crew, vet, gets a callsign
         skill = SkillLevel.LEGENDARY;
-        createEntityWithCrew(faction, skill, campaign, entity3);
+        createEntityWithCrew(faction, skill, campaign, entity3, true);
         assertFalse(entity3.getCrew().getNickname(0).isEmpty());
     }
 }

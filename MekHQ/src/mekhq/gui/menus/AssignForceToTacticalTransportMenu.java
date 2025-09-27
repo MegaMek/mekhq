@@ -57,7 +57,7 @@ import mekhq.utilities.MHQInternationalization;
 public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMenu {
 
     /**
-     * Constructor for a new tactical transport Menu
+     * Constructor for new tactical transport Menu
      *
      * @param campaign current campaign
      * @param units    selected units to try and assign

@@ -48,7 +48,7 @@ import megamek.logging.MMLogger;
  * @author Neoancient
  */
 public class PluginManager {
-    private static final MMLogger logger = MMLogger.create(PluginManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(PluginManager.class);
 
     private static PluginManager instance;
     private static final String PLUGIN_DIR = "./plugins";
@@ -64,21 +64,21 @@ public class PluginManager {
     }
 
     private PluginManager() {
-        logger.debug("Initializing plugin manager.");
+        LOGGER.debug("Initializing plugin manager.");
 
         scriptFiles = new ArrayList<>();
         File dir = new File(PLUGIN_DIR);
         if (!dir.exists()) {
-            logger.warn("Could not find plugin directory");
+            LOGGER.warn("Could not find plugin directory");
         }
         URL[] urls = new URL[0];
         if (dir.exists() && dir.isDirectory()) {
             List<URL> plugins = getPluginsFromDir(dir);
             urls = plugins.toArray(urls);
         } else {
-            logger.warn("Could not find plugin directory.");
+            LOGGER.warn("Could not find plugin directory.");
         }
-        logger.debug("Found " + urls.length + " plugins");
+        LOGGER.debug("Found {} plugins", urls.length);
         classLoader = new URLClassLoader(urls);
     }
 
@@ -98,7 +98,7 @@ public class PluginManager {
             return new ArrayList<>();
         }
 
-        logger.debug("Now checking directory " + origin.getName());
+        LOGGER.debug("Now checking directory {}", origin.getName());
         final List<URL> plugins = new ArrayList<>();
         for (final File file : files) {
             if (file.getName().startsWith(".")) {
@@ -108,7 +108,7 @@ public class PluginManager {
             plugins.addAll(getPluginsFromDir(file));
 
             if (file.getName().toLowerCase().endsWith(".jar")) {
-                logger.debug("Now adding plugin " + file.getName() + " to class loader.");
+                LOGGER.debug("Now adding plugin {} to class loader.", file.getName());
                 try {
                     plugins.add(file.toURI().toURL());
                 } catch (MalformedURLException ignored) {

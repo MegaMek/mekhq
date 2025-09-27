@@ -76,13 +76,7 @@ public enum UnitMarketMethod {
     //endregion Boolean Comparisons
 
     public AbstractUnitMarket getUnitMarket() {
-        switch (this) {
-            case ATB_MONTHLY:
-                return new AtBMonthlyUnitMarket();
-            case NONE:
-            default:
-                return new DisabledUnitMarket();
-        }
+        return (this.equals(ATB_MONTHLY)) ? new AtBMonthlyUnitMarket() : new DisabledUnitMarket();
     }
 
     @Override

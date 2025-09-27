@@ -46,18 +46,18 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import megamek.Version;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.TechConstants;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.util.weightedMaps.WeightedIntMap;
-import megamek.common.weapons.InfantryAttack;
-import megamek.common.weapons.autocannons.ACWeapon;
-import megamek.common.weapons.autocannons.LBXACWeapon;
-import megamek.common.weapons.autocannons.UACWeapon;
-import megamek.common.weapons.bayweapons.BayWeapon;
+import megamek.common.weapons.attacks.InfantryAttack;
+import megamek.common.weapons.autoCannons.ACWeapon;
+import megamek.common.weapons.autoCannons.LBXACWeapon;
+import megamek.common.weapons.autoCannons.UACWeapon;
+import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -80,13 +80,15 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SpecialAbility {
-    private static final MMLogger logger = MMLogger.create(SpecialAbility.class);
+    private static final MMLogger LOGGER = MMLogger.create(SpecialAbility.class);
 
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
-    private static final String PREREQ_MISC_CLANPILOT = "clanperson";
+    private static final String PREREQ_MISC_CLAN_PILOT = "clanperson";
+    private static String SPA_DIRECTORY = "data/universe/defaultspa.xml";
+    private static String TEST_DIRECTORY = "testresources/data/universe/defaultspa_test.xml";
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
-    private static Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
+    private static final Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
 
     private String displayName;
     private String lookupName;
@@ -174,8 +176,8 @@ public class SpecialAbility {
             }
         }
 
-        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT) ||
-                     (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
+        return !prereqMisc.containsKey(PREREQ_MISC_CLAN_PILOT) ||
+                     (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLAN_PILOT)));
     }
 
     public boolean isEligible(boolean isClanPilot, Skills skills, PersonnelOptions options) {
@@ -199,8 +201,8 @@ public class SpecialAbility {
             }
         }
 
-        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT) ||
-                     (isClanPilot == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
+        return !prereqMisc.containsKey(PREREQ_MISC_CLAN_PILOT) ||
+                     (isClanPilot == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLAN_PILOT)));
     }
 
     public boolean isEligible(int unitType) {
@@ -285,8 +287,8 @@ public class SpecialAbility {
               Utilities.combineString(invalidAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
-        for (SkillPrerequisite skillpre : prereqSkills) {
-            skillpre.writeToXML(pw, indent);
+        for (SkillPrerequisite skillPrerequisite : prereqSkills) {
+            skillPrerequisite.writeToXML(pw, indent);
         }
 
         for (String pre : prereqMisc.keySet()) {
@@ -347,7 +349,7 @@ public class SpecialAbility {
 
             specialAbilities.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -403,20 +405,20 @@ public class SpecialAbility {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
-    public static void initializeSPA() {
+    public static void initializeSPA(boolean useTestDirectory) {
         if (!getDefaultSpecialAbilities().isEmpty()) {
             return;
         }
 
         Document xmlDoc;
-        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
+        try (InputStream is = new FileInputStream(useTestDirectory ? TEST_DIRECTORY : SPA_DIRECTORY)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return;
         }
 
@@ -475,7 +477,7 @@ public class SpecialAbility {
     }
 
     /**
-     * This return a random weapon to specialize in, selected based on weightings. Introtech weaponry is weighted at 50,
+     * This return a random weapon to specialize in, selected based on weightings. IntroTech weaponry is weighted at 50,
      * standard weaponry at 25, advanced weaponry at 5, while experimental and unofficial weaponry are both weighted at
      * 1.
      *
@@ -557,16 +559,15 @@ public class SpecialAbility {
      * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
      */
     public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
-        if (!(et instanceof WeaponType)) {
+        if (!(et instanceof WeaponType wt)) {
             return false;
         } else if ((et instanceof InfantryWeapon) || (et instanceof BayWeapon) || (et instanceof InfantryAttack)) {
             return false;
         }
-        WeaponType wt = (WeaponType) et;
         if (wt.isCapital() ||
                   wt.isSubCapital() ||
                   wt.hasFlag(WeaponType.F_INFANTRY) ||
-                  wt.hasFlag(WeaponType.F_ONESHOT) ||
+                  wt.hasFlag(WeaponType.F_ONE_SHOT) ||
                   wt.hasFlag(WeaponType.F_PROTOTYPE)) {
             return false;
         }
@@ -588,15 +589,11 @@ public class SpecialAbility {
             return false;
         }
 
-        if (clusterOnly &&
-                  !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
-                          (wt instanceof ACWeapon) ||
-                          (wt instanceof UACWeapon) ||
-                          (wt instanceof LBXACWeapon))) {
-            return false;
-        }
-
-        return true;
+        return !clusterOnly ||
+                     ((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTER_TABLE) ||
+                            (wt instanceof ACWeapon) ||
+                            (wt instanceof UACWeapon) ||
+                            (wt instanceof LBXACWeapon));
     }
 
     public String getAllPrereqDesc() {

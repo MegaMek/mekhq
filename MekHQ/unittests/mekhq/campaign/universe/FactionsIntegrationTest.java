@@ -37,21 +37,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.common.universe.FactionTag;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 public class FactionsIntegrationTest {
     @Test
-    public void loadDefaultTest()
-          throws DOMException, SAXException, IOException, ParserConfigurationException {
-        Factions factions = Factions.loadDefault();
+    public void loadDefaultTest() throws DOMException {
+        Factions factions = Factions.loadDefault(true);
 
         assertNotNull(factions);
 

@@ -42,7 +42,7 @@ public enum PlanetaryType {
 
     public final String name;
 
-    private PlanetaryType(String name) {
+    PlanetaryType(String name) {
         this.name = name;
     }
 

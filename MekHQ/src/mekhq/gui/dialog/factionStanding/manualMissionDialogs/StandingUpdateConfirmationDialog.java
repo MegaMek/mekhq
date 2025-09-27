@@ -53,7 +53,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import megamek.logging.MMLogger;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -64,7 +63,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @since 0.50.07
  */
 public class StandingUpdateConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(SimulateMissionDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);

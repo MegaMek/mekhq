@@ -33,7 +33,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import static java.io.File.separator;
-import static megamek.common.Board.START_SW;
+import static megamek.common.board.Board.START_SW;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
@@ -41,8 +41,8 @@ import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
-import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
+import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -51,12 +51,12 @@ import java.util.List;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -64,10 +64,10 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -85,7 +85,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class PrisonEscapeScenario {
     private final Campaign campaign;
     private final AtBContract contract;
-    private Set<Person> escapees;
+    private final Set<Person> escapees;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
     private final MMLogger logger = MMLogger.create(PrisonEscapeScenario.class);
@@ -243,30 +243,30 @@ public class PrisonEscapeScenario {
 
         // If we've failed to deserialize the requested template, report the error and make the delivery.
         if (template == null) {
-            logger.info(String.format("Failed to deserialize %s", GENERIC));
+            logger.info("Failed to deserialize {}", GENERIC);
             return;
         }
 
         // Pick a random track where the interception will take place. If we fail to get a track,
         // we log an error and make the delivery, in the same manner as above.
-        StratconTrackState track;
+        StratConTrackState track;
         try {
-            final StratconCampaignState campaignState = contract.getStratconCampaignState();
-            List<StratconTrackState> tracks = campaignState.getTracks();
+            final StratConCampaignState campaignState = contract.getStratconCampaignState();
+            List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
-            logger.info(String.format("Failed to fetch a track: %s", e.getMessage()));
+            logger.info("Failed to fetch a track: {}", e.getMessage());
             return;
         }
 
-        StratconCoords coords = getUnoccupiedCoords(track);
+        StratConCoords coords = getUnoccupiedCoords(track);
 
         if (coords == null) {
             logger.info("Failed to fetch a free set of coords");
             return;
         }
 
-        StratconScenario scenario = generateExternalScenario(campaign,
+        StratConScenario scenario = generateExternalScenario(campaign,
               contract,
               track,
               coords,

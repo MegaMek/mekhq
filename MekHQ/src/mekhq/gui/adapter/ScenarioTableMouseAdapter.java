@@ -40,7 +40,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import mekhq.MekHQ;
-import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
@@ -49,9 +49,9 @@ import mekhq.gui.model.ScenarioTableModel;
 
 public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
-    private CampaignGUI gui;
-    private JTable scenarioTable;
-    private ScenarioTableModel scenarioModel;
+    private final CampaignGUI gui;
+    private final JTable scenarioTable;
+    private final ScenarioTableModel scenarioModel;
     //endregion Variable Declarations
 
     protected ScenarioTableMouseAdapter(CampaignGUI gui, JTable scenarioTable, ScenarioTableModel scenarioModel) {
@@ -78,7 +78,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         JMenuItem menuItem;
         JMenu menu;
 
-        // lets fill the pop up menu
+        // let's fill the pop-up menu
         menuItem = new JMenuItem("Edit...");
         menuItem.addActionListener(evt -> editScenario(scenario));
         popup.add(menuItem);

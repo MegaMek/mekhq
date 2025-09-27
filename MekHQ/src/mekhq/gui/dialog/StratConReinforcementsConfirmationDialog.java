@@ -50,8 +50,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.common.TargetRoll;
 import megamek.common.TargetRollModifier;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -98,7 +98,7 @@ public class StratConReinforcementsConfirmationDialog {
         /** GM reinforcements. */
         REINFORCE_GM,
         /** Instant GM reinforcements. */
-        REINFORCE_GM_INSTANTLY;
+        REINFORCE_GM_INSTANTLY
     }
 
     /**
@@ -158,9 +158,11 @@ public class StratConReinforcementsConfirmationDialog {
             case 2 -> ReinforcementDialogResponseType.REINFORCE_GM_INSTANTLY;
             case 3 -> ReinforcementDialogResponseType.REINFORCE;
             case 4 -> ReinforcementDialogResponseType.REINFORCE_INSTANTLY;
-            default -> throw new IllegalStateException("Unexpected dialog choice value: " 
-                    + dialog.getDialogChoice() 
-                    + ". Valid choices are 0-4 (or 0-2 for non-GM users). This may occur if an invalid dialog choice is returned.");
+            default -> throw new IllegalStateException("Unexpected dialog choice value: "
+                                                             +
+                                                             dialog.getDialogChoice()
+                                                             +
+                                                             ". Valid choices are 0-4 (or 0-2 for non-GM users). This may occur if an invalid dialog choice is returned.");
         };
     }
 
@@ -227,7 +229,7 @@ public class StratConReinforcementsConfirmationDialog {
     /**
      * Builds the list of button definitions for the dialog, including any GM-specific options.
      *
-     * @param isGM true if the player is a GM, showing more buttons
+     * @param isGM                 true if the player is a GM, showing more buttons
      * @param maximumSupportPoints the max allowed support points
      *
      * @return list of button/tooltip pairs to show in the dialog
@@ -342,7 +344,7 @@ public class StratConReinforcementsConfirmationDialog {
     private String getTargetNumberBreakdown(TargetRoll targetNumber) {
         StringBuilder breakdown = new StringBuilder();
         for (TargetRollModifier modifier : targetNumber.getModifiers()) {
-            breakdown.append("<br><b>").append(modifier.getDesc()).append(":</b> ").append(modifier.getValue());
+            breakdown.append("<br><b>").append(modifier.getDesc()).append(":</b> ").append(modifier.value());
         }
 
         breakdown.append("<br><b>")

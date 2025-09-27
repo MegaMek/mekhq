@@ -35,8 +35,8 @@ package mekhq.campaign.market;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -48,7 +48,7 @@ import mekhq.module.api.PersonnelMarketMethod;
  *
  * @author Neoancient
  */
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarketFMMr implements PersonnelMarketMethod {
 
     @Override
@@ -62,7 +62,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
             return null;
         }
         List<Person> retVal = new ArrayList<>();
-        int q = 0;
+        int q;
         long mft = PersonnelMarket.getUnitMainForceType(c);
         int mftMod = 0;
         if (mft == Entity.ETYPE_MEK ||

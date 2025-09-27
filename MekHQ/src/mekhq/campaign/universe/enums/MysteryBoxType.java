@@ -106,30 +106,6 @@ public enum MysteryBoxType {
     }
     //endregion Boolean Comparison Methods
 
-/*
-    public AbstractMysteryBox getMysteryBox() {
-        switch (this) {
-            case STAR_LEAGUE_ROYAL:
-                return new StarLeagueRoyalMysteryBox();
-            case STAR_LEAGUE_REGULAR:
-                return new StarLeagueRegularMysteryBox();
-            case INNER_SPHERE_EXPERIMENTAL:
-                return new InnerSphereExperimentalMysteryBox();
-            case CLAN_KESHIK:
-                return new ClanKeshikMysteryBox();
-            case CLAN_FRONT_LINE:
-                return new ClanFrontLineMysteryBox();
-            case CLAN_SECOND_LINE:
-                return new ClanSecondLineMysteryBox();
-            case CLAN_EXPERIMENTAL:
-                return new ClanExperimentalMysteryBox();
-            case THIRD_SUCCESSION_WAR:
-            default:
-                return new ThirdSuccessionWarMysteryBox();
-        }
-    }
-*/
-
     @Override
     public String toString() {
         return name;

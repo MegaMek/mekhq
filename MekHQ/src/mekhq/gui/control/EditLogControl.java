@@ -73,7 +73,6 @@ public class EditLogControl extends JPanel {
     private final LogType logType;
     private final LogTableModel logModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JTable logsTable;
@@ -157,7 +156,7 @@ public class EditLogControl extends JPanel {
         JPanel buttonPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, PADDING, 0));
 
-        btnAdd = createButton("logController.btnAdd.text", "btnAdd", true, this::addEntry);
+        JButton btnAdd = createButton("logController.btnAdd.text", "btnAdd", true, this::addEntry);
         btnEdit = createButton("logController.btnEdit.text", "btnEdit", false, this::editEntry);
         btnDelete = createButton("logController.btnDelete.text", "btnDelete", false, this::deleteEntry);
 

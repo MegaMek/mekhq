@@ -118,7 +118,7 @@ public class ObjectiveEffect {
         FacilityCaptured("Facility captured and changes controller", false);
 
         private final String descriptiveText;
-        private boolean magnitudeIsRelevant;
+        private final boolean magnitudeIsRelevant;
 
         /**
          * Whether the scaling is relevant for this particular objective effect type - e.g. it doesn't matter how many

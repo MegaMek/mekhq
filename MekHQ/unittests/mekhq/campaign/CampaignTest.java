@@ -36,6 +36,7 @@ package mekhq.campaign;
 import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -54,19 +55,29 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
-import megamek.common.WeaponType;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Cubicle;
+import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -234,26 +245,26 @@ public class CampaignTest {
     }
 
     @Test
-    void testIniative() {
+    void testInitiative() {
         Campaign campaign = new Campaign();
 
         campaign.applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
-        assertTrue(campaign.getInitiativeBonus() == 6);
-        assertTrue(campaign.getInitiativeMaxBonus() == 6);
+        assertEquals(6, campaign.getInitiativeBonus());
+        assertEquals(6, campaign.getInitiativeMaxBonus());
         // Should not be able to increment over max of 6
         campaign.initiativeBonusIncrement(true);
-        assertFalse(campaign.getInitiativeBonus() == 7);
+        assertNotEquals(7, campaign.getInitiativeBonus());
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 6);
+        assertEquals(6, campaign.getInitiativeBonus());
         // But should be able to decrease below max
         campaign.initiativeBonusIncrement(false);
-        assertEquals(campaign.getInitiativeBonus(), 5);
-        // After setting lower Max Bonus any appied bonus thats less then max should set
+        assertEquals(5, campaign.getInitiativeBonus());
+        // After setting lower Max Bonus any applied bonus that's less than max should set
         // bonus to max
         campaign.setInitiativeMaxBonus(3);
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 3);
+        assertEquals(3, campaign.getInitiativeBonus());
 
     }
 
@@ -446,7 +457,7 @@ public class CampaignTest {
         }
 
         /**
-         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
+         * {@link Campaign# getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
          * testing
          */
         @Nested
@@ -481,7 +492,7 @@ public class CampaignTest {
             }
 
             /**
-             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
+             * @return parts that are not explicitly handled by {@link Campaign# getDefaultStockPercent(Part)}
              */
             public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
                 return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());
@@ -565,7 +576,7 @@ public class CampaignTest {
             @Test
             public void testGetDefaultStockPercentCT() {
                 // Arrange
-                part = new MekLocation(Mek.LOC_CT, 1, 0, false, false, false, false, false, campaign);
+                part = new MekLocation(Mek.LOC_CENTER_TORSO, 1, 0, false, false, false, false, false, campaign);
 
                 // Act
                 try {
@@ -593,7 +604,7 @@ public class CampaignTest {
             }
 
             @ParameterizedTest
-            @ValueSource(ints = { Mek.LOC_LARM, Mek.LOC_RARM, Mek.LOC_LT, Mek.LOC_RT })
+            @ValueSource(ints = { Mek.LOC_LEFT_ARM, Mek.LOC_RIGHT_ARM, Mek.LOC_LEFT_TORSO, Mek.LOC_RIGHT_TORSO })
             public void testGetDefaultStockPercentOtherLocation(int location) {
                 // Arrange
                 part = new MekLocation(location, 1, 0, false, false, false, false, false, campaign);

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,17 +55,17 @@ import java.util.Objects;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.ConvFighter;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.ProtoMek;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -83,7 +83,7 @@ import org.w3c.dom.NodeList;
  */
 public class SkillType {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
-    private static final MMLogger logger = MMLogger.create(SkillType.class);
+    private static final MMLogger LOGGER = MMLogger.create(SkillType.class);
 
     /**
      * A constant string value representing the suffix " (RP Only)".
@@ -373,12 +373,12 @@ public class SkillType {
      * Retrieves a list of unique skill names that match any of the specified {@link SkillSubType}s.
      *
      * <p>This method iterates through all known {@link SkillType} instances and collects the names of those whose
-     * sub-type is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
+     * subtype is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
      * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
      *
      * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
      *
-     * @return A list of unique skill names that belong to one of the specified skill sub-types.
+     * @return A list of unique skill names that belong to one of the specified skill subtypes.
      *
      * @author Illiani
      * @since 0.50.06
@@ -460,10 +460,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </pre>
+     *                                               Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                               SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                               SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                      </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -488,7 +488,7 @@ public class SkillType {
         // This validates the length of costs to ensure that valid entries exist for all possible skill levels (0-10,
         // inclusive)
         if (costs == null || costs.length != 11) {
-            logger.warn(
+            LOGGER.warn(
                   "The costs array is null or does not have exactly 11 entries. Filling missing levels with default values.");
             Integer[] validCosts = new Integer[11];
             Arrays.fill(validCosts, DISABLED_SKILL_LEVEL);
@@ -1135,10 +1135,10 @@ public class SkillType {
                     // skillType.name = wn2.getTextContent();
 
                     // The above code can be uncommented once these handlers have been removed
-                    String name = wn2.getTextContent().trim().toLowerCase();
+                    String name = wn2.getTextContent().trim();
 
                     //Start <50.07 compatibility handler.
-                    skillType.name = switch (name) {
+                    skillType.name = switch (name.toLowerCase()) {
                         // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
                         case "anti-mech" -> S_ANTI_MEK;
                         case "medtech" -> S_MEDTECH;
@@ -1152,7 +1152,7 @@ public class SkillType {
                         case "doctor" -> S_SURGERY;
                         case "tactics" -> S_TACTICS;
                         case "tracking (rp only)" -> S_TRACKING;
-                        default -> wn2.getTextContent().trim();
+                        default -> name;
                     };
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
                     skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);
@@ -1198,7 +1198,7 @@ public class SkillType {
 
             lookupHash.put(skillType.name, skillType);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -1251,7 +1251,7 @@ public class SkillType {
 
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -1269,7 +1269,7 @@ public class SkillType {
      */
     private static void compatibilityHandler(SkillType skillType) {
         if (skillType == null) {
-            logger.info("SkillType is null, unable to update compatibility. " +
+            LOGGER.info("SkillType is null, unable to update compatibility. " +
                               "This suggests a deeper issue and should be reported.");
             return;
         }
@@ -1385,7 +1385,7 @@ public class SkillType {
             case S_SUPPORT_WEAPONS -> createSupportWeapons();
             case S_RUNNING -> createRunning();
             default -> {
-                logger.warn("Unexpected value in compatibilityHandler: {}", skillType.getName());
+                LOGGER.warn("Unexpected value in compatibilityHandler: {}", skillType.getName());
                 yield null;
             }
         };

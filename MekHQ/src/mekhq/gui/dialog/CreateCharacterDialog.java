@@ -73,14 +73,14 @@ import megamek.client.ui.panels.DialogOptionComponentYPanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Crew;
-import megamek.common.EquipmentType;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Crew;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -110,7 +110,7 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * This dialog is used to create a character in story arcs from a pool of XP
  */
 public class CreateCharacterDialog extends JDialog implements DialogOptionListener {
-    private static final MMLogger logger = MMLogger.create(CreateCharacterDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(CreateCharacterDialog.class);
 
     public enum NameRestrictions {
         ALL, FIRST_NAME, NONE
@@ -120,7 +120,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private final boolean editOrigin;
     private final boolean editBirthday;
     private final boolean editGender;
-    private boolean limitFaction;
     private final NameRestrictions nameRestrictions;
 
     private String instructions;
@@ -132,7 +131,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private final Map<String, JSpinner> skillLvls = new Hashtable<>();
     private final Map<String, JSpinner> skillBonus = new Hashtable<>();
     private final Map<String, JLabel> skillValues = new Hashtable<>();
-    private final Map<String, JCheckBox> skillChks = new Hashtable<>();
+    private final Map<String, JCheckBox> skillChecks = new Hashtable<>();
     private PersonnelOptions options;
     private LocalDate birthdate;
     private final JFrame frame;
@@ -208,7 +207,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         try {
             setUserPreferences();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e, "Unable to set user preferences");
         }
     }
 
@@ -232,7 +231,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
 
-        getContentPane().add(getDemogPanel(), BorderLayout.CENTER);
+        getContentPane().add(getDemographicPanel(), BorderLayout.CENTER);
         getContentPane().add(getRightPanel(), BorderLayout.LINE_END);
         getContentPane().add(getButtonPanel(), BorderLayout.PAGE_END);
 
@@ -241,11 +240,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         pack();
     }
 
-    private JScrollPane getDemogPanel() {
-        JPanel demogPanel = new JPanel(new GridBagLayout());
+    private JScrollPane getDemographicPanel() {
+        JPanel demographicPanel = new JPanel(new GridBagLayout());
         JLabel lblName = new JLabel();
         JLabel lblGender = new JLabel();
-        JLabel lblBday = new JLabel();
+        JLabel lblBirthday = new JLabel();
         lblAge = new JLabel();
         JLabel lblNickname = new JLabel();
         JLabel lblBloodname = new JLabel();
@@ -281,7 +280,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblName, gridBagConstraints);
+        demographicPanel.add(lblName, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -327,7 +326,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-        demogPanel.add(panName, gridBagConstraints);
+        demographicPanel.add(panName, gridBagConstraints);
 
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
         btnRandomName.setName("btnRandomName"); // NOI18N
@@ -339,7 +338,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-        demogPanel.add(btnRandomName, gridBagConstraints);
+        demographicPanel.add(btnRandomName, gridBagConstraints);
 
         y++;
 
@@ -351,7 +350,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblBloodname, gridBagConstraints);
+            demographicPanel.add(lblBloodname, gridBagConstraints);
 
             textBloodname.setMinimumSize(new Dimension(150, 28));
             textBloodname.setName("textBloodname");
@@ -364,14 +363,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             textBloodname.setText(person.getBloodname());
             textBloodname.setEditable(nameRestrictions == NameRestrictions.ALL);
-            demogPanel.add(textBloodname, gridBagConstraints);
+            demographicPanel.add(textBloodname, gridBagConstraints);
 
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text"));
             btnRandomBloodname.setName("btnRandomBloodname");
             btnRandomBloodname.addActionListener(evt -> randomBloodname());
             btnRandomBloodname.setEnabled(nameRestrictions == NameRestrictions.ALL);
             gridBagConstraints.gridx = 2;
-            demogPanel.add(btnRandomBloodname, gridBagConstraints);
+            demographicPanel.add(btnRandomBloodname, gridBagConstraints);
         } else {
             lblNickname.setText(resourceMap.getString("lblNickname.text"));
             lblNickname.setName("lblNickname");
@@ -380,7 +379,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblNickname, gridBagConstraints);
+            demographicPanel.add(lblNickname, gridBagConstraints);
 
             textNickname.setText(person.getCallsign());
             textNickname.setName("textNickname");
@@ -390,14 +389,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.BOTH;
-            demogPanel.add(textNickname, gridBagConstraints);
+            demographicPanel.add(textNickname, gridBagConstraints);
 
             JButton btnRandomCallsign = new JButton(resourceMap.getString("btnRandomCallsign.text"));
             btnRandomCallsign.setName("btnRandomCallsign");
             btnRandomCallsign.addActionListener(e -> textNickname.setText(RandomCallsignGenerator.getInstance()
                                                                                 .generate()));
             gridBagConstraints.gridx = 2;
-            demogPanel.add(btnRandomCallsign, gridBagConstraints);
+            demographicPanel.add(btnRandomCallsign, gridBagConstraints);
         }
 
         y++;
@@ -409,7 +408,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblGender, gridBagConstraints);
+        demographicPanel.add(lblGender, gridBagConstraints);
 
         choiceGender = new JComboBox<>(Gender.values());
         choiceGender.setName("choiceGender");
@@ -421,7 +420,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(choiceGender, gridBagConstraints);
+        demographicPanel.add(choiceGender, gridBagConstraints);
         choiceGender.setEnabled(editGender);
 
         y++;
@@ -431,7 +430,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(new JLabel("Origin Faction:"), gridBagConstraints);
+        demographicPanel.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
         DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel();
         choiceFaction = new JComboBox<>(factionsModel);
@@ -471,7 +470,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(choiceFaction, gridBagConstraints);
+        demographicPanel.add(choiceFaction, gridBagConstraints);
         choiceFaction.setEnabled(editOrigin);
 
         y++;
@@ -481,7 +480,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(new JLabel("Origin System:"), gridBagConstraints);
+        demographicPanel.add(new JLabel("Origin System:"), gridBagConstraints);
 
         DefaultComboBoxModel<Planet> planetsModel = new DefaultComboBoxModel<>();
         choicePlanet = new JComboBox<>(planetsModel);
@@ -520,7 +519,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(choiceSystem, gridBagConstraints);
+        demographicPanel.add(choiceSystem, gridBagConstraints);
 
         chkOnlyOurFaction = new JCheckBox("Faction Specific");
         chkOnlyOurFaction.addActionListener(e -> filterPlanetarySystemsForOurFaction(chkOnlyOurFaction.isSelected()));
@@ -532,7 +531,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(chkOnlyOurFaction, gridBagConstraints);
+        demographicPanel.add(chkOnlyOurFaction, gridBagConstraints);
 
         y++;
 
@@ -541,7 +540,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(new JLabel("Origin Planet:"), gridBagConstraints);
+        demographicPanel.add(new JLabel("Origin Planet:"), gridBagConstraints);
 
         choicePlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -566,7 +565,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(choicePlanet, gridBagConstraints);
+        demographicPanel.add(choicePlanet, gridBagConstraints);
 
         y++;
 
@@ -575,7 +574,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(new JLabel("Phenotype:"), gridBagConstraints);
+        demographicPanel.add(new JLabel("Phenotype:"), gridBagConstraints);
 
         DefaultComboBoxModel<Phenotype> phenotypeModel = new DefaultComboBoxModel<>();
         phenotypeModel.addElement(Phenotype.NONE);
@@ -593,10 +592,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(choicePhenotype, gridBagConstraints);
+        demographicPanel.add(choicePhenotype, gridBagConstraints);
         choicePhenotype.setEnabled(editOrigin);
 
-        chkClan = new JCheckBox("Clanner");
+        chkClan = new JCheckBox("Clan Personnel");
         chkClan.setSelected(person.isClanPersonnel());
         chkClan.addItemListener(et -> backgroundChanged());
         gridBagConstraints = new GridBagConstraints();
@@ -606,19 +605,19 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        demogPanel.add(chkClan, gridBagConstraints);
+        demographicPanel.add(chkClan, gridBagConstraints);
         chkClan.setEnabled(editOrigin);
 
         y++;
 
-        lblBday.setText(resourceMap.getString("lblBday.text")); // NOI18N
-        lblBday.setName("lblBday"); // NOI18N
+        lblBirthday.setText(resourceMap.getString("lblBday.text")); // NOI18N
+        lblBirthday.setName("lblBirthday"); // NOI18N
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblBday, gridBagConstraints);
+        demographicPanel.add(lblBirthday, gridBagConstraints);
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(birthdate));
         btnDate.setName("btnDate");
@@ -627,7 +626,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        demogPanel.add(btnDate, gridBagConstraints);
+        demographicPanel.add(btnDate, gridBagConstraints);
         btnDate.setEnabled(editBirthday);
 
         lblAge.setText(person.getAge(campaign.getLocalDate()) + " " + resourceMap.getString("age")); // NOI18N
@@ -637,7 +636,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblAge, gridBagConstraints);
+        demographicPanel.add(lblAge, gridBagConstraints);
 
         y++;
 
@@ -653,13 +652,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblToughness, gridBagConstraints);
+            demographicPanel.add(lblToughness, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            demogPanel.add(textToughness, gridBagConstraints);
+            demographicPanel.add(textToughness, gridBagConstraints);
 
             y++;
         }
@@ -675,13 +674,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblConnections, gridBagConstraints);
+        demographicPanel.add(lblConnections, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        demogPanel.add(textConnections, gridBagConstraints);
+        demographicPanel.add(textConnections, gridBagConstraints);
 
         y++;
 
@@ -696,13 +695,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblWealth, gridBagConstraints);
+        demographicPanel.add(lblWealth, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        demogPanel.add(textWealth, gridBagConstraints);
+        demographicPanel.add(textWealth, gridBagConstraints);
 
         y++;
 
@@ -717,13 +716,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblReputation, gridBagConstraints);
+        demographicPanel.add(lblReputation, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        demogPanel.add(textReputation, gridBagConstraints);
+        demographicPanel.add(textReputation, gridBagConstraints);
 
         y++;
 
@@ -738,13 +737,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblUnlucky, gridBagConstraints);
+        demographicPanel.add(lblUnlucky, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        demogPanel.add(textUnlucky, gridBagConstraints);
+        demographicPanel.add(textUnlucky, gridBagConstraints);
 
         y++;
 
@@ -759,13 +758,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblBloodmark, gridBagConstraints);
+        demographicPanel.add(lblBloodmark, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        demogPanel.add(textBloodmark, gridBagConstraints);
+        demographicPanel.add(textBloodmark, gridBagConstraints);
 
         y++;
 
@@ -784,13 +783,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblEducationLevel, gridBagConstraints);
+            demographicPanel.add(lblEducationLevel, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            demogPanel.add(textEducationLevel, gridBagConstraints);
+            demographicPanel.add(textEducationLevel, gridBagConstraints);
 
             y++;
         }
@@ -808,13 +807,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblLoyalty, gridBagConstraints);
+            demographicPanel.add(lblLoyalty, gridBagConstraints);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            demogPanel.add(textLoyalty, gridBagConstraints);
+            demographicPanel.add(textLoyalty, gridBagConstraints);
 
             y++;
         }
@@ -829,7 +828,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(labelAggression, gridBagConstraints);
+            demographicPanel.add(labelAggression, gridBagConstraints);
 
             comboAggression = new MMComboBox<>("comboAggression", Aggression.values());
             comboAggression.setSelectedItem(person.getAggression());
@@ -839,7 +838,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(comboAggression, gridBagConstraints);
+            demographicPanel.add(comboAggression, gridBagConstraints);
 
             spnAggression = new JSpinner(new SpinnerNumberModel(person.getAggressionDescriptionIndex(),
                   0, Ambition.MAXIMUM_VARIATIONS, 1));
@@ -849,7 +848,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(spnAggression, gridBagConstraints);
+            demographicPanel.add(spnAggression, gridBagConstraints);
 
             JLabel labelAmbition = new JLabel();
             labelAmbition.setText("Ambition:");
@@ -859,7 +858,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(labelAmbition, gridBagConstraints);
+            demographicPanel.add(labelAmbition, gridBagConstraints);
 
             comboAmbition = new MMComboBox<>("comboAmbition", Ambition.values());
             comboAmbition.setSelectedItem(person.getAmbition());
@@ -869,7 +868,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(comboAmbition, gridBagConstraints);
+            demographicPanel.add(comboAmbition, gridBagConstraints);
 
             spnAmbition = new JSpinner(new SpinnerNumberModel(person.getAmbitionDescriptionIndex(),
                   0, Ambition.MAXIMUM_VARIATIONS, 1));
@@ -879,7 +878,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(spnAmbition, gridBagConstraints);
+            demographicPanel.add(spnAmbition, gridBagConstraints);
 
             JLabel labelGreed = new JLabel();
             labelGreed.setText("Greed:");
@@ -889,7 +888,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(labelGreed, gridBagConstraints);
+            demographicPanel.add(labelGreed, gridBagConstraints);
 
             comboGreed = new MMComboBox<>("comboGreed", Greed.values());
             comboGreed.setSelectedItem(person.getGreed());
@@ -899,7 +898,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(comboGreed, gridBagConstraints);
+            demographicPanel.add(comboGreed, gridBagConstraints);
 
             spnGreed = new JSpinner(new SpinnerNumberModel(person.getGreedDescriptionIndex(),
                   0, Greed.MAXIMUM_VARIATIONS, 1));
@@ -909,7 +908,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(spnGreed, gridBagConstraints);
+            demographicPanel.add(spnGreed, gridBagConstraints);
 
             JLabel labelSocial = new JLabel();
             labelSocial.setText("Social:");
@@ -919,7 +918,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(labelSocial, gridBagConstraints);
+            demographicPanel.add(labelSocial, gridBagConstraints);
 
             comboSocial = new MMComboBox<>("comboSocial", Social.values());
             comboSocial.setSelectedItem(person.getSocial());
@@ -929,7 +928,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(comboSocial, gridBagConstraints);
+            demographicPanel.add(comboSocial, gridBagConstraints);
 
             spnSocial = new JSpinner(new SpinnerNumberModel(person.getSocialDescriptionIndex(),
                   0, Social.MAXIMUM_VARIATIONS, 1));
@@ -939,7 +938,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(spnSocial, gridBagConstraints);
+            demographicPanel.add(spnSocial, gridBagConstraints);
 
             JLabel labelPersonalityQuirk = new JLabel();
             labelPersonalityQuirk.setText("Quirk:");
@@ -949,7 +948,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(labelPersonalityQuirk, gridBagConstraints);
+            demographicPanel.add(labelPersonalityQuirk, gridBagConstraints);
 
             comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", personalityQuirksSortedAlphabetically());
             comboPersonalityQuirk.setSelectedItem(person.getPersonalityQuirk());
@@ -959,7 +958,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(comboPersonalityQuirk, gridBagConstraints);
+            demographicPanel.add(comboPersonalityQuirk, gridBagConstraints);
 
             spnPersonalityQuirk = new JSpinner(new SpinnerNumberModel(person.getPersonalityQuirkDescriptionIndex(),
                   0, PersonalityQuirk.MAXIMUM_VARIATIONS, 1));
@@ -969,7 +968,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(spnPersonalityQuirk, gridBagConstraints);
+            demographicPanel.add(spnPersonalityQuirk, gridBagConstraints);
         }
 
         y++;
@@ -985,10 +984,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        demogPanel.add(txtBio, gridBagConstraints);
+        demographicPanel.add(txtBio, gridBagConstraints);
 
-        // Wrap the demogPanel in a JScrollPane
-        JScrollPane scrollPane = new JScrollPane(demogPanel);
+        // Wrap the demographicPanel in a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(demographicPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -1001,20 +1000,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        JButton portraitButton = new JButton();
-        portraitButton.setMinimumSize(new Dimension(72, 72));
-        portraitButton.setPreferredSize(new Dimension(72, 72));
-        portraitButton.setName("portrait");
-        portraitButton.addActionListener(e -> {
-            final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(null, portrait);
-            portraitDialog.setAlwaysOnTop(true);
-            if (portraitDialog.showDialog().isConfirmed()) {
-                portrait = portraitDialog.getSelectedItem();
-                portraitButton.setIcon(portraitDialog.getSelectedItem().getImageIcon());
-            }
-        });
-
-        portraitButton.setIcon(portrait.getImageIcon());
+        JButton portraitButton = getPortraitButton();
         topPanel.add(portraitButton, BorderLayout.LINE_START);
 
         JTextPane txtDesc = new JTextPane();
@@ -1063,6 +1049,24 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         rightPanel.add(tabStats, BorderLayout.CENTER);
 
         return rightPanel;
+    }
+
+    private JButton getPortraitButton() {
+        JButton portraitButton = new JButton();
+        portraitButton.setMinimumSize(new Dimension(72, 72));
+        portraitButton.setPreferredSize(new Dimension(72, 72));
+        portraitButton.setName("portrait");
+        portraitButton.addActionListener(e -> {
+            final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(null, portrait);
+            portraitDialog.setAlwaysOnTop(true);
+            if (portraitDialog.showDialog().isConfirmed()) {
+                portrait = portraitDialog.getSelectedItem();
+                portraitButton.setIcon(portraitDialog.getSelectedItem().getImageIcon());
+            }
+        });
+
+        portraitButton.setIcon(portrait.getImageIcon());
+        return portraitButton;
     }
 
     private JPanel getButtonPanel() {
@@ -1203,15 +1207,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         List<String> sortedSkillNames = getSortedSkillNames();
 
-        SkillType stype;
+        SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
             c.gridy = index;
             c.gridx = 0;
             final String type = sortedSkillNames.get(index);
-            stype = SkillType.getType(type);
+            skillType = SkillType.getType(type);
             chkSkill = new JCheckBox();
             chkSkill.setSelected(person.hasSkill(type));
-            skillChks.put(type, chkSkill);
+            skillChecks.put(type, chkSkill);
             chkSkill.addItemListener(e -> {
                 changeSkillValue(type);
                 changeValueEnabled(type);
@@ -1238,7 +1242,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 level = clamp(skill.getLevel(), 0, 10);
                 bonus = clamp(skill.getBonus(), -8, 8);
             }
-            spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, stype.getMaxLevel(), 1));
+            spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, skillType.getMaxLevel(), 1));
             spnLevel.addChangeListener(evt -> changeSkillValue(type));
             spnLevel.setEnabled(chkSkill.isSelected());
             spnBonus = new JSpinner(new SpinnerNumberModel(bonus, -8, 8, 1));
@@ -1307,7 +1311,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             SkillType skillType = SkillType.getType(skillName);
 
             if (skillType == null) {
-                logger.warn("Unknown skill type: {}", skillName);
+                LOGGER.warn("Unknown skill type: {}", skillName);
                 continue;
             }
 
@@ -1333,7 +1337,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private void setSkills() {
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
-            if (skillChks.get(type).isSelected()) {
+            if (skillChecks.get(type).isSelected()) {
                 int lvl = (Integer) skillLvls.get(type).getModel().getValue();
                 int b = (Integer) skillBonus.get(type).getModel().getValue();
                 person.addSkill(type, lvl, b);
@@ -1439,19 +1443,19 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
-            optionComp.addValue(Crew.HUMANTRO_NONE);
-            optionComp.addValue(Crew.HUMANTRO_MEK);
-            optionComp.addValue(Crew.HUMANTRO_AERO);
-            optionComp.addValue(Crew.HUMANTRO_VEE);
-            optionComp.addValue(Crew.HUMANTRO_BA);
+            optionComp.addValue(Crew.HUMAN_TRO_NONE);
+            optionComp.addValue(Crew.HUMAN_TRO_MEK);
+            optionComp.addValue(Crew.HUMAN_TRO_AERO);
+            optionComp.addValue(Crew.HUMAN_TRO_VEE);
+            optionComp.addValue(Crew.HUMAN_TRO_BA);
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_ENV_SPECIALIST.equals(option.getName())) {
-            optionComp.addValue(Crew.ENVSPC_NONE);
-            optionComp.addValue(Crew.ENVSPC_FOG);
-            optionComp.addValue(Crew.ENVSPC_LIGHT);
-            optionComp.addValue(Crew.ENVSPC_RAIN);
-            optionComp.addValue(Crew.ENVSPC_SNOW);
-            optionComp.addValue(Crew.ENVSPC_WIND);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_NONE);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_FOG);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_LIGHT);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_RAIN);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_SNOW);
+            optionComp.addValue(Crew.ENVIRONMENT_SPECIALIST_WIND);
             optionComp.setSelected(option.stringValue());
         } else if (option.getType() == Option.CHOICE) {
             SpecialAbility spa = SpecialAbility.getOption(option.getName());
@@ -1484,12 +1488,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         int totalCost = 0;
 
         //first figure out skills
-        SkillType stype;
+        SkillType skillType;
         for (Entry<String, JSpinner> entry : skillLvls.entrySet()) {
-            stype = SkillType.getType(entry.getKey());
-            if (skillChks.get(stype.getName()).isSelected()) {
+            skillType = SkillType.getType(entry.getKey());
+            if (skillChecks.get(skillType.getName()).isSelected()) {
                 int lvl = (Integer) entry.getValue().getModel().getValue();
-                totalCost = totalCost + stype.getTotalCost(lvl);
+                totalCost = totalCost + skillType.getTotalCost(lvl);
             }
         }
 
@@ -1548,7 +1552,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void changeSkillValue(String type) {
         refreshXpSpent();
-        if (!skillChks.get(type).isSelected()) {
+        if (!skillChecks.get(type).isSelected()) {
             skillValues.get(type).setText("-");
             skillLvls.get(type).getModel().setValue(0);
             return;
@@ -1568,7 +1572,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void changeValueEnabled(String type) {
-        skillLvls.get(type).setEnabled(skillChks.get(type).isSelected());
+        skillLvls.get(type).setEnabled(skillChecks.get(type).isSelected());
     }
 
     private void btnDateActionPerformed(ActionEvent evt) {

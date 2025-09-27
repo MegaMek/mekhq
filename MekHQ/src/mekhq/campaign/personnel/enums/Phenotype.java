@@ -185,7 +185,7 @@ public enum Phenotype {
      * Retrieves the short name of this phenotype based on its Clan status.
      *
      * <p>The method determines the appropriate key by appending the Clan status
-     * ("trueborn" or "freeborn") to the base key "shortName.". This key is then used to fetch the formatted text from
+     * ("trueborn" or "freeborn") to the base key "shortName." This key is then used to fetch the formatted text from
      * the resource bundle.</p>
      *
      * @return A formatted short name string corresponding to the born type (e.g., "shortName.trueborn" or
@@ -340,8 +340,6 @@ public enum Phenotype {
      *         and tries to match it using {@link Phenotype#valueOf(String)}.</li>
      *     <li><b>By label (short name):</b> Matches the input case-insensitively against
      *         the short name of each {@link Phenotype}.</li>
-     *     <li><b>Legacy compatibility:</b> Matches certain input strings such as
-     *         {@code "MECHWARRIOR"} and {@code "PROTOMECH"} to their updated {@link Phenotype} equivalents.</li>
      *     <li><b>By ordinal:</b> Parses the input as an integer and retrieves the
      *         phenotype corresponding to the specified ordinal.</li>
      * </ol>
@@ -353,7 +351,6 @@ public enum Phenotype {
      *             <ul>
      *                 <li>The full name of the phenotype (case-insensitive, spaces allowed).</li>
      *                 <li>The short name (label) of the phenotype (case-insensitive).</li>
-     *                 <li>Legacy names such as {@code "MECHWARRIOR"} or {@code "PROTOMECH"}.</li>
      *                 <li>An ordinal value corresponding to the phenotype.</li>
      *             </ul>
      *

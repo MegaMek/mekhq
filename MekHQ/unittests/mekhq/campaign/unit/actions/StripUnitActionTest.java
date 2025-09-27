@@ -34,7 +34,7 @@ package mekhq.campaign.unit.actions;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import megamek.common.EquipmentType;
+import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;

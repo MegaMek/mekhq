@@ -34,7 +34,7 @@ package mekhq.gui.dialog.markets.personnelMarket;
 
 import static java.lang.Math.min;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
@@ -70,6 +70,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -282,12 +283,7 @@ public class PersonnelMarketDialog extends JDialog {
         rightPanel.add(availabilityLabel, rightGbc);
 
         // Slider
-        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
-                                             MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
-                                             MAXIMUM_DAYS_IN_MONTH;
-        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
-        JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
-        personnelAvailabilitySlider.setEnabled(false);
+        JSlider personnelAvailabilitySlider = getPersonnelAvailabilitySlider();
         rightPanel.add(personnelAvailabilitySlider, rightGbc);
 
         // Experience Label
@@ -308,6 +304,16 @@ public class PersonnelMarketDialog extends JDialog {
         panel.add(rightPanel, mainGbc);
 
         return panel;
+    }
+
+    private JSlider getPersonnelAvailabilitySlider() {
+        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
+                                             MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
+                                             MAXIMUM_DAYS_IN_MONTH;
+        int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
+        JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
+        personnelAvailabilitySlider.setEnabled(false);
+        return personnelAvailabilitySlider;
     }
 
 
@@ -533,10 +539,14 @@ public class PersonnelMarketDialog extends JDialog {
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
             if (!isGMHire && market.isWasOfferingGoldenHello()) {
+                // Personnel are hired without rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
+                // 12 months' salary, we double the multiplier from 12 to 24.
+                Money cost = applicant.getSalary(campaign).multipliedBy(24);
+
                 campaign.getFinances()
                       .debit(RECRUITMENT,
                             campaign.getLocalDate(),
-                            applicant.getSalary(campaign).multipliedBy(12),
+                            cost,
                             getFormattedTextAt(RESOURCE_BUNDLE,
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
@@ -576,6 +586,8 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
+        LOGGER.info(applicant.getFullTitle());
+
         currentApplicants.add(applicant);
 
         // Refresh the table view (notify the model of data changes)
@@ -588,7 +600,11 @@ public class PersonnelMarketDialog extends JDialog {
         int rowCount = model.getRowCount();
         if (rowCount > 0) {
             if (rowCount == 1) { // Only 1 applicant in the table
-                tablePanel.getTable().setRowSelectionInterval(0, 0); // Select the first (and only) row
+                SwingUtilities.invokeLater(() -> {
+                    if (tablePanel.getTable().getRowCount() > 0) {
+                        tablePanel.getTable().setRowSelectionInterval(0, 0);
+                    }
+                });
             }
             personViewPanel.setVisible(true);
         }

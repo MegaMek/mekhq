@@ -52,9 +52,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
@@ -106,7 +106,8 @@ public class PrisonerEventManager {
     // a stretch, so we suggested errata-ing it to 100 per platoon, and these numbers reflect that.
     public static final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 5;
     public static final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
-    public static final int PRISONER_CAPACITY_OTHER = 2;
+    public static final double PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER = 0.05;
+    public static final double PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER = 0.25;
     public static final int PRISONER_CAPACITY_CAM_OPS_MULTIPLIER = 3;
 
     // Fixed Dialog Options
@@ -265,7 +266,7 @@ public class PrisonerEventManager {
     List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
-        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
+        double overflowPercentage = (double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity;
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
@@ -357,7 +358,7 @@ public class PrisonerEventManager {
      * @param isSuccessful {@code true} if the player's response to the event was successful, {@code false} otherwise
      * @param choiceIndex  the index of the response option chosen by the player
      * @param event        the {@link PrisonerEvent} associated with the dialog
-     * @param eventReport  additional report or commentary to display in the dialog (may be {@code null})
+     * @param eventReport  additional report or commentary to display in the dialog (maybe {@code null})
      *
      * @author Illiani
      * @since 0.50.06
@@ -615,7 +616,7 @@ public class PrisonerEventManager {
         }
 
         // Build the report
-        String key = getFormattedTextAt(RESOURCE_BUNDLE, hasBackfired ? "execute.backfired" : "execute.successful");
+        String key = hasBackfired ? "execute.backfired" : "execute.successful";
 
         String messageColor = hasBackfired ?
                                     spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
@@ -687,6 +688,7 @@ public class PrisonerEventManager {
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacity = 0;
+        double otherUnitMultiplier = 1.0;
 
         for (Force force : campaign.getAllForces()) {
             if (!force.isForceType(SECURITY)) {
@@ -734,9 +736,12 @@ public class PrisonerEventManager {
                 }
 
                 if (!unit.isDamaged() && isMekHQCaptureStyle) {
-                    prisonerCapacity += unit.getCrew().size() * PRISONER_CAPACITY_OTHER;
+                    otherUnitMultiplier += PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER;
                 }
             }
+
+            otherUnitMultiplier = min(PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER, otherUnitMultiplier);
+            prisonerCapacity = (int) round(prisonerCapacity * otherUnitMultiplier);
         }
 
         double modifier = (double) campaign.getTemporaryPrisonerCapacity() / 100;

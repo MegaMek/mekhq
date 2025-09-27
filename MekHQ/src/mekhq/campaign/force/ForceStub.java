@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,13 +55,13 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceStub {
-    private static final MMLogger logger = MMLogger.create(ForceStub.class);
+    private static final MMLogger LOGGER = MMLogger.create(ForceStub.class);
 
     // region Variable Declarations
     private String name;
     private StandardForceIcon forceIcon;
-    private Vector<ForceStub> subForces;
-    private Vector<UnitStub> units;
+    private final Vector<ForceStub> subForces;
+    private final Vector<UnitStub> units;
     // endregion Variable Declarations
 
     // region Constructors
@@ -119,8 +119,8 @@ public class ForceStub {
 
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "units");
-            for (UnitStub ustub : units) {
-                ustub.writeToXML(pw, indent);
+            for (UnitStub unitStub : units) {
+                unitStub.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
@@ -156,8 +156,8 @@ public class ForceStub {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
-                            logger
-                                  .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LOGGER
+                                  .error("Unknown node type not loaded in ForceStub nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -170,8 +170,8 @@ public class ForceStub {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
-                            logger
-                                  .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LOGGER
+                                  .error("Unknown node type not loaded in ForceStub nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -180,7 +180,7 @@ public class ForceStub {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

@@ -233,30 +233,22 @@ public enum Profession {
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final String name) {
-        switch (name.toUpperCase(Locale.ENGLISH)) {
-            case "--MW":
-                return MEKWARRIOR;
-            case "--ASF":
-                return AEROSPACE;
-            case "--VEE":
-                return VEHICLE;
-            case "--NAVAL":
-                return NAVAL;
-            case "--INF":
-                return INFANTRY;
-            case "--TECH":
-                return TECH;
-            case "--MEDICAL":
-                return MEDICAL;
-            case "--ADMIN":
-                return ADMINISTRATOR;
-            case "--CIVILIAN":
-                return CIVILIAN;
-            default:
-                MMLogger.create(Profession.class).debug("Cannot get alternate profession for unknown alternative "
-                                                              + name + " returning MEKWARRIOR.");
-                return MEKWARRIOR;
-        }
+        return switch (name.toUpperCase(Locale.ENGLISH)) {
+            case "--MW" -> MEKWARRIOR;
+            case "--ASF" -> AEROSPACE;
+            case "--VEE" -> VEHICLE;
+            case "--NAVAL" -> NAVAL;
+            case "--INF" -> INFANTRY;
+            case "--TECH" -> TECH;
+            case "--MEDICAL" -> MEDICAL;
+            case "--ADMIN" -> ADMINISTRATOR;
+            case "--CIVILIAN" -> CIVILIAN;
+            default -> {
+                MMLogger.create(Profession.class)
+                      .debug("Cannot get alternate profession for unknown alternative {} returning MEKWARRIOR.", name);
+                yield MEKWARRIOR;
+            }
+        };
     }
 
     /**

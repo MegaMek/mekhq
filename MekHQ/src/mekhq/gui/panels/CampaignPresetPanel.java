@@ -109,7 +109,7 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
     protected void initialize() {
         final boolean editPreset = (getCampaign() != null) && (getPreset() != null) && getPreset().isUserData();
 
-        // Setup the Panel
+        // Set up the Panel
         setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createEmptyBorder(5, 5, 5, 5),
               BorderFactory.createLineBorder(Color.BLACK, 2)));

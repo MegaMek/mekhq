@@ -55,7 +55,7 @@ import megamek.logging.MMLogger;
  * @author Neoancient
  */
 public class PersonnelOptions extends PilotOptions {
-    private static final MMLogger logger = MMLogger.create(PersonnelOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelOptions.class);
 
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
@@ -187,18 +187,18 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            logger.warn("Could not find L3Advantage group");
+            LOGGER.warn("Could not find L3Advantage group");
             l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            logger.warn("Could not find edge group");
+            LOGGER.warn("Could not find edge group");
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            logger.warn("Could not find augmentation (MD) group");
+            LOGGER.warn("Could not find augmentation (MD) group");
             md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 
@@ -389,7 +389,7 @@ public class PersonnelOptions extends PilotOptions {
             case MADNESS_REGRESSION, MADNESS_HYSTERIA -> COMPULSION_CHECK_MODIFIER_SEVERE;
             case MADNESS_BERSERKER, MADNESS_CATATONIA -> COMPULSION_CHECK_MODIFIER_EXTREME;
             default -> {
-                logger.warn("Unexpected compulsion name provided: {}", name);
+                LOGGER.warn("Unexpected compulsion name provided: {}", name);
                 yield COMPULSION_CHECK_MODIFIER_TRIVIAL;
             }
         };
@@ -409,9 +409,9 @@ public class PersonnelOptions extends PilotOptions {
      */
     private static class PersonnelOptionsInfo extends AbstractOptionsInfo {
         private static boolean initialized = false;
-        private static AbstractOptionsInfo instance = new PersonnelOptionsInfo();
+        private static final AbstractOptionsInfo instance = new PersonnelOptionsInfo();
 
-        private Hashtable<String, IOptionInfo> optionsHash = new Hashtable<>();
+        private final Hashtable<String, IOptionInfo> optionsHash = new Hashtable<>();
 
         public static AbstractOptionsInfo getInstance() {
             if (!initialized) {
@@ -443,13 +443,8 @@ public class PersonnelOptions extends PilotOptions {
      *
      * @author Neoancient
      */
-    private static class PersonnelOptionInfo implements IOptionInfo {
-        private String name;
-        private static PilotOptions mmOptions = new PilotOptions();
-
-        public PersonnelOptionInfo(String name) {
-            this.name = name;
-        }
+    private record PersonnelOptionInfo(String name) implements IOptionInfo {
+        private static final PilotOptions mmOptions = new PilotOptions();
 
         @Override
         public String getDisplayableName() {

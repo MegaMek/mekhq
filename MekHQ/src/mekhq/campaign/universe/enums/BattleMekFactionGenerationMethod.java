@@ -88,15 +88,11 @@ public enum BattleMekFactionGenerationMethod {
 
     public Faction generateFaction(final Person person, final Campaign campaign,
           final Faction specifiedFaction) {
-        switch (this) {
-            case CAMPAIGN_FACTION:
-                return campaign.getFaction();
-            case SPECIFIED_FACTION:
-                return specifiedFaction;
-            case ORIGIN_FACTION:
-            default:
-                return person.getOriginFaction();
-        }
+        return switch (this) {
+            case CAMPAIGN_FACTION -> campaign.getFaction();
+            case SPECIFIED_FACTION -> specifiedFaction;
+            default -> person.getOriginFaction();
+        };
     }
 
     @Override

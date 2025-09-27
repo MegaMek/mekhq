@@ -82,8 +82,8 @@ public class InvalidFactionNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise.
      */
     public static boolean checkNag(Faction campaignFaction, LocalDate today) {
-        final String NAG_KEY = NAG_INVALID_FACTION;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && (isFactionInvalid(campaignFaction, today));
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INVALID_FACTION) &&
+                     (isFactionInvalid(campaignFaction, today));
     }
 }

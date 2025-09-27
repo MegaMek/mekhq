@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,8 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
@@ -79,8 +79,10 @@ import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.TargetRollModifier;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Portrait;
@@ -88,14 +90,16 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.PersonStatusChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -386,7 +390,6 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
-    private boolean employed;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -604,7 +607,6 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
-        setEmployed(true);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -1005,7 +1007,7 @@ public class Person {
     /**
      * Use {@link #setPrimaryRole(LocalDate, PersonnelRole)} instead
      */
-    @Deprecated(since = "0.50.07", forRemoval = false) // we need to remove the uses before removal
+    @Deprecated(since = "0.50.07") // we need to remove the uses before removal
     public void setPrimaryRole(final Campaign campaign, final PersonnelRole primaryRole) {
         // don't need to do any processing for no changes
         if (primaryRole == getPrimaryRole()) {
@@ -1140,7 +1142,7 @@ public class Person {
     public String getFormatedRoleDescriptions(LocalDate today) {
         StringBuilder description = new StringBuilder("<html>");
 
-        if (!employed) {
+        if (!isEmployed()) {
             description.append("\u25CF ");
         }
 
@@ -1833,7 +1835,9 @@ public class Person {
      * @param recruitment the date the entity was recruited, or {@code null} to unset
      */
     public void setRecruitment(final @Nullable LocalDate recruitment) {
-        employed = recruitment != null;
+        if (recruitment == null) {
+            status = PersonnelStatus.CAMP_FOLLOWER;
+        }
 
         this.recruitment = recruitment;
     }
@@ -2742,11 +2746,7 @@ public class Person {
     }
 
     public boolean isEmployed() {
-        return employed;
-    }
-
-    public void setEmployed(final boolean employed) {
-        this.employed = employed;
+        return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
     public boolean isMarriageable() {
@@ -3273,7 +3273,6 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employed", employed);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
@@ -3811,13 +3810,6 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("employed")) {
-                    // Fixes a <50.07 bug
-                    if (!person.isCivilian()) { // Non-civilians are always employed
-                        person.setEmployed(true);
-                    } else {
-                        person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    }
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
@@ -3944,7 +3936,7 @@ public class Person {
             return Money.zero();
         }
 
-        if (!employed) {
+        if (!isEmployed()) {
             return Money.zero();
         }
 
@@ -4145,7 +4137,7 @@ public class Person {
     }
 
     /**
-     * Retrieves the character's rank <b>sub-level</b>. Predominantly used in ComStar rank styles.
+     * Retrieves the character's rank <b>sublevel</b>. Predominantly used in ComStar rank styles.
      *
      * <p><b>Important:</b> You almost always want to use {@link #getRankNumeric()} instead.</p>
      *
@@ -6570,7 +6562,7 @@ public class Person {
 
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
-        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
+        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOX_SET) {
             originalUnitTech = TECH_IS2;
         } else {
             originalUnitTech = TECH_IS1;
@@ -6761,7 +6753,7 @@ public class Person {
             return;
         }
 
-        if (employed) {
+        if (isEmployed()) {
             LocalDate estimatedJoinDate = null;
             for (LogEntry logEntry : getPersonalLog()) {
                 if (estimatedJoinDate == null) {
@@ -6789,10 +6781,10 @@ public class Person {
 
             if (joinedCampaign != null) {
                 if (updateRecruitment) {
-                    recruitment = estimatedJoinDate;
+                    recruitment = null;
                 }
                 if (updateLastRankChange) {
-                    lastRankChangeDate = estimatedJoinDate;
+                    lastRankChangeDate = null;
                 }
                 recruitment = joinedCampaign;
                 return;
@@ -7498,7 +7490,7 @@ public class Person {
     }
 
     /**
-     * Determines whether a character's dark secret is revealed based on a dice roll, configured modifiers, and campaign
+     * Determines whether a character's dark secret is revealed based on a die roll, configured modifiers, and campaign
      * options.
      *
      * <p>If the character does not have a dark secret, an empty string is returned. Otherwise, a target number is
@@ -7511,7 +7503,7 @@ public class Person {
      *
      * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
      *                      {@link #hasDarkSecret()}
-     * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
+     * @param forceReveal   {@code true} if the reveal should be forced without a die roll.
      *
      * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise
      *
@@ -7608,7 +7600,7 @@ public class Person {
             return 0;
         }
 
-        // If the character has a dark secret but it is not revealed, return a default modifier (e.g., -1)
+        // If the character has a dark secret, but it is not revealed, return a default modifier (e.g., -1)
         if (!darkSecretRevealed && hasDarkSecret()) {
             return -1; // Default modifier for unrevealed dark secrets
         }

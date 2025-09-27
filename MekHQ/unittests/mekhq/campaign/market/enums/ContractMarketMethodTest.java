@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
@@ -106,14 +106,6 @@ public class ContractMarketMethodTest {
         }
     }
     //endregion Boolean Comparison Methods
-
-/*
-    @Test
-    public void testGetContractMarket() {
-        assertInstanceOf(DisabledContractMarket.class, ContractMarketMethod.NONE.getContractMarket());
-        assertInstanceOf(AtBMonthlyContractMarket.class, ContractMarketMethod.ATB_MONTHLY.getContractMarket());
-    }
-*/
 
     @Test
     public void testToStringOverride() {

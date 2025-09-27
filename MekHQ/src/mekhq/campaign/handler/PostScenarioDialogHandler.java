@@ -47,7 +47,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -106,8 +106,11 @@ public class PostScenarioDialogHandler {
             LOGGER.error(e, "An error occurred during scenario resolution: {}", e.getMessage());
             LOGGER.errorDialog(
                   e,
-                  "A critical error has occurred during the scenario resolution. This issue is under investigation." +
-                        "\n\nPlease open an issue report and include your MekHQ log file for further assessment.",
+                  """
+                        A critical error has occurred during the scenario resolution. This issue is under investigation.\
+                        
+                        
+                        Please open an issue report and include your MekHQ log file for further assessment.""",
                   "Critical Error"
             );
         }
@@ -166,7 +169,7 @@ public class PostScenarioDialogHandler {
             boolean isCivilianHelp = false;
 
             if (tracker.getScenario() instanceof AtBScenario atbScenario) {
-                isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIANHELP;
+                isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIAN_HELP;
             }
 
             AutoAwardsController autoAwardsController = new AutoAwardsController();

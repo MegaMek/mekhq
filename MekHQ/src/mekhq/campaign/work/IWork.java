@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.personnel.Person;
 
 public interface IWork {

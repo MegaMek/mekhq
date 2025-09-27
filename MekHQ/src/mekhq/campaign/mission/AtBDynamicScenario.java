@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,9 +47,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
@@ -101,8 +101,8 @@ public class AtBDynamicScenario extends AtBScenario {
     private int hostileReinforcementDelayReduction;
 
     // derived fields used for various calculations
-    private SkillLevel effectiveOpforSkill;
-    private int effectiveOpforQuality;
+    private SkillLevel effectiveOpForSkill;
+    private int effectiveOpForQuality;
 
     // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
     private Map<UUID, BenchedEntityData> playerUnitSwaps;
@@ -129,8 +129,8 @@ public class AtBDynamicScenario extends AtBScenario {
         setFriendlyDelayedReinforcements(new ArrayList<>());
         setFriendlyInstantReinforcements(new ArrayList<>());
         setHostileReinforcementDelayReduction(0);
-        setEffectiveOpforSkill(SkillLevel.REGULAR);
-        setEffectiveOpforQuality(IUnitRating.DRAGOON_C);
+        setEffectiveOpForSkill(SkillLevel.REGULAR);
+        setEffectiveOpForQuality(IUnitRating.DRAGOON_C);
         setPlayerUnitSwaps(new HashMap<>());
         setFinalized(false);
         setBotForceTemplates(new HashMap<>());
@@ -331,20 +331,20 @@ public class AtBDynamicScenario extends AtBScenario {
         this.playerUnitSwaps = playerUnitSwaps;
     }
 
-    public SkillLevel getEffectiveOpforSkill() {
-        return effectiveOpforSkill;
+    public SkillLevel getEffectiveOpForSkill() {
+        return effectiveOpForSkill;
     }
 
-    public void setEffectiveOpforSkill(SkillLevel skillLevel) {
-        effectiveOpforSkill = skillLevel;
+    public void setEffectiveOpForSkill(SkillLevel skillLevel) {
+        effectiveOpForSkill = skillLevel;
     }
 
-    public int getEffectiveOpforQuality() {
-        return effectiveOpforQuality;
+    public int getEffectiveOpForQuality() {
+        return effectiveOpForQuality;
     }
 
-    public void setEffectiveOpforQuality(int qualityLevel) {
-        effectiveOpforQuality = qualityLevel;
+    public void setEffectiveOpForQuality(int qualityLevel) {
+        effectiveOpForQuality = qualityLevel;
     }
 
     public List<UUID> getFriendlyDelayedReinforcements() {
@@ -388,7 +388,7 @@ public class AtBDynamicScenario extends AtBScenario {
      * Further "post-force-generation" modifiers can be applied to this scenario, but calling finalizeScenario() on it
      * again will lead to "unsupported" behavior.
      * <p>
-     * Can be called as a short hand way of telling "is this scenario ready to play".
+     * Can be called as a shorthand way of telling "is this scenario ready to play".
      */
     public boolean isFinalized() {
         return finalized;
@@ -402,21 +402,20 @@ public class AtBDynamicScenario extends AtBScenario {
      * A list of all the force IDs associated with pre-defined scenario templates
      */
     public List<Integer> getPlayerTemplateForceIDs() {
-        List<Integer> retval = new ArrayList<>();
+        List<Integer> retVal = new ArrayList<>();
 
         for (int forceID : getForceIDs()) {
             if (getPlayerForceTemplates().containsKey(forceID)) {
-                retval.add(forceID);
+                retVal.add(forceID);
             }
         }
 
-        return retval;
+        return retVal;
     }
 
     /**
      * Convenience method that returns the commander of the first force assigned to this scenario.
      *
-     * @return
      */
     public Person getLanceCommander(Campaign campaign) {
         if (getForceIDs().isEmpty()) {
@@ -558,14 +557,14 @@ public class AtBDynamicScenario extends AtBScenario {
                   indent,
                   "hostileReinforcementDelayReduction",
                   getHostileReinforcementDelayReduction());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpForSkill", getEffectiveOpForSkill().name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpForQuality", getEffectiveOpForQuality());
 
             if (!playerUnitSwaps.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
 
                 // note: if you update the order in which data is stored here or anything else about it
-                // double check loadFieldsFromXmlNode
+                // double-check loadFieldsFromXmlNode
                 for (UUID unitID : playerUnitSwaps.keySet()) {
                     MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAP_ELEMENT);
                     MHQXMLUtility.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
@@ -617,10 +616,10 @@ public class AtBDynamicScenario extends AtBScenario {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("hostileReinforcementDelayReduction")) {
                 setHostileReinforcementDelayReduction(Integer.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpforSkill")) {
-                setEffectiveOpforSkill(SkillLevel.valueOf(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpforQuality")) {
-                setEffectiveOpforQuality(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForSkill")) {
+                setEffectiveOpForSkill(SkillLevel.valueOf(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForQuality")) {
+                setEffectiveOpForQuality(Integer.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
                 for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
                     Node swapNode = wn2.getChildNodes().item(snsIndex);

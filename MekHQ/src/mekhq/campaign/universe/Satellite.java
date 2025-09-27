@@ -49,7 +49,7 @@ public class Satellite {
     @JsonProperty("icon")
     private String icon;
 
-    public SourceableValue getSourcedName() {
+    public SourceableValue<String> getSourcedName() {
         return name;
     }
 

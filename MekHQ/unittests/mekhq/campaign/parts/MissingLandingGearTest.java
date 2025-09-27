@@ -43,9 +43,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.missing.MissingLandingGear;
+import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
@@ -63,10 +65,10 @@ public class MissingLandingGearTest {
         missing.setUnit(unit);
 
         final MissingMekLocation rightTorso = mock(MissingMekLocation.class);
-        when(rightTorso.getLocation()).thenReturn(Mek.LOC_RT);
+        when(rightTorso.getLocation()).thenReturn(Mek.LOC_RIGHT_TORSO);
 
         final MissingMekLocation leftTorso = mock(MissingMekLocation.class);
-        when(leftTorso.getLocation()).thenReturn(Mek.LOC_LT);
+        when(leftTorso.getLocation()).thenReturn(Mek.LOC_LEFT_TORSO);
 
         // No missing parts
         when(unit.getParts()).thenReturn(new ArrayList<>());
@@ -94,7 +96,7 @@ public class MissingLandingGearTest {
 
         // Missing an arm
         final MissingMekLocation arm = mock(MissingMekLocation.class);
-        when(arm.getLocation()).thenReturn(Mek.LOC_RARM);
+        when(arm.getLocation()).thenReturn(Mek.LOC_RIGHT_ARM);
         when(unit.getParts()).thenReturn(List.of(arm));
 
         // We CAN repair the landing gear with just a missing arm

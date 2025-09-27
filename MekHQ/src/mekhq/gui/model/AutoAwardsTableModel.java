@@ -51,7 +51,7 @@ import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class AutoAwardsTableModel extends AbstractTableModel {
-    private static final MMLogger logger = MMLogger.create(AutoAwardsTableModel.class);
+    private static final MMLogger LOGGER = MMLogger.create(AutoAwardsTableModel.class);
 
     public static final int COL_PERSON = 0;
     public static final int COL_NAME = 1;
@@ -74,13 +74,13 @@ public class AutoAwardsTableModel extends AbstractTableModel {
 
     public void setData(Map<Integer, List<Object>> map) {
         if (map.isEmpty()) {
-            logger.error("AutoAwardsDialog failed to pass 'data' into AutoAwardsTableModel");
+            LOGGER.error("AutoAwardsDialog failed to pass 'data' into AutoAwardsTableModel");
         } else {
-            logger.debug("AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
+            LOGGER.debug("AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
         }
 
         data = map;
-        logger.debug("Translated data: {}", data);
+        LOGGER.debug("Translated data: {}", data);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
                 retVal = value.getClass();
             }
         } catch (NullPointerException e) {
-            logger.error("autoAwards 'getColumnClass()' failed to parse {}",
+            LOGGER.error("autoAwards 'getColumnClass()' failed to parse {}",
                   getValueAt(0, col));
         }
         return retVal;
@@ -137,7 +137,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (data.isEmpty() || !data.containsKey(rowIndex)) {
-            logger.error("'data' is empty or does not contain key for index: {}", rowIndex);
+            LOGGER.error("'data' is empty or does not contain key for index: {}", rowIndex);
             return "";
         }
 

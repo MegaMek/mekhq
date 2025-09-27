@@ -34,11 +34,11 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -60,7 +60,7 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class LargeCraftAmmoBin extends AmmoBin {
-    private static final MMLogger logger = MMLogger.create(LargeCraftAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(LargeCraftAmmoBin.class);
 
     private int bayEqNum = -1;
 
@@ -116,7 +116,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             }
         }
 
-        logger.warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        LOGGER.warn("Could not find weapon bay for {} for {}", typeName, unit.getName());
         return null;
     }
 
@@ -211,7 +211,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -360,8 +360,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (null != unit) {
             double space = 0.0;
             for (Part p : unit.getParts()) {
-                if (p instanceof LargeCraftAmmoBin) {
-                    final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
+                if (p instanceof LargeCraftAmmoBin bin) {
                     if ((getBayEqNum() == bin.getBayEqNum()) &&
                               getType().equalsAmmoTypeOnly(bin.getType()) &&
                               (getType().getRackSize() == bin.getType().getRackSize())) {
@@ -388,7 +387,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         toReturn += ">";
         toReturn += "<b>Unload " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeft() + " minutes" + scheduled;
         toReturn += "</font></html>";
         return toReturn;
     }

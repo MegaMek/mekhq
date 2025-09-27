@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,63 +45,63 @@ import javax.swing.JTextField;
 
 @SuppressWarnings("unused") // FIXME!
 public class PlanetEditorGUI extends JPanel {
-    private JPanel pnlGeneral = new JPanel();
-    private JLabel lblSlot = new JLabel("Slot: ");
+    private final JPanel pnlGeneral = new JPanel();
+    private final JLabel lblSlot = new JLabel("Slot: ");
     private JComboBox<String> orbitalSlot;
-    private JLabel lblType = new JLabel("Type: ");
+    private final JLabel lblType = new JLabel("Type: ");
     private JComboBox<String> type;
-    private JLabel lblPressure = new JLabel("Pressure: ");
+    private final JLabel lblPressure = new JLabel("Pressure: ");
     private JComboBox<String> pressure;
-    private JLabel lblLifezone = new JLabel("Lifezone: ");
-    private JComboBox<String> lifezone;
-    private JLabel lblClimate = new JLabel("Climate: ");
+    private final JLabel lblLifezone = new JLabel("Lifezone: ");
+    private JComboBox<String> lifeZone;
+    private final JLabel lblClimate = new JLabel("Climate: ");
     private JComboBox<String> climate;
-    private JLabel lblLifeforms = new JLabel("Lifeforms: ");
+    private final JLabel lblLifeforms = new JLabel("Lifeforms: ");
     private JComboBox<String> lifeforms;
-    private JLabel lblDensity = new JLabel("Density: ");
+    private final JLabel lblDensity = new JLabel("Density: ");
     private JTextField density;
-    private JLabel lblDay = new JLabel("Day Length: ");
+    private final JLabel lblDay = new JLabel("Day Length: ");
     private JTextField dayLength;
-    private JLabel lblYear = new JLabel("Year Length: ");
+    private final JLabel lblYear = new JLabel("Year Length: ");
     private JTextField yearLength;
-    private JLabel lblDiameter = new JLabel("Diameter: ");
+    private final JLabel lblDiameter = new JLabel("Diameter: ");
     private JTextField diameter;
-    private JLabel lblGravity = new JLabel("Gravity: ");
+    private final JLabel lblGravity = new JLabel("Gravity: ");
     private JTextField gravity;
-    private JLabel lblPercWater = new JLabel("Percent Water: ");
+    private final JLabel lblPercentWater = new JLabel("Percent Water: ");
     private JSpinner percentWater;
-    private JLabel lblTemp = new JLabel("Temperature: ");
+    private final JLabel lblTemp = new JLabel("Temperature: ");
     private JSpinner temperature;
-    private JLabel lblLandmasses = new JLabel("Land Masses: ");
+    private final JLabel lblLandmasses = new JLabel("Land Masses: ");
     private JSpinner landmasses;
 
     // Habitability
-    private JPanel pnlHabitability = new JPanel();
+    private final JPanel pnlHabitability = new JPanel();
     private ButtonGroup habGroup;
     private JRadioButton habTrue;
     private JRadioButton habFalse;
 
     // Hyper-pulse Generators
-    private JPanel pnlHPG = new JPanel();
+    private final JPanel pnlHPG = new JPanel();
     private ButtonGroup hpgGroup;
     private JRadioButton hpgClassA;
     private JRadioButton hpgClassB;
     private JRadioButton hpgClassC;
 
     // Zenith Recharge Station?
-    private JPanel pnlZenith = new JPanel();
+    private final JPanel pnlZenith = new JPanel();
     private ButtonGroup zenithGroup;
     private JRadioButton zenithTrue;
     private JRadioButton zenithFalse;
 
     // Nadir Recharge Station?
-    private JPanel pnlNadir = new JPanel();
+    private final JPanel pnlNadir = new JPanel();
     private ButtonGroup nadirGroup;
     private JRadioButton nadirTrue;
     private JRadioButton nadirFalse;
 
     // Socio-Industrial Ratings
-    private JPanel pnlSocioIndi = new JPanel();
+    private final JPanel pnlSocioIndi = new JPanel();
     private JSpinner socioIndustrial1;
     private JSpinner socioIndustrial2;
     private JSpinner socioIndustrial3;
@@ -137,7 +137,7 @@ public class PlanetEditorGUI extends JPanel {
         gbc.gridy++;
         pnlGeneral.add(lblLifezone, gbc);
         gbc.gridx++;
-        pnlGeneral.add(lifezone, gbc);
+        pnlGeneral.add(lifeZone, gbc);
         gbc.gridx--;
         gbc.gridy++;
         pnlGeneral.add(lblClimate, gbc);
@@ -175,7 +175,7 @@ public class PlanetEditorGUI extends JPanel {
         pnlGeneral.add(gravity, gbc);
         gbc.gridx--;
         gbc.gridy++;
-        pnlGeneral.add(lblPercWater, gbc);
+        pnlGeneral.add(lblPercentWater, gbc);
         gbc.gridx++;
         pnlGeneral.add(percentWater, gbc);
         gbc.gridx--;

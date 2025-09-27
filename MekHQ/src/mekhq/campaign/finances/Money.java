@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 - Vicente Cartas Espinel (vicente.cartas at outlook.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 import org.joda.money.BigMoney;
 
@@ -45,16 +46,9 @@ import org.joda.money.BigMoney;
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
-public class Money implements Comparable<Money> {
-    private final BigMoney wrapped;
-
-    private Money(BigMoney money) {
-        Objects.requireNonNull(money);
-        this.wrapped = money;
-    }
-
-    private BigMoney getWrapped() {
-        return wrapped;
+public record Money(BigMoney wrapped) implements Comparable<Money> {
+    public Money {
+        Objects.requireNonNull(wrapped);
     }
 
     public static Money of(double amount, Currency currency) {
@@ -74,35 +68,35 @@ public class Money implements Comparable<Money> {
     }
 
     public boolean isZero() {
-        return getWrapped().isZero();
+        return wrapped().isZero();
     }
 
     public boolean isPositive() {
-        return getWrapped().isPositive();
+        return wrapped().isPositive();
     }
 
     public boolean isPositiveOrZero() {
-        return getWrapped().isPositive() || getWrapped().isZero();
+        return wrapped().isPositive() || wrapped().isZero();
     }
 
     public boolean isNegative() {
-        return getWrapped().isNegative();
+        return wrapped().isNegative();
     }
 
     public boolean isGreaterThan(Money other) {
-        return getWrapped().isGreaterThan(other.getWrapped());
+        return wrapped().isGreaterThan(other.wrapped());
     }
 
     public boolean isGreaterOrEqualThan(Money other) {
-        return getWrapped().isGreaterThan(other.getWrapped()) || getWrapped().isEqual(other.getWrapped());
+        return wrapped().isGreaterThan(other.wrapped()) || wrapped().isEqual(other.wrapped());
     }
 
     public boolean isLessThan(Money other) {
-        return getWrapped().isLessThan(other.getWrapped());
+        return wrapped().isLessThan(other.wrapped());
     }
 
     public BigDecimal getAmount() {
-        return getWrapped().getAmount();
+        return wrapped().getAmount();
     }
 
     public Money absolute() {
@@ -114,15 +108,15 @@ public class Money implements Comparable<Money> {
             return plus(0L);
         }
 
-        return new Money(getWrapped().plus(amount.getWrapped()));
+        return new Money(wrapped().plus(amount.wrapped()));
     }
 
     public Money plus(double amount) {
-        return new Money(getWrapped().plus(amount));
+        return new Money(wrapped().plus(amount));
     }
 
     public Money plus(List<Money> amounts) {
-        return new Money(getWrapped().plus((Iterable<BigMoney>) (amounts.stream().map(Money::getWrapped)::iterator)));
+        return new Money(wrapped().plus((Iterable<BigMoney>) (amounts.stream().map(Money::wrapped)::iterator)));
     }
 
     public Money minus(Money amount) {
@@ -130,57 +124,57 @@ public class Money implements Comparable<Money> {
             return minus(0L);
         }
 
-        return new Money(getWrapped().minus(amount.getWrapped()));
+        return new Money(wrapped().minus(amount.wrapped()));
     }
 
     public Money minus(long amount) {
-        return new Money(getWrapped().minus(amount));
+        return new Money(wrapped().minus(amount));
     }
 
     public Money minus(double amount) {
-        return new Money(getWrapped().minus(amount));
+        return new Money(wrapped().minus(amount));
     }
 
     public Money minus(List<Money> amounts) {
-        return new Money(getWrapped().minus((Iterable<BigMoney>) (amounts.stream().map(Money::getWrapped)::iterator)));
+        return new Money(wrapped().minus((Iterable<BigMoney>) (amounts.stream().map(Money::wrapped)::iterator)));
     }
 
     public Money multipliedBy(long amount) {
-        return new Money(getWrapped().multipliedBy(amount));
+        return new Money(wrapped().multipliedBy(amount));
     }
 
     public Money multipliedBy(double amount) {
-        return new Money(getWrapped().multipliedBy(amount));
+        return new Money(wrapped().multipliedBy(amount));
     }
 
     public Money dividedBy(double amount) {
-        return new Money(getWrapped().dividedBy(amount, RoundingMode.HALF_EVEN));
+        return new Money(wrapped().dividedBy(amount, RoundingMode.HALF_EVEN));
     }
 
     public Money dividedBy(Money money) {
-        return new Money(getWrapped().dividedBy(money.getWrapped().getAmount(), RoundingMode.HALF_EVEN));
+        return new Money(wrapped().dividedBy(money.wrapped().getAmount(), RoundingMode.HALF_EVEN));
     }
 
     public String toAmountString() {
-        return CurrencyManager.getInstance().getUiAmountPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance().getUiAmountPrinter().print(wrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     public String toAmountAndSymbolString() {
         return CurrencyManager.getInstance()
                      .getUiAmountAndSymbolPrinter()
-                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+                     .print(wrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     /**
      * @return a new money object, rounded to use a scale of 0 with no trailing 0's
      */
     public Money round() {
-        return new Money(getWrapped().withScale(0, RoundingMode.HALF_UP));
+        return new Money(wrapped().withScale(0, RoundingMode.HALF_UP));
     }
 
     // region File I/O
     public String toXmlString() {
-        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(wrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     public static Money fromXmlString(String xmlData) {
@@ -189,22 +183,18 @@ public class Money implements Comparable<Money> {
     // endregion File I/O
 
     @Override
+    @Nonnull
     public String toString() {
-        return getWrapped().toString();
+        return wrapped().toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof Money) && getWrapped().isEqual(((Money) obj).getWrapped());
+        return (obj instanceof Money) && wrapped().isEqual(((Money) obj).wrapped());
     }
 
     @Override
-    public int hashCode() {
-        return this.wrapped.hashCode();
-    }
-
-    @Override
-    public int compareTo(Money o) {
-        return (o != null) ? getWrapped().compareTo(o.getWrapped()) : -1;
+    public int compareTo(@Nonnull Money o) {
+        return wrapped().compareTo(o.wrapped());
     }
 }

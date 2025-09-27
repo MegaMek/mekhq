@@ -77,9 +77,9 @@ import mekhq.campaign.personnel.Person;
  * @since 0.50.06
  */
 public class PersonnelTablePanel extends JPanel {
-    private List<Person> selectedApplicants = new ArrayList<>();
-    private int rowCount;
-    private JTable table;
+    private final List<Person> selectedApplicants = new ArrayList<>();
+    private final int rowCount;
+    private final JTable table;
 
     /**
      * Constructs a {@code PersonnelTablePanel} to list applicants.

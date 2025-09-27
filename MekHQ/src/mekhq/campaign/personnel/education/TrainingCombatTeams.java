@@ -32,16 +32,25 @@
  */
 package mekhq.campaign.personnel.education;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessColor;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.*;
 
+import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -51,6 +60,8 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -68,21 +79,22 @@ import mekhq.utilities.ReportingUtilities;
  * <ul>
  *     <li>{@link #processTrainingCombatTeams(Campaign)}: Entry point for processing all combat
  *     team training in the campaign.</li>
- *     <li>{@link #processTraining(Campaign, CombatTeam)}: Applies training logic to a specific
+ *     <li>{@link #processTraining(Campaign, Force)}: Applies training logic to a specific
  *     combat team.</li>
- *     <li>{@link #performTraining(Campaign, Force, Person, Map)}: Handles training for individual
+ *     <li>{@link #performTraining(Campaign, Force, Person, Map, int)}: Handles training for individual
  *     trainees in a force.</li>
- *     <li>{@link #processEducationTime(Campaign, Person, Person, List)}: Updates a trainee's
- *     education progression and improves skills.</li>
+ *     <li>{@link #processEducationTime(Person, Person, List, int, double)} Updates a trainee's education progression
+ *     and improves skills.</li>
  *     <li>{@link #createSkillsList(Campaign, Set)}: Collects the skill levels of educators to
  *     determine skills eligible for training.</li>
  * </ul>
  */
 public class TrainingCombatTeams {
-    private static final MMLogger logger = MMLogger.create(TrainingCombatTeams.class);
+    private static final MMLogger LOGGER = MMLogger.create(TrainingCombatTeams.class);
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
-    private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
+    private static final ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
+          MekHQ.getMHQOptions().getLocale());
 
     /**
      * Processes all training combat teams in the campaign.
@@ -113,7 +125,14 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            processTraining(campaign, combatTeam);
+            Force force = combatTeam.getForce(campaign);
+            List<Force> allForces = new ArrayList<>();
+            allForces.add(force); // We want to include the force itself in the training process
+            allForces.addAll(force.getAllSubForces());
+
+            for (Force trainingForce : allForces) {
+                processTraining(campaign, trainingForce);
+            }
         }
     }
 
@@ -128,47 +147,69 @@ public class TrainingCombatTeams {
      * <p>If educators or trainees lack eligible skills, appropriate reports are generated.
      * Training updates for skills and progression are logged within the campaign.</p>
      *
-     * @param campaign   the {@link Campaign} managing the combat team and its associated personnel
-     * @param combatTeam the {@link CombatTeam} undergoing training during this session
+     * @param campaign the {@link Campaign} managing the combat team and its associated personnel
+     * @param force    the {@link Force} undergoing training during this session
      */
-    private static void processTraining(final Campaign campaign, final CombatTeam combatTeam) {
-        // First, identify the Combat Team's commander
-        combatTeam.refreshCommander(campaign);
-        Person commander = combatTeam.getCommander(campaign);
-
-        if (commander == null) {
-            logger.info(String.format("Failed to fetch commander for Combat Team: %s", combatTeam.getForceId()));
+    private static void processTraining(final Campaign campaign, final Force force) {
+        // If the force is empty, we skip it
+        Vector<UUID> units = force.getUnits(); // We only want units in the direct force, not child forces
+        if (units.isEmpty()) {
+            LOGGER.info("No units in force '{}' for campaign '{}'", force.getName(), campaign.getName());
             return;
         }
 
-        // Second, fetch all active crew in the commander's unit.
-        // If the commander's unit is not multi-crewed, only the commander will be returned.
+        // Identify the Combat Team's commander (i.e. the Trainer)
+        UUID commanderID = force.getForceCommanderID();
+        Person commander = campaign.getPerson(commanderID);
+
+        if (commander == null) {
+            campaign.addReport(String.format(resources.getString("noCommander.text"), force.getName(),
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+            LOGGER.info("Failed to fetch commander for Force: {}", force.getName());
+            return;
+        }
+
+        // Second, fetch all active crew in the commander's unit. If the commander's unit is not multi-crewed, only
+        // the commander will be returned.
         Set<Person> educators = new HashSet<>(commander.getUnit().getActiveCrew());
 
         // Then build a set of their skills
         Map<String, Integer> educatorSkills = createSkillsList(campaign, educators);
 
-        // Next cycle through each character in the force
-        Force force = campaign.getForceFor(commander);
+        int marginOfSuccess = performTrainingSkillCheck(campaign, commander);
 
-        performTraining(campaign, force, commander, educatorSkills);
+        performTraining(campaign, force, commander, educatorSkills, marginOfSuccess);
     }
 
     /**
-     * Handles training for all trainees within a force.
+     * Processes training for all eligible trainees within a force.
      *
-     * <p>This method iterates over each unit in the specified force and processes training
-     * for all active personnel within each unit. Eligible skills are identified by comparing the educator's abilities
-     * to those of the trainees, and skill improvement is simulated.</p>
+     * <p>This method iterates through every unit assigned to the specified {@link Force} and, for each unit,
+     * processes training for all of its active crew members (trainees). For each trainee, it determines which skills
+     * are eligible for improvement by comparing the educator's skills against the trainee's skill and experience
+     * levels. Only skills where the trainee's experience is less than one level below the educator's are eligible.</p>
      *
-     * @param campaign       the current {@link Campaign}
-     * @param force          the {@link Force} containing the units to train
-     * @param commander      the {@link Person} commanding the combat team
-     * @param educatorSkills a map of skills and their experience levels available for teaching
+     * <p>The method also handles simulation of fatigue changes for trainees based on campaign settings and personnel
+     * options, and skips training for the commander (educator) themself if present in the active crew.</p>
+     *
+     * <p>If there are no eligible skills to train, the trainee's education state is reset and a report is generated.
+     * For each valid skill, a learning report is generated and progress is recorded via the
+     * {@code processEducationTime} helper method, using the result of the training check's {@code marginOfSuccess} to
+     * determine training time awarded and progress.</p>
+     *
+     * @param campaign        the current {@link Campaign} in which training is occurring
+     * @param force           the {@link Force} containing the units and trainees to train
+     * @param commander       the {@link Person} acting as the educator/commander providing the training
+     * @param educatorSkills  a map containing all skills and their experience levels available for teaching by the
+     *                        educator(s)
+     * @param marginOfSuccess the margin of success for the training check, as an integer (affects training
+     *                        speed/progress)
      */
     private static void performTraining(Campaign campaign, Force force, Person commander,
-          Map<String, Integer> educatorSkills) {
-        for (UUID unitId : force.getAllUnits(true)) {
+          Map<String, Integer> educatorSkills, int marginOfSuccess) {
+        double xpCostMultiplier = campaign.getCampaignOptions().getXpCostMultiplier();
+
+        for (UUID unitId : force.getUnits()) {
             Unit unit = campaign.getUnit(unitId);
 
             if (unit == null) {
@@ -227,28 +268,53 @@ public class TrainingCombatTeams {
                     continue;
                 }
 
-                // We piggyback on the education module here.
-                // If the character ever enters actual education, this will be overwritten.
-                processEducationTime(campaign, commander, trainee, skillsBeingTrained);
+                // We piggyback on the education module here. If the character ever enters actual education, this
+                // will be overwritten.
+                String report = processEducationTime(commander,
+                      trainee,
+                      skillsBeingTrained,
+                      marginOfSuccess,
+                      xpCostMultiplier);
+
+                if (!StringUtility.isNullOrBlank(report)) {
+                    campaign.addReport(report);
+                }
             }
         }
     }
 
     /**
-     * Progresses a trainee's education time and improves skills if the required threshold is met.
+     * Progresses a trainee's education time and increases the skill level of the trainee if enough training time has
+     * accrued.
      *
-     * <p>This method calculates the education time required for the next experience level and compares
-     * it with the trainee's accumulated education time. If the required time is met or exceeded, the skill level is
-     * increased, and education time is reset or reduced as needed.</p>
+     * <p>This method simulates on-the-job or field training for a {@link Person} (the trainee) by the given educator
+     * (trainer). It does so by maintaining an education history and counting accumulated days. When the accumulated
+     * training time reaches the required threshold for the next skill improvement, the lowest eligible skill from
+     * {@code skillsBeingTrained} will be increased by one level, the trainee's education-time counter will be reduced
+     * appropriately, and a report is generated.</p>
      *
-     * @param campaign           the current {@link Campaign}
-     * @param commander          the {@link Person} acting as the educator for the trainee
-     * @param trainee            the {@link Person} receiving training
-     * @param skillsBeingTrained a list of eligible {@link Skill} objects for training
+     * <p>Functional details:</p>
+     * <ul>
+     *     <li>If the trainee is not currently set as being in the {@code TRAINING_COMBAT_TEAM} 'academy', their
+     *     education time is reset and this value is set.</li>
+     *     <li>If the trainee is already in team training, increment their education time. If they have no trainable
+     *     skills for this session, no further action is taken.</li>
+     *     <li>The skill improved is always the lowest-level skill in {@code skillsBeingTrained} (ties are broken
+     *     arbitrarily).</li>
+     *     <li>The experience required for the next level is based on a campaign setting-multiplied constant, with
+     *     the experience tier for the <b>next</b> level (not current) used as a multiplier.</li>
+     *     <li>If after incrementing, the education time counter is still above the required threshold, another point
+     *     of improvement may happen at a future call.</li>
+     * </ul>
+     *
+     * @param educator           the {@link Person} acting as the educator (commander or trainer) for the trainee
+     * @param trainee            the {@link Person} receiving the training and accumulating skill improvement
+     * @param skillsBeingTrained a list of {@link Skill} objects that the trainee is eligible to improve during this
+     *                           session. The lowest-level skill in this list is chosen for improvement if the time
+     *                           threshold is met.
      */
-    private static void processEducationTime(Campaign campaign, Person commander, Person trainee,
-          List<Skill> skillsBeingTrained) {
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+    private static String processEducationTime(Person educator, Person trainee, List<Skill> skillsBeingTrained,
+          int marginOfSuccess, double trainingMultiplier) {
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
         final int WEEK_DURATION = 7; // days
         final int EDUCATION_TIME_MULTIPLIER = 35; // days
@@ -256,13 +322,22 @@ public class TrainingCombatTeams {
         if (!Objects.equals(trainee.getEduAcademyName(), EDUCATION_STRING)) {
             trainee.setEduAcademyName(EDUCATION_STRING);
             trainee.setEduEducationTime(0);
+            return String.format(resources.getString("learningStarted.text"), trainee.getHyperlinkedFullTitle());
         } else {
-            int newEducationTime = trainee.getEduEducationTime() + WEEK_DURATION;
-            trainee.setEduEducationTime(newEducationTime);
-
             if (skillsBeingTrained.isEmpty()) {
-                return;
+                return "";
             }
+
+            double successMultiplier = 1.0;
+            if (marginOfSuccess >= getMarginValue(BARELY_MADE_IT)) {
+                successMultiplier += (marginOfSuccess * 0.25);
+            } else {
+                successMultiplier -= (abs(marginOfSuccess) * 0.25);
+            }
+
+            int trainingTime = (int) round(WEEK_DURATION * successMultiplier);
+            int newEducationTime = trainee.getEduEducationTime() + trainingTime;
+            trainee.setEduEducationTime(newEducationTime);
 
             // The lowest skill is improved first
             skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
@@ -273,25 +348,45 @@ public class TrainingCombatTeams {
             int currentExperienceLevel = targetSkill.getType().getExperienceLevel(currentSkillLevel + 1);
 
             int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
-            double experienceMultiplier = campaignOptions.getXpCostMultiplier();
 
             // Reasoning cost changes should always take place before global changes
-            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier);
+            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * trainingMultiplier);
 
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {
                 trainee.setEduEducationTime(newEducationTime - educationTimeReduction);
                 targetSkill.setLevel(currentSkillLevel + 1);
 
-                campaign.addReport(String.format(resources.getString("learnedNewSkill.text"),
-                      commander.getFullTitle(),
+                return String.format(resources.getString("learnedNewSkill.text"),
+                      educator.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       targetSkill.getType().getName(),
-                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes())));
+                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes()));
             }
         }
+
+        return "";
+    }
+
+    private static int performTrainingSkillCheck(Campaign campaign, Person educator) {
+        final LocalDate today = campaign.getLocalDate();
+        final boolean isClanCampaign = campaign.isClanCampaign();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean useAgingEffects = campaignOptions.isUseAgeEffects();
+
+        SkillCheckUtility skillCheck = new SkillCheckUtility(educator, S_TRAINING, new ArrayList<>(), 0, true,
+              false, useAgingEffects, isClanCampaign, today);
+        int raw = skillCheck.getMarginOfSuccess();
+        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
+
+        String report = String.format(resources.getString("learnedProgress.text"),
+              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getMarginOfSuccessColor(marginOfSuccess)),
+              getMarginOfSuccessString(marginOfSuccess), CLOSING_SPAN_TAG);
+        campaign.addReport(report);
+
+        return raw;
     }
 
     /**

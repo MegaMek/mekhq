@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createCLImprovedSensors;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createCLImprovedSensors;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
@@ -56,12 +56,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.Compute;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.MapSettings;
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.MapSettings;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -89,7 +89,7 @@ import mekhq.utilities.ReportingUtilities;
  * mechanics, and provides support for defection offers.</p>
  */
 public class CapturePrisoners {
-    private static final MMLogger logger = MMLogger.create(CapturePrisoners.class);
+    private static final MMLogger LOGGER = MMLogger.create(CapturePrisoners.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
@@ -115,7 +115,7 @@ public class CapturePrisoners {
     final static int SAR_INCLUDES_DROPSHIP = -2;
 
     final static int BASE_TARGET_NUMBER = 8; // Base Target Number (CamOps pg 223)
-    private TargetRoll sarTargetNumber = new TargetRoll(BASE_TARGET_NUMBER, "Base TN");
+    private final TargetRoll sarTargetNumber = new TargetRoll(BASE_TARGET_NUMBER, "Base TN");
 
     /**
      * Constructs a {@link CapturePrisoners} object and initializes modifiers based on the faction, scenario, and SAR
@@ -144,12 +144,13 @@ public class CapturePrisoners {
         int today = campaign.getLocalDate().getYear();
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        ITechnology.Faction techFaction = searchingFactionIsClan ?
-                                                ITechnology.getFactionFromMMAbbr("CLAN") :
-                                                ITechnology.getFactionFromMMAbbr("IS");
+        megamek.common.enums.Faction techFaction = searchingFactionIsClan ?
+                                                         ITechnology.getFactionFromMMAbbr("CLAN") :
+                                                         ITechnology.getFactionFromMMAbbr("IS");
         try {
-            // searchingFaction being null is fine because we're just ignoring any exceptions
-            techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
+            if (searchingFaction != null) {
+                techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
+            }
         } catch (Exception ignored) {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
@@ -187,7 +188,7 @@ public class CapturePrisoners {
             }
         }
 
-        logger.info(sarTargetNumber.toString());
+        LOGGER.info(sarTargetNumber.toString());
     }
 
     /**
@@ -568,7 +569,7 @@ public class CapturePrisoners {
     }
 
     /**
-     * Performs a dice roll using a specified number of dice and returns the total.
+     * Performs a die roll using a specified number of dice and returns the total.
      *
      * <p>This method allows us to pass in explicit values in during Unit Testing.</p>
      *

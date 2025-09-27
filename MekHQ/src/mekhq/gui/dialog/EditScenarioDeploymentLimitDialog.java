@@ -44,7 +44,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.ScenarioDeploymentLimit;
 import mekhq.campaign.mission.ScenarioDeploymentLimit.CountType;
@@ -53,7 +53,7 @@ import mekhq.campaign.mission.ScenarioDeploymentLimit.QuantityType;
 public class EditScenarioDeploymentLimitDialog extends JDialog {
 
     private ScenarioDeploymentLimit deploymentLimit;
-    private boolean newLimit;
+    private final boolean newLimit;
 
     private JSpinner spnQuantity;
     private MMComboBox<QuantityType> choiceQuantityType;

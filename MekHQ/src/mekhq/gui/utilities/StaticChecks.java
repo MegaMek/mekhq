@@ -41,7 +41,7 @@ import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.stream.Stream;
 
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -50,7 +50,7 @@ import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
-    public static boolean areAllForcesUndeployed(final Campaign campaign, final List<Force> forces) {
+    public static boolean areAllForcesUnDeployed(final Campaign campaign, final List<Force> forces) {
         return forces.stream().noneMatch(Force::isDeployed)
                      && forces.stream().flatMap(force -> force.getAllUnits(false).stream())
                               .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
@@ -81,7 +81,7 @@ public class StaticChecks {
     }
 
     /**
-     * Used to test a selection of Units provided by the player and determine whether or not they have a Transport ship
+     * Used to test a selection of Units provided by the player and determine whether they have a Transport ship
      * assignment
      *
      * @param units Vector of units that the player has selected
@@ -93,14 +93,13 @@ public class StaticChecks {
     }
 
     /**
-     * Used to test a selection of Units provided by the player and a larger Transport to determine whether or not the
-     * Transport can carry all of the selected units
+     * Used to test a selection of Units provided by the player and a larger Transport to determine whether the
+     * Transport can carry all the selected units
      *
      * @param units Vector of units that the player has selected
      * @param ship  A single Transport-Bay-equipped Unit whose capacity we want to test the selection against
      *
-     * @return a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it
-     *       can
+     * @return a String  indicating why the Transport cannot carry all the selected units, or a blank result if it can
      */
     public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
         StringJoiner reason = new StringJoiner("");
@@ -124,7 +123,7 @@ public class StaticChecks {
                 return "    Selection of Units includes a large spacecraft. \n";
             } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
                 numberSC++;
-            } else if (unit.getEntity().getUnitType() == UnitType.AEROSPACEFIGHTER
+            } else if (unit.getEntity().getUnitType() == UnitType.AEROSPACE_FIGHTER
                              || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
                 // Includes conventional fighters
                 numberASF++;
@@ -134,7 +133,7 @@ public class StaticChecks {
                 // Make sure we account for space consumed by different platoon types
                 numberInfantry += (int) Math.ceil(unit.getEntity().getWeight());
             } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
-                // Includes LAMs and Quadvees
+                // Includes LAMs and QuadVees
                 numberMek++;
             } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
                 numberProto++;

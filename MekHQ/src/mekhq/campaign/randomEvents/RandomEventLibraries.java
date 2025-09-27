@@ -64,8 +64,8 @@ public class RandomEventLibraries {
     private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
 
     // lists
-    private List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
-    private List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
+    private final List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
+    private final List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
 
     /**
      * Constructs a {@code RandomEventLibraries} object and initializes the event data by loading it from the YAML

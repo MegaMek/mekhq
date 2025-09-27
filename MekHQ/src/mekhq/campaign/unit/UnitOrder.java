@@ -35,8 +35,15 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
@@ -55,7 +62,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitOrder extends Unit implements IAcquisitionWork {
-    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
+    private static final MMLogger LOGGER = MMLogger.create(UnitOrder.class);
 
     int quantity;
     int daysToWait;
@@ -123,7 +130,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
      */
     @Override
     public String getQuantityName(int quantity) {
-        String answer = "" + quantity + " " + getName();
+        String answer = quantity + " " + getName();
         if (quantity > 1) {
             answer += "s";
         }
@@ -135,13 +142,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         String name = getEntity().getShortNameRaw();
         MekSummary summary = MekSummaryCache.getInstance().getMek(name);
         if (null == summary) {
-            logger.error("Could not find a mek summary for " + name);
+            LOGGER.error("Could not find a mek summary for {}", name);
             return null;
         }
         try {
             return new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            logger.error("Could not load " + summary.getEntryName());
+            LOGGER.error("Could not load {}", summary.getEntryName());
             return null;
         }
     }
@@ -215,9 +222,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
-        if (!entity.isCanon()) {
-            // TODO: custom job
-        }
+
         if (entity.isClan() && getCampaign().getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(getCampaign().getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
         } else if (getCampaign().getCampaignOptions().getIsAcquisitionPenalty() > 0) {
@@ -375,7 +380,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         retVal.initializeParts(false);
@@ -384,12 +389,12 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

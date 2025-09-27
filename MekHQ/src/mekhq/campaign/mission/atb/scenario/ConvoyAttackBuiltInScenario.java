@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,10 +35,10 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.board.Board;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.mission.AtBContract;
@@ -50,7 +50,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ConvoyAttackBuiltInScenario extends AtBScenario {
-    private static String CONVOY_FORCE_ID = "Convoy";
+    private static final String CONVOY_FORCE_ID = "Convoy";
 
     @Override
     public boolean isBigBattle() {
@@ -59,7 +59,7 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CONVOYATTACK;
+        return CONVOY_ATTACK;
     }
 
     @Override

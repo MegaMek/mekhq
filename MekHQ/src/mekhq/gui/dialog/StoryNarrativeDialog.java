@@ -40,8 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint;
+import mekhq.campaign.storyArc.StoryArc;
+import mekhq.campaign.storyArc.storypoint.NarrativeStoryPoint;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 

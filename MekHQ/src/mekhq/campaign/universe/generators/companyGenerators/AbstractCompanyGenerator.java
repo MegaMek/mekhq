@@ -51,13 +51,13 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
@@ -138,7 +138,7 @@ import mekhq.campaign.work.WorkTime;
  * Implement Surprises
  * Implement Mystery Boxes
  * Generate spare personnel (?)
- * Optional: Mercenaries may customize their 'Meks, with clantech if enabled
+ * Optional: Mercenaries may customize their 'Meks, with ClanTech if enabled
  * only post-3055
  * Think about generating custom setups for specific canon mercenary groups or
  * factions
@@ -148,7 +148,7 @@ import mekhq.campaign.work.WorkTime;
  * @author Justin "Windchild" Bowen
  */
 public abstract class AbstractCompanyGenerator {
-    private static final MMLogger logger = MMLogger.create(AbstractCompanyGenerator.class);
+    private static final MMLogger LOGGER = MMLogger.create(AbstractCompanyGenerator.class);
 
     // region Variable Declarations
     private final CompanyGenerationMethod method;
@@ -263,7 +263,7 @@ public abstract class AbstractCompanyGenerator {
                                                                                final Person person = campaign.newPerson(
                                                                                      PersonnelRole.MEKWARRIOR,
                                                                                      getPersonnelGenerator());
-                                                                               if (getOptions().isAssignMekWarriorsCallsigns()) {
+                                                                               if (getOptions().isAssignMekWarriorsCallSigns()) {
                                                                                    person.setCallsign(
                                                                                          RandomCallsignGenerator.getInstance()
                                                                                                .generate());
@@ -468,9 +468,8 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateOfficer(final CompanyGenerationPersonTracker tracker) {
         if (!tracker.getPersonType().isOfficer()) {
-            logger.error(tracker.getPerson().getFullTitle()
-                               +
-                               " is not a valid officer for the officer generation, cannot generate them as an officer.");
+            LOGGER.error("{} is not a valid officer for the officer generation, cannot generate them as an officer.",
+                  tracker.getPerson().getFullTitle());
             return;
         }
 
@@ -647,12 +646,12 @@ public abstract class AbstractCompanyGenerator {
             default -> 2;
         };
 
-        for (int i = 0; i < campaign.getAstechNeed(); i++) {
-            final Person astech = campaign.newPerson(PersonnelRole.ASTECH, getPersonnelGenerator());
+        for (int i = 0; i < campaign.getAsTechNeed(); i++) {
+            final Person asTech = campaign.newPerson(PersonnelRole.ASTECH, getPersonnelGenerator());
             if (getOptions().isAutomaticallyAssignRanks()) {
-                astech.setRank(assistantRank);
+                asTech.setRank(assistantRank);
             }
-            trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.ASSISTANT, astech));
+            trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.ASSISTANT, asTech));
         }
 
         for (int i = 0; i < campaign.getMedicsNeed(); i++) {
@@ -724,25 +723,7 @@ public abstract class AbstractCompanyGenerator {
         // Then, we need to separate out the best roll for the unit commander if that
         // option is enabled
         if (getOptions().isAssignBestRollToCompanyCommander()) {
-            int bestIndex = 0;
-            AtBRandomMekParameters bestParameters = parameters.get(bestIndex);
-            for (int i = 1; i < parameters.size(); i++) {
-                final AtBRandomMekParameters checkParameters = parameters.get(i);
-                if (bestParameters.isStarLeague() == checkParameters.isStarLeague()) {
-                    if (bestParameters.getWeight() == checkParameters.getWeight()) {
-                        if (bestParameters.getQuality() < checkParameters.getQuality()) {
-                            bestParameters = checkParameters;
-                            bestIndex = i;
-                        }
-                    } else if (bestParameters.getWeight() < checkParameters.getWeight()) {
-                        bestParameters = checkParameters;
-                        bestIndex = i;
-                    }
-                } else if (!bestParameters.isStarLeague() && checkParameters.isStarLeague()) {
-                    bestParameters = checkParameters;
-                    bestIndex = i;
-                }
-            }
+            int bestIndex = getBestIndex(parameters);
 
             if (bestIndex != 0) {
                 Collections.swap(parameters, 0, bestIndex);
@@ -750,21 +731,7 @@ public abstract class AbstractCompanyGenerator {
         }
 
         // Now, we need to apply the various sorts based on the provided options
-        Comparator<AtBRandomMekParameters> parametersComparator = (p1, p2) -> 0;
-
-        if (getOptions().isSortStarLeagueUnitsFirst()) {
-            parametersComparator = parametersComparator.thenComparing(AtBRandomMekParameters::isStarLeague);
-        }
-
-        if (getOptions().isGroupByWeight()) {
-            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMekParameters::getWeight);
-        }
-
-        if (getOptions().isGroupByQuality()) {
-            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMekParameters::getQuality);
-        }
-
-        parametersComparator = parametersComparator.reversed();
+        Comparator<AtBRandomMekParameters> parametersComparator = getAtBRandomMekParametersComparator();
 
         if (getOptions().isKeepOfficerRollsSeparate()) {
             final int firstNonOfficer = determineNumberOfLances();
@@ -792,6 +759,48 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < parameters.size(); i++) {
             trackers.get(i).setParameters(parameters.get(i));
         }
+    }
+
+    private Comparator<AtBRandomMekParameters> getAtBRandomMekParametersComparator() {
+        Comparator<AtBRandomMekParameters> parametersComparator = (p1, p2) -> 0;
+
+        if (getOptions().isSortStarLeagueUnitsFirst()) {
+            parametersComparator = parametersComparator.thenComparing(AtBRandomMekParameters::isStarLeague);
+        }
+
+        if (getOptions().isGroupByWeight()) {
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMekParameters::getWeight);
+        }
+
+        if (getOptions().isGroupByQuality()) {
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMekParameters::getQuality);
+        }
+
+        parametersComparator = parametersComparator.reversed();
+        return parametersComparator;
+    }
+
+    private static int getBestIndex(List<AtBRandomMekParameters> parameters) {
+        int bestIndex = 0;
+        AtBRandomMekParameters bestParameters = parameters.get(bestIndex);
+        for (int i = 1; i < parameters.size(); i++) {
+            final AtBRandomMekParameters checkParameters = parameters.get(i);
+            if (bestParameters.isStarLeague() == checkParameters.isStarLeague()) {
+                if (bestParameters.getWeight() == checkParameters.getWeight()) {
+                    if (bestParameters.getQuality() < checkParameters.getQuality()) {
+                        bestParameters = checkParameters;
+                        bestIndex = i;
+                    }
+                } else if (bestParameters.getWeight() < checkParameters.getWeight()) {
+                    bestParameters = checkParameters;
+                    bestIndex = i;
+                }
+            } else if (!bestParameters.isStarLeague() && checkParameters.isStarLeague()) {
+                bestParameters = checkParameters;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
     }
 
     /**
@@ -862,7 +871,7 @@ public abstract class AbstractCompanyGenerator {
             case MEKWARRIOR -> 0;
             default -> {
                 // Shouldn't be hit, but a safety for attempting non-combat generation
-                logger.error("Attempting to generate a unit for a {}, returning a -20 modifier",
+                LOGGER.error("Attempting to generate a unit for a {}, returning a -20 modifier",
                       tracker.getPersonType());
                 yield -20;
             }
@@ -992,15 +1001,15 @@ public abstract class AbstractCompanyGenerator {
         final MekSummary mekSummary = generateMekSummary(campaign, parameters, faction);
 
         if (mekSummary == null) {
-            logger.error(
-                  "Failed to generate an entity due to a null 'Mek summary for faction " + faction.getShortName());
+            LOGGER.error("Failed to generate an entity due to a null 'Mek summary for faction {}",
+                  faction.getShortName());
             return null;
         }
 
         try {
             return new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName()).getEntity();
         } catch (Exception ex) {
-            logger.error("Failed to generate entity", ex);
+            LOGGER.error("Failed to generate entity", ex);
             return null;
         }
     }
@@ -1297,7 +1306,7 @@ public abstract class AbstractCompanyGenerator {
                             MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
             }
         } catch (Exception ex) {
-            logger.error("Cannot create a layered force icon, setting " + force + " to the default", ex);
+            LOGGER.error("Cannot create a layered force icon, setting {} to the default", force, ex);
             force.setForceIcon(new LayeredForceIcon());
             return;
         }
@@ -1394,7 +1403,7 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < numberMothballedEntities; i++) {
             final Faction faction = factionSelector.selectFaction(campaign);
             if (faction == null) {
-                logger.error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mek");
+                LOGGER.error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mek");
                 continue;
             }
 
@@ -1834,7 +1843,7 @@ public abstract class AbstractCompanyGenerator {
     public List<Unit> applyPhaseOneToCampaign(final Campaign campaign,
           final List<CompanyGenerationPersonTracker> trackers) {
         // Process Personnel
-        // If we aren't using the pool, generate all the Astechs and Medics required
+        // If we aren't using the pool, generate all the AsTechs and Medics required
         generateAssistants(campaign, trackers);
 
         // This does all the final personnel processing, including recruitment and
@@ -1845,7 +1854,7 @@ public abstract class AbstractCompanyGenerator {
         // We can only fill the pool after finalizing and recruiting our support
         // personnel
         if (getOptions().isPoolAssistants()) {
-            campaign.fillAstechPool();
+            campaign.fillAsTechPool();
             campaign.fillMedicPool();
         }
 

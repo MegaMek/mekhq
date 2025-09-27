@@ -70,14 +70,11 @@ public class LogTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_DATE:
-                return "Date";
-            case COL_DESC:
-                return "Description";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_DATE -> "Date";
+            case COL_DESC -> "Description";
+            default -> "?";
+        };
     }
 
     @Override
@@ -99,11 +96,6 @@ public class LogTableModel extends AbstractTableModel {
     }
 
     @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
-    @Override
     public Class<?> getColumnClass(int c) {
         return getValueAt(0, c).getClass();
     }
@@ -113,12 +105,10 @@ public class LogTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_DESC:
-                return 200;
-            default:
-                return 10;
+        if (c == COL_DESC) {
+            return 200;
         }
+        return 10;
     }
 
     public int getAlignment(int col) {

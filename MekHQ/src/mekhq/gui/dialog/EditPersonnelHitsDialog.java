@@ -54,12 +54,10 @@ import mekhq.campaign.personnel.Person;
  * Provides an editor for the number of hits sustained by a person, when advanced medical rules are not in use.
  */
 public class EditPersonnelHitsDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditPersonnelHitsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditPersonnelHitsDialog.class);
 
     private final Person person;
-    private JButton btnOK;
     private JSpinner spinnerHits;
-    private SpinnerNumberModel spinnerModel;
 
     public EditPersonnelHitsDialog(final Frame frame, final boolean modal, final Person person) {
         super(frame, modal);
@@ -71,7 +69,7 @@ public class EditPersonnelHitsDialog extends JDialog {
 
     private void initComponents() {
         spinnerHits = new JSpinner();
-        btnOK = new JButton();
+        JButton btnOK = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -81,7 +79,7 @@ public class EditPersonnelHitsDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         setMinimumSize(new Dimension(240, 40));
 
-        spinnerModel = new SpinnerNumberModel(person.getHits(), 0, 5, 1);
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(person.getHits(), 0, 5, 1);
         spinnerHits.setModel(spinnerModel);
         spinnerHits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "spinnerHits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -104,7 +102,7 @@ public class EditPersonnelHitsDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

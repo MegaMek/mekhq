@@ -42,7 +42,7 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -313,6 +313,14 @@ public class Clan {
         }
 
         return retVal;
+    }
+
+    public int getAbjurationDate() {
+        return abjurationDate;
+    }
+
+    public void setAbjurationDate(int abjurationDate) {
+        this.abjurationDate = abjurationDate;
     }
 
     /**

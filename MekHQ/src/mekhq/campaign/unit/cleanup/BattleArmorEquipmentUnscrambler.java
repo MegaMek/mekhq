@@ -36,8 +36,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import megamek.common.BattleArmor;
-import megamek.common.Mounted;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -90,7 +90,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
             if (parts.isEmpty()) {
                 parts = tempParts.stream()
                               .filter(part -> part.getType().getInternalName().equals(m.getType().getInternalName()))
-                              .collect(Collectors.toList());
+                              .toList();
 
                 parts.forEach(part -> part.setEquipmentNum(eqNum));
             }
@@ -125,8 +125,8 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
                 // possibility of equipment missing equipment for some troopers in the case of
                 // modular/AP mounts or DWPs
                 for (final Part part : perTrooper) {
-                    if (part != null) {
-                        tempParts.remove(part);
+                    if (part instanceof EquipmentPart equipmentPart) {
+                        tempParts.remove(equipmentPart);
                     }
                 }
             } else {

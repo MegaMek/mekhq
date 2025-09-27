@@ -37,10 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import megamek.Version;
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -60,7 +59,7 @@ import org.w3c.dom.NodeList;
  * Scenario#canStartScenario will return false if these personnel or units are not present in the deployed force.
  */
 public class ScenarioDeploymentLimit {
-    private static final MMLogger logger = MMLogger.create(ScenarioDeploymentLimit.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioDeploymentLimit.class);
 
     // region Variable Declarations
 
@@ -142,9 +141,9 @@ public class ScenarioDeploymentLimit {
         copy.quantityLimit = this.quantityLimit;
         copy.quantityType = this.quantityType;
         copy.countType = this.countType;
-        copy.requiredPersonnel = this.requiredPersonnel.stream().collect(Collectors.toList());
-        copy.requiredPersonnel = this.requiredUnits.stream().collect(Collectors.toList());
-        copy.allowedUnitTypes = this.allowedUnitTypes.stream().collect(Collectors.toList());
+        copy.requiredPersonnel = new ArrayList<>(this.requiredPersonnel);
+        copy.requiredUnits = new ArrayList<>(this.requiredUnits);
+        copy.allowedUnitTypes = new ArrayList<>(this.allowedUnitTypes);
 
         return copy;
     }
@@ -248,7 +247,7 @@ public class ScenarioDeploymentLimit {
      * @param f - a Force to be evaluated
      * @param c - a pointer to the Campaign
      *
-     * @return the an integer giving the quantity that this force counts toward in the appropriate units of CountType
+     * @return the integer giving the quantity that this force counts toward in the appropriate units of CountType
      */
     public int getForceQuantity(Force f, Campaign c) {
         int quantity = 0;
@@ -285,7 +284,7 @@ public class ScenarioDeploymentLimit {
             return (int) Math.ceil(totalValue * ((double) quantityLimit / 100.0));
         } else {
             // should not get here
-            logger.error("Unable to set quantity cap in ScenarioDeploymentLimit because of unknown quantityType.");
+            LOGGER.error("Unable to set quantity cap in ScenarioDeploymentLimit because of unknown quantityType.");
             return 0;
         }
     }
@@ -436,13 +435,13 @@ public class ScenarioDeploymentLimit {
     /**
      * Determines whether a given unit is part of a Force
      *
-     * @param unitId - the id of a Person
-     * @param force  - a Force
-     * @param c      - a pointer to the campaign
+     * @param unitId   - the id of a Person
+     * @param force    - a Force
+     * @param campaign - a pointer to the campaign
      *
      * @return a boolean that evaluates to true if the unit identified by unitId is part of the force
      */
-    public boolean isUnitInForce(UUID unitId, Force force, Campaign c) {
+    public boolean isUnitInForce(UUID unitId, Force force, Campaign campaign) {
         Vector<UUID> unitIds = force.getAllUnits(false);
         for (UUID id : unitIds) {
             if (id.equals(unitId)) {
@@ -498,7 +497,7 @@ public class ScenarioDeploymentLimit {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioDeploymentLimit");
     }
 
-    public static ScenarioDeploymentLimit generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static ScenarioDeploymentLimit generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
         ScenarioDeploymentLimit retVal = new ScenarioDeploymentLimit();
 
         try {
@@ -530,7 +529,7 @@ public class ScenarioDeploymentLimit {
 
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

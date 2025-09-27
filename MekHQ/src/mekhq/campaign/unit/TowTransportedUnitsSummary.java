@@ -41,11 +41,11 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import megamek.common.Entity;
-import megamek.common.Tank;
-import megamek.common.TankTrailerHitch;
-import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.TankTrailerHitch;
+import megamek.common.equipment.Transporter;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -63,7 +63,7 @@ import mekhq.campaign.unit.enums.TransporterType;
  *
  */
 public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
-    private static final MMLogger logger = MMLogger.create(TowTransportedUnitsSummary.class);
+    private static final MMLogger LOGGER = MMLogger.create(TowTransportedUnitsSummary.class);
 
     public TowTransportedUnitsSummary(Unit transport) {
         super(transport, TOW_TRANSPORT);
@@ -73,7 +73,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
      * Bay unloading utility used when removing a bay-equipped Transport unit This removes all units assigned to the
      * transport from it
      *
-     * @param campaign used to remove this unit as a transport from any other units in the campaign
+     * @param campaign used to remove this unit as transport from any other units in the campaign
      */
     @Override
     public void clearTransportedUnits(Campaign campaign) {
@@ -147,8 +147,6 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
     /**
      * Fixes references after loading
      *
-     * @param campaign
-     * @param unit
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
@@ -162,14 +160,14 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
                     if (realUnit.hasTransportAssignment(TOW_TRANSPORT)) {
                         towTrailer(realUnit, null, realUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
                     } else {
-                        logger.error(
+                        LOGGER.error(
                               "Unit {} ('{}') references tow transported unit {} which has no transport assignment",
                               unit.getId(),
                               unit.getName(),
                               towTransportedUnit.getId());
                     }
                 } else {
-                    logger.error("Unit {} ('{}') references missing tow transported unit {}",
+                    LOGGER.error("Unit {} ('{}') references missing tow transported unit {}",
                           unit.getId(), unit.getName(), towTransportedUnit.getId());
                 }
             } else {
@@ -205,7 +203,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         } else if (transporterType != null) {
             towedUnit.setTransportAssignment(TOW_TRANSPORT, new TransportAssignment(transport, transporterType));
         } else {
-            logger.error("Cannot load transport ({}) with unit ({}) without a transported location or transporter!",
+            LOGGER.error("Cannot load transport ({}) with unit ({}) without a transported location or transporter!",
                   transport.getId(),
                   towedUnit.getId());
             return oldTractor;

@@ -1,0 +1,59 @@
+<!--
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+-->
+<AtBScenarioModifier>
+    <additionalBriefingText>Enemy aircraft detected on approach.</additionalBriefingText>
+    <benefitsPlayer>false</benefitsPlayer>
+    <eventTiming>PostForceGeneration</eventTiming>
+    <forceDefinition>
+        <actualDeploymentZone>-1</actualDeploymentZone>
+        <allowAeroBombs>false</allowAeroBombs>
+        <allowedUnitType>-3</allowedUnitType>
+        <arrivalTurn>-3</arrivalTurn>
+        <canReinforceLinked>true</canReinforceLinked>
+        <contributesToBV>false</contributesToBV>
+        <contributesToMapSize>true</contributesToMapSize>
+        <contributesToUnitCount>false</contributesToUnitCount>
+        <deploymentZones>
+            <deploymentZone>1</deploymentZone>
+            <deploymentZone>2</deploymentZone>
+            <deploymentZone>3</deploymentZone>
+            <deploymentZone>4</deploymentZone>
+            <deploymentZone>5</deploymentZone>
+            <deploymentZone>6</deploymentZone>
+            <deploymentZone>7</deploymentZone>
+            <deploymentZone>8</deploymentZone>
+            <deploymentZone>9</deploymentZone>
+        </deploymentZones>
+        <destinationZone>5</destinationZone>
+        <fixedUnitCount>-1</fixedUnitCount>
+        <forceAlignment>2</forceAlignment>
+        <forceMultiplier>1.0</forceMultiplier>
+        <forceName>Aircraft</forceName>
+        <generationMethod>3</generationMethod>
+        <generationOrder>5</generationOrder>
+        <maxWeightClass>4</maxWeightClass>
+        <objectiveLinkedForces>
+            <objectiveLinkedForce>OpFor</objectiveLinkedForce>
+        </objectiveLinkedForces>
+        <retreatThreshold>50</retreatThreshold>
+        <startingAltitude>5</startingAltitude>
+        <syncDeploymentType>None</syncDeploymentType>
+        <syncedForceName />
+    </forceDefinition>
+</AtBScenarioModifier>

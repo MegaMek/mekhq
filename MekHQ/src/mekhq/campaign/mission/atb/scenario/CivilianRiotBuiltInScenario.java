@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,11 +35,11 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -58,9 +58,9 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class CivilianRiotBuiltInScenario extends AtBScenario {
-    private static String RIOTER_FORCE_ID = "Rioters";
-    private static String REBEL_FORCE_ID = "Rebels";
-    private static String LOYALIST_FORCE_ID = "Loyalists";
+    private static final String RIOTER_FORCE_ID = "Rioters";
+    private static final String REBEL_FORCE_ID = "Rebels";
+    private static final String LOYALIST_FORCE_ID = "Loyalists";
 
     @Override
     public boolean isBigBattle() {
@@ -69,7 +69,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CIVILIANRIOT;
+        return CIVILIAN_RIOT;
     }
 
     @Override

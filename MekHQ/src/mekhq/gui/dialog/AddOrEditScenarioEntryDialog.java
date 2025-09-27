@@ -60,7 +60,7 @@ import mekhq.campaign.log.ServiceLogEntry;
  * Dialog used to add or edit scenario entries.
  */
 public class AddOrEditScenarioEntryDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(AddOrEditScenarioEntryDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(AddOrEditScenarioEntryDialog.class);
 
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
@@ -72,12 +72,8 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
     private final String originalDescription;
     private LocalDate newDate;
 
-    private JPanel panMain;
     private JButton btnDate;
     private JTextField txtDesc;
-    private JPanel panBtn;
-    private JButton btnOK;
-    private JButton btnClose;
 
     public AddOrEditScenarioEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
         this(parent, modal, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
@@ -113,13 +109,13 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
               MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
-        panMain = new JPanel();
+        JPanel panMain = new JPanel();
         btnDate = new JButton();
         txtDesc = new JTextField();
 
-        panBtn = new JPanel();
-        btnOK = new JButton();
-        btnClose = new JButton();
+        JPanel panBtn = new JPanel();
+        JButton btnOK = new JButton();
+        JButton btnClose = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
@@ -187,7 +183,7 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

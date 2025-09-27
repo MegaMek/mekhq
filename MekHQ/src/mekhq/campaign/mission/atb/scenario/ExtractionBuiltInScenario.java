@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,10 +37,10 @@ import java.util.UUID;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
@@ -57,7 +57,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
-    private static final MMLogger logger = MMLogger.create(ExtractionBuiltInScenario.class);
+    private static final MMLogger LOGGER = MMLogger.create(ExtractionBuiltInScenario.class);
 
     private static final String CIVILIAN_FORCE_ID = "Civilians";
 
@@ -147,7 +147,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 addBotForce(bf, campaign);
             }
         } catch (PrincessException ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,10 +35,10 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
@@ -59,7 +59,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return BASEATTACK;
+        return BASE_ATTACK;
     }
 
     @Override
@@ -236,13 +236,13 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
     @Override
     public String getBattlefieldControlDescription() {
-        String retval = super.getBattlefieldControlDescription();
+        String retVal = super.getBattlefieldControlDescription();
 
         if (!isAttacker()) {
-            retval += "\r\n";
-            retval += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
+            retVal += "\r\n";
+            retVal += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
         }
 
-        return retval;
+        return retVal;
     }
 }

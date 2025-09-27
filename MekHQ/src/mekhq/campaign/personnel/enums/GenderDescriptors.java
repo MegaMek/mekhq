@@ -135,18 +135,13 @@ public enum GenderDescriptors {
      * @return the descriptor
      */
     public String getDescriptor(final Gender gender) {
-        switch (gender) {
-            case MALE:
-                return getMasculine();
-            case FEMALE:
-                return getFeminine();
-            case OTHER_MALE:
-                return getNeutral().isBlank() ? getMasculine() : getNeutral();
-            case OTHER_FEMALE:
-                return getNeutral().isBlank() ? getFeminine() : getNeutral();
-            default:
-                return getNeutral();
-        }
+        return switch (gender) {
+            case MALE -> getMasculine();
+            case FEMALE -> getFeminine();
+            case OTHER_MALE -> getNeutral().isBlank() ? getMasculine() : getNeutral();
+            case OTHER_FEMALE -> getNeutral().isBlank() ? getFeminine() : getNeutral();
+            default -> getNeutral();
+        };
     }
 
     /**

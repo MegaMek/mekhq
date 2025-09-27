@@ -36,12 +36,12 @@ import static java.lang.Math.max;
 import static megamek.common.force.Force.NO_FORCE;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.ProtoMek;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.ProtoMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -54,7 +54,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
 public class AverageExperienceRating {
-    private static final MMLogger logger = MMLogger.create(AverageExperienceRating.class);
+    private static final MMLogger LOGGER = MMLogger.create(AverageExperienceRating.class);
 
     /**
      * Calculates the skill level based on the average experience rating of a campaign.
@@ -87,7 +87,7 @@ public class AverageExperienceRating {
     }
 
     /**
-     * Retrieves the average experience level of the campaign. Useful for AtB Systems.
+     * Retrieves the average experience level of the campaign. Useful for ATB Systems.
      *
      * @param averageSkillLevel the average skill level for which to calculate the reputation modifier
      *
@@ -101,7 +101,7 @@ public class AverageExperienceRating {
             case ELITE, HEROIC, LEGENDARY -> 40;
         };
 
-        logger.debug("Reputation Rating = {}, +{}", averageSkillLevel.toString(), modifier);
+        LOGGER.debug("Reputation Rating = {}, +{}", averageSkillLevel.toString(), modifier);
 
         return modifier;
     }
@@ -133,7 +133,7 @@ public class AverageExperienceRating {
             }
             Force force = campaign.getForce(forceId);
             if (force == null) {
-                logger.warn("Force returned null for forceId {}", forceId);
+                LOGGER.warn("Force returned null for forceId {}", forceId);
                 continue;
             }
 
@@ -206,7 +206,7 @@ public class AverageExperienceRating {
         // Log the details of the calculation to aid debugging,
         // and so the user can easily see if there is a mistake
         if (log) {
-            logger.debug("Average Experience Rating: {} / {} = {}",
+            LOGGER.debug("Average Experience Rating: {} / {} = {}",
                   totalExperience,
                   personnelCount,
                   averageExperienceRating);
@@ -257,7 +257,7 @@ public class AverageExperienceRating {
                 skillValue += max(0, skill.getFinalSkillValue(options, attributes));
                 skillCount++;
             } else {
-                logger.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
+                LOGGER.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
                       skillType,
                       entity);
             }
@@ -271,7 +271,7 @@ public class AverageExperienceRating {
                 skillValue += max(0, skill.getFinalSkillValue(options, attributes));
                 skillCount++;
             } else {
-                logger.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",
+                LOGGER.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",
                       skillType,
                       entity);
             }

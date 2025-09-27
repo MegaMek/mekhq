@@ -35,9 +35,7 @@ package mekhq.gui;
 import java.awt.FileDialog;
 import java.io.File;
 import java.util.Optional;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import mekhq.io.FileType;
 
@@ -96,20 +94,4 @@ public class GUI {
         }
     }
 
-    private static Optional<File> swingFileDialog(JFrame parent, String title, FileType fileType, String directoryPath,
-          String saveFilename) {
-        JFileChooser fd = new JFileChooser(directoryPath);
-        fd.setDialogTitle(title);
-        if (saveFilename != null) {
-            fd.setSelectedFile(new File(saveFilename));
-        }
-        fd.addChoosableFileFilter(new FileNameExtensionFilter(fileType.getDescription(),
-              fileType.getExtensions().toArray(new String[0])));
-        int buttonClicked = saveFilename != null
-                                  ? fd.showSaveDialog(parent)
-                                  : fd.showOpenDialog(parent);
-        return buttonClicked == JFileChooser.APPROVE_OPTION
-                     ? Optional.ofNullable(fd.getSelectedFile())
-                     : Optional.empty();
-    }
 }

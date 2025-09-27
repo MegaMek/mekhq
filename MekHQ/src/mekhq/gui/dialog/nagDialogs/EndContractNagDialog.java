@@ -83,8 +83,7 @@ public class EndContractNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(LocalDate today, List<AtBContract> activeContracts) {
-        final String NAG_KEY = NAG_CONTRACT_ENDED;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && isContractEnded(today, activeContracts);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_CONTRACT_ENDED) && isContractEnded(today, activeContracts);
     }
 }

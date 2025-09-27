@@ -91,7 +91,7 @@ public class HRStrainNagDialog extends ImmersiveDialogNag {
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public class AdminStrainNagDialog extends HRStrainNagDialog {
+    public static class AdminStrainNagDialog extends HRStrainNagDialog {
         public AdminStrainNagDialog(Campaign campaign) {
             super(campaign);
         }

@@ -44,7 +44,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -136,10 +136,10 @@ public class NewsItem {
         int maxRandomDays;
         switch (datePrecision) {
             case MONTH:
-                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.MONTHS)));
+                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plusMonths(1)));
                 break;
             case YEAR:
-                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.YEARS)));
+                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plusYears(1)));
                 break;
             case DECADE:
                 maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.DECADES)));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,12 +36,12 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
-import static megamek.common.UnitType.*;
-import static megamek.common.WeaponType.CLASS_ARTILLERY;
-import static megamek.common.planetaryconditions.Atmosphere.THIN;
-import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
+import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.planetaryConditions.Atmosphere.THIN;
+import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
+import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
@@ -71,15 +71,28 @@ import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
+import megamek.common.OffBoardDirection;
 import megamek.common.annotations.Nullable;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.eras.EraFlag;
+import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
-import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.Wind;
+import megamek.common.loaders.MULParser;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.Wind;
+import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
@@ -105,13 +118,13 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconFacility;
-import mekhq.campaign.stratcon.StratconFacility.FacilityType;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConContractInitializer;
+import mekhq.campaign.stratCon.StratConFacility;
+import mekhq.campaign.stratCon.StratConFacility.FacilityType;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -120,7 +133,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
-import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.utilities.EntityUtilities;
 
 /**
@@ -161,8 +173,8 @@ public class AtBDynamicScenarioFactory {
         scenario.setStratConScenarioType(template.getStratConScenarioType());
         scenario.setDesc(template.detailedBriefing);
         scenario.setTemplate(template);
-        scenario.setEffectiveOpforSkill(contract.getEnemySkill());
-        scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
+        scenario.setEffectiveOpForSkill(contract.getEnemySkill());
+        scenario.setEffectiveOpForQuality(contract.getEnemyQuality());
         scenario.setMissionId(contract.getId());
 
         // apply any fixed modifiers
@@ -197,21 +209,26 @@ public class AtBDynamicScenarioFactory {
         // apply a default "reinforcements" force template if a scenario-specific one
         // does not already exist
         if (!template.getScenarioForces().containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
-            ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
-
-            // the default template should not allow the user to deploy ground units as
-            // reinforcements to aerospace battles
-            // space battles are even more restrictive
-            if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
-                defaultReinforcements.setAllowedUnitType(SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
-            } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
-                defaultReinforcements.setAllowedUnitType(AEROSPACEFIGHTER);
-            }
+            ScenarioForceTemplate defaultReinforcements = getScenarioForceTemplate(template);
 
             template.getScenarioForces().put(defaultReinforcements.getForceName(), defaultReinforcements);
         }
 
         return scenario;
+    }
+
+    private static ScenarioForceTemplate getScenarioForceTemplate(ScenarioTemplate template) {
+        ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
+
+        // the default template should not allow the user to deploy ground units as
+        // reinforcements to aerospace battles
+        // space battles are even more restrictive
+        if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
+            defaultReinforcements.setAllowedUnitType(SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
+        } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
+            defaultReinforcements.setAllowedUnitType(AEROSPACE_FIGHTER);
+        }
+        return defaultReinforcements;
     }
 
     /**
@@ -346,9 +363,9 @@ public class AtBDynamicScenarioFactory {
      */
     public static int generateFixedForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
           ScenarioForceTemplate forceTemplate) {
-        File mulFile = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
+        File mulFile = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
         if (!mulFile.exists()) {
-            LOGGER.error(String.format("MUL file %s does not exist", mulFile.getAbsolutePath()));
+            LOGGER.error("MUL file {} does not exist", mulFile.getAbsolutePath());
             return 0;
         }
 
@@ -369,7 +386,7 @@ public class AtBDynamicScenarioFactory {
             MULParser mp = new MULParser(mulFile, campaign.getGameOptions());
             generatedEntities = mp.getEntities();
         } catch (Exception e) {
-            LOGGER.error(String.format("Unable to parse MUL file %s", mulFile.getAbsolutePath()), e);
+            LOGGER.error("Unable to parse MUL file {}", mulFile.getAbsolutePath(), e);
             return 0;
         }
 
@@ -465,8 +482,8 @@ public class AtBDynamicScenarioFactory {
                 // enemy or "Unidentified Hostiles" which are considered pirates or bandit caste
                 // with random quality and skill
             case Third:
-                skill = scenario.getEffectiveOpforSkill();
-                quality = scenario.getEffectiveOpforQuality();
+                skill = scenario.getEffectiveOpForSkill();
+                quality = scenario.getEffectiveOpForQuality();
                 if (forceTemplate.getForceName().toLowerCase().contains("unidentified")) {
                     unidentifiedThirdPartyPresent = true;
 
@@ -574,12 +591,12 @@ public class AtBDynamicScenarioFactory {
                                                                                .getAtmosphere(currentDate);
 
                 switch (specific_atmosphere) {
-                    case TOXICPOISON, TOXICCAUSTIC -> {
+                    case TOXIC_POISON, TOXIC_CAUSTIC -> {
                         LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specific_atmosphere);
                         allowsConvInfantry = false;
                         allowsTanks = false;
                     }
-                    case TAINTEDPOISON, TAINTEDCAUSTIC -> {
+                    case TAINTED_POISON, TAINTED_CAUSTIC -> {
                         LOGGER.info("Atmosphere is {}, setting tainted flag", specific_atmosphere);
                         isTainted = true;
                     }
@@ -623,7 +640,7 @@ public class AtBDynamicScenarioFactory {
                 requiredRoles.put(TANK, new ArrayList<>(baseRoles));
             } else if (forceTemplate.getAllowedUnitType() == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                 requiredRoles.put(CONV_FIGHTER, new ArrayList<>(baseRoles));
-                requiredRoles.put(AEROSPACEFIGHTER, new ArrayList<>(baseRoles));
+                requiredRoles.put(AEROSPACE_FIGHTER, new ArrayList<>(baseRoles));
             } else if (forceTemplate.getAllowedUnitType() == SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 // TODO: this will need to be adjusted to cover SUPPORT and CIVILIAN separately
                 for (int i = 0; i <= AERO; i++) {
@@ -825,7 +842,7 @@ public class AtBDynamicScenarioFactory {
                 Game cGame = campaign.getGame();
                 TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
                 if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
-                    // Configure non-Turret generated units with appropriate munitions (for BV calcs)
+                    // Configure non-Turret generated units with appropriate munitions (for BV calculations)
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(
                           generatedLance.stream().filter(e -> !(e instanceof GunEmplacement)).toList()
                     );
@@ -920,11 +937,11 @@ public class AtBDynamicScenarioFactory {
                 balancingType = " Generic";
             }
 
-            LOGGER.info(String.format("%s generated a force with %s / %s %s BV",
+            LOGGER.info("{} generated a force with {} / {} {} BV",
                   forceTemplate.getForceName(),
                   forceBV,
                   forceBVBudget,
-                  balancingType));
+                  balancingType);
 
             if ((forceBV > forceBVBudget) && generatedEntities.size() != 1) {
                 List<Entity> forceComposition = new ArrayList<>();
@@ -997,10 +1014,10 @@ public class AtBDynamicScenarioFactory {
                         int fighterMultiplier = 0;
 
                         try {
-                            StratconTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
+                            StratConTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
 
                             if (scenarioHomeTrack != null) {
-                                for (StratconFacility facility : scenarioHomeTrack.getFacilities().values()) {
+                                for (StratConFacility facility : scenarioHomeTrack.getFacilities().values()) {
                                     if (facility.getFacilityType().equals(FacilityType.AirBase)) {
                                         fighterMultiplier++;
                                     }
@@ -1287,27 +1304,27 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Retrieves the {@link StratconTrackState} associated with the given {@link AtBDynamicScenario}.
+     * Retrieves the {@link StratConTrackState} associated with the given {@link AtBDynamicScenario}.
      * <p>
-     * This method iterates over all {@link StratconTrackState} instances in the provided {@link AtBContract}'s
-     * {@link StratconCampaignState} to find the track that contains a {@link StratconScenario} corresponding to the
+     * This method iterates over all {@link StratConTrackState} instances in the provided {@link AtBContract}'s
+     * {@link StratConCampaignState} to find the track that contains a {@link StratConScenario} corresponding to the
      * specified {@link AtBDynamicScenario}. If a match is found, the track is returned; otherwise, {@code null} is
      * returned.
      * </p>
      *
      * @param scenario the {@link AtBDynamicScenario} whose associated track is to be identified.
-     * @param contract the {@link AtBContract} containing the {@link StratconCampaignState} with all available tracks.
+     * @param contract the {@link AtBContract} containing the {@link StratConCampaignState} with all available tracks.
      *
-     * @return the {@link StratconTrackState} that contains the {@link StratconScenario} backed by the specified
+     * @return the {@link StratConTrackState} that contains the {@link StratConScenario} backed by the specified
      *       {@link AtBDynamicScenario}, or {@code null} if no matching track is found.
      */
-    private static @Nullable StratconTrackState getStratconTrackState(AtBDynamicScenario scenario,
+    private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
           AtBContract contract) {
-        List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
-        StratconTrackState scenarioHomeTrack = null;
+        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        StratConTrackState scenarioHomeTrack = null;
 
-        for (StratconTrackState track : tracks) {
-            for (StratconScenario stratconScenario : track.getScenarios().values()) {
+        for (StratConTrackState track : tracks) {
+            for (StratConScenario stratconScenario : track.getScenarios().values()) {
                 if (stratconScenario.getBackingScenarioID() == scenario.getId()) {
                     scenarioHomeTrack = track;
                     break;
@@ -1424,11 +1441,10 @@ public class AtBDynamicScenarioFactory {
                 boolean isUseLoggerHeader = true;
                 for (Entity entity : bidAwayForces) {
                     if (isUseLoggerHeader) {
-                        LOGGER.info(String.format(resources.getString("bidAwayForcesLogger.text"),
-                              generatedForce.getName()));
+                        LOGGER.info(resources.getString("bidAwayForcesLogger.text"), generatedForce.getName());
                         isUseLoggerHeader = false;
                     }
-                    LOGGER.info(String.format("%s, %s", entity.getFullChassis(), entity.getGenericBattleValue()));
+                    LOGGER.info("{}, {}", entity.getFullChassis(), entity.getGenericBattleValue());
                 }
             }
         }
@@ -1542,7 +1558,7 @@ public class AtBDynamicScenarioFactory {
 
         OffBoardDirection calculatedDestinationZone = OffBoardDirection.NONE;
 
-        // for each of the objective's force names loop through all of the following:
+        // for each of the objective's force names loop through all the following:
         // bot forces
         // assigned player forces
         // assigned player units
@@ -1568,7 +1584,7 @@ public class AtBDynamicScenarioFactory {
 
             // if the bot force's force template's name is included in the objective's force
             // names
-            // or if the bot force is hostile and we're including all enemy forces
+            // or if the bot force is hostile, and we're including all enemy forces
             if (templateObjective.isApplicableToForceTemplate(forceTemplate, scenario) ||
                       (botForceIsHostile &&
                              templateObjective.getAssociatedForceNames()
@@ -1715,9 +1731,8 @@ public class AtBDynamicScenarioFactory {
 
                 // If we fail to fetch scaleFactor, log it and use a placeholder value of 1
                 if (scaleFactor == null) {
-                    LOGGER.error(String.format(
-                          "Failed to fetch scaleFactor for scenario template %s. Using fallback value of 1",
-                          scenario.getTemplate().name));
+                    LOGGER.error("Failed to fetch scaleFactor for scenario template {}. Using fallback value of 1",
+                          scenario.getTemplate().name);
                     scaleFactor = 1;
                 }
 
@@ -1754,9 +1769,9 @@ public class AtBDynamicScenarioFactory {
         // otherwise, pick one from the allowed ones
         if (scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain) {
             scenario.setBoardType(T_GROUND);
-            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
-            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+            StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
                                                 .floorEntry(kelvinTemp)
                                                 .getValue().allowedTerrainTypes;
 
@@ -1773,12 +1788,12 @@ public class AtBDynamicScenarioFactory {
             scenario.setTerrain();
             scenario.setMapFile();
         } else {
-            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
-            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedFacility = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+            StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedFacility = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
                                                  .floorEntry(kelvinTemp)
                                                  .getValue().allowedTerrainTypes;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
                                                 .floorEntry(kelvinTemp)
                                                 .getValue().allowedTerrainTypes;
             List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
@@ -2055,12 +2070,9 @@ public class AtBDynamicScenarioFactory {
      * @return randomly generated Entity with crew, or null
      */
     public static Entity getTankEntity(UnitGeneratorParameters params, SkillLevel skill, Campaign campaign) {
-        // useful debugging statement that forces generation of specific units rather
-        // than random ones
-        // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill,
-        // campaign);
-        // return getEntityByName("Badger (C) Tracked Transport B", params.getFaction(),
-        // skill, campaign);
+        // useful debugging statement that forces generation of specific units rather than random ones
+        // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill, campaign);
+        // return getEntityByName("Badger (C) Tracked Transport B", params.getFaction(), skill, campaign);
 
         if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
@@ -2076,14 +2088,14 @@ public class AtBDynamicScenarioFactory {
 
         if (unitData == null) {
             if (params.getMissionRoles() != null && !params.getMissionRoles().isEmpty()) {
-                LOGGER.info(String.format("Unable to randomly generate %s %s with roles: %s",
+                LOGGER.info("Unable to randomly generate {} {} with roles: {}",
                       params.getWeightClass(),
                       getTypeName(TANK),
-                      params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+                      params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(",")));
             } else {
-                LOGGER.info(String.format("Unable to randomly generate %s %s with no roles.",
+                LOGGER.info("Unable to randomly generate {} {} with no roles.",
                       params.getWeightClass(),
-                      getTypeName(TANK)));
+                      getTypeName(TANK));
             }
             return null;
         }
@@ -2172,9 +2184,9 @@ public class AtBDynamicScenarioFactory {
             }
             if (unitData == null) {
                 if (!params.getMissionRoles().isEmpty()) {
-                    LOGGER.warn(String.format("Unable to randomly generate %s with roles: %s",
+                    LOGGER.warn("Unable to randomly generate {} with roles: {}",
                           getTypeName(INFANTRY),
-                          params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+                          params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(",")));
                 }
                 return null;
             }
@@ -2584,13 +2596,14 @@ public class AtBDynamicScenarioFactory {
                 newParams.addMissionRole((MECHANIZED_BA));
                 unitData = campaign.getUnitGenerator().generate(newParams);
             }
+
             if (unitData == null) {
                 return null;
             }
         }
 
         // Add an appropriate crew
-        if (newParams != null && unitData != null) {
+        if (newParams != null) {
             return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
         } else {
             return null;
@@ -2620,7 +2633,7 @@ public class AtBDynamicScenarioFactory {
 
         // non-clan forces and units that aren't stars don't become novas
         // TODO: allow for non-Clan integrated mechanized formations, like WOB choirs,
-        // as well as stars that are short one or more omnis
+        // as well as stars that are short one or more OmniMeks
         if (!Factions.getInstance().getFaction(factionCode).isClan() && ((starUnits.size() != 5) || forceBASpawn)) {
             return transportedUnits;
         }
@@ -2684,7 +2697,7 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units.
+     * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units. This is a debugging method.
      *
      * @param name        Full name (chassis + model) of the entity to generate.
      * @param factionCode Faction code to use for name generation
@@ -2692,8 +2705,6 @@ public class AtBDynamicScenarioFactory {
      * @param campaign    The campaign instance
      *
      * @return The newly generated Entity
-     *
-     * @note This is a debugging method
      */
     @SuppressWarnings(value = "unused")
     private static Entity getEntityByName(String name, String factionCode, SkillLevel skill, Campaign campaign) {
@@ -2721,15 +2732,31 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Creates an {@link Entity} object with a crew based on the provided parameters.
+     *
+     * @param faction  the faction to which the entity belongs
+     * @param skill    the skill level of the crew
+     * @param campaign the campaign context for the entity
+     * @param unitData the unit data defining the entity's specifications
+     *
+     * @return the created Entity object, or null if the creation fails
+     */
+    public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign,
+          MekSummary unitData) {
+        return createEntityWithCrew(faction, skill, campaign, unitData, false);
+    }
+
+    /**
      * @param faction  Faction for selection of crew name(s)
      * @param skill    {@link SkillLevel} for the average crew skill level
      * @param campaign Current campaign
      * @param unitData Chassis/model data of unit
+     * @param isTest   {@code true} if called from within a Unit Test
      *
      * @return A crewed entity
      */
     public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign,
-          MekSummary unitData) {
+          MekSummary unitData, boolean isTest) {
         Entity entity;
         try {
             entity = new MekFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
@@ -2738,7 +2765,7 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
-        return createEntityWithCrew(faction, skill, campaign, entity);
+        return createEntityWithCrew(faction, skill, campaign, entity, isTest);
     }
 
     /**
@@ -2748,8 +2775,8 @@ public class AtBDynamicScenarioFactory {
      * <p>This method sets ownership, game context, names, gender (which may be non-binary depending on campaign
      * settings), and skills.</p>
      *
-     * <p>For certain factions, special attributes such as phenotype and bloodname may also be assigned.
-     * Additionally, callsigns or command bonuses are configured if enabled by campaign options.</p>
+     * <p>For certain factions, special attributes such as phenotype and blood name may also be assigned.
+     * Additionally, call signs or command bonuses are configured if enabled by campaign options.</p>
      *
      * <p>The new crew is assigned to the entity, and a unique external identifier is set.</p>
      *
@@ -2757,10 +2784,12 @@ public class AtBDynamicScenarioFactory {
      * @param skill    the base {@link SkillLevel} for the crew, potentially adjusted by a random roll
      * @param campaign the owning {@link Campaign} instance providing context and options
      * @param entity   the {@link Entity} to configure with crew, ownership, and random details
+     * @param isTest   {@code true} if called from within a Unit Test
      *
      * @return the {@link Entity} with its crew assigned and campaign-related attributes set
      */
-    public static Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, Entity entity) {
+    public static Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, Entity entity,
+          boolean isTest) {
         entity.setOwner(campaign.getPlayer());
         entity.setGame(campaign.getGame());
 
@@ -2819,7 +2848,7 @@ public class AtBDynamicScenarioFactory {
                 case BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case AEROSPACEFIGHTER:
+                case AEROSPACE_FIGHTER:
                 case CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -2838,10 +2867,10 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (!phenotype.isNone()) {
-                String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype, campaign.getGameYear())
+                String bloodName = Bloodname.randomBloodname(faction.getShortName(), phenotype, campaign.getGameYear())
                                          .getName();
-                crewName += ' ' + bloodname;
-                innerMap.put(Crew.MAP_BLOODNAME, bloodname);
+                crewName += ' ' + bloodName;
+                innerMap.put(Crew.MAP_BLOOD_NAME, bloodName);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
         }
@@ -2859,9 +2888,9 @@ public class AtBDynamicScenarioFactory {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Optionally assign a callsign to the unit commander if enabled and skill at or above minimum level
-        if (campaignOptions.isAutoGenerateOpForCallsigns() &&
+        if (campaignOptions.isAutoGenerateOpForCallSigns() &&
                   (skill.equalsOrGreaterThan(campaignOptions.getMinimumCallsignSkillLevel()))) {
-            entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
+            entityCrew.setNickname(RandomCallsignGenerator.getInstance(isTest).generate(), 0);
         }
 
         // Assign the crew to the unit
@@ -2881,13 +2910,13 @@ public class AtBDynamicScenarioFactory {
      * faction-specific adjustments.
      *
      * <p>This method determines the tactics modifier through a series of checks, adjustments, and
-     * randomizations, considering crew skills, faction-based leadership status. The final modifier is clamped to a
+     * randomization's, considering crew skills, faction-based leadership status. The final modifier is clamped to a
      * range between {@code 0} and {@code 10}.</p>
      *
      * <ul>
      *     <li>If the skill level is less than "Green," the modifier is set to {@code 0}.</li>
      *     <li>The base modifier is derived from the skill's adjusted value, capped at {@code EXP_ELITE},
-     *     and further modified by rolling two six-sided dice (2d6) added to the command skills
+     *     and further modified by rolling two six-sided dice (2d6) added to the command skills'
      *     modifier. The result of this calculation falls within the range of {@code 2} to {@code 12}
      *     and determines a skill level:
      *         <ul>
@@ -3048,7 +3077,7 @@ public class AtBDynamicScenarioFactory {
                       allowTanks &&
                       (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()))) {
 
-                // some specialized logic for clan opfors
+                // some specialized logic for clan op fors
                 // if we're in the late republic or dark ages, clans no longer have the luxury
                 // of mek only stars
                 boolean clanEquipmentScarcity = campaign.getEra()
@@ -3149,7 +3178,7 @@ public class AtBDynamicScenarioFactory {
                 }
             }
         } else if (unitTypeCode == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            actualUnitType = AEROSPACEFIGHTER;
+            actualUnitType = AEROSPACE_FIGHTER;
         }
 
         // Add unit types to the list of actual unity types
@@ -3242,12 +3271,12 @@ public class AtBDynamicScenarioFactory {
      * <li>APC should include light and medium weights, as few heavy/assault weight
      * classes
      * include infantry bays</li>
-     * <li>CAVALRY is limited to heavy weight class and lighter with Meks and
+     * <li>CAVALRY is limited to heavyweight class and lighter with Meks and
      * ProtoMeks, and
      * medium weight class and lighter with vehicles. Heavy cavalry Meks are rare
      * without
      * advanced technology and may fail to generate a random unit.</li>
-     * <li>RAIDER is limited to heavy weight class and lighter for Meks and
+     * <li>RAIDER is limited to heavyweight class and lighter for Meks and
      * ProtoMeks</li>
      * </ul>
      *
@@ -3275,9 +3304,9 @@ public class AtBDynamicScenarioFactory {
         }
         String weights = campaign.getAtBConfig().selectBotUnitWeights(factionWeightString, weightClass);
         if (weights == null) {
-            LOGGER.error(String.format("Failed to generate weights for faction %s with weight class %s",
+            LOGGER.error("Failed to generate weights for faction {} with weight class {}",
                   factionWeightString,
-                  weightClass));
+                  weightClass);
             return null;
         }
 
@@ -3286,7 +3315,7 @@ public class AtBDynamicScenarioFactory {
         weights = adjustForMinWeight(weights, minWeight);
 
         // Aerospace fighter weight cap
-        if (unitTypes.contains(AEROSPACEFIGHTER)) {
+        if (unitTypes.contains(AEROSPACE_FIGHTER)) {
             weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
         }
 
@@ -3567,9 +3596,9 @@ public class AtBDynamicScenarioFactory {
         // generate the lower of the two counts
         int unitTypeSize = unitTypes.size();
         if (unitTypeSize > weights.length()) {
-            LOGGER.error(String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.",
+            LOGGER.error("More unit types ({}) provided than weights ({}). Truncating generated lance.",
                   unitTypes.size(),
-                  weights.length()));
+                  weights.length());
             unitTypeSize = weights.length();
         }
 
@@ -3590,11 +3619,10 @@ public class AtBDynamicScenarioFactory {
                 }
             }
 
-            LOGGER.info(String.format("Failed to generate unit of type %s, weight %s, role %s." +
-                                            " Beginning substitution.",
+            LOGGER.info("Failed to generate unit of type {}, weight {}, role {}. Beginning substitution.",
                   getTypeName(unitTypes.get(unitIndex)),
                   EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, unitIndex)),
-                  role != null ? "roles (" + role + ')' : ""));
+                  role != null ? "roles (" + role + ')' : "");
 
             entity = substituteEntity(faction,
                   skill,
@@ -3671,9 +3699,9 @@ public class AtBDynamicScenarioFactory {
                           unitTypes);
                 }
             } else {
-                if (unitTypes.get(unitIndex) != AEROSPACEFIGHTER) {
+                if (unitTypes.get(unitIndex) != AEROSPACE_FIGHTER) {
                     LOGGER.info("Switching unit type to Aerospace Fighter");
-                    fallbackUnitType = List.of(AEROSPACEFIGHTER);
+                    fallbackUnitType = List.of(AEROSPACE_FIGHTER);
 
                     entity = substituteEntity(faction,
                           skill,
@@ -3688,7 +3716,7 @@ public class AtBDynamicScenarioFactory {
 
                 // Abandon attempts to generate by role
                 if (entity == null) {
-                    LOGGER.info("Removing role requirements.");
+                    LOGGER.info("Abandon attempts to generate by role requirements.");
                     entity = substituteEntity(faction,
                           skill,
                           quality,
@@ -3794,8 +3822,8 @@ public class AtBDynamicScenarioFactory {
             entity = getNewEntity(faction, skill, quality, individualType, weight, rolesByType, campaign, unitIndex);
 
             if (entity != null) {
-                LOGGER.info(String.format("Substitution successful (%s)",
-                      EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, unitIndex))));
+                LOGGER.info("Substitution successful ({})",
+                      EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, unitIndex)));
                 return entity;
             }
         }
@@ -3882,7 +3910,6 @@ public class AtBDynamicScenarioFactory {
      * advisable to call it only after setDeploymentZones has been called on the scenario, as otherwise you'll have
      * "unpredictable" destination zones.
      *
-     * @param scenario
      */
     private static void setDestinationZones(AtBDynamicScenario scenario) {
         for (BotForce generatedForce : scenario.getBotForceTemplates().keySet()) {
@@ -4104,7 +4131,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Set up deployment turns for player units as specified in the scenario's template. Note that this is currently
      * invoked during the BriefingTab.startScenario() method, as that method resets all properties of for each player
-     * entity. Hence it being public.
+     * entity. Hence, it being public.
      *
      * @param scenario The scenario to process.
      * @param campaign The campaign in which the scenario is occurring.
@@ -4114,19 +4141,17 @@ public class AtBDynamicScenarioFactory {
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
             AtBContract contract = scenario.getContract(campaign);
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
 
-            for (StratconTrackState track : campaignState.getTracks()) {
-                StratconScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
+            for (StratConTrackState track : campaignState.getTracks()) {
+                StratConScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
                 if (stratconScenario != null) {
                     primaryForceIDs = stratconScenario.getPrimaryForceIDs();
                 }
             }
 
             if (primaryForceIDs.isEmpty()) {
-                LOGGER.warn(String.format("Unable to find primary force for scenario %s (%d)",
-                      scenario.getName(),
-                      scenario.getId()));
+                LOGGER.warn("Unable to find primary force for scenario {} ({})", scenario.getName(), scenario.getId());
             }
         }
 
@@ -4368,7 +4393,7 @@ public class AtBDynamicScenarioFactory {
         List<Integer> entityWalkMPs = new ArrayList<>();
 
         for (Entity entity : entityList) {
-            // AtB has a legacy mekanism where units with jump jets are counted a little
+            // AtB has a legacy mechanism where units with jump jets are counted a little
             // faster
             // for arrival times. We calculate it once and store it.
             int speed = calculateAtBSpeed(entity);
@@ -4495,8 +4520,8 @@ public class AtBDynamicScenarioFactory {
 
             // the actual arrival turn will be the scale divided by the slowest speed.
             // so, a group of Atlases (3/5) should arrive at turn 7 (20 / 3)
-            // a group of jump-capable Griffins (5/8/5) should arrive on turn 3 (20 / 6, rounded down)
-            // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
+            // a group of jump-capable Griffins (5/8/5) should arrive at turn 3 (20 / 6, rounded down)
+            // a group of Ostscouts (8/12/8) should arrive at turn 2 (20 / 9, rounded down)
             // we then subtract the passed-in turn modifier, which is usually the
             // commander's strategy skill level.
             int rollingArrivalTurn = max(0, (arrivalScale / speed) - turnModifier);
@@ -4643,7 +4668,6 @@ public class AtBDynamicScenarioFactory {
     /**
      * Helper function that deploys the given units off board a random distance 1-2 boards in a random direction
      *
-     * @param entityList
      */
     private static void deployArtilleryOffBoard(List<Entity> entityList) {
         OffBoardDirection direction = OffBoardDirection.getDirection(randomInt(4));
@@ -4670,7 +4694,7 @@ public class AtBDynamicScenarioFactory {
             if (entity instanceof IAero) {
                 entity.setAltitude(startingAltitude);
 
-                // there's a lot of stuff that happens whan an aerospace unit
+                // there's a lot of stuff that happens when an aerospace unit
                 // "lands", so let's make sure it all happens
                 if (startingAltitude == 0) {
                     ((IAero) entity).land();
@@ -4686,11 +4710,11 @@ public class AtBDynamicScenarioFactory {
     private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int boardType) {
         for (Entity entity : entityList) {
             boolean inSpace = boardType == AtBScenario.T_SPACE;
-            boolean inAtmo = boardType == AtBScenario.T_ATMOSPHERE;
+            boolean inAtmosphere = boardType == AtBScenario.T_ATMOSPHERE;
 
             // hack for land-air meks
             if (entity instanceof LandAirMek) {
-                if (inSpace || inAtmo) {
+                if (inSpace || inAtmosphere) {
                     entity.setConversionMode(LandAirMek.CONV_MODE_FIGHTER);
                 } else {
                     // for now, the bot does not know how to use WIGEs, so go as a mek
@@ -4747,7 +4771,7 @@ public class AtBDynamicScenarioFactory {
      */
     static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, LocalDate currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer
-        // or opfor. If it's not, third-party.
+        // or op for. If it's not, third-party.
         if (contract.getSystem().getFactions(currentDate).contains(factionCode)) {
             if (factionCode.equals(contract.getEmployerCode())) {
                 return ForceAlignment.Allied;
@@ -4850,7 +4874,7 @@ public class AtBDynamicScenarioFactory {
         } else {
             BotForce botForce = null;
 
-            // slightly inefficient to loop through all bot forces looking for our template
+            // slightly inefficient to loop through all bot forces looking for our template,
             // but it is also difficult to create a reverse lookup, so we avoid that problem
             // for now
             for (int x = 0; x < scenario.getNumBots(); x++) {
@@ -4910,7 +4934,7 @@ public class AtBDynamicScenarioFactory {
      */
     public static void unbenchAttachedAlly(UUID playerUnitID, AtBDynamicScenario scenario) {
         // get entity from temporary store (big battle allies?), if it exists
-        // add it to to bot force being worked with or attached ally list
+        // add it to bot force being worked with or attached ally list
         if (scenario.getPlayerUnitSwaps().containsKey(playerUnitID)) {
             BenchedEntityData benchedEntityData = scenario.getPlayerUnitSwaps().get(playerUnitID);
 

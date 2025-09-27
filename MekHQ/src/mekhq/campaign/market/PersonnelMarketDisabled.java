@@ -39,7 +39,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.module.api.PersonnelMarketMethod;
 
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarketDisabled implements PersonnelMarketMethod {
 
 
@@ -49,12 +49,12 @@ public class PersonnelMarketDisabled implements PersonnelMarketMethod {
     }
 
     @Override
-    public List<Person> generatePersonnelForDay(Campaign c) {
-        return new ArrayList<Person>();
+    public List<Person> generatePersonnelForDay(Campaign campaign) {
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
-        return new ArrayList<Person>();
+    public List<Person> removePersonnelForDay(Campaign campaign, List<Person> current) {
+        return new ArrayList<>();
     }
 }

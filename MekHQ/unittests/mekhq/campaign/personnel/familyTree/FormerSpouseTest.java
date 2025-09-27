@@ -48,23 +48,18 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @ExtendWith(value = MockitoExtension.class)
 public class FormerSpouseTest {
-    @Mock
-    private Campaign mockCampaign;
-
     //region File I/O
     @Test
     public void testWriteToXML() throws IOException {

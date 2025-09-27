@@ -57,16 +57,11 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 
 public class HistoricalDailyReportDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(HistoricalDailyReportDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(HistoricalDailyReportDialog.class);
 
     private final CampaignGUI gui;
-    private JPanel filterPanel;
-    private JLabel pickTimeLabel;
     private JComboBox<Integer> pickTime;
-    private JLabel daysLabel;
     private DailyReportLogPanel logPanel;
-    private JButton closeBtn;
-    private JLabel cacheInfoLabel;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.HistoricalDailyReportDialog",
@@ -94,14 +89,14 @@ public class HistoricalDailyReportDialog extends JDialog {
         getContentPane().setLayout(new GridBagLayout());
 
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
-            pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
+            JLabel pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
             Integer[] days = new Integer[] { 7, 30, 60, 90, MHQConstants.MAX_HISTORICAL_LOG_DAYS };
             pickTime = new JComboBox<>(days);
             logPanel = new DailyReportLogPanel(gui);
-            daysLabel = new JLabel(resourceMap.getString("days.text"));
-            filterPanel = new JPanel();
-            closeBtn = new JButton(resourceMap.getString("closeBtn.text"));
-            cacheInfoLabel = new JLabel(resourceMap.getString("cachedInformationMessage.text"));
+            JLabel daysLabel = new JLabel(resourceMap.getString("days.text"));
+            JPanel filterPanel = new JPanel();
+            JButton closeBtn = new JButton(resourceMap.getString("closeBtn.text"));
+            JLabel cacheInfoLabel = new JLabel(resourceMap.getString("cachedInformationMessage.text"));
 
             updateLogPanel((Integer) pickTime.getSelectedItem());
 
@@ -161,7 +156,7 @@ public class HistoricalDailyReportDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

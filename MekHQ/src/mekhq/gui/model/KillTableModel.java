@@ -69,16 +69,12 @@ public class KillTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_DATE:
-                return "Date";
-            case COL_KILLED:
-                return "Kill";
-            case COL_KILLER:
-                return "With";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_DATE -> "Date";
+            case COL_KILLED -> "Kill";
+            case COL_KILLER -> "With";
+            default -> "?";
+        };
     }
 
     @Override
@@ -89,21 +85,12 @@ public class KillTableModel extends AbstractTableModel {
         } else {
             kill = data.get(row);
         }
-        switch (col) {
-            case COL_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
-            case COL_KILLED:
-                return kill.getWhatKilled();
-            case COL_KILLER:
-                return kill.getKilledByWhat();
-            default:
-                return "?";
-        }
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
+        return switch (col) {
+            case COL_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
+            case COL_KILLED -> kill.getWhatKilled();
+            case COL_KILLER -> kill.getKilledByWhat();
+            default -> "?";
+        };
     }
 
     @Override
@@ -116,12 +103,10 @@ public class KillTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_DATE:
-                return 20;
-            default:
-                return 100;
+        if (c == COL_DATE) {
+            return 20;
         }
+        return 100;
     }
 
     public int getAlignment(int col) {

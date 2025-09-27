@@ -46,7 +46,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -779,50 +779,6 @@ public class AbstractProcreationTest {
         assertNull(mother.getDueDate());
         assertNull(mother.getExpectedDueDate());
         assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
-    }
-
-    @Test
-    public void testBirth() {
-/*
-        doCallRealMethod().when(mockProcreation).birth(any(), any(), any());
-
-        when(mockCampaignOptions.getBabySurnameStyle()).thenReturn(BabySurnameStyle.MOTHERS);
-
-        final Person father = new Person(mockCampaign);
-
-        final Person mother = new Person(mockCampaign);
-        mother.getGenealogy().setSpouse(father);
-
-        final List<Person> activePersonnel = new ArrayList<>();
-        activePersonnel.add(mother);
-        activePersonnel.add(father);
-
-        lenient().when(mockCampaign.getActivePersonnel()).thenReturn(activePersonnel);
-        doAnswer(answer -> {
-            final Person person = new Person(mockCampaign);
-            activePersonnel.add(person);
-            return person;
-        }).when(mockCampaign).newDependent(anyBoolean());
-
-        // Single Baby Tests
-        when(mockCampaignOptions.getPrisonerBabyStatus()).thenReturn(false);
-        when(mockProcreation.determineFather(any(), any())).thenReturn(null);
-        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 1);
-        mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
-        assertEquals(3, activePersonnel.size());
-        assertEquals(activePersonnel.get(2).getGenealogy().getMothers().get(0), mother);
-        assertTrue(activePersonnel.get(2).getGenealogy().getFathers().isEmpty());
-
-        when(mockProcreation.determineFather(any(), any())).thenReturn(father);
-        mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
-        assertEquals(4, activePersonnel.size());
-
-        // Multiple Baby Test
-        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 2);
-        mother.setPrisonerStatusDirect(PrisonerStatus.PRISONER);
-        when(mockCampaignOptions.getPrisonerBabyStatus()).thenReturn(true);
-        mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
-*/
     }
 
     //region Pregnancy Complications

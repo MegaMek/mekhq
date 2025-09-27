@@ -33,7 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static java.lang.Math.min;
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -70,7 +70,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Abstract base class for various Contract Market types in AtB/Stratcon. Responsible for generation and initialization
+ * Abstract base class for various Contract Market types in AtB/StratCon. Responsible for generation and initialization
  * of AtBContracts.
  */
 public abstract class AbstractContractMarket {
@@ -124,8 +124,6 @@ public abstract class AbstractContractMarket {
     /**
      * Generate a new contract and add it to the market.
      *
-     * @param campaign
-     *
      * @return The newly generated contract
      */
     public abstract AtBContract addAtBContract(Campaign campaign);
@@ -133,7 +131,6 @@ public abstract class AbstractContractMarket {
     /**
      * Generate available contract offers for the player's force.
      *
-     * @param campaign
      * @param newCampaign Boolean indicating whether this is a fresh campaign.
      */
     public abstract void generateContractOffers(Campaign campaign, boolean newCampaign);
@@ -149,9 +146,6 @@ public abstract class AbstractContractMarket {
     /**
      * Calculate the total payment modifier for the contract based on the configured market method (e.g., CAM_OPS,
      * ATB_MONTHLY).
-     *
-     * @param campaign
-     * @param contract
      *
      * @return a double representing the total payment multiplier.
      */
@@ -217,14 +211,12 @@ public abstract class AbstractContractMarket {
     /**
      * Returns the number of rerolls used so far for a specific clause.
      *
-     * @param c
      * @param clause ID representing the type of clause.
      *
-     * @return
      */
-    public int getRerollsUsed(Contract c, int clause) {
-        if (null != clauseMods.get(c.getId())) {
-            return clauseMods.get(c.getId()).rerollsUsed[clause];
+    public int getRerollsUsed(Contract contract, int clause) {
+        if (null != clauseMods.get(contract.getId())) {
+            return clauseMods.get(contract.getId()).rerollsUsed[clause];
         }
         return 0;
     }
@@ -239,7 +231,6 @@ public abstract class AbstractContractMarket {
     /**
      * Empties the market and generates a new batch of contract offers for an existing campaign.
      *
-     * @param campaign
      */
     public void generateContractOffers(Campaign campaign) {
         generateContractOffers(campaign, false);
@@ -261,7 +252,7 @@ public abstract class AbstractContractMarket {
      *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
      *   <li>The effective unit forces.</li>
      *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
-     *   <li>Variance adjustments applied through a dice roll, affecting the availability of forces.</li>
+     *   <li>Variance adjustments applied through a die roll, affecting the availability of forces.</li>
      * </ul>
      * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
      * element while not exceeding the maximum deployable combat elements.
@@ -400,7 +391,7 @@ public abstract class AbstractContractMarket {
      * Calculates and sets the command rights clause for a contract based on a roll and modifier.
      *
      * <p>This method determines the appropriate {@link ContractCommandRights} for the given {@link Contract},
-     * using the result of a dice roll (with modifiers). The logic differentiates between mercenary and non-mercenary
+     * using the result of a die roll (with modifiers). The logic differentiates between mercenary and non-mercenary
      * contracts, as these have different thresholds for command rights determination.</p>
      *
      * <ul>
@@ -459,7 +450,7 @@ public abstract class AbstractContractMarket {
      *   </li>
      * </ul>
      *
-     * @param roll The total value of a dice roll (with modifiers) used to determine command rights.
+     * @param roll The total value of a die roll (with modifiers) used to determine command rights.
      *
      * @return The {@link ContractCommandRights} determined based on the roll value.
      */
@@ -828,7 +819,6 @@ public abstract class AbstractContractMarket {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public void writeToXML(final PrintWriter pw, int indent) {
-        return;
     }
 
     public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {

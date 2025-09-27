@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -317,7 +317,7 @@ public class Loan {
      * range of 1 to 7. Ratings below 1 are clamped to 1, and ratings above 7 are clamped to 7. The clamped value is
      * directly returned.</p>
      *
-     * <p>The clamped values coincide with the Experience Level ordinals (Ultra-Green, Green, etc).
+     * <p>The clamped values coincide with the Experience Level ordinals (Ultra-Green, Green, etc.).
      * This means a Veteran-rated campaign (ordinal 4) could take up to a 4-year loan.</p>
      *
      * @param rating the input rating value to be clamped.

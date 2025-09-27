@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,10 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -63,7 +63,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CIVILIANHELP;
+        return CIVILIAN_HELP;
     }
 
     @Override

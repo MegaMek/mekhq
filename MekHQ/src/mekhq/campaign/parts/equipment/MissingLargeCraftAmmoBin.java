@@ -35,8 +35,8 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.AmmoType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
  * @author cwspain
  */
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
-    private static final MMLogger logger = MMLogger.create(MissingLargeCraftAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(MissingLargeCraftAmmoBin.class);
 
     private int bayEqNum;
 
@@ -91,14 +91,13 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
             }
         }
 
-        logger.warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        LOGGER.warn("Could not find weapon bay for {} for {}", typeName, unit.getName());
         return null;
     }
 
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
      *
-     * @param bay
      */
     public void setBay(WeaponMounted bay) {
         if (null != unit) {
@@ -110,7 +109,6 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
      *
-     * @param bayEqNum
      */
     public void setBay(int bayEqNum) {
         this.bayEqNum = bayEqNum;
@@ -160,7 +158,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     public void fix() {
         LargeCraftAmmoBin replacement = getNewPart();
         unit.addPart(replacement);
-        campaign.getQuartermaster().addPart(replacement, 0);
+        campaign.getQuartermaster().addPart(replacement, 0, false);
 
         remove(false);
 
@@ -188,7 +186,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }

@@ -38,14 +38,14 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
-import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Era {
-    private static final MMLogger logger = MMLogger.create(Era.class);
+    private static final MMLogger LOGGER = MMLogger.create(Era.class);
 
     // region Variable Declarations
     private String code;
@@ -119,7 +119,7 @@ public class Era {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
                 return null;
             }
         }

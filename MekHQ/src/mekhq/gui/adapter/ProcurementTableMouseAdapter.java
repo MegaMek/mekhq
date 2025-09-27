@@ -41,10 +41,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
@@ -55,7 +55,7 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.utilities.ReportingUtilities;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
-    private static final MMLogger logger = MMLogger.create(ProcurementTableMouseAdapter.class);
+    private static final MMLogger LOGGER = MMLogger.create(ProcurementTableMouseAdapter.class);
 
     // region Variable Declarations
     private final CampaignGUI gui;
@@ -99,7 +99,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             model.getAcquisition(table.convertRowIndexToModel(row)).ifPresent(acquisitions::add);
         }
 
-        // Lets fill the popup menu
+        // Let's fill the popup menu
         menuItem = new JMenuItem(resources.getString("miClearItems.text"));
         menuItem.setToolTipText(resources.getString("miClearItems.toolTipText"));
         menuItem.setName("miClearItems");
@@ -183,7 +183,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
      */
     private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
         if (acquisition.getQuantity() <= 0) {
-            logger.info("Attempted to acquire item with no quantity remaining, ignoring the attempt.");
+            LOGGER.info("Attempted to acquire item with no quantity remaining, ignoring the attempt.");
             return false;
         }
         final Object equipment = acquisition.getNewEquipment();
@@ -194,7 +194,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         } else if (equipment instanceof Entity) {
             success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
         } else {
-            logger.error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
+            LOGGER.error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
             return false;
         }
 
@@ -244,7 +244,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
      */
     private void addOneItem(final IAcquisitionWork acquisition) {
         if (acquisition.getQuantity() <= 0) {
-            logger.info("Attempted to add item with no quantity remaining, ignoring the attempt.");
+            LOGGER.info("Attempted to add item with no quantity remaining, ignoring the attempt.");
             return;
         }
 
@@ -262,7 +262,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
             gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality);
         } else {
-            logger.error("Attempted to add unknown equipment of {}", acquisition.getAcquisitionName());
+            LOGGER.error("Attempted to add unknown equipment of {}", acquisition.getAcquisitionName());
             return;
         }
 

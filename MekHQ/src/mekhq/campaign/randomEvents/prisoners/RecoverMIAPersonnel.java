@@ -32,17 +32,17 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static megamek.common.Compute.d6;
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createCLImprovedSensors;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createCLImprovedSensors;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.TargetRoll;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -63,7 +63,7 @@ public class RecoverMIAPersonnel {
     final int SAR_CONTAINS_VTOL_OR_WIGE = 1;
     final int SAR_HAS_IMPROVED_SENSORS = 2; // largest only
     final int SAR_HAS_ACTIVE_PROBE = 1; // largest only
-    private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
+    private final TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
     /**
      * Constructs a new instance to handle the SAR search for MIA personnel.
@@ -84,9 +84,9 @@ public class RecoverMIAPersonnel {
         int today = campaign.getLocalDate().getYear();
         boolean isClan = searchingFaction != null && searchingFaction.isClan();
 
-        ITechnology.Faction techFaction = isClan ?
-                                                ITechnology.getFactionFromMMAbbr("CLAN") :
-                                                ITechnology.getFactionFromMMAbbr("IS");
+        megamek.common.enums.Faction techFaction = isClan ?
+                                                         ITechnology.getFactionFromMMAbbr("CLAN") :
+                                                         ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
             if (searchingFaction != null) {

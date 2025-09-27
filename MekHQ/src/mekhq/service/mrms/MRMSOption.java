@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class MRMSOption {
-    private static final MMLogger logger = MMLogger.create(MRMSOption.class);
+    private static final MMLogger LOGGER = MMLogger.create(MRMSOption.class);
 
     // region Variable Declarations
     private PartRepairType type;
@@ -209,12 +209,12 @@ public class MRMSOption {
 
                 if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) ||
                           !partRepairTypes.contains(mrmsOption.getType())) {
-                    logger.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
+                    LOGGER.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);
                 }
             } catch (Exception ex) {
-                logger.error("Failed to parse MRMSOption from XML", ex);
+                LOGGER.error("Failed to parse MRMSOption from XML", ex);
             }
         }
 
@@ -250,7 +250,7 @@ public class MRMSOption {
                     mrmsOption.setDailyTimeMin(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 

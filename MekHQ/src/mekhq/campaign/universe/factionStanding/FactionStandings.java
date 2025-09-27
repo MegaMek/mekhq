@@ -360,7 +360,7 @@ public class FactionStandings {
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.defaultFactionHints(false);
 
         boolean isMercenary = campaignFaction.isMercenaryOrganization();
         boolean isPirate = campaignFaction.isPirate();
@@ -519,7 +519,7 @@ public class FactionStandings {
     }
 
     /**
-     * Retrieves all current faction standings based on climate climate.
+     * Retrieves all current faction standings based on climate.
      *
      * @return a {@link Map} containing all faction codes mapped to their current regard values.
      *
@@ -833,8 +833,35 @@ public class FactionStandings {
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
           final double regardMultiplier) {
+        return updateClimateRegard(campaignFaction, today, regardMultiplier, false);
+    }
+
+    /**
+     * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
+     * specified campaign faction and all other factions for the given date.
+     *
+     * <p>The method iterates over all factions and assigns a regard value based on alliances, wars, rivalry, and
+     * whether the faction is untracked or invalid for the specified year.</p>
+     *
+     * <p>Existing climateRegard entries are removed.</p>
+     *
+     * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
+     * regard standings for all relevant factions.</p>
+     *
+     * @param campaignFaction  the {@link Faction} representing the campaign's primary faction
+     * @param today            the {@link LocalDate} to use for validating factions and determining relationships
+     * @param regardMultiplier the regard multiplier set in campaign options
+     * @param useTestDirectory {@code true} if called from within a Unit Test
+     *
+     * @return an HTML-formatted {@link String} report of faction climate regard changes
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
+          final double regardMultiplier, boolean useTestDirectory) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.defaultFactionHints(useTestDirectory);
         boolean isPirate = campaignFaction.isPirate();
 
         // Clear any existing climate regard entries
@@ -1216,8 +1243,7 @@ public class FactionStandings {
      * Processes the outcome of a contract upon its completion and updates regard standings accordingly.
      *
      * <p>Depending on the mission status (success, partial, failure, or breach), this method determines the
-     * appropriate
-     * regard delta for the employer faction and its allies.</p>
+     * appropriate regard delta for the employer faction and its allies.</p>
      *
      * <p>If the employer faction is missing, a report is generated and returned accordingly. This report informs the
      * player that they need to manually apply the Standing change via the Standing Report GUI.</p>
@@ -1245,16 +1271,7 @@ public class FactionStandings {
             return new ArrayList<>();
         }
 
-        double regardDeltaEmployer = switch (missionStatus) {
-            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
-            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
-            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
-            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
-        };
-
-        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
-        regardDeltaEmployer *= durationMultiplier;
+        double regardDeltaEmployer = getRegardDeltaEmployer(missionStatus, contractDuration);
 
         List<String> regardChangeReports = new ArrayList<>();
 
@@ -1294,6 +1311,20 @@ public class FactionStandings {
         }
 
         return regardChangeReports;
+    }
+
+    private static double getRegardDeltaEmployer(MissionStatus missionStatus, double contractDuration) {
+        double regardDeltaEmployer = switch (missionStatus) {
+            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
+            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
+        };
+
+        double durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        regardDeltaEmployer *= durationMultiplier;
+        return regardDeltaEmployer;
     }
 
     /**
@@ -1434,8 +1465,7 @@ public class FactionStandings {
      * Processes the penalty for refusing a batchall against a specific Clan faction.
      *
      * <p>This method applies a regard penalty to the given clan faction code for the specified year and generates a
-     * regard
-     * change report if applicable.</p>
+     * regard change report if applicable.</p>
      *
      * <p>This method is included as a shortcut to allow developers to call Batchall refusal changes without needing to
      * worry about setting up bespoke methods any time this could occur.</p>
@@ -1468,9 +1498,8 @@ public class FactionStandings {
      * Applies regard changes when the player executes prisoners of war.
      *
      * <p>For each victim in the specified list, the method identifies their origin faction and increments a regard
-     * penalty
-     * for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction, their
-     * penalties are accumulated.</p>
+     * penalty for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction,
+     * their penalties are accumulated.</p>
      *
      * <p>After processing all victims, the method applies the total regard change for each affected faction for the
      * specified game year and collects any resulting regard change reports.</p>

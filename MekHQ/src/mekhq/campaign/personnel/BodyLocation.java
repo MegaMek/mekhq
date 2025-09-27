@@ -77,7 +77,7 @@ public enum BodyLocation {
 
     //region Static Initialization
     // Initialize by-id array lookup table
-    private static BodyLocation[] idMap;
+    private static final BodyLocation[] idMap;
 
     static {
         int maxId = 0;

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,67 +33,67 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.ITechnology.TechBase;
-import megamek.common.TargetRoll;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 
 public interface IAcquisitionWork extends IWork {
-    public String getAcquisitionName();
+    String getAcquisitionName();
 
-    public String getAcquisitionDisplayName();
+    String getAcquisitionDisplayName();
 
-    public Object getNewEquipment();
+    Object getNewEquipment();
 
-    public String getAcquisitionDesc();
+    String getAcquisitionDesc();
 
-    public String getAcquisitionExtraDesc();
+    String getAcquisitionExtraDesc();
 
-    public String getAcquisitionBonus();
+    String getAcquisitionBonus();
 
-    public Part getAcquisitionPart();
+    Part getAcquisitionPart();
 
-    public Unit getUnit();
+    Unit getUnit();
 
-    public int getDaysToWait();
+    int getDaysToWait();
 
-    public void resetDaysToWait();
+    void resetDaysToWait();
 
-    public void decrementDaysToWait();
+    void decrementDaysToWait();
 
-    public String find(int transitDays);
+    String find(int transitDays);
 
-    public String failToFind();
+    String failToFind();
 
-    public TargetRoll getAllAcquisitionMods();
+    TargetRoll getAllAcquisitionMods();
 
-    public TechBase getTechBase();
+    TechBase getTechBase();
 
-    public int getTechLevel();
+    int getTechLevel();
 
-    public int getQuantity();
+    int getQuantity();
 
-    public String getQuantityName(int quantity);
+    String getQuantityName(int quantity);
 
-    public void incrementQuantity();
+    void incrementQuantity();
 
-    public void decrementQuantity();
+    void decrementQuantity();
 
-    public Money getBuyCost();
+    Money getBuyCost();
 
-    public default Money getTotalBuyCost() {
+    default Money getTotalBuyCost() {
         return getBuyCost().multipliedBy(getQuantity());
     }
 
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction);
+    boolean isIntroducedBy(int year, boolean clan, Faction techFaction);
 
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
+    boolean isExtinctIn(int year, boolean clan, Faction techFaction);
 
-    public AvailabilityValue getAvailability();
+    AvailabilityValue getAvailability();
 
-    public String getShoppingListReport(int quantity);
+    String getShoppingListReport(int quantity);
 
 }

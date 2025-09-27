@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,15 +52,15 @@ import mekhq.IconPackage;
  * @author Cord Awtry (kipstafoo)
  */
 public class RepairTaskInfo extends JPanel {
-    private JLabel lblImage;
-    private JLabel lblSecondaryImage;
+    private final JLabel lblImage;
+    private final JLabel lblSecondaryImage;
 
-    public RepairTaskInfo(IconPackage i) {
+    public RepairTaskInfo(IconPackage iconPackage) {
         lblImage = new JLabel();
 
-        GridBagLayout gridbag = new GridBagLayout();
+        GridBagLayout gridBagLayout = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
-        setLayout(gridbag);
+        setLayout(gridBagLayout);
 
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(1, 1, 1, 1);
@@ -71,8 +71,7 @@ public class RepairTaskInfo extends JPanel {
         c.gridwidth = 1;
         c.gridheight = 1;
         c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.BOTH;
-        gridbag.setConstraints(lblImage, c);
+        gridBagLayout.setConstraints(lblImage, c);
         add(lblImage);
 
         lblSecondaryImage = new JLabel();
@@ -87,7 +86,7 @@ public class RepairTaskInfo extends JPanel {
         c.gridwidth = 1;
         c.gridheight = 1;
         c.anchor = GridBagConstraints.EAST;
-        gridbag.setConstraints(lblSecondaryImage, c);
+        gridBagLayout.setConstraints(lblSecondaryImage, c);
         add(lblSecondaryImage);
 
         this.setBorder(BorderFactory.createEmptyBorder());

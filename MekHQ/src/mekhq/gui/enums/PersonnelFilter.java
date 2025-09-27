@@ -81,7 +81,7 @@ public enum PersonnelFilter {
     MECHANIC("PersonnelFilter.MECHANIC.text", "PersonnelFilter.MECHANIC.toolTipText", false, true),
     AERO_TECH("PersonnelFilter.AERO_TECH.text", "PersonnelFilter.AERO_TECH.toolTipText", false, true),
     BA_TECH("PersonnelFilter.BA_TECH.text", "PersonnelFilter.BA_TECH.toolTipText", false, true),
-    ASTECH("PersonnelFilter.ASTECH.text", "PersonnelFilter.ASTECH.toolTipText", false, true),
+    AS_TECH("PersonnelFilter.ASTECH.text", "PersonnelFilter.ASTECH.toolTipText", false, true),
     MEDICAL("PersonnelFilter.MEDICAL.text", "PersonnelFilter.MEDICAL.toolTipText", true, false),
     DOCTOR("PersonnelFilter.DOCTOR.text", "PersonnelFilter.DOCTOR.toolTipText", false, true),
     MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText", false, true),
@@ -95,6 +95,7 @@ public enum PersonnelFilter {
     ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false,
           true),
     DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
+    CAMP_FOLLOWER("PersonnelFilter.CAMP_FOLLOWER.text", "PersonnelFilter.CAMP_FOLLOWER.toolTipText"),
     // endregion Standard Personnel Filters
 
     // region Expanded Personnel Tab Filters
@@ -278,8 +279,8 @@ public enum PersonnelFilter {
         return this == BA_TECH;
     }
 
-    public boolean isAstech() {
-        return this == ASTECH;
+    public boolean isAsTech() {
+        return this == AS_TECH;
     }
 
     public boolean isMedical() {
@@ -316,6 +317,10 @@ public enum PersonnelFilter {
 
     public boolean isDependent() {
         return this == DEPENDENT;
+    }
+
+    public boolean isCampFollower() {
+        return this == CAMP_FOLLOWER;
     }
 
     public boolean isFounder() {
@@ -477,8 +482,8 @@ public enum PersonnelFilter {
             case BA_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                              person.getPrimaryRole().isBATech() :
                                              person.hasRole(PersonnelRole.BA_TECH));
-            case ASTECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                            person.getPrimaryRole().isAstech() : person.hasRole(PersonnelRole.ASTECH));
+            case AS_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+                                             person.getPrimaryRole().isAstech() : person.hasRole(PersonnelRole.ASTECH));
             case MEDICAL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                              person.getPrimaryRole().isMedicalStaff() :
                                              (person.getPrimaryRole().isMedicalStaff() ||
@@ -503,6 +508,7 @@ public enum PersonnelFilter {
                                                       person.getPrimaryRole().isAdministratorHR() :
                                                       person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isCivilian()));
+            case CAMP_FOLLOWER -> ((!dead) && (active && person.getStatus().isCampFollower()));
             case BACKGROUND_CHARACTER -> person.getStatus().isBackground();
             case FOUNDER -> ((!dead) && (person.isFounder()));
             case KIDS -> ((!dead) && (!status.isLeft()) && (person.isChild(currentDate)));

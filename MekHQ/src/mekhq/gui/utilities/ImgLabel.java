@@ -41,7 +41,8 @@ import javax.swing.JLabel;
  * A custom label that paints an image to the label that resizes based on the size of the label while maintaining the
  * aspect ratio of the original image.
  * <p>
- * Code borrowed from: https://stackoverflow.com/questions/10245220/java-image-resize-maintain-aspect-ratio
+ * Code borrowed from:
+ * <a href="https://stackoverflow.com/questions/10245220/java-image-resize-maintain-aspect-ratio">Stack Overflow</a>
  *
  * @author Taharqa
  */

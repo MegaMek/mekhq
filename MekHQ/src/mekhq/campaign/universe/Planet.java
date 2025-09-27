@@ -41,9 +41,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.ITechnology.TechRating;
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -112,7 +112,7 @@ public class Planet {
     // Atmospheric description
     /** Pressure classification - we use the MegaMek enum here directly */
     @JsonProperty("pressure")
-    private SourceableValue<megamek.common.planetaryconditions.Atmosphere> pressure;
+    private SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure;
     @JsonProperty("atmosphere")
     private SourceableValue<Atmosphere> atmosphere;
     @JsonProperty("composition")
@@ -455,11 +455,11 @@ public class Planet {
         return getEventData(when, temperature, e -> e.temperature);
     }
 
-    public megamek.common.planetaryconditions.Atmosphere getPressure(LocalDate when) {
+    public megamek.common.planetaryConditions.Atmosphere getPressure(LocalDate when) {
         return (null == getSourcedPressure(when)) ? null : getSourcedPressure(when).getValue();
     }
 
-    public SourceableValue<megamek.common.planetaryconditions.Atmosphere> getSourcedPressure(LocalDate when) {
+    public SourceableValue<megamek.common.planetaryConditions.Atmosphere> getSourcedPressure(LocalDate when) {
         return getEventData(when, pressure, e -> e.pressure);
     }
 
@@ -779,7 +779,7 @@ public class Planet {
         @JsonProperty("hpg")
         public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
-        private SourceableValue<megamek.common.planetaryconditions.Atmosphere> pressure;
+        private SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure;
         @JsonProperty("hiringHall")
         private SourceableValue<HiringHallLevel> hiringHall;
         @JsonProperty("atmosphere")
@@ -847,7 +847,7 @@ public class Planet {
     }
 
     // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
-    private interface EventGetter<T> {
+    protected interface EventGetter<T> {
         T get(PlanetaryEvent e);
     }
 

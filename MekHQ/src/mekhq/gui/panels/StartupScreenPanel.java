@@ -67,7 +67,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
@@ -76,24 +76,21 @@ import mekhq.gui.dialog.NewPlayerQuickstartDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
-    private static final MMLogger logger = MMLogger.create(StartupScreenPanel.class);
+    private static final MMLogger LOGGER = MMLogger.create(StartupScreenPanel.class);
 
     // region Variable Declarations
-    private MekHQ app;
-    private File lastSaveFile;
-    private File newPlayerQuickstartFile;
+    private final MekHQ app;
+    private final File lastSaveFile;
+    private final File newPlayerQuickstartFile;
     private BufferedImage backgroundIcon;
 
     // Save file filtering needs to avoid loading some special files
-    public static FilenameFilter saveFilter = new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-            // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
-            // files
-            List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
-            return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml")) ||
-                           name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
-        }
+    public static FilenameFilter saveFilter = (dir, name) -> {
+        // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
+        // files
+        List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
+        return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml")) ||
+                       name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
     };
 
     // endregion Variable Declarations
@@ -126,7 +123,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             if (skinSpec.backgrounds.size() > 1) {
                 File file = new MegaMekFile(Configuration.widgetsDir(), skinSpec.backgrounds.get(1)).getFile();
                 if (!file.exists()) {
-                    logger.error("Background icon doesn't exist: " + file.getAbsolutePath());
+                    LOGGER.error("Background icon doesn't exist: {}", file.getAbsolutePath());
                 } else {
                     backgroundIcon = (BufferedImage) ImageUtil.loadImageFromFile(file.toString());
                 }

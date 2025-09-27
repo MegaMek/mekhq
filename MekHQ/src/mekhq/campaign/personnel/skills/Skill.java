@@ -55,9 +55,9 @@ import java.util.List;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.TargetRoll;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -73,8 +73,8 @@ import org.w3c.dom.NodeList;
  * <p>
  * Four important characteristics will determine how each skill works
  * <p>
- * level - this is the level of the skill. By default this will go from 0 to 10, but the max will be customizable. These
- * won't necessarily correspond to named levels (e.g. Green, Elite).
+ * level - this is the level of the skill. By default, this will go from 0 to 10, but the max will be customizable.
+ * These won't necessarily correspond to named levels (e.g. Green, Elite).
  * <p>
  * By assigning skill costs of 0 to some levels, these can basically be skipped and by assigning skill costs of -1, they
  * can be made inaccessible.
@@ -85,7 +85,7 @@ import org.w3c.dom.NodeList;
  * target - this is the baseline target number for the skill when level and bonus are zero.
  * <p>
  * isCountUp - this is a boolean that defines whether this skill's target is a "roll greater than or equal to" (false)
- * or an rpg-style bonus to a roll (true)
+ * or a rpg-style bonus to a roll (true)
  * <p>
  * The actual target number for a skill is given by
  * <p>

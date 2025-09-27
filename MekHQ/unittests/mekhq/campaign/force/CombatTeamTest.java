@@ -47,7 +47,7 @@ public class CombatTeamTest {
     @BeforeAll
     public static void setup() {
         testFactions2 = new Factions2("testresources/data/universe/factions");
-        Factions.setInstance(Factions.loadDefault());
+        Factions.setInstance(Factions.loadDefault(true));
     }
 
     @SuppressWarnings("all") // get() without test; if it fails, test data is not loading; the test should fail

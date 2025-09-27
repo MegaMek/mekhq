@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -51,7 +50,7 @@ import mekhq.module.api.MekHQModule;
  * @author Neoancient
  */
 abstract public class AbstractServiceManager<T extends MekHQModule> {
-    private static final MMLogger logger = MMLogger.create(AbstractServiceManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(AbstractServiceManager.class);
 
     private final ServiceLoader<T> loader;
     private final Map<String, T> services;
@@ -65,14 +64,13 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
 
     private void loadServices() {
         try {
-            for (Iterator<T> iter = loader.iterator(); iter.hasNext(); ) {
-                final T service = iter.next();
-                logger.debug("Found service " + service.getModuleName());
+            for (final T service : loader) {
+                LOGGER.debug("Found service {}", service.getModuleName());
 
                 services.put(service.getModuleName(), service);
             }
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -112,10 +110,10 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
      */
     public Collection<T> getAllServices(boolean sort) {
         if (sort) {
-            return Collections.unmodifiableCollection(services.values()
-                                                            .stream()
-                                                            .sorted(Comparator.comparing(MekHQModule::getModuleName))
-                                                            .collect(Collectors.toList()));
+            return services.values()
+                         .stream()
+                         .sorted(Comparator.comparing(MekHQModule::getModuleName))
+                         .collect(Collectors.toUnmodifiableList());
         }
         return Collections.unmodifiableCollection(services.values());
     }

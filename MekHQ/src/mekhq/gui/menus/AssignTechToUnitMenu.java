@@ -34,11 +34,10 @@ package mekhq.gui.menus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.swing.JMenuItem;
 
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.HangarSorter;
@@ -93,7 +92,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                                                                          (person.getMaintenanceTimeUsing() +
                                                                                 unit.getMaintenanceTime() <=
                                                                                 Person.PRIMARY_ROLE_SUPPORT_TIME)))
-                                       .collect(Collectors.toList());
+                                       .toList();
         for (final Unit unit : units) {
             if (unit.getEntity().getUnitType() != unitType) {
                 // Add the current menus, first the Entity Weight Class menu to the Unit Type menu,

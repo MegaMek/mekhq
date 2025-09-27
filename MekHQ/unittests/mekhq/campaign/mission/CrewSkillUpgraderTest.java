@@ -40,11 +40,12 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import megamek.common.units.*;
 import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -54,14 +55,13 @@ class CrewSkillUpgraderTest {
     @BeforeAll
     static void setUpAll() {
         EquipmentType.initializeTypes();
-        SpecialAbility.initializeSPA();
+        SpecialAbility.initializeSPA(true);
     }
 
-    boolean allSPAsFalse(Crew c) {
-        Enumeration<IOptionGroup> g = c.getOptions().getGroups();
-        Enumeration<IOption> o = c.getOptions(PilotOptions.LVL3_ADVANTAGES);
-        while (o.hasMoreElements()) {
-            IOption spa = o.nextElement();
+    boolean allSPAsFalse(Crew crew) {
+        Enumeration<IOption> iOptionEnumeration = crew.getOptions(PilotOptions.LVL3_ADVANTAGES);
+        while (iOptionEnumeration.hasMoreElements()) {
+            IOption spa = iOptionEnumeration.nextElement();
             if (spa.getValue() instanceof Vector) {
                 if (!((Vector<?>) spa.getValue()).isEmpty()) {
                     return false;
@@ -80,7 +80,7 @@ class CrewSkillUpgraderTest {
         CrewSkillUpgrader csu = new CrewSkillUpgrader(4);
         ArrayList<Entity> entities = new ArrayList<>();
         // Iterate over these to make units
-        ArrayList<Class> eClasses = new ArrayList<>(List.of(
+        ArrayList<Class<?>> eClasses = new ArrayList<>(List.of(
               BipedMek.class,
               VTOL.class,
               Tank.class,
@@ -104,7 +104,7 @@ class CrewSkillUpgraderTest {
         for (int i = 0; i < 1000; i++) {
             Entity e = (Entity) eClasses.get(i % eClasses.size()).getDeclaredConstructor().newInstance();
             CrewType t = crewTypes.get(i % crewTypes.size());
-            Crew c = new Crew(t, "Pilot #" + String.valueOf(i), t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2 == 0,
+            Crew c = new Crew(t, "Pilot #" + i, t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2 == 0,
                   null);
             assertTrue(allSPAsFalse(c));
             e.setCrew(c);

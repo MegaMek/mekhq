@@ -76,20 +76,14 @@ public class ObjectiveTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_CRITERION:
-                return "Type";
-            case COL_AMOUNT:
-                return "Amount";
-            case COL_TIME:
-                return "Time limits";
-            case COL_SUCCESS_EFFECT:
-                return "On Success";
-            case COL_FAILURE_EFFECT:
-                return "On Failure";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_CRITERION -> "Type";
+            case COL_AMOUNT -> "Amount";
+            case COL_TIME -> "Time limits";
+            case COL_SUCCESS_EFFECT -> "On Success";
+            case COL_FAILURE_EFFECT -> "On Failure";
+            default -> "?";
+        };
     }
 
     public void addObjective(ScenarioObjective objective) {
@@ -135,17 +129,11 @@ public class ObjectiveTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            default:
-                return 20;
-        }
+        return 20;
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            default:
-                return SwingConstants.LEFT;
-        }
+        return SwingConstants.LEFT;
     }
 
     public String getTooltip(int row, int col) {

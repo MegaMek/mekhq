@@ -48,8 +48,8 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
@@ -461,7 +461,7 @@ public abstract class AbstractProcreation {
             // Recruit the baby but do not employ the baby. Babies can't have jobs. They don't have object permanence.
             campaign.recruitPerson(baby, prisonerStatus, true, true, false);
 
-            // if the mother is at school, add the baby to the list of tag alongs
+            // if the mother is at school, add the baby to the list of tag along
             if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);

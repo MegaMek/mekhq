@@ -56,7 +56,7 @@ public class AutomatedPersonnelCleanUp {
     private final boolean isUseRemovalExemptRetirees;
     private final boolean isUseRemovalExemptCemetery;
     private final Collection<Person> personnelToProcess;
-    private List<Person> personnelToCleanUp = new ArrayList<>();
+    private final List<Person> personnelToCleanUp = new ArrayList<>();
 
     /**
      * Constructs an automated personnel cleanup process.

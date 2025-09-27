@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,9 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.*;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -363,11 +365,11 @@ public class HangarReport extends AbstractReport {
         int countConv = 0;
 
         //region ProtoMeks
-        int countProtos = 0;
-        int countAssaultProtos = 0;
-        int countHeavyProtos = 0;
-        int countMediumProtos = 0;
-        int countLightProtos = 0;
+        int countProtoMeks = 0;
+        int countAssaultProtoMeks = 0;
+        int countHeavyProtoMeks = 0;
+        int countMediumProtoMeks = 0;
+        int countLightProtoMeks = 0;
         //endregion ProtoMeks
 
         // Turrets
@@ -416,20 +418,20 @@ public class HangarReport extends AbstractReport {
         DefaultMutableTreeNode ultralightMeks = new DefaultMutableTreeNode();
         battleMeks.add(ultralightMeks);
 
-        DefaultMutableTreeNode omnis = new DefaultMutableTreeNode();
-        meks.add(omnis);
+        DefaultMutableTreeNode omniMeks = new DefaultMutableTreeNode();
+        meks.add(omniMeks);
         DefaultMutableTreeNode superHeavyOmniMeks = new DefaultMutableTreeNode();
-        omnis.add(superHeavyOmniMeks);
+        omniMeks.add(superHeavyOmniMeks);
         DefaultMutableTreeNode assaultOmniMeks = new DefaultMutableTreeNode();
-        omnis.add(assaultOmniMeks);
+        omniMeks.add(assaultOmniMeks);
         DefaultMutableTreeNode heavyOmniMeks = new DefaultMutableTreeNode();
-        omnis.add(heavyOmniMeks);
+        omniMeks.add(heavyOmniMeks);
         DefaultMutableTreeNode mediumOmniMeks = new DefaultMutableTreeNode();
-        omnis.add(mediumOmniMeks);
+        omniMeks.add(mediumOmniMeks);
         DefaultMutableTreeNode lightOmniMeks = new DefaultMutableTreeNode();
-        omnis.add(lightOmniMeks);
+        omniMeks.add(lightOmniMeks);
         DefaultMutableTreeNode ultralightOmniMeks = new DefaultMutableTreeNode();
-        omnis.add(ultralightOmniMeks);
+        omniMeks.add(ultralightOmniMeks);
 
         DefaultMutableTreeNode industrialMeks = new DefaultMutableTreeNode();
         meks.add(industrialMeks);
@@ -949,17 +951,17 @@ public class HangarReport extends AbstractReport {
         top.add(conv);
 
         // ProtoMeks
-        final DefaultMutableTreeNode protos = new DefaultMutableTreeNode();
+        final DefaultMutableTreeNode protoMeks = new DefaultMutableTreeNode();
         DefaultMutableTreeNode pAssault = new DefaultMutableTreeNode();
-        protos.add(pAssault);
+        protoMeks.add(pAssault);
         DefaultMutableTreeNode pHeavy = new DefaultMutableTreeNode();
-        protos.add(pHeavy);
+        protoMeks.add(pHeavy);
         DefaultMutableTreeNode pMedium = new DefaultMutableTreeNode();
-        protos.add(pMedium);
+        protoMeks.add(pMedium);
         DefaultMutableTreeNode pLight = new DefaultMutableTreeNode();
-        protos.add(pLight);
+        protoMeks.add(pLight);
 
-        top.add(protos);
+        top.add(protoMeks);
 
         // Turrets
         final DefaultMutableTreeNode ge = new DefaultMutableTreeNode();
@@ -969,27 +971,27 @@ public class HangarReport extends AbstractReport {
         // Space
         final DefaultMutableTreeNode space = new DefaultMutableTreeNode();
 
-        DefaultMutableTreeNode sc = new DefaultMutableTreeNode();
-        space.add(sc);
+        DefaultMutableTreeNode smallCraft = new DefaultMutableTreeNode();
+        space.add(smallCraft);
 
-        DefaultMutableTreeNode ds = new DefaultMutableTreeNode();
-        space.add(ds);
-        DefaultMutableTreeNode lgds = new DefaultMutableTreeNode();
-        ds.add(lgds);
-        DefaultMutableTreeNode mdds = new DefaultMutableTreeNode();
-        ds.add(mdds);
-        DefaultMutableTreeNode smds = new DefaultMutableTreeNode();
-        ds.add(smds);
+        DefaultMutableTreeNode dropShip = new DefaultMutableTreeNode();
+        space.add(dropShip);
+        DefaultMutableTreeNode largeDropShips = new DefaultMutableTreeNode();
+        dropShip.add(largeDropShips);
+        DefaultMutableTreeNode mediumDropShips = new DefaultMutableTreeNode();
+        dropShip.add(mediumDropShips);
+        DefaultMutableTreeNode smallDropShips = new DefaultMutableTreeNode();
+        dropShip.add(smallDropShips);
 
-        DefaultMutableTreeNode js = new DefaultMutableTreeNode();
-        space.add(js);
+        DefaultMutableTreeNode jumpShips = new DefaultMutableTreeNode();
+        space.add(jumpShips);
 
-        DefaultMutableTreeNode ws = new DefaultMutableTreeNode();
-        space.add(ws);
-        DefaultMutableTreeNode lgws = new DefaultMutableTreeNode();
-        ws.add(lgws);
-        DefaultMutableTreeNode smws = new DefaultMutableTreeNode();
-        ws.add(smws);
+        DefaultMutableTreeNode warShips = new DefaultMutableTreeNode();
+        space.add(warShips);
+        DefaultMutableTreeNode largeWarShips = new DefaultMutableTreeNode();
+        warShips.add(largeWarShips);
+        DefaultMutableTreeNode smallWarShips = new DefaultMutableTreeNode();
+        warShips.add(smallWarShips);
 
         top.add(space);
 
@@ -1533,38 +1535,38 @@ public class HangarReport extends AbstractReport {
                 switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_WAR:
                         countLargeWS++;
-                        lgws.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        largeWarShips.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_SMALL_WAR:
                         countSmallWS++;
-                        smws.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        smallWarShips.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
             } else if (e instanceof Jumpship) {
                 countSpace++;
                 countJumpShips++;
-                js.add(new DefaultMutableTreeNode(createNodeName(u)));
+                jumpShips.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Dropship) {
                 countSpace++;
                 countDropships++;
                 switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_DROP:
                         countLargeDS++;
-                        lgds.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        largeDropShips.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_MEDIUM_DROP:
                         countMediumDS++;
-                        mdds.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        mediumDropShips.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_SMALL_DROP:
                         countSmallDS++;
-                        smds.add(new DefaultMutableTreeNode(createNodeName(u)));
+                        smallDropShips.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
             } else if (e instanceof SmallCraft) {
                 countSpace++;
                 countSmallCraft++;
-                sc.add(new DefaultMutableTreeNode(createNodeName(u)));
+                smallCraft.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Aero) {
                 countASF++;
                 if (e.isOmni()) {
@@ -1601,22 +1603,22 @@ public class HangarReport extends AbstractReport {
                     }
                 }
             } else if (e instanceof ProtoMek) {
-                countProtos++;
+                countProtoMeks++;
                 switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_ASSAULT:
-                        countAssaultProtos++;
+                        countAssaultProtoMeks++;
                         pAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_HEAVY:
-                        countHeavyProtos++;
+                        countHeavyProtoMeks++;
                         pHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_MEDIUM:
-                        countMediumProtos++;
+                        countMediumProtoMeks++;
                         pMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_LIGHT:
-                        countLightProtos++;
+                        countLightProtoMeks++;
                         pLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
@@ -2023,7 +2025,7 @@ public class HangarReport extends AbstractReport {
         lightMeks.setUserObject(resources.getString("HangarReport.Light") + " " + lightMek);
         ultralightMeks.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightMek);
 
-        omnis.setUserObject(resources.getString("HangarReport.OmniMeks") + " " + countOmniMeks);
+        omniMeks.setUserObject(resources.getString("HangarReport.OmniMeks") + " " + countOmniMeks);
         superHeavyOmniMeks.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyOmniMek);
         assaultOmniMeks.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultOmniMek);
         heavyOmniMeks.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyOmniMek);
@@ -2407,11 +2409,11 @@ public class HangarReport extends AbstractReport {
         conv.setUserObject(resources.getString("HangarReport.ConventionalFighters") + " " + countConv);
 
         // ProtoMeks
-        protos.setUserObject(resources.getString("HangarReport.ProtoMeks") + " " + countProtos);
-        pAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countAssaultProtos);
-        pHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countHeavyProtos);
-        pMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumProtos);
-        pLight.setUserObject(resources.getString("HangarReport.Light") + " " + countLightProtos);
+        protoMeks.setUserObject(resources.getString("HangarReport.ProtoMeks") + " " + countProtoMeks);
+        pAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countAssaultProtoMeks);
+        pHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countHeavyProtoMeks);
+        pMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumProtoMeks);
+        pLight.setUserObject(resources.getString("HangarReport.Light") + " " + countLightProtoMeks);
 
         // Turrets
         ge.setUserObject(resources.getString("HangarReport.GunEmplacements") + " " + countGE);
@@ -2419,18 +2421,18 @@ public class HangarReport extends AbstractReport {
         // Space
         space.setUserObject(resources.getString("HangarReport.Spacecraft") + " " + countSpace);
 
-        sc.setUserObject(resources.getString("HangarReport.SmallCraft") + " " + countSmallCraft);
+        smallCraft.setUserObject(resources.getString("HangarReport.SmallCraft") + " " + countSmallCraft);
 
-        ds.setUserObject(resources.getString("HangarReport.DropShips") + " " + countDropships);
-        lgds.setUserObject(resources.getString("HangarReport.Large") + " " + countLargeDS);
-        mdds.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumDS);
-        smds.setUserObject(resources.getString("HangarReport.Small") + " " + countSmallDS);
+        dropShip.setUserObject(resources.getString("HangarReport.DropShips") + " " + countDropships);
+        largeDropShips.setUserObject(resources.getString("HangarReport.Large") + " " + countLargeDS);
+        mediumDropShips.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumDS);
+        smallDropShips.setUserObject(resources.getString("HangarReport.Small") + " " + countSmallDS);
 
-        js.setUserObject(resources.getString("HangarReport.JumpShips") + " " + countJumpShips);
+        jumpShips.setUserObject(resources.getString("HangarReport.JumpShips") + " " + countJumpShips);
 
-        ws.setUserObject(resources.getString("HangarReport.WarShips") + " " + countWarShips);
-        lgws.setUserObject(resources.getString("HangarReport.Large") + " " + countLargeWS);
-        smws.setUserObject(resources.getString("HangarReport.Small") + " " + countSmallWS);
+        warShips.setUserObject(resources.getString("HangarReport.WarShips") + " " + countWarShips);
+        largeWarShips.setUserObject(resources.getString("HangarReport.Large") + " " + countLargeWS);
+        smallWarShips.setUserObject(resources.getString("HangarReport.Small") + " " + countSmallWS);
 
         //Space Stations
         spaceStation.setUserObject(resources.getString("HangarReport.SpaceStations") + " " + countSpaceStations);

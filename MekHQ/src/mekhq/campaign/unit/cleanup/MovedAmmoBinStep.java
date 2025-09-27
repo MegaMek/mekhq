@@ -34,8 +34,8 @@ package mekhq.campaign.unit.cleanup;
 
 import java.util.Map.Entry;
 
-import megamek.common.AmmoType;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 
@@ -48,7 +48,7 @@ public class MovedAmmoBinStep extends UnscrambleStep {
     }
 
     public void visit(final EquipmentProposal proposal, final AmmoBin ammoBin) {
-        for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
+        for (final Entry<Integer, Mounted<?>> equipment : proposal.getEquipment()) {
             final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed() || !(m.getType() instanceof AmmoType)) {
                 continue;

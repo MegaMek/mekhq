@@ -277,7 +277,7 @@ public class Award implements Comparable<Award> {
      */
     public boolean canBeAwarded(Person person) {
         // If we wish to force the user to not be able to give awards for some reason (e.g. lack of kill count),
-        // we need to create classes for each awards and override this method.
+        // we need to create classes for each award and override this method.
         return (!person.getAwardController().hasAward(this) || stackable);
     }
 

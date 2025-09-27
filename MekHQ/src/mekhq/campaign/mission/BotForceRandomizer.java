@@ -46,16 +46,16 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -72,7 +72,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * A class that can be used to generate a random force with some parameters. Provides a simpler approach to opfor
+ * A class that can be used to generate a random force with some parameters. Provides a simpler approach to op for
  * generation than AtBDynamicScenarioFactory. Intended for use by StoryArc but written generally enough to be
  * repurposed.
  * <p>
@@ -81,7 +81,7 @@ import org.w3c.dom.NodeList;
  * the BotForce through the GameThread when a game is started.
  */
 public class BotForceRandomizer {
-    private static final MMLogger logger = MMLogger.create(BotForceRandomizer.class);
+    private static final MMLogger LOGGER = MMLogger.create(BotForceRandomizer.class);
 
     // region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
@@ -287,7 +287,7 @@ public class BotForceRandomizer {
         ArrayList<Entity> entityList = new ArrayList<>();
 
         double targetPoints = calculateMaxPoints(playerUnits);
-        double currentPoints = calculateStartingPoints(botFixedEntities);
+        double currentPoints;
         // don't use actual focalWeightClass because we don't want to save changes
         double targetWeightClass = focalWeightClass;
         if ((targetWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
@@ -322,7 +322,7 @@ public class BotForceRandomizer {
                 // original error
                 // bars will max out error bars at roughly 25%.
                 loosenError = loosenError + 0.5;
-                logger.info(
+                LOGGER.info(
                       "Could not find randomized forces within specified parameters. Increasing target bounds by 50%");
             }
             highBounds = targetPoints * (1 + error * loosenError);
@@ -340,7 +340,7 @@ public class BotForceRandomizer {
                 if ((unitType == UnitType.MEK) && (percentConventional > 0)
                           && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.TANK;
-                } else if ((unitType == UnitType.AEROSPACEFIGHTER) && (percentConventional > 0)
+                } else if ((unitType == UnitType.AEROSPACE_FIGHTER) && (percentConventional > 0)
                                  && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.CONV_FIGHTER;
                 }
@@ -353,7 +353,7 @@ public class BotForceRandomizer {
             if ((currentPoints <= highBounds) || (nAttempts >= 99)) {
                 if (nAttempts >= 99) {
                     entityList = new ArrayList<>();
-                    logger.info("Could not find randomized forces after 99 attempts. No forces generated.");
+                    LOGGER.info("Could not find randomized forces after 99 attempts. No forces generated.");
                 }
                 startOver = false;
             }
@@ -361,23 +361,6 @@ public class BotForceRandomizer {
 
         return entityList;
     }
-
-    /**
-     * This is the primary function that generates a force of entities from the
-     * given parameters. The
-     * intent is that this function is called from GameThread when the game is
-     * started.
-     *
-     * @param playerUnits      A List of Units for the player's deployed force in
-     *                         the relevant scenario. This
-     *                         is used to determine the total points allowed for
-     *                         this force.
-     * @param botFixedEntities A List of The fixed Entities that might have also
-     *                         been declared in BotForce already.
-     *                         This is used to calculate the starting points already
-     *                         used when generating the force.
-     * @return A List of Entities that will be added to the game by GameThread.
-     */
 
     /**
      * Generate a "lance" of entities based on the lanceSize variable. This is not really a lance but the size of the
@@ -467,7 +450,7 @@ public class BotForceRandomizer {
         try {
             en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            logger.error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
+            LOGGER.error("Unable to load entity: {}: {}", ms.getSourceFile(), ms.getEntryName(), ex);
             return null;
         }
         Faction faction = Factions.getInstance().getFaction(factionCode);
@@ -519,7 +502,7 @@ public class BotForceRandomizer {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -538,10 +521,10 @@ public class BotForceRandomizer {
             }
 
             if (!phenotype.isNone()) {
-                String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
+                String bloodName = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                       campaign.getGameYear()).getName();
-                crewName += ' ' + bloodname;
-                innerMap.put(Crew.MAP_BLOODNAME, bloodname);
+                crewName += ' ' + bloodName;
+                innerMap.put(Crew.MAP_BLOOD_NAME, bloodName);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
         }
@@ -635,40 +618,22 @@ public class BotForceRandomizer {
     private static double getAdjustedWeightPoints(Entity e) {
         double points = e.getWeight();
 
-        double multiplier;
-        switch (e.getUnitType()) {
-            case UnitType.MEK:
-            case UnitType.AEROSPACEFIGHTER:
-            case UnitType.PROTOMEK:
-                multiplier = 1.0;
-                break;
-            case UnitType.TANK:
-            case UnitType.VTOL:
-            case UnitType.NAVAL:
-                multiplier = 0.6;
-                break;
-            case UnitType.CONV_FIGHTER:
-                multiplier = 0.4;
-                break;
-            case UnitType.BATTLE_ARMOR:
+        double multiplier = switch (e.getUnitType()) {
+            case UnitType.MEK, UnitType.AEROSPACE_FIGHTER, UnitType.PROTOMEK -> 1.0;
+            case UnitType.TANK, UnitType.VTOL, UnitType.NAVAL -> 0.6;
+            case UnitType.CONV_FIGHTER -> 0.4;
+            case UnitType.BATTLE_ARMOR -> {
                 points = 10;
-                multiplier = 1;
-                break;
-            case UnitType.INFANTRY:
+                yield 1;
+            }
+            case UnitType.INFANTRY -> {
                 points = 0.5;
-                multiplier = 1;
-                break;
-            case UnitType.GUN_EMPLACEMENT:
-                multiplier = 0.2;
-                break;
-            case UnitType.DROPSHIP:
-            case UnitType.JUMPSHIP:
-            case UnitType.WARSHIP:
-                multiplier = 0.1;
-                break;
-            default:
-                multiplier = 0;
-        }
+                yield 1;
+            }
+            case UnitType.GUN_EMPLACEMENT -> 0.2;
+            case UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP -> 0.1;
+            default -> 0;
+        };
 
         return points * multiplier;
 
@@ -697,8 +662,7 @@ public class BotForceRandomizer {
     }
 
     public String getShortDescription() {
-        String sb = forceMultiplier + " (" + balancingMethod.toString() + ')';
-        return sb;
+        return forceMultiplier + " (" + balancingMethod.toString() + ')';
     }
 
     /**
@@ -742,7 +706,7 @@ public class BotForceRandomizer {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForceRandomizer");
     }
 
-    public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
         BotForceRandomizer retVal = new BotForceRandomizer();
 
         try {
@@ -775,7 +739,7 @@ public class BotForceRandomizer {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

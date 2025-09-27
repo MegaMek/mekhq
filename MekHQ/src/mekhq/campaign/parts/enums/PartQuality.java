@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.ITechnology.TechRating;
+import megamek.common.enums.TechRating;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -70,7 +70,7 @@ public enum PartQuality {
         }
     }
 
-    private PartQuality(int index, String name, String reversedName, int repairModifier, TechRating techRating) {
+    PartQuality(int index, String name, String reversedName, int repairModifier, TechRating techRating) {
         this.index = index;
         this.name = name;
         this.reversedName = reversedName;
@@ -116,7 +116,6 @@ public enum PartQuality {
      *
      * @return corresponding PartQuality
      *
-     * @throws IllegalArgumentException
      */
     public static PartQuality fromNumeric(int rawQuality) {
         try {
@@ -141,7 +140,6 @@ public enum PartQuality {
      *
      * @return corresponding PartQuality
      *
-     * @throws IllegalArgumentException
      */
     public static PartQuality fromName(String code, boolean reversed) {
         try {

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Carl Spain. All rights reserved.
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,10 +50,10 @@ import javax.swing.JRadioButton;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
@@ -65,7 +65,7 @@ import mekhq.gui.CampaignGUI;
  * @author Neoancient
  */
 public class ShipSearchDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(ShipSearchDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(ShipSearchDialog.class);
 
     private final JRadioButton btnDropship = new JRadioButton();
     private final JRadioButton btnJumpship = new JRadioButton();
@@ -258,7 +258,7 @@ public class ShipSearchDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

@@ -50,7 +50,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.FlatLafStyleBuilder;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.EnhancedTabbedPane;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;

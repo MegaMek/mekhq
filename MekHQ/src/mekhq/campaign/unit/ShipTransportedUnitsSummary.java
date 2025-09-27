@@ -38,8 +38,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
-import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Transporter;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -55,7 +55,7 @@ import mekhq.campaign.utilities.CampaignTransportUtilities;
  *
  */
 public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
-    private static final MMLogger logger = MMLogger.create(ShipTransportedUnitsSummary.class);
+    private static final MMLogger LOGGER = MMLogger.create(ShipTransportedUnitsSummary.class);
 
     /**
      * Initialize the transport details for a transport ship
@@ -140,13 +140,12 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
             if ((transportedUnit.getEntity().getBayById(bayNumber) != null &&
                        TransporterType.getTransporterType(transportedUnit.getEntity().getBayById(bayNumber)) !=
                              transporterType)) {
-                logger.warn(String.format(
-                      "Unit was assigned a bay number for a different transport type than the unit is assigned! " +
-                            "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
+                LOGGER.warn(
+                      "Unit was assigned a bay number for a different transport type than the unit is assigned! Transport: {} Unit: {} Assigned Transporter: {} Assigned Bay ID: {}",
                       transport.getName(),
                       transportedUnit.getName(),
                       transporterType,
-                      bayNumber));
+                      bayNumber);
             }
         }
 
@@ -193,8 +192,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
     /**
      * Fixes references after loading
      *
-     * @param campaign
-     * @param unit
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
@@ -205,9 +202,10 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
                 if (realUnit != null) {
                     newTransportedUnits.add(realUnit);
                 } else {
-                    logger.error(
-                          String.format("Unit %s ('%s') references missing transported unit %s",
-                                unit.getId(), unit.getName(), transportedUnit.getId()));
+                    LOGGER.error("Unit {} ('{}') references missing transported unit {}",
+                          unit.getId(),
+                          unit.getName(),
+                          transportedUnit.getId());
                 }
             } else {
                 newTransportedUnits.add(transportedUnit);

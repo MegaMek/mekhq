@@ -53,17 +53,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.Mounted;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
@@ -242,7 +242,7 @@ public class MissingLargeCraftAmmoBinTest {
         when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
         missingAmmoBin.setUnit(unit);
         missingAmmoBin.setBay(bayNum);
-        quartermaster.addPart(missingAmmoBin, 0);
+        quartermaster.addPart(missingAmmoBin, 0, false);
 
         // Attempt to fix the missing ammo bin
         missingAmmoBin.fix();

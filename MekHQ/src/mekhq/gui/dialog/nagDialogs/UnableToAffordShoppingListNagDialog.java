@@ -103,9 +103,8 @@ public class UnableToAffordShoppingListNagDialog extends ImmersiveDialogNag {
      *       {@code false} otherwise.
      */
     public static boolean checkNag(Money totalBuyCost, Money currentFunds) {
-        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_SHOPPING_LIST;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_SHOPPING_LIST) &&
                      unableToAffordShoppingList(totalBuyCost, currentFunds);
     }
 

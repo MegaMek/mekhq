@@ -35,8 +35,8 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -55,9 +55,9 @@ public class MissingMASC extends MissingEquipmentPart {
         this(0, null, -1, null, 0, 0, false);
     }
 
-    public MissingMASC(int tonnage, EquipmentType et, int equipNum, Campaign c, double etonnage,
+    public MissingMASC(int tonnage, EquipmentType equipmentType, int equipNum, Campaign campaign, double eTonnage,
           int rating, boolean omniPodded) {
-        super(tonnage, et, equipNum, c, etonnage, 1.0, omniPodded);
+        super(tonnage, equipmentType, equipNum, campaign, eTonnage, 1.0, omniPodded);
         this.engineRating = rating;
     }
 
@@ -113,11 +113,10 @@ public class MissingMASC extends MissingEquipmentPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if (part instanceof MASC) {
-            EquipmentPart eqpart = (EquipmentPart) part;
-            EquipmentType et = eqpart.getType();
-            return type.equals(et) && getTonnage() == part.getTonnage()
-                         && ((MASC) part).getEngineRating() == engineRating;
+        if (part instanceof MASC mascPart) {
+            EquipmentType equipmentType = mascPart.getType();
+            return type.equals(equipmentType) && getTonnage() == part.getTonnage()
+                         && mascPart.getEngineRating() == engineRating;
         }
         return false;
     }
@@ -133,9 +132,9 @@ public class MissingMASC extends MissingEquipmentPart {
 
     @Override
     public MASC getNewPart() {
-        MASC epart = new MASC(getUnitTonnage(), type, -1, campaign, engineRating, omniPodded);
-        epart.setEquipTonnage(equipTonnage);
-        return epart;
+        MASC ePart = new MASC(getUnitTonnage(), type, -1, campaign, engineRating, omniPodded);
+        ePart.setEquipTonnage(equipTonnage);
+        return ePart;
     }
 
     @Override

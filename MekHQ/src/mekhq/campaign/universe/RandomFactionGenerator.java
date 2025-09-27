@@ -47,8 +47,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -60,11 +60,11 @@ import mekhq.campaign.Campaign;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                   TODO : Account for the de facto alliance of the invading Clans and the
- *                   TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                         TODO : Account for the de facto alliance of the invading Clans and the
+ *                         TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
-    private static final MMLogger logger = MMLogger.create(RandomFactionGenerator.class);
+    private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
 
     private static RandomFactionGenerator rfg = null;
 
@@ -233,7 +233,7 @@ public class RandomFactionGenerator {
     public String getEnemy(String employer, boolean useRebels) {
         Faction employerFaction = Factions.getInstance().getFaction(employer);
         if (null == employerFaction) {
-            logger.error("Could not find enemy for employer: {}", employer);
+            LOGGER.error("Could not find enemy for employer: {}", employer);
             return "PIR";
         } else {
             return getEnemy(employerFaction, useRebels);
@@ -287,7 +287,7 @@ public class RandomFactionGenerator {
             return enemy.getShortName();
         }
 
-        logger.error("Could not find enemy for employerName {}", employerName);
+        LOGGER.error("Could not find enemy for employerName {}", employerName);
 
         // Fallback; there are always pirates.
         return "PIR";
@@ -399,7 +399,7 @@ public class RandomFactionGenerator {
     public List<String> getEnemyList(String employerName) {
         Faction employer = Factions.getInstance().getFaction(employerName);
         if (null == employer) {
-            logger.warn("Unknown faction key: {}", employerName);
+            LOGGER.warn("Unknown faction key: {}", employerName);
             return Collections.emptyList();
         }
         return getEnemyList(Factions.getInstance().getFaction(employerName));
@@ -507,11 +507,11 @@ public class RandomFactionGenerator {
         Faction f1 = Factions.getInstance().getFaction(attacker);
         Faction f2 = Factions.getInstance().getFaction(defender);
         if (null == f1) {
-            logger.error("Non-existent faction key: {}", attacker);
+            LOGGER.error("Non-existent faction key: {}", attacker);
             return null;
         }
         if (null == f2) {
-            logger.error("Non-existent faction key: {}", attacker);
+            LOGGER.error("Non-existent faction key: {}", attacker);
             return null;
         }
         List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
@@ -533,10 +533,10 @@ public class RandomFactionGenerator {
         Faction attacker = Factions.getInstance().getFaction(attackerKey);
         Faction defender = Factions.getInstance().getFaction(defenderKey);
         if (null == attacker) {
-            logger.error("Non-existent faction key (attacker): {}", attackerKey);
+            LOGGER.error("Non-existent faction key (attacker): {}", attackerKey);
         }
         if (null == defender) {
-            logger.error("Non-existent faction key (defender): {}", defenderKey);
+            LOGGER.error("Non-existent faction key (defender): {}", defenderKey);
         }
         if ((null != attacker) && (null != defender)) {
             return getMissionTargetList(attacker, defender);

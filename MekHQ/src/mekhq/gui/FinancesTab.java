@@ -62,7 +62,16 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.event.Subscribe;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.GMModeEvent;
+import mekhq.campaign.events.assets.AssetEvent;
+import mekhq.campaign.events.loans.LoanEvent;
+import mekhq.campaign.events.missions.MissionChangedEvent;
+import mekhq.campaign.events.missions.MissionNewEvent;
+import mekhq.campaign.events.parts.PartEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
+import mekhq.campaign.events.transactions.TransactionEvent;
+import mekhq.campaign.events.units.UnitEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
@@ -100,8 +109,6 @@ import org.jfree.data.xy.XYDataset;
  * Shows record of financial transactions.
  */
 public final class FinancesTab extends CampaignGuiTab {
-    private JTable financeTable;
-    private JTable loanTable;
     private JTextArea areaNetWorth;
     private RoundedJButton btnAddFunds;
     private RoundedJButton btnManageAssets;
@@ -136,7 +143,7 @@ public final class FinancesTab extends CampaignGuiTab {
         ChartPanel financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
 
         financeModel = new FinanceTableModel();
-        financeTable = new JTable(financeModel);
+        JTable financeTable = new JTable(financeModel);
         // make column headers in the table clickable and sortable
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(financeTable.getModel());
         sorter.setComparator(FinanceTableModel.COL_DEBIT, new FormattedNumberSorter());
@@ -156,7 +163,7 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTable.setShowGrid(false);
 
         loanModel = new LoanTableModel();
-        loanTable = new JTable(loanModel);
+        JTable loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         LoanTableMouseAdapter.connect(getCampaignGui(), loanTable, loanModel);
         loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -211,21 +218,21 @@ public final class FinancesTab extends CampaignGuiTab {
 
         JPanel panelFinanceRight = new JPanel(new BorderLayout());
 
-        JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
+        JPanel pnlFinanceButtons = new JPanel(new GridLayout(2, 2));
         btnAddFunds = new RoundedJButton("Add Transaction (GM)");
         btnAddFunds.addActionListener(ev -> addFundsActionPerformed());
         btnAddFunds.setEnabled(getCampaign().isGM());
-        pnlFinanceBtns.add(btnAddFunds);
+        pnlFinanceButtons.add(btnAddFunds);
         RoundedJButton btnGetLoan = new RoundedJButton("Get Loan");
         btnGetLoan.addActionListener(e -> showNewLoanDialog());
-        pnlFinanceBtns.add(btnGetLoan);
+        pnlFinanceButtons.add(btnGetLoan);
 
         btnManageAssets = new RoundedJButton("Manage Assets (GM)");
         btnManageAssets.addActionListener(e -> manageAssets());
         btnManageAssets.setEnabled(getCampaign().isGM());
-        pnlFinanceBtns.add(btnManageAssets);
+        pnlFinanceButtons.add(btnManageAssets);
 
-        panelFinanceRight.add(pnlFinanceBtns, BorderLayout.NORTH);
+        panelFinanceRight.add(pnlFinanceButtons, BorderLayout.NORTH);
 
         areaNetWorth = new JTextArea();
         areaNetWorth.setLineWrap(true);
@@ -499,16 +506,14 @@ public final class FinancesTab extends CampaignGuiTab {
 
         if (!getCampaign().getFinances().getAssets().isEmpty()) {
             for (Asset asset : getCampaign().getFinances().getAssets()) {
-                String assetName = asset.getName();
+                StringBuilder assetName = new StringBuilder(asset.getName());
                 if (assetName.length() > 18) {
-                    assetName = assetName.substring(0, 17);
+                    assetName = new StringBuilder(assetName.substring(0, 17));
                 } else {
                     int numPeriods = 18 - assetName.length();
-                    for (int i = 0; i < numPeriods; i++) {
-                        assetName += ".";
-                    }
+                    assetName.append(".".repeat(Math.max(0, numPeriods)));
                 }
-                assetName += " ";
+                assetName.append(" ");
                 sb.append("       ")
                       .append(assetName)
                       .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))

@@ -35,15 +35,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingAeroHeatSink;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -55,11 +58,11 @@ import org.w3c.dom.NodeList;
 public class AeroHeatSink extends Part {
     private int type;
 
-    static final TechAdvancement TA_SINGLE = EquipmentType.get("Heat Sink").getTechAdvancement();
-    static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
-    static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
+    public static final TechAdvancement TA_SINGLE = EquipmentType.get("Heat Sink").getTechAdvancement();
+    public static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
+    public static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
 
-    // To differentiate Clan double heatsinks, which aren't defined in Aero
+    // To differentiate Clan double heat sinks, which aren't defined in Aero
     public static final int CLAN_HEAT_DOUBLE = 2;
 
     public AeroHeatSink() {
@@ -89,7 +92,7 @@ public class AeroHeatSink extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit && unit.getEntity() instanceof Aero && hits == 0) {
-            // ok this is really ugly, but we don't track individual heat sinks, so I have no idea of
+            // ok this is hideous, but we don't track individual heat sinks, so I have no idea of
             // a better way to do it
             int hsDamage = ((Aero) unit.getEntity()).getHeatSinkHits();
             for (Part part : unit.getParts()) {
@@ -134,10 +137,9 @@ public class AeroHeatSink extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if (null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero aero) {
             if (hits == 0) {
-                Aero a = (Aero) unit.getEntity();
-                a.setHeatSinks(Math.min(a.getHeatSinks() + 1, a.getOHeatSinks()));
+                aero.setHeatSinks(Math.min(aero.getHeatSinks() + 1, aero.getOHeatSinks()));
             }
         }
     }
@@ -162,13 +164,13 @@ public class AeroHeatSink extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -206,11 +208,11 @@ public class AeroHeatSink extends Part {
     @Override
     public TechRating getTechRating() {
         if (type == CLAN_HEAT_DOUBLE) {
-            return EquipmentType.TechRating.F;
+            return TechRating.F;
         } else if (type == Aero.HEAT_DOUBLE) {
-            return EquipmentType.TechRating.E;
+            return TechRating.E;
         } else {
-            return EquipmentType.TechRating.C;
+            return TechRating.C;
         }
     }
 

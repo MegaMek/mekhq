@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,14 +50,14 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 import megamek.Version;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -81,7 +81,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Force {
-    private static final MMLogger logger = MMLogger.create(Force.class);
+    private static final MMLogger LOGGER = MMLogger.create(Force.class);
 
     // region Variable Declarations
     // pathway to force icon
@@ -406,12 +406,12 @@ public class Force {
     }
 
     /**
-     * Add a subforce to the subforce vector. In general, this should not be called directly to add forces to the
+     * Add a sub force to the sub force vector. In general, this should not be called directly to add forces to the
      * campaign because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)} instead The boolean
      * assignParent here is set to false when assigning forces from the TOE to a scenario, because we don't want to
      * switch this forces real parent
      *
-     * @param sub the subforce to add, which may be null from a load failure. This returns without adding in that case
+     * @param sub the sub force to add, which may be null from a load failure. This returns without adding in that case
      */
     public void addSubForce(final @Nullable Force sub, boolean assignParent) {
         if (sub == null) {
@@ -477,7 +477,6 @@ public class Force {
      * Add a unit id to the units vector. In general, this should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)} instead
      *
-     * @param uid
      */
     public void addUnit(UUID uid) {
         addUnit(null, uid, false, null);
@@ -507,7 +506,6 @@ public class Force {
     /**
      * This should not be directly called except by {@link Campaign#removeUnitFromForce(Unit)} instead
      *
-     * @param id
      */
     public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
@@ -678,7 +676,7 @@ public class Force {
         }
 
         if (highestRankedPerson == null) {
-            logger.info("Force {} has no eligible commanders", getName());
+            LOGGER.info("Force {} has no eligible commanders", getName());
             forceCommanderID = null;
         } else {
             forceCommanderID = highestRankedPerson.getId();
@@ -857,7 +855,7 @@ public class Force {
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
                             String message = String.format("Unknown node type not loaded in Forces nodes: %s",
                                   wn3.getNodeName());
-                            logger.error(message);
+                            LOGGER.error(message);
                             continue;
                         }
 
@@ -867,7 +865,7 @@ public class Force {
             }
             campaign.importForce(force);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return null;
         }
 
@@ -888,11 +886,24 @@ public class Force {
         }
     }
 
+    /**
+     * Returns a vector containing all children of this force, including sub-forces and units, sorted by commander
+     * rank.
+     *
+     * <p>This method gathers all subordinate objects belonging to this force: first, it adds all sub-forces, then it
+     * adds all units under this force (with crewed units before uncrewed units), finally sorting crewed units by their
+     * commander's numeric rank in descending order.</p>
+     *
+     * @param campaign The {@link Campaign} instance used to look up unit and personnel data.
+     *
+     * @return A {@link Vector} of all child objects, including sub-forces and units, sorted such that crewed units
+     *       appear before unmanned units, and crewed units are ordered by their commander's rank descending.
+     */
     public Vector<Object> getAllChildren(Campaign campaign) {
         Vector<Object> children = new Vector<>(subForces);
         // add any units
         Enumeration<UUID> uids = getUnits().elements();
-        // put them into a temporary array so I can sort it by rank
+        // put them into a temporary array, so I can sort it by rank
         List<Unit> units = new ArrayList<>();
         List<Unit> unmannedUnits = new ArrayList<>();
         while (uids.hasMoreElements()) {
@@ -1130,7 +1141,7 @@ public class Force {
             }
 
             if (isValid) {
-                lowerBoundary = level.parseToInt() < lowerBoundary ? level.parseToInt() : lowerBoundary;
+                lowerBoundary = Math.min(level.parseToInt(), lowerBoundary);
             }
         }
         return lowerBoundary;

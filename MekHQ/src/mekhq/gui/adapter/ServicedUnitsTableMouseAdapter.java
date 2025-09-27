@@ -41,11 +41,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.event.RepairStatusChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.RepairStatusChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.IUnitAction;
@@ -59,9 +59,9 @@ import mekhq.service.mrms.MRMSService;
 
 public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 
-    private CampaignGUI gui;
-    private JTable servicedUnitTable;
-    private UnitTableModel servicedUnitModel;
+    private final CampaignGUI gui;
+    private final JTable servicedUnitTable;
+    private final UnitTableModel servicedUnitModel;
 
     protected ServicedUnitsTableMouseAdapter(CampaignGUI gui, JTable servicedUnitTable,
           UnitTableModel servicedUnitModel) {
@@ -155,7 +155,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
         }
         JMenuItem menuItem;
         JCheckBoxMenuItem cbMenuItem;
-        // **lets fill the pop up menu**//
+        // **let's fill the pop-up menu**//
         // change the location
         JMenu menu = new JMenu("Change site");
         int i;
@@ -185,16 +185,15 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
                     ammoMenu = new JMenu(ammo.getType().getDesc());
                     AmmoType curType = ammo.getType();
-                    for (AmmoType atype : Utilities.getMunitionsFor(unit
-                                                                          .getEntity(), curType, gui.getCampaign()
-                                                                                                       .getCampaignOptions()
-                                                                                                       .getTechLevel())) {
-                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType)) {
+                    for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
+                          curType,
+                          gui.getCampaign().getCampaignOptions().getTechLevel())) {
+                        cbMenuItem = new JCheckBoxMenuItem(ammoType.getDesc());
+                        if (ammoType.equals(curType)) {
                             cbMenuItem.setSelected(true);
                         } else {
                             cbMenuItem.addActionListener(evt -> {
-                                IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, atype);
+                                IUnitAction swapAmmoTypeAction = new SwapAmmoTypeAction(ammo, ammoType);
                                 swapAmmoTypeAction.execute(gui.getCampaign(), unit);
                             });
                         }

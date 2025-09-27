@@ -37,9 +37,20 @@ import java.io.PrintWriter;
 import java.util.EnumSet;
 import java.util.Objects;
 
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.Jumpship;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -61,7 +72,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
-    private static final MMLogger logger = MMLogger.create(AmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(AmmoBin.class);
 
     protected int shotsNeeded;
     protected boolean oneShot;
@@ -246,7 +257,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
 
@@ -306,7 +317,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 return mounted;
             }
 
-            logger.warn("Missing valid equipment for {} to manage ammo on unit {}", getName(), getUnit().getName());
+            LOGGER.warn("Missing valid equipment for {} to manage ammo on unit {}", getName(), getUnit().getName());
         }
 
         return null;
@@ -703,12 +714,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 }

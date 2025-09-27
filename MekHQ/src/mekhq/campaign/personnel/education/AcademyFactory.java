@@ -55,7 +55,7 @@ import mekhq.utilities.MHQXMLUtility;
  * provides methods to retrieve a list of set names and a list of academies for a given set name.
  */
 public class AcademyFactory {
-    private static final MMLogger logger = MMLogger.create(AcademyFactory.class);
+    private static final MMLogger LOGGER = MMLogger.create(AcademyFactory.class);
 
     private static AcademyFactory instance = null;
     private final Map<String, Map<String, Academy>> academyMap;
@@ -112,7 +112,7 @@ public class AcademyFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAcademyFromStream(inputStream, new File(file).getName());
             } catch (IOException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -144,7 +144,7 @@ public class AcademyFactory {
             }
             academyMap.put(currentSetName, tempAcademyMap);
         } catch (JAXBException e) {
-            logger.error("Error loading XML for academies", e);
+            LOGGER.error("Error loading XML for academies", e);
         }
     }
 }

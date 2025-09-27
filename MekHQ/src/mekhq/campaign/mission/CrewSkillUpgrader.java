@@ -39,13 +39,13 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.UnitType;
-import megamek.common.WeaponType;
+import megamek.common.compute.Compute;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -62,12 +62,12 @@ public class CrewSkillUpgrader {
     // complex data structure
     // first key is the unit type as in Megamek.common.UnitType
     // second key is the XP cost of the SPA
-    private Map<Integer, Map<Integer, List<SpecialAbility>>> specialAbilitiesByUnitType;
+    private final Map<Integer, Map<Integer, List<SpecialAbility>>> specialAbilitiesByUnitType;
     private double maxAbilityXPCost = 0;
-    private double twoThirdsXPCost;
-    private double oneThirdXPCost;
+    private final double twoThirdsXPCost;
+    private final double oneThirdXPCost;
     private double minAbilityCost = Double.MAX_VALUE;
-    private int upgradeIntensity;
+    private final int upgradeIntensity;
 
     /**
      * Constructor. Initializes updated SPA list, broken down by unit type.
@@ -109,7 +109,7 @@ public class CrewSkillUpgrader {
      */
     public void upgradeCrew(Entity entity) {
         // roll 1d4, and get SPAs with configurable odds
-        // determine veterancy level
+        // determine veteran level
         // this sets the weight limit and how many SPAs we can assign
         // complete scrubs don't get SPAs.
         // this is described in some detail in CamOps page 70 (Special Pilot Abilities)
@@ -152,8 +152,6 @@ public class CrewSkillUpgrader {
 
     /**
      * Upgrade an entity with a single SPA
-     *
-     * @param entity
      *
      * @return the xp cost of the added SPA
      */
@@ -260,18 +258,12 @@ public class CrewSkillUpgrader {
     /**
      * Contains "special" logic to ensure SPA is appropriate for the entity, beyond the simple unit type check.
      *
-     * @param spa
-     * @param entity
-     *
-     * @return
      */
     private boolean extraEligibilityCheck(SpecialAbility spa, Entity entity) {
-        switch (spa.getName()) {
-            case OptionsConstants.PILOT_ANIMAL_MIMIC:
-                return entity.entityIsQuad() || entity.hasQuirk(OptionsConstants.QUIRK_POS_ANIMALISTIC);
-            default:
-                return true;
+        if (spa.getName().equals(OptionsConstants.PILOT_ANIMAL_MIMIC)) {
+            return entity.entityIsQuad() || entity.hasQuirk(OptionsConstants.QUIRK_POS_ANIMALISTIC);
         }
+        return true;
     }
 
     /**
@@ -310,12 +302,12 @@ public class CrewSkillUpgrader {
      */
     private String pickRandomGunnerySpecialization(Entity entity) {
         // if you've got no weapons, tough
-        if (entity.getIndividualWeaponList().size() <= 0) {
+        if (entity.getIndividualWeaponList().isEmpty()) {
             return Crew.SPECIAL_NONE;
         }
 
         int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
-        WeaponType weaponType = (WeaponType) entity.getIndividualWeaponList().get(weaponIndex).getType();
+        WeaponType weaponType = entity.getIndividualWeaponList().get(weaponIndex).getType();
 
         if (weaponType.hasFlag(WeaponType.F_BALLISTIC)) {
             return Crew.SPECIAL_BALLISTIC;
@@ -335,17 +327,17 @@ public class CrewSkillUpgrader {
     }
 
     private String pickRandomHumanTRO() {
-        return ObjectUtility.getRandomItem(Arrays.asList(Crew.HUMANTRO_MEK,
-              Crew.HUMANTRO_AERO,
-              Crew.HUMANTRO_VEE,
-              Crew.HUMANTRO_BA));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.HUMAN_TRO_MEK,
+              Crew.HUMAN_TRO_AERO,
+              Crew.HUMAN_TRO_VEE,
+              Crew.HUMAN_TRO_BA));
     }
 
     private String pickRandomEnvSpec() {
-        return ObjectUtility.getRandomItem(Arrays.asList(Crew.ENVSPC_FOG,
-              Crew.ENVSPC_LIGHT,
-              Crew.ENVSPC_RAIN,
-              Crew.ENVSPC_SNOW,
-              Crew.ENVSPC_WIND));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.ENVIRONMENT_SPECIALIST_FOG,
+              Crew.ENVIRONMENT_SPECIALIST_LIGHT,
+              Crew.ENVIRONMENT_SPECIALIST_RAIN,
+              Crew.ENVIRONMENT_SPECIALIST_SNOW,
+              Crew.ENVIRONMENT_SPECIALIST_WIND));
     }
 }

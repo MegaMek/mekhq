@@ -54,7 +54,7 @@ public enum WorkTime {
     RUSH_30(-1, "Rush Job (1/30)", 5, true, 5, 1.0 / 30.0);
 
     // Initialize by-id array lookup table
-    private static WorkTime[] idMap;
+    private static final WorkTime[] idMap;
 
     static {
         int maxId = 0;
@@ -93,7 +93,7 @@ public enum WorkTime {
     public static WorkTime of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch (NumberFormatException nfex) {
+        } catch (NumberFormatException ignored) {
             // Try something else
         }
         return valueOf(str.toUpperCase(Locale.ROOT));
@@ -170,7 +170,7 @@ public enum WorkTime {
             return workTime;
         }
 
-        MMLogger.create(WorkTime.class).error("Unable to parse " + text + " into a WorkTime. Returning NORMAL.");
+        MMLogger.create(WorkTime.class).error("Unable to parse {} into a WorkTime. Returning NORMAL.", text);
         return NORMAL;
     }
     // endregion File I/O

@@ -43,7 +43,7 @@ import javax.swing.JOptionPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
@@ -131,17 +131,20 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
             // Intentionally letting this throw an NPE if towingEnt is null, it
             // shouldn't happen and is more clear that something's wrong than doing nothing.
-            Unit oldTransport = towingEnt.towTrailer(unit, null, transporterType);
+            if (towingEnt != null) {
+                Unit oldTransport = towingEnt.towTrailer(unit, null, transporterType);
 
-            if (oldTransport != null) {
-                campaign.updateTransportInTransports(TOW_TRANSPORT, oldTransport);
-                MekHQ.triggerEvent(new UnitChangedEvent(oldTransport));
-            }
-            if (!towingEnt.equals(transport)) {
-                transport.getTransportedUnitsSummary(TOW_TRANSPORT)
-                      .recalculateTransportCapacity(transport.getEntity().getTransports());
-                campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
-                MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
+                if (oldTransport != null) {
+                    campaign.updateTransportInTransports(TOW_TRANSPORT, oldTransport);
+                    MekHQ.triggerEvent(new UnitChangedEvent(oldTransport));
+                }
+
+                if (!towingEnt.equals(transport)) {
+                    transport.getTransportedUnitsSummary(TOW_TRANSPORT)
+                          .recalculateTransportCapacity(transport.getEntity().getTransports());
+                    campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
+                    MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
+                }
             }
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
 

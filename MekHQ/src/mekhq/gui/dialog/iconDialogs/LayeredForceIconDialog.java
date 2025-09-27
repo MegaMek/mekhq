@@ -57,7 +57,7 @@ import mekhq.gui.panels.StandardForceIconChooser;
  * open at the same time.
  */
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
-    private static final MMLogger logger = MMLogger.create(LayeredForceIconDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(LayeredForceIconDialog.class);
 
     // region Variable Declarations
     private StandardForceIcon originalForceIcon;
@@ -71,7 +71,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     public LayeredForceIconDialog(final JFrame parent, final @Nullable StandardForceIcon originalForceIcon) {
         super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
         if (originalForceIcon instanceof UnitIcon) {
-            logger.error(
+            LOGGER.error(
                   "This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
             setOriginalForceIcon(
                   new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));

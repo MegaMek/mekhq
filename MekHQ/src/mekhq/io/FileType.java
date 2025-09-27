@@ -86,7 +86,7 @@ public enum FileType {
      */
     CPNX("Campaign file", "cpnx", "cpnx.gz", "xml");
 
-    private FileType(String description, String... extensions) {
+    FileType(String description, String... extensions) {
         this.description = description;
         this.extensions = Arrays.asList(extensions);
     }

@@ -48,8 +48,8 @@ import java.util.concurrent.Executors;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.NewDayEvent;
 
 /**
  * Checks all planets within a given region of space and can report which factions control one or more planets in the
@@ -73,13 +73,13 @@ public class FactionBorderTracker {
     private LocalDate lastUpdate;
     private LocalDate now;
 
-    private Map<Faction, FactionBorders> borders;
-    private Map<Faction, Map<Faction, List<PlanetarySystem>>> borderSystems;
+    private final Map<Faction, FactionBorders> borders;
+    private final Map<Faction, Map<Faction, List<PlanetarySystem>>> borderSystems;
 
     private double isBorderSize = 60;
     private double peripheryBorderSize = 90;
     private double clanBorderSize = 90;
-    private Map<Faction, Double> factionBorderSize = new HashMap<>();
+    private final Map<Faction, Double> factionBorderSize = new HashMap<>();
 
     private int dayThreshold = 0;
     private double distanceThreshold = 0;
@@ -358,7 +358,7 @@ public class FactionBorderTracker {
 
     /**
      * The default distance from a faction's borders to check for neighboring foreign planets. This is the value that is
-     * used if a specific value has not be set, and is based on whether the faction is IS, Clan, or Periphery.
+     * used if a specific value has not been set, and is based on whether the faction is IS, Clan, or Periphery.
      *
      * @param f A faction
      *

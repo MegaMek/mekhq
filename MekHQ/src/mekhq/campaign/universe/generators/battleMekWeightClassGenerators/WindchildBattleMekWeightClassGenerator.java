@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.generators.battleMekWeightClassGenerators;
 
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 
 /**
@@ -47,24 +47,12 @@ public class WindchildBattleMekWeightClassGenerator extends AbstractBattleMekWei
 
     @Override
     public int generate(final int roll) {
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return EntityWeightClass.WEIGHT_LIGHT;
-            case 6:
-            case 7:
-            case 8:
-                return EntityWeightClass.WEIGHT_MEDIUM;
-            case 9:
-            case 10:
-                return EntityWeightClass.WEIGHT_HEAVY;
-            case 11:
-            case 12:
-                return EntityWeightClass.WEIGHT_ASSAULT;
-            default:
-                return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-        }
+        return switch (roll) {
+            case 2, 3, 4, 5 -> EntityWeightClass.WEIGHT_LIGHT;
+            case 6, 7, 8 -> EntityWeightClass.WEIGHT_MEDIUM;
+            case 9, 10 -> EntityWeightClass.WEIGHT_HEAVY;
+            case 11, 12 -> EntityWeightClass.WEIGHT_ASSAULT;
+            default -> EntityWeightClass.WEIGHT_SUPER_HEAVY;
+        };
     }
 }

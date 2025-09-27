@@ -34,21 +34,18 @@ package mekhq.campaign.unit.actions;
 
 import java.util.Objects;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 
 /**
  * Swaps the {@code AmmoType} for an {@code AmmoBin} on a {@code Unit}.
  */
-public class SwapAmmoTypeAction implements IUnitAction {
-
-    private final AmmoBin ammoBin;
-    private final AmmoType ammoType;
+public record SwapAmmoTypeAction(AmmoBin ammoBin, AmmoType ammoType) implements IUnitAction {
 
     /**
      * Initializes a new instance of the {@code SwapAmmoTypeAction} class.

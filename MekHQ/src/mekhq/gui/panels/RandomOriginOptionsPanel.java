@@ -35,7 +35,6 @@ package mekhq.gui.panels;
 import java.awt.Component;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
@@ -59,7 +58,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * @author Justin "Windchild" Bowen
  */
 public class RandomOriginOptionsPanel extends AbstractMHQPanel {
-    private static final MMLogger logger = MMLogger.create(RandomOriginOptionsPanel.class);
+    private static final MMLogger LOGGER = MMLogger.create(RandomOriginOptionsPanel.class);
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -405,7 +404,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         return getCampaign().getSystems().stream()
                      .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction))
                      .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
-                     .collect(Collectors.toList()).toArray(new PlanetarySystem[] {});
+                     .toList().toArray(new PlanetarySystem[] {});
     }
     // endregion Initialization
 
@@ -440,7 +439,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             options.setAllowClanOrigins(getChkAllowClanOrigins().isSelected());
             options.setExtraRandomOrigin(getChkExtraRandomOrigin().isSelected());
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
         return options;
     }

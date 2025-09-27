@@ -814,7 +814,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", campaignOptions.isPayForFood());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", campaignOptions.isPayForHousing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", campaignOptions.isUseLoanLimits());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaint());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", campaignOptions.isInfantryDontCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePeacetimeCost", campaignOptions.isUsePeacetimeCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedPartsModifier",
@@ -1030,7 +1030,7 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAssignPortraitOnRoleChange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits",
               campaignOptions.isAllowDuplicatePortraits());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", campaignOptions.isAllowOpForAeros());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", campaignOptions.isAllowOpForAerospace());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForLocalUnits", campaignOptions.isAllowOpForLocalUnits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForAeroChance", campaignOptions.getOpForAeroChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLocalUnitChance", campaignOptions.getOpForLocalUnitChance());
@@ -1040,8 +1040,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", campaignOptions.getScenarioModBV());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", campaignOptions.isAutoConfigMunitions());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallsigns",
-              campaignOptions.isAutoGenerateOpForCallsigns());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallSigns",
+              campaignOptions.isAutoGenerateOpForCallSigns());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "minimumCallsignSkillLevel",

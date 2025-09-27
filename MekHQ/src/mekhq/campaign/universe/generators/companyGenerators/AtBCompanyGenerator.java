@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummary;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
@@ -95,7 +95,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
                 parameters.setQuality(IUnitRating.DRAGOON_B);
                 return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
-                // Roll on the Star League Royal table if you get a SL mek with A* Rating
+                // Roll on the Star League Royal table if you get an SL mek with A* Rating
                 final String factionCode = (parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL";
                 return generateMekSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }

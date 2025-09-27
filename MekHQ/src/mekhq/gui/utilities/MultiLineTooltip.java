@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,12 +38,12 @@ import java.util.List;
 /**
  * This class splits a tooltip into multiple lines in order to wrap it. It will enclose a string into HTML format
  * <p>
- * https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java
+ * <a href="https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java">Stack Overflow</a>
  *
  * @author Paul Taylor (adapted by Miguel Azevedo)
  */
 public class MultiLineTooltip {
-    private static int DIALOG_TOOLTIP_MAX_SIZE = 85;
+    private static final int DIALOG_TOOLTIP_MAX_SIZE = 85;
     private static final int SPACE_BUFFER = 10;
 
     /**
@@ -73,7 +73,7 @@ public class MultiLineTooltip {
 
         List<String> parts = new ArrayList<>();
 
-        int maxLength = 0;
+        int maxLength;
         String overLong = tip.substring(0, length + SPACE_BUFFER);
         int lastSpace = overLong.lastIndexOf(' ');
         if (lastSpace >= length) {
@@ -96,7 +96,7 @@ public class MultiLineTooltip {
 
         StringBuilder sb = new StringBuilder("<html>");
         for (int i = 0; i < parts.size() - 1; i++) {
-            sb.append(parts.get(i) + "<br>");
+            sb.append(parts.get(i)).append("<br>");
         }
         sb.append(parts.get(parts.size() - 1));
         sb.append(("</html>"));

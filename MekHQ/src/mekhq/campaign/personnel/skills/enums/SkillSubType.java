@@ -37,9 +37,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import megamek.logging.MMLogger;
 
 /**
- * Enum representing the sub-types of skills used in MekHQ.
+ * Enum representing the subtypes of skills used in MekHQ.
  *
- * <p>The available skill sub-types are:</p>
+ * <p>The available skill subtypes are:</p>
  *
  * <p>This enum also includes a utility method for parsing {@link SkillSubType} values from strings
  * or integers.</p>

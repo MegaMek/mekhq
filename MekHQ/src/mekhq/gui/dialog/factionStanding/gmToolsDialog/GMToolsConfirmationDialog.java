@@ -60,7 +60,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -78,7 +77,6 @@ import mekhq.gui.dialog.glossary.NewGlossaryDialog;
  * @since 0.50.07
  */
 public class GMToolsConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(GMToolsConfirmationDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);

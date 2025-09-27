@@ -117,25 +117,16 @@ public enum BattleMekQualityGenerationMethod {
     //endregion Boolean Comparison Methods
 
     public AbstractBattleMekQualityGenerator getGenerator() {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBBattleMekQualityGenerator();
-            case F:
-                return new FBattleMekQualityGenerator();
-            case D:
-                return new DBattleMekQualityGenerator();
-            case C:
-                return new CBattleMekQualityGenerator();
-            case B:
-                return new BBattleMekQualityGenerator();
-            case A:
-                return new ABattleMekQualityGenerator();
-            case A_STAR:
-                return new AStarBattleMekQualityGenerator();
-            case WINDCHILD:
-            default:
-                return new WindchildBattleMekQualityGenerator();
-        }
+        return switch (this) {
+            case AGAINST_THE_BOT -> new AtBBattleMekQualityGenerator();
+            case F -> new FBattleMekQualityGenerator();
+            case D -> new DBattleMekQualityGenerator();
+            case C -> new CBattleMekQualityGenerator();
+            case B -> new BBattleMekQualityGenerator();
+            case A -> new ABattleMekQualityGenerator();
+            case A_STAR -> new AStarBattleMekQualityGenerator();
+            default -> new WindchildBattleMekQualityGenerator();
+        };
     }
 
     @Override

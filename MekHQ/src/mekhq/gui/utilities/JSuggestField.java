@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,18 +56,16 @@ import javax.swing.SwingUtilities;
  */
 public class JSuggestField extends JTextField {
     /** Dialog used as the drop-down list. */
-    private JDialog d;
-
-    /** Location of said drop-down list. */
-    private Point location;
+    private final JDialog dialog;
 
     /** List contained in the drop-down dialog. */
-    private JList<String> list;
+    private final JList<String> list;
 
     /**
      * Vectors containing the original data and the filtered data for the suggestions.
      */
-    private Vector<String> data, suggestions;
+    private Vector<String> data;
+    private final Vector<String> suggestions;
 
     /**
      * Separate matcher-thread, prevents the text-field from hanging while the suggestions are being prepared.
@@ -77,7 +75,8 @@ public class JSuggestField extends JTextField {
     /**
      * Fonts used to indicate that the text-field is processing the request, i.e. looking for matches
      */
-    private Font busy, regular;
+    private final Font busy;
+    private final Font regular;
 
     /** Needed for the new narrowing search, so we know when to reset the list */
     private String lastWord = "";
@@ -88,7 +87,7 @@ public class JSuggestField extends JTextField {
     private String lastChosenExistingVariable;
 
     /** Listeners, fire event when a selection as occurred */
-    private LinkedList<ActionListener> listeners;
+    private final LinkedList<ActionListener> listeners;
 
     /**
      * Create a new JSuggestField.
@@ -128,7 +127,7 @@ public class JSuggestField extends JTextField {
 
             @Override
             public void windowIconified(WindowEvent e) {
-                d.setVisible(false);
+                dialog.setVisible(false);
             }
 
             @Override
@@ -141,12 +140,12 @@ public class JSuggestField extends JTextField {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                d.dispose();
+                dialog.dispose();
             }
 
             @Override
             public void windowClosed(WindowEvent e) {
-                d.dispose();
+                dialog.dispose();
             }
 
             @Override
@@ -156,7 +155,7 @@ public class JSuggestField extends JTextField {
         addFocusListener(new FocusListener() {
             @Override
             public void focusLost(FocusEvent e) {
-                d.setVisible(false);
+                dialog.setVisible(false);
 
                 if (getText().isBlank() && (e.getOppositeComponent() != null)
                           && (e.getOppositeComponent().getName() != null)) {
@@ -177,10 +176,10 @@ public class JSuggestField extends JTextField {
                 // showSuggest();
             }
         });
-        d = new JDialog(owner);
-        d.setUndecorated(true);
-        d.setFocusableWindowState(false);
-        d.setFocusable(false);
+        dialog = new JDialog(owner);
+        dialog.setUndecorated(true);
+        dialog.setFocusableWindowState(false);
+        dialog.setFocusable(false);
         list = new JList<>();
         list.addMouseListener(new MouseListener() {
             private int selected;
@@ -196,7 +195,7 @@ public class JSuggestField extends JTextField {
                     setText(list.getSelectedValue());
                     lastChosenExistingVariable = list.getSelectedValue();
                     fireActionEvent();
-                    d.setVisible(false);
+                    dialog.setVisible(false);
                 }
                 selected = list.getSelectedIndex();
             }
@@ -213,9 +212,9 @@ public class JSuggestField extends JTextField {
             public void mouseClicked(MouseEvent e) {
             }
         });
-        d.add(new JScrollPaneWithSpeed(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        dialog.add(new JScrollPaneWithSpeed(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
-        d.pack();
+        dialog.pack();
         addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -229,10 +228,10 @@ public class JSuggestField extends JTextField {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    d.setVisible(false);
+                    dialog.setVisible(false);
                     return;
                 } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    if (d.isVisible()) {
+                    if (dialog.isVisible()) {
                         list.setSelectedIndex(list.getSelectedIndex() + 1);
                         list.ensureIndexIsVisible(list.getSelectedIndex() + 1);
                         return;
@@ -248,7 +247,7 @@ public class JSuggestField extends JTextField {
                     setText(list.getSelectedValue());
                     lastChosenExistingVariable = list.getSelectedValue();
                     fireActionEvent();
-                    d.setVisible(false);
+                    dialog.setVisible(false);
                     return;
                 }
                 showSuggest();
@@ -273,17 +272,14 @@ public class JSuggestField extends JTextField {
      * Sets new data used to suggest similar words.
      *
      * @param data Vector containing available words
-     *
-     * @return success, true unless the data-vector was null
      */
-    public boolean setSuggestData(Vector<String> data) {
+    public void setSuggestData(Vector<String> data) {
         if (data == null) {
-            return false;
+            return;
         }
         Collections.sort(data);
         this.data = data;
         list.setListData(data);
-        return true;
     }
 
     /**
@@ -302,7 +298,7 @@ public class JSuggestField extends JTextField {
      * @param size Preferred size of the drop-down list
      */
     public void setPreferredSuggestSize(Dimension size) {
-        d.setPreferredSize(size);
+        dialog.setPreferredSize(size);
     }
 
     /**
@@ -311,7 +307,7 @@ public class JSuggestField extends JTextField {
      * @param size Minimum size of the drop-down list
      */
     public void setMinimumSuggestSize(Dimension size) {
-        d.setMinimumSize(size);
+        dialog.setMinimumSize(size);
     }
 
     /**
@@ -320,7 +316,7 @@ public class JSuggestField extends JTextField {
      * @param size Maximum size of the drop-down list
      */
     public void setMaximumSuggestSize(Dimension size) {
-        d.setMaximumSize(size);
+        dialog.setMaximumSize(size);
     }
 
     /**
@@ -347,14 +343,14 @@ public class JSuggestField extends JTextField {
      * Force the suggestions to be hidden (Useful for buttons, e.g. to use JSuggestionField like a ComboBox)
      */
     public void hideSuggest() {
-        d.setVisible(false);
+        dialog.setVisible(false);
     }
 
     /**
      * @return boolean Visibility of the suggestion window
      */
     public boolean isSuggestVisible() {
-        return d.isVisible();
+        return dialog.isVisible();
     }
 
     /**
@@ -362,9 +358,9 @@ public class JSuggestField extends JTextField {
      */
     private void relocate() {
         try {
-            location = getLocationOnScreen();
+            Point location = getLocationOnScreen();
             location.y += getHeight();
-            d.setLocation(location);
+            dialog.setLocation(location);
         } catch (IllegalComponentStateException ignored) {
 
         }
@@ -400,12 +396,12 @@ public class JSuggestField extends JTextField {
                 }
                 setFont(regular);
                 if (suggestions.isEmpty()) {
-                    d.setVisible(false);
+                    dialog.setVisible(false);
                 } else {
                     list.setListData(suggestions);
                     list.setSelectedIndex(0);
                     list.ensureIndexIsVisible(0);
-                    d.setVisible(true);
+                    dialog.setVisible(true);
                 }
             } catch (Exception ignored) {
                 // Despite all precautions, external changes have occurred.
@@ -445,7 +441,7 @@ public class JSuggestField extends JTextField {
     }
 
     /**
-     * Returns the selected value in the drop down list
+     * Returns the selected value in the drop-down list
      *
      * @return selected value from the user or null if the entered value does not exist
      */

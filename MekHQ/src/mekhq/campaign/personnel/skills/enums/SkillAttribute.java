@@ -218,7 +218,7 @@ public enum SkillAttribute {
      * @param text The input string or integer representing the skill attribute.
      *
      * @return The corresponding {@link SkillAttribute} value if the input is valid, or {@link #NONE} as the default if
-     *       fault if it is not.
+     *       fault is it is not.
      */
     public static SkillAttribute fromString(String text) {
         try {

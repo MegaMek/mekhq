@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.randomEvents.personalities;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.*;
 
 import java.util.ArrayList;
