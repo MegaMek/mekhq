@@ -70,6 +70,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -538,10 +539,14 @@ public class PersonnelMarketDialog extends JDialog {
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
             if (!isGMHire && market.isWasOfferingGoldenHello()) {
+                // Personnel are hired without rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
+                // 12 months' salary, we double the multiplier from 12 to 24.
+                Money cost = applicant.getSalary(campaign).multipliedBy(24);
+
                 campaign.getFinances()
                       .debit(RECRUITMENT,
                             campaign.getLocalDate(),
-                            applicant.getSalary(campaign).multipliedBy(12),
+                            cost,
                             getFormattedTextAt(RESOURCE_BUNDLE,
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
