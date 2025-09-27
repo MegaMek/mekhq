@@ -390,17 +390,12 @@ public final class BatchXPDialog extends JDialog {
                 person.improveSkill(skillName);
                 person.spendXP(cost);
 
-                int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
-                      campaign.isClanCampaign(),
-                      campaign.getLocalDate(),
-                      person.getRankNumeric());
-
-                PerformanceLogger.improvedSkill(campaign,
+                Skill skill = person.getSkill(skillName);
+                PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
                       person,
                       campaign.getLocalDate(),
-                      person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName)
-                            .toString(person.getOptions(), person.getATOWAttributes(), adjustedReputation));
+                      skill.getType().getName(),
+                      skill.getLevel());
                 campaign.personUpdated(person);
             }
 

@@ -642,18 +642,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = selectedPerson.getSkill(type);
                 SkillType skillType = skill.getType();
 
-                int adjustedReputation = selectedPerson.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
-                      getCampaign().isClanCampaign(),
-                      getCampaign().getLocalDate(),
-                      selectedPerson.getRankNumeric());
-
-                PerformanceLogger.improvedSkill(getCampaign(),
+                PerformanceLogger.improvedSkill(getCampaignOptions().isPersonnelLogSkillGain(),
                       selectedPerson,
                       getCampaign().getLocalDate(),
                       skillType.getName(),
-                      skill.toString(selectedPerson.getOptions(),
-                            selectedPerson.getATOWAttributes(),
-                            adjustedReputation));
+                      skill.getLevel());
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
