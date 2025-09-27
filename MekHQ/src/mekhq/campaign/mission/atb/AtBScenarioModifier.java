@@ -67,7 +67,16 @@ import mekhq.utilities.MHQXMLUtility;
  */
 @XmlRootElement(name = "AtBScenarioModifier")
 public class AtBScenarioModifier implements Cloneable {
-    private static final MMLogger logger = MMLogger.create(AtBScenarioModifier.class);
+    private static final MMLogger LOGGER = MMLogger.create(AtBScenarioModifier.class);
+
+    private static final String MODIFIER_DIRECTORY = "./data/scenariomodifiers/modifiermanifest.xml";
+    private static final String MODIFIER_DIRECTORY_WILDCARD = "./data/scenariomodifiers/%s";
+
+    private static final String MODIFIER_TEST_DIRECTORY = "testresources/data/scenariomodifiers" +
+                                                                "/modifiermanifest_test.xml";
+    private static final String MODIFIER_TEST_DIRECTORY_WILDCARD = "testresources/data/scenariomodifiers/%s";
+
+    private static final String MODIFIER_USER_DIRECTORY = "./data/scenariomodifiers/usermodifiermanifest.xml";
 
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.
@@ -138,7 +147,7 @@ public class AtBScenarioModifier implements Cloneable {
      */
     public static AtBScenarioModifier getScenarioModifier(String key) {
         if (!scenarioModifiers.containsKey(key)) {
-            logger.error("Scenario modifier {} does not exist.", key);
+            LOGGER.error("Scenario modifier {} does not exist.", key);
             return null;
         }
 
@@ -217,9 +226,16 @@ public class AtBScenarioModifier implements Cloneable {
         return getScenarioModifier(ObjectUtility.getRandomItem(keyList));
     }
 
-    static {
-        loadManifest();
-        loadScenarioModifiers();
+    /**
+     * Call this method before using scenario modifiers, passing the desired directory flag.
+     * <p>
+     * If not called, the class will not be initialized.
+     *
+     * @param useTestDirectory {@code true} to use testresources, false for production data
+     */
+    public static void initializeScenarioModifiers(boolean useTestDirectory) {
+        loadManifest(useTestDirectory);
+        loadScenarioModifiers(useTestDirectory);
 
         initializeSpecificManifest(MHQConstants.STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS,
               requiredHostileFacilityModifierKeys);
@@ -270,13 +286,13 @@ public class AtBScenarioModifier implements Cloneable {
     /**
      * Loads the scenario modifier manifest.
      */
-    private static void loadManifest() {
-        scenarioModifierManifest = ScenarioModifierManifest
-                                         .Deserialize("./data/scenariomodifiers/modifiermanifest.xml"); // TODO : Remove inline file path
+    private static void loadManifest(boolean useTestDirectory) {
+        scenarioModifierManifest = ScenarioModifierManifest.Deserialize(useTestDirectory ?
+                                                                              MODIFIER_TEST_DIRECTORY :
+                                                                              MODIFIER_DIRECTORY);
 
         // load user-specified modifier list
-        ScenarioModifierManifest userModList = ScenarioModifierManifest
-                                                     .Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml"); // TODO : Remove inline file path
+        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize(MODIFIER_USER_DIRECTORY);
         if (userModList != null) {
             scenarioModifierManifest.fileNameList.addAll(userModList.fileNameList);
         }
@@ -288,12 +304,14 @@ public class AtBScenarioModifier implements Cloneable {
     /**
      * Loads the defined scenario modifiers from the manifest.
      */
-    private static void loadScenarioModifiers() {
+    private static void loadScenarioModifiers(boolean useTestDirectory) {
         scenarioModifiers = new HashMap<>();
         scenarioModifierKeys = new ArrayList<>();
 
         for (String fileName : scenarioModifierManifest.fileNameList) {
-            String filePath = String.format("./data/scenariomodifiers/%s", fileName); // TODO : Remove inline file path
+            String filePath = String.format(useTestDirectory ?
+                                                  MODIFIER_TEST_DIRECTORY_WILDCARD :
+                                                  MODIFIER_DIRECTORY_WILDCARD, fileName);
 
             try {
                 AtBScenarioModifier modifier = Deserialize(filePath);
@@ -307,7 +325,7 @@ public class AtBScenarioModifier implements Cloneable {
                     }
                 }
             } catch (Exception ex) {
-                logger.error("Error Loading Scenario {}", filePath, ex);
+                LOGGER.error("Error Loading Scenario {}", filePath, ex);
             }
         }
 
@@ -329,7 +347,7 @@ public class AtBScenarioModifier implements Cloneable {
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
             if (!xmlFile.exists()) {
-                logger.warn("Specified file {} does not exist", fileName);
+                LOGGER.warn("Specified file {} does not exist", fileName);
                 return null;
             }
 
@@ -339,7 +357,7 @@ public class AtBScenarioModifier implements Cloneable {
                 resultingModifier = modifierElement.getValue();
             }
         } catch (Exception ex) {
-            logger.error("Error Deserializing Scenario Modifier: {}", fileName, ex);
+            LOGGER.error("Error Deserializing Scenario Modifier: {}", fileName, ex);
         }
 
         return resultingModifier;
@@ -359,7 +377,7 @@ public class AtBScenarioModifier implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 

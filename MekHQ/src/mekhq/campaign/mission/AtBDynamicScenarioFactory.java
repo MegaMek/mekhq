@@ -2732,15 +2732,31 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Creates an {@link Entity} object with a crew based on the provided parameters.
+     *
+     * @param faction  the faction to which the entity belongs
+     * @param skill    the skill level of the crew
+     * @param campaign the campaign context for the entity
+     * @param unitData the unit data defining the entity's specifications
+     *
+     * @return the created Entity object, or null if the creation fails
+     */
+    public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign,
+          MekSummary unitData) {
+        return createEntityWithCrew(faction, skill, campaign, unitData, false);
+    }
+
+    /**
      * @param faction  Faction for selection of crew name(s)
      * @param skill    {@link SkillLevel} for the average crew skill level
      * @param campaign Current campaign
      * @param unitData Chassis/model data of unit
+     * @param isTest   {@code true} if called from within a Unit Test
      *
      * @return A crewed entity
      */
     public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign,
-          MekSummary unitData) {
+          MekSummary unitData, boolean isTest) {
         Entity entity;
         try {
             entity = new MekFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
@@ -2749,7 +2765,7 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
-        return createEntityWithCrew(faction, skill, campaign, entity);
+        return createEntityWithCrew(faction, skill, campaign, entity, isTest);
     }
 
     /**
@@ -2768,10 +2784,12 @@ public class AtBDynamicScenarioFactory {
      * @param skill    the base {@link SkillLevel} for the crew, potentially adjusted by a random roll
      * @param campaign the owning {@link Campaign} instance providing context and options
      * @param entity   the {@link Entity} to configure with crew, ownership, and random details
+     * @param isTest   {@code true} if called from within a Unit Test
      *
      * @return the {@link Entity} with its crew assigned and campaign-related attributes set
      */
-    public static Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, Entity entity) {
+    public static Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, Entity entity,
+          boolean isTest) {
         entity.setOwner(campaign.getPlayer());
         entity.setGame(campaign.getGame());
 
@@ -2872,7 +2890,7 @@ public class AtBDynamicScenarioFactory {
         // Optionally assign a callsign to the unit commander if enabled and skill at or above minimum level
         if (campaignOptions.isAutoGenerateOpForCallSigns() &&
                   (skill.equalsOrGreaterThan(campaignOptions.getMinimumCallsignSkillLevel()))) {
-            entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
+            entityCrew.setNickname(RandomCallsignGenerator.getInstance(isTest).generate(), 0);
         }
 
         // Assign the crew to the unit

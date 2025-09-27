@@ -1040,7 +1040,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", campaignOptions.getScenarioModBV());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", campaignOptions.isAutoConfigMunitions());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallsigns",
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallSigns",
               campaignOptions.isAutoGenerateOpForCallSigns());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

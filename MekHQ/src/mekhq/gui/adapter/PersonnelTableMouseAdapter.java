@@ -1654,6 +1654,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_INTEREST);
                     person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_SCIENCE);
                     person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_SECURITY);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -3477,10 +3478,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
                 int cost = (int) round(getCampaignOptions().getEdgeCost() * xpCostMultiplier);
 
-                if ((cost >= 0) && (person.getXP() >= cost)) {
+                if (cost >= 0) {
                     menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));
                     menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
                     menuItem.addActionListener(this);
+                    menuItem.setEnabled(person.getXP() >= cost);
                     edgeMenu.add(menuItem);
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, edgeMenu);
@@ -4364,17 +4366,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            menuItem = new JMenuItem(resources.getString("generateRoleplayAttributes.text"));
+            RandomSkillPreferences randomSkillPreferences = getCampaign().getRandomSkillPreferences();
+            boolean isRandomizeAttributes = randomSkillPreferences.isRandomizeAttributes();
+
+            menuItem = new JMenuItem(resources.getString("generateRoleplayAttributes." + (isRandomizeAttributes ?
+                                                                                                "random" : "reset")));
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_ATTRIBUTES);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            if (getCampaign().getRandomSkillPreferences().isRandomizeTraits()) {
-                menuItem = new JMenuItem(resources.getString("generateRoleplayTraits.text"));
-                menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_TRAITS);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-            }
+            boolean isRandomizeTraits = randomSkillPreferences.isRandomizeTraits();
+            menuItem = new JMenuItem(resources.getString("generateRoleplayTraits." + (isRandomizeTraits ?
+                                                                                            "random" : "reset")));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_TRAITS);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
 
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
 

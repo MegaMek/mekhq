@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                    Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                    SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                           </pre>
+     *                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                               </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1189,7 +1189,7 @@ public class SkillType {
                     // skillType.name = wn2.getTextContent();
 
                     // The above code can be uncommented once these handlers have been removed
-                    String name = wn2.getTextContent().trim().toLowerCase();
+                    String name = wn2.getTextContent().trim();
 
                     //Start <50.07 compatibility handler.
                     skillType.name = updateSkillName(name);

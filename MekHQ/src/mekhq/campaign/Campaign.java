@@ -2340,7 +2340,6 @@ public class Campaign implements ITechManager {
         }
 
         if (employ) {
-            person.setEmployed(true);
             if (person.getPrimaryRole().isAstech()) {
                 asTechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
                 asTechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
@@ -2349,7 +2348,7 @@ public class Campaign implements ITechManager {
                 asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
             }
         } else {
-            person.setEmployed(false);
+            person.changeStatus(this, currentDay, PersonnelStatus.CAMP_FOLLOWER);
         }
 
         person.setPrisonerStatus(this, prisonerStatus, log);

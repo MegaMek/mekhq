@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -821,6 +822,8 @@ public class PersonnelTableModelColumnTest {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
                 case RANK -> assertInstanceOf(PersonRankStringSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                       assertInstanceOf(DateStringComparator.class,

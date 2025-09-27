@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.skills.enums;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.logging.MMLogger;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Represents margins of success (mos) that define ranges of roll results with an associated integer margin, lower
@@ -48,6 +49,7 @@ import megamek.logging.MMLogger;
  *     <li>A lower bound (inclusive),</li>
  *     <li>An upper bound (inclusive),</li>
  *     <li>A margin of success value.</li>
+ *     <li>A reporting color.</li>
  * </ul>
  *
  * <p>For example, {@link #SPECTACULAR} represents a margin of success in the range of 7 to {@link Integer#MAX_VALUE},
@@ -57,15 +59,15 @@ import megamek.logging.MMLogger;
  * @since 0.50.05
  */
 public enum MarginOfSuccess {
-    SPECTACULAR(7, Integer.MAX_VALUE, 4),
-    EXTRAORDINARY(5, 6, 3),
-    GOOD(3, 4, 2),
-    IT_WILL_DO(1, 2, 1),
-    BARELY_MADE_IT(0, 0, 0),
-    ALMOST(-2, -1, -1),
-    BAD(-4, -3, -2),
-    TERRIBLE(-6, -5, -3),
-    DISASTROUS(Integer.MIN_VALUE, -7, -4);
+    SPECTACULAR(7, Integer.MAX_VALUE, 4, ReportingUtilities.getAmazingColor()),
+    EXTRAORDINARY(5, 6, 3, ReportingUtilities.getPositiveColor()),
+    GOOD(3, 4, 2, ReportingUtilities.getPositiveColor()),
+    IT_WILL_DO(1, 2, 1, ReportingUtilities.getWarningColor()),
+    BARELY_MADE_IT(0, 0, 0, ReportingUtilities.getWarningColor()),
+    ALMOST(-2, -1, -1, ReportingUtilities.getWarningColor()),
+    BAD(-4, -3, -2, ReportingUtilities.getNegativeColor()),
+    TERRIBLE(-6, -5, -3, ReportingUtilities.getNegativeColor()),
+    DISASTROUS(Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
 
     private static final MMLogger logger = MMLogger.create(MarginOfSuccess.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MarginOfSuccess";
@@ -73,6 +75,7 @@ public enum MarginOfSuccess {
     private final int lowerBound;
     private final int upperBound;
     private final int margin;
+    private final String color;
 
     /**
      * Constructs a {@link MarginOfSuccess} enum constant with the specified bounds and margin value.
@@ -80,14 +83,16 @@ public enum MarginOfSuccess {
      * @param lowerBound the lower inclusive bound for this margin of success
      * @param upperBound the upper inclusive bound for this margin of success
      * @param margin     the margin value associated with this range
+     * @param color      the color of reporting text
      *
      * @author Illiani
      * @since 0.50.05
      */
-    MarginOfSuccess(int lowerBound, int upperBound, int margin) {
+    MarginOfSuccess(int lowerBound, int upperBound, int margin, String color) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.margin = margin;
+        this.color = color;
     }
 
     /**
@@ -123,6 +128,23 @@ public enum MarginOfSuccess {
      */
     public static int getMarginOfSuccess(int differenceBetweenRollAndTarget) {
         return getMarginOfSuccessObject(differenceBetweenRollAndTarget).margin;
+    }
+
+    /**
+     * Returns the color associated with the specified {@link MarginOfSuccess} value.
+     *
+     * <p>This method allows retrieval of a string representing a display color associated with a given margin of
+     * success outcome, which is typically used for formatting or UI rendering purposes.</p>
+     *
+     * @param marginOfSuccess The {@link MarginOfSuccess} for which to retrieve the associated color string.
+     *
+     * @return The color string defined for the given margin of success.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getMarginOfSuccessColor(MarginOfSuccess marginOfSuccess) {
+        return marginOfSuccess.color;
     }
 
     /**
