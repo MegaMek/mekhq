@@ -106,7 +106,7 @@ public class PrisonerEventManager {
     // a stretch, so we suggested errata-ing it to 100 per platoon, and these numbers reflect that.
     public static final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 5;
     public static final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
-    public static final int PRISONER_CAPACITY_OTHER = 2;
+    public static final double PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER = 0.05;
     public static final int PRISONER_CAPACITY_CAM_OPS_MULTIPLIER = 3;
 
     // Fixed Dialog Options
@@ -687,6 +687,7 @@ public class PrisonerEventManager {
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
 
         int prisonerCapacity = 0;
+        double otherUnitMultiplier = 1.0;
 
         for (Force force : campaign.getAllForces()) {
             if (!force.isForceType(SECURITY)) {
@@ -734,9 +735,11 @@ public class PrisonerEventManager {
                 }
 
                 if (!unit.isDamaged() && isMekHQCaptureStyle) {
-                    prisonerCapacity += unit.getCrew().size() * PRISONER_CAPACITY_OTHER;
+                    otherUnitMultiplier += PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER;
                 }
             }
+
+            prisonerCapacity = (int) round(prisonerCapacity * otherUnitMultiplier);
         }
 
         double modifier = (double) campaign.getTemporaryPrisonerCapacity() / 100;
