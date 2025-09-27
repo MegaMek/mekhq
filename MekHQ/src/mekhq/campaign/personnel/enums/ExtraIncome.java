@@ -145,9 +145,9 @@ public enum ExtraIncome {
     }
 
     /**
-     * Parses an {@link ExtraIncome} object from an {@link Integer} entry.
+     * Parses an {@link ExtraIncome} object from an {@code Integer} entry.
      *
-     * <p>This method converts the given {@link Integer} to a string and delegates parsing to
+     * <p>This method converts the given {@code Integer} to a string and delegates parsing to
      * {@link #extraIncomeParseFromString(String)}.</p>
      *
      * @param entry the integer value representing extra income data to be parsed.
