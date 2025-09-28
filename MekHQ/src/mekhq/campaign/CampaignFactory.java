@@ -237,6 +237,10 @@ public class CampaignFactory {
 
         Systems systems = Systems.getInstance();
 
+        // For simplicity, createPartialCampaignConfiguration needs a CampaignOptions instance.
+        CampaignOptions campaignOptions = new CampaignOptions();
+        CampaignConfiguration campaignConfig = CampaignFactory.createPartialCampaignConfiguration(campaignOptions);
+
         // A starting CurrentLocation is required
         PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
         CurrentLocation location;
@@ -245,15 +249,11 @@ public class CampaignFactory {
         } catch (Exception ex) {
             String message = String.format(
                   "Unable to set location to %s. If this wasn't during automated testing this must be investigated.",
-                  starterSystem
+                  starterSystem.getName(campaignConfig.getDate())
             );
             LOGGER.error(message, ex);
             return null;
         }
-
-        // For simplicity, createPartialCampaignConfiguration needs a CampaignOptions instance.
-        CampaignOptions campaignOptions = new CampaignOptions();
-        CampaignConfiguration campaignConfig = CampaignFactory.createPartialCampaignConfiguration(campaignOptions);
 
         GameOptions gameOptions = new GameOptions();
         gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaignConfig.getDate().getYear());
