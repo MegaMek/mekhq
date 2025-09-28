@@ -266,11 +266,11 @@ public class CampaignFactory {
         RandomDeath randomDeath = new RandomDeath();
         CampaignSummary campaignSummary = new CampaignSummary();
 
-
         // Assign remaining values to CampaignConfig
         campaignConfig.setGame(game);
         campaignConfig.setPlayer(player);
         campaignConfig.setGameOptions(gameOptions);
+        campaignConfig.setSystemsInstance(systems);
         campaignConfig.setLocation(location);
         campaignConfig.setPartsStore(partsStore);
         campaignConfig.setNewPersonnelMarket(newPersonnelMarket);
