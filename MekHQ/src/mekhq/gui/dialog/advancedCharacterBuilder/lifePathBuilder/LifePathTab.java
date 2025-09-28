@@ -33,7 +33,6 @@
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.min;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -551,7 +550,7 @@ public class LifePathTab {
         // Attributes
         storedAttributes.put(index, new HashMap<>());
         storedFlexibleAttributes.put(index, null);
-        storedEdge.put(index, MINIMUM_ATTRIBUTE_SCORE);
+        storedEdge.put(index, 0);
 
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addAttribute.label");
@@ -879,7 +878,7 @@ public class LifePathTab {
         }
 
         Integer workingEdge = storedEdge.get(index);
-        if (workingEdge != null && !storedEdge.isEmpty()) {
+        if (workingEdge != null && workingEdge != 0 && !storedEdge.isEmpty()) {
             appendBreaker(individualProgressText);
 
             individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.edge.label"));
