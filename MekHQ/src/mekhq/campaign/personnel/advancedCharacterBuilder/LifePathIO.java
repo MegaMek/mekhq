@@ -162,7 +162,7 @@ public class LifePathIO {
                                 // second boolean bypasses the 'check for legal statement' conditional and causes all
                                 // Life Paths in the data directory to be resaved with a legal statement. Note that
                                 // both booleans need to be true for this statement inclusion to occur.
-                                boolean overrideUpgradeRequirements = true;
+                                boolean overrideUpgradeRequirements = false;
                                 boolean overrideLegalStatementRequirements = false;
 
                                 if (record.version().isLowerThan(MHQConstants.VERSION) || overrideUpgradeRequirements) {
