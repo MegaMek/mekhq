@@ -91,6 +91,7 @@ public class LifePathIO {
         LOGGER.info("Loading LifePaths from user directory {}", LIFE_PATHS_USER_DIRECTORY_PATH);
         Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(campaign, userDirectory,
               false));
+
         for (UUID id : tempLifePathMap.keySet()) {
             if (lifePathMap.containsKey(id)) {
                 LOGGER.warn("Overriding {} with {}.", lifePathMap.get(id).name(),
@@ -161,7 +162,7 @@ public class LifePathIO {
                                 // second boolean bypasses the 'check for legal statement' conditional and causes all
                                 // Life Paths in the data directory to be resaved with a legal statement. Note that
                                 // both booleans need to be true for this statement inclusion to occur.
-                                boolean overrideUpgradeRequirements = false;
+                                boolean overrideUpgradeRequirements = true;
                                 boolean overrideLegalStatementRequirements = false;
 
                                 if (record.version().isLowerThan(MHQConstants.VERSION) || overrideUpgradeRequirements) {
@@ -353,9 +354,10 @@ public class LifePathIO {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
-            DefaultIndenter indenter = new DefaultIndenter("    ", DefaultIndenter.SYS_LF);
-            printer.indentObjectsWith(indenter);
-            printer.indentArraysWith(indenter);
+            printer.indentObjectsWith(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
+            printer.indentArraysWith(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
+            printer = printer.withArrayIndenter(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
+            printer = printer.withObjectIndenter(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
             String jsonContent = objectMapper.writer(printer).writeValueAsString(record);
 
             // Always open the file in OVERWRITE mode (default):
