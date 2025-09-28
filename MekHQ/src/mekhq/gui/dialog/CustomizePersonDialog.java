@@ -844,13 +844,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        panDemog.add(lblExtraIncome, gridBagConstraints);
+        panDemographics.add(lblExtraIncome, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panDemog.add(textExtraIncome, gridBagConstraints);
+        panDemographics.add(textExtraIncome, gridBagConstraints);
 
         y++;
 

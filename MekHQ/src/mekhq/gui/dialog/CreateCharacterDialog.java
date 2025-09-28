@@ -782,13 +782,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        demogPanel.add(lblExtraIncome, gridBagConstraints);
+        demographicPanel.add(lblExtraIncome, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        demogPanel.add(textExtraIncome, gridBagConstraints);
+        demographicPanel.add(textExtraIncome, gridBagConstraints);
 
         y++;
 
