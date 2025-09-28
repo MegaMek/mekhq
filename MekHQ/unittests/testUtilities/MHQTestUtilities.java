@@ -40,6 +40,8 @@ import java.util.Base64;
 
 import megamek.common.Player;
 import megamek.common.game.Game;
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
@@ -68,18 +70,41 @@ public final class MHQTestUtilities {
     public static final String TEST_MTF = ".mtf";
 
 
+    /**
+     * Create a Campaign Configuration partially configured from the campaign options
+     * Most dependencies are configured here with default values; for more information see
+     * {@link CampaignFactory#createPartialCampaignConfiguration}
+     *
+     * Then set the heavyweight dependencies here:
+     * 1. Systems (TestSystems for testing purposes)
+     * 2. GameOptions (required for MegaMek, may be candidate for further test class development)
+     * 3. Player instance
+     * 4. LocalDate for Campaign start day
+     * 5. CurrentLocation (created from a PlanetarySystem, which must be retrieved using Systems or TestSystems)
+     * 6. Logistical classes: parts store, new-type personnel market, random death generator, persistent campaign
+     *    summary tracker.
+     */
     public static CampaignConfiguration buildTestConfigWithSystems(Systems systems) {
         CampaignOptions options = new CampaignOptions();
         CampaignConfiguration campaignConfiguration = CampaignFactory.createPartialCampaignConfiguration(options);
 
+        // Set Systems instance (may be TestSystems instance)
         campaignConfiguration.setSystemsInstance(systems);
+
         // Finalize config and set up game instance
         Game game = new Game();
         campaignConfiguration.setGame(game);
 
+        // Set gameOptions, although not necessary for testing that does not spawn a MegaMek instance
+        GameOptions gameOptions = new GameOptions();
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaignConfiguration.getDate().getYear());
+        campaignConfiguration.setGameOptions(gameOptions);
+
+        // Player instance is required
         Player player = new Player(0, "TestPlayer");
         campaignConfiguration.setPlayer(player);
 
+        // Date is used for system lookups, events, valid equipment, etc.
         LocalDate date = LocalDate.ofYearDay(3067, 1);
         campaignConfiguration.setCurrentDay(date);
 
@@ -88,6 +113,7 @@ public final class MHQTestUtilities {
         PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
         campaignConfiguration.setLocation(new CurrentLocation(starterSystem, 0));
 
+        // Create instances of various stores, markets, etc.
         PartsStore partsStore = new TestPartsStore();
         NewPersonnelMarket newPersonnelMarket = new NewPersonnelMarket();
         RandomDeath randomDeath = new RandomDeath();

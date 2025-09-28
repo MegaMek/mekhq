@@ -44,9 +44,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.TEST_CANON_SYSTEMS_DIR;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -113,6 +115,28 @@ public class CampaignTest {
     public void before() {
         // Reset TestSystems
         systems = TestSystems.getInstance();
+    }
+
+    @Test
+    void testCampaignConstructorWithDependencyInjection() {
+        // Example of using dependency injection to provide test data directly to a Campaign instance
+        // without mocking or spying.
+
+        // Create a test CampaignConfiguration with default values but using the above TestSystems instance
+        CampaignConfiguration config = MHQTestUtilities.buildTestConfigWithSystems(systems);
+
+        // Let's try switching the year up.
+        config.setCurrentDay(LocalDate.ofYearDay(2875, 183));
+
+        // Add a system to the systems instance; it must exist in the testresources dir
+        config.getSystemsInstance().load(TEST_CANON_SYSTEMS_DIR + "Skye.yml");
+
+        // Instantiate the campaign with the new info
+        Campaign campaign = new Campaign(config);
+
+        // Let's plot a trip from the starting location to Skye!  It should be about 6 days:
+        int travelTime = campaign.getSimplifiedTravelTime(systems.getSystemByName("Skye", config.getDate()));
+        assertEquals(6, travelTime);
     }
 
     @Test
