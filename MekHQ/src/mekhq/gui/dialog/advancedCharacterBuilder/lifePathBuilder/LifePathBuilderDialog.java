@@ -526,6 +526,7 @@ public class LifePathBuilderDialog extends JDialog {
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsLifePath()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsCategories()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsAttributes()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsEdge()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsFlexibleAttribute()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsTraits()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsSkills()));
@@ -539,6 +540,7 @@ public class LifePathBuilderDialog extends JDialog {
             requirementsTab.setLifePaths(record.requirementsLifePath());
             requirementsTab.setCategories(record.requirementsCategories());
             requirementsTab.setAttributes(record.requirementsAttributes());
+            requirementsTab.setEdge(record.requirementsEdge());
             requirementsTab.setFlexibleAttribute(record.requirementsFlexibleAttribute());
             requirementsTab.setTraits(record.requirementsTraits());
             requirementsTab.setSkills(record.requirementsSkills());
@@ -556,6 +558,7 @@ public class LifePathBuilderDialog extends JDialog {
         exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsLifePath()));
         exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsCategories()));
         exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsAttributes()));
+        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsEdge()));
         exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsFlexibleAttribute()));
         exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsTraits()));
         exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsSkills()));
@@ -569,6 +572,7 @@ public class LifePathBuilderDialog extends JDialog {
             exclusionsTab.setLifePaths(record.exclusionsLifePath());
             exclusionsTab.setCategories(record.exclusionsCategories());
             exclusionsTab.setAttributes(record.exclusionsAttributes());
+            exclusionsTab.setEdge(record.exclusionsEdge());
             exclusionsTab.setFlexibleAttribute(record.exclusionsFlexibleAttribute());
             exclusionsTab.setTraits(record.exclusionsTraits());
             exclusionsTab.setSkills(record.exclusionsSkills());
@@ -583,6 +587,7 @@ public class LifePathBuilderDialog extends JDialog {
         int fixedXPMaxKey = -1;
 
         fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPAttributes()));
+        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPEdge()));
         fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPFlexibleAttribute()));
         fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPTraits()));
         fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPSkills()));
@@ -593,6 +598,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         if (fixedXPMaxKey > -1) {
             fixedXPTab.setAttributes(record.fixedXPAttributes());
+            fixedXPTab.setEdge(record.fixedXPEdge());
             fixedXPTab.setFlexibleAttribute(record.fixedXPFlexibleAttribute());
             fixedXPTab.setTraits(record.fixedXPTraits());
             fixedXPTab.setSkills(record.fixedXPSkills());
@@ -607,6 +613,7 @@ public class LifePathBuilderDialog extends JDialog {
         int flexibleXPMaxKey = -1;
 
         flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPAttributes()));
+        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPEdge()));
         flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPFlexibleAttribute()));
         flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPTraits()));
         flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPSkills()));
@@ -617,6 +624,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         if (flexibleXPMaxKey > -1) {
             flexibleXPTab.setAttributes(record.flexibleXPAttributes());
+            flexibleXPTab.setEdge(record.flexibleXPEdge());
             flexibleXPTab.setFlexibleAttribute(record.flexibleXPFlexibleAttribute());
             flexibleXPTab.setTraits(record.flexibleXPTraits());
             flexibleXPTab.setSkills(record.flexibleXPSkills());
@@ -692,6 +700,7 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Set<UUID>> requirementsLifePath = requirementsTab.getLifePaths();
         Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories = requirementsTab.getCategories();
         Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes = requirementsTab.getAttributes();
+        Map<Integer, Integer> requirementsEdge = requirementsTab.getEdge();
         Map<Integer, Integer> requirementsFlexibleAttributes = requirementsTab.getFlexibleAttribute();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits = requirementsTab.getTraits();
         Map<Integer, Map<String, Integer>> requirementsSkills = requirementsTab.getSkills();
@@ -703,6 +712,7 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Set<UUID>> exclusionsLifePath = exclusionsTab.getLifePaths();
         Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories = exclusionsTab.getCategories();
         Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes = exclusionsTab.getAttributes();
+        Map<Integer, Integer> exclusionsEdge = exclusionsTab.getEdge();
         Map<Integer, Integer> exclusionsFlexibleAttributes = exclusionsTab.getFlexibleAttribute();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits = exclusionsTab.getTraits();
         Map<Integer, Map<String, Integer>> exclusionsSkills = exclusionsTab.getSkills();
@@ -711,6 +721,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         // Fixed XP
         Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes = fixedXPTab.getAttributes();
+        Map<Integer, Integer> fixedXPEdge = fixedXPTab.getEdge();
         Map<Integer, Integer> fixedXPFlexibleAttributes = fixedXPTab.getFlexibleAttribute();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits = fixedXPTab.getTraits();
         Map<Integer, Map<String, Integer>> fixedXPSkills = fixedXPTab.getSkills();
@@ -719,6 +730,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         // Flexible XP
         Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes = flexibleXPTab.getAttributes();
+        Map<Integer, Integer> flexibleXPEdge = flexibleXPTab.getEdge();
         Map<Integer, Integer> flexibleXPFlexibleAttributes = flexibleXPTab.getFlexibleAttribute();
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits = flexibleXPTab.getTraits();
         Map<Integer, Map<String, Integer>> flexibleXPSkills = flexibleXPTab.getSkills();
@@ -729,18 +741,20 @@ public class LifePathBuilderDialog extends JDialog {
         // Dynamic
         UUID id = lifePathId;
         Version version = MHQConstants.VERSION;
-        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount, fixedXPAttributes, fixedXPFlexibleAttributes,
-              fixedXPTraits, fixedXPSkills, fixedXPMetaSkills, fixedXPAbilities, flexibleXPTab.getTabCount(),
-              flexibleXPPickCount, flexibleXPAttributes, flexibleXPFlexibleAttributes, flexibleXPTraits,
-              flexibleXPSkills, flexibleXPMetaSkills, flexibleXPAbilities);
+        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount, fixedXPAttributes,
+              fixedXPFlexibleAttributes, fixedXPEdge, fixedXPTraits, fixedXPSkills, fixedXPMetaSkills,
+              fixedXPAbilities, flexibleXPTab.getTabCount(), flexibleXPPickCount, flexibleXPAttributes,
+              flexibleXPFlexibleAttributes, flexibleXPEdge, flexibleXPTraits, flexibleXPSkills, flexibleXPMetaSkills,
+              flexibleXPAbilities);
 
         // Validation
-        int maximumGroupSize = LifePathValidator.getMaximumGroupSize(flexibleXPAbilities.size(),
-              flexibleXPAttributes.size(),
+        int maximumGroupSize = LifePathValidator.getMaximumGroupSize(flexibleXPAttributes.size(),
+              flexibleXPEdge.size(),
               flexibleXPFlexibleAttributes.size(),
+              flexibleXPTraits.size(),
               flexibleXPSkills.size(),
               flexibleXPMetaSkills.size(),
-              flexibleXPTraits.size());
+              flexibleXPAbilities.size());
 
         Set<UUID> requirementIDs = new HashSet<>();
         for (Set<UUID> ids : requirementsLifePath.values()) {
@@ -779,6 +793,7 @@ public class LifePathBuilderDialog extends JDialog {
               requirementsLifePath,
               requirementsCategories,
               requirementsAttributes,
+              requirementsEdge,
               requirementsFlexibleAttributes,
               requirementsTraits,
               requirementsSkills,
@@ -788,18 +803,21 @@ public class LifePathBuilderDialog extends JDialog {
               exclusionsLifePath,
               exclusionsCategories,
               exclusionsAttributes,
+              exclusionsEdge,
               exclusionsFlexibleAttributes,
               exclusionsTraits,
               exclusionsSkills,
               exclusionsMetaSkills,
               exclusionsAbilities,
               fixedXPAttributes,
+              fixedXPEdge,
               fixedXPFlexibleAttributes,
               fixedXPTraits,
               fixedXPSkills,
               fixedXPMetaSkills,
               fixedXPAbilities,
               flexibleXPAttributes,
+              flexibleXPEdge,
               flexibleXPFlexibleAttributes,
               flexibleXPTraits,
               flexibleXPSkills,

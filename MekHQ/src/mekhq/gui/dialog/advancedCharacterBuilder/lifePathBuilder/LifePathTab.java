@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.min;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -100,6 +101,7 @@ public class LifePathTab {
     private Map<Integer, Set<UUID>> storedLifePaths = new HashMap<>();
     private Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
     private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
+    private Map<Integer, Integer> storedEdge = new HashMap<>();
     private Map<Integer, Integer> storedFlexibleAttributes = new HashMap<>();
     private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
@@ -139,6 +141,14 @@ public class LifePathTab {
 
     public void setAttributes(Map<Integer, Map<SkillAttribute, Integer>> storedAttributes) {
         this.storedAttributes = storedAttributes;
+    }
+
+    public Map<Integer, Integer> getEdge() {
+        return storedEdge;
+    }
+
+    public void setEdge(Map<Integer, Integer> storedEdge) {
+        this.storedEdge = storedEdge;
     }
 
     /**
@@ -378,6 +388,18 @@ public class LifePathTab {
         storedAttributes.clear();
         storedAttributes.putAll(tempAttributes);
 
+        storedEdge.remove(selectedIndex);
+        Map<Integer, Integer> tempEdge = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : storedEdge.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempEdge.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempEdge.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedEdge.clear();
+        storedEdge.putAll(tempEdge);
+
         storedFlexibleAttributes.remove(selectedIndex);
         Map<Integer, Integer> tempFlexibleAttributes = new HashMap<>();
         for (Map.Entry<Integer, Integer> entry : storedFlexibleAttributes.entrySet()) {
@@ -467,6 +489,9 @@ public class LifePathTab {
         Map<SkillAttribute, Integer> currentAttributes = new HashMap<>(storedAttributes.get(selectedIndex));
         storedAttributes.put(newIndex, currentAttributes);
 
+        Integer currentEdge = storedEdge.get(selectedIndex);
+        storedEdge.put(newIndex, currentEdge);
+
         Integer currentFlexibleAttributes = storedFlexibleAttributes.get(selectedIndex);
         storedFlexibleAttributes.put(newIndex, currentFlexibleAttributes);
 
@@ -526,6 +551,7 @@ public class LifePathTab {
         // Attributes
         storedAttributes.put(index, new HashMap<>());
         storedFlexibleAttributes.put(index, null);
+        storedEdge.put(index, MINIMUM_ATTRIBUTE_SCORE);
 
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addAttribute.label");
@@ -657,8 +683,9 @@ public class LifePathTab {
             int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathAttributePicker picker = new LifePathAttributePicker(storedAttributes.get(currentIndex),
-                  storedFlexibleAttributes.get(currentIndex), tabType);
+                  storedFlexibleAttributes.get(currentIndex), storedEdge.get(currentIndex), tabType);
             storedAttributes.put(currentIndex, picker.getSelectedAttributeScores());
+            storedEdge.put(currentIndex, picker.getEdge());
             storedFlexibleAttributes.put(currentIndex, picker.getFlexibleAttribute());
             standardizedActions(currentIndex, editorProgress);
 
@@ -851,17 +878,24 @@ public class LifePathTab {
             }
         }
 
+        Integer workingEdge = storedEdge.get(index);
+        if (workingEdge != null && !storedEdge.isEmpty()) {
+            appendBreaker(individualProgressText);
+
+            individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.edge.label"));
+            individualProgressText.append(workingEdge >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
+            individualProgressText.append(workingEdge);
+            individualProgressText.append(TEXT_TRAIL);
+        }
+
         Integer workingFlexibleAttributes = storedFlexibleAttributes.get(index);
         if (workingFlexibleAttributes != null && !storedFlexibleAttributes.isEmpty()) {
             appendBreaker(individualProgressText);
-
-            int counter = 0;
 
             individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleAttribute.label"));
             individualProgressText.append(workingFlexibleAttributes >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
             individualProgressText.append(workingFlexibleAttributes);
             individualProgressText.append(TEXT_TRAIL);
-            counter++;
         }
 
         // Traits
@@ -992,6 +1026,7 @@ public class LifePathTab {
         storedLifePaths.clear();
         storedCategories.clear();
         storedAttributes.clear();
+        storedEdge.clear();
         storedFlexibleAttributes.clear();
         storedTraits.clear();
         storedSkills.clear();

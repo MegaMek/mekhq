@@ -43,6 +43,7 @@ public class LifePathXPCostCalculator {
     public static int calculateXPCost(int discount,
           Map<Integer, Map<SkillAttribute, Integer>> fixedAttributes,
           Map<Integer, Integer> fixedFlexibleAttribute,
+          Map<Integer, Integer> fixedXPEdge,
           Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedTraits,
           Map<Integer, Map<String, Integer>> fixedSkills,
           Map<Integer, Map<SkillSubType, Integer>> fixedMetaSkills,
@@ -50,6 +51,7 @@ public class LifePathXPCostCalculator {
           int flexibleTabCount,
           int flexiblePickCount,
           Map<Integer, Map<SkillAttribute, Integer>> flexibleAttributes,
+          Map<Integer, Integer> flexibleXPEdge,
           Map<Integer, Integer> flexibleFlexibleAttribute,
           Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleTraits,
           Map<Integer, Map<String, Integer>> flexibleSkills,
@@ -59,17 +61,16 @@ public class LifePathXPCostCalculator {
         int globalCost = -discount;
 
         // Fixed XP
-        globalCost += getCost(fixedAttributes, fixedFlexibleAttribute, fixedTraits, fixedSkills, fixedMetaSkills,
-              fixedAbilities);
+        globalCost += getCost(fixedAttributes, fixedFlexibleAttribute, fixedXPEdge, fixedTraits, fixedSkills,
+              fixedMetaSkills, fixedAbilities);
 
         // Flexible XP
         if (flexiblePickCount > 0) {
             int divisor = max(1, flexibleTabCount); // Prevents divide by zero errors
-            int baseCost = getCost(flexibleAttributes, flexibleFlexibleAttribute, flexibleTraits, flexibleSkills,
-                  flexibleMetaSkills, flexibleAbilities);
+            int baseCost = getCost(flexibleAttributes, flexibleFlexibleAttribute, flexibleXPEdge, flexibleTraits,
+                  flexibleSkills, flexibleMetaSkills, flexibleAbilities);
             double costPerTab = ((double) baseCost) / divisor;
             globalCost += (int) Math.round(costPerTab * flexiblePickCount);
-
         }
 
         // We can have 0 cost Life Paths, but not negative
@@ -77,9 +78,9 @@ public class LifePathXPCostCalculator {
     }
 
     private static int getCost(Map<Integer, Map<SkillAttribute, Integer>> attributes,
-          Map<Integer, Integer> flexibleAttribute, Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> traits,
-          Map<Integer, Map<String, Integer>> skills, Map<Integer, Map<SkillSubType, Integer>> metaSkills,
-          Map<Integer, Map<String, Integer>> abilities) {
+          Map<Integer, Integer> flexibleAttribute, Map<Integer, Integer> edge,
+          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> traits, Map<Integer, Map<String, Integer>> skills,
+          Map<Integer, Map<SkillSubType, Integer>> metaSkills, Map<Integer, Map<String, Integer>> abilities) {
         int cost = 0;
 
         for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : attributes.entrySet()) {
@@ -90,6 +91,13 @@ public class LifePathXPCostCalculator {
         }
 
         for (Map.Entry<Integer, Integer> entry : flexibleAttribute.entrySet()) {
+            Integer value = entry.getValue();
+            if (value != null) {
+                cost += value;
+            }
+        }
+
+        for (Map.Entry<Integer, Integer> entry : edge.entrySet()) {
             Integer value = entry.getValue();
             if (value != null) {
                 cost += value;

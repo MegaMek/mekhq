@@ -72,6 +72,7 @@ public record LifePath(
       Map<Integer, Set<UUID>> requirementsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes,
+      Map<Integer, Integer> requirementsEdge,
       Map<Integer, Integer> requirementsFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> requirementsTraits,
       Map<Integer, Map<String, Integer>> requirementsSkills,
@@ -82,6 +83,7 @@ public record LifePath(
       Map<Integer, Set<UUID>> exclusionsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes,
+      Map<Integer, Integer> exclusionsEdge,
       Map<Integer, Integer> exclusionsFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> exclusionsTraits,
       Map<Integer, Map<String, Integer>> exclusionsSkills,
@@ -89,6 +91,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> exclusionsAbilities,
       // Fixed XP
       Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes,
+      Map<Integer, Integer> fixedXPEdge,
       Map<Integer, Integer> fixedXPFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits,
       Map<Integer, Map<String, Integer>> fixedXPSkills,
@@ -96,6 +99,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> fixedXPAbilities,
       // Flexible XP
       Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes,
+      Map<Integer, Integer> flexibleXPEdge,
       Map<Integer, Integer> flexibleXPFlexibleAttribute,
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits,
       Map<Integer, Map<String, Integer>> flexibleXPSkills,
@@ -151,6 +155,16 @@ public record LifePath(
                 randomWeight = 1.0;
             }
 
+            if (requirementsEdge == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: requirementsEdge is null, assigning empty map", id, name);
+                requirementsEdge = new HashMap<>();
+            }
+
+            if (exclusionsEdge == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: exclusionsEdge is null, assigning empty map", id, name);
+                exclusionsEdge = new HashMap<>();
+            }
+
             if (requirementsFlexibleAttribute == null) { // Added in 50.07
                 LOGGER.warn("{} - {}: requirementsFlexibleAttribute is null, assigning empty map", id, name);
                 requirementsFlexibleAttribute = new HashMap<>();
@@ -159,6 +173,16 @@ public record LifePath(
             if (exclusionsFlexibleAttribute == null) { // Added in 50.07
                 LOGGER.warn("{} - {}: exclusionsFlexibleAttribute is null, assigning empty map", id, name);
                 exclusionsFlexibleAttribute = new HashMap<>();
+            }
+
+            if (fixedXPEdge == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: fixedXPEdge is null, assigning empty map", id, name);
+                fixedXPEdge = new HashMap<>();
+            }
+
+            if (flexibleXPEdge == null) { // Added in 50.07
+                LOGGER.warn("{} - {}: flexibleXPEdge is null, assigning empty map", id, name);
+                flexibleXPEdge = new HashMap<>();
             }
 
             if (fixedXPFlexibleAttribute == null) { // Added in 50.07
@@ -308,6 +332,7 @@ public record LifePath(
 
         int groupCount = java.util.stream.Stream.of(
               flexibleXPAttributes.size(),
+              flexibleXPEdge.size(),
               flexibleXPFlexibleAttribute.size(),
               flexibleXPTraits.size(),
               flexibleXPSkills.size(),

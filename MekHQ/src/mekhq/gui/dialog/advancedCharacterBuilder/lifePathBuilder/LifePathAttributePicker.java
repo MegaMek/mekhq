@@ -89,6 +89,9 @@ class LifePathAttributePicker extends JDialog {
     private final Map<SkillAttribute, Integer> storedAttributeScores;
     private Map<SkillAttribute, Integer> selectedAttributeScores;
 
+    private final Integer storedEdge;
+    private Integer selectedEdge;
+
     private final Integer storedFlexibleAttribute;
     private Integer selectedFlexibleAttribute;
 
@@ -97,18 +100,25 @@ class LifePathAttributePicker extends JDialog {
     }
 
     @Nullable
+    Integer getEdge() {
+        return selectedEdge;
+    }
+
+    @Nullable
     Integer getFlexibleAttribute() {
         return selectedFlexibleAttribute;
     }
 
     LifePathAttributePicker(Map<SkillAttribute, Integer> selectedAttributeScores,
-          @Nullable Integer selectedFlexibleAttribute,
-          LifePathBuilderTabType tabType) {
+          @Nullable Integer selectedFlexibleAttribute, Integer selectedEdge, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
         this.selectedAttributeScores = new HashMap<>(selectedAttributeScores);
         storedAttributeScores = new HashMap<>(selectedAttributeScores);
+
+        this.selectedEdge = selectedEdge;
+        storedEdge = selectedEdge;
 
         this.selectedFlexibleAttribute = selectedFlexibleAttribute;
         storedFlexibleAttribute = selectedFlexibleAttribute;
@@ -167,6 +177,7 @@ class LifePathAttributePicker extends JDialog {
         RoundedJButton btnCancel = new RoundedJButton(titleCancel);
         btnCancel.addActionListener(e -> {
             selectedAttributeScores = storedAttributeScores;
+            selectedEdge = storedEdge;
             selectedFlexibleAttribute = storedFlexibleAttribute;
             dispose();
         });
@@ -221,6 +232,20 @@ class LifePathAttributePicker extends JDialog {
         String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.options.label");
         pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
 
+        int categoryMinimumValue = switch (tabType) {
+            case FIXED_XP, FLEXIBLE_XP -> LOWEST_VALUE;
+            case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
+        };
+        int categoryMaximumValue = switch (tabType) {
+            case FIXED_XP, FLEXIBLE_XP -> HIGHEST_VALUE;
+            case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
+        };
+        int keyValue = switch (tabType) {
+            case REQUIREMENTS -> categoryMinimumValue;
+            case EXCLUSIONS -> categoryMaximumValue;
+            case FIXED_XP, FLEXIBLE_XP -> 0;
+        };
+
         for (SkillAttribute attribute : SkillAttribute.values()) {
             if (attribute == SkillAttribute.NONE) {
                 continue;
@@ -228,21 +253,6 @@ class LifePathAttributePicker extends JDialog {
 
             String label = attribute.getLabel();
             String tooltip = attribute.getDescription();
-
-            int categoryMinimumValue = switch (tabType) {
-                case FIXED_XP, FLEXIBLE_XP -> LOWEST_VALUE;
-                case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
-            };
-            int categoryMaximumValue = switch (tabType) {
-                case FIXED_XP, FLEXIBLE_XP -> HIGHEST_VALUE;
-                case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
-            };
-
-            int keyValue = switch (tabType) {
-                case REQUIREMENTS -> categoryMinimumValue;
-                case EXCLUSIONS -> categoryMaximumValue;
-                case FIXED_XP, FLEXIBLE_XP -> 0;
-            };
 
             int defaultValue = selectedAttributeScores.getOrDefault(attribute, keyValue);
 
@@ -259,27 +269,24 @@ class LifePathAttributePicker extends JDialog {
             pnlOptions.add(row);
         }
 
+        // Edge attribute row
+        String edgeLabel = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.label");
+        String edgeTooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.tooltip");
+        int edgeDefaultValue = selectedEdge == null ? keyValue : selectedEdge;
+
+        JPanel edgeRow = buildAttributeRow(
+              edgeLabel, edgeTooltip, categoryMinimumValue, categoryMaximumValue, edgeDefaultValue,
+              value -> selectedEdge = value
+        );
+        pnlOptions.add(edgeRow);
+
         // Flexible attribute row
         String label = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.flexible.label");
         String tooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.flexible.tooltip");
+        int flexibleDefaultValue = selectedFlexibleAttribute == null ? keyValue : selectedFlexibleAttribute;
 
-        int categoryMinimumValue = switch (tabType) {
-            case FIXED_XP, FLEXIBLE_XP -> LOWEST_VALUE;
-            case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
-        };
-        int categoryMaximumValue = switch (tabType) {
-            case FIXED_XP, FLEXIBLE_XP -> HIGHEST_VALUE;
-            case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
-        };
-        int keyValue = switch (tabType) {
-            case REQUIREMENTS -> categoryMinimumValue;
-            case EXCLUSIONS -> categoryMaximumValue;
-            case FIXED_XP, FLEXIBLE_XP -> 0;
-        };
-        int defaultValue = selectedFlexibleAttribute == null ? keyValue : selectedFlexibleAttribute;
-
-        JPanel row = buildAttributeRow(
-              label, tooltip, categoryMinimumValue, categoryMaximumValue, defaultValue,
+        JPanel flexibleRow = buildAttributeRow(
+              label, tooltip, categoryMinimumValue, categoryMaximumValue, flexibleDefaultValue,
               value -> {
                   if (value == keyValue) {
                       selectedFlexibleAttribute = null;
@@ -288,7 +295,7 @@ class LifePathAttributePicker extends JDialog {
                   }
               }
         );
-        pnlOptions.add(row);
+        pnlOptions.add(flexibleRow);
 
         return pnlOptions;
     }

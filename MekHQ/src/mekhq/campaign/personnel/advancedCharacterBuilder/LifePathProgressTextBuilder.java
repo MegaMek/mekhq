@@ -45,13 +45,13 @@ public class LifePathProgressTextBuilder {
 
     public static String getProgressText(
           mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation basicInfoTab,
-          LifePathTab requirementsTab,
-          LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
+          LifePathTab requirementsTab, LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
         int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
               fixedXPTab.getAttributes(),
               fixedXPTab.getFlexibleAttribute(),
+              fixedXPTab.getEdge(),
               fixedXPTab.getTraits(),
               fixedXPTab.getSkills(),
               fixedXPTab.getMetaSkills(),
@@ -60,6 +60,7 @@ public class LifePathProgressTextBuilder {
               flexibleXPTab.getPickCount(),
               flexibleXPTab.getAttributes(),
               flexibleXPTab.getFlexibleAttribute(),
+              flexibleXPTab.getEdge(),
               flexibleXPTab.getTraits(),
               flexibleXPTab.getSkills(),
               flexibleXPTab.getMetaSkills(),

@@ -87,17 +87,18 @@ public class LifePathValidator {
         checkLifePathExclusions();
     }
 
-    public static int getMaximumGroupSize(int flexibleAbilitiesCount, int flexibleAttributesCount,
-          int flexibleSkillsCount, int flexibleMetaSkillsCount, int flexibleTraitsCount, int flexibleXPTraits) {
-        return Math.max(flexibleAbilitiesCount,
-              Math.max(flexibleAttributesCount,
-                    Math.max(flexibleSkillsCount,
-                          Math.max(flexibleMetaSkillsCount,
-                                Math.max(flexibleTraitsCount, flexibleXPTraits)
-                          )
-                    )
-              )
-        );
+    public static int getMaximumGroupSize(int flexibleXPAttributesCount, int flexibleXPEdgeCount,
+          int flexibleXPFlexibleAttributesCount, int flexibleXPTraitsCount, int flexibleXPSkillsCount,
+          int flexibleXPMetaSkillsCount, int flexibleXPAbilitiesCount) {
+        return java.util.stream.Stream.of(
+              flexibleXPAttributesCount,
+              flexibleXPEdgeCount,
+              flexibleXPFlexibleAttributesCount,
+              flexibleXPTraitsCount,
+              flexibleXPSkillsCount,
+              flexibleXPMetaSkillsCount,
+              flexibleXPAbilitiesCount
+        ).mapToInt(Integer::intValue).max().orElse(0);
     }
 
     private void checkFlexiblePicks() {
