@@ -57,6 +57,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -1595,15 +1596,26 @@ public class EducationController {
             }
         }
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Integer curriculumXpRate = campaignOptions.getCurriculumXpRate();
+        boolean isLogSkillGain = campaignOptions.isPersonnelLogSkillGain();
         for (String skill : curriculum) {
             if (skill.equalsIgnoreCase("none")) {
                 return;
             }
 
             if (skill.equalsIgnoreCase("xp")) {
-                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+                person.awardXP(campaign, curriculumXpRate);
             } else {
                 updateSkill(person, educationLevel, skill);
+
+                String skillParsed = Academy.skillParser(skill);
+                int actualSkillLevel = person.hasSkill(skillParsed) ? person.getSkill(skillParsed).getLevel() : 0;
+                PerformanceLogger.improvedSkill(isLogSkillGain,
+                      person,
+                      campaign.getLocalDate(),
+                      skill,
+                      actualSkillLevel);
             }
         }
     }
