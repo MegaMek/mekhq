@@ -933,7 +933,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Initializes the unit generator. Called when the unit generator is first used or when the method has been changed
-     * in {@link CampaignOptions}..
+     * in {@link CampaignOptions}.
      */
     public void initUnitGenerator() {
         unitGenerator = new RATGeneratorConnector(getGameYear());
