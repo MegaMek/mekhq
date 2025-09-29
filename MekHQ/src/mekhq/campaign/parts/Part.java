@@ -1358,6 +1358,10 @@ public abstract class Part implements IPartWork, ITechnology {
         return quantity;
     }
 
+    public int getTotalQuantity() {
+        return getQuantity();
+    }
+
     public int getSellableQuantity() {
         return getQuantity();
     }
