@@ -590,12 +590,6 @@ public class CampaignOptions {
     private int dropShipBonusPercentage;
     // endregion Markets Tab
 
-    // region RATs Tab
-    private boolean useStaticRATs;
-    private String[] rats;
-    private boolean ignoreRATEra;
-    // endregion RATs Tab
-
     // region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
@@ -1226,12 +1220,6 @@ public class CampaignOptions {
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
         // endregion Markets Tab
-
-        // region RATs Tab
-        setUseStaticRATs(false);
-        setRATs("Xotl", "Total Warfare");
-        setIgnoreRATEra(false);
-        // endregion RATs Tab
 
         // region Against the Bot Tab
         useAtB = false;
@@ -3788,28 +3776,50 @@ public class CampaignOptions {
     // endregion Markets Tab
 
     // region RATs Tab
+
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseStaticRATs() {
-        return useStaticRATs;
+        return false;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setUseStaticRATs(final boolean useStaticRATs) {
-        this.useStaticRATs = useStaticRATs;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String[] getRATs() {
-        return rats;
+        return new String[0];
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setRATs(final String... rats) {
-        this.rats = rats;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isIgnoreRATEra() {
-        return ignoreRATEra;
+        return false;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setIgnoreRATEra(final boolean ignore) {
-        this.ignoreRATEra = ignore;
     }
     // endregion RATs Tab
 

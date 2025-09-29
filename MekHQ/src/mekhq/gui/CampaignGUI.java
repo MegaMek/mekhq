@@ -1860,10 +1860,8 @@ public class CampaignGUI extends JPanel {
      */
     private void menuOptionsActionPerformed(final ActionEvent evt) {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
-        // We need to handle it like this for now, as the options above get written to
-        // currently
+        // We need to handle it like this for now, as the options above get written to currently
         boolean atb = oldOptions.isUseAtB();
-        boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
@@ -1961,10 +1959,6 @@ public class CampaignGUI extends JPanel {
         }
 
         getCampaign().initTurnover();
-
-        if (staticRATs != newOptions.isUseStaticRATs()) {
-            getCampaign().initUnitGenerator();
-        }
 
         if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
