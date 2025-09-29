@@ -3498,7 +3498,7 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            // <50.05 compatibility handlerw
+                            // <50.05 compatibility handler
                             LogEntryType logEntryType = logEntry.getType();
                             String logEntryDescription = logEntry.getDesc();
                             if (logEntryType == MEDICAL) {
