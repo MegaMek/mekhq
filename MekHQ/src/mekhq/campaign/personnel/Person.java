@@ -3504,9 +3504,9 @@ public class Person {
                             if (logEntryType == MEDICAL) {
                                 person.addMedicalLogEntry(logEntry);
                             } else if (logEntryType == SERVICE) {
-                                // < 50.05 compatibility handler
+                                // < 50.07 compatibility handler
                                 List<String> assignmentTargetStrings = List.of("Assigned to",
-                                      "Reassigned from",
+                                      "Reassigned to",
                                       "Removed from",
                                       "Added to");
 
