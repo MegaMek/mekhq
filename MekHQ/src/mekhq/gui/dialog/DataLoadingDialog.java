@@ -322,7 +322,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             if (getCampaignFile() == null) {
                 // region progress 6
                 LOGGER.info("Starting a new campaign");
-                campaign = new Campaign();
+                campaign = CampaignFactory.createCampaign();
 
                 // Campaign Preset
                 final CampaignOptionsPresetPicker campaignOptionsPresetPicker =

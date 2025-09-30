@@ -56,7 +56,6 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
@@ -110,7 +109,6 @@ import javax.swing.JOptionPane;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -189,11 +187,9 @@ import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -228,7 +224,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
-import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
@@ -250,13 +245,10 @@ import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
-import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
@@ -306,7 +298,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
-import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
@@ -403,13 +394,14 @@ public class Campaign implements ITechManager {
 
     private Finances finances;
 
+    private Systems systemsInstance;
     private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
     private final News news;
 
-    private final PartsStore partsStore;
+    private PartsStore partsStore;
 
     private final List<String> customs;
 
@@ -451,7 +443,7 @@ public class Campaign implements ITechManager {
     private FactionStandings factionStandings;
     private int initiativeBonus;
     private int initiativeMaxBonus;
-    private final CampaignSummary campaignSummary;
+    private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
     private BehaviorSettings autoResolveBehaviorSettings;
@@ -502,81 +494,121 @@ public class Campaign implements ITechManager {
 
     private final IAutosaveService autosaveService;
 
-    public Campaign() {
+    public Campaign(CampaignConfiguration campConf) {
+        this(
+            campConf.getGame(),
+            campConf.getPlayer(),
+            campConf.getName(),
+            campConf.getDate(),
+            campConf.getCampaignOpts(),
+            campConf.getGameOptions(),
+            campConf.getPartsStore(),
+            campConf.getNewPersonnelMarket(),
+            campConf.getRandomDeath(),
+            campConf.getCampaignSummary(),
+            campConf.getfaction(),
+            campConf.getTechFaction(),
+            campConf.getCurrencyManager(),
+            campConf.getSystemsInstance(),
+            campConf.getLocation(),
+            campConf.getReputationController(),
+            campConf.getFactionStandings(),
+            campConf.getRankSystem(),
+            campConf.getforce(),
+            campConf.getfinances(),
+            campConf.getRandomEvents(),
+            campConf.getUltimatums(),
+            campConf.getRetDefTracker(),
+            campConf.getAutosave(),
+            campConf.getBehaviorSettings(),
+            campConf.getPersonnelMarket(),
+            campConf.getAtBMonthlyContractMarket(),
+            campConf.getUnitMarket(),
+            campConf.getDivorce(),
+            campConf.getMarriage(),
+            campConf.getProcreation()
+        );
+    }
+
+    public Campaign(Game game,
+          Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
+          PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
+          RandomDeath randomDeath, CampaignSummary campaignSummary,
+          Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
+          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
+          FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
+          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
+          RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
+          BehaviorSettings behaviorSettings,
+          PersonnelMarket persMarket, AbstractContractMarket atbMonthlyContractMarket,
+          AbstractUnitMarket unitMarket,
+          AbstractDivorce divorce, AbstractMarriage marriage,
+          AbstractProcreation procreation) {
+
+        // Essential state
         id = UUID.randomUUID();
-        game = new Game();
-        player = new Player(0, "self");
-        game.addPlayer(0, player);
-        currentDay = LocalDate.ofYearDay(3067, 1);
+        this.game = game;
+        this.player = player;
+        this.game.addPlayer(0, this.player);
+        this.name = name;
+        currentDay = date;
+        campaignOptions = campaignOpts;
+        this.gameOptions = gameOptions;
+        game.setOptions(gameOptions);
+        this.techFaction = techFaction;
+        this.systemsInstance = systemsInstance;
+        location = startLocation;
+        reputation = reputationController;
+        this.factionStandings = factionStandings;
+        forces = force;
+        forceIds.put(0, forces);
+        this.finances = finances;
+        randomEventLibraries = randomEvents;
+        factionStandingUltimatumsLibrary = ultimatums;
+        retirementDefectionTracker = retDefTracker;
+        autosaveService = autosave;
+        autoResolveBehaviorSettings = behaviorSettings;
+        this.partsStore = partsStore;
+        this.newPersonnelMarket = newPersonnelMarket;
+        this.randomDeath = randomDeath;
+        this.campaignSummary = campaignSummary;
+
+        // Members that take `this` as an argument
+        this.quartermaster = new Quartermaster(this);
+
+        // Primary init, sets state from passed values
+        setFaction(faction);
+        setRankSystemDirect(rankSystem);
+        setPersonnelMarket(persMarket);
+        setContractMarket(atbMonthlyContractMarket);
+        setUnitMarket(unitMarket);
+        setDivorce(divorce);
+        setMarriage(marriage);
+        setProcreation(procreation);
+
+        // Starting config / default values
         campaignStartDate = null;
-        campaignOptions = new CampaignOptions();
-        try {
-            setFaction(Factions.getInstance().getDefaultFaction());
-        } catch (Exception ex) {
-            LOGGER.error("Unable to set faction to default faction. If this wasn't during automated testing this must" +
-                               " be investigated.", ex);
-            setFaction(new Faction());
-        }
-        techFaction = megamek.common.enums.Faction.MERC;
-        CurrencyManager.getInstance().setCampaign(this);
-        try {
-            location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
-        } catch (Exception ex) {
-            LOGGER.error("Unable to set location to default galatea system. If this wasn't during automated testing " +
-                               "this must be investigated.", ex);
-            PlanetarySystem fallbackSystem = new PlanetarySystem("Galatea");
-            location = new CurrentLocation(fallbackSystem, 0);
-        }
+        shoppingList = new ShoppingList();
         isAvoidingEmptySystems = true;
         isOverridingCommandCircuitRequirements = false;
-        currentReport = new ArrayList<>();
-        currentReportHTML = "";
-        newReports = new ArrayList<>();
-        name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputation = new ReputationController();
-        factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
         initiativeBonus = 0;
         initiativeMaxBonus = 1;
-        setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
-        forces = new Force(name);
-        forceIds.put(0, forces);
         combatTeams = new Hashtable<>();
-        finances = new Finances();
         asTechPool = 0;
         medicPool = 0;
-        resetAsTechMinutes();
-        partsStore = new PartsStore(this);
-        gameOptions = new GameOptions();
-        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
-        game.setOptions(gameOptions);
         customs = new ArrayList<>();
-        shoppingList = new ShoppingList();
-        newPersonnelMarket = new NewPersonnelMarket(this);
-        news = new News(getGameYear(), id.getLeastSignificantBits());
-        setPersonnelMarket(new PersonnelMarket());
-        setContractMarket(new AtbMonthlyContractMarket());
-        setUnitMarket(new DisabledUnitMarket());
-        randomDeath = new RandomDeath(this);
-        setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
-        setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
-        setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         personnelWhoAdvancedInXP = new ArrayList<>();
-        retirementDefectionTracker = new RetirementDefectionTracker();
         turnoverRetirementInformation = new ArrayList<>();
         atbConfig = null;
-        autosaveService = new AutosaveService();
         hasActiveContract = false;
-        campaignSummary = new CampaignSummary(this);
-        quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -584,20 +616,21 @@ public class Campaign implements ITechManager {
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
-        // Library initialization
-        try {
-            randomEventLibraries = new RandomEventLibraries();
-        } catch (Exception ex) {
-            LOGGER.error("Unable to initialize RandomEventLibraries. If this wasn't during automated testing this " +
-                               "must be investigated.", ex);
-        }
+        // Reports
+        currentReport = new ArrayList<>();
+        currentReportHTML = "";
+        newReports = new ArrayList<>();
 
-        try {
-            factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
-        } catch (Exception ex) {
-            LOGGER.error("Unable to initialize FactionStandingUltimatumsLibrary. If this wasn't during automated " +
-                               "testing this must be investigated.", ex);
-        }
+        // Secondary initialization from passed / derived values
+        news = new News(getGameYear(), id.getLeastSignificantBits());
+        resetAsTechMinutes();
+
+        // These classes require a Campaign reference to operate/initialize
+        currencyManager.setCampaign(this);
+        this.partsStore.stock(this);
+        this.newPersonnelMarket.setCampaign(this);
+        this.randomDeath.setCampaign(this);
+        this.campaignSummary.setCampaign(this);
     }
 
     /**
@@ -871,12 +904,18 @@ public class Campaign implements ITechManager {
 
     public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
         this.newPersonnelMarket = newPersonnelMarket;
+        this.newPersonnelMarket.setCampaign(this);
     }
     // endregion Markets
 
     // region Personnel Modules
     public void resetRandomDeath() {
-        this.randomDeath = new RandomDeath(this);
+        setRandomDeath(new RandomDeath());
+    }
+
+    public void setRandomDeath(RandomDeath randomDeath) {
+        this.randomDeath = randomDeath;
+        this.randomDeath.setCampaign(this);
     }
 
     public AbstractDivorce getDivorce() {
@@ -1280,6 +1319,11 @@ public class Campaign implements ITechManager {
 
     public CampaignSummary getCampaignSummary() {
         return campaignSummary;
+    }
+
+    public void setCampaignSummary(CampaignSummary campaignSummary) {
+        this.campaignSummary = campaignSummary;
+        this.campaignSummary.setCampaign(this);
     }
 
     public News getNews() {
@@ -4034,7 +4078,7 @@ public class Campaign implements ITechManager {
 
         // find planets within a certain radius - the function will weed out dead
         // planets
-        List<PlanetarySystem> systems = Systems.getInstance()
+        List<PlanetarySystem> systems = this.systemsInstance
                                               .getShoppingSystems(getCurrentSystem(),
                                                     getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                                                     currentDate);
@@ -4962,7 +5006,7 @@ public class Campaign implements ITechManager {
             addReport(article.getHeadlineForReport());
         }
 
-        for (NewsItem article : Systems.getInstance().getPlanetaryNews(getLocalDate())) {
+        for (NewsItem article : this.systemsInstance.getPlanetaryNews(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
     }
@@ -7609,26 +7653,26 @@ public class Campaign implements ITechManager {
 
     public ArrayList<PlanetarySystem> getSystems() {
         ArrayList<PlanetarySystem> systems = new ArrayList<>();
-        for (String key : Systems.getInstance().getSystems().keySet()) {
-            systems.add(Systems.getInstance().getSystems().get(key));
+        for (String key : this.systemsInstance.getSystems().keySet()) {
+            systems.add(this.systemsInstance.getSystems().get(key));
         }
         return systems;
     }
 
     public PlanetarySystem getSystemById(String id) {
-        return Systems.getInstance().getSystemById(id);
+        return this.systemsInstance.getSystemById(id);
     }
 
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<>();
-        for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
+        for (PlanetarySystem key : this.systemsInstance.getSystems().values()) {
             systemNames.add(key.getPrintableName(getLocalDate()));
         }
         return systemNames;
     }
 
     public PlanetarySystem getSystemByName(String name) {
-        return Systems.getInstance().getSystemByName(name, getLocalDate());
+        return this.systemsInstance.getSystemByName(name, getLocalDate());
     }
 
     // region Ranks
@@ -7774,8 +7818,7 @@ public class Campaign implements ITechManager {
         Map<String, Double> scoreG = new HashMap<>(); // Path costs from start
 
         // Precompute heuristics
-        Systems systemsInstance = Systems.getInstance();
-        Map<String, PlanetarySystem> allSystems = systemsInstance.getSystems();
+        Map<String, PlanetarySystem> allSystems = this.systemsInstance.getSystems();
 
         for (Entry<String, PlanetarySystem> entry : allSystems.entrySet()) {
             scoreH.put(entry.getKey(), end.getDistanceTo(entry.getValue()));
@@ -8903,6 +8946,11 @@ public class Campaign implements ITechManager {
         return partsStore;
     }
 
+    public void setPartsStore(PartsStore partsStore) {
+        this.partsStore = partsStore;
+        this.partsStore.stock(this);
+    }
+
     public void addCustom(String name) {
         customs.add(name);
     }
@@ -9000,7 +9048,7 @@ public class Campaign implements ITechManager {
     public void setStartingSystem(final @Nullable Planet planet) {
         PlanetarySystem startingSystem;
         if (planet == null) {
-            final Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+            final Map<String, PlanetarySystem> systemList = this.systemsInstance.getSystems();
             startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
             if (startingSystem == null) {
@@ -10731,7 +10779,7 @@ public class Campaign implements ITechManager {
             startingFaction = factions.getDefaultFaction();
             startingSystem = startingFaction.getStartingPlanet(this, currentDay);
             if (startingSystem == null) {
-                startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+                startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
             }
         }
 
@@ -10816,7 +10864,24 @@ public class Campaign implements ITechManager {
         }
 
         // Fallback if no startingSystem
-        startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+        startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
         return startingSystem != null ? startingSystem.getPrimaryPlanet() : null;
+    }
+
+    /**
+     * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
+     * @return systemsInstance Systems instance used when instantiating this Campaign instance.
+     */
+    public Systems getSystemsInstance() {
+        return systemsInstance;
+    }
+
+    /**
+     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems
+     * within a running Campaign.
+     * @param systemsInstance new Systems instance that this campaign should use.
+     */
+    public void setSystemsInstance(Systems systemsInstance) {
+        this.systemsInstance = systemsInstance;
     }
 }

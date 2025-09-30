@@ -54,7 +54,6 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -69,7 +68,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import org.junit.jupiter.api.BeforeAll;
@@ -84,7 +82,6 @@ import org.mockito.Mockito;
  * JUnit Tests for {@link MRMSService}
  */
 public class MRMSServiceTest {
-    static MMLogger LOGGER = MMLogger.create(MRMSServiceTest.class);
 
     static int DEFAULT_TARGET_NUMBER = 6;
 
@@ -105,11 +102,6 @@ public class MRMSServiceTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
-        }
 
         mockFaction = Mockito.mock(Faction.class);
         when(mockFaction.getShortName()).thenReturn("Faction");
