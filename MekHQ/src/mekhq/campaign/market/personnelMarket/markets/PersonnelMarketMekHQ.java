@@ -54,7 +54,6 @@ import java.util.Set;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;

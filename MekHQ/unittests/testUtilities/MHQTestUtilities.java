@@ -55,7 +55,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.TestPartsStore;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.mission.TestSystems;
+import mekhq.campaign.universe.TestSystems;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;

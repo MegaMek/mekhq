@@ -574,7 +574,6 @@ public class Campaign implements ITechManager {
         this.campaignSummary = campaignSummary;
 
         // Members that take `this` as an argument
-        // (TODO Sleet01: refactor to allow lazy linking / setting post-instantiation)
         this.quartermaster = new Quartermaster(this);
 
         // Primary init, sets state from passed values
@@ -10867,5 +10866,22 @@ public class Campaign implements ITechManager {
         // Fallback if no startingSystem
         startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
         return startingSystem != null ? startingSystem.getPrimaryPlanet() : null;
+    }
+
+    /**
+     * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
+     * @return systemsInstance Systems instance used when instantiating this Campaign instance.
+     */
+    public Systems getSystemsInstance() {
+        return systemsInstance;
+    }
+
+    /**
+     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems
+     * within a running Campaign.
+     * @param systemsInstance new Systems instance that this campaign should use.
+     */
+    public void setSystemsInstance(Systems systemsInstance) {
+        this.systemsInstance = systemsInstance;
     }
 }

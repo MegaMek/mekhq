@@ -65,7 +65,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.mission.TestSystems;
+import mekhq.campaign.universe.TestSystems;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Cubicle;

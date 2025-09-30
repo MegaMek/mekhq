@@ -31,10 +31,7 @@
  * affiliated with Microsoft.
  */
 
-package mekhq.campaign.mission;
-
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
+package mekhq.campaign.universe;
 
 public class TestSystems extends Systems {
 
