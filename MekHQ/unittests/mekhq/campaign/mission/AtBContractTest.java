@@ -64,6 +64,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.TestSystems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,7 +88,7 @@ public class AtBContractTest {
         RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
         try {
             Factions.setInstance(Factions.loadDefault(true));
-            Systems.setInstance(Systems.loadDefault());
+            Systems.setInstance(TestSystems.loadDefault());
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }

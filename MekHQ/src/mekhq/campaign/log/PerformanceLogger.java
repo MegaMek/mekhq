@@ -60,9 +60,31 @@ public class PerformanceLogger {
               MessageFormat.format(message, patient, injuries, xp)));
     }
 
+    /**
+     * @deprecated use {@link #improvedSkill(boolean, Person, LocalDate, String, int)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static void improvedSkill(final Campaign campaign, final Person person, final LocalDate date,
           final String skill, final String value) {
         if (campaign.getCampaignOptions().isPersonnelLogSkillGain()) {
+            person.addPerformanceLogEntry(new PerformanceLogEntry(date,
+                  MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
+        }
+    }
+
+    /**
+     * Logs a skill improvement event for a specified person if skill gain logging  is enabled. This method records the
+     * event details including the skill improved, its value, and the date of the improvement.
+     *
+     * @param isLogSkillGain a boolean indicating whether skill gain logging is enabled
+     * @param person         the {@link Person} object representing the individual gaining the skill
+     * @param date           the {@link LocalDate} of the skill improvement
+     * @param skill          a {@link String} representing the name of the skill that was improved
+     * @param value          an {@code int} representing the value of the improvement to the skill
+     */
+    public static void improvedSkill(final boolean isLogSkillGain, final Person person, final LocalDate date,
+          final String skill, final int value) {
+        if (isLogSkillGain) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
         }

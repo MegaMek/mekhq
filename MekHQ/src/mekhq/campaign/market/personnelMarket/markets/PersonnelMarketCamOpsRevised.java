@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.personnel.Person;
@@ -78,13 +77,11 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
      *
      * <p>Initializes market styles and loads relevant personnel market libraries.</p>
      *
-     * @param campaign the parent campaign instance
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketCamOpsRevised(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketCamOpsRevised() {
+        super();
 
         setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_REVISED);
 

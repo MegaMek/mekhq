@@ -966,12 +966,6 @@ public class CampaignOptionsMarshaller {
         // endregion Contract Market
         // endregion Markets Tab
 
-        // region RATs Tab
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStaticRATs", campaignOptions.isUseStaticRATs());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rats", campaignOptions.getRATs());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreRATEra", campaignOptions.isIgnoreRATEra());
-        // endregion RATs Tab
-
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", campaignOptions.getSkillLevel().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", campaignOptions.getAutoResolveMethod().name());

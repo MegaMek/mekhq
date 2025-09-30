@@ -139,6 +139,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                      && Objects.equals(getType(), ((AmmoStorage) part).getType());
     }
 
+    @Override
+    public int getTotalQuantity() {
+        return getQuantity() * getShots();
+    }
+
     /**
      * Gets a value indicating whether or an {@code AmmoType} is the same as this instance's ammo.
      *
@@ -355,10 +360,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoStorage getNewPart() {
-        if (getType().getKgPerShot() > 0) {
-            return new AmmoStorage(1, getType(), (int) Math.ceil(1000 / getType().getKgPerShot()), campaign);
-        }
-        return new AmmoStorage(1, getType(), getType().getShots(), campaign);
+        return new AmmoStorage(1, getType(), getShotsPerTon(), campaign);
     }
 
     @Override
@@ -396,5 +398,16 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
+    }
+
+    protected int getShotsPerTon() {
+        AmmoType ammoType = getType();
+
+        if (ammoType.hasCustomKgPerShot()) {
+            return (int) Math.floor(1000.0 / ammoType.getKgPerShot());
+        }
+
+        // if not listed by kg per shot, we assume this is a single ton increment
+        return ammoType.getShots();
     }
 }

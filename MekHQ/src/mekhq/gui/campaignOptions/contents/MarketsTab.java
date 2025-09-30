@@ -913,11 +913,12 @@ public class MarketsTab {
             PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
             if (selectedPersonnelMarketStyle != originalPersonnelMarketStyle) {
                 NewPersonnelMarket replacementMarket = switch (selectedPersonnelMarketStyle) {
-                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
-                    case MEKHQ -> new PersonnelMarketMekHQ(campaign);
-                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
-                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
+                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+                    case MEKHQ -> new PersonnelMarketMekHQ();
+                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
                 };
+                replacementMarket.setCampaign(campaign);
                 campaign.setNewPersonnelMarket(replacementMarket);
             }
             options.setPersonnelMarketStyle(comboPersonnelMarketStyle.getSelectedItem());

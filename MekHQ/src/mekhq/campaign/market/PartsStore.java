@@ -99,11 +99,10 @@ public class PartsStore {
     private final ArrayList<Part> parts;
     private final Map<String, Part> nameAndDetailMap;
 
-    public PartsStore(Campaign campaign) {
+    public PartsStore() {
         LOGGER.debug("Creating PartsStore for campaign");
         parts = new ArrayList<>(EXPECTED_SIZE);
         nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
-        stock(campaign);
         LOGGER.debug("Finished creating PartsStore for campaign");
     }
 
@@ -144,7 +143,7 @@ public class PartsStore {
         }
     }
 
-    private void stockBattleArmorSuits(Campaign c) {
+    protected void stockBattleArmorSuits(Campaign c) {
         // this is just a test
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             if (!summary.getUnitType().equals("BattleArmor")) {
@@ -167,7 +166,7 @@ public class PartsStore {
         }
     }
 
-    private void stockWeaponsAmmoAndEquipment(Campaign campaign) {
+    protected void stockWeaponsAmmoAndEquipment(Campaign campaign) {
         for (Enumeration<EquipmentType> allTypes = EquipmentType.getAllTypes(); allTypes.hasMoreElements(); ) {
             EquipmentType equipmentType = allTypes.nextElement();
             if (!equipmentType.isHittable() &&
@@ -302,7 +301,7 @@ public class PartsStore {
         parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, campaign));
     }
 
-    private void stockMekActuators(Campaign c) {
+    protected void stockMekActuators(Campaign c) {
         for (int i = Mek.ACTUATOR_UPPER_ARM; i <= Mek.ACTUATOR_FOOT; i++) {
             if (i == Mek.ACTUATOR_HIP) {
                 continue;
@@ -352,7 +351,7 @@ public class PartsStore {
         return TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
     }
 
-    private void stockEngines(Campaign c) {
+    protected void stockEngines(Campaign c) {
         Engine engine;
         int year = c.getGameYear();
         for (int rating = 10; rating <= 400; rating += 5) {
@@ -397,7 +396,7 @@ public class PartsStore {
         }
     }
 
-    private void stockGyros(Campaign c) {
+    protected void stockGyros(Campaign c) {
         // values of 0.5 to 8.0 inclusive
         for (int r = 1; r <= 16; r++) {
             double i = r * 0.5;
@@ -422,7 +421,7 @@ public class PartsStore {
         }
     }
 
-    private void stockMekComponents(Campaign c) {
+    protected void stockMekComponents(Campaign c) {
         parts.add(new MekLifeSupport(0, c));
         for (int ton = 20; ton <= 100; ton += 5) {
             parts.add(new MekSensor(ton, c));
@@ -437,7 +436,7 @@ public class PartsStore {
         }
     }
 
-    private void stockAeroComponents(Campaign c) {
+    protected void stockAeroComponents(Campaign c) {
         parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c));
         parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c));
@@ -465,7 +464,7 @@ public class PartsStore {
         }
     }
 
-    private void stockVeeComponents(Campaign c) {
+    protected void stockVeeComponents(Campaign c) {
         parts.add(new VeeSensor(0, c));
         parts.add(new VeeStabilizer(0, -1, c));
         for (int ton = 5; ton <= 100; ton = ton + 5) {
@@ -474,7 +473,7 @@ public class PartsStore {
         }
     }
 
-    private void stockArmor(Campaign c) {
+    protected void stockArmor(Campaign c) {
         int amount;
         for (ArmorType armor : ArmorType.allArmorTypes()) {
             if (armor.hasFlag(MiscType.F_BA_EQUIPMENT)) {
@@ -489,7 +488,7 @@ public class PartsStore {
         parts.add(new ProtoMekArmor(0, EquipmentType.T_ARMOR_EDP, 66, -1, true, c));
     }
 
-    private void stockMekLocations(Campaign c) {
+    protected void stockMekLocations(Campaign c) {
         for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CENTER_LEG; loc++) {
             for (int ton = 20; ton <= 100; ton = ton + 5) {
                 for (int type = 0; type < EquipmentType.structureNames.length; type++) {
@@ -503,7 +502,7 @@ public class PartsStore {
         }
     }
 
-    private void addMekLocation(Campaign c, int loc, int ton, int type, boolean clan) {
+    protected void addMekLocation(Campaign c, int loc, int ton, int type, boolean clan) {
         if (loc == Mek.LOC_HEAD) {
             parts.add(new MekLocation(loc, ton, type, clan, false, false, true, true, c));
             parts.add(new MekLocation(loc, ton, type, clan, true, false, true, true, c));
@@ -519,7 +518,7 @@ public class PartsStore {
         }
     }
 
-    private void stockProtomekLocations(Campaign c) {
+    protected void stockProtomekLocations(Campaign c) {
         for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAIN_GUN; loc++) {
             for (int ton = 2; ton <= 15; ton++) {
                 parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
@@ -532,7 +531,7 @@ public class PartsStore {
         }
     }
 
-    private void stockProtomekComponents(Campaign c) {
+    protected void stockProtomekComponents(Campaign c) {
         int ton = 2;
         while (ton <= 15) {
             parts.add(new ProtoMekArmActuator(ton, c));

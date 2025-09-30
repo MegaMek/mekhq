@@ -105,7 +105,7 @@ public class NewPersonnelMarket {
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
 
-    final private Campaign campaign;
+    private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
     private Faction campaignFaction;
     private LocalDate today;
@@ -130,14 +130,10 @@ public class NewPersonnelMarket {
     /**
      * Creates a new Personnel Market instance bound to a campaign.
      *
-     * @param campaign the parent {@link Campaign} instance to associate with this personnel market
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    public NewPersonnelMarket(Campaign campaign) {
-        this.campaign = campaign;
-
+    public NewPersonnelMarket() {
         clanMarketEntries = new HashMap<>();
         innerSphereMarketEntries = new HashMap<>();
     }
@@ -169,11 +165,12 @@ public class NewPersonnelMarket {
                 if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
                     PersonnelMarketStyle marketStyle = PersonnelMarketStyle.fromString(nodeContents);
                     personnelMarket = switch (marketStyle) {
-                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
-                        case MEKHQ -> new PersonnelMarketMekHQ(campaign);
-                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
-                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
+                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+                        case MEKHQ -> new PersonnelMarketMekHQ();
+                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
                     };
+                    personnelMarket.setCampaign(campaign);
                 }
             }
         } catch (Exception ex) {
@@ -184,7 +181,7 @@ public class NewPersonnelMarket {
             logger.error("Using fallback Personnel Market. This means we've failed to load the Personnel Market data " +
                                "from the campaign save. If this save predates 50.07 that's to be expected. Otherwise, " +
                                "please report this as a bug.");
-            return new NewPersonnelMarket(campaign);
+            return new NewPersonnelMarket();
         }
 
         try {
@@ -509,6 +506,13 @@ public class NewPersonnelMarket {
      */
     public Campaign getCampaign() {
         return campaign;
+    }
+
+    /**
+     * @param campaign Campaign instance that this instance will be attached to and access
+     */
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
     }
 
     /**

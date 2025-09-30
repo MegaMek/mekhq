@@ -87,7 +87,6 @@ import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -278,7 +277,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             FinancialInstitutions.initializeFinancialInstitutions();
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
-            RATManager.populateCollectionNames();
             SkillType.initializeTypes();
             sort(SkillType.getSkillList()); // sort all skills alphabetically
             SpecialAbility.initializeSPA(false);
@@ -324,7 +322,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             if (getCampaignFile() == null) {
                 // region progress 6
                 LOGGER.info("Starting a new campaign");
-                campaign = new Campaign();
+                campaign = CampaignFactory.createCampaign();
 
                 // Campaign Preset
                 final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
