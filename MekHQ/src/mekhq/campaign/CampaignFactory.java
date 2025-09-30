@@ -32,10 +32,14 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 import megamek.Version;
@@ -61,6 +65,8 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathIO;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -78,8 +84,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.CampaignHasProblemOnLoad;
 import mekhq.service.AutosaveService;
-
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 
 /**
  * Defines a factory API that enables {@link Campaign} instances to be created from its detected format.
@@ -157,17 +161,15 @@ public class CampaignFactory {
     }
 
     /**
-     * Creates a partially-configured CampaignConfiguration that is missing:
-     * 1. Systems (TestSystems for testing purposes)
-     * 2. GameOptions (required for MegaMek, may be candidate for further test class development)
-     * 3. Player instance
-     * 4. LocalDate for Campaign start day
-     * 5. CurrentLocation (created from a PlanetarySystem, which must be retrieved using Systems or TestSystems)
-     * 6. Logistical classes: parts store, new-type personnel market, random death generator, persistent campaign
-     *    summary tracker.
-     * Useful for testing purposes, as the missing references can be replaced with mocks or lightweight
-     * test classes.
+     * Creates a partially-configured CampaignConfiguration that is missing: 1. Systems (TestSystems for testing
+     * purposes) 2. GameOptions (required for MegaMek, may be candidate for further test class development) 3. Player
+     * instance 4. LocalDate for Campaign start day 5. CurrentLocation (created from a PlanetarySystem, which must be
+     * retrieved using Systems or TestSystems) 6. Logistical classes: parts store, new-type personnel market, random
+     * death generator, persistent campaign summary tracker. Useful for testing purposes, as the missing references can
+     * be replaced with mocks or lightweight test classes.
+     *
      * @param options CampaignOptions instance; used in Randomizer construction
+     *
      * @return campaignConfig CampaignConfiguration with the above items unset
      */
     public static @Nullable CampaignConfiguration createPartialCampaignConfiguration(CampaignOptions options) {
@@ -188,6 +190,7 @@ public class CampaignFactory {
         Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
         FactionStandingUltimatumsLibrary ultimatums = null;
+        Map<UUID, LifePath> lifePaths = null;
 
         RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
         AutosaveService autosave = new AutosaveService();
@@ -226,12 +229,11 @@ public class CampaignFactory {
         }
 
         try {
-            campaignConfig = new CampaignConfiguration(name, date, options,
-                  faction, techFaction, currencyManager, reputationController,
-                  factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
-                  retirementDefectionTracker, autosave, behaviorSettings,
-                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
-                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+            campaignConfig = new CampaignConfiguration(name, date, options, faction, techFaction, currencyManager,
+                  reputationController, factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
+                  lifePaths, retirementDefectionTracker, autosave, behaviorSettings, personnelMarket,
+                  atbMonthlyContractMarket, disabledUnitMarket, disabledRandomDivorce, disabledRandomMarriage,
+                  disabledRandomProcreation);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }
@@ -240,13 +242,10 @@ public class CampaignFactory {
     }
 
     /**
-     * Factory function to create an object containing all the configuration info needed
-     * to generate a Campaign instance.  Useful for tweaking some settings prior to creating the
-     * Campaign.
-     * The standard CampaignConfiguration uses all the settings that previously were generated or
-     * initialized within * `new Campaign()`.
-     * Note: this method does load all Planetary Systems and PartsStore entries, which can take several
-     * seconds
+     * Factory function to create an object containing all the configuration info needed to generate a Campaign
+     * instance.  Useful for tweaking some settings prior to creating the Campaign. The standard CampaignConfiguration
+     * uses all the settings that previously were generated or initialized within * `new Campaign()`. Note: this method
+     * does load all Planetary Systems and PartsStore entries, which can take several seconds
      *
      * @return campaignConfig CampaignConfiguration with all of the default values set
      */
@@ -301,12 +300,10 @@ public class CampaignFactory {
     }
 
     /**
-     * Create a new Campaign() instance with all of the correct default values and data providers
-     * needed to run a MekHQ game.
-     * Analogous to `new Campaign(...)` with all standard values.
-     * Note: calls `createCampaignConfiguration()` to get these values in a compact object.
-     * Note: Side effect: loads all Planetary Systems and PartsStore entries, which can take several
-     * seconds
+     * Create a new Campaign() instance with all of the correct default values and data providers needed to run a MekHQ
+     * game. Analogous to `new Campaign(...)` with all standard values. Note: calls `createCampaignConfiguration()` to
+     * get these values in a compact object. Note: Side effect: loads all Planetary Systems and PartsStore entries,
+     * which can take several seconds
      *
      * @return campaign Campaign object that is fully initialized and ready to run.
      */
@@ -322,6 +319,17 @@ public class CampaignFactory {
             campaign = new Campaign(campaignConfig);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
+        }
+
+        // TODO this is currently bolted in here, but really we need to remove Immersive Dialog's reliance on
+        //  Campaign. Once that has been handled this can get shifted to CampaignConfiguration
+        if (campaign != null) {
+            try {
+                campaignConfig.setLifePathLibrary(LifePathIO.loadAllLifePaths(campaign));
+            } catch (Exception ex) {
+                LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this " +
+                                   "must be investigated.", ex);
+            }
         }
 
         return campaign;
