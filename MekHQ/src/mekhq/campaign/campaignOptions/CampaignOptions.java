@@ -131,6 +131,7 @@ public class CampaignOptions {
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
     private boolean techsUseAdministration;
+    private boolean useUsefulAsTechs;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
@@ -677,6 +678,7 @@ public class CampaignOptions {
         assignedTechFirst = false;
         resetToFirstTech = false;
         techsUseAdministration = false;
+        useUsefulAsTechs = false;
         useQuirks = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
@@ -825,7 +827,7 @@ public class CampaignOptions {
         setTougherHealing(false);
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
-        setIsUseUsefulMedics(false);
+        useUsefulMedics = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -3880,6 +3882,14 @@ public class CampaignOptions {
      */
     public void setTechsUseAdministration(final boolean techsUseAdministration) {
         this.techsUseAdministration = techsUseAdministration;
+    }
+
+    public boolean isUseUsefulAsTechs() {
+        return useUsefulAsTechs;
+    }
+
+    public void setIsUseUsefulAsTechs(final boolean useUsefulAsTechs) {
+        this.useUsefulAsTechs = useUsefulAsTechs;
     }
 
     /**

@@ -861,7 +861,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireAstechsNum.text"),
                   1,
                   0,
-                  getCampaign().getAsTechPool());
+                  getCampaign().getTemporaryAsTechPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
@@ -878,7 +878,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
         miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllAsTechs.addActionListener(evt -> getCampaign().decreaseAsTechPool(getCampaign().getAsTechPool()));
+        miFireAllAsTechs.addActionListener(evt -> getCampaign().decreaseAsTechPool(getCampaign().getTemporaryAsTechPool()));
         menuAsTechPool.add(miFireAllAsTechs);
         menuMarket.add(menuAsTechPool);
         // endregion Astech Pool
@@ -2754,7 +2754,7 @@ public class CampaignGUI extends JPanel {
 
     private void refreshTempAsTechs() {
         // FIXME : Localize
-        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getAsTechPool() + "</html>";
+        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getTemporaryAsTechPool() + "</html>";
         lblTempAsTechs.setText(text);
     }
 

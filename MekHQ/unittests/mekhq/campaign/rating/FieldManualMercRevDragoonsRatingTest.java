@@ -422,7 +422,7 @@ public class FieldManualMercRevDragoonsRatingTest {
               mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 165;
-        when(mockCampaign.getAsTechPool()).thenReturn(6);
+        when(mockCampaign.getTemporaryAsTechPool()).thenReturn(6);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
 
         // Add a mekwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.

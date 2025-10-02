@@ -72,6 +72,7 @@ public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
 
     private JCheckBox chkTechsUseAdministration;
+    private JCheckBox chkUsefulAsTechs;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox resetToFirstTechCheckBox;
@@ -128,6 +129,7 @@ public class RepairAndMaintenanceTab {
      */
     private void initializeRepairTab() {
         chkTechsUseAdministration = new JCheckBox();
+        chkUsefulAsTechs = new JCheckBox();
         useEraModsCheckBox = new JCheckBox();
 
         assignedTechFirstCheckBox = new JCheckBox();
@@ -196,6 +198,9 @@ public class RepairAndMaintenanceTab {
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));
 
+        chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs");
+        chkUsefulAsTechs.addMouseListener(createTipPanelUpdater(repairHeader, "UsefulAsTechs"));
+
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
         useEraModsCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseEraModsCheckBox"));
 
@@ -233,6 +238,9 @@ public class RepairAndMaintenanceTab {
         layoutLeft.gridy = 0;
         layoutLeft.gridwidth = 1;
         panelLeft.add(chkTechsUseAdministration, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkUsefulAsTechs, layoutLeft);
 
         layoutLeft.gridy++;
         panelLeft.add(useEraModsCheckBox, layoutLeft);
@@ -435,6 +443,7 @@ public class RepairAndMaintenanceTab {
 
         // Repair
         options.setTechsUseAdministration(chkTechsUseAdministration.isSelected());
+        options.setIsUseUsefulAsTechs(chkUsefulAsTechs.isSelected());
         options.setEraMods(useEraModsCheckBox.isSelected());
         options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
@@ -482,6 +491,7 @@ public class RepairAndMaintenanceTab {
 
         // Repair
         chkTechsUseAdministration.setSelected(options.isTechsUseAdministration());
+        chkUsefulAsTechs.setSelected(options.isUseUsefulAsTechs());
         useEraModsCheckBox.setSelected(options.isUseEraMods());
         assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
         resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());

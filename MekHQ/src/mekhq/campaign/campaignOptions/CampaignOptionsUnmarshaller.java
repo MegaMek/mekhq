@@ -130,6 +130,7 @@ public class CampaignOptionsUnmarshaller {
             case "assignedTechFirst" -> campaignOptions.setAssignedTechFirst(parseBoolean(nodeContents));
             case "resetToFirstTech" -> campaignOptions.setResetToFirstTech(parseBoolean(nodeContents));
             case "techsUseAdministration" -> campaignOptions.setTechsUseAdministration(parseBoolean(nodeContents));
+            case "useUsefulAsTechs" -> campaignOptions.setIsUseUsefulAsTechs(parseBoolean(nodeContents));
             case "useQuirks" -> campaignOptions.setQuirks(parseBoolean(nodeContents));
             case "xpCostMultiplier" -> campaignOptions.setXpCostMultiplier(parseDouble(nodeContents));
             case "scenarioXP" -> campaignOptions.setScenarioXP(parseInt(nodeContents));
