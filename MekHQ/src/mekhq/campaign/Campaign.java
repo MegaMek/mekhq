@@ -8787,7 +8787,7 @@ public class Campaign implements ITechManager {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
 
-            // It is possible for very poorly skilled characters to actually be a deteriment to their teams. This is
+            // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
             // by design.
             return asTechSkill.getTotalSkillLevel(options, attributes);
         }
