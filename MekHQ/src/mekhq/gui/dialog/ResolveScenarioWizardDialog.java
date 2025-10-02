@@ -1866,7 +1866,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         UnitEditorDialog med = new UnitEditorDialog(frame, unitStatus.getEntity());
         med.setVisible(true);
-        unitStatus.getUnit().runDiagnostic(false);
 
         if (isSalvage) {
             salvageUnitLabel.get(unitIndex).setText(unitStatus.getDesc(true));
