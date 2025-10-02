@@ -34,9 +34,10 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab.getAttributeMaximumValue;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab.getAttributeMinimumValue;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab.getDefaultAttributeValue;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -47,6 +48,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -199,14 +201,25 @@ class LifePathAttributePicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildAttributeRow(
-          String label, String tooltip, int minValue, int maxValue, int defaultValue,
-          java.util.function.Consumer<Integer> onChanged) {
+    private JPanel buildAttributeRow(String label, String tooltip, int minValue, int maxValue,
+          int defaultValue,
+          Consumer<Integer> onChanged) {
 
         JLabel lblAttribute = new JLabel(label);
         lblAttribute.setToolTipText(tooltip);
 
-        JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, minValue, maxValue, 1));
+        // During development, we ran into a scenario where under certain circumstances, the default value could be
+        // invalid. While that bug was fixed, we added this catch to ensure future failures of that kind are caught
+        // elegantly. - Illiani, Oct 02 2025
+        JSpinner spnAttributeScore;
+        try {
+            spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, minValue, maxValue, 1));
+        } catch (IllegalArgumentException ex) {
+            LOGGER.error(ex, "Invalid default value for attribute {}: {} vs {}-{}", label, defaultValue, minValue,
+                  maxValue);
+            return new JPanel();
+        }
+
         spnAttributeScore.addChangeListener(evt -> onChanged.accept((Integer) spnAttributeScore.getValue()));
         spnAttributeScore.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip)
@@ -223,28 +236,15 @@ class LifePathAttributePicker extends JDialog {
     }
 
     private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
-        final int LOWEST_VALUE = -1000;
-        final int HIGHEST_VALUE = 1000;
-
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
         String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.options.label");
         pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
 
-        int categoryMinimumValue = switch (tabType) {
-            case FIXED_XP, FLEXIBLE_XP -> LOWEST_VALUE;
-            case REQUIREMENTS, EXCLUSIONS -> MINIMUM_ATTRIBUTE_SCORE;
-        };
-        int categoryMaximumValue = switch (tabType) {
-            case FIXED_XP, FLEXIBLE_XP -> HIGHEST_VALUE;
-            case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
-        };
-        int keyValue = switch (tabType) {
-            case REQUIREMENTS -> categoryMinimumValue;
-            case EXCLUSIONS -> categoryMaximumValue;
-            case FIXED_XP, FLEXIBLE_XP -> 0;
-        };
+        int categoryMinimumValue = getAttributeMinimumValue(tabType, false);
+        int categoryMaximumValue = getAttributeMaximumValue(tabType);
+        int keyValue = getDefaultAttributeValue(tabType, categoryMinimumValue, categoryMaximumValue);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
             if (attribute == SkillAttribute.NONE) {
@@ -256,9 +256,8 @@ class LifePathAttributePicker extends JDialog {
 
             int defaultValue = selectedAttributeScores.getOrDefault(attribute, keyValue);
 
-            JPanel row = buildAttributeRow(
-                  label, tooltip, categoryMinimumValue, categoryMaximumValue, defaultValue,
-                  value -> {
+            JPanel row = buildAttributeRow(label, tooltip, categoryMinimumValue, categoryMaximumValue,
+                  defaultValue, value -> {
                       if (value == keyValue) {
                           selectedAttributeScores.remove(attribute);
                       } else {
@@ -272,11 +271,15 @@ class LifePathAttributePicker extends JDialog {
         // Edge attribute row
         String edgeLabel = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.label");
         String edgeTooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.tooltip");
-        int edgeDefaultValue = selectedEdge == null ? keyValue : selectedEdge;
 
-        JPanel edgeRow = buildAttributeRow(
-              edgeLabel, edgeTooltip, categoryMinimumValue, categoryMaximumValue, edgeDefaultValue,
-              value -> selectedEdge = value
+        int edgeMinimumValue = getAttributeMinimumValue(tabType, true);
+        int edgeKeyValue = getDefaultAttributeValue(tabType, edgeMinimumValue, categoryMaximumValue);
+        int edgeDefaultValue = selectedEdge == null ? edgeKeyValue : selectedEdge;
+
+        LOGGER.info("selectedEdge: {}", selectedEdge);
+
+        JPanel edgeRow = buildAttributeRow(edgeLabel, edgeTooltip, edgeMinimumValue, categoryMaximumValue,
+              edgeDefaultValue, value -> selectedEdge = value
         );
         pnlOptions.add(edgeRow);
 
@@ -285,9 +288,8 @@ class LifePathAttributePicker extends JDialog {
         String tooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.flexible.tooltip");
         int flexibleDefaultValue = selectedFlexibleAttribute == null ? keyValue : selectedFlexibleAttribute;
 
-        JPanel flexibleRow = buildAttributeRow(
-              label, tooltip, categoryMinimumValue, categoryMaximumValue, flexibleDefaultValue,
-              value -> {
+        JPanel flexibleRow = buildAttributeRow(label, tooltip, categoryMinimumValue, categoryMaximumValue,
+              flexibleDefaultValue, value -> {
                   if (value == keyValue) {
                       selectedFlexibleAttribute = null;
                   } else {

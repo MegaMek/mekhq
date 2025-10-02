@@ -33,6 +33,9 @@
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.min;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -84,6 +87,9 @@ public class LifePathTab {
 
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
     private final static int PADDING = getLifePathBuilderPadding();
+
+    final static int ATTRIBUTE_SPINNER_LOWEST_VALUE = -1000;
+    final static int ATTRIBUTE_SPINNER_HIGHEST_VALUE = 1000;
 
     private final Factions factions = Factions.getInstance();
 
@@ -550,7 +556,9 @@ public class LifePathTab {
         // Attributes
         storedAttributes.put(index, new HashMap<>());
         storedFlexibleAttributes.put(index, null);
-        storedEdge.put(index, 0);
+
+        int defaultEdgeValue = getDefaultAttributeValue(tabType, true);
+        storedEdge.put(index, defaultEdgeValue);
 
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addAttribute.label");
@@ -763,6 +771,35 @@ public class LifePathTab {
 
             parent.setVisible(true);
         });
+    }
+
+    private int getDefaultAttributeValue(LifePathBuilderTabType tabType, boolean isEdge) {
+        int categoryMinimumValue = getAttributeMinimumValue(tabType, isEdge);
+        int categoryMaximumValue = getAttributeMaximumValue(tabType);
+        return getDefaultAttributeValue(tabType, categoryMinimumValue, categoryMaximumValue);
+    }
+
+    static int getDefaultAttributeValue(LifePathBuilderTabType tabType, int categoryMinimumValue,
+          int categoryMaximumValue) {
+        return switch (tabType) {
+            case REQUIREMENTS -> categoryMinimumValue;
+            case EXCLUSIONS -> categoryMaximumValue;
+            case FIXED_XP, FLEXIBLE_XP -> 0;
+        };
+    }
+
+    static int getAttributeMaximumValue(LifePathBuilderTabType tabType) {
+        return switch (tabType) {
+            case FIXED_XP, FLEXIBLE_XP -> ATTRIBUTE_SPINNER_HIGHEST_VALUE;
+            case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
+        };
+    }
+
+    static int getAttributeMinimumValue(LifePathBuilderTabType tabType, boolean isEdge) {
+        return switch (tabType) {
+            case FIXED_XP, FLEXIBLE_XP -> ATTRIBUTE_SPINNER_LOWEST_VALUE;
+            case REQUIREMENTS, EXCLUSIONS -> isEdge ? MINIMUM_EDGE_SCORE : MINIMUM_ATTRIBUTE_SCORE;
+        };
     }
 
     private void standardizedActions(int index, JEditorPane newText) {

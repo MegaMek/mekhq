@@ -325,7 +325,9 @@ public class CampaignFactory {
         //  Campaign. Once that has been handled this can get shifted to CampaignConfiguration
         if (campaign != null) {
             try {
-                campaignConfig.setLifePathLibrary(LifePathIO.loadAllLifePaths(campaign));
+                Map<UUID, LifePath> lifePathLibrary = LifePathIO.loadAllLifePaths(campaign);
+                campaignConfig.setLifePathLibrary(lifePathLibrary);
+                campaign.setLifePathLibrary(lifePathLibrary);
             } catch (Exception ex) {
                 LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this " +
                                    "must be investigated.", ex);

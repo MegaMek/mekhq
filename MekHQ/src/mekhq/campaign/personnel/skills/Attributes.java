@@ -96,7 +96,15 @@ public class Attributes {
     public static int DEFAULT_ATTRIBUTE_SCORE = 5;
 
     /**
-     * The minimum allowable score for any attribute.
+     * The minimum allowable score for the Edge attribute.
+     *
+     * <p>The Edge attribute can be set to zero. his is distinct from other attributes, whose minimums are set by
+     * {@link #MINIMUM_ATTRIBUTE_SCORE}.</p>
+     */
+    public static int MINIMUM_EDGE_SCORE = 0;
+
+    /**
+     * The minimum allowable score for any attribute other than Edge.
      *
      * <p>Attribute values cannot be set below this limit, and any attempts to do so will result in clamping to this
      * value.</p>
