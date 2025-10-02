@@ -459,10 +459,12 @@ public class FieldManualMercRevDragoonsRatingTest {
         Person mockAstech = mock(Person.class);
         when(mockAstech.isDoctor()).thenReturn(false);
         when(mockAstech.isTech()).thenReturn(false);
+        when(mockAstech.isEmployed()).thenReturn(true);
         when(mockAstech.getPrimaryRole()).thenReturn(PersonnelRole.ASTECH);
         when(mockAstech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockAstech).getStatus();
         when(mockAstech.isDeployed()).thenReturn(false);
+        when(mockAstech.isEmployed()).thenReturn(true);
         when(mockAstech.getSkill(eq(SkillType.S_ASTECH))).thenReturn(mockAstechSkill);
         when(mockAstech.hasSkill(eq(SkillType.S_ASTECH))).thenReturn(true);
         when(mockAstech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
