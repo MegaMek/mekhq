@@ -915,7 +915,11 @@ public class LifePathTab {
         }
 
         Integer workingEdge = storedEdge.get(index);
-        if (workingEdge != null && workingEdge != 0 && !storedEdge.isEmpty()) {
+        int edgeMinimumValue = getAttributeMinimumValue(tabType, true);
+        int edgeMaximumValue = getAttributeMaximumValue(tabType);
+        int edgeDefaultValue = getDefaultAttributeValue(tabType, edgeMinimumValue, edgeMaximumValue);
+
+        if (workingEdge != null && workingEdge != edgeDefaultValue) {
             appendBreaker(individualProgressText);
 
             individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.edge.label"));
