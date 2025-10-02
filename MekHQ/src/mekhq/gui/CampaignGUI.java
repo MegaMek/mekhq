@@ -872,7 +872,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetMedicPool());
+        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
         menuAsTechPool.add(miFullStrengthAsTechs);
 
         JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
