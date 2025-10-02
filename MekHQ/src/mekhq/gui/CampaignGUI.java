@@ -915,7 +915,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireMedicsNum.text"),
                   1,
                   0,
-                  getCampaign().getMedicPool());
+                  getCampaign().getTemporaryMedicPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
@@ -926,13 +926,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().resetMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
+        miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getTemporaryMedicPool()));
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
         // endregion Medic Pool
@@ -2760,7 +2760,7 @@ public class CampaignGUI extends JPanel {
 
     private void refreshTempMedics() {
         // FIXME : Localize
-        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getTemporaryMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 

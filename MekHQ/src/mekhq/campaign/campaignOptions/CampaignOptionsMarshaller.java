@@ -338,6 +338,7 @@ public class CampaignOptionsMarshaller {
               indent,
               "doctorsUseAdministration",
               campaignOptions.isDoctorsUseAdministration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulMedics", campaignOptions.isUseUsefulMedics());
         // endregion Medical
 
         // region Prisoners

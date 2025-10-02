@@ -208,7 +208,7 @@ public class PersonnelReport extends AbstractReport {
                                    getCampaign().getAsTechPool());
         salary = salary.plus(getCampaign().getCampaignOptions()
                                    .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getMedicPool());
+                                   getCampaign().getTemporaryMedicPool());
 
         StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text") + "\n\n");
 
@@ -223,7 +223,7 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Temp Medics and Astechs to Support List
-        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getMedicPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getTemporaryMedicPool()));
         sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getAsTechPool()));
 
         sb.append(getSecondarySupportPersonnelDetails());

@@ -108,7 +108,7 @@ public record Accountant(Campaign campaign) {
                                        .doubleValue() * campaign().getAsTechPool());
         salaries = salaries.plus(campaign().getCampaignOptions()
                                        .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                       campaign().getMedicPool());
+                                       campaign().getTemporaryMedicPool());
 
         return salaries;
     }
@@ -566,7 +566,7 @@ public record Accountant(Campaign campaign) {
                               campaign().getAsTechPool()) +
                              (campaign().getCampaignOptions()
                                     .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                    campaign().getMedicPool())));
+                                    campaign().getTemporaryMedicPool())));
 
         return payRollSummary;
     }

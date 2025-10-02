@@ -68,6 +68,7 @@ import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
@@ -496,37 +497,37 @@ public class Campaign implements ITechManager {
 
     public Campaign(CampaignConfiguration campConf) {
         this(
-            campConf.getGame(),
-            campConf.getPlayer(),
-            campConf.getName(),
-            campConf.getDate(),
-            campConf.getCampaignOpts(),
-            campConf.getGameOptions(),
-            campConf.getPartsStore(),
-            campConf.getNewPersonnelMarket(),
-            campConf.getRandomDeath(),
-            campConf.getCampaignSummary(),
-            campConf.getfaction(),
-            campConf.getTechFaction(),
-            campConf.getCurrencyManager(),
-            campConf.getSystemsInstance(),
-            campConf.getLocation(),
-            campConf.getReputationController(),
-            campConf.getFactionStandings(),
-            campConf.getRankSystem(),
-            campConf.getforce(),
-            campConf.getfinances(),
-            campConf.getRandomEvents(),
-            campConf.getUltimatums(),
-            campConf.getRetDefTracker(),
-            campConf.getAutosave(),
-            campConf.getBehaviorSettings(),
-            campConf.getPersonnelMarket(),
-            campConf.getAtBMonthlyContractMarket(),
-            campConf.getUnitMarket(),
-            campConf.getDivorce(),
-            campConf.getMarriage(),
-            campConf.getProcreation()
+              campConf.getGame(),
+              campConf.getPlayer(),
+              campConf.getName(),
+              campConf.getDate(),
+              campConf.getCampaignOpts(),
+              campConf.getGameOptions(),
+              campConf.getPartsStore(),
+              campConf.getNewPersonnelMarket(),
+              campConf.getRandomDeath(),
+              campConf.getCampaignSummary(),
+              campConf.getfaction(),
+              campConf.getTechFaction(),
+              campConf.getCurrencyManager(),
+              campConf.getSystemsInstance(),
+              campConf.getLocation(),
+              campConf.getReputationController(),
+              campConf.getFactionStandings(),
+              campConf.getRankSystem(),
+              campConf.getforce(),
+              campConf.getfinances(),
+              campConf.getRandomEvents(),
+              campConf.getUltimatums(),
+              campConf.getRetDefTracker(),
+              campConf.getAutosave(),
+              campConf.getBehaviorSettings(),
+              campConf.getPersonnelMarket(),
+              campConf.getAtBMonthlyContractMarket(),
+              campConf.getUnitMarket(),
+              campConf.getDivorce(),
+              campConf.getMarriage(),
+              campConf.getProcreation()
         );
     }
 
@@ -3211,8 +3212,8 @@ public class Campaign implements ITechManager {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
                 Part newPart = (maybePart instanceof MissingPart) ?
-                                        (((MissingPart) maybePart).getNewPart())
-                                        : (Part) maybePart;
+                                     (((MissingPart) maybePart).getNewPart())
+                                     : (Part) maybePart;
                 partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
             }
         }
@@ -3308,8 +3309,8 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             Part newPart = (maybePart instanceof MissingPart) ?
-                    (((MissingPart) maybePart).getNewPart())
-                    : (Part) maybePart;
+                                 (((MissingPart) maybePart).getNewPart())
+                                 : (Part) maybePart;
             partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
         }
         return inUse.keySet()
@@ -6072,8 +6073,8 @@ public class Campaign implements ITechManager {
             fillAsTechPool();
         }
 
-        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
-            fillMedicPool();
+        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
+            resetMedicPool();
         }
 
         // Ensure we don't have anything that would prevent the new day
@@ -8680,7 +8681,13 @@ public class Campaign implements ITechManager {
         medicPool = size;
     }
 
+    /** @deprecated no longer in use **/
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getMedicPool() {
+        return getTemporaryMedicPool();
+    }
+
+    public int getTemporaryMedicPool() {
         return medicPool;
     }
 
@@ -8831,15 +8838,58 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int count = 0;
+        int permanentMedicPool = getPermanentMedicPool();
+        return getTemporaryMedicPool() + permanentMedicPool;
+    }
+
+    /**
+     * Calculates the total number of medics available in the campaign by summing the skill levels in the
+     * {@link SkillType#S_MEDTECH} skill for all eligible personnel.
+     *
+     * <p>Eligible personnel must have either a primary or secondary role as a medic, must not be currently deployed,
+     * and must be employed.</p>
+     *
+     * <p></p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
+     * modifiers) is added to the running total.</p>
+     *
+     * @return The total number of medics available.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int getPermanentMedicPool() {
+        final boolean isUseUsefulMedics = campaignOptions.isUseUsefulMedics();
+        int permanentMedicPool = 0;
+
         for (Person person : getActivePersonnel(false)) {
-            if ((person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) &&
-                      !person.isDeployed() &&
-                      person.isEmployed()) {
-                count++;
+            if (person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) {
+                if (person.isDeployed()) {
+                    continue;
+                }
+
+                if (!person.isEmployed()) {
+                    continue;
+                }
+
+                if (!isUseUsefulMedics) {
+                    permanentMedicPool++;
+                } else {
+                    Skill medicSkill = person.getSkill(S_MEDTECH);
+                    if (medicSkill != null) {
+                        PersonnelOptions options = person.getOptions();
+                        Attributes attributes = person.getATOWAttributes();
+
+                        int skillLevel = medicSkill.getTotalSkillLevel(options, attributes);
+
+                        // It is possible for very poorly skilled personnel to actually reduce the pool, this is by
+                        // design. Not all help is helpful.
+                        permanentMedicPool += skillLevel;
+                    }
+                }
             }
         }
-        return getMedicPool() + count;
+
+        return permanentMedicPool;
     }
 
     public boolean requiresAdditionalMedics() {
@@ -8853,6 +8903,16 @@ public class Campaign implements ITechManager {
     public void increaseMedicPool(int i) {
         medicPool += i;
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
+    }
+
+    public void resetMedicPool() {
+        emptyMedicPool();
+        fillMedicPool();
+    }
+
+    public void emptyMedicPool() {
+        final int currentMedicPool = getTemporaryMedicPool();
+        decreaseMedicPool(currentMedicPool);
     }
 
     public void fillMedicPool() {
@@ -10870,6 +10930,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
+     *
      * @return systemsInstance Systems instance used when instantiating this Campaign instance.
      */
     public Systems getSystemsInstance() {
@@ -10877,8 +10938,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems
-     * within a running Campaign.
+     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems within a running
+     * Campaign.
+     *
      * @param systemsInstance new Systems instance that this campaign should use.
      */
     public void setSystemsInstance(Systems systemsInstance) {

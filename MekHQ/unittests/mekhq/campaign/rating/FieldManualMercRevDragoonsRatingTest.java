@@ -367,7 +367,7 @@ public class FieldManualMercRevDragoonsRatingTest {
               mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 120;
-        when(mockCampaign.getMedicPool()).thenReturn(4);
+        when(mockCampaign.getTemporaryMedicPool()).thenReturn(4);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
 
         // Add a mekwarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.

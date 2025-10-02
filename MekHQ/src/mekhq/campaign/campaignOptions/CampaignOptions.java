@@ -263,6 +263,7 @@ public class CampaignOptions {
     private boolean tougherHealing;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
+    private boolean useUsefulMedics;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -824,6 +825,7 @@ public class CampaignOptions {
         setTougherHealing(false);
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
+        setIsUseUsefulMedics(false);
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1959,6 +1961,14 @@ public class CampaignOptions {
 
     public void setDoctorsUseAdministration(final boolean doctorsUseAdministration) {
         this.doctorsUseAdministration = doctorsUseAdministration;
+    }
+
+    public boolean isUseUsefulMedics() {
+        return useUsefulMedics;
+    }
+
+    public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
+        this.useUsefulMedics = useUsefulMedics;
     }
 
     // endregion Medical
