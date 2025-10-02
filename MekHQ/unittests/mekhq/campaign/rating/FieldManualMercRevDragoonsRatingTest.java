@@ -83,6 +83,7 @@ import org.junit.jupiter.api.Test;
 public class FieldManualMercRevDragoonsRatingTest {
     private Campaign mockCampaign;
     private Hangar mockHangar;
+    private CampaignOptions mockCampaignOptions;
 
     private List<Person> mockPersonnelList;
     private List<Person> mockActivePersonnelList;
@@ -98,6 +99,8 @@ public class FieldManualMercRevDragoonsRatingTest {
     public void setUp() {
         mockCampaign = mock(Campaign.class);
         mockHangar = mock(Hangar.class);
+        mockCampaignOptions = mock(CampaignOptions.class);
+
         when(mockCampaign.getHangar()).thenReturn(mockHangar);
 
         mockPersonnelList = new ArrayList<>();
@@ -358,6 +361,9 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Test
     public void testGetMedSupportAvailable() {
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.isUseUsefulMedics()).thenReturn(false);
+
         // Test having 1 regular doctor with 4 temp medics.
         // Expected available support should be:
         // Regular Doctor = 40 hours.
@@ -412,6 +418,8 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Test
     public void testGetTechSupportAvailable() {
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.isUseUsefulAsTechs()).thenReturn(false);
 
         // Test having 1 veteran mek tech with 6 temp astechs.
         // Expected available support should be:

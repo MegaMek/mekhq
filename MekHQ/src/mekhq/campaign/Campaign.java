@@ -8755,7 +8755,7 @@ public class Campaign implements ITechManager {
      * @return the total number of primary AsTechs in the campaign
      */
     public int getNumberPrimaryAsTechs() {
-        boolean isUseUsefulAsTechs = campaignOptions.isUseUsefulAsTechs();
+        boolean isUseUsefulAsTechs = getCampaignOptions().isUseUsefulAsTechs();
 
         int asTechs = getTemporaryAsTechPool();
 
@@ -8806,7 +8806,7 @@ public class Campaign implements ITechManager {
      * @return the total number of secondary AsTechs in the campaign
      */
     public int getNumberSecondaryAsTechs() {
-        boolean isUseUsefulAsTechs = campaignOptions.isUseUsefulAsTechs();
+        boolean isUseUsefulAsTechs = getCampaignOptions().isUseUsefulAsTechs();
 
         int asTechs = 0;
 
@@ -8912,7 +8912,7 @@ public class Campaign implements ITechManager {
      * @since 0.50.07
      */
     private int getPermanentMedicPool() {
-        final boolean isUseUsefulMedics = campaignOptions.isUseUsefulMedics();
+        final boolean isUseUsefulMedics = getCampaignOptions().isUseUsefulMedics();
         int permanentMedicPool = 0;
 
         for (Person person : getActivePersonnel(false)) {
