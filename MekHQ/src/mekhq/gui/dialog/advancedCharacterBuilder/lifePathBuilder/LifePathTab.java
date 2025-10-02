@@ -929,7 +929,12 @@ public class LifePathTab {
         }
 
         Integer workingFlexibleAttributes = storedFlexibleAttributes.get(index);
-        if (workingFlexibleAttributes != null && !storedFlexibleAttributes.isEmpty()) {
+        int flexibleMinimumValue = getAttributeMinimumValue(tabType, true);
+        int flexibleMaximumValue = getAttributeMaximumValue(tabType);
+        int flexibleDefaultValue = getDefaultAttributeValue(tabType, edgeMinimumValue, edgeMaximumValue);
+        if (workingFlexibleAttributes != null &&
+                  !storedFlexibleAttributes.isEmpty() &&
+                  workingFlexibleAttributes != flexibleDefaultValue) {
             appendBreaker(individualProgressText);
 
             individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleAttribute.label"));
