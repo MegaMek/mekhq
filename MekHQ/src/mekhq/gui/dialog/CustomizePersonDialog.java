@@ -33,14 +33,12 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
-import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
@@ -53,6 +51,7 @@ import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -91,8 +90,8 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -1651,7 +1650,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillLevels.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
 
-            SkillType skillType = SkillType.getType(type);
+            SkillTypeNew skillType = SkillTypeNew.getType(type);
             lblAging = new JLabel(resourceMap.getString("lblAging.text"));
             int ageModifier = getAgeModifier(milestone, skillType.getFirstAttribute(), skillType.getSecondAttribute());
             skillAgeModifiers.put(type, new JLabel(ageModifier + ""));
@@ -1717,13 +1716,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      * @since 0.50.06
      */
     private static List<String> getSortedSkillNames() {
-        String[] unsortedSkillNames = SkillType.getSkillList();
+        String[] unsortedSkillNames = Arrays.stream(SkillTypeNew.values()).map(Enum::name).toArray(String[]::new);
         List<String> sortedSkillNames = new ArrayList<>();
         List<String> combatSkills = new ArrayList<>();
         List<String> supportSkills = new ArrayList<>();
         List<String> roleplaySkills = new ArrayList<>();
         for (String skillName : unsortedSkillNames) {
-            SkillType skillType = SkillType.getType(skillName);
+            SkillTypeNew skillType = SkillTypeNew.getType(skillName);
 
             if (skillType == null) {
                 LOGGER.warn("Unknown skill type: {}", skillName);
@@ -1750,13 +1749,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void setSkills() {
-        for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            final String type = SkillType.getSkillList()[i];
+        for (int i = 0; i < SkillTypeNew.values().length; i++) {
+            final String type = SkillTypeNew.values()[i].name();
             AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
             if (skillChecks.get(type).isSelected()) {
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
-                SkillType skillType = SkillType.getType(type);
+                SkillTypeNew skillType = SkillTypeNew.getType(type);
                 int ageModifier = 0;
                 if (campaign.getCampaignOptions().isUseAgeEffects()) {
                     ageModifier = getAgeModifier(milestone,
@@ -1908,7 +1907,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillValues.get(type).setText("-");
             return;
         }
-        SkillType skillType = SkillType.getType(type);
+        SkillTypeNew skillType = SkillTypeNew.getType(type);
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
@@ -1919,13 +1918,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                   skillType.getSecondAttribute());
         }
 
-        if (skillType.isCountUp()) {
-            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus + ageModifier);
-            skillValues.get(type).setText("+" + target);
-        } else {
-            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus - ageModifier);
-            skillValues.get(type).setText(target + "+");
-        }
+        int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus - ageModifier);
+        skillValues.get(type).setText(target + "+");
     }
 
     private void changeValueEnabled(String type) {
@@ -1985,33 +1979,33 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
                     case MEKWARRIOR:
-                        decreasePhenotypeBonus(SkillType.S_GUN_MEK);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_MEK);
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_MEK.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_MEK.name());
                         break;
                     case ELEMENTAL:
-                        decreasePhenotypeBonus(SkillType.S_GUN_BA);
-                        decreasePhenotypeBonus(SkillType.S_ANTI_MEK);
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_BA.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_ANTI_MEK.name());
                         break;
                     case AEROSPACE:
-                        decreasePhenotypeBonus(SkillType.S_GUN_AERO);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_AERO);
-                        decreasePhenotypeBonus(SkillType.S_GUN_JET);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_JET);
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_AERO.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_AERO.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_JET.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_JET.name());
                         break;
                     case VEHICLE:
-                        decreasePhenotypeBonus(SkillType.S_GUN_VEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_GVEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_VEE.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_GVEE.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_NVEE.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_VTOL.name());
                         break;
                     case PROTOMEK:
-                        decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_PROTO.name());
                         break;
                     case NAVAL:
-                        decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
-                        decreasePhenotypeBonus(SkillType.S_GUN_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_NAVIGATION);
+                        decreasePhenotypeBonus(SkillTypeNew.S_TECH_VESSEL.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_GUN_SPACE.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_PILOT_SPACE.name());
+                        decreasePhenotypeBonus(SkillTypeNew.S_NAVIGATION.name());
                         break;
                     default:
                         break;
@@ -2019,33 +2013,33 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
                 switch (newPhenotype) {
                     case MEKWARRIOR:
-                        increasePhenotypeBonus(SkillType.S_GUN_MEK);
-                        increasePhenotypeBonus(SkillType.S_PILOT_MEK);
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_MEK.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_MEK.name());
                         break;
                     case ELEMENTAL:
-                        increasePhenotypeBonus(SkillType.S_GUN_BA);
-                        increasePhenotypeBonus(SkillType.S_ANTI_MEK);
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_BA.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_ANTI_MEK.name());
                         break;
                     case AEROSPACE:
-                        increasePhenotypeBonus(SkillType.S_GUN_AERO);
-                        increasePhenotypeBonus(SkillType.S_PILOT_AERO);
-                        increasePhenotypeBonus(SkillType.S_GUN_JET);
-                        increasePhenotypeBonus(SkillType.S_PILOT_JET);
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_AERO.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_AERO.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_JET.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_JET.name());
                         break;
                     case VEHICLE:
-                        increasePhenotypeBonus(SkillType.S_GUN_VEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_GVEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_VEE.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_GVEE.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_NVEE.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_VTOL.name());
                         break;
                     case PROTOMEK:
-                        increasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_PROTO.name());
                         break;
                     case NAVAL:
-                        increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
-                        increasePhenotypeBonus(SkillType.S_GUN_SPACE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        increasePhenotypeBonus(SkillType.S_NAVIGATION);
+                        increasePhenotypeBonus(SkillTypeNew.S_TECH_VESSEL.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_GUN_SPACE.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_PILOT_SPACE.name());
+                        increasePhenotypeBonus(SkillTypeNew.S_NAVIGATION.name());
                         break;
                     default:
                         break;

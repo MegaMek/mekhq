@@ -85,6 +85,7 @@ import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
@@ -249,8 +250,8 @@ public class ResolverTest {
     Person randomPerson(Crew crew, Campaign campaign) {
         var person = new Person(campaign);
         person.setPrimaryRole(campaign, PersonnelRole.MEKWARRIOR);
-        person.addSkill(SkillType.S_GUN_MEK, crew.getGunnery(), 0);
-        person.addSkill(SkillType.S_PILOT_MEK, crew.getPiloting(), 0);
+        person.addSkill(SkillTypeNew.S_GUN_MEK.name(), crew.getGunnery(), 0);
+        person.addSkill(SkillTypeNew.S_PILOT_MEK.name(), crew.getPiloting(), 0);
         return person;
     }
 

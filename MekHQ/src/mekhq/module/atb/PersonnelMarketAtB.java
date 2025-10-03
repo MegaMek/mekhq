@@ -32,7 +32,6 @@
  */
 package mekhq.module.atb;
 
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
@@ -50,7 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
@@ -135,10 +134,10 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     }
                 }
 
-                Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, S_ADMIN);
+                Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillTypeNew.S_ADMIN.name());
                 int adminExperienceLevel = SKILL_LEVEL_NONE;
-                if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
-                    Skill adminSkill = adminHR.getSkill(S_ADMIN);
+                if (adminHR != null && adminHR.hasSkill(SkillTypeNew.S_ADMIN.name())) {
+                    Skill adminSkill = adminHR.getSkill(SkillTypeNew.S_ADMIN.name());
                     adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(),
                           adminHR.getATOWAttributes());
                 }
@@ -174,35 +173,35 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
                 switch (recruit.getPrimaryRole()) {
                     case MEKWARRIOR:
-                        adjustSkill(recruit, SkillType.S_GUN_MEK, gunneryMod);
-                        adjustSkill(recruit, SkillType.S_PILOT_MEK, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_GUN_MEK.name(), gunneryMod);
+                        adjustSkill(recruit, SkillTypeNew.S_PILOT_MEK.name(), pilotingMod);
                         break;
                     case GROUND_VEHICLE_DRIVER:
-                        adjustSkill(recruit, SkillType.S_PILOT_GVEE, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_PILOT_GVEE.name(), pilotingMod);
                         break;
                     case NAVAL_VEHICLE_DRIVER:
-                        adjustSkill(recruit, SkillType.S_PILOT_NVEE, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_PILOT_NVEE.name(), pilotingMod);
                         break;
                     case VTOL_PILOT:
-                        adjustSkill(recruit, SkillType.S_PILOT_VTOL, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_PILOT_VTOL.name(), pilotingMod);
                         break;
                     case VEHICLE_GUNNER:
-                        adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
+                        adjustSkill(recruit, SkillTypeNew.S_GUN_VEE.name(), gunneryMod);
                         break;
                     case AEROSPACE_PILOT:
-                        adjustSkill(recruit, SkillType.S_GUN_AERO, gunneryMod);
-                        adjustSkill(recruit, SkillType.S_PILOT_AERO, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_GUN_AERO.name(), gunneryMod);
+                        adjustSkill(recruit, SkillTypeNew.S_PILOT_AERO.name(), pilotingMod);
                         break;
                     case PROTOMEK_PILOT:
-                        adjustSkill(recruit, SkillType.S_GUN_PROTO, gunneryMod);
+                        adjustSkill(recruit, SkillTypeNew.S_GUN_PROTO.name(), gunneryMod);
                         break;
                     case BATTLE_ARMOUR:
-                        adjustSkill(recruit, SkillType.S_GUN_BA, gunneryMod);
-                        adjustSkill(recruit, SkillType.S_ANTI_MEK, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_GUN_BA.name(), gunneryMod);
+                        adjustSkill(recruit, SkillTypeNew.S_ANTI_MEK.name(), pilotingMod);
                         break;
                     case SOLDIER:
-                        adjustSkill(recruit, SkillType.S_SMALL_ARMS, gunneryMod);
-                        adjustSkill(recruit, SkillType.S_ANTI_MEK, pilotingMod);
+                        adjustSkill(recruit, SkillTypeNew.S_SMALL_ARMS.name(), gunneryMod);
+                        adjustSkill(recruit, SkillTypeNew.S_ANTI_MEK.name(), pilotingMod);
                         break;
                     default:
                         break;
