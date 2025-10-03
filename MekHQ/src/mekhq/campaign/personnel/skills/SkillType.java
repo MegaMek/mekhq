@@ -40,15 +40,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
@@ -626,7 +618,7 @@ public class SkillType {
     /**
      * Determines if this skill is classified as a support skill.
      *
-     * <p>Support skills include support and support command subtypes.</p>
+     * <p>Support skills include support, support command, and support technician subtypes.</p>
      *
      * @return {@code true} if the skill subtype is a support category; {@code false} otherwise
      *
@@ -634,7 +626,7 @@ public class SkillType {
      * @since 0.50.06
      */
     public boolean isSupportSkill() {
-        return this.subType == SUPPORT || this.subType == SUPPORT_COMMAND;
+        return this.subType == SUPPORT || this.subType == SUPPORT_COMMAND || this.subType == SUPPORT_TECHNICIAN;
     }
 
     /**
@@ -1730,7 +1722,7 @@ public class SkillType {
         return new SkillType(S_TECH_MEK,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1748,7 +1740,7 @@ public class SkillType {
         return new SkillType(S_TECH_MECHANIC,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1766,7 +1758,7 @@ public class SkillType {
         return new SkillType(S_TECH_AERO,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1784,7 +1776,7 @@ public class SkillType {
         return new SkillType(S_TECH_BA,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1802,7 +1794,7 @@ public class SkillType {
         return new SkillType(S_TECH_VESSEL,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1820,7 +1812,7 @@ public class SkillType {
         return new SkillType(S_ASTECH,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               INTELLIGENCE,
               NONE,
               null,

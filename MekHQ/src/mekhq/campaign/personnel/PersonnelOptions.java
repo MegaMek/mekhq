@@ -95,6 +95,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String FLAW_ILLITERATE = "flaw_illiterate";
+    public static final String FLAW_IN_FOR_LIFE = "flaw_in_for_life";
+    public static final String ATOW_G_TOLERANCE = "atow_g_tolerance";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -117,6 +119,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE = "exceptional_attribute_intelligence";
     public static final String EXCEPTIONAL_ATTRIBUTE_WILLPOWER = "exceptional_attribute_willpower";
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
+    public static final String EXCEPTIONAL_ATTRIBUTE_EDGE = "exceptional_attribute_edge";
 
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
@@ -132,9 +135,18 @@ public class PersonnelOptions extends PilotOptions {
     public static final String COMPULSION_RELIGIOUS_FANATICISM = "compulsion_religious_fanaticism";
     public static final String COMPULSION_TRAUMATIC_PAST = "compulsion_traumatic_past";
     public static final String COMPULSION_FACTION_PRIDE = "compulsion_faction_pride";
+    public static final String COMPULSION_OTHER_FACTION_DISLIKE = "compulsion_other_faction_dislike";
+    public static final String COMPULSION_PARENT_FACTION_DISLIKE = "compulsion_parent_faction_dislike";
     public static final String COMPULSION_GAMBLING = "compulsion_gambling";
     public static final String COMPULSION_ANARCHIST = "compulsion_hatred_authority";
     public static final String COMPULSION_FACTION_LOYALTY = "compulsion_faction_loyalty";
+    public static final String COMPULSION_OTHER_FACTION_HATE = "compulsion_other_faction_hate";
+    public static final String COMPULSION_PARENT_FACTION_HATE = "compulsion_parent_faction_hate";
+    public static final String COMPULSION_INNER_SPHERE_HATE = "compulsion_inner_sphere_hate";
+    public static final String COMPULSION_CLAN_HATE = "compulsion_clan_hate";
+    public static final String COMPULSION_MERCENARY_HATE = "compulsion_merc_hate";
+    public static final String COMPULSION_PIRATE_HATE = "compulsion_pirate_hate";
+    public static final String COMPULSION_BIONIC_HATE = "compulsion_bionic_hate";
     public static final String COMPULSION_PATHOLOGIC_RACISM = "compulsion_pathologic_racism";
     public static final String COMPULSION_XENOPHOBIA = "compulsion_xenophobia";
     public static final String COMPULSION_ADDICTION = "compulsion_addiction";
@@ -234,6 +246,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, FLAW_ILLITERATE, false);
+        addOption(l3a, FLAW_IN_FOR_LIFE, false);
+        addOption(l3a, ATOW_G_TOLERANCE, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
@@ -256,6 +270,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_WILLPOWER, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_EDGE, false);
 
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
@@ -271,9 +286,18 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, COMPULSION_RELIGIOUS_FANATICISM, false);
         addOption(l3a, COMPULSION_TRAUMATIC_PAST, false);
         addOption(l3a, COMPULSION_FACTION_PRIDE, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_DISLIKE, false);
         addOption(l3a, COMPULSION_GAMBLING, false);
         addOption(l3a, COMPULSION_ANARCHIST, false);
         addOption(l3a, COMPULSION_FACTION_LOYALTY, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_CLAN_HATE, false);
+        addOption(l3a, COMPULSION_INNER_SPHERE_HATE, false);
+        addOption(l3a, COMPULSION_MERCENARY_HATE, false);
+        addOption(l3a, COMPULSION_PIRATE_HATE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_BIONIC_HATE, false);
         addOption(l3a, COMPULSION_PATHOLOGIC_RACISM, false);
         addOption(l3a, COMPULSION_XENOPHOBIA, false);
         addOption(l3a, COMPULSION_ADDICTION, false);
