@@ -54,16 +54,16 @@ import mekhq.MekHQ;
 public class SkillUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillUtilities";
 
-    public static final int SKILL_NONE = 0;
+    public static final int NO_SKILL = 0;
 
-    public static final int EXP_NONE = -1;
-    public static final int EXP_ULTRA_GREEN = 0;
-    public static final int EXP_GREEN = 1;
-    public static final int EXP_REGULAR = 2;
-    public static final int EXP_VETERAN = 3;
-    public static final int EXP_ELITE = 4;
-    public static final int EXP_HEROIC = 5;
-    public static final int EXP_LEGENDARY = 6;
+    public static final int SKILL_LEVEL_NONE = -1;
+    public static final int SKILL_LEVEL_ULTRA_GREEN = 0;
+    public static final int SKILL_LEVEL_GREEN = 1;
+    public static final int SKILL_LEVEL_REGULAR = 2;
+    public static final int SKILL_LEVEL_VETERAN = 3;
+    public static final int SKILL_LEVEL_ELITE = 4;
+    public static final int SKILL_LEVEL_HEROIC = 5;
+    public static final int SKILL_LEVEL_LEGENDARY = 6;
 
     /**
      * Returns the localized display name for the specified experience level.
@@ -78,13 +78,13 @@ public class SkillUtilities {
      */
     public static String getExperienceLevelName(int level) {
         String key = switch (level) {
-            case EXP_ULTRA_GREEN -> "ultraGreen";
-            case EXP_GREEN -> "green";
-            case EXP_REGULAR -> "regular";
-            case EXP_VETERAN -> "veteran";
-            case EXP_ELITE -> "elite";
-            case EXP_HEROIC -> "heroic";
-            case EXP_LEGENDARY -> "legendary";
+            case SKILL_LEVEL_ULTRA_GREEN -> "ultraGreen";
+            case SKILL_LEVEL_GREEN -> "green";
+            case SKILL_LEVEL_REGULAR -> "regular";
+            case SKILL_LEVEL_VETERAN -> "veteran";
+            case SKILL_LEVEL_ELITE -> "elite";
+            case SKILL_LEVEL_HEROIC -> "heroic";
+            case SKILL_LEVEL_LEGENDARY -> "legendary";
             case -1 -> "none";
             default -> "default";
         };
@@ -119,11 +119,12 @@ public class SkillUtilities {
      */
     public static String getExperienceLevelColor(int level) {
         return switch (level) {
-            case EXP_ULTRA_GREEN -> MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
-            case EXP_GREEN -> MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
-            case EXP_REGULAR -> MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
-            case EXP_VETERAN -> MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
-            case EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            case SKILL_LEVEL_ULTRA_GREEN -> MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
+            case SKILL_LEVEL_GREEN -> MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
+            case SKILL_LEVEL_REGULAR -> MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
+            case SKILL_LEVEL_VETERAN -> MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
+            case SKILL_LEVEL_ELITE, SKILL_LEVEL_HEROIC, SKILL_LEVEL_LEGENDARY ->
+                  MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
             default -> "";
         };
     }

@@ -35,8 +35,8 @@ package mekhq.campaign.againstTheBot;
 
 
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -359,13 +359,13 @@ public class AtBConfiguration {
         TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
         Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
 
-        int experienceLevel = EXP_ULTRA_GREEN;
+        int experienceLevel = SKILL_LEVEL_ULTRA_GREEN;
         if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
             Skill skill = logisticsAdmin.getSkill(S_ADMIN);
             experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
         }
 
-        target.addModifier(EXP_REGULAR - experienceLevel, "Admin/Logistics");
+        target.addModifier(SKILL_LEVEL_REGULAR - experienceLevel, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }

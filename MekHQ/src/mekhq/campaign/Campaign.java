@@ -69,10 +69,10 @@ import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -4714,7 +4714,7 @@ public class Campaign implements ITechManager {
                 if (roll >= target.getValue()) {
                     report += theRefit.succeed();
                 } else {
-                    report += theRefit.fail(EXP_GREEN);
+                    report += theRefit.fail(SKILL_LEVEL_GREEN);
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
@@ -4902,7 +4902,7 @@ public class Campaign implements ITechManager {
                       (!getCampaignOptions().isDestroyByMargin()
                              // if a legendary, primary tech and destroy by margin is NOT on
                              &&
-                             ((tech.getExperienceLevel(this, false) == EXP_LEGENDARY) ||
+                             ((tech.getExperienceLevel(this, false) == SKILL_LEVEL_LEGENDARY) ||
                                     tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -4937,7 +4937,7 @@ public class Campaign implements ITechManager {
         } else {
             int modePenalty = partWork.getMode().expReduction;
             Skill relevantSkill = tech.getSkillForWorkingOn(partWork);
-            int actualSkillLevel = EXP_NONE;
+            int actualSkillLevel = SKILL_LEVEL_NONE;
 
             if (relevantSkill != null) {
                 actualSkillLevel = relevantSkill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
@@ -4947,10 +4947,10 @@ public class Campaign implements ITechManager {
                 if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
                     // possible
-                    effectiveSkillLevel = EXP_ULTRA_GREEN;
+                    effectiveSkillLevel = SKILL_LEVEL_ULTRA_GREEN;
                 } else {
                     // destroyed - set the effective level to legendary
-                    effectiveSkillLevel = EXP_LEGENDARY;
+                    effectiveSkillLevel = SKILL_LEVEL_LEGENDARY;
                 }
             }
             report = report + partWork.fail(effectiveSkillLevel);
@@ -8327,7 +8327,7 @@ public class Campaign implements ITechManager {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
 
-        int actualSkillLevel = EXP_NONE;
+        int actualSkillLevel = SKILL_LEVEL_NONE;
         if (skill != null) {
             actualSkillLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
         }
@@ -8341,7 +8341,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         } else if (!getCampaignOptions().isDestroyByMargin() && (partWork.getSkillMin() > effectiveSkillLevel)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
-        } else if (partWork.getSkillMin() > EXP_LEGENDARY) {
+        } else if (partWork.getSkillMin() > SKILL_LEVEL_LEGENDARY) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
@@ -8377,7 +8377,7 @@ public class Campaign implements ITechManager {
         // this is ugly, if the mode penalty drops you to green, you drop two
         // levels instead of two
         int value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes()) + modePenalty;
-        if ((modePenalty > 0) && (EXP_GREEN == effectiveSkillLevel)) {
+        if ((modePenalty > 0) && (SKILL_LEVEL_GREEN == effectiveSkillLevel)) {
             value++;
         }
         final TargetRoll target = new TargetRoll(value, getExperienceLevelName(effectiveSkillLevel));

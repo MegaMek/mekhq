@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
@@ -215,7 +215,7 @@ public abstract class Part implements IPartWork, ITechnology {
         this.unitTonnageMatters = false;
         this.omniPodded = omniPodded;
         this.hits = 0;
-        this.skillMin = EXP_GREEN;
+        this.skillMin = SKILL_LEVEL_GREEN;
         this.mode = WorkTime.NORMAL;
         this.timeSpent = 0;
         this.workingOvertime = false;
@@ -318,7 +318,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy((getSkillMin() > EXP_LEGENDARY) ?
+            cost = cost.multipliedBy((getSkillMin() > SKILL_LEVEL_LEGENDARY) ?
                                            campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
                                            campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
@@ -473,7 +473,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -1139,7 +1139,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * Sets minimum skill, shorthanded mod, and rush job/extra time setting to defaults.
      */
     public void resetRepairSettings() {
-        skillMin = EXP_GREEN;
+        skillMin = SKILL_LEVEL_GREEN;
         shorthandedMod = 0;
         mode = WorkTime.NORMAL;
     }

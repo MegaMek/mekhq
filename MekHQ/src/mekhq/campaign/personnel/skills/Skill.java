@@ -45,7 +45,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -115,7 +115,7 @@ public class Skill {
 
     public Skill(String type) {
         this.type = SkillType.getType(type);
-        this.level = this.type.getLevelFromExperience(EXP_REGULAR);
+        this.level = this.type.getLevelFromExperience(SKILL_LEVEL_REGULAR);
     }
 
     public Skill(String type, int level, int bonus) {

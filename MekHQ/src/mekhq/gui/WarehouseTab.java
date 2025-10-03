@@ -33,7 +33,7 @@
 package mekhq.gui;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -545,7 +545,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > EXP_LEGENDARY) {
+                } else if (part.getSkillMin() > SKILL_LEVEL_LEGENDARY) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;

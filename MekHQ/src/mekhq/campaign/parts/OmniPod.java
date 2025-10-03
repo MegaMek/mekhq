@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 
 import java.io.PrintWriter;
 
@@ -275,7 +275,7 @@ public class OmniPod extends Part {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        if (skillMin > EXP_LEGENDARY) {
+        if (skillMin > SKILL_LEVEL_LEGENDARY) {
             return " <font color='" + ReportingUtilities.getNegativeColor()
                          + "'><b> failed and part destroyed.</b></font>";
         } else {

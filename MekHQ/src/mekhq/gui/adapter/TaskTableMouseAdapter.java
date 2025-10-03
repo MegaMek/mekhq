@@ -32,7 +32,7 @@
  */
 package mekhq.gui.adapter;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 
 import java.awt.event.ActionEvent;
 import java.util.Optional;
@@ -101,7 +101,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 Unit u = p.getUnit();
                 gui.getCampaign().addReport(((Part) p).scrap());
-                ((Part) p).setSkillMin(EXP_GREEN);
+                ((Part) p).setSkillMin(SKILL_LEVEL_GREEN);
                 if ((u != null) && !u.isRepairable() && !u.hasSalvageableParts()) {
                     gui.getCampaign().removeUnit(u.getId());
                 }

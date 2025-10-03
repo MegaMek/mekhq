@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
@@ -152,7 +152,7 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -363,7 +363,7 @@ public class Armor extends Part implements IAcquisitionWork {
         unit.getEntity().setArmor(fixAmount, location, rear);
         changeAmountAvailable(-1 * amountFound);
         updateConditionFromEntity(false);
-        skillMin = EXP_GREEN;
+        skillMin = SKILL_LEVEL_GREEN;
         shorthandedMod = 0;
     }
 
@@ -649,12 +649,12 @@ public class Armor extends Part implements IAcquisitionWork {
         // if we are impossible to fix now, we should scrap this amount of armor
         // from spares and start over
         String scrap = "";
-        if (skillMin > EXP_LEGENDARY) {
+        if (skillMin > SKILL_LEVEL_LEGENDARY) {
             scrap = " Armor supplies lost!";
             if (isSalvaging()) {
                 remove(false);
             } else {
-                skillMin = EXP_GREEN;
+                skillMin = SKILL_LEVEL_GREEN;
                 if ((unit != null) && (unit.getEntity() != null) && (unit.getEntity().isCapitalScale())) {
                     changeAmountAvailable(-1 * (amountNeeded * 10));
                 } else {
@@ -672,7 +672,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String scrap() {
         remove(false);
-        skillMin = EXP_GREEN;
+        skillMin = SKILL_LEVEL_GREEN;
         return ArmorType.of(type, clan).getName() + " armor scrapped.";
     }
 

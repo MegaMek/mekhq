@@ -34,7 +34,7 @@ package mekhq.module.atb;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -136,7 +136,7 @@ public record AtBEventProcessor(Campaign campaign) {
 
         Person adminHR = campaign.findBestInRole(ADMINISTRATOR_HR, S_ADMIN);
         Skill adminSkill = adminHR.getSkill(S_ADMIN);
-        int adminExperienceLevel = EXP_NONE;
+        int adminExperienceLevel = SKILL_LEVEL_NONE;
         if (adminSkill != null) {
             adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes());
         }

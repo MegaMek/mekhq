@@ -32,13 +32,13 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -1229,26 +1229,26 @@ public class AdvancementTab {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
         }
 
-        spnAbilityUltraGreen.setValue(skillPreferences.getSpecialAbilityBonus(EXP_ULTRA_GREEN));
-        spnAbilityGreen.setValue(skillPreferences.getSpecialAbilityBonus(EXP_GREEN));
-        spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(EXP_REGULAR));
-        spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(EXP_VETERAN));
-        spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(EXP_ELITE));
+        spnAbilityUltraGreen.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_ULTRA_GREEN));
+        spnAbilityGreen.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_GREEN));
+        spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_REGULAR));
+        spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_VETERAN));
+        spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_ELITE));
         try {
-            spnAbilityHeroic.setValue(skillPreferences.getSpecialAbilityBonus(EXP_HEROIC));
-            spnAbilityLegendary.setValue(skillPreferences.getSpecialAbilityBonus(EXP_LEGENDARY));
+            spnAbilityHeroic.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_HEROIC));
+            spnAbilityLegendary.setValue(skillPreferences.getSpecialAbilityBonus(SKILL_LEVEL_LEGENDARY));
         } catch (NullPointerException e) {
             // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
         }
 
-        spnCommandSkillsUltraGreen.setValue(skillPreferences.getCommandSkillsModifier(EXP_ULTRA_GREEN));
-        spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(EXP_GREEN));
-        spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(EXP_REGULAR));
-        spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(EXP_VETERAN));
-        spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(EXP_ELITE));
+        spnCommandSkillsUltraGreen.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_ULTRA_GREEN));
+        spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_GREEN));
+        spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_REGULAR));
+        spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_VETERAN));
+        spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_ELITE));
         try {
-            spnCommandSkillsHeroic.setValue(skillPreferences.getCommandSkillsModifier(EXP_HEROIC));
-            spnCommandSkillsLegendary.setValue(skillPreferences.getCommandSkillsModifier(EXP_LEGENDARY));
+            spnCommandSkillsHeroic.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_HEROIC));
+            spnCommandSkillsLegendary.setValue(skillPreferences.getCommandSkillsModifier(SKILL_LEVEL_LEGENDARY));
         } catch (NullPointerException e) {
             // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
         }
@@ -1329,24 +1329,24 @@ public class AdvancementTab {
         skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
         skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
 
-        skillPreferences.setCommandSkillsMod(EXP_ULTRA_GREEN, (int) spnCommandSkillsUltraGreen.getValue());
-        skillPreferences.setCommandSkillsMod(EXP_GREEN, (int) spnCommandSkillsGreen.getValue());
-        skillPreferences.setCommandSkillsMod(EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
-        skillPreferences.setCommandSkillsMod(EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
-        skillPreferences.setCommandSkillsMod(EXP_ELITE, (int) spnCommandSkillsElite.getValue());
-        skillPreferences.setCommandSkillsMod(EXP_HEROIC, (int) spnCommandSkillsHeroic.getValue());
-        skillPreferences.setCommandSkillsMod(EXP_LEGENDARY, (int) spnCommandSkillsLegendary.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_ULTRA_GREEN, (int) spnCommandSkillsUltraGreen.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_GREEN, (int) spnCommandSkillsGreen.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_REGULAR, (int) spnCommandSkillsReg.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_VETERAN, (int) spnCommandSkillsVet.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_ELITE, (int) spnCommandSkillsElite.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_HEROIC, (int) spnCommandSkillsHeroic.getValue());
+        skillPreferences.setCommandSkillsMod(SKILL_LEVEL_LEGENDARY, (int) spnCommandSkillsLegendary.getValue());
         skillPreferences.setRoleplaySkillModifier((int) spnRoleplaySkillsModifier.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
 
-        skillPreferences.setSpecialAbilityBonus(EXP_ULTRA_GREEN, (int) spnAbilityUltraGreen.getValue());
-        skillPreferences.setSpecialAbilityBonus(EXP_GREEN, (int) spnAbilityGreen.getValue());
-        skillPreferences.setSpecialAbilityBonus(EXP_REGULAR, (int) spnAbilityReg.getValue());
-        skillPreferences.setSpecialAbilityBonus(EXP_VETERAN, (int) spnAbilityVet.getValue());
-        skillPreferences.setSpecialAbilityBonus(EXP_ELITE, (int) spnAbilityElite.getValue());
-        skillPreferences.setSpecialAbilityBonus(EXP_HEROIC, (int) spnAbilityHeroic.getValue());
-        skillPreferences.setSpecialAbilityBonus(EXP_LEGENDARY, (int) spnAbilityLegendary.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_ULTRA_GREEN, (int) spnAbilityUltraGreen.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_GREEN, (int) spnAbilityGreen.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_REGULAR, (int) spnAbilityReg.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_VETERAN, (int) spnAbilityVet.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_ELITE, (int) spnAbilityElite.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_HEROIC, (int) spnAbilityHeroic.getValue());
+        skillPreferences.setSpecialAbilityBonus(SKILL_LEVEL_LEGENDARY, (int) spnAbilityLegendary.getValue());
 
         //start Recruitment Bonuses
         final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();

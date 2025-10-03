@@ -32,8 +32,8 @@
  */
 package mekhq.service.mrms;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -67,8 +67,8 @@ public class MRMSOption {
     public MRMSOption(PartRepairType type) {
         this(type,
               false,
-              EXP_ULTRA_GREEN,
-              EXP_LEGENDARY,
+              SKILL_LEVEL_ULTRA_GREEN,
+              SKILL_LEVEL_LEGENDARY,
               TARGET_NUMBER_PREFERRED,
               TARGET_NUMBER_MAX,
               DAILY_TIME_MIN);

@@ -35,14 +35,14 @@ package mekhq;
 
 import static java.lang.Math.max;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -407,11 +407,11 @@ public class Utilities {
         int roll = MathUtility.clamp(Compute.d6(2) + bonus, 1, 12);
 
         return switch (roll) {
-            case 1 -> EXP_ULTRA_GREEN;
-            case 2, 3, 4, 5 -> EXP_GREEN;
-            case 6, 7, 8, 9 -> EXP_REGULAR;
-            case 10, 11 -> EXP_VETERAN;
-            case 12 -> EXP_ELITE;
+            case 1 -> SKILL_LEVEL_ULTRA_GREEN;
+            case 2, 3, 4, 5 -> SKILL_LEVEL_GREEN;
+            case 6, 7, 8, 9 -> SKILL_LEVEL_REGULAR;
+            case 10, 11 -> SKILL_LEVEL_VETERAN;
+            case 12 -> SKILL_LEVEL_ELITE;
             default ->
                   throw new IllegalStateException("Unexpected value in mekhq/Utilities.java/generateExpLevel: " + roll);
         };
@@ -963,13 +963,13 @@ public class Utilities {
      * @return The calculated age of the character based on the input parameters.
      */
     public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
-        if (experienceLevel > EXP_LEGENDARY) {
-            experienceLevel = EXP_LEGENDARY;
+        if (experienceLevel > SKILL_LEVEL_LEGENDARY) {
+            experienceLevel = SKILL_LEVEL_LEGENDARY;
         }
 
         int baseAge = 16;
 
-        if (experienceLevel == EXP_NONE) {
+        if (experienceLevel == SKILL_LEVEL_NONE) {
             baseAge = 0; // only use the result of the dice roll
         }
 
@@ -977,13 +977,13 @@ public class Utilities {
 
         // How many dice to roll
         int diceCount = switch (experienceLevel) {
-            case EXP_NONE -> 7;
-            case EXP_GREEN -> 1;
-            case EXP_REGULAR -> 2;
-            case EXP_VETERAN -> 3;
-            case EXP_ELITE -> 4;
-            case EXP_HEROIC -> 5;
-            case EXP_LEGENDARY -> 6;
+            case SKILL_LEVEL_NONE -> 7;
+            case SKILL_LEVEL_GREEN -> 1;
+            case SKILL_LEVEL_REGULAR -> 2;
+            case SKILL_LEVEL_VETERAN -> 3;
+            case SKILL_LEVEL_ELITE -> 4;
+            case SKILL_LEVEL_HEROIC -> 5;
+            case SKILL_LEVEL_LEGENDARY -> 6;
             default -> 0;
         };
 
@@ -995,7 +995,7 @@ public class Utilities {
                 roll += (Compute.d6() - 1);
             }
 
-            if (isClan && (experienceLevel != EXP_NONE)) {
+            if (isClan && (experienceLevel != SKILL_LEVEL_NONE)) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
 
@@ -1003,7 +1003,7 @@ public class Utilities {
         }
 
         // Clamp age, if necessary
-        if (experienceLevel != EXP_NONE) {
+        if (experienceLevel != SKILL_LEVEL_NONE) {
             age = max(16, age);
         }
 

@@ -33,13 +33,13 @@
 package mekhq.module.atb;
 
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -136,7 +136,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 }
 
                 Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, S_ADMIN);
-                int adminExperienceLevel = EXP_NONE;
+                int adminExperienceLevel = SKILL_LEVEL_NONE;
                 if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
                     Skill adminSkill = adminHR.getSkill(S_ADMIN);
                     adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(),
@@ -146,25 +146,25 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminExperienceLevel) {
-                    case EXP_ULTRA_GREEN:
+                    case SKILL_LEVEL_ULTRA_GREEN:
                         gunneryMod = -1;
                         pilotingMod = -1;
                         break;
-                    case EXP_GREEN:
+                    case SKILL_LEVEL_GREEN:
                         if (Compute.d6() < 4) {
                             gunneryMod = -1;
                         } else {
                             pilotingMod = -1;
                         }
                         break;
-                    case EXP_VETERAN:
+                    case SKILL_LEVEL_VETERAN:
                         if (Compute.d6() < 4) {
                             gunneryMod = 1;
                         } else {
                             pilotingMod = 1;
                         }
                         break;
-                    case EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY:
+                    case SKILL_LEVEL_ELITE, SKILL_LEVEL_HEROIC, SKILL_LEVEL_LEGENDARY:
                         gunneryMod = 1;
                         pilotingMod = 1;
                         break;

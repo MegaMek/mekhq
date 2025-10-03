@@ -37,7 +37,7 @@ import static java.lang.Math.round;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessColor;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
@@ -246,7 +246,7 @@ public class TrainingCombatTeams {
                         int skillLevel = traineeSkill.getLevel();
                         int traineeExperienceLevel = traineeSkill.getType().getExperienceLevel(skillLevel);
 
-                        if (traineeExperienceLevel > EXP_GREEN) {
+                        if (traineeExperienceLevel > SKILL_LEVEL_GREEN) {
                             continue;
                         }
 

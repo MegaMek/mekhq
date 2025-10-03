@@ -33,10 +33,10 @@
  */
 package mekhq.campaign.rating;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -301,10 +301,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     private static int getSupportHours(int skillLevel) {
         return switch (skillLevel) {
-            case EXP_ULTRA_GREEN -> 20;
-            case EXP_GREEN -> 30;
-            case EXP_REGULAR -> 40;
-            case EXP_VETERAN -> 45;
+            case SKILL_LEVEL_ULTRA_GREEN -> 20;
+            case SKILL_LEVEL_GREEN -> 30;
+            case SKILL_LEVEL_REGULAR -> 40;
+            case SKILL_LEVEL_VETERAN -> 45;
             default -> 50;
         };
     }
@@ -314,7 +314,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                              SkillType.S_TECH_VESSEL, SkillType.S_TECH_MECHANIC };
 
         // Get the highest tech skill this person has.
-        int highestSkill = EXP_ULTRA_GREEN;
+        int highestSkill = SKILL_LEVEL_ULTRA_GREEN;
         for (String skillName : skillNames) {
             if (tech.hasSkill(skillName)) {
                 int rank = tech.getSkill(skillName).getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());

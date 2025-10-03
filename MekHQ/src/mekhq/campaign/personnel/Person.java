@@ -59,14 +59,14 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -403,27 +403,27 @@ public class Person {
         MEKWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
 
         // no official AtB rules for really inexperienced scrubs, but...
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_NONE, Money.of(2500));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_NONE, Money.of(2500));
 
         // no official AtB rules for really inexperienced scrubs, but...
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(5000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_ULTRA_GREEN, Money.of(5000));
 
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_GREEN, Money.of(10000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_REGULAR, Money.of(25000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_VETERAN, Money.of(50000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ELITE, Money.of(100000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_HEROIC, Money.of(150000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(200000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_GREEN, Money.of(10000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_REGULAR, Money.of(25000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_VETERAN, Money.of(50000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_ELITE, Money.of(100000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_HEROIC, Money.of(150000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_LEGENDARY, Money.of(200000));
 
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(EXP_NONE, Money.of(1250));
-        OTHER_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(2500));
-        OTHER_RANSOM_VALUES.put(EXP_GREEN, Money.of(5000));
-        OTHER_RANSOM_VALUES.put(EXP_REGULAR, Money.of(10000));
-        OTHER_RANSOM_VALUES.put(EXP_VETERAN, Money.of(25000));
-        OTHER_RANSOM_VALUES.put(EXP_ELITE, Money.of(50000));
-        OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
-        OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_NONE, Money.of(1250));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_ULTRA_GREEN, Money.of(2500));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_GREEN, Money.of(5000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_REGULAR, Money.of(10000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_VETERAN, Money.of(25000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_ELITE, Money.of(50000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_HEROIC, Money.of(100000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_LEGENDARY, Money.of(150000));
     }
     // endregion Variable Declarations
 
@@ -4368,7 +4368,7 @@ public class Person {
                     } else if (hasSkill(S_ARTILLERY)) {
                         yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes);
                     } else {
-                        yield EXP_NONE;
+                        yield SKILL_LEVEL_NONE;
                     }
                 }
             }
@@ -4385,7 +4385,7 @@ public class Person {
                       S_COMMUNICATIONS,
                       S_ART_COOKING,
                       S_SENSOR_OPERATIONS);
-                int highestExperienceLevel = EXP_NONE;
+                int highestExperienceLevel = SKILL_LEVEL_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
 
@@ -4420,7 +4420,7 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    yield EXP_NONE;
+                    yield SKILL_LEVEL_NONE;
                 } else {
                     yield Math.max(0, levelSum / divisor);
                 }
@@ -4465,7 +4465,7 @@ public class Person {
           int adjustedReputation) {
         if (skillNames.isEmpty()) {
             // If we're not tracking skills for this profession, it always counts as REGULAR
-            return EXP_REGULAR;
+            return SKILL_LEVEL_REGULAR;
         }
 
         int totalSkillLevel = 0;
@@ -4478,13 +4478,13 @@ public class Person {
                 // If a character is missing a skill, it means they're unqualified for a profession. They will lose
                 // that profession the next time the campaign is loaded. We don't remove it here as that would
                 // require passing in a bunch of extra information that is largely irrelevant.
-                return EXP_NONE;
+                return SKILL_LEVEL_NONE;
             }
 
             SkillType skillType = getType(skillName);
             if (skillType == null) {
                 LOGGER.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
-                return EXP_NONE;
+                return SKILL_LEVEL_NONE;
             }
 
             int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
@@ -4508,7 +4508,7 @@ public class Person {
 
         Skill skill = getSkill(skillNames.get(0));
         if (skill == null) {
-            return EXP_NONE;
+            return SKILL_LEVEL_NONE;
         }
 
         return skill.getType().getExperienceLevel(averageSkillLevel);
@@ -5510,7 +5510,7 @@ public class Person {
      */
     public @Nullable Skill getBestTechSkill() {
         Skill skill = null;
-        int level = EXP_NONE;
+        int level = SKILL_LEVEL_NONE;
 
         if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes) > level) {
             skill = getSkill(S_TECH_MEK);
@@ -5833,7 +5833,7 @@ public class Person {
     }
 
     public int getBestTechLevel() {
-        int level = EXP_NONE;
+        int level = SKILL_LEVEL_NONE;
         final Skill mekSkill = getSkill(S_TECH_MEK);
         final Skill mechanicSkill = getSkill(S_TECH_MECHANIC);
         final Skill baSkill = getSkill(S_TECH_BA);

@@ -36,7 +36,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 smallArmsLevel = 0;
             }
 
-            if (smallArmsLevel > EXP_ULTRA_GREEN) {
+            if (smallArmsLevel > SKILL_LEVEL_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_SMALL_ARMS, smallArmsLevel, skillPreferences.randomizeSkill(), bonus);
             }
         }
@@ -97,17 +97,17 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // roll command skills
         if (primaryRole.isCombat()) {
             int leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
-            if (leadershipSkillLevel > EXP_ULTRA_GREEN) {
+            if (leadershipSkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
             }
 
             leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
-            if (leadershipSkillLevel > EXP_ULTRA_GREEN) {
+            if (leadershipSkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
             }
 
             leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
-            if (leadershipSkillLevel > EXP_ULTRA_GREEN) {
+            if (leadershipSkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
             }
         }

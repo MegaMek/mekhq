@@ -33,13 +33,13 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
 import java.awt.BorderLayout;
@@ -265,7 +265,7 @@ public class MRMSDialog extends JDialog {
             campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() &&
                           part.needsFixing() &&
-                          !(part instanceof AmmoBin) && (part.getSkillMin() <= EXP_LEGENDARY)) {
+                          !(part instanceof AmmoBin) && (part.getSkillMin() <= SKILL_LEVEL_LEGENDARY)) {
                     completePartsList.add(part);
                 }
             });
@@ -772,13 +772,13 @@ public class MRMSDialog extends JDialog {
 
     private static DefaultComboBoxModel<String> getSkillModel() {
         DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
-        skillModel.addElement(getExperienceLevelName(EXP_ULTRA_GREEN));
-        skillModel.addElement(getExperienceLevelName(EXP_GREEN));
-        skillModel.addElement(getExperienceLevelName(EXP_REGULAR));
-        skillModel.addElement(getExperienceLevelName(EXP_VETERAN));
-        skillModel.addElement(getExperienceLevelName(EXP_ELITE));
-        skillModel.addElement(getExperienceLevelName(EXP_HEROIC));
-        skillModel.addElement(getExperienceLevelName(EXP_LEGENDARY));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_ULTRA_GREEN));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_GREEN));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_REGULAR));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_VETERAN));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_ELITE));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_HEROIC));
+        skillModel.addElement(getExperienceLevelName(SKILL_LEVEL_LEGENDARY));
         return skillModel;
     }
 

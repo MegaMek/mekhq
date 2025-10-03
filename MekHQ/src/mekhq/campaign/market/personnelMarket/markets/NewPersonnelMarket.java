@@ -37,13 +37,13 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -1099,8 +1099,8 @@ public class NewPersonnelMarket {
 
         // Define the experience levels and tie them to their respective constants.
         final int[] expLevels = {
-              EXP_ULTRA_GREEN, EXP_GREEN, EXP_REGULAR,
-              EXP_VETERAN, EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY
+              SKILL_LEVEL_ULTRA_GREEN, SKILL_LEVEL_GREEN, SKILL_LEVEL_REGULAR,
+              SKILL_LEVEL_VETERAN, SKILL_LEVEL_ELITE, SKILL_LEVEL_HEROIC, SKILL_LEVEL_LEGENDARY
         };
 
         // Set up per-level tracking (index order must match expLevels)

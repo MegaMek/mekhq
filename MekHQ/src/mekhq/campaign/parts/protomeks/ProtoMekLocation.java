@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.parts.protomeks;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
@@ -627,7 +627,7 @@ public class ProtoMekLocation extends Part {
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
             if (isBlownOff()) {
                 toReturn.append(" <b>TN:</b> ")

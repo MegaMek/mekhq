@@ -33,13 +33,13 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
@@ -386,10 +386,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                                                                             Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                             SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                             SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                         </pre>
+     *                                                                                                                                                                                                                                                                                      Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                      SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                      SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                  </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -645,12 +645,12 @@ public class SkillType {
 
     public int getLevelFromExperience(int expLvl) {
         return switch (expLvl) {
-            case EXP_GREEN -> greenLvl;
-            case EXP_REGULAR -> regLvl;
-            case EXP_VETERAN -> vetLvl;
-            case EXP_ELITE -> eliteLvl;
-            case EXP_HEROIC -> heroicLvl;
-            case EXP_LEGENDARY -> legendaryLvl;
+            case SKILL_LEVEL_GREEN -> greenLvl;
+            case SKILL_LEVEL_REGULAR -> regLvl;
+            case SKILL_LEVEL_VETERAN -> vetLvl;
+            case SKILL_LEVEL_ELITE -> eliteLvl;
+            case SKILL_LEVEL_HEROIC -> heroicLvl;
+            case SKILL_LEVEL_LEGENDARY -> legendaryLvl;
             default ->
                 // for ultra-green we take the midpoint between green and 0, rounding down.
                 // If the user has set green as zero, then this will be the same
@@ -802,19 +802,19 @@ public class SkillType {
      */
     public int getExperienceLevel(final int level) {
         if (level >= legendaryLvl) {
-            return EXP_LEGENDARY;
+            return SKILL_LEVEL_LEGENDARY;
         } else if (level >= heroicLvl) {
-            return EXP_HEROIC;
+            return SKILL_LEVEL_HEROIC;
         } else if (level >= eliteLvl) {
-            return EXP_ELITE;
+            return SKILL_LEVEL_ELITE;
         } else if (level >= vetLvl) {
-            return EXP_VETERAN;
+            return SKILL_LEVEL_VETERAN;
         } else if (level >= regLvl) {
-            return EXP_REGULAR;
+            return SKILL_LEVEL_REGULAR;
         } else if (level >= greenLvl) {
-            return EXP_GREEN;
+            return SKILL_LEVEL_GREEN;
         } else {
-            return EXP_ULTRA_GREEN;
+            return SKILL_LEVEL_ULTRA_GREEN;
         }
     }
 

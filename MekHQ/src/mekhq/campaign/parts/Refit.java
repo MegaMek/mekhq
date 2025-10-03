@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -2049,7 +2049,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public int getSkillMin() {
-        return EXP_GREEN;
+        return SKILL_LEVEL_GREEN;
     }
 
     /**

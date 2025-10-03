@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.personnel;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
 import java.io.PrintWriter;
@@ -176,7 +176,7 @@ public class SkillPrerequisite {
             String key = enumKeys.nextElement();
             int lvl = skillSet.get(key);
             String skillLvl = "";
-            if (lvl >= EXP_GREEN) {
+            if (lvl >= SKILL_LEVEL_GREEN) {
                 skillLvl = getExperienceLevelName(lvl) + ' ';
             }
             if (SkillType.getType(key) != null) {

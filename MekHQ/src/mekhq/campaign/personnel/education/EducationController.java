@@ -33,8 +33,8 @@
 package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -2072,7 +2072,7 @@ public class EducationController {
      */
     private static EducationLevel getCombatEducationLevel(final int experienceLevel, boolean flunked,
           final int passRate) {
-        if (experienceLevel < EXP_REGULAR) {
+        if (experienceLevel < SKILL_LEVEL_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
                 flunked = Compute.randomInt(100) < passRate;
@@ -2111,16 +2111,16 @@ public class EducationController {
      */
     private static EducationLevel getNonCombatEducationLevel(final int experienceLevel, boolean flunked,
           final int passRate) {
-        if (experienceLevel < EXP_REGULAR) {
+        if (experienceLevel < SKILL_LEVEL_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
                 flunked = Compute.randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
-        } else if (experienceLevel == EXP_REGULAR) {
+        } else if (experienceLevel == SKILL_LEVEL_REGULAR) {
             return flunked ? EducationLevel.HIGH_SCHOOL : EducationLevel.COLLEGE;
-        } else if (experienceLevel == EXP_VETERAN) {
+        } else if (experienceLevel == SKILL_LEVEL_VETERAN) {
             return flunked ? EducationLevel.COLLEGE : EducationLevel.POST_GRADUATE;
         } else {
             return flunked ? EducationLevel.POST_GRADUATE : EducationLevel.DOCTORATE;

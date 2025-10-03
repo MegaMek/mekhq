@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.parts.missing;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
@@ -118,7 +118,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
               .append(getDetails())
               .append("<br/>");
 
-        if (getSkillMin() <= EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -283,11 +283,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        if (skillMin > EXP_LEGENDARY) {
+        if (skillMin > SKILL_LEVEL_LEGENDARY) {
             Part part = findReplacement(false);
             if (null != part) {
                 part.changeQuantity(-1);
-                skillMin = EXP_GREEN;
+                skillMin = SKILL_LEVEL_GREEN;
             }
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                   ReportingUtilities.getNegativeColor(),
@@ -441,7 +441,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return replace.getName() + " scrapped.";
         }
 
-        skillMin = EXP_GREEN;
+        skillMin = SKILL_LEVEL_GREEN;
 
         return getName() + " scrapped.";
     }

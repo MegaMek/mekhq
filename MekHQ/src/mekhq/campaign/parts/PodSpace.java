@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
@@ -291,7 +291,7 @@ public class PodSpace implements IPartWork {
                 replacing |= part instanceof MissingPart;
             }
         }
-        if (rating >= EXP_LEGENDARY && replacing) {
+        if (rating >= SKILL_LEVEL_LEGENDARY && replacing) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                   ReportingUtilities.getNegativeColor(),
                   "<b> failed and part(s) destroyed</b>") + ".";
@@ -318,7 +318,7 @@ public class PodSpace implements IPartWork {
 
     @Override
     public int getSkillMin() {
-        int minSkill = EXP_GREEN;
+        int minSkill = SKILL_LEVEL_GREEN;
         for (int id : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(id);
             if (part != null) {
@@ -417,7 +417,7 @@ public class PodSpace implements IPartWork {
               .append(getDetails())
               .append("<br/>");
 
-        if (getSkillMin() <= EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(getTech() != null ? " (scheduled)" : "")

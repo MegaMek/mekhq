@@ -36,7 +36,7 @@ import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAli
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.PlanetOwner;
-import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.NO_SKILL;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -443,7 +443,7 @@ public class AtBDynamicScenario extends AtBScenario {
      */
     public int getLanceCommanderSkill(String skillType, Campaign campaign) {
         Person commander = getLanceCommander(campaign);
-        int skillValue = SKILL_NONE;
+        int skillValue = NO_SKILL;
 
         if ((commander != null) &&
                   commander.hasSkill(skillType)) {
