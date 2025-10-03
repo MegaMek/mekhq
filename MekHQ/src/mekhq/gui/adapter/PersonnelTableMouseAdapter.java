@@ -139,6 +139,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
@@ -656,7 +657,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_REFUND_SKILL: {
                 String typeLabel = data[1];
-                SkillType skillType = SkillType.getType(typeLabel);
+                SkillTypeNew skillType = SkillTypeNew.getType(typeLabel);
                 Skills skills = selectedPerson.getSkills();
                 int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.getName());
 

@@ -46,7 +46,7 @@ import megamek.common.units.VTOL;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 
@@ -145,8 +145,8 @@ public class CrewListModel extends AbstractListModel<Person> {
               boolean isSelected, boolean cellHasFocus) {
             setOpaque(true);
             Person person = getElementAt(index);
-            String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
-            String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
+            String gunSkill = SkillUtilities.getGunnerySkillFor(unit.getEntity()).name();
+            String driveSkill = SkillUtilities.getDrivingSkillFor(unit.getEntity()).name();
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
             String sb = "<html><font><b>" +

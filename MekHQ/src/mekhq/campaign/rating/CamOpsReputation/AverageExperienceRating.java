@@ -51,6 +51,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.unit.Unit;
 
 public class AverageExperienceRating {
@@ -250,7 +251,7 @@ public class AverageExperienceRating {
         PersonnelOptions options = person.getOptions();
         Attributes attributes = person.getATOWAttributes();
         if (unit.isDriver(person)) {
-            skillType = SkillType.getDrivingSkillFor(entity);
+            skillType = SkillUtilities.getDrivingSkillFor(entity).name();
             Skill skill = person.getSkill(skillType);
 
             if (skill != null) {
@@ -264,7 +265,7 @@ public class AverageExperienceRating {
         }
 
         if (unit.isGunner(person)) {
-            skillType = SkillType.getGunnerySkillFor(entity);
+            skillType = SkillUtilities.getGunnerySkillFor(entity).name();
 
             Skill skill = person.getSkill(skillType);
             if (skill != null) {

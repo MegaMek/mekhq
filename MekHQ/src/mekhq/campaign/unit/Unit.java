@@ -137,6 +137,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -4418,8 +4419,8 @@ public class Unit implements ITechnology {
     public void resetPilotAndEntity() {
         entity.getCrew().resetGameState();
         if (entity.getCrew().getSlotCount() > 1) {
-            final String driveType = SkillType.getDrivingSkillFor(entity);
-            final String gunType = SkillType.getGunnerySkillFor(entity);
+            final String driveType = SkillUtilities.getDrivingSkillFor(entity).name();
+            final String gunType = SkillUtilities.getGunnerySkillFor(entity).name();
             if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
                 // Command console; each crew is assigned as both driver and gunner
                 int slot = 0;
@@ -4712,8 +4713,8 @@ public class Unit implements ITechnology {
         int piloting = 13;
         int gunnery = 13;
         int artillery = 13;
-        String driveType = SkillType.getDrivingSkillFor(entity);
-        String gunType = SkillType.getGunnerySkillFor(entity);
+        String driveType = SkillUtilities.getDrivingSkillFor(entity).name();
+        String gunType = SkillUtilities.getGunnerySkillFor(entity).name();
         int sumPiloting = 0;
         int nDrivers = 0;
         int sumGunnery = 0;
