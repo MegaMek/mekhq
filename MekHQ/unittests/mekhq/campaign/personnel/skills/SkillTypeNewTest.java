@@ -45,7 +45,7 @@ import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class SkillTypeTest {
+class SkillTypeNewTest {
 
     static Stream<String> allSkillNames() {
         return Stream.of(SkillType.getSkillList());

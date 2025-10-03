@@ -32,11 +32,27 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.enums.SkillTypeNew.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
 /**
  * Utility class providing static methods for working with experience levels and skill-related attributes.
@@ -55,6 +71,8 @@ public class SkillUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillUtilities";
 
     public static final int NO_SKILL = 0;
+    public static final int DISABLED_SKILL_LEVEL = -1;
+    public static final int[] DEFAULT_SKILL_COSTS = new int[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
 
     public static final int SKILL_LEVEL_NONE = -1;
     public static final int SKILL_LEVEL_ULTRA_GREEN = 0;
@@ -160,5 +178,132 @@ public class SkillUtilities {
     public static String getColoredExperienceLevelName(SkillLevel skillLevel) {
         int level = skillLevel.getAdjustedValue();
         return getColoredExperienceLevelName(level);
+    }
+
+    /**
+     * Determines the appropriate driving-related {@link SkillTypeNew} for the given entity.
+     *
+     * <p>The method inspects the type and movement mode of the provided {@link Entity} and returns the corresponding
+     * driving skill type. Defaults to the 'Mech Piloting' skill if no other type matches.</p>
+     *
+     * @param entity the {@link Entity} whose driving skill is to be determined
+     *
+     * @return the corresponding driving-related {@link SkillTypeNew}
+     */
+    public static SkillTypeNew getDrivingSkillFor(Entity entity) {
+        if (entity instanceof Tank) {
+            return switch (entity.getMovementMode()) {
+                case VTOL -> S_PILOT_VTOL;
+                case NAVAL, HYDROFOIL, SUBMARINE -> S_PILOT_NVEE;
+                default -> S_PILOT_GVEE;
+            };
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+            return S_PILOT_SPACE;
+        } else if (entity instanceof ConvFighter) {
+            return S_PILOT_JET;
+        } else if (entity instanceof Aero) {
+            return S_PILOT_AERO;
+        } else if (entity instanceof Infantry) {
+            return S_ANTI_MEK;
+        } else if (entity instanceof ProtoMek) {
+            return S_GUN_PROTO;
+        } else {
+            return S_PILOT_MEK;
+        }
+    }
+
+    /**
+     * Determines the appropriate gunnery-related {@link SkillTypeNew} for the given entity.
+     *
+     * <p>The method evaluates the type of the provided {@code Entity} and returns the corresponding gunnery skill
+     * type. Defaults to the 'Mech Gunnery' skill if no other type matches.</p>
+     *
+     * @param entity the {@link Entity} whose gunnery skill is to be determined
+     *
+     * @return the corresponding gunnery-related {@link SkillTypeNew}
+     */
+    public static SkillTypeNew getGunnerySkillFor(Entity entity) {
+        if (entity instanceof Tank) {
+            return S_GUN_VEE;
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+            return S_GUN_SPACE;
+        } else if (entity instanceof ConvFighter) {
+            return S_GUN_JET;
+        } else if (entity instanceof Aero) {
+            return S_GUN_AERO;
+        } else if (entity instanceof Infantry) {
+            if (entity instanceof BattleArmor) {
+                return S_GUN_BA;
+            } else {
+                return S_SMALL_ARMS;
+            }
+        } else if (entity instanceof ProtoMek) {
+            return S_GUN_PROTO;
+        } else {
+            return S_GUN_MEK;
+        }
+    }
+
+    /**
+     * Retrieves a curated list of roleplay {@link SkillTypeNew}s, sampling from multiple subtypes.
+     *
+     * <p>The method collects all skill types belonging to the general roleplay subtype and additionally samples one
+     * random skill from each specialization (art, interest, science, security) if skills in those categories are
+     * available. This ensures skill selection does not overly favor specialized subtypes.
+     *
+     * @return a list of selected roleplay-related {@link SkillTypeNew} values
+     */
+    public static List<SkillTypeNew> getRoleplaySkills() {
+        List<SkillTypeNew> roleplaySkills = new ArrayList<>();
+        List<SkillTypeNew> roleplaySkillsArt = new ArrayList<>();
+        List<SkillTypeNew> roleplaySkillsInterest = new ArrayList<>();
+        List<SkillTypeNew> roleplaySkillsScience = new ArrayList<>();
+        List<SkillTypeNew> roleplaySkillsSecurity = new ArrayList<>();
+
+        for (SkillTypeNew type : SkillTypeNew.values()) {
+            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_GENERAL)) {
+                roleplaySkills.add(type);
+                continue;
+            }
+
+            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_ART)) {
+                roleplaySkillsArt.add(type);
+                continue;
+            }
+
+            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_INTEREST)) {
+                roleplaySkillsInterest.add(type);
+                continue;
+            }
+
+            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_SCIENCE)) {
+                roleplaySkillsScience.add(type);
+                continue;
+            }
+
+            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_SECURITY)) {
+                roleplaySkillsSecurity.add(type);
+            }
+        }
+
+        // These next few steps are so that we don't overweight skill specializations. Without this, the chances of
+        // having a Science-related skill, for example, skyrocket and make those skills feel 'spammy'.
+        if (!roleplaySkillsArt.isEmpty()) {
+            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsArt));
+        }
+
+        if (!roleplaySkillsInterest.isEmpty()) {
+            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsInterest));
+        }
+
+        if (!roleplaySkillsScience.isEmpty()) {
+            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsScience));
+        }
+
+        if (!roleplaySkillsSecurity.isEmpty()) {
+            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsSecurity));
+        }
+
+        return roleplaySkills;
     }
 }

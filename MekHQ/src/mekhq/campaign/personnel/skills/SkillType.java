@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.DISABLED_SKILL_LEVEL;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
@@ -56,7 +57,6 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENC
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
-import static mekhq.campaign.personnel.skills.enums.SkillType.DISABLED_SKILL_LEVEL;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
@@ -69,17 +69,7 @@ import java.util.Objects;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.battleArmor.BattleArmor;
-import megamek.common.units.Aero;
-import megamek.common.units.ConvFighter;
-import megamek.common.units.Entity;
-import megamek.common.units.Infantry;
-import megamek.common.units.Jumpship;
-import megamek.common.units.ProtoMek;
-import megamek.common.units.SmallCraft;
-import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -386,10 +376,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                                                                                                      Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                      SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                      SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                  </pre>
+     *                                                                                                                                                                                                                                                                                                                                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                    </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -979,104 +969,6 @@ public class SkillType {
             default -> skillName;
         };
         return skillName;
-    }
-
-    public static String getDrivingSkillFor(Entity en) {
-        if (en instanceof Tank) {
-            return switch (en.getMovementMode()) {
-                case VTOL -> S_PILOT_VTOL;
-                case NAVAL, HYDROFOIL, SUBMARINE -> S_PILOT_NVEE;
-                default -> S_PILOT_GVEE;
-            };
-        } else if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
-            return S_PILOT_SPACE;
-        } else if (en instanceof ConvFighter) {
-            return S_PILOT_JET;
-        } else if (en instanceof Aero) {
-            return S_PILOT_AERO;
-        } else if (en instanceof Infantry) {
-            return S_ANTI_MEK;
-        } else if (en instanceof ProtoMek) {
-            return S_GUN_PROTO;
-        } else {
-            return S_PILOT_MEK;
-        }
-    }
-
-    public static String getGunnerySkillFor(Entity en) {
-        if (en instanceof Tank) {
-            return S_GUN_VEE;
-        } else if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
-            return S_GUN_SPACE;
-        } else if (en instanceof ConvFighter) {
-            return S_GUN_JET;
-        } else if (en instanceof Aero) {
-            return S_GUN_AERO;
-        } else if (en instanceof Infantry) {
-            if (en instanceof BattleArmor) {
-                return S_GUN_BA;
-            } else {
-                return S_SMALL_ARMS;
-            }
-        } else if (en instanceof ProtoMek) {
-            return S_GUN_PROTO;
-        } else {
-            return S_GUN_MEK;
-        }
-    }
-
-    public static List<SkillType> getRoleplaySkills() {
-        List<SkillType> roleplaySkills = new ArrayList<>();
-        List<SkillType> roleplaySkillsArt = new ArrayList<>();
-        List<SkillType> roleplaySkillsInterest = new ArrayList<>();
-        List<SkillType> roleplaySkillsScience = new ArrayList<>();
-        List<SkillType> roleplaySkillsSecurity = new ArrayList<>();
-
-        for (SkillType type : lookupHash.values()) {
-            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_GENERAL)) {
-                roleplaySkills.add(type);
-                continue;
-            }
-
-            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_ART)) {
-                roleplaySkillsArt.add(type);
-                continue;
-            }
-
-            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_INTEREST)) {
-                roleplaySkillsInterest.add(type);
-                continue;
-            }
-
-            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_SCIENCE)) {
-                roleplaySkillsScience.add(type);
-                continue;
-            }
-
-            if (type.isSubTypeOf(SkillSubType.ROLEPLAY_SECURITY)) {
-                roleplaySkillsSecurity.add(type);
-            }
-        }
-
-        // These next few steps are so that we don't overweight skill specializations. Without this, the chances of
-        // having a Science-related skill, for example, skyrocket and make those skills feel 'spammy'.
-        if (!roleplaySkillsArt.isEmpty()) {
-            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsArt));
-        }
-
-        if (!roleplaySkillsInterest.isEmpty()) {
-            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsInterest));
-        }
-
-        if (!roleplaySkillsScience.isEmpty()) {
-            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsScience));
-        }
-
-        if (!roleplaySkillsSecurity.isEmpty()) {
-            roleplaySkills.add(ObjectUtility.getRandomItem(roleplaySkillsSecurity));
-        }
-
-        return roleplaySkills;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
