@@ -193,7 +193,7 @@ public class RepairAndMaintenanceTab {
         // Header
         //start Repair Tab
         CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
-              getImageDirectory() + "logo_clan_burrock.png", 3);
+              getImageDirectory() + "logo_clan_burrock.png", 4);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));

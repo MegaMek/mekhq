@@ -789,7 +789,7 @@ public class PersonnelTab {
         //start Medical Tab
         CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
               getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-              3);
+              4);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
