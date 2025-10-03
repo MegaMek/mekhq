@@ -33,9 +33,6 @@
 package mekhq.campaign.universe.generators.companyGenerators;
 
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -83,7 +80,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
@@ -293,7 +290,9 @@ public abstract class AbstractCompanyGenerator {
             if (getOptions().isPrioritizeCompanyCommanderCombatSkills()) {
                 personnelSorter = personnelSorter
                                         .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
-                                        .thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                                        .thenComparingInt(t -> Stream.of(SkillTypeNew.S_LEADER.name(),
+                                                    SkillTypeNew.S_STRATEGY.name(),
+                                                    SkillTypeNew.S_TACTICS.name())
                                                                      .mapToInt(s -> t.getPerson()
                                                                                           .getSkillLevel(s,
                                                                                                 isUseAgingEffects,
@@ -301,7 +300,9 @@ public abstract class AbstractCompanyGenerator {
                                                                                                 today))
                                                                      .sum());
             } else {
-                personnelSorter = personnelSorter.thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                personnelSorter = personnelSorter.thenComparingInt(t -> Stream.of(SkillTypeNew.S_LEADER.name(),
+                                  SkillTypeNew.S_STRATEGY.name(),
+                                  SkillTypeNew.S_TACTICS.name())
                                                                               .mapToInt(s -> t.getPerson()
                                                                                                    .getSkillLevel(s,
                                                                                                          isUseAgingEffects,
@@ -339,7 +340,9 @@ public abstract class AbstractCompanyGenerator {
             if (getOptions().isPrioritizeOfficerCombatSkills()) {
                 personnelSorter = personnelSorter
                                         .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
-                                        .thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                                        .thenComparingInt(t -> Stream.of(SkillTypeNew.S_LEADER.name(),
+                                                    SkillTypeNew.S_STRATEGY.name(),
+                                                    SkillTypeNew.S_TACTICS.name())
                                                                      .mapToInt(s -> t.getPerson()
                                                                                           .getSkillLevel(s,
                                                                                                 isUseAgingEffects,
@@ -347,7 +350,9 @@ public abstract class AbstractCompanyGenerator {
                                                                                                 today))
                                                                      .sum());
             } else {
-                personnelSorter = personnelSorter.thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                personnelSorter = personnelSorter.thenComparingInt(t -> Stream.of(SkillTypeNew.S_LEADER.name(),
+                                  SkillTypeNew.S_STRATEGY.name(),
+                                  SkillTypeNew.S_TACTICS.name())
                                                                               .mapToInt(s -> t.getPerson()
                                                                                                    .getSkillLevel(s,
                                                                                                          isUseAgingEffects,
@@ -412,8 +417,8 @@ public abstract class AbstractCompanyGenerator {
           final int numMekWarriors) {
         tracker.setPersonType(CompanyGenerationPersonType.MEKWARRIOR_COMPANY_COMMANDER);
         tracker.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
-        tracker.getPerson().improveSkill(SkillType.S_GUN_MEK);
-        tracker.getPerson().improveSkill(SkillType.S_PILOT_MEK);
+        tracker.getPerson().improveSkill(SkillTypeNew.S_GUN_MEK.name());
+        tracker.getPerson().improveSkill(SkillTypeNew.S_PILOT_MEK.name());
         assignRandomOfficerSkillIncrease(tracker, 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
@@ -474,16 +479,16 @@ public abstract class AbstractCompanyGenerator {
         }
 
         // Improve Skills
-        final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MEK);
-        final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MEK);
+        final Skill gunnery = tracker.getPerson().getSkill(SkillTypeNew.S_GUN_MEK.name());
+        final Skill piloting = tracker.getPerson().getSkill(SkillTypeNew.S_PILOT_MEK.name());
         if ((gunnery == null) && (piloting != null)) {
-            tracker.getPerson().improveSkill(SkillType.S_GUN_MEK);
+            tracker.getPerson().improveSkill(SkillTypeNew.S_GUN_MEK.name());
         } else if ((gunnery != null) && (piloting == null)) {
-            tracker.getPerson().improveSkill(SkillType.S_PILOT_MEK);
+            tracker.getPerson().improveSkill(SkillTypeNew.S_PILOT_MEK.name());
         } else if (gunnery == null) {
             // Both are null... this shouldn't occur. In this case, boost both
-            tracker.getPerson().improveSkill(SkillType.S_GUN_MEK);
-            tracker.getPerson().improveSkill(SkillType.S_PILOT_MEK);
+            tracker.getPerson().improveSkill(SkillTypeNew.S_GUN_MEK.name());
+            tracker.getPerson().improveSkill(SkillTypeNew.S_PILOT_MEK.name());
         } else {
             tracker.getPerson().improveSkill((((gunnery.getLevel() > piloting.getLevel())
                                                      && getOptions().isApplyOfficerStatBonusToWorstSkill()) ?
@@ -523,21 +528,21 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < boosts; i++) {
             switch (Utilities.dice(1, 3)) {
                 case 1:
-                    tracker.getPerson().improveSkill(S_LEADER);
-                    if (tracker.getPerson().getSkill(S_LEADER).getLevel() == 0) {
-                        tracker.getPerson().improveSkill(S_LEADER);
+                    tracker.getPerson().improveSkill(SkillTypeNew.S_LEADER.name());
+                    if (tracker.getPerson().getSkill(SkillTypeNew.S_LEADER.name()).getLevel() == 0) {
+                        tracker.getPerson().improveSkill(SkillTypeNew.S_LEADER.name());
                     }
                     break;
                 case 2:
-                    tracker.getPerson().improveSkill(S_STRATEGY);
-                    if (tracker.getPerson().getSkill(S_STRATEGY).getLevel() == 0) {
-                        tracker.getPerson().improveSkill(S_STRATEGY);
+                    tracker.getPerson().improveSkill(SkillTypeNew.S_STRATEGY.name());
+                    if (tracker.getPerson().getSkill(SkillTypeNew.S_STRATEGY.name()).getLevel() == 0) {
+                        tracker.getPerson().improveSkill(SkillTypeNew.S_STRATEGY.name());
                     }
                     break;
                 case 3:
-                    tracker.getPerson().improveSkill(S_TACTICS);
-                    if (tracker.getPerson().getSkill(S_TACTICS).getLevel() == 0) {
-                        tracker.getPerson().improveSkill(S_TACTICS);
+                    tracker.getPerson().improveSkill(SkillTypeNew.S_TACTICS.name());
+                    if (tracker.getPerson().getSkill(SkillTypeNew.S_TACTICS.name()).getLevel() == 0) {
+                        tracker.getPerson().improveSkill(SkillTypeNew.S_TACTICS.name());
                     }
                     break;
                 default:

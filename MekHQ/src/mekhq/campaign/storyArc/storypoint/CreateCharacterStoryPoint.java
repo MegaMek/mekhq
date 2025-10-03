@@ -52,7 +52,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.campaign.unit.Unit;
@@ -154,33 +154,33 @@ public class CreateCharacterStoryPoint extends StoryPoint {
 
             switch (phenotype) {
                 case MEKWARRIOR:
-                    person.addSkill(SkillType.S_GUN_MEK, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_MEK, 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_MEK.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_MEK.name(), 0, 1);
                     break;
                 case ELEMENTAL:
-                    person.addSkill(SkillType.S_GUN_BA, 0, 1);
-                    person.addSkill(SkillType.S_ANTI_MEK, 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_BA.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_ANTI_MEK.name(), 0, 1);
                     break;
                 case AEROSPACE:
-                    person.addSkill(SkillType.S_GUN_AERO, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_AERO, 0, 1);
-                    person.addSkill(SkillType.S_GUN_JET, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_JET, 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_AERO.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_AERO.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_JET.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_JET.name(), 0, 1);
                     break;
                 case VEHICLE:
-                    person.addSkill(SkillType.S_GUN_VEE, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_GVEE, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_NVEE, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_VTOL, 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_VEE.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_GVEE.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_NVEE.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_VTOL.name(), 0, 1);
                     break;
                 case PROTOMEK:
-                    person.addSkill(SkillType.S_GUN_PROTO, 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_PROTO.name(), 0, 1);
                     break;
                 case NAVAL:
-                    person.addSkill(SkillType.S_TECH_VESSEL, 0, 1);
-                    person.addSkill(SkillType.S_GUN_SPACE, 0, 1);
-                    person.addSkill(SkillType.S_PILOT_SPACE, 0, 1);
-                    person.addSkill(SkillType.S_NAVIGATION, 0, 1);
+                    person.addSkill(SkillTypeNew.S_TECH_VESSEL.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_GUN_SPACE.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_PILOT_SPACE.name(), 0, 1);
+                    person.addSkill(SkillTypeNew.S_NAVIGATION.name(), 0, 1);
                     break;
                 default:
                     break;

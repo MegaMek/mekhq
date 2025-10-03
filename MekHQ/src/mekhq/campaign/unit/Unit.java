@@ -136,8 +136,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Attributes;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.SkillUtilities;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -4507,9 +4507,9 @@ public class Unit implements ITechnology {
         if (getCampaign().getCampaignOptions().isUseTactics() ||
                   getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
             // Tactics command bonus. This should actually reflect the unit's commander
-            if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
+            if (null != commander && commander.hasSkill(SkillTypeNew.S_TACTICS.name())) {
                 entity.getCrew()
-                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
+                      .setCommandBonus(commander.getSkill(SkillTypeNew.S_TACTICS.name())
                                              .getTotalSkillLevel(commander.getOptions(),
                                                    commander.getATOWAttributes(),
                                                    0));
@@ -4754,9 +4754,10 @@ public class Unit implements ITechnology {
                 sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
                 nGunners++;
             }
-            if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
-                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+            if (person.hasSkill(SkillTypeNew.S_ARTILLERY.name()) &&
+                      person.getSkill(SkillTypeNew.S_ARTILLERY.name()).getFinalSkillValue(options, attributes) <
+                            artillery) {
+                artillery = person.getSkill(SkillTypeNew.S_ARTILLERY.name()).getFinalSkillValue(options, attributes);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += person.getInjuryModifiers(false);
@@ -4881,20 +4882,20 @@ public class Unit implements ITechnology {
 
         PersonnelOptions options = pilot.getOptions();
         Attributes attributes = pilot.getATOWAttributes();
-        if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
-            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options, attributes);
+        if (pilot.hasSkill(SkillTypeNew.S_PILOT_MEK.name())) {
+            pilotingMek = pilot.getSkill(SkillTypeNew.S_PILOT_MEK.name()).getFinalSkillValue(options, attributes);
         }
-        if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
-            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options, attributes);
+        if (pilot.hasSkill(SkillTypeNew.S_GUN_MEK.name())) {
+            gunneryMek = pilot.getSkill(SkillTypeNew.S_GUN_MEK.name()).getFinalSkillValue(options, attributes);
         }
-        if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
-            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options, attributes);
+        if (pilot.hasSkill(SkillTypeNew.S_PILOT_AERO.name())) {
+            pilotingAero = pilot.getSkill(SkillTypeNew.S_PILOT_AERO.name()).getFinalSkillValue(options, attributes);
         }
-        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options, attributes);
+        if (pilot.hasSkill(SkillTypeNew.S_GUN_AERO.name())) {
+            gunneryAero = pilot.getSkill(SkillTypeNew.S_GUN_AERO.name()).getFinalSkillValue(options, attributes);
         }
-        if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
-            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+        if (pilot.hasSkill(SkillTypeNew.S_ARTILLERY.name())) {
+            artillery = pilot.getSkill(SkillTypeNew.S_ARTILLERY.name()).getFinalSkillValue(options, attributes);
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -4939,9 +4940,10 @@ public class Unit implements ITechnology {
         if (person.hasSkill(driveType)) {
             piloting = person.getSkill(driveType).getFinalSkillValue(options, attributes);
         }
-        if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
-            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+        if (person.hasSkill(SkillTypeNew.S_ARTILLERY.name()) &&
+                  person.getSkill(SkillTypeNew.S_ARTILLERY.name()).getFinalSkillValue(options, attributes) <
+                        artillery) {
+            artillery = person.getSkill(SkillTypeNew.S_ARTILLERY.name()).getFinalSkillValue(options, attributes);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);
@@ -4994,11 +4996,11 @@ public class Unit implements ITechnology {
                 engineer.setRank(getCommander().getRankNumeric());
                 // will only be reloading ammo, so doesn't really matter what skill level we
                 // give them - set to regular
-                engineer.addSkill(SkillType.S_TECH_MECHANIC,
-                      SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(),
+                engineer.addSkill(SkillTypeNew.S_TECH_MECHANIC.name(),
+                      SkillTypeNew.getType(SkillTypeNew.S_TECH_MECHANIC.name()).getRegularLevel(),
                       0);
-                engineer.addSkill(SkillType.S_ADMIN,
-                      SkillType.getType(SkillType.S_ADMIN).getRegularLevel(),
+                engineer.addSkill(SkillTypeNew.S_ADMIN.name(),
+                      SkillTypeNew.getType(SkillTypeNew.S_ADMIN.name()).getRegularLevel(),
                       0);
             } else {
                 engineer = null;
@@ -5039,15 +5041,15 @@ public class Unit implements ITechnology {
                     }
                     sumEdge += person.getAdjustedEdge();
 
-                    if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
-                        sumTechSkill += person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                        sumTechBonus += person.getSkill(SkillType.S_TECH_VESSEL).getBonus();
+                    if (person.hasSkill(SkillTypeNew.S_TECH_VESSEL.name())) {
+                        sumTechSkill += person.getSkill(SkillTypeNew.S_TECH_VESSEL.name()).getLevel();
+                        sumTechBonus += person.getSkill(SkillTypeNew.S_TECH_VESSEL.name()).getBonus();
                         nCrew++;
                     }
 
-                    if (person.hasSkill(SkillType.S_ADMIN)) {
-                        sumAdminSkill += person.getSkill(SkillType.S_ADMIN).getLevel();
-                        sumAdminBonus += person.getSkill(SkillType.S_ADMIN).getBonus();
+                    if (person.hasSkill(SkillTypeNew.S_ADMIN.name())) {
+                        sumAdminSkill += person.getSkill(SkillTypeNew.S_ADMIN.name()).getLevel();
+                        sumAdminBonus += person.getSkill(SkillTypeNew.S_ADMIN.name()).getBonus();
                     }
                     if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
                         breakPartReRoll = false;
@@ -5074,9 +5076,9 @@ public class Unit implements ITechnology {
                     if (bestRank > -1) {
                         engineer.setRank(bestRank);
                     }
-                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumTechSkill / nCrew, sumTechBonus / nCrew);
+                    engineer.addSkill(SkillTypeNew.S_TECH_VESSEL.name(), sumTechSkill / nCrew, sumTechBonus / nCrew);
                     if (sumAdminSkill > -1) {
-                        engineer.addSkill(SkillType.S_ADMIN, sumAdminSkill / nCrew, sumAdminBonus / nCrew);
+                        engineer.addSkill(SkillTypeNew.S_ADMIN.name(), sumAdminSkill / nCrew, sumAdminBonus / nCrew);
                     }
                     engineer.setEdgeUsed(sumEdgeUsed);
                     engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
@@ -5178,15 +5180,15 @@ public class Unit implements ITechnology {
     // TODO : Switch similar tables in person to use this one instead
     public String determineUnitTechSkillType() {
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return SkillType.S_TECH_MEK;
+            return SkillTypeNew.S_TECH_MEK.name();
         } else if (entity instanceof BattleArmor) {
-            return SkillType.S_TECH_BA;
+            return SkillTypeNew.S_TECH_BA.name();
         } else if (entity instanceof Tank) {
-            return SkillType.S_TECH_MECHANIC;
+            return SkillTypeNew.S_TECH_MECHANIC.name();
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
-            return SkillType.S_TECH_VESSEL;
+            return SkillTypeNew.S_TECH_VESSEL.name();
         } else if ((entity instanceof Aero)) {
-            return SkillType.S_TECH_AERO;
+            return SkillTypeNew.S_TECH_AERO.name();
         } else {
             return "";
         }

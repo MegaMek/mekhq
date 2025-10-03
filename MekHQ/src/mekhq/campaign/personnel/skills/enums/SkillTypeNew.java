@@ -1660,8 +1660,43 @@ public enum SkillTypeNew {
         return skillLevelsMatter;
     }
 
+    /**
+     * Determines if this skill is classified as a roleplay skill.
+     *
+     * <p>Roleplay skills include general, art, interest, science, and security subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a roleplay category; {@code false} otherwise
+     */
     public boolean isRoleplaySkill() {
         return getRoleplaySkillSubTypes().contains(subType);
+    }
+
+    /**
+     * Determines if this skill is classified as a combat skill.
+     *
+     * <p>Combat skills include gunnery and piloting subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a combat category; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isCombatSkill() {
+        return this.subType == COMBAT_GUNNERY || this.subType == COMBAT_PILOTING;
+    }
+
+    /**
+     * Determines if this skill is classified as a support skill.
+     *
+     * <p>Support skills include support and support command subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a support category; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isSupportSkill() {
+        return this.subType == SUPPORT || this.subType == SUPPORT_COMMAND;
     }
 
     /**
