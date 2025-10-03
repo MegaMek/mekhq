@@ -67,8 +67,6 @@ import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
-import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
-import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
@@ -256,9 +254,9 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -2623,59 +2621,59 @@ public class Campaign implements ITechManager {
         if (!ignoreDice) {
             switch (person.getPhenotype()) {
                 case MEKWARRIOR: {
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MEK) ?
-                                             person.getSkill(SkillType.S_GUN_MEK)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_GUN_MEK.name()) ?
+                                             person.getSkill(SkillTypeNew.S_GUN_MEK.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
-                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MEK) ?
-                                             person.getSkill(SkillType.S_PILOT_MEK)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_PILOT_MEK.name()) ?
+                                             person.getSkill(SkillTypeNew.S_PILOT_MEK.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case AEROSPACE: {
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO) ?
-                                             person.getSkill(SkillType.S_GUN_AERO)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_GUN_AERO.name()) ?
+                                             person.getSkill(SkillTypeNew.S_GUN_AERO.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
-                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO) ?
-                                             person.getSkill(SkillType.S_PILOT_AERO)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_PILOT_AERO.name()) ?
+                                             person.getSkill(SkillTypeNew.S_PILOT_AERO.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case ELEMENTAL: {
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA) ?
-                                             person.getSkill(SkillType.S_GUN_BA)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_GUN_BA.name()) ?
+                                             person.getSkill(SkillTypeNew.S_GUN_BA.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
-                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MEK) ?
-                                             person.getSkill(SkillType.S_ANTI_MEK)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_ANTI_MEK.name()) ?
+                                             person.getSkill(SkillTypeNew.S_ANTI_MEK.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case VEHICLE: {
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE) ?
-                                             person.getSkill(SkillType.S_GUN_VEE)
+                    bloodnameTarget += person.hasSkill(SkillTypeNew.S_GUN_VEE.name()) ?
+                                             person.getSkill(SkillTypeNew.S_GUN_VEE.name())
                                                    .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     switch (person.getPrimaryRole()) {
                         case GROUND_VEHICLE_DRIVER:
-                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
-                                                     person.getSkill(SkillType.S_PILOT_GVEE)
+                            bloodnameTarget += person.hasSkill(SkillTypeNew.S_PILOT_GVEE.name()) ?
+                                                     person.getSkill(SkillTypeNew.S_PILOT_GVEE.name())
                                                            .getFinalSkillValue(options, attributes) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case NAVAL_VEHICLE_DRIVER:
-                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
-                                                     person.getSkill(SkillType.S_PILOT_NVEE)
+                            bloodnameTarget += person.hasSkill(SkillTypeNew.S_PILOT_NVEE.name()) ?
+                                                     person.getSkill(SkillTypeNew.S_PILOT_NVEE.name())
                                                            .getFinalSkillValue(options, attributes) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VTOL_PILOT:
-                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
-                                                     person.getSkill(SkillType.S_PILOT_VTOL)
+                            bloodnameTarget += person.hasSkill(SkillTypeNew.S_PILOT_VTOL.name()) ?
+                                                     person.getSkill(SkillTypeNew.S_PILOT_VTOL.name())
                                                            .getFinalSkillValue(options, attributes) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
@@ -2686,8 +2684,8 @@ public class Campaign implements ITechManager {
                 }
                 case PROTOMEK: {
                     bloodnameTarget += 2 *
-                                             (person.hasSkill(SkillType.S_GUN_PROTO) ?
-                                                    person.getSkill(SkillType.S_GUN_PROTO)
+                                             (person.hasSkill(SkillTypeNew.S_GUN_PROTO.name()) ?
+                                                    person.getSkill(SkillTypeNew.S_GUN_PROTO.name())
                                                           .getFinalSkillValue(options, attributes) :
                                                     TargetRoll.AUTOMATIC_FAIL);
                     break;
@@ -2696,29 +2694,29 @@ public class Campaign implements ITechManager {
                     switch (person.getPrimaryRole()) {
                         case VESSEL_PILOT:
                             bloodnameTarget += 2 *
-                                                     (person.hasSkill(SkillType.S_PILOT_SPACE) ?
-                                                            person.getSkill(SkillType.S_PILOT_SPACE)
+                                                     (person.hasSkill(SkillTypeNew.S_PILOT_SPACE.name()) ?
+                                                            person.getSkill(SkillTypeNew.S_PILOT_SPACE.name())
                                                                   .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_GUNNER:
                             bloodnameTarget += 2 *
-                                                     (person.hasSkill(SkillType.S_GUN_SPACE) ?
-                                                            person.getSkill(SkillType.S_GUN_SPACE)
+                                                     (person.hasSkill(SkillTypeNew.S_GUN_SPACE.name()) ?
+                                                            person.getSkill(SkillTypeNew.S_GUN_SPACE.name())
                                                                   .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_CREW:
                             bloodnameTarget += 2 *
-                                                     (person.hasSkill(SkillType.S_TECH_VESSEL) ?
-                                                            person.getSkill(SkillType.S_TECH_VESSEL)
+                                                     (person.hasSkill(SkillTypeNew.S_TECH_VESSEL.name()) ?
+                                                            person.getSkill(SkillTypeNew.S_TECH_VESSEL.name())
                                                                   .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
-                                                     (person.hasSkill(SkillType.S_NAVIGATION) ?
-                                                            person.getSkill(SkillType.S_NAVIGATION)
+                                                     (person.hasSkill(SkillTypeNew.S_NAVIGATION.name()) ?
+                                                            person.getSkill(SkillTypeNew.S_NAVIGATION.name())
                                                                   .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
@@ -7524,14 +7522,6 @@ public class Campaign implements ITechManager {
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "kills");
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "skillTypes");
-        for (final String skillName : SkillType.skillList) {
-            final SkillType type = getType(skillName);
-            if (type != null) {
-                type.writeToXML(writer, indent);
-            }
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "specialAbilities");
         for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
             SpecialAbility.getAbility(key).writeToXML(writer, indent);
@@ -9029,11 +9019,11 @@ public class Campaign implements ITechManager {
         int commanderStrategy = 0;
         Person commander = getCommander();
 
-        if (commander == null || !commander.hasSkill(S_STRATEGY)) {
+        if (commander == null || !commander.hasSkill(SkillTypeNew.S_STRATEGY.name())) {
             return commanderStrategy;
         }
 
-        Skill strategy = commander.getSkill(S_STRATEGY);
+        Skill strategy = commander.getSkill(SkillTypeNew.S_STRATEGY.name());
 
         return strategy.getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
     }
