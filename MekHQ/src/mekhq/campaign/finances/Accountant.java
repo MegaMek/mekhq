@@ -105,10 +105,10 @@ public record Accountant(Campaign campaign) {
         // And pay our pool
         salaries = salaries.plus(campaign().getCampaignOptions()
                                        .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
-                                       .doubleValue() * campaign().getAsTechPool());
+                                       .doubleValue() * campaign().getTemporaryAsTechPool());
         salaries = salaries.plus(campaign().getCampaignOptions()
                                        .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                       campaign().getMedicPool());
+                                       campaign().getTemporaryMedicPool());
 
         return salaries;
     }
@@ -563,10 +563,10 @@ public record Accountant(Campaign campaign) {
         payRollSummary.put(null,
               Money.of((campaign().getCampaignOptions()
                               .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() *
-                              campaign().getAsTechPool()) +
+                              campaign().getTemporaryAsTechPool()) +
                              (campaign().getCampaignOptions()
                                     .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                    campaign().getMedicPool())));
+                                    campaign().getTemporaryMedicPool())));
 
         return payRollSummary;
     }

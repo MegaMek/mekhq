@@ -1851,11 +1851,10 @@ public abstract class AbstractCompanyGenerator {
         // marriages
         finalizePersonnel(campaign, trackers);
 
-        // We can only fill the pool after finalizing and recruiting our support
-        // personnel
+        // We can only fill the pool after finalizing and recruiting our support personnel
         if (getOptions().isPoolAssistants()) {
             campaign.fillAsTechPool();
-            campaign.fillMedicPool();
+            campaign.resetMedicPool();
         }
 
         // Process Units
