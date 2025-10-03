@@ -251,7 +251,7 @@ public class SkillUtilities {
      *
      * <p>The method collects all skill types belonging to the general roleplay subtype and additionally samples one
      * random skill from each specialization (art, interest, science, security) if skills in those categories are
-     * available. This ensures skill selection does not overly favor specialized subtypes.
+     * available. This ensures skill selection does not overly favor specialized subtypes.</p>
      *
      * @return a list of selected roleplay-related {@link SkillTypeNew} values
      */

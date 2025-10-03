@@ -16,15 +16,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
@@ -1574,8 +1566,26 @@ public enum SkillTypeNew {
         return skillLevelsMatter;
     }
 
+    public boolean isRoleplaySkill() {
+        return getRoleplaySkillSubTypes().contains(subType);
+    }
+
+    /**
+     * Returns the localized display name for this skill type.
+     *
+     * <p>Retrieves the name from the resource bundle. If the skill is a roleplay skill, appends a marker indicating
+     * that it is roleplay-only.</p>
+     *
+     * @return the localized name of this skill type, with a roleplay-only marker if applicable
+     */
     public String getName() {
-        return getTextAt(RESOURCE_BUNDLE, "SkillTypeNew." + this.name() + ".name");
+        String name = getTextAt(RESOURCE_BUNDLE, "SkillTypeNew." + this.name() + ".name");
+
+        if (isRoleplaySkill()) {
+            name += ' ' + getTextAt(RESOURCE_BUNDLE, "SkillType.rpOnly");
+        }
+
+        return name;
     }
 
     /**
