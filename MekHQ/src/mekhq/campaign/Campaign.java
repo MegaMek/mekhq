@@ -314,6 +314,11 @@ public class Campaign implements ITechManager {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
+    /**
+     * When using the 'useful assistants' campaign options, the relevant skill levels possessed by each assistant is
+     * divided by this value and then floored.\
+     */
+    private static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
@@ -8761,7 +8766,11 @@ public class Campaign implements ITechManager {
 
         for (Person person : getActivePersonnel(false)) {
             if (person.getPrimaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
-                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 1;
+                // All skilled assistants contribute 1 to the pool, regardless of skill level
+                asTechs++;
+
+                // They then contribution additional 'assistants' to the pool based on their skill level
+                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 0;
             }
         }
 
@@ -8789,7 +8798,8 @@ public class Campaign implements ITechManager {
 
             // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
             // by design.
-            return asTechSkill.getTotalSkillLevel(options, attributes);
+            int totalSkillLevel = asTechSkill.getFinalSkillValue(options, attributes);
+            return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
         }
 
         return 0;
@@ -8812,7 +8822,11 @@ public class Campaign implements ITechManager {
 
         for (Person person : getActivePersonnel(false)) {
             if (person.getSecondaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
-                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 1;
+                // All skilled assistants contribute 1 to the pool, regardless of skill level
+                asTechs++;
+
+                // They then contribution additional 'assistants' to the pool based on their skill level
+                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 0;
             }
         }
 
@@ -8935,9 +8949,12 @@ public class Campaign implements ITechManager {
 
                         int skillLevel = medicSkill.getTotalSkillLevel(options, attributes);
 
+                        // All skilled assistants contribute 1 to the pool, regardless of skill level
+                        permanentMedicPool++;
+
                         // It is possible for very poorly skilled personnel to actually reduce the pool, this is by
                         // design. Not all help is helpful.
-                        permanentMedicPool += skillLevel;
+                        permanentMedicPool += (int) floor(skillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
                     }
                 }
             }
