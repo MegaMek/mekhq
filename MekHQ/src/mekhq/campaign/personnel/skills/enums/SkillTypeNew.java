@@ -30,6 +30,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import mekhq.campaign.personnel.skills.SkillUtilities;
 
@@ -1485,6 +1486,10 @@ public enum SkillTypeNew {
         this.costs = costs;
     }
 
+    public int getTarget() {
+        return getBaseTargetNumber();
+    }
+
     public int getBaseTargetNumber() {
         return baseTargetNumber;
     }
@@ -1499,6 +1504,38 @@ public enum SkillTypeNew {
 
     public List<SkillAttribute> getAttributes() {
         return Arrays.asList(firstAttribute, secondAttribute);
+    }
+
+    /**
+     * Determines whether the skill type has the specified attribute.
+     *
+     * <p>This method checks if the provided {@link SkillAttribute} matches either of the two attributes associated
+     * with the skill type.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to check
+     *
+     * @return {@code true} if the skill type includes the specified attribute; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean hasAttribute(SkillAttribute attribute) {
+        return (firstAttribute == attribute) || (secondAttribute == attribute);
+    }
+
+    /**
+     * Calculates the number of linked attributes.
+     *
+     * <p>This method checks the primary and secondary attributes to determine how many are valid (i.e., not {@code
+     * null} and not {@code NONE}). It returns the total count of linked attributes.</p>
+     *
+     * @return the number of linked attributes, which can be 0, 1, or 2 depending on the validity of the attributes.
+     */
+    public int getLinkedAttributeCount() {
+        int count = 0;
+        count += (firstAttribute != null && firstAttribute != NONE) ? 1 : 0;
+        count += (secondAttribute != null && secondAttribute != NONE) ? 1 : 0;
+        return count;
     }
 
     public SkillAttribute getFirstAttribute() {
@@ -1538,11 +1575,43 @@ public enum SkillTypeNew {
     }
 
     public String getName() {
-        return getTextAt(RESOURCE_BUNDLE, "SkillType." + this.name() + ".name");
+        return getTextAt(RESOURCE_BUNDLE, "SkillTypeNew." + this.name() + ".name");
     }
 
-    public String getDescription() {
-        return getTextAt(RESOURCE_BUNDLE, "SkillType." + this.name() + ".description");
+    /**
+     * Retrieves the flavor text for this skill, optionally including HTML tags and attribute details.
+     *
+     * @param includeHtmlTags   if {@code true}, the returned string will be wrapped with {@code <html>} and
+     *                          {@code </html>} tags
+     * @param includeAttributes if {@code true}, the returned string will append the object's attributes as labels; if
+     *                          {@code false}, only the raw flavor text is returned
+     *
+     * @return the assembled flavor text, with optional HTML formatting and attribute information
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getDescription(boolean includeHtmlTags, boolean includeAttributes) {
+        String rawFlavorText = getTextAt(RESOURCE_BUNDLE, "SkillTypeNew." + this.name() + ".flavorText");
+
+        String htmlOpenTag = includeHtmlTags ? "<html>" : "";
+        String htmlCloseTag = includeHtmlTags ? "</html>" : "";
+
+        if (!includeAttributes) {
+            return htmlOpenTag + rawFlavorText + htmlCloseTag;
+        }
+
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
+
+        if (secondAttribute != NONE) {
+            flavorText += ", " + secondAttribute.getLabel() + ')';
+        } else {
+            flavorText += ")";
+        }
+
+        flavorText += htmlCloseTag;
+
+        return flavorText;
     }
 
     /**
@@ -1692,5 +1761,50 @@ public enum SkillTypeNew {
         if ((name != null) && (level < 11)) {
             type.costs[level] = cost;
         }
+    }
+
+    public static SkillTypeNew getType(String name) {
+        return SkillTypeNew.valueOf(name);
+    }
+
+    /**
+     * Checks if the current instance is affected by the "Gremlins" or "Tech Empathy" SPAs.
+     *
+     * @return {@code true} if the {@code name} field matches one of the known tech or electronic-related skills,
+     *       {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isAffectedByGremlinsOrTechEmpathy() {
+        return Objects.equals(this, S_TECH_BA) ||
+                     Objects.equals(this, S_TECH_AERO) ||
+                     Objects.equals(this, S_TECH_MECHANIC) ||
+                     Objects.equals(this, S_TECH_MEK) ||
+                     Objects.equals(this, S_TECH_VESSEL) ||
+                     Objects.equals(this, S_COMPUTERS) ||
+                     Objects.equals(this, S_COMMUNICATIONS) ||
+                     Objects.equals(this, S_SECURITY_SYSTEMS_ELECTRONIC);
+    }
+
+    /**
+     * Checks if the current instance is affected by the "Impatient" or "Patient" SPAs.
+     *
+     * @return {@code true} if the instance is related to one of the affected subtypes or names, {@code false}
+     *       otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isAffectedByImpatientOrPatient() {
+        return this.isSubTypeOf(ROLEPLAY_ART) ||
+                     this.isSubTypeOf(ROLEPLAY_SECURITY) ||
+                     Objects.equals(this, S_CRYPTOGRAPHY) ||
+                     Objects.equals(this, S_DEMOLITIONS) ||
+                     Objects.equals(this, S_INVESTIGATION) ||
+                     Objects.equals(this, S_PROTOCOLS) ||
+                     Objects.equals(this, S_STRATEGY) ||
+                     Objects.equals(this, S_TACTICS) ||
+                     Objects.equals(this, S_TRAINING);
     }
 }
