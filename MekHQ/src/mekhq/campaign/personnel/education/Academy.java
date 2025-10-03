@@ -54,7 +54,7 @@ import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
@@ -822,7 +822,7 @@ public class Academy implements Comparable<Academy> {
 
                     if (skill != null) {
                         int skillLevel = skill.getLevel();
-                        SkillType skillType = skill.getType();
+                        SkillTypeNew skillType = skill.getType();
                         if (skillType.getExperienceLevel(skillLevel) >= educationLevel) {
                             tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                             continue;
@@ -932,37 +932,37 @@ public class Academy implements Comparable<Academy> {
      */
     public static String skillParser(String skill) {
         return switch (skill.toLowerCase().trim()) {
-            case "piloting/mek" -> SkillType.S_PILOT_MEK;
-            case "gunnery/mek" -> SkillType.S_GUN_MEK;
-            case "piloting/aerospace" -> SkillType.S_PILOT_AERO;
-            case "gunnery/aerospace" -> SkillType.S_GUN_AERO;
-            case "piloting/ground vehicle" -> SkillType.S_PILOT_GVEE;
-            case "piloting/vtol" -> SkillType.S_PILOT_VTOL;
-            case "piloting/naval" -> SkillType.S_PILOT_NVEE;
-            case "gunnery/vehicle" -> SkillType.S_GUN_VEE;
-            case "piloting/aircraft" -> SkillType.S_PILOT_JET;
-            case "gunnery/aircraft" -> SkillType.S_GUN_JET;
-            case "piloting/spacecraft" -> SkillType.S_PILOT_SPACE;
-            case "gunnery/spacecraft" -> SkillType.S_GUN_SPACE;
-            case "artillery" -> SkillType.S_ARTILLERY;
-            case "gunnery/battlearmor" -> SkillType.S_GUN_BA;
-            case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
-            case "small arms" -> SkillType.S_SMALL_ARMS;
-            case "anti-mek" -> SkillType.S_ANTI_MEK;
-            case "tech/mek" -> SkillType.S_TECH_MEK;
-            case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
-            case "tech/aero" -> SkillType.S_TECH_AERO;
-            case "tech/battlearmor" -> SkillType.S_TECH_BA;
-            case "tech/vessel" -> SkillType.S_TECH_VESSEL;
-            case "astech" -> SkillType.S_ASTECH;
-            case "doctor" -> SkillType.S_SURGERY;
-            case "medtech" -> SkillType.S_MEDTECH;
-            case "hyperspace navigation" -> SkillType.S_NAVIGATION;
-            case "administration" -> SkillType.S_ADMIN;
-            case "tactics" -> SkillType.S_TACTICS;
-            case "strategy" -> SkillType.S_STRATEGY;
-            case "negotiation" -> SkillType.S_NEGOTIATION;
-            case "leadership" -> SkillType.S_LEADER;
+            case "piloting/mek" -> SkillTypeNew.S_PILOT_MEK.name();
+            case "gunnery/mek" -> SkillTypeNew.S_GUN_MEK.name();
+            case "piloting/aerospace" -> SkillTypeNew.S_PILOT_AERO.name();
+            case "gunnery/aerospace" -> SkillTypeNew.S_GUN_AERO.name();
+            case "piloting/ground vehicle" -> SkillTypeNew.S_PILOT_GVEE.name();
+            case "piloting/vtol" -> SkillTypeNew.S_PILOT_VTOL.name();
+            case "piloting/naval" -> SkillTypeNew.S_PILOT_NVEE.name();
+            case "gunnery/vehicle" -> SkillTypeNew.S_GUN_VEE.name();
+            case "piloting/aircraft" -> SkillTypeNew.S_PILOT_JET.name();
+            case "gunnery/aircraft" -> SkillTypeNew.S_GUN_JET.name();
+            case "piloting/spacecraft" -> SkillTypeNew.S_PILOT_SPACE.name();
+            case "gunnery/spacecraft" -> SkillTypeNew.S_GUN_SPACE.name();
+            case "artillery" -> SkillTypeNew.S_ARTILLERY.name();
+            case "gunnery/battlearmor" -> SkillTypeNew.S_GUN_BA.name();
+            case "gunnery/protomek" -> SkillTypeNew.S_GUN_PROTO.name();
+            case "small arms" -> SkillTypeNew.S_SMALL_ARMS.name();
+            case "anti-mek" -> SkillTypeNew.S_ANTI_MEK.name();
+            case "tech/mek" -> SkillTypeNew.S_TECH_MEK.name();
+            case "tech/mechanic" -> SkillTypeNew.S_TECH_MECHANIC.name();
+            case "tech/aero" -> SkillTypeNew.S_TECH_AERO.name();
+            case "tech/battlearmor" -> SkillTypeNew.S_TECH_BA.name();
+            case "tech/vessel" -> SkillTypeNew.S_TECH_VESSEL.name();
+            case "astech" -> SkillTypeNew.S_ASTECH.name();
+            case "doctor" -> SkillTypeNew.S_SURGERY.name();
+            case "medtech" -> SkillTypeNew.S_MEDTECH.name();
+            case "hyperspace navigation" -> SkillTypeNew.S_NAVIGATION.name();
+            case "administration" -> SkillTypeNew.S_ADMIN.name();
+            case "tactics" -> SkillTypeNew.S_TACTICS.name();
+            case "strategy" -> SkillTypeNew.S_STRATEGY.name();
+            case "negotiation" -> SkillTypeNew.S_NEGOTIATION.name();
+            case "leadership" -> SkillTypeNew.S_LEADER.name();
             default -> throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
         };
     }

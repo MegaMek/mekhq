@@ -38,13 +38,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
-import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
-import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
-import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
@@ -63,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -104,7 +98,7 @@ public class Skill {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger logger = MMLogger.create(Skill.class);
 
-    private SkillType type;
+    private SkillTypeNew type;
     private int level;
     private int bonus;
     private int agingModifier;
@@ -114,25 +108,25 @@ public class Skill {
     }
 
     public Skill(String type) {
-        this.type = SkillType.getType(type);
+        this.type = SkillTypeNew.getType(type);
         this.level = this.type.getLevelFromExperience(SKILL_LEVEL_REGULAR);
     }
 
     public Skill(String type, int level, int bonus) {
-        this(SkillType.getType(type), level, bonus);
+        this(SkillTypeNew.getType(type), level, bonus);
     }
 
     public Skill(String type, int level, int bonus, int agingModifier) {
-        this(SkillType.getType(type), level, bonus, agingModifier);
+        this(SkillTypeNew.getType(type), level, bonus, agingModifier);
     }
 
-    public Skill(SkillType type, int level, int bonus) {
+    public Skill(SkillTypeNew type, int level, int bonus) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
     }
 
-    public Skill(SkillType type, int level, int bonus, int agingModifier) {
+    public Skill(SkillTypeNew type, int level, int bonus, int agingModifier) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
@@ -154,10 +148,11 @@ public class Skill {
     }
 
     /**
-     * @return {@code true} if the progression type is "count up", {@code false} otherwise.
+     * @deprecated no longer used
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private boolean isCountUp() {
-        return type.isCountUp();
+        return false;
     }
 
     /**
@@ -183,13 +178,13 @@ public class Skill {
      * Creates a new {@link Skill} from the given experience level and bonus.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN).
      * @param bonus           The bonus for the resulting {@link Skill}.
      *
      * @return A new {@link Skill} of the appropriate type, with a level based on {@code experienceLevel} and the bonus.
      */
     public static Skill createFromExperience(String type, int experienceLevel, int bonus) {
-        SkillType skillType = SkillType.getType(type);
+        SkillTypeNew skillType = SkillTypeNew.getType(type);
         int level = skillType.getLevelFromExperience(experienceLevel);
         return new Skill(skillType, level, bonus);
     }
@@ -198,7 +193,7 @@ public class Skill {
      * Creates a new {@link Skill} with a randomized level.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN).
      * @param bonus           The bonus for the resulting {@link Skill}.
      * @param rollModifier    The roll modifier on a 1D6.
      *
@@ -206,7 +201,7 @@ public class Skill {
      *       1D6 roll.
      */
     public static Skill randomizeLevel(String type, int experienceLevel, int bonus, int rollModifier) {
-        SkillType skillType = SkillType.getType(type);
+        SkillTypeNew skillType = SkillTypeNew.getType(type);
         int level = skillType.getLevelFromExperience(experienceLevel);
 
         int roll = Compute.d6() + rollModifier;
@@ -243,7 +238,7 @@ public class Skill {
         this.agingModifier = agingModifier;
     }
 
-    public SkillType getType() {
+    public SkillTypeNew getType() {
         return type;
     }
 
@@ -331,9 +326,9 @@ public class Skill {
 
         String name = type.getName();
         // Reputation and Alternate ID
-        if (Objects.equals(name, S_NEGOTIATION) ||
-                  Objects.equals(name, S_PROTOCOLS) ||
-                  Objects.equals(name, S_STREETWISE)) {
+        if (Objects.equals(name, SkillTypeNew.S_NEGOTIATION.name()) ||
+                  Objects.equals(name, SkillTypeNew.S_PROTOCOLS.name()) ||
+                  Objects.equals(name, SkillTypeNew.S_STREETWISE.name())) {
             if (characterOptions.booleanOption(ATOW_ALTERNATE_ID) && reputation < 0) {
                 reputation = min(0, reputation + 2);
             }
@@ -342,7 +337,7 @@ public class Skill {
         }
 
         // Animal Empathy and Animal Antipathy
-        if (Objects.equals(name, S_ANIMAL_HANDLING)) {
+        if (Objects.equals(name, SkillTypeNew.S_ANIMAL_HANDLING.name())) {
             if (characterOptions.booleanOption(FLAW_ANIMAL_ANTIPATHY)) {
                 modifier -= 2;
             }
@@ -380,7 +375,7 @@ public class Skill {
         }
 
         // Poor Hearing, Good Hearing, Poor Vision, Good Vision, Sixth Sense, Cat Girl
-        if (Objects.equals(name, S_PERCEPTION)) {
+        if (Objects.equals(name, SkillTypeNew.S_PERCEPTION.name())) {
             if (characterOptions.booleanOption(FLAW_POOR_HEARING)) {
                 modifier -= 1;
             }
@@ -411,7 +406,8 @@ public class Skill {
         }
 
         // Introvert, Gregarious
-        if (Objects.equals(name, S_ACTING) || Objects.equals(name, S_NEGOTIATION)) {
+        if (Objects.equals(name, SkillTypeNew.S_ACTING.name()) ||
+                  Objects.equals(name, SkillTypeNew.S_NEGOTIATION.name())) {
             if (characterOptions.booleanOption(FLAW_INTROVERT)) {
                 modifier -= 1;
             }
@@ -444,7 +440,7 @@ public class Skill {
         }
 
         // Trivial Compulsion - Religious Fanaticism
-        if (Objects.equals(S_INTEREST_THEOLOGY, name)) {
+        if (Objects.equals(SkillTypeNew.S_INTEREST_THEOLOGY.name(), name)) {
             if (hasReligiousFanaticism) {
                 modifier += 2;
             }
@@ -488,7 +484,7 @@ public class Skill {
      * @since 0.50.05
      */
     public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes,
-          final SkillType skillType) {
+          final SkillTypeNew skillType) {
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             return 0;
         }
@@ -640,7 +636,7 @@ public class Skill {
     }
 
     public void improve() {
-        if (level >= SkillType.NUM_LEVELS - 1) {
+        if (level >= SkillUtilities.MAXIMUM_SKILL_LEVEL - 1) {
             // Can't improve past the max
             return;
         }
@@ -666,7 +662,7 @@ public class Skill {
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
-        while (cost <= 0 && (level + i) < SkillType.NUM_LEVELS) {
+        while (cost <= 0 && (level + i) < SkillUtilities.MAXIMUM_SKILL_LEVEL) {
             cost = type.getCost(level + i);
             ++i;
         }
@@ -848,7 +844,7 @@ public class Skill {
     public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
         StringBuilder tooltip = new StringBuilder();
 
-        String flavorText = getType().getFlavorText(false, false);
+        String flavorText = getType().getDescription(false, false);
         if (!flavorText.isBlank()) {
             tooltip.append(flavorText).append("<br><br>");
         }
@@ -909,7 +905,7 @@ public class Skill {
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     String text = wn2.getTextContent();
-                    retVal.type = SkillType.getType(text);
+                    retVal.type = SkillTypeNew.getType(text);
                 } else if (wn2.getNodeName().equalsIgnoreCase("level")) {
                     retVal.level = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
@@ -926,6 +922,6 @@ public class Skill {
     }
 
     public void updateType() {
-        type = SkillType.getType(type.getName());
+        type = SkillTypeNew.getType(type.getName());
     }
 }

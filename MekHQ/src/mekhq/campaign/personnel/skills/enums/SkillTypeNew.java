@@ -1447,16 +1447,16 @@ public enum SkillTypeNew {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
 
-    private final int baseTargetNumber;
+    private int baseTargetNumber;
     private final SkillSubType subType;
     private final SkillAttribute firstAttribute;
     private final SkillAttribute secondAttribute;
-    private final int skillMilestoneGreen;
-    private final int skillMilestoneRegular;
-    private final int skillMilestoneVeteran;
-    private final int skillMilestoneElite;
-    private final int skillMilestoneHeroic;
-    private final int skillMilestoneLegendary;
+    private int skillMilestoneGreen;
+    private int skillMilestoneRegular;
+    private int skillMilestoneVeteran;
+    private int skillMilestoneElite;
+    private int skillMilestoneHeroic;
+    private int skillMilestoneLegendary;
     private final boolean skillLevelsMatter;
     private final int[] costs;
 
@@ -1478,12 +1478,22 @@ public enum SkillTypeNew {
         this.costs = costs;
     }
 
+    @Deprecated
     public int getTarget() {
         return getBaseTargetNumber();
     }
 
+    @Deprecated
+    public void setTarget(int target) {
+        setBaseTargetNumber(target);
+    }
+
     public int getBaseTargetNumber() {
         return baseTargetNumber;
+    }
+
+    public void setBaseTargetNumber(int baseTargetNumber) {
+        this.baseTargetNumber = baseTargetNumber;
     }
 
     public boolean isSubTypeOf(SkillSubType subType) {
@@ -1542,24 +1552,108 @@ public enum SkillTypeNew {
         return skillMilestoneGreen;
     }
 
+    public void setSkillMilestoneGreen(int milestone) {
+        this.skillMilestoneGreen = milestone;
+    }
+
     public int getSkillMilestoneRegular() {
         return skillMilestoneRegular;
+    }
+
+    public void setSkillMilestoneRegular(int milestone) {
+        this.skillMilestoneRegular = milestone;
     }
 
     public int getSkillMilestoneVeteran() {
         return skillMilestoneVeteran;
     }
 
+    public void setSkillMilestoneVeteran(int milestone) {
+        this.skillMilestoneVeteran = milestone;
+    }
+
     public int getSkillMilestoneElite() {
         return skillMilestoneElite;
+    }
+
+    public void setSkillMilestoneElite(int milestone) {
+        this.skillMilestoneElite = milestone;
     }
 
     public int getSkillMilestoneHeroic() {
         return skillMilestoneHeroic;
     }
 
+    public void setSkillMilestoneHeroic(int milestone) {
+        this.skillMilestoneHeroic = milestone;
+    }
+
     public int getSkillMilestoneLegendary() {
         return skillMilestoneLegendary;
+    }
+
+    public void setSkillMilestoneLegendary(int milestone) {
+        this.skillMilestoneLegendary = milestone;
+    }
+
+    @Deprecated
+    public int getGreenLevel() {
+        return getSkillMilestoneGreen();
+    }
+
+    @Deprecated
+    public void setGreenLevel(int level) {
+        setSkillMilestoneGreen(level);
+    }
+
+    @Deprecated
+    public int getRegularLevel() {
+        return getSkillMilestoneRegular();
+    }
+
+    @Deprecated
+    public void setRegularLevel(int level) {
+        setSkillMilestoneRegular(level);
+    }
+
+    @Deprecated
+    public int getVeteranLevel() {
+        return getSkillMilestoneVeteran();
+    }
+
+    @Deprecated
+    public void setVeteranLevel(int level) {
+        setSkillMilestoneVeteran(level);
+    }
+
+    @Deprecated
+    public int getEliteLevel() {
+        return getSkillMilestoneElite();
+    }
+
+    @Deprecated
+    public void setEliteLevel(int level) {
+        setSkillMilestoneElite(level);
+    }
+
+    @Deprecated
+    public int getHeroicLevel() {
+        return getSkillMilestoneHeroic();
+    }
+
+    @Deprecated
+    public void setHeroicLevel(int level) {
+        setSkillMilestoneHeroic(level);
+    }
+
+    @Deprecated
+    public int getLegendaryLevel() {
+        return getSkillMilestoneLegendary();
+    }
+
+    @Deprecated
+    public void setLegendaryLevel(int level) {
+        setSkillMilestoneLegendary(level);
     }
 
     public boolean isSkillLevelsMatter() {

@@ -6760,7 +6760,7 @@ public class Person {
         // We make an iteration safe list so we can easily remove skills during the loop
         List<Skill> allSkills = new ArrayList<>(skills.getSkills());
         for (Skill skill : allSkills) {
-            SkillType skillType = skill.getType();
+            SkillTypeNew skillType = skill.getType();
 
             if (skillType.isSubTypeOf(subType)) {
                 removeSkill(skillType.getName());
