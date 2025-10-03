@@ -33,6 +33,10 @@
  */
 package mekhq.campaign.parts.protomeks;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
@@ -618,12 +622,12 @@ public class ProtoMekLocation extends Part {
         }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
-                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
-                        getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
+                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(
+                        getSkillMin()), getExperienceLevelName(getSkillMin()) + "+"));
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= EXP_LEGENDARY) {
             toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
             if (isBlownOff()) {
                 toReturn.append(" <b>TN:</b> ")

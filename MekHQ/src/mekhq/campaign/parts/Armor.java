@@ -33,6 +33,11 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -55,7 +60,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
@@ -143,12 +147,12 @@ public class Armor extends Part implements IAcquisitionWork {
         toReturn.append("<html><b>Replace ").append(getName());
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
-                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
-                        getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
+                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(
+                        getSkillMin()), getExperienceLevelName(getSkillMin()) + "+"));
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -359,7 +363,7 @@ public class Armor extends Part implements IAcquisitionWork {
         unit.getEntity().setArmor(fixAmount, location, rear);
         changeAmountAvailable(-1 * amountFound);
         updateConditionFromEntity(false);
-        skillMin = SkillType.EXP_GREEN;
+        skillMin = EXP_GREEN;
         shorthandedMod = 0;
     }
 
@@ -645,12 +649,12 @@ public class Armor extends Part implements IAcquisitionWork {
         // if we are impossible to fix now, we should scrap this amount of armor
         // from spares and start over
         String scrap = "";
-        if (skillMin > SkillType.EXP_LEGENDARY) {
+        if (skillMin > EXP_LEGENDARY) {
             scrap = " Armor supplies lost!";
             if (isSalvaging()) {
                 remove(false);
             } else {
-                skillMin = SkillType.EXP_GREEN;
+                skillMin = EXP_GREEN;
                 if ((unit != null) && (unit.getEntity() != null) && (unit.getEntity().isCapitalScale())) {
                     changeAmountAvailable(-1 * (amountNeeded * 10));
                 } else {
@@ -668,7 +672,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String scrap() {
         remove(false);
-        skillMin = SkillType.EXP_GREEN;
+        skillMin = EXP_GREEN;
         return ArmorType.of(type, clan).getName() + " armor scrapped.";
     }
 

@@ -32,7 +32,7 @@
  */
 package mekhq.gui.model;
 
-import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
 
 import java.awt.Component;
 import java.util.ArrayList;

@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
 
 import java.util.Objects;
 
@@ -115,7 +116,7 @@ public abstract class AbstractSkillGenerator {
 
     protected void generateArtillerySkill(final Person person, final int bonus) {
         final int experienceLevel = Utilities.generateExpLevel(randomSkillPreferences.getArtilleryBonus());
-        if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
+        if (experienceLevel > EXP_ULTRA_GREEN) {
             addSkill(person, SkillType.S_ARTILLERY, experienceLevel, randomSkillPreferences.randomizeSkill(), bonus);
         }
     }
@@ -132,7 +133,7 @@ public abstract class AbstractSkillGenerator {
             }
 
             int roleplaySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getRoleplaySkillModifier());
-            if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+            if (roleplaySkillLevel > EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
         }

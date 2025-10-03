@@ -45,6 +45,8 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.LocalDate;
@@ -69,7 +71,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -749,7 +750,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         boolean isClanCampaign = campaign.isClanCampaign();
         LocalDate today = campaign.getLocalDate();
 
-        int adminCommandExp = SkillType.EXP_NONE;
+        int adminCommandExp = EXP_NONE;
         if (adminCommand != null) {
             Skill skill = adminCommand.getSkill(S_NEGOTIATION);
             if (skill != null) {
@@ -763,7 +764,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
-        int adminTransportExp = SkillType.EXP_NONE;
+        int adminTransportExp = EXP_NONE;
         if (adminTransport != null) {
             Skill skill = adminTransport.getSkill(S_NEGOTIATION);
             if (skill != null) {
@@ -777,7 +778,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
-        int adminLogisticsExp = SkillType.EXP_NONE;
+        int adminLogisticsExp = EXP_NONE;
         if (adminLogistics != null) {
             Skill skill = adminLogistics.getSkill(S_NEGOTIATION);
             if (skill != null) {
@@ -809,10 +810,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        mods.mods[CLAUSE_COMMAND] = adminCommandExp - SkillType.EXP_REGULAR;
-        mods.mods[CLAUSE_SALVAGE] = adminLogisticsExp - SkillType.EXP_REGULAR;
-        mods.mods[CLAUSE_TRANSPORT] = adminTransportExp - SkillType.EXP_REGULAR;
-        mods.mods[CLAUSE_SUPPORT] = adminLogisticsExp - SkillType.EXP_REGULAR;
+        mods.mods[CLAUSE_COMMAND] = adminCommandExp - EXP_REGULAR;
+        mods.mods[CLAUSE_SALVAGE] = adminLogisticsExp - EXP_REGULAR;
+        mods.mods[CLAUSE_TRANSPORT] = adminTransportExp - EXP_REGULAR;
+        mods.mods[CLAUSE_SUPPORT] = adminLogisticsExp - EXP_REGULAR;
         if (unitRatingMod >= IUnitRating.DRAGOON_A) {
             mods.mods[Compute.randomInt(4)] += 2;
             mods.mods[Compute.randomInt(4)] += 2;

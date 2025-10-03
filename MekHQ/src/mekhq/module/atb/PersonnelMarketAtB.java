@@ -32,8 +32,14 @@
  */
 package mekhq.module.atb;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -140,25 +146,25 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminExperienceLevel) {
-                    case SkillType.EXP_ULTRA_GREEN:
+                    case EXP_ULTRA_GREEN:
                         gunneryMod = -1;
                         pilotingMod = -1;
                         break;
-                    case SkillType.EXP_GREEN:
+                    case EXP_GREEN:
                         if (Compute.d6() < 4) {
                             gunneryMod = -1;
                         } else {
                             pilotingMod = -1;
                         }
                         break;
-                    case SkillType.EXP_VETERAN:
+                    case EXP_VETERAN:
                         if (Compute.d6() < 4) {
                             gunneryMod = 1;
                         } else {
                             pilotingMod = 1;
                         }
                         break;
-                    case SkillType.EXP_ELITE, SkillType.EXP_HEROIC, SkillType.EXP_LEGENDARY:
+                    case EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY:
                         gunneryMod = 1;
                         pilotingMod = 1;
                         break;

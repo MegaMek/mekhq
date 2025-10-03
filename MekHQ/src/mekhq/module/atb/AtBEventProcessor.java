@@ -33,8 +33,8 @@
 package mekhq.module.atb;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;

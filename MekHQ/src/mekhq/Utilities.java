@@ -35,14 +35,14 @@ package mekhq;
 
 import static java.lang.Math.max;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

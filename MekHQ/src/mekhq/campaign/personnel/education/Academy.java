@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.education;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -827,7 +829,7 @@ public class Academy implements Comparable<Academy> {
                         }
                     }
 
-                    tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    tooltip.append(getExperienceLevelName(educationLevel)).append(")<br>");
                 }
             }
         } else {

@@ -33,8 +33,10 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -363,7 +365,7 @@ public class AtBConfiguration {
             experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
         }
 
-        target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
+        target.addModifier(EXP_REGULAR - experienceLevel, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }

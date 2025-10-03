@@ -59,6 +59,14 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;

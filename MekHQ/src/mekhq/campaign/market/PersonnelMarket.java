@@ -33,8 +33,12 @@
  */
 package mekhq.campaign.market;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -209,7 +213,7 @@ public class PersonnelMarket {
             // Add details about the first personnel's experience, primary role, and name
             Person person = personnel.get(0);
             int experienceLevel = person.getExperienceLevel(campaign, false);
-            String expLevel = SkillType.getExperienceLevelName(experienceLevel);
+            String expLevel = getExperienceLevelName(experienceLevel);
 
             if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {
                 report.append("<br>An ");
@@ -218,7 +222,7 @@ public class PersonnelMarket {
             }
 
             report.append("<b>")
-                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                  .append(getColoredExperienceLevelName(experienceLevel))
                   .append(' ')
                   .append(person.getPrimaryRole())
                   .append("</b>")
@@ -554,7 +558,7 @@ public class PersonnelMarket {
             experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
         }
 
-        target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
+        target.addModifier(EXP_REGULAR - experienceLevel, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }

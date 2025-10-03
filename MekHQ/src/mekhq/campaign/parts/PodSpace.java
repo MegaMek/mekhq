@@ -32,6 +32,11 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -286,7 +291,7 @@ public class PodSpace implements IPartWork {
                 replacing |= part instanceof MissingPart;
             }
         }
-        if (rating >= SkillType.EXP_LEGENDARY && replacing) {
+        if (rating >= EXP_LEGENDARY && replacing) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                   ReportingUtilities.getNegativeColor(),
                   "<b> failed and part(s) destroyed</b>") + ".";
@@ -313,7 +318,7 @@ public class PodSpace implements IPartWork {
 
     @Override
     public int getSkillMin() {
-        int minSkill = SkillType.EXP_GREEN;
+        int minSkill = EXP_GREEN;
         for (int id : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(id);
             if (part != null) {
@@ -406,13 +411,13 @@ public class PodSpace implements IPartWork {
               .append(isSalvaging() ? "Salvage  " : "Replace ")
               .append(getPartName())
               .append(" Equipment - ")
-              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
-                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+              .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(getSkillMin()),
+                    getExperienceLevelName(getSkillMin()) + "+"))
               .append("</b><br/>")
               .append(getDetails())
               .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(getTech() != null ? " (scheduled)" : "")

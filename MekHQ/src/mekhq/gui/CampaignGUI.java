@@ -37,7 +37,8 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -132,7 +133,6 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -1994,7 +1994,7 @@ public class CampaignGUI extends JPanel {
                 name = "<html>" +
                              tech.getFullName() +
                              ", <b>" +
-                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
+                             getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
                              "</b> " +
                              tech.getPrimaryRoleDesc() +
                              " (" +

@@ -33,8 +33,8 @@
 package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 

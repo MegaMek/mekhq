@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -91,7 +93,6 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
@@ -2048,7 +2049,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public int getSkillMin() {
-        return SkillType.EXP_GREEN;
+        return EXP_GREEN;
     }
 
     /**

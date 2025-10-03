@@ -32,6 +32,7 @@
  */
 package mekhq.gui.enums;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 import java.time.LocalDate;
@@ -630,7 +631,7 @@ public enum PersonnelTableModelColumn {
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
                 return "<html>" +
-                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
+                             getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
                 return person.getFormatedRoleDescriptions(today);

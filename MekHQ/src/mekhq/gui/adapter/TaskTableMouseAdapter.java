@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+
 import java.awt.event.ActionEvent;
 import java.util.Optional;
 import javax.swing.JCheckBoxMenuItem;
@@ -47,7 +49,6 @@ import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
@@ -100,7 +101,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 Unit u = p.getUnit();
                 gui.getCampaign().addReport(((Part) p).scrap());
-                ((Part) p).setSkillMin(SkillType.EXP_GREEN);
+                ((Part) p).setSkillMin(EXP_GREEN);
                 if ((u != null) && !u.isRepairable() && !u.hasSalvageableParts()) {
                     gui.getCampaign().removeUnit(u.getId());
                 }

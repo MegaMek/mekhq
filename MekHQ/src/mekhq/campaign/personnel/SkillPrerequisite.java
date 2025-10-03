@@ -33,6 +33,9 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -173,8 +176,8 @@ public class SkillPrerequisite {
             String key = enumKeys.nextElement();
             int lvl = skillSet.get(key);
             String skillLvl = "";
-            if (lvl >= SkillType.EXP_GREEN) {
-                skillLvl = SkillType.getExperienceLevelName(lvl) + ' ';
+            if (lvl >= EXP_GREEN) {
+                skillLvl = getExperienceLevelName(lvl) + ' ';
             }
             if (SkillType.getType(key) != null) {
                 toReturn.append(skillLvl).append(SkillType.getType(key).getName());
@@ -196,7 +199,7 @@ public class SkillPrerequisite {
                 MHQXMLUtility.writeSimpleXMLTag(pw,
                       indent,
                       "skill",
-                      key + "::" + SkillType.getExperienceLevelName(lvl));
+                      key + "::" + getExperienceLevelName(lvl));
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");

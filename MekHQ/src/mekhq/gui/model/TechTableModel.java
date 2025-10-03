@@ -32,6 +32,8 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
@@ -159,7 +161,7 @@ public class TechTableModel extends DataTableModel<Person> {
             int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
 
             toReturn.append("<b>")
-                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                  .append(getColoredExperienceLevelName(experienceLevel))
                   .append("</b> ").append(skillName);
             first = false;
         }

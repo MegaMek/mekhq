@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+
 import java.io.PrintWriter;
 
 import megamek.common.TechAdvancement;
@@ -52,7 +54,6 @@ import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.missing.MissingOmniPod;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -274,7 +275,7 @@ public class OmniPod extends Part {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        if (skillMin > SkillType.EXP_LEGENDARY) {
+        if (skillMin > EXP_LEGENDARY) {
             return " <font color='" + ReportingUtilities.getNegativeColor()
                          + "'><b> failed and part destroyed.</b></font>";
         } else {

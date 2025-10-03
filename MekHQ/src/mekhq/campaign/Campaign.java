@@ -67,9 +67,13 @@ import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -496,37 +500,37 @@ public class Campaign implements ITechManager {
 
     public Campaign(CampaignConfiguration campConf) {
         this(
-            campConf.getGame(),
-            campConf.getPlayer(),
-            campConf.getName(),
-            campConf.getDate(),
-            campConf.getCampaignOpts(),
-            campConf.getGameOptions(),
-            campConf.getPartsStore(),
-            campConf.getNewPersonnelMarket(),
-            campConf.getRandomDeath(),
-            campConf.getCampaignSummary(),
-            campConf.getfaction(),
-            campConf.getTechFaction(),
-            campConf.getCurrencyManager(),
-            campConf.getSystemsInstance(),
-            campConf.getLocation(),
-            campConf.getReputationController(),
-            campConf.getFactionStandings(),
-            campConf.getRankSystem(),
-            campConf.getforce(),
-            campConf.getfinances(),
-            campConf.getRandomEvents(),
-            campConf.getUltimatums(),
-            campConf.getRetDefTracker(),
-            campConf.getAutosave(),
-            campConf.getBehaviorSettings(),
-            campConf.getPersonnelMarket(),
-            campConf.getAtBMonthlyContractMarket(),
-            campConf.getUnitMarket(),
-            campConf.getDivorce(),
-            campConf.getMarriage(),
-            campConf.getProcreation()
+              campConf.getGame(),
+              campConf.getPlayer(),
+              campConf.getName(),
+              campConf.getDate(),
+              campConf.getCampaignOpts(),
+              campConf.getGameOptions(),
+              campConf.getPartsStore(),
+              campConf.getNewPersonnelMarket(),
+              campConf.getRandomDeath(),
+              campConf.getCampaignSummary(),
+              campConf.getfaction(),
+              campConf.getTechFaction(),
+              campConf.getCurrencyManager(),
+              campConf.getSystemsInstance(),
+              campConf.getLocation(),
+              campConf.getReputationController(),
+              campConf.getFactionStandings(),
+              campConf.getRankSystem(),
+              campConf.getforce(),
+              campConf.getfinances(),
+              campConf.getRandomEvents(),
+              campConf.getUltimatums(),
+              campConf.getRetDefTracker(),
+              campConf.getAutosave(),
+              campConf.getBehaviorSettings(),
+              campConf.getPersonnelMarket(),
+              campConf.getAtBMonthlyContractMarket(),
+              campConf.getUnitMarket(),
+              campConf.getDivorce(),
+              campConf.getMarriage(),
+              campConf.getProcreation()
         );
     }
 
@@ -3211,8 +3215,8 @@ public class Campaign implements ITechManager {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
                 Part newPart = (maybePart instanceof MissingPart) ?
-                                        (((MissingPart) maybePart).getNewPart())
-                                        : (Part) maybePart;
+                                     (((MissingPart) maybePart).getNewPart())
+                                     : (Part) maybePart;
                 partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
             }
         }
@@ -3308,8 +3312,8 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             Part newPart = (maybePart instanceof MissingPart) ?
-                    (((MissingPart) maybePart).getNewPart())
-                    : (Part) maybePart;
+                                 (((MissingPart) maybePart).getNewPart())
+                                 : (Part) maybePart;
             partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
         }
         return inUse.keySet()
@@ -4710,7 +4714,7 @@ public class Campaign implements ITechManager {
                 if (roll >= target.getValue()) {
                     report += theRefit.succeed();
                 } else {
-                    report += theRefit.fail(SkillType.EXP_GREEN);
+                    report += theRefit.fail(EXP_GREEN);
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
@@ -4898,7 +4902,7 @@ public class Campaign implements ITechManager {
                       (!getCampaignOptions().isDestroyByMargin()
                              // if a legendary, primary tech and destroy by margin is NOT on
                              &&
-                             ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
+                             ((tech.getExperienceLevel(this, false) == EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -4943,10 +4947,10 @@ public class Campaign implements ITechManager {
                 if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
                     // possible
-                    effectiveSkillLevel = SkillType.EXP_ULTRA_GREEN;
+                    effectiveSkillLevel = EXP_ULTRA_GREEN;
                 } else {
                     // destroyed - set the effective level to legendary
-                    effectiveSkillLevel = SkillType.EXP_LEGENDARY;
+                    effectiveSkillLevel = EXP_LEGENDARY;
                 }
             }
             report = report + partWork.fail(effectiveSkillLevel);
@@ -8337,7 +8341,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         } else if (!getCampaignOptions().isDestroyByMargin() && (partWork.getSkillMin() > effectiveSkillLevel)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
-        } else if (partWork.getSkillMin() > SkillType.EXP_LEGENDARY) {
+        } else if (partWork.getSkillMin() > EXP_LEGENDARY) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
@@ -8373,10 +8377,10 @@ public class Campaign implements ITechManager {
         // this is ugly, if the mode penalty drops you to green, you drop two
         // levels instead of two
         int value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes()) + modePenalty;
-        if ((modePenalty > 0) && (SkillType.EXP_GREEN == effectiveSkillLevel)) {
+        if ((modePenalty > 0) && (EXP_GREEN == effectiveSkillLevel)) {
             value++;
         }
-        final TargetRoll target = new TargetRoll(value, SkillType.getExperienceLevelName(effectiveSkillLevel));
+        final TargetRoll target = new TargetRoll(value, getExperienceLevelName(effectiveSkillLevel));
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
@@ -10870,6 +10874,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
+     *
      * @return systemsInstance Systems instance used when instantiating this Campaign instance.
      */
     public Systems getSystemsInstance() {
@@ -10877,8 +10882,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems
-     * within a running Campaign.
+     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems within a running
+     * Campaign.
+     *
      * @param systemsInstance new Systems instance that this campaign should use.
      */
     public void setSystemsInstance(Systems systemsInstance) {

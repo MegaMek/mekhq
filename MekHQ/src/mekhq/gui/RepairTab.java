@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -82,7 +84,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
@@ -796,7 +797,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
+                } else if (part.getSkillMin() > EXP_LEGENDARY) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;

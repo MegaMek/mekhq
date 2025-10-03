@@ -32,10 +32,10 @@
  */
 package mekhq.utilities.spaUtilities;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
-import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;

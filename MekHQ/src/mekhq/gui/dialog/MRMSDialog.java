@@ -33,6 +33,14 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -64,7 +72,6 @@ import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
@@ -258,7 +265,7 @@ public class MRMSDialog extends JDialog {
             campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() &&
                           part.needsFixing() &&
-                          !(part instanceof AmmoBin) && (part.getSkillMin() <= SkillType.EXP_LEGENDARY)) {
+                          !(part instanceof AmmoBin) && (part.getSkillMin() <= EXP_LEGENDARY)) {
                     completePartsList.add(part);
                 }
             });
@@ -748,7 +755,7 @@ public class MRMSDialog extends JDialog {
     private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx,
           int columnIdx) {
         DefaultComboBoxModel<String> skillModel = getSkillModel();
-        skillModel.setSelectedItem(SkillType.getExperienceLevelName(selectedValue));
+        skillModel.setSelectedItem(getExperienceLevelName(selectedValue));
         JComboBox<String> skillCBox = new JComboBox<>(skillModel);
         skillCBox.setEnabled(enabled);
 
@@ -765,13 +772,13 @@ public class MRMSDialog extends JDialog {
 
     private static DefaultComboBoxModel<String> getSkillModel() {
         DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_HEROIC));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_LEGENDARY));
+        skillModel.addElement(getExperienceLevelName(EXP_ULTRA_GREEN));
+        skillModel.addElement(getExperienceLevelName(EXP_GREEN));
+        skillModel.addElement(getExperienceLevelName(EXP_REGULAR));
+        skillModel.addElement(getExperienceLevelName(EXP_VETERAN));
+        skillModel.addElement(getExperienceLevelName(EXP_ELITE));
+        skillModel.addElement(getExperienceLevelName(EXP_HEROIC));
+        skillModel.addElement(getExperienceLevelName(EXP_LEGENDARY));
         return skillModel;
     }
 

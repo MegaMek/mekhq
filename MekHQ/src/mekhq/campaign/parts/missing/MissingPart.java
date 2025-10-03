@@ -33,6 +33,11 @@
  */
 package mekhq.campaign.parts.missing;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 
@@ -47,7 +52,6 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
@@ -108,13 +112,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
         toReturn.append(" - ")
-              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
-                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+              .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(getSkillMin()),
+                    getExperienceLevelName(getSkillMin()) + "+"))
               .append("</b><br/>")
               .append(getDetails())
               .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -279,11 +283,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        if (skillMin > SkillType.EXP_LEGENDARY) {
+        if (skillMin > EXP_LEGENDARY) {
             Part part = findReplacement(false);
             if (null != part) {
                 part.changeQuantity(-1);
-                skillMin = SkillType.EXP_GREEN;
+                skillMin = EXP_GREEN;
             }
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                   ReportingUtilities.getNegativeColor(),
@@ -437,7 +441,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return replace.getName() + " scrapped.";
         }
 
-        skillMin = SkillType.EXP_GREEN;
+        skillMin = EXP_GREEN;
 
         return getName() + " scrapped.";
     }

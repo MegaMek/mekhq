@@ -33,6 +33,11 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +79,6 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingVeeStabilizer;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -211,7 +215,7 @@ public abstract class Part implements IPartWork, ITechnology {
         this.unitTonnageMatters = false;
         this.omniPodded = omniPodded;
         this.hits = 0;
-        this.skillMin = SkillType.EXP_GREEN;
+        this.skillMin = EXP_GREEN;
         this.mode = WorkTime.NORMAL;
         this.timeSpent = 0;
         this.workingOvertime = false;
@@ -314,7 +318,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_LEGENDARY) ?
+            cost = cost.multipliedBy((getSkillMin() > EXP_LEGENDARY) ?
                                            campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
                                            campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
@@ -437,8 +441,8 @@ public abstract class Part implements IPartWork, ITechnology {
         }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
-                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
-                        getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
+                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(
+                        getSkillMin()), getExperienceLevelName(getSkillMin()) + "+"));
         }
 
         String details = getDetails();
@@ -469,7 +473,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -495,8 +499,8 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                 toReturn.append(" - <b>")
-                      .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
-                            getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+                      .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(
+                            getSkillMin()), getExperienceLevelName(getSkillMin()) + "+"))
                       .append("</b>");
             }
 
@@ -1135,7 +1139,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * Sets minimum skill, shorthanded mod, and rush job/extra time setting to defaults.
      */
     public void resetRepairSettings() {
-        skillMin = SkillType.EXP_GREEN;
+        skillMin = EXP_GREEN;
         shorthandedMod = 0;
         mode = WorkTime.NORMAL;
     }

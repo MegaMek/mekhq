@@ -32,6 +32,8 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -61,7 +63,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
@@ -505,7 +506,7 @@ public class MRMSService {
             boolean refreshParts = false;
 
             for (IPartWork partWork : parts) {
-                if ((partWork instanceof Part) && (partWork.getSkillMin() > SkillType.EXP_LEGENDARY)) {
+                if ((partWork instanceof Part) && (partWork.getSkillMin() > EXP_LEGENDARY)) {
                     campaign.addReport(((Part) partWork).scrap());
                     refreshParts = true;
                 }
@@ -759,7 +760,7 @@ public class MRMSService {
                 highestAvailableTechSkill = experienceLevel;
             }
 
-            if (highestAvailableTechSkill == SkillType.EXP_LEGENDARY) {
+            if (highestAvailableTechSkill == EXP_LEGENDARY) {
                 break;
             }
         }

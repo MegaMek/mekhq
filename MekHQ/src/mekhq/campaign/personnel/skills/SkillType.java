@@ -33,6 +33,13 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.EXP_VETERAN;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
@@ -49,8 +56,8 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENC
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillType.DISABLED_SKILL_LEVEL;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -65,7 +72,6 @@ import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
-import megamek.common.enums.SkillLevel;
 import megamek.common.units.Aero;
 import megamek.common.units.ConvFighter;
 import megamek.common.units.Entity;
@@ -75,7 +81,6 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.utilities.MHQXMLUtility;
@@ -251,18 +256,6 @@ public class SkillType {
 
     public static Map<String, SkillType> lookupHash;
 
-    public static final int SKILL_NONE = 0;
-    public static final int DISABLED_SKILL_LEVEL = -1;
-
-    public static final int EXP_NONE = -1;
-    public static final int EXP_ULTRA_GREEN = 0;
-    public static final int EXP_GREEN = 1;
-    public static final int EXP_REGULAR = 2;
-    public static final int EXP_VETERAN = 3;
-    public static final int EXP_ELITE = 4;
-    public static final int EXP_HEROIC = 5;
-    public static final int EXP_LEGENDARY = 6;
-
     private String name;
     private int target;
     private boolean countUp;
@@ -277,83 +270,6 @@ public class SkillType {
     private int legendaryLvl;
     private Integer[] costs;
     private boolean skillLevelsMatter;
-
-    /**
-     * @param level skill level integer to get name for
-     *
-     * @return String skill name
-     */
-    public static String getExperienceLevelName(int level) {
-        return switch (level) {
-            case EXP_ULTRA_GREEN -> "Ultra-Green";
-            case EXP_GREEN -> "Green";
-            case EXP_REGULAR -> "Regular";
-            case EXP_VETERAN -> "Veteran";
-            case EXP_ELITE -> "Elite";
-            case EXP_HEROIC -> "Heroic";
-            case EXP_LEGENDARY -> "Legendary";
-            case -1 -> "None";
-            default -> "Impossible";
-        };
-    }
-
-    /**
-     * @param level skill level integer to get color for
-     *
-     * @return String hex code for a font tag
-     */
-    public static String getExperienceLevelColor(int level) {
-        return switch (level) {
-            case EXP_ULTRA_GREEN -> MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
-            case EXP_GREEN -> MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
-            case EXP_REGULAR -> MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
-            case EXP_VETERAN -> MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
-            case EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-            default -> "";
-        };
-    }
-
-    /**
-     * @param level SkillLevel enum to get color for
-     *
-     * @return String hex code for a font tag
-     */
-    public static String getExperienceLevelColor(SkillLevel level) {
-        return switch (level) {
-            case ULTRA_GREEN -> MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
-            case GREEN -> MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
-            case REGULAR -> MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
-            case VETERAN -> MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
-            case ELITE, HEROIC, LEGENDARY -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-            default -> "";
-        };
-    }
-
-    /**
-     * @param level - skill level integer to get tagged name for
-     *
-     * @return "Skillname" wrapped by coloring span or bare if no color exists
-     */
-    public static String getColoredExperienceLevelName(int level) {
-        if (getExperienceLevelColor(level).isEmpty()) {
-            return getExperienceLevelName(level);
-        }
-
-        return messageSurroundedBySpanWithColor(getExperienceLevelColor(level), getExperienceLevelName(level));
-    }
-
-    /**
-     * @param level - SkillLevel enum to get tagged name for
-     *
-     * @return "Skillname" wrapped by coloring span or bare if no color exists
-     */
-    public static String getColoredExperienceLevelName(SkillLevel level) {
-        if (getExperienceLevelColor(level).isEmpty()) {
-            return level.toString();
-        }
-
-        return messageSurroundedBySpanWithColor(getExperienceLevelColor(level), level.toString());
-    }
 
 
     public static void setSkillTypes(Map<String, SkillType> skills) {
@@ -438,8 +354,8 @@ public class SkillType {
      *
      * <p>The {@code costs} parameter is validated to ensure it contains exactly 11 entries,
      * corresponding to skill levels 0 through 10 inclusive. If the provided array is {@code null} or has fewer than 11
-     * elements, a new array will be created with missing entries filled with {@link #DISABLED_SKILL_LEVEL}. If the
-     * array has more than 11 entries, it will be trimmed to size. Additionally, the input array is copied to prevent
+     * elements, a new array will be created with missing entries filled with {@code ISABLED_SKILL_LEVEL}. If the array
+     * has more than 11 entries, it will be trimmed to size. Additionally, the input array is copied to prevent
      * accidental external changes to the internal state of the instance.</p>
      *
      * @param name              The name of the skill type. <b>Cannot</b> be {@code null}.
@@ -465,15 +381,15 @@ public class SkillType {
      * @param costs             An {@code Integer[]} array representing the skill's progression costs for each level
      *                          from 0 to 10 inclusive. If the array is {@code null} or its length is not exactly 11, a
      *                          new array is created with default values. Missing entries are filled with
-     *                          {@link #DISABLED_SKILL_LEVEL}, and extra entries beyond the 11th are ignored. A clean
+     *                          {@code DISABLED_SKILL_LEVEL}, and extra entries beyond the 11th are ignored. A clean
      *                          copy of the array is always used to ensure the integrity of the internal state.
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                       Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                       SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                       SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                   </pre>
+     *                                                                                                                                                                                                                                                             Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                             SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                             SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                         </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -853,7 +769,7 @@ public class SkillType {
     }
 
     /**
-     * @return the maximum level of that skill (the last one not set to cost {@link #DISABLED_SKILL_LEVEL}, or 10)
+     * @return the maximum level of that skill (the last one not set to cost {@code DISABLED_SKILL_LEVEL}, or 10)
      */
     public int getMaxLevel() {
         for (int lvl = 0; lvl < costs.length; ++lvl) {
