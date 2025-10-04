@@ -35,8 +35,6 @@ package mekhq.campaign.universe.factionStanding;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.FINE;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.FORMAL_WARNING;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.NO_ACTION;
@@ -65,6 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -469,12 +468,12 @@ public class FactionCensureEvent {
               politicalRole,
               VETERAN);
 
-        if (!replacement.hasSkill(S_LEADER)) {
-            replacement.addSkill(S_LEADER, randomInt(3) + 1, 0);
+        if (!replacement.hasSkill(SkillTypeNew.S_LEADER.name())) {
+            replacement.addSkill(SkillTypeNew.S_LEADER.name(), randomInt(3) + 1, 0);
         }
 
-        if (!replacement.hasSkill(S_ADMIN)) {
-            replacement.addSkill(S_ADMIN, randomInt(3) + 1, 0);
+        if (!replacement.hasSkill(SkillTypeNew.S_ADMIN.name())) {
+            replacement.addSkill(SkillTypeNew.S_ADMIN.name(), randomInt(3) + 1, 0);
         }
 
         replacement.setLoyalty(Compute.d6(3) + 2);

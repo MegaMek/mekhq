@@ -36,8 +36,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessColor;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
@@ -63,6 +62,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -246,7 +246,7 @@ public class TrainingCombatTeams {
                         int skillLevel = traineeSkill.getLevel();
                         int traineeExperienceLevel = traineeSkill.getType().getExperienceLevel(skillLevel);
 
-                        if (traineeExperienceLevel > EXP_GREEN) {
+                        if (traineeExperienceLevel > SKILL_LEVEL_GREEN) {
                             continue;
                         }
 
@@ -379,8 +379,15 @@ public class TrainingCombatTeams {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean useAgingEffects = campaignOptions.isUseAgeEffects();
 
-        SkillCheckUtility skillCheck = new SkillCheckUtility(educator, S_TRAINING, new ArrayList<>(), 0, true,
-              false, useAgingEffects, isClanCampaign, today);
+        SkillCheckUtility skillCheck = new SkillCheckUtility(educator,
+              SkillTypeNew.S_TRAINING.name(),
+              new ArrayList<>(),
+              0,
+              true,
+              false,
+              useAgingEffects,
+              isClanCampaign,
+              today);
         int raw = skillCheck.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
 

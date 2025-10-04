@@ -40,6 +40,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
@@ -74,7 +75,7 @@ public class SkillDeprecationTool {
      *
      * <p><b>Last Updated:</b> 50.07</p>
      */
-    public static final List<SkillType> DEPRECATED_SKILLS = List.of();
+    public static final List<SkillTypeNew> DEPRECATED_SKILLS = List.of();
 
     private final Campaign campaign;
     private final Person person;
@@ -120,8 +121,8 @@ public class SkillDeprecationTool {
         final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
 
         final Skills skills = person.getSkills();
-        for (SkillType skillType : DEPRECATED_SKILLS) {
-            final String skillName = skillType.getName();
+        for (SkillTypeNew skillType : DEPRECATED_SKILLS) {
+            final String skillName = skillType.name();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
 
@@ -137,12 +138,12 @@ public class SkillDeprecationTool {
      * of the skill.
      *
      * @param skills    the {@link Skills} object containing details about the person's skills
-     * @param skillType the {@link SkillType} of the deprecated skill
+     * @param skillType the {@link SkillTypeNew} of the deprecated skill
      * @param skillName the name of the deprecated skill
      *
      * @return the total XP refund value for the deprecated skill
      */
-    public static int getRefundValue(Skills skills, SkillType skillType, String skillName) {
+    public static int getRefundValue(Skills skills, SkillTypeNew skillType, String skillName) {
         Skill skill = skills.getSkill(skillName);
         int level = skill.getLevel();
 

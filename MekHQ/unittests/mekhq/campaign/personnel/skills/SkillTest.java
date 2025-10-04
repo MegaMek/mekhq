@@ -35,12 +35,10 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import megamek.common.rolls.TargetRoll;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -49,10 +47,6 @@ public class SkillTest {
     @Test
     void testGetTotalAttributeModifier_SingleLinkedAttribute() {
         // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(NONE);
-
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               7,
@@ -64,7 +58,7 @@ public class SkillTest {
         TargetRoll targetNumber = new TargetRoll();
 
         // Act
-        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType);
+        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, SkillTypeNew.S_ANIMAL_HANDLING);
 
         // Assert
         assertEquals(1, totalModifier);
@@ -73,10 +67,6 @@ public class SkillTest {
     @Test
     void testGetTotalAttributeModifier_TwoLinkedAttributes() {
         // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(DEXTERITY);
-
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               7,
@@ -88,34 +78,10 @@ public class SkillTest {
         TargetRoll targetNumber = new TargetRoll();
 
         // Act
-        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType);
+        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, SkillTypeNew.S_GUN_MEK);
 
         // Assert
         assertEquals(2, totalModifier);
-    }
-
-    @Test
-    void testGetTotalAttributeModifier_NoLinkedAttributes() {
-        // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(NONE);
-        testSkillType.setSecondAttribute(NONE);
-
-        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE);
-
-        TargetRoll targetNumber = new TargetRoll();
-
-        // Act
-        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType);
-
-        // Assert
-        assertEquals(0, totalModifier);
     }
 
     @ParameterizedTest

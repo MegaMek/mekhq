@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
 public class Aging {
     /**
@@ -74,7 +75,7 @@ public class Aging {
      * <p><strong>Behavior:</strong></p>
      * <ul>
      *     <li>Determines the {@link AgingMilestone} based on the person's age.</li>
-     *     <li>Iterates over all skills defined in {@link SkillType#skillList}.</li>
+     *     <li>Iterates over all skills defined in {@link SkillTypeNew}.</li>
      *     <li>If the person doesn't have a specific skill, it skips processing that skill.</li>
      *     <li>Retrieves the skill's attributes and calculates the aging modifier using {@link #getAgeModifier(AgingMilestone,
      *     SkillAttribute, SkillAttribute)}.</li>
@@ -87,16 +88,16 @@ public class Aging {
     public static void updateAllSkillAgeModifiers(LocalDate today, Person person) {
         AgingMilestone milestone = getMilestone(person.getAge(today));
 
-        for (String skillName : SkillType.skillList) {
-            boolean hasSkill = person.hasSkill(skillName);
+        for (SkillTypeNew skillType : SkillTypeNew.values()) {
+            boolean hasSkill = person.hasSkill(skillType.name());
 
             if (!hasSkill) {
                 continue;
             }
 
-            Skill skill = person.getSkill(skillName);
+            Skill skill = person.getSkill(skillType.name());
 
-            SkillType type = SkillType.getType(skillName);
+            SkillTypeNew type = SkillTypeNew.getType(skillType.name());
             SkillAttribute firstAttribute = type.getFirstAttribute();
             SkillAttribute secondAttribute = type.getSecondAttribute();
 
@@ -109,7 +110,7 @@ public class Aging {
     /**
      * Resets all age-related modifiers for the skills of a given person to zero.
      *
-     * <p>This method iterates through all skills in the {@code SkillType.skillList} and, for each skill that
+     * <p>This method iterates through all skills in {@link SkillTypeNew} and, for each skill that
      * the person possesses, sets its aging modifier to zero. Skills that the person does not have are ignored.</p>
      *
      * @param person The person whose skill age modifiers will be cleared.
@@ -118,14 +119,14 @@ public class Aging {
      * @since 0.50.05
      */
     public static void clearAllAgeModifiers(Person person) {
-        for (String skillName : SkillType.skillList) {
-            boolean hasSkill = person.hasSkill(skillName);
+        for (SkillTypeNew typeNew : SkillTypeNew.values()) {
+            boolean hasSkill = person.hasSkill(typeNew.name());
 
             if (!hasSkill) {
                 continue;
             }
 
-            Skill skill = person.getSkill(skillName);
+            Skill skill = person.getSkill(typeNew.name());
             skill.setAgingModifier(0);
         }
     }

@@ -51,7 +51,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingAeroSensor;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -265,7 +265,8 @@ public class AeroSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return (skillType.equals(SkillTypeNew.S_TECH_AERO.name()) ||
+                      skillType.equals(SkillTypeNew.S_TECH_VESSEL.name()));
     }
 
     @Override

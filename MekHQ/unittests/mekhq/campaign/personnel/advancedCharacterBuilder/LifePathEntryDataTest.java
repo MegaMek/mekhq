@@ -43,16 +43,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
-import java.util.stream.Stream;
 
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 class LifePathEntryDataTest {
     @ParameterizedTest
@@ -185,19 +183,15 @@ class LifePathEntryDataTest {
     class GetSkill_SkillType {
         @BeforeAll
         public static void setup() {
-            SkillType.initializeTypes();
-        }
 
-        private static Stream<String> skills() {
-            return Stream.of(SkillType.skillList);
         }
 
         @ParameterizedTest
-        @MethodSource("skills")
-        void testGetSkill_ValidSkill(String skillName) {
-            LifePathEntryData data = new LifePathEntryData("SKILL", skillName, 5);
-            assertEquals(5, data.getSkill(skillName),
-                  "Should return " + skillName + " when classLookupName and objectLookupName match");
+        @EnumSource(SkillTypeNew.class)
+        void testGetSkill_ValidSkill(SkillTypeNew skillType) {
+            LifePathEntryData data = new LifePathEntryData("SKILL", skillType.name(), 5);
+            assertEquals(5, data.getSkill(skillType.name()),
+                  "Should return " + skillType + " when classLookupName and objectLookupName match");
         }
 
         @Test

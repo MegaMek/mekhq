@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static java.util.Arrays.sort;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -80,7 +79,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.StoryArcStub;
@@ -277,8 +275,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             FinancialInstitutions.initializeFinancialInstitutions();
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
-            SkillType.initializeTypes();
-            sort(SkillType.getSkillList()); // sort all skills alphabetically
+
             SpecialAbility.initializeSPA(false);
             AtBScenarioModifier.initializeScenarioModifiers(false);
             // endregion Progress 0

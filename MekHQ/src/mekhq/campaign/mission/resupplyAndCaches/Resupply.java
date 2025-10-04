@@ -73,7 +73,7 @@ import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -814,7 +814,7 @@ public class Resupply {
         }
 
         if (negotiator != null) {
-            Skill skill = negotiator.getSkill(SkillType.S_NEGOTIATION);
+            Skill skill = negotiator.getSkill(SkillTypeNew.S_NEGOTIATION.name());
 
             if (skill != null) {
                 int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),

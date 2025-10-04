@@ -49,7 +49,6 @@ import java.util.stream.IntStream;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -765,7 +764,7 @@ class PersonnelRoleTest {
 
         Person person = new Person(mockCampaign);
 
-        SkillType.initializeTypes();
+
         LocalDate today = LocalDate.of(9999, 1, 1);
 
         // Act
@@ -828,7 +827,7 @@ class PersonnelRoleTest {
 
         Person person = new Person(mockCampaign);
         person.setDateOfBirth(today.minusDays(daysOld));
-        SkillType.initializeTypes();
+
 
         PersonnelRole role = PersonnelRole.ADULT_ENTERTAINER;
 
@@ -865,7 +864,7 @@ class PersonnelRoleTest {
 
         Person person = new Person(mockCampaign);
         person.setDateOfBirth(today.minusYears(18));
-        SkillType.initializeTypes();
+
 
         PersonnelRole role = PersonnelRole.ADULT_ENTERTAINER;
 
@@ -896,7 +895,7 @@ class PersonnelRoleTest {
 
         Person person = new Person(mockCampaign);
         person.setDateOfBirth(today.minusDays(daysOld));
-        SkillType.initializeTypes();
+
 
         PersonnelRole role = PersonnelRole.LUXURY_COMPANION;
 
@@ -918,7 +917,7 @@ class PersonnelRoleTest {
 
         Person person = new Person(mockCampaign);
         person.setDateOfBirth(today.minusYears(18));
-        SkillType.initializeTypes();
+
 
         PersonnelRole role = PersonnelRole.LUXURY_COMPANION;
 

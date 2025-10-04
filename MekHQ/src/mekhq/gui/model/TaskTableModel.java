@@ -186,7 +186,7 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
 
                         if (null != tech) {
                             Skill partSkill = tech.getSkillForWorkingOn(part);
-                            String skillName = partSkill.getType().getName();
+                            String skillName = partSkill.getType().name();
 
                             //Find a tech in our placeholder cache
                             tech = techCache.get(skillName);

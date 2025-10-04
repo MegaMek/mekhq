@@ -32,6 +32,11 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +56,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.ReportingUtilities;
@@ -286,7 +291,7 @@ public class PodSpace implements IPartWork {
                 replacing |= part instanceof MissingPart;
             }
         }
-        if (rating >= SkillType.EXP_LEGENDARY && replacing) {
+        if (rating >= SKILL_LEVEL_LEGENDARY && replacing) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                   ReportingUtilities.getNegativeColor(),
                   "<b> failed and part(s) destroyed</b>") + ".";
@@ -313,7 +318,7 @@ public class PodSpace implements IPartWork {
 
     @Override
     public int getSkillMin() {
-        int minSkill = SkillType.EXP_GREEN;
+        int minSkill = SKILL_LEVEL_GREEN;
         for (int id : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(id);
             if (part != null) {
@@ -360,11 +365,11 @@ public class PodSpace implements IPartWork {
     @Override
     public boolean isRightTechType(String skillType) {
         if (unit.getEntity() instanceof Mek) {
-            return skillType.equals(SkillType.S_TECH_MEK);
+            return skillType.equals(SkillTypeNew.S_TECH_MEK.name());
         } else if (unit.getEntity() instanceof Aero) {
-            return skillType.equals(SkillType.S_TECH_AERO);
+            return skillType.equals(SkillTypeNew.S_TECH_AERO.name());
         } else if (unit.getEntity() instanceof Tank) {
-            return skillType.equals(SkillType.S_TECH_MECHANIC);
+            return skillType.equals(SkillTypeNew.S_TECH_MECHANIC.name());
         }
         return false;
     }
@@ -406,13 +411,13 @@ public class PodSpace implements IPartWork {
               .append(isSalvaging() ? "Salvage  " : "Replace ")
               .append(getPartName())
               .append(" Equipment - ")
-              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
-                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+              .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(getSkillMin()),
+                    getExperienceLevelName(getSkillMin()) + "+"))
               .append("</b><br/>")
               .append(getDetails())
               .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(getTech() != null ? " (scheduled)" : "")

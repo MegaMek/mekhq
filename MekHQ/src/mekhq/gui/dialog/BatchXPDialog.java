@@ -60,7 +60,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -258,8 +258,8 @@ public final class BatchXPDialog extends JDialog {
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
         personSkillModel.addElement(choiceNoSkill);
-        for (String skill : SkillType.getSkillList()) {
-            personSkillModel.addElement(skill);
+        for (SkillTypeNew skill : SkillTypeNew.values()) {
+            personSkillModel.addElement(skill.name());
         }
         choiceSkill.setModel(personSkillModel);
         choiceSkill.setSelectedIndex(0);
@@ -271,13 +271,13 @@ public final class BatchXPDialog extends JDialog {
                 buttonSpendXP.setEnabled(false);
             } else {
                 final String skillName = (String) choiceSkill.getSelectedItem();
-                final SkillType skillType = SkillType.getType(skillName);
+                final SkillTypeNew skillType = SkillTypeNew.getType(skillName);
                 if (skillType == null) {
                     LOGGER.error("Cannot mass train unknown skill type with name {}", skillName);
                     return;
                 }
                 personnelFilter.setSkillName(skillName);
-                int maxSkillLevel = SkillType.getType(skillName).getMaxLevel();
+                int maxSkillLevel = SkillTypeNew.getType(skillName).getMaxLevel();
                 if (maxSkillLevel == -1) {
                     skillLevel.setEnabled(false);
                     buttonSpendXP.setEnabled(false);

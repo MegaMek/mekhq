@@ -47,7 +47,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
@@ -71,10 +71,10 @@ public class CommandRating {
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
         Map<String, Integer> commandRating = new HashMap<>();
 
-        commandRating.put("leadership", getSkillValue(commander, SkillType.S_LEADER));
-        commandRating.put("tactics", getSkillValue(commander, SkillType.S_TACTICS));
-        commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
-        commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEGOTIATION));
+        commandRating.put("leadership", getSkillValue(commander, SkillTypeNew.S_LEADER.name()));
+        commandRating.put("tactics", getSkillValue(commander, SkillTypeNew.S_TACTICS.name()));
+        commandRating.put("strategy", getSkillValue(commander, SkillTypeNew.S_STRATEGY.name()));
+        commandRating.put("negotiation", getSkillValue(commander, SkillTypeNew.S_NEGOTIATION.name()));
 
         commandRating.put("traits",
               getATOWTraitValues(commander,

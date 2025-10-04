@@ -41,11 +41,9 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeScoreForSkill;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.performQuickSkillCheck;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,6 +57,7 @@ import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -88,7 +87,7 @@ class SkillCheckUtilityTest {
     @Test
     void testIsPersonNull_EdgeDisallowed() {
         SkillCheckUtility checkUtility = new SkillCheckUtility(null,
-              S_GUN_MEK,
+              SkillTypeNew.S_GUN_MEK.name(),
               null,
               0,
               false,
@@ -114,7 +113,7 @@ class SkillCheckUtilityTest {
     @Test
     void testIsPersonNull_EdgeAllowed() {
         SkillCheckUtility checkUtility = new SkillCheckUtility(null,
-              S_GUN_MEK,
+              SkillTypeNew.S_GUN_MEK.name(),
               null,
               0,
               true,
@@ -139,16 +138,20 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_PerformQuickSkillCheck() {
-        boolean results = performQuickSkillCheck(null, S_GUN_MEK, null, 0, false, false, CURRENT_DATE);
+        boolean results = performQuickSkillCheck(null,
+              SkillTypeNew.S_GUN_MEK.name(),
+              null,
+              0,
+              false,
+              false,
+              CURRENT_DATE);
         assertFalse(results);
     }
 
     @Test
     void testGetTotalAttributeScoreForSkill_SingleLinkedAttribute() {
         // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(NONE);
+        SkillTypeNew testSkillType = SkillTypeNew.S_ANIMAL_HANDLING;
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -170,9 +173,7 @@ class SkillCheckUtilityTest {
     @Test
     void testGetTotalAttributeScoreForSkill_TwoLinkedAttributes() {
         // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(DEXTERITY);
+        SkillTypeNew testSkillType = SkillTypeNew.S_GUN_MEK;
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -192,35 +193,9 @@ class SkillCheckUtilityTest {
     }
 
     @Test
-    void testGetTotalAttributeScoreForSkill_NoLinkedAttributes() {
-        // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(NONE);
-        testSkillType.setSecondAttribute(NONE);
-
-        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              7,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE);
-
-        TargetRoll targetNumber = new TargetRoll();
-
-        // Act
-        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(targetNumber, attributes, testSkillType);
-
-        // Assert
-        assertEquals(0, totalScore);
-    }
-
-    @Test
     void testGetTotalAttributeScoreForSkill_SingleLinkedAttribute_None() {
         // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(NONE);
-        testSkillType.setSecondAttribute(REFLEXES);
+        SkillTypeNew testSkillType = SkillTypeNew.S_ANIMAL_HANDLING;
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -248,11 +223,11 @@ class SkillCheckUtilityTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(mockCampaign);
 
-        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-            SkillType testSkillType = new SkillType();
-            testSkillType.setSecondAttribute(NONE);
+        try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+            SkillTypeNew testSkillType = SkillTypeNew.S_ANIMAL_HANDLING;
 
-            mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+            mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_ANIMAL_HANDLING.name()))
+                  .thenReturn(testSkillType);
 
             // Act
             TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
@@ -274,10 +249,10 @@ class SkillCheckUtilityTest {
 
         Person person = new Person(mockCampaign);
 
-        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-            SkillType testSkillType = new SkillType();
+        try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+            SkillTypeNew testSkillType = SkillTypeNew.S_GUN_MEK;
 
-            mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+            mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_GUN_MEK.name())).thenReturn(testSkillType);
 
             // Act
             TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
@@ -294,8 +269,7 @@ class SkillCheckUtilityTest {
     void testDetermineTargetNumber_TrainedWithOneLinkedAttribute() {
         for (int attributeScore = MINIMUM_ATTRIBUTE_SCORE; attributeScore < MAXIMUM_ATTRIBUTE_SCORE; attributeScore++) {
             // Setup
-            SkillType testSkillType = new SkillType();
-            testSkillType.setSecondAttribute(NONE);
+            SkillTypeNew testSkillType = SkillTypeNew.S_ANIMAL_HANDLING;
 
             Skill skill = new Skill(testSkillType, 0, 0);
 
@@ -308,14 +282,15 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE);
 
             Person mockPerson = mock(Person.class);
-            when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
-            when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
+            when(mockPerson.hasSkill(SkillTypeNew.S_ANIMAL_HANDLING.name())).thenReturn(true);
+            when(mockPerson.getSkill(SkillTypeNew.S_ANIMAL_HANDLING.name())).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
             when(mockPerson.getReputation()).thenReturn(0);
 
-            try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-                mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+            try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+                mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_ANIMAL_HANDLING.name()))
+                      .thenReturn(testSkillType);
 
                 // Act
                 TargetRoll targetNumber = determineTargetNumber(mockPerson,
@@ -336,8 +311,7 @@ class SkillCheckUtilityTest {
     @Test
     void testDetermineTargetNumber_TrainedWithOneLinkedAttribute_AboveNormalAttributeScore() {
         // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setSecondAttribute(NONE);
+        SkillTypeNew testSkillType = SkillTypeNew.S_ANIMAL_HANDLING;
 
         Skill skill = new Skill(testSkillType, 0, 0);
 
@@ -350,14 +324,15 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE);
 
         Person mockPerson = mock(Person.class);
-        when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
-        when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
+        when(mockPerson.hasSkill(SkillTypeNew.S_ANIMAL_HANDLING.name())).thenReturn(true);
+        when(mockPerson.getSkill(SkillTypeNew.S_ANIMAL_HANDLING.name())).thenReturn(skill);
         when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
         when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
         when(mockPerson.getReputation()).thenReturn(0);
 
-        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-            mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+        try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+            mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_ANIMAL_HANDLING.name()))
+                  .thenReturn(testSkillType);
 
             // Act
             TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0, false, false, CURRENT_DATE);
@@ -372,7 +347,7 @@ class SkillCheckUtilityTest {
     void testDetermineTargetNumber_TrainedWithTwoLinkedAttributes() {
         for (int attributeScore = MINIMUM_ATTRIBUTE_SCORE; attributeScore < MAXIMUM_ATTRIBUTE_SCORE; attributeScore++) {
             // Setup
-            SkillType testSkillType = new SkillType();
+            SkillTypeNew testSkillType = SkillTypeNew.S_GUN_MEK;
 
             Skill skill = new Skill(testSkillType, 0, 0);
 
@@ -385,14 +360,14 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE);
 
             Person mockPerson = mock(Person.class);
-            when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
-            when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
+            when(mockPerson.hasSkill(SkillTypeNew.S_GUN_MEK.name())).thenReturn(true);
+            when(mockPerson.getSkill(SkillTypeNew.S_GUN_MEK.name())).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
             when(mockPerson.getReputation()).thenReturn(0);
 
-            try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-                mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+            try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+                mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_GUN_MEK.name())).thenReturn(testSkillType);
 
                 // Act
                 TargetRoll targetNumber = determineTargetNumber(mockPerson,
@@ -423,12 +398,10 @@ class SkillCheckUtilityTest {
         Attributes invalidAttributes = new Attributes(-5, -5, -5, -5, -5, -5, -5); // Invalid attribute scores
         person.setATOWAttributes(invalidAttributes);
 
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(DEXTERITY);
+        SkillTypeNew testSkillType = SkillTypeNew.S_GUN_MEK;
 
-        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-            mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+        try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+            mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_GUN_MEK.name())).thenReturn(testSkillType);
 
             // Act
             TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);
@@ -438,33 +411,6 @@ class SkillCheckUtilityTest {
                                              SkillCheckUtility.getTotalAttributeScoreForSkill(new TargetRoll(),
                                                    invalidAttributes,
                                                    testSkillType);
-            assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
-        }
-    }
-
-    @Test
-    void testDetermineTargetNumber_EdgeCaseSkillType() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-        Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
-        when(campaignFaction.getShortName()).thenReturn("MERC");
-        Person person = new Person(mockCampaign);
-
-        // Using default attributes.
-        SkillType edgeCaseSkillType = new SkillType();
-        edgeCaseSkillType.setFirstAttribute(NONE); // No attributes linked
-        edgeCaseSkillType.setSecondAttribute(NONE);
-        person.setATOWAttributes(new Attributes());
-
-        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-            mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(edgeCaseSkillType);
-
-            // Act
-            TargetRoll targetNumber = determineTargetNumber(person, edgeCaseSkillType, 0, false, false, CURRENT_DATE);
-
-            // Assert
-            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE + UNTRAINED_SKILL_MODIFIER;
             assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
@@ -488,12 +434,10 @@ class SkillCheckUtilityTest {
 
         person.setATOWAttributes(attributes);
 
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(DEXTERITY);
-        testSkillType.setSecondAttribute(REFLEXES);
+        SkillTypeNew testSkillType = SkillTypeNew.S_GUN_MEK;
 
-        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
-            mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
+        try (MockedStatic<SkillTypeNew> mockSkillType = Mockito.mockStatic(SkillTypeNew.class)) {
+            mockSkillType.when(() -> SkillTypeNew.getType(SkillTypeNew.S_GUN_MEK.name())).thenReturn(testSkillType);
 
             // Act
             TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0, false, false, CURRENT_DATE);

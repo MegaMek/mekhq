@@ -50,7 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingAvionics;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import org.w3c.dom.Node;
 
 /**
@@ -254,9 +254,10 @@ public class Avionics extends Part {
     @Override
     public boolean isRightTechType(String skillType) {
         if (unit != null && unit.getEntity() instanceof LandAirMek) {
-            return skillType.equals(SkillType.S_TECH_MEK);
+            return skillType.equals(SkillTypeNew.S_TECH_MEK.name());
         }
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return (skillType.equals(SkillTypeNew.S_TECH_AERO.name()) ||
+                      skillType.equals(SkillTypeNew.S_TECH_VESSEL.name()));
     }
 
     @Override
