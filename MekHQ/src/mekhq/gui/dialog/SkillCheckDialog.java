@@ -54,7 +54,7 @@ import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -317,8 +317,7 @@ public class SkillCheckDialog {
     private String[] getComboListItems(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         List<String> skills = new ArrayList<>();
 
-        for (String skillName : SkillType.getSkillList()) {
-            SkillType skillType = SkillType.getType(skillName);
+        for (SkillTypeNew skillType : SkillTypeNew.values()) {
             TargetRoll targetRoll = determineTargetNumber(character,
                   skillType,
                   0,
@@ -326,14 +325,13 @@ public class SkillCheckDialog {
                   isClanCampaign,
                   today);
             int targetNumber = targetRoll.getValue();
-            boolean isCountsUp = SkillType.getType(skillName).isCountUp();
 
             // Build the label with the target number
-            String formattedSkillName = "<html><b>" + skillName.replace(" (RP Only)", "") + "</b>";
-            String label = formattedSkillName + " (" + targetNumber + (isCountsUp ? '-' : '+') + ")</html>";
+            String formattedSkillName = "<html><b>" + skillType.getName().replace(" (RP Only)", "") + "</b>";
+            String label = formattedSkillName + " (" + targetNumber + "+)</html>";
 
             skills.add(label);
-            skillNames.add(skillName);
+            skillNames.add(skillType.name());
         }
 
         // Convert the list to a String array and return it

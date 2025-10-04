@@ -32,6 +32,8 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -61,7 +63,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
@@ -505,7 +506,7 @@ public class MRMSService {
             boolean refreshParts = false;
 
             for (IPartWork partWork : parts) {
-                if ((partWork instanceof Part) && (partWork.getSkillMin() > SkillType.EXP_LEGENDARY)) {
+                if ((partWork instanceof Part) && (partWork.getSkillMin() > SKILL_LEVEL_LEGENDARY)) {
                     campaign.addReport(((Part) partWork).scrap());
                     refreshParts = true;
                 }
@@ -759,7 +760,7 @@ public class MRMSService {
                 highestAvailableTechSkill = experienceLevel;
             }
 
-            if (highestAvailableTechSkill == SkillType.EXP_LEGENDARY) {
+            if (highestAvailableTechSkill == SKILL_LEVEL_LEGENDARY) {
                 break;
             }
         }
@@ -788,7 +789,7 @@ public class MRMSService {
             }
 
             // We really only have to check one tech of each skill level
-            if (!techSkillToWorktimeMap.containsKey(skill.getType().getName() + "-" + skill.getLevel())) {
+            if (!techSkillToWorktimeMap.containsKey(skill.getType().name() + "-" + skill.getLevel())) {
                 TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
                 WorkTime selectedWorktime = WorkTime.NORMAL;
 
@@ -841,7 +842,7 @@ public class MRMSService {
                     }
                 }
 
-                techSkillToWorktimeMap.put(skill.getType().getName() + "-" + skill.getLevel(), selectedWorktime);
+                techSkillToWorktimeMap.put(skill.getType().name() + "-" + skill.getLevel(), selectedWorktime);
 
                 if (canChangeWorkTime) {
                     ((Part) partWork).resetModeToNormal();
@@ -851,7 +852,7 @@ public class MRMSService {
             // Fallback TN check to account for discrepancies between Techs
             TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
             if (canChangeWorkTime) {
-                WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+                WorkTime wt = techSkillToWorktimeMap.get(skill.getType().name() + "-" + skill.getLevel());
                 if (null == wt) {
                     debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
                     wt = WorkTime.NORMAL;
@@ -945,7 +946,7 @@ public class MRMSService {
 
         if (canChangeWorkTime) {
             Skill skill = tech.getSkillForWorkingOn(partWork);
-            WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+            WorkTime wt = techSkillToWorktimeMap.get(skill.getType().name() + "-" + skill.getLevel());
 
             if (null == wt) {
                 debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
@@ -1024,7 +1025,7 @@ public class MRMSService {
                 continue;
             }
 
-            String skillName = partSkill.getType().getName();
+            String skillName = partSkill.getType().name();
 
             // Find a tech in our placeholder cache
             Person tech = techCache.get(skillName);

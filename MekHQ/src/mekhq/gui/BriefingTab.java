@@ -110,7 +110,7 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConScenario;
@@ -517,7 +517,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null) &&
                           getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
                     for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
-                        Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                        Person admin = getCampaign().findBestInRole(role, SkillTypeNew.S_ADMIN.name());
                         if (admin != null) {
                             admin.awardXP(getCampaign(), 1);
                             getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
@@ -1188,8 +1188,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 int assignedForceId = combatTeam.getForceId();
                 int cmdrStrategy = 0;
                 Person commander = getCampaign().getPerson(CombatTeam.findCommander(assignedForceId, getCampaign()));
-                if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
-                    cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
+                if ((null != commander) && (null != commander.getSkill(SkillTypeNew.S_STRATEGY.name()))) {
+                    cmdrStrategy = commander.getSkill(SkillTypeNew.S_STRATEGY.name()).getLevel();
                 }
                 List<Entity> reinforcementEntities = new ArrayList<>();
 

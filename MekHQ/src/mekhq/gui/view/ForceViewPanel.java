@@ -32,6 +32,7 @@
  */
 package mekhq.gui.view;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 import java.awt.GridBagConstraints;
@@ -56,7 +57,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -502,7 +502,7 @@ public class ForceViewPanel extends JScrollablePanel {
         toReturn.append("<html><nobr><font size='3'><b>")
               .append(person.getFullTitle())
               .append("</b><br/><b>")
-              .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+              .append(getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
               .append("</b> ")
               .append(person.getRoleDesc());
 

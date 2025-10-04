@@ -32,10 +32,8 @@
  */
 package mekhq.utilities.spaUtilities;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
-import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
@@ -50,7 +48,7 @@ import java.util.regex.Pattern;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
@@ -128,7 +126,7 @@ public class SpaUtilities {
             skillPrerequisiteString = orPattern.matcher(skillPrerequisiteString).replaceAll("");
 
             // Step 2: remove experience levels
-            for (int i = 0; i < EXP_LEGENDARY; i++) {
+            for (int i = 0; i < SKILL_LEVEL_LEGENDARY; i++) {
                 skillPrerequisiteString = skillPrerequisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
             }
 
@@ -136,9 +134,9 @@ public class SpaUtilities {
             String[] parts = skillPrerequisiteString.split("<br>");
 
             // Step 4: Test each part
-            List<String> specialAbilitySkills = List.of(S_GUN_PROTO, S_GUN_BA);
+            List<String> specialAbilitySkills = List.of(SkillTypeNew.S_GUN_PROTO.name(), SkillTypeNew.S_GUN_BA.name());
             for (String part : parts) {
-                SkillType skillType = SkillType.getType(part);
+                SkillTypeNew skillType = SkillTypeNew.getType(part);
                 if (part == null || skillType == null) {
                     LOGGER.warn("Invalid skill type in prerequisite: Invalid value={} - skillPrerequisiteString {}",
                           part, skillPrerequisiteString);

@@ -33,6 +33,10 @@
  */
 package mekhq.campaign.parts.meks;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Objects;
@@ -66,7 +70,7 @@ import mekhq.campaign.parts.missing.MissingAvionics;
 import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
@@ -912,13 +916,13 @@ public class MekLocation extends Part {
               .append(" (")
               .append(getUnitTonnage())
               .append(" ton) - ")
-              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
-                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+              .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(getSkillMin()),
+                    getExperienceLevelName(getSkillMin()) + "+"))
               .append("</b><br/>")
               .append(getDetails())
               .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
             if (isBlownOff()) {
                 toReturn.append(" <b>TN:</b> ")
@@ -940,7 +944,7 @@ public class MekLocation extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillTypeNew.S_TECH_MEK.name());
     }
 
     public boolean hasSensors() {

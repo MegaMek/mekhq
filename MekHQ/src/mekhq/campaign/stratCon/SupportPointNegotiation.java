@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.stratCon;
 
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -50,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.utilities.ReportingUtilities;
@@ -200,7 +200,8 @@ public class SupportPointNegotiation {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2) + modifier;
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
+            int adminSkill = admin.getSkill(SkillTypeNew.S_ADMIN.name())
+                                   .getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints++;
             }
@@ -325,7 +326,7 @@ public class SupportPointNegotiation {
      */
     private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankIndex) {
-        Skill skill = person.getSkill(S_ADMIN);
+        Skill skill = person.getSkill(SkillTypeNew.S_ADMIN.name());
         return skill.getTotalSkillLevel(person.getOptions(),
               person.getATOWAttributes(),
               person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankIndex));

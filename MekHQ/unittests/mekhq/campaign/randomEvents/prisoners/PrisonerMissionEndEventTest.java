@@ -36,9 +36,6 @@ import static mekhq.campaign.personnel.Person.MEKWARRIOR_AERO_RANSOM_VALUES;
 import static mekhq.campaign.personnel.Person.OTHER_RANSOM_VALUES;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
-import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_MEK;
-import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.GOOD_EVENT_CHANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -52,7 +49,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
@@ -161,11 +158,10 @@ class PrisonerMissionEndEventTest {
 
         AtBContract contract = new AtBContract("TEST");
 
-        SkillType.initializeTypes();
 
         Person prisoner = new Person(mockCampaign);
-        prisoner.addSkill(S_GUN_MEK, SKILL_LEVEL, 0);
-        prisoner.addSkill(S_PILOT_MEK, SKILL_LEVEL, 0);
+        prisoner.addSkill(SkillTypeNew.S_GUN_MEK.name(), SKILL_LEVEL, 0);
+        prisoner.addSkill(SkillTypeNew.S_PILOT_MEK.name(), SKILL_LEVEL, 0);
         prisoner.setPrimaryRole(mockCampaign, MEKWARRIOR);
 
         // Act
@@ -194,10 +190,9 @@ class PrisonerMissionEndEventTest {
 
         AtBContract contract = new AtBContract("TEST");
 
-        SkillType.initializeTypes();
 
         Person prisoner = new Person(mockCampaign);
-        prisoner.addSkill(S_SMALL_ARMS, SKILL_LEVEL, 0);
+        prisoner.addSkill(SkillTypeNew.S_SMALL_ARMS.name(), SKILL_LEVEL, 0);
         prisoner.setPrimaryRole(mockCampaign, SOLDIER);
 
         // Act

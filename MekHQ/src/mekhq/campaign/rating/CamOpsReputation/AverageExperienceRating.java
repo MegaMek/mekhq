@@ -50,7 +50,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 
 public class AverageExperienceRating {
@@ -170,9 +171,9 @@ public class AverageExperienceRating {
                 personnelCount++;
             } else if (entity instanceof ProtoMek) {
                 // ProtoMek entities only use gunnery for calculation
-                if (person.hasSkill(SkillType.S_GUN_PROTO)) {
+                if (person.hasSkill(SkillTypeNew.S_GUN_PROTO.name())) {
                     totalExperience += max(0,
-                          person.getSkill(SkillType.S_GUN_PROTO)
+                          person.getSkill(SkillTypeNew.S_GUN_PROTO.name())
                                 .getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
                 }
 
@@ -250,7 +251,7 @@ public class AverageExperienceRating {
         PersonnelOptions options = person.getOptions();
         Attributes attributes = person.getATOWAttributes();
         if (unit.isDriver(person)) {
-            skillType = SkillType.getDrivingSkillFor(entity);
+            skillType = SkillUtilities.getDrivingSkillFor(entity).name();
             Skill skill = person.getSkill(skillType);
 
             if (skill != null) {
@@ -264,7 +265,7 @@ public class AverageExperienceRating {
         }
 
         if (unit.isGunner(person)) {
-            skillType = SkillType.getGunnerySkillFor(entity);
+            skillType = SkillUtilities.getGunnerySkillFor(entity).name();
 
             Skill skill = person.getSkill(skillType);
             if (skill != null) {

@@ -50,7 +50,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.missing.MissingKFHeliumTank;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -287,7 +287,7 @@ public class KFHeliumTank extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_VESSEL);
+        return skillType.equals(SkillTypeNew.S_TECH_VESSEL.name());
     }
 
     @Override

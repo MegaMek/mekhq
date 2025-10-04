@@ -32,7 +32,7 @@
  */
 package mekhq.gui.model;
 
-import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ import javax.swing.table.TableCellRenderer;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.gui.BasicInfo;
 import mekhq.utilities.ReportingUtilities;
 
@@ -79,12 +79,14 @@ public class DocTableModel extends DataTableModel<Person> {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font><b>").append(doctor.getFullTitle()).append("</b><br/>");
 
-        Skill skill = doctor.getSkill(SkillType.S_SURGERY);
+        Skill skill = doctor.getSkill(SkillTypeNew.S_SURGERY.name());
         if (null != skill) {
             int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
 
-            toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
-                  .append("</b> " + SkillType.S_SURGERY);
+            toReturn.append("<b>")
+                  .append(getColoredExperienceLevelName(experienceLevel))
+                  .append("</b> ")
+                  .append(SkillTypeNew.S_SURGERY.getName());
         }
 
         toReturn.append(String.format(" (%d XP)", doctor.getXP()));

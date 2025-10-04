@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.skills.enums;
 
+import java.util.List;
+
 import megamek.logging.MMLogger;
 
 /**
@@ -92,6 +94,10 @@ public enum SkillSubType {
      * Represents roleplay or narrative-based skills related to security.
      */
     ROLEPLAY_SECURITY;
+
+    public static List<SkillSubType> getRoleplaySkillSubTypes() {
+        return List.of(ROLEPLAY_GENERAL, ROLEPLAY_ART, ROLEPLAY_INTEREST, ROLEPLAY_SCIENCE, ROLEPLAY_SECURITY);
+    }
 
     /**
      * Converts a string or integer input to its corresponding {@link SkillSubType}.

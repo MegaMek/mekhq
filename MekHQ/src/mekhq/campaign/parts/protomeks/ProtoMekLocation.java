@@ -33,6 +33,10 @@
  */
 package mekhq.campaign.parts.protomeks;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelColor;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
@@ -57,7 +61,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingProtoMekLocation;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -618,12 +622,12 @@ public class ProtoMekLocation extends Part {
         }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
-                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
-                        getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
+                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(getExperienceLevelColor(
+                        getSkillMin()), getExperienceLevelName(getSkillMin()) + "+"));
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= SKILL_LEVEL_LEGENDARY) {
             toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
             if (isBlownOff()) {
                 toReturn.append(" <b>TN:</b> ")
@@ -640,7 +644,7 @@ public class ProtoMekLocation extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillTypeNew.S_TECH_MEK.name());
     }
 
     @Override

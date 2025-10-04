@@ -56,9 +56,6 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLA
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
-import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
-import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -135,10 +132,10 @@ import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
@@ -640,7 +637,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
 
                 Skill skill = selectedPerson.getSkill(type);
-                SkillType skillType = skill.getType();
+                SkillTypeNew skillType = skill.getType();
 
                 PerformanceLogger.improvedSkill(getCampaignOptions().isPersonnelLogSkillGain(),
                       selectedPerson,
@@ -656,11 +653,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_REFUND_SKILL: {
                 String typeLabel = data[1];
-                SkillType skillType = SkillType.getType(typeLabel);
+                SkillTypeNew skillType = SkillTypeNew.getType(typeLabel);
                 Skills skills = selectedPerson.getSkills();
-                int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.getName());
+                int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.name());
 
-                selectedPerson.removeSkill(skillType.getName());
+                selectedPerson.removeSkill(skillType.name());
                 selectedPerson.awardXP(getCampaign(), refundValue);
 
                 getCampaign().personUpdated(selectedPerson);
@@ -749,7 +746,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             continue;
                         }
 
-                        SkillType skillType = SkillType.getType(skillName);
+                        SkillTypeNew skillType = SkillTypeNew.getType(skillName);
                         int targetLevel = skillType.getExperienceLevel(experienceLevel);
                         person.addSkill(skillName, targetLevel, 0);
                     }
@@ -1778,7 +1775,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         for (Person person : campaign.getActivePersonnel(false)) {
             if (person.isDoctor()) {
-                Skill skill = person.getSkill(S_SURGERY);
+                Skill skill = person.getSkill(SkillTypeNew.S_SURGERY.name());
 
                 if (skill != null &&
                           skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
@@ -3178,14 +3175,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   getCampaign().getLocalDate(),
                   person.getRankNumeric());
 
-            for (int i = 0; i < SkillType.getSkillList().length; i++) {
-                String typeName = SkillType.getSkillList()[i];
+            for (int i = 0; i < SkillTypeNew.values().length; i++) {
+                String typeName = SkillTypeNew.values()[i].name();
 
                 int cost = person.getCostToImprove(typeName);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
-                    if (Objects.equals(typeName, S_ARTILLERY)) {
+                    if (Objects.equals(typeName, SkillTypeNew.S_ARTILLERY.name())) {
                         if (!getCampaignOptions().isUseArtillery()) {
                             continue;
                         }
@@ -3199,7 +3196,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (person.hasSkill(typeName)) {
                         Skill skill = person.getSkill(typeName);
                         if (skill.isImprovementLegal()) {
-                            SkillType skillType = getType(typeName);
+                            SkillTypeNew skillType = SkillTypeNew.getType(typeName);
                             if (skillType == null) {
                                 LOGGER.error("(Current Skills) Unknown skill type: {}", typeName);
                                 continue;
@@ -3226,13 +3223,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             }
                         }
                     } else {
-                        SkillType skillType = getType(typeName);
+                        SkillTypeNew skillType = SkillTypeNew.getType(typeName);
                         if (skillType == null) {
                             LOGGER.error("(New Skills) Unknown skill type: {}", typeName);
                             continue;
                         }
 
-                        String tooltip = wordWrap(skillType.getFlavorText(false, true));
+                        String tooltip = wordWrap(skillType.getDescription(false, true));
                         menuItem.setToolTipText(tooltip);
 
                         SkillSubType subType = skillType.getSubType();

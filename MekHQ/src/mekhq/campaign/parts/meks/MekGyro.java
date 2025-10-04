@@ -47,7 +47,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingMekGyro;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -265,7 +265,7 @@ public class MekGyro extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillTypeNew.S_TECH_MEK.name());
     }
 
     @Override

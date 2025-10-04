@@ -58,8 +58,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -300,7 +300,7 @@ public class AtBScenarioModifierApplicator {
                     // at least one visible
                     // as the bot is unable to handle an invisible op for at the moment.
                     int maxHiddenUnits = Math.min(playerForce.getAllUnits(false).size() - 1,
-                          scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
+                          scenario.getLanceCommanderSkill(SkillTypeNew.S_TACTICS.name(), campaign));
                     int numHiddenUnits = 0;
 
                     for (UUID unitID : playerForce.getAllUnits(false)) {

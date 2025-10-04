@@ -58,7 +58,15 @@ import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_VETERAN;
+import static mekhq.campaign.personnel.skills.enums.SkillTypeNew.getSkillsBySkillSubType;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -123,10 +131,11 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
@@ -395,27 +404,27 @@ public class Person {
         MEKWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
 
         // no official AtB rules for really inexperienced scrubs, but...
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_NONE, Money.of(2500));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_NONE, Money.of(2500));
 
         // no official AtB rules for really inexperienced scrubs, but...
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(5000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_ULTRA_GREEN, Money.of(5000));
 
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_GREEN, Money.of(10000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_REGULAR, Money.of(25000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_VETERAN, Money.of(50000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ELITE, Money.of(100000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_HEROIC, Money.of(150000));
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(200000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_GREEN, Money.of(10000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_REGULAR, Money.of(25000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_VETERAN, Money.of(50000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_ELITE, Money.of(100000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_HEROIC, Money.of(150000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SKILL_LEVEL_LEGENDARY, Money.of(200000));
 
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(EXP_NONE, Money.of(1250));
-        OTHER_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(2500));
-        OTHER_RANSOM_VALUES.put(EXP_GREEN, Money.of(5000));
-        OTHER_RANSOM_VALUES.put(EXP_REGULAR, Money.of(10000));
-        OTHER_RANSOM_VALUES.put(EXP_VETERAN, Money.of(25000));
-        OTHER_RANSOM_VALUES.put(EXP_ELITE, Money.of(50000));
-        OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
-        OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_NONE, Money.of(1250));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_ULTRA_GREEN, Money.of(2500));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_GREEN, Money.of(5000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_REGULAR, Money.of(10000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_VETERAN, Money.of(25000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_ELITE, Money.of(50000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_HEROIC, Money.of(100000));
+        OTHER_RANSOM_VALUES.put(SKILL_LEVEL_LEGENDARY, Money.of(150000));
     }
     // endregion Variable Declarations
 
@@ -1260,30 +1269,30 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> Stream.of(S_TECH_MEK,
-                  S_TECH_AERO,
-                  S_TECH_MECHANIC,
-                  S_TECH_BA,
-                  S_SURGERY,
-                  S_MEDTECH,
-                  S_ASTECH,
-                  S_COMMUNICATIONS,
-                  S_SENSOR_OPERATIONS,
-                  S_ART_COOKING).anyMatch(this::hasSkill);
-            case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
-            case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
-            case MEK_TECH -> hasSkill(S_TECH_MEK);
-            case AERO_TEK -> hasSkill(S_TECH_AERO);
-            case BA_TECH -> hasSkill(S_TECH_BA);
-            case DOCTOR -> hasSkill(S_SURGERY);
+            case VEHICLE_CREW -> Stream.of(SkillTypeNew.S_TECH_MEK.name(),
+                  SkillTypeNew.S_TECH_AERO.name(),
+                  SkillTypeNew.S_TECH_MECHANIC.name(),
+                  SkillTypeNew.S_TECH_BA.name(),
+                  SkillTypeNew.S_SURGERY.name(),
+                  SkillTypeNew.S_MEDTECH.name(),
+                  SkillTypeNew.S_ASTECH.name(),
+                  SkillTypeNew.S_COMMUNICATIONS.name(),
+                  SkillTypeNew.S_SENSOR_OPERATIONS.name(),
+                  SkillTypeNew.S_ART_COOKING.name()).anyMatch(this::hasSkill);
+            case BATTLE_ARMOUR -> hasSkill(SkillTypeNew.S_GUN_BA.name());
+            case VESSEL_CREW -> hasSkill(SkillTypeNew.S_TECH_VESSEL.name());
+            case MEK_TECH -> hasSkill(SkillTypeNew.S_TECH_MEK.name());
+            case AERO_TEK -> hasSkill(SkillTypeNew.S_TECH_AERO.name());
+            case BA_TECH -> hasSkill(SkillTypeNew.S_TECH_BA.name());
+            case DOCTOR -> hasSkill(SkillTypeNew.S_SURGERY.name());
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(S_ADMIN);
+                  hasSkill(SkillTypeNew.S_ADMIN.name());
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (isChild(today, true)) {
                     yield false;
                 } else {
-                    yield hasSkill(S_ART_OTHER) && hasSkill(S_ACTING);
+                    yield hasSkill(SkillTypeNew.S_ART_OTHER.name()) && hasSkill(SkillTypeNew.S_ACTING.name());
                 }
             }
             case LUXURY_COMPANION -> {
@@ -1291,7 +1300,7 @@ public class Person {
                 if (isChild(today, true)) {
                     yield false;
                 } else {
-                    yield hasSkill(S_ACTING) && hasSkill(S_PROTOCOLS);
+                    yield hasSkill(SkillTypeNew.S_ACTING.name()) && hasSkill(SkillTypeNew.S_PROTOCOLS.name());
                 }
             }
             default -> {
@@ -3463,7 +3472,7 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
-                        person.skills.addSkill(s.getType().getName(), s);
+                        person.skills.addSkill(s.getType().name(), s);
                     }
                 } else if (nodeName.equalsIgnoreCase("techUnitIds")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -3948,7 +3957,7 @@ public class Person {
 
         // Specialization multiplier
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(S_ANTI_MEK)) {
+            if (hasSkill(SkillTypeNew.S_ANTI_MEK.name())) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
             }
         }
@@ -3964,7 +3973,7 @@ public class Person {
             // SpecInf is a special case, this needs to be applied first to bring base
             // salary up to RAW.
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
-                if (hasSkill(S_ANTI_MEK)) {
+                if (hasSkill(SkillTypeNew.S_ANTI_MEK.name())) {
                     secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
                                                                      .getSalaryAntiMekMultiplier());
                 }
@@ -3977,7 +3986,7 @@ public class Person {
 
             // Specialization
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
-                if (hasSkill(S_ANTI_MEK)) {
+                if (hasSkill(SkillTypeNew.S_ANTI_MEK.name())) {
                     secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
                                                                      .getSalaryAntiMekMultiplier());
                 }
@@ -4313,7 +4322,7 @@ public class Person {
      *     </li>
      *     <li>
      *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation skills,
-     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillType#EXP_NONE}.
+     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillUtilities#SKILL_LEVEL_NONE}.
      *         Otherwise, returns the average, floored at 0.
      *     </li>
      *     <li>
@@ -4325,7 +4334,8 @@ public class Person {
      * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
      *                  role
      *
-     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     * @return the calculated experience level for the relevant role, or {@link SkillUtilities#SKILL_LEVEL_NONE} if not
+     *       qualified
      */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
@@ -4352,32 +4362,33 @@ public class Person {
                           isAlternativeQualityAveraging,
                           adjustedReputation);
                 } else {
-                    if ((hasSkill(S_GUN_VEE)) && (hasSkill(S_ARTILLERY))) {
-                        yield Math.max((getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
-                              (getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
-                    } else if (hasSkill(S_GUN_VEE)) {
-                        yield getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes);
-                    } else if (hasSkill(S_ARTILLERY)) {
-                        yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes);
+                    if ((hasSkill(SkillTypeNew.S_GUN_VEE.name())) && (hasSkill(SkillTypeNew.S_ARTILLERY.name()))) {
+                        yield Math.max((getSkill(SkillTypeNew.S_GUN_VEE.name()).getExperienceLevel(options,
+                                    atowAttributes)),
+                              (getSkill(SkillTypeNew.S_ARTILLERY.name()).getExperienceLevel(options, atowAttributes)));
+                    } else if (hasSkill(SkillTypeNew.S_GUN_VEE.name())) {
+                        yield getSkill(SkillTypeNew.S_GUN_VEE.name()).getExperienceLevel(options, atowAttributes);
+                    } else if (hasSkill(SkillTypeNew.S_ARTILLERY.name())) {
+                        yield getSkill(SkillTypeNew.S_ARTILLERY.name()).getExperienceLevel(options, atowAttributes);
                     } else {
-                        yield EXP_NONE;
+                        yield SKILL_LEVEL_NONE;
                     }
                 }
             }
             case VEHICLE_CREW -> {
                 // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
-                List<String> relevantSkills = List.of(S_TECH_MEK,
-                      S_TECH_AERO,
-                      S_TECH_MECHANIC,
-                      S_TECH_BA,
-                      S_SURGERY,
-                      S_MEDTECH,
-                      S_ASTECH,
-                      S_COMMUNICATIONS,
-                      S_ART_COOKING,
-                      S_SENSOR_OPERATIONS);
-                int highestExperienceLevel = EXP_NONE;
+                List<String> relevantSkills = List.of(SkillTypeNew.S_TECH_MEK.name(),
+                      SkillTypeNew.S_TECH_AERO.name(),
+                      SkillTypeNew.S_TECH_MECHANIC.name(),
+                      SkillTypeNew.S_TECH_BA.name(),
+                      SkillTypeNew.S_SURGERY.name(),
+                      SkillTypeNew.S_MEDTECH.name(),
+                      SkillTypeNew.S_ASTECH.name(),
+                      SkillTypeNew.S_COMMUNICATIONS.name(),
+                      SkillTypeNew.S_ART_COOKING.name(),
+                      SkillTypeNew.S_SENSOR_OPERATIONS.name());
+                int highestExperienceLevel = SKILL_LEVEL_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
 
@@ -4394,10 +4405,10 @@ public class Person {
                 yield highestExperienceLevel;
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(SkillTypeNew.S_ADMIN.name());
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
 
-                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION);
+                int negotiationLevel = getSkillLevelOrNegative(SkillTypeNew.S_NEGOTIATION.name());
                 negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
@@ -4412,7 +4423,7 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    yield EXP_NONE;
+                    yield SKILL_LEVEL_NONE;
                 } else {
                     yield Math.max(0, levelSum / divisor);
                 }
@@ -4427,8 +4438,9 @@ public class Person {
      * Calculates the experience level for a profession based on the specified skill names and quality averaging
      * method.
      *
-     * <p>If the provided list of skill names is empty, this method returns {@link SkillType#EXP_REGULAR} by default.
-     * If any skill is missing or its type cannot be determined, {@link SkillType#EXP_NONE} is returned.</p>
+     * <p>If the provided list of skill names is empty, this method returns
+     * {@link SkillUtilities#SKILL_LEVEL_REGULAR} by default. If any skill is missing or its type cannot be determined,
+     * {@link SkillUtilities#SKILL_LEVEL_NONE} is returned.</p>
      *
      * <ul>
      *     <li>
@@ -4447,8 +4459,8 @@ public class Person {
      * @param isAlternativeQualityAveraging if {@code true}, uses the alternative averaging method; if {@code false},
      *                                      uses standard averaging
      *
-     * @return the determined experience level, or {@link SkillType#EXP_NONE} if an error occurs or prerequisite skills
-     *       are missing
+     * @return the determined experience level, or {@link SkillUtilities#SKILL_LEVEL_NONE} if an error occurs or
+     *       prerequisite skills are missing
      *
      * @author Illiani
      * @since 0.50.06
@@ -4457,7 +4469,7 @@ public class Person {
           int adjustedReputation) {
         if (skillNames.isEmpty()) {
             // If we're not tracking skills for this profession, it always counts as REGULAR
-            return EXP_REGULAR;
+            return SKILL_LEVEL_REGULAR;
         }
 
         int totalSkillLevel = 0;
@@ -4470,13 +4482,13 @@ public class Person {
                 // If a character is missing a skill, it means they're unqualified for a profession. They will lose
                 // that profession the next time the campaign is loaded. We don't remove it here as that would
                 // require passing in a bunch of extra information that is largely irrelevant.
-                return EXP_NONE;
+                return SKILL_LEVEL_NONE;
             }
 
-            SkillType skillType = getType(skillName);
+            SkillTypeNew skillType = SkillTypeNew.getType(skillName);
             if (skillType == null) {
                 LOGGER.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
-                return EXP_NONE;
+                return SKILL_LEVEL_NONE;
             }
 
             int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
@@ -4500,7 +4512,7 @@ public class Person {
 
         Skill skill = getSkill(skillNames.get(0));
         if (skill == null) {
-            return EXP_NONE;
+            return SKILL_LEVEL_NONE;
         }
 
         return skill.getType().getExperienceLevel(averageSkillLevel);
@@ -4764,9 +4776,9 @@ public class Person {
      */
     public List<String> getKnownSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
         List<String> knownSkills = new ArrayList<>();
-        for (String skillName : getSkillsBySkillSubType(skillSubTypes)) {
-            if (hasSkill(skillName)) {
-                knownSkills.add(skillName);
+        for (SkillTypeNew skillType : getSkillsBySkillSubType(skillSubTypes)) {
+            if (hasSkill(skillType.name())) {
+                knownSkills.add(skillType.name());
             }
         }
 
@@ -4820,7 +4832,7 @@ public class Person {
      */
     public int getCostToImprove(final String skillName) {
         final Skill skill = getSkill(skillName);
-        final SkillType skillType = getType(skillName);
+        final SkillTypeNew skillType = SkillTypeNew.getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
         double multiplier = 1.0;
@@ -5137,29 +5149,31 @@ public class Person {
         }
 
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.LAM_PILOT);
+            return hasSkill(SkillTypeNew.S_PILOT_MEK.name()) &&
+                         hasSkill(SkillTypeNew.S_PILOT_AERO.name()) &&
+                         isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_PILOT_MEK) && isRole(PersonnelRole.MEKWARRIOR);
+            return hasSkill(SkillTypeNew.S_PILOT_MEK.name()) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof VTOL) {
-            return hasSkill(S_PILOT_VTOL) && isRole(PersonnelRole.VTOL_PILOT);
+            return hasSkill(SkillTypeNew.S_PILOT_VTOL.name()) && isRole(PersonnelRole.VTOL_PILOT);
         } else if (entity instanceof Tank) {
             if (entity.getMovementMode().isMarine()) {
-                return hasSkill(S_PILOT_NVEE) && isRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                return hasSkill(SkillTypeNew.S_PILOT_NVEE.name()) && isRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
             } else {
-                return hasSkill(S_PILOT_GVEE) && isRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                return hasSkill(SkillTypeNew.S_PILOT_GVEE.name()) && isRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
             }
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_PILOT_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+            return hasSkill(SkillTypeNew.S_PILOT_JET.name()) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_PILOT_SPACE) && isRole(PersonnelRole.VESSEL_PILOT);
+            return hasSkill(SkillTypeNew.S_PILOT_SPACE.name()) && isRole(PersonnelRole.VESSEL_PILOT);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
+            return hasSkill(SkillTypeNew.S_PILOT_AERO.name()) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
+            return hasSkill(SkillTypeNew.S_GUN_BA.name()) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
+            return hasSkill(SkillTypeNew.S_SMALL_ARMS.name()) && isRole(PersonnelRole.SOLDIER);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
+            return hasSkill(SkillTypeNew.S_GUN_PROTO.name()) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
@@ -5184,23 +5198,25 @@ public class Person {
         }
 
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO) && isRole(PersonnelRole.LAM_PILOT);
+            return hasSkill(SkillTypeNew.S_GUN_MEK.name()) &&
+                         hasSkill(SkillTypeNew.S_GUN_AERO.name()) &&
+                         isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_GUN_MEK) && isRole(PersonnelRole.MEKWARRIOR);
+            return hasSkill(SkillTypeNew.S_GUN_MEK.name()) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof Tank) {
-            return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_GUNNER);
+            return hasSkill(SkillTypeNew.S_GUN_VEE.name()) && isRole(PersonnelRole.VEHICLE_GUNNER);
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_GUN_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+            return hasSkill(SkillTypeNew.S_GUN_JET.name()) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_GUN_SPACE) && isRole(PersonnelRole.VESSEL_GUNNER);
+            return hasSkill(SkillTypeNew.S_GUN_SPACE.name()) && isRole(PersonnelRole.VESSEL_GUNNER);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_GUN_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
+            return hasSkill(SkillTypeNew.S_GUN_AERO.name()) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
+            return hasSkill(SkillTypeNew.S_GUN_BA.name()) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
+            return hasSkill(SkillTypeNew.S_SMALL_ARMS.name()) && isRole(PersonnelRole.SOLDIER);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
+            return hasSkill(SkillTypeNew.S_GUN_PROTO.name()) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
@@ -5223,15 +5239,15 @@ public class Person {
         }
 
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK) && isTechMek();
+            return hasSkill(SkillTypeNew.S_TECH_MEK.name()) && isTechMek();
         } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(S_TECH_VESSEL) && isTechLargeVessel();
+            return hasSkill(SkillTypeNew.S_TECH_VESSEL.name()) && isTechLargeVessel();
         } else if (entity instanceof Aero) {
-            return hasSkill(S_TECH_AERO) && isTechAero();
+            return hasSkill(SkillTypeNew.S_TECH_AERO.name()) && isTechAero();
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA) && isTechBA();
+            return hasSkill(SkillTypeNew.S_TECH_BA.name()) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
+            return hasSkill(SkillTypeNew.S_TECH_MECHANIC.name()) && isTechMechanic();
         } else {
             return false;
         }
@@ -5502,23 +5518,26 @@ public class Person {
      */
     public @Nullable Skill getBestTechSkill() {
         Skill skill = null;
-        int level = EXP_NONE;
+        int level = SKILL_LEVEL_NONE;
 
-        if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes) > level) {
-            skill = getSkill(S_TECH_MEK);
-            level = getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes);
+        if (hasSkill(SkillTypeNew.S_TECH_MEK.name()) &&
+                  getSkill(SkillTypeNew.S_TECH_MEK.name()).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(SkillTypeNew.S_TECH_MEK.name());
+            level = getSkill(SkillTypeNew.S_TECH_MEK.name()).getExperienceLevel(options, atowAttributes);
         }
-        if (hasSkill(S_TECH_AERO) && getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes) > level) {
-            skill = getSkill(S_TECH_AERO);
-            level = getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes);
+        if (hasSkill(SkillTypeNew.S_TECH_AERO.name()) &&
+                  getSkill(SkillTypeNew.S_TECH_AERO.name()).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(SkillTypeNew.S_TECH_AERO.name());
+            level = getSkill(SkillTypeNew.S_TECH_AERO.name()).getExperienceLevel(options, atowAttributes);
         }
-        if (hasSkill(S_TECH_MECHANIC) &&
-                  getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes) > level) {
-            skill = getSkill(S_TECH_MECHANIC);
-            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes);
+        if (hasSkill(SkillTypeNew.S_TECH_MECHANIC.name()) &&
+                  getSkill(SkillTypeNew.S_TECH_MECHANIC.name()).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(SkillTypeNew.S_TECH_MECHANIC.name());
+            level = getSkill(SkillTypeNew.S_TECH_MECHANIC.name()).getExperienceLevel(options, atowAttributes);
         }
-        if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel(options, atowAttributes) > level) {
-            skill = getSkill(S_TECH_BA);
+        if (hasSkill(SkillTypeNew.S_TECH_BA.name()) &&
+                  getSkill(SkillTypeNew.S_TECH_BA.name()).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(SkillTypeNew.S_TECH_BA.name());
         }
         return skill;
     }
@@ -5537,27 +5556,27 @@ public class Person {
     }
 
     public boolean isTechLargeVessel() {
-        boolean hasSkill = hasSkill(S_TECH_VESSEL);
+        boolean hasSkill = hasSkill(SkillTypeNew.S_TECH_VESSEL.name());
         return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
     }
 
     public boolean isTechMek() {
-        boolean hasSkill = hasSkill(S_TECH_MEK);
+        boolean hasSkill = hasSkill(SkillTypeNew.S_TECH_MEK.name());
         return hasSkill && (getPrimaryRole().isMekTech() || getSecondaryRole().isMekTech());
     }
 
     public boolean isTechAero() {
-        boolean hasSkill = hasSkill(S_TECH_AERO);
+        boolean hasSkill = hasSkill(SkillTypeNew.S_TECH_AERO.name());
         return hasSkill && (getPrimaryRole().isAeroTek() || getSecondaryRole().isAeroTek());
     }
 
     public boolean isTechMechanic() {
-        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
+        boolean hasSkill = hasSkill(SkillTypeNew.S_TECH_MECHANIC.name());
         return hasSkill && (getPrimaryRole().isMechanic() || getSecondaryRole().isMechanic());
     }
 
     public boolean isTechBA() {
-        boolean hasSkill = hasSkill(S_TECH_BA);
+        boolean hasSkill = hasSkill(SkillTypeNew.S_TECH_BA.name());
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
@@ -5630,7 +5649,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(S_ADMIN);
+        Skill administration = skills.getSkill(SkillTypeNew.S_ADMIN.name());
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -5647,7 +5666,8 @@ public class Person {
     }
 
     public boolean isDoctor() {
-        return hasSkill(S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+        return hasSkill(SkillTypeNew.S_SURGERY.name()) &&
+                     (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
     }
 
     /**
@@ -5678,7 +5698,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(S_ADMIN);
+        Skill administration = skills.getSkill(SkillTypeNew.S_ADMIN.name());
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -5718,39 +5738,48 @@ public class Person {
         }
         // check spare parts
         // return the best one
-        if (part.isRightTechType(S_TECH_MEK) && hasSkill(S_TECH_MEK)) {
-            skill = getSkill(S_TECH_MEK);
+        if (part.isRightTechType(SkillTypeNew.S_TECH_MEK.name()) && hasSkill(SkillTypeNew.S_TECH_MEK.name())) {
+            skill = getSkill(SkillTypeNew.S_TECH_MEK.name());
         }
 
-        if (part.isRightTechType(S_TECH_BA) && hasSkill(S_TECH_BA)) {
+        if (part.isRightTechType(SkillTypeNew.S_TECH_BA.name()) && hasSkill(SkillTypeNew.S_TECH_BA.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_BA);
+                             getSkill(SkillTypeNew.S_TECH_BA.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_BA.name());
             }
         }
 
-        if (part.isRightTechType(S_TECH_AERO) && hasSkill(S_TECH_AERO)) {
+        if (part.isRightTechType(SkillTypeNew.S_TECH_AERO.name()) && hasSkill(SkillTypeNew.S_TECH_AERO.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_AERO);
+                             getSkill(SkillTypeNew.S_TECH_AERO.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_AERO.name());
             }
         }
 
-        if (part.isRightTechType(S_TECH_MECHANIC) && hasSkill(S_TECH_MECHANIC)) {
+        if (part.isRightTechType(SkillTypeNew.S_TECH_MECHANIC.name()) &&
+                  hasSkill(SkillTypeNew.S_TECH_MECHANIC.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_MECHANIC);
+                             getSkill(SkillTypeNew.S_TECH_MECHANIC.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_MECHANIC.name());
             }
         }
 
-        if (part.isRightTechType(S_TECH_VESSEL) && hasSkill(S_TECH_VESSEL)) {
+        if (part.isRightTechType(SkillTypeNew.S_TECH_VESSEL.name()) && hasSkill(SkillTypeNew.S_TECH_VESSEL.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_VESSEL);
+                             getSkill(SkillTypeNew.S_TECH_VESSEL.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_VESSEL.name());
             }
         }
 
@@ -5760,31 +5789,37 @@ public class Person {
         // if we are still here then we didn't have the right tech skill, so return the
         // highest
         // of any tech skills that we do have
-        if (hasSkill(S_TECH_MEK)) {
-            skill = getSkill(S_TECH_MEK);
+        if (hasSkill(SkillTypeNew.S_TECH_MEK.name())) {
+            skill = getSkill(SkillTypeNew.S_TECH_MEK.name());
         }
 
-        if (hasSkill(S_TECH_BA)) {
+        if (hasSkill(SkillTypeNew.S_TECH_BA.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_BA);
+                             getSkill(SkillTypeNew.S_TECH_BA.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_BA.name());
             }
         }
 
-        if (hasSkill(S_TECH_MECHANIC)) {
+        if (hasSkill(SkillTypeNew.S_TECH_MECHANIC.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_MECHANIC);
+                             getSkill(SkillTypeNew.S_TECH_MECHANIC.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_MECHANIC.name());
             }
         }
 
-        if (hasSkill(S_TECH_AERO)) {
+        if (hasSkill(SkillTypeNew.S_TECH_AERO.name())) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
-                skill = getSkill(S_TECH_AERO);
+                             getSkill(SkillTypeNew.S_TECH_AERO.name()).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
+                skill = getSkill(SkillTypeNew.S_TECH_AERO.name());
             }
         }
 
@@ -5795,20 +5830,20 @@ public class Person {
         if (unit == null) {
             return null;
         } else if (((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) &&
-                         hasSkill(S_TECH_MEK)) {
-            return getSkill(S_TECH_MEK);
-        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
-            return getSkill(S_TECH_BA);
-        } else if ((unit.getEntity() instanceof Tank) && hasSkill(S_TECH_MECHANIC)) {
-            return getSkill(S_TECH_MECHANIC);
+                         hasSkill(SkillTypeNew.S_TECH_MEK.name())) {
+            return getSkill(SkillTypeNew.S_TECH_MEK.name());
+        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(SkillTypeNew.S_TECH_BA.name())) {
+            return getSkill(SkillTypeNew.S_TECH_BA.name());
+        } else if ((unit.getEntity() instanceof Tank) && hasSkill(SkillTypeNew.S_TECH_MECHANIC.name())) {
+            return getSkill(SkillTypeNew.S_TECH_MECHANIC.name());
         } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) &&
-                         hasSkill(S_TECH_VESSEL)) {
-            return getSkill(S_TECH_VESSEL);
+                         hasSkill(SkillTypeNew.S_TECH_VESSEL.name())) {
+            return getSkill(SkillTypeNew.S_TECH_VESSEL.name());
         } else if ((unit.getEntity() instanceof Aero) &&
                          !(unit.getEntity() instanceof Dropship) &&
                          !(unit.getEntity() instanceof Jumpship) &&
-                         hasSkill(S_TECH_AERO)) {
-            return getSkill(S_TECH_AERO);
+                         hasSkill(SkillTypeNew.S_TECH_AERO.name())) {
+            return getSkill(SkillTypeNew.S_TECH_AERO.name());
         } else {
             return null;
         }
@@ -5825,11 +5860,11 @@ public class Person {
     }
 
     public int getBestTechLevel() {
-        int level = EXP_NONE;
-        final Skill mekSkill = getSkill(S_TECH_MEK);
-        final Skill mechanicSkill = getSkill(S_TECH_MECHANIC);
-        final Skill baSkill = getSkill(S_TECH_BA);
-        final Skill aeroSkill = getSkill(S_TECH_AERO);
+        int level = SKILL_LEVEL_NONE;
+        final Skill mekSkill = getSkill(SkillTypeNew.S_TECH_MEK.name());
+        final Skill mechanicSkill = getSkill(SkillTypeNew.S_TECH_MECHANIC.name());
+        final Skill baSkill = getSkill(SkillTypeNew.S_TECH_BA.name());
+        final Skill aeroSkill = getSkill(SkillTypeNew.S_TECH_AERO.name());
         if ((mekSkill != null) && (mekSkill.getLevel() > level)) {
             level = mekSkill.getLevel();
         }
@@ -5852,21 +5887,25 @@ public class Person {
     public boolean isRightTechTypeFor(final IPartWork part) {
         Unit unit = part.getUnit();
         if (unit == null) {
-            return (hasSkill(S_TECH_MEK) && part.isRightTechType(S_TECH_MEK)) ||
-                         (hasSkill(S_TECH_AERO) && part.isRightTechType(S_TECH_AERO)) ||
-                         (hasSkill(S_TECH_MECHANIC) && part.isRightTechType(S_TECH_MECHANIC)) ||
-                         (hasSkill(S_TECH_BA) && part.isRightTechType(S_TECH_BA)) ||
-                         (hasSkill(S_TECH_VESSEL) && part.isRightTechType(S_TECH_VESSEL));
+            return (hasSkill(SkillTypeNew.S_TECH_MEK.name()) && part.isRightTechType(SkillTypeNew.S_TECH_MEK.name())) ||
+                         (hasSkill(SkillTypeNew.S_TECH_AERO.name()) &&
+                                part.isRightTechType(SkillTypeNew.S_TECH_AERO.name())) ||
+                         (hasSkill(SkillTypeNew.S_TECH_MECHANIC.name()) &&
+                                part.isRightTechType(SkillTypeNew.S_TECH_MECHANIC.name())) ||
+                         (hasSkill(SkillTypeNew.S_TECH_BA.name()) &&
+                                part.isRightTechType(SkillTypeNew.S_TECH_BA.name())) ||
+                         (hasSkill(SkillTypeNew.S_TECH_VESSEL.name()) &&
+                                part.isRightTechType(SkillTypeNew.S_TECH_VESSEL.name()));
         } else if ((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK);
+            return hasSkill(SkillTypeNew.S_TECH_MEK.name());
         } else if (unit.getEntity() instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA);
+            return hasSkill(SkillTypeNew.S_TECH_BA.name());
         } else if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Infantry)) {
-            return hasSkill(S_TECH_MECHANIC);
+            return hasSkill(SkillTypeNew.S_TECH_MECHANIC.name());
         } else if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
-            return hasSkill(S_TECH_VESSEL);
+            return hasSkill(SkillTypeNew.S_TECH_VESSEL.name());
         } else if (unit.getEntity() instanceof Aero) {
-            return hasSkill(S_TECH_AERO);
+            return hasSkill(SkillTypeNew.S_TECH_AERO.name());
         } else {
             return false;
         }
@@ -6719,10 +6758,10 @@ public class Person {
         // We make an iteration safe list so we can easily remove skills during the loop
         List<Skill> allSkills = new ArrayList<>(skills.getSkills());
         for (Skill skill : allSkills) {
-            SkillType skillType = skill.getType();
+            SkillTypeNew skillType = skill.getType();
 
             if (skillType.isSubTypeOf(subType)) {
-                removeSkill(skillType.getName());
+                removeSkill(skillType.name());
             }
         }
     }
@@ -7706,7 +7745,7 @@ public class Person {
      * Determines whether the character is considered illiterate.
      *
      * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
-     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
+     * their base level in the {@link SkillTypeNew#S_LANGUAGES} skill is below
      * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
      *
      * @return {@code true} if the person is considered illiterate; {@code false} otherwise.
@@ -7719,7 +7758,7 @@ public class Person {
             return false;
         }
 
-        Skill languages = skills.getSkill(S_LANGUAGES);
+        Skill languages = skills.getSkill(SkillTypeNew.S_LANGUAGES.name());
         int level = languages.getLevel();
         return level < ILLITERACY_LANGUAGES_THRESHOLD;
     }

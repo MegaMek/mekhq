@@ -43,7 +43,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
 public class SkillAwards {
     private static final MMLogger LOGGER = MMLogger.create(SkillAwards.class);
@@ -115,185 +115,187 @@ public class SkillAwards {
             // These first couple of cases are for those instances where the users want to
             // check against multiple skills, but only needs one passing grade
             case "piloting":
-                relevantSkills = Arrays.asList(SkillType.S_PILOT_MEK,
-                      SkillType.S_PILOT_AERO,
-                      SkillType.S_PILOT_GVEE,
-                      SkillType.S_PILOT_VTOL,
-                      SkillType.S_PILOT_NVEE,
-                      SkillType.S_PILOT_JET,
-                      SkillType.S_PILOT_SPACE);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_PILOT_MEK.name(),
+                      SkillTypeNew.S_PILOT_AERO.name(),
+                      SkillTypeNew.S_PILOT_GVEE.name(),
+                      SkillTypeNew.S_PILOT_VTOL.name(),
+                      SkillTypeNew.S_PILOT_NVEE.name(),
+                      SkillTypeNew.S_PILOT_JET.name(),
+                      SkillTypeNew.S_PILOT_SPACE.name());
                 break;
 
             case "accuracy":
-                relevantSkills = Arrays.asList(SkillType.S_GUN_MEK,
-                      SkillType.S_GUN_AERO,
-                      SkillType.S_GUN_VEE,
-                      SkillType.S_GUN_JET,
-                      SkillType.S_GUN_SPACE,
-                      SkillType.S_GUN_BA,
-                      SkillType.S_GUN_PROTO,
-                      SkillType.S_ARTILLERY,
-                      SkillType.S_SMALL_ARMS,
-                      SkillType.S_ANTI_MEK);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_GUN_MEK.name(),
+                      SkillTypeNew.S_GUN_AERO.name(),
+                      SkillTypeNew.S_GUN_VEE.name(),
+                      SkillTypeNew.S_GUN_JET.name(),
+                      SkillTypeNew.S_GUN_SPACE.name(),
+                      SkillTypeNew.S_GUN_BA.name(),
+                      SkillTypeNew.S_GUN_PROTO.name(),
+                      SkillTypeNew.S_ARTILLERY.name(),
+                      SkillTypeNew.S_SMALL_ARMS.name(),
+                      SkillTypeNew.S_ANTI_MEK.name());
                 break;
 
             case "command":
-                relevantSkills = Arrays.asList(SkillType.S_LEADER, SkillType.S_TACTICS, SkillType.S_STRATEGY);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_LEADER.name(),
+                      SkillTypeNew.S_TACTICS.name(),
+                      SkillTypeNew.S_STRATEGY.name());
                 break;
 
             case "admin":
-                relevantSkills = Arrays.asList(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_ADMIN.name(), SkillTypeNew.S_NEGOTIATION.name());
                 break;
 
             case "techwithmedical":
-                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
-                      SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
-                      SkillType.S_TECH_VESSEL,
-                      SkillType.S_TECH_BA,
-                      SkillType.S_ASTECH,
-                      SkillType.S_SURGERY,
-                      SkillType.S_MEDTECH);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_TECH_MEK.name(),
+                      SkillTypeNew.S_TECH_AERO.name(),
+                      SkillTypeNew.S_TECH_MECHANIC.name(),
+                      SkillTypeNew.S_TECH_VESSEL.name(),
+                      SkillTypeNew.S_TECH_BA.name(),
+                      SkillTypeNew.S_ASTECH.name(),
+                      SkillTypeNew.S_SURGERY.name(),
+                      SkillTypeNew.S_MEDTECH.name());
                 break;
 
             case "tech":
-                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
-                      SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
-                      SkillType.S_TECH_VESSEL,
-                      SkillType.S_TECH_BA,
-                      SkillType.S_ASTECH);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_TECH_MEK.name(),
+                      SkillTypeNew.S_TECH_AERO.name(),
+                      SkillTypeNew.S_TECH_MECHANIC.name(),
+                      SkillTypeNew.S_TECH_VESSEL.name(),
+                      SkillTypeNew.S_TECH_BA.name(),
+                      SkillTypeNew.S_ASTECH.name());
                 break;
 
             case "medical":
-                relevantSkills = Arrays.asList(SkillType.S_SURGERY, SkillType.S_MEDTECH);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_SURGERY.name(), SkillTypeNew.S_MEDTECH.name());
                 break;
 
             case "assistant":
-                relevantSkills = Arrays.asList(SkillType.S_ASTECH, SkillType.S_MEDTECH);
+                relevantSkills = Arrays.asList(SkillTypeNew.S_ASTECH.name(), SkillTypeNew.S_MEDTECH.name());
                 break;
 
             case "piloting/mek":
-                relevantSkills = List.of(SkillType.S_PILOT_MEK);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_MEK.name());
                 break;
 
             case "piloting/aerospace":
-                relevantSkills = List.of(SkillType.S_PILOT_AERO);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_AERO.name());
                 break;
 
             case "piloting/groundvehicle":
-                relevantSkills = List.of(SkillType.S_PILOT_GVEE);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_GVEE.name());
                 break;
 
             case "piloting/vtol":
-                relevantSkills = List.of(SkillType.S_PILOT_VTOL);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_VTOL.name());
                 break;
 
             case "piloting/naval":
-                relevantSkills = List.of(SkillType.S_PILOT_NVEE);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_NVEE.name());
                 break;
 
             case "piloting/aircraft":
-                relevantSkills = List.of(SkillType.S_PILOT_JET);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_JET.name());
                 break;
 
             case "piloting/spacecraft":
-                relevantSkills = List.of(SkillType.S_PILOT_SPACE);
+                relevantSkills = List.of(SkillTypeNew.S_PILOT_SPACE.name());
                 break;
 
             case "gunnery/mek":
-                relevantSkills = List.of(SkillType.S_GUN_MEK);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_MEK.name());
                 break;
 
             case "gunnery/aerospace":
-                relevantSkills = List.of(SkillType.S_GUN_AERO);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_AERO.name());
                 break;
 
             case "gunnery/vehicle":
-                relevantSkills = List.of(SkillType.S_GUN_VEE);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_VEE.name());
                 break;
 
             case "gunnery/aircraft":
-                relevantSkills = List.of(SkillType.S_GUN_JET);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_JET.name());
                 break;
 
             case "gunnery/spacecraft":
-                relevantSkills = List.of(SkillType.S_GUN_SPACE);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_SPACE.name());
                 break;
 
             case "gunnery/battlesuit":
-                relevantSkills = List.of(SkillType.S_GUN_BA);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_BA.name());
                 break;
 
             case "gunnery/protomek":
-                relevantSkills = List.of(SkillType.S_GUN_PROTO);
+                relevantSkills = List.of(SkillTypeNew.S_GUN_PROTO.name());
                 break;
 
             case "tech/mek":
-                relevantSkills = List.of(SkillType.S_TECH_MEK);
+                relevantSkills = List.of(SkillTypeNew.S_TECH_MEK.name());
                 break;
 
             case "tech/mechanic":
-                relevantSkills = List.of(SkillType.S_TECH_MECHANIC);
+                relevantSkills = List.of(SkillTypeNew.S_TECH_MECHANIC.name());
                 break;
 
             case "tech/aero":
-                relevantSkills = List.of(SkillType.S_TECH_AERO);
+                relevantSkills = List.of(SkillTypeNew.S_TECH_AERO.name());
                 break;
 
             case "tech/ba":
-                relevantSkills = List.of(SkillType.S_TECH_BA);
+                relevantSkills = List.of(SkillTypeNew.S_TECH_BA.name());
                 break;
 
             case "tech/vessel":
-                relevantSkills = List.of(SkillType.S_TECH_VESSEL);
+                relevantSkills = List.of(SkillTypeNew.S_TECH_VESSEL.name());
                 break;
 
             case "artillery":
-                relevantSkills = List.of(SkillType.S_ARTILLERY);
+                relevantSkills = List.of(SkillTypeNew.S_ARTILLERY.name());
                 break;
 
             case "smallarms":
-                relevantSkills = List.of(SkillType.S_SMALL_ARMS);
+                relevantSkills = List.of(SkillTypeNew.S_SMALL_ARMS.name());
                 break;
 
             case "antimek":
-                relevantSkills = List.of(SkillType.S_ANTI_MEK);
+                relevantSkills = List.of(SkillTypeNew.S_ANTI_MEK.name());
                 break;
             case "astech":
-                relevantSkills = List.of(SkillType.S_ASTECH);
+                relevantSkills = List.of(SkillTypeNew.S_ASTECH.name());
                 break;
 
             case "doctor":
-                relevantSkills = List.of(SkillType.S_SURGERY);
+                relevantSkills = List.of(SkillTypeNew.S_SURGERY.name());
                 break;
 
             case "medtech":
-                relevantSkills = List.of(SkillType.S_MEDTECH);
+                relevantSkills = List.of(SkillTypeNew.S_MEDTECH.name());
                 break;
 
             case "hyperspacenavigation":
-                relevantSkills = List.of(SkillType.S_NAVIGATION);
+                relevantSkills = List.of(SkillTypeNew.S_NAVIGATION.name());
                 break;
 
             case "administration":
-                relevantSkills = List.of(SkillType.S_ADMIN);
+                relevantSkills = List.of(SkillTypeNew.S_ADMIN.name());
                 break;
 
             case "tactics":
-                relevantSkills = List.of(SkillType.S_TACTICS);
+                relevantSkills = List.of(SkillTypeNew.S_TACTICS.name());
                 break;
 
             case "strategy":
-                relevantSkills = List.of(SkillType.S_STRATEGY);
+                relevantSkills = List.of(SkillTypeNew.S_STRATEGY.name());
                 break;
 
             case "negotiation":
-                relevantSkills = List.of(SkillType.S_NEGOTIATION);
+                relevantSkills = List.of(SkillTypeNew.S_NEGOTIATION.name());
                 break;
 
             case "leadership":
-                relevantSkills = List.of(SkillType.S_LEADER);
+                relevantSkills = List.of(SkillTypeNew.S_LEADER.name());
                 break;
 
             default:

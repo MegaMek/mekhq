@@ -33,6 +33,9 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
+
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -41,8 +44,8 @@ import java.util.Map;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -96,9 +99,9 @@ public class SkillPrerequisite {
      * Determines if the given {@link Skills} object qualifies based on the requirements in this object's skill set.
      *
      * <p>For each skill name in the required skill set, this method checks if the {@link Skills} object contains that
-     * skill. If it does, it retrieves the associated {@link SkillType}, calculates the experience level from the skill
-     * level, and compares it to the required minimum level for that skill. If any skill meets or exceeds the required
-     * experience level, this method returns {@code true}. If none do, it returns {@code false}.</p>
+     * skill. If it does, it retrieves the associated {@link SkillTypeNew}, calculates the experience level from the
+     * skill level, and compares it to the required minimum level for that skill. If any skill meets or exceeds the
+     * required experience level, this method returns {@code true}. If none do, it returns {@code false}.</p>
      *
      * @param skills the {@link Skills} object to evaluate
      *
@@ -108,7 +111,7 @@ public class SkillPrerequisite {
         for (String skillName : skillSet.keySet()) {
             Skill skill = skills.getSkill(skillName);
             if (skill != null) {
-                SkillType skillType = SkillType.getType(skillName);
+                SkillTypeNew skillType = SkillTypeNew.getType(skillName);
                 int skillLevel = skill.getLevel();
                 if (skillType.getExperienceLevel(skillLevel) >= skillSet.get(skillName)) {
                     return true;
@@ -128,28 +131,28 @@ public class SkillPrerequisite {
      */
     public boolean qualifies(int unitType) {
         return switch (unitType) {
-            case UnitType.AERO, UnitType.AEROSPACE_FIGHTER ->
-                  skillSet.containsKey(SkillType.S_PILOT_AERO) || skillSet.containsKey(SkillType.S_GUN_AERO);
-            case UnitType.BATTLE_ARMOR ->
-                  skillSet.containsKey(SkillType.S_GUN_BA) || skillSet.containsKey(SkillType.S_ANTI_MEK);
-            case UnitType.CONV_FIGHTER ->
-                  skillSet.containsKey(SkillType.S_GUN_JET) || skillSet.containsKey(SkillType.S_PILOT_JET);
+            case UnitType.AERO, UnitType.AEROSPACE_FIGHTER -> skillSet.containsKey(SkillTypeNew.S_PILOT_AERO.name()) ||
+                                                                    skillSet.containsKey(SkillTypeNew.S_GUN_AERO.name());
+            case UnitType.BATTLE_ARMOR -> skillSet.containsKey(SkillTypeNew.S_GUN_BA.name()) ||
+                                                skillSet.containsKey(SkillTypeNew.S_ANTI_MEK.name());
+            case UnitType.CONV_FIGHTER -> skillSet.containsKey(SkillTypeNew.S_GUN_JET.name()) ||
+                                                skillSet.containsKey(SkillTypeNew.S_PILOT_JET.name());
             case UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION, UnitType.SMALL_CRAFT ->
-                  skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
-                        skillSet.containsKey(SkillType.S_GUN_SPACE) ||
-                        skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
-                        skillSet.containsKey(SkillType.S_NAVIGATION);
-            case UnitType.GUN_EMPLACEMENT, UnitType.TANK ->
-                  skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.INFANTRY ->
-                  skillSet.containsKey(SkillType.S_SMALL_ARMS) || skillSet.containsKey(SkillType.S_ANTI_MEK);
-            case UnitType.NAVAL ->
-                  skillSet.containsKey(SkillType.S_PILOT_NVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.PROTOMEK -> skillSet.containsKey(SkillType.S_GUN_PROTO);
-            case UnitType.VTOL ->
-                  skillSet.containsKey(SkillType.S_PILOT_VTOL) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.MEK ->
-                  skillSet.containsKey(SkillType.S_PILOT_MEK) || skillSet.containsKey(SkillType.S_GUN_MEK);
+                  skillSet.containsKey(SkillTypeNew.S_PILOT_SPACE.name()) ||
+                        skillSet.containsKey(SkillTypeNew.S_GUN_SPACE.name()) ||
+                        skillSet.containsKey(SkillTypeNew.S_TECH_VESSEL.name()) ||
+                        skillSet.containsKey(SkillTypeNew.S_NAVIGATION.name());
+            case UnitType.GUN_EMPLACEMENT, UnitType.TANK -> skillSet.containsKey(SkillTypeNew.S_PILOT_GVEE.name()) ||
+                                                                  skillSet.containsKey(SkillTypeNew.S_GUN_VEE.name());
+            case UnitType.INFANTRY -> skillSet.containsKey(SkillTypeNew.S_SMALL_ARMS.name()) ||
+                                            skillSet.containsKey(SkillTypeNew.S_ANTI_MEK.name());
+            case UnitType.NAVAL -> skillSet.containsKey(SkillTypeNew.S_PILOT_NVEE.name()) ||
+                                         skillSet.containsKey(SkillTypeNew.S_GUN_VEE.name());
+            case UnitType.PROTOMEK -> skillSet.containsKey(SkillTypeNew.S_GUN_PROTO.name());
+            case UnitType.VTOL -> skillSet.containsKey(SkillTypeNew.S_PILOT_VTOL.name()) ||
+                                        skillSet.containsKey(SkillTypeNew.S_GUN_VEE.name());
+            case UnitType.MEK -> skillSet.containsKey(SkillTypeNew.S_PILOT_MEK.name()) ||
+                                       skillSet.containsKey(SkillTypeNew.S_GUN_MEK.name());
             default -> false;
         };
     }
@@ -173,11 +176,11 @@ public class SkillPrerequisite {
             String key = enumKeys.nextElement();
             int lvl = skillSet.get(key);
             String skillLvl = "";
-            if (lvl >= SkillType.EXP_GREEN) {
-                skillLvl = SkillType.getExperienceLevelName(lvl) + ' ';
+            if (lvl >= SKILL_LEVEL_GREEN) {
+                skillLvl = getExperienceLevelName(lvl) + ' ';
             }
-            if (SkillType.getType(key) != null) {
-                toReturn.append(skillLvl).append(SkillType.getType(key).getName());
+            if (SkillTypeNew.getType(key) != null) {
+                toReturn.append(skillLvl).append(SkillTypeNew.getType(key).name());
             }
             if (enumKeys.hasMoreElements()) {
                 toReturn.append("<br>OR ");
@@ -196,7 +199,7 @@ public class SkillPrerequisite {
                 MHQXMLUtility.writeSimpleXMLTag(pw,
                       indent,
                       "skill",
-                      key + "::" + SkillType.getExperienceLevelName(lvl));
+                      key + "::" + getExperienceLevelName(lvl));
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");
@@ -220,7 +223,7 @@ public class SkillPrerequisite {
                         skillName = parseStringForName(skillName);
                     }
                     // if the skill name does not match existing skills, then ignore
-                    if (null != SkillType.getType(skillName)) {
+                    if (null != SkillTypeNew.getType(skillName)) {
                         retVal.addPrereq(skillName, level);
                     }
                 }
