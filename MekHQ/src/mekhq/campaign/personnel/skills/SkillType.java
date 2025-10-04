@@ -247,6 +247,8 @@ public class SkillType {
 
     public static Map<String, SkillType> lookupHash;
 
+    public static final int DISABLED_SKILL_LEVEL = -1;
+
     private String name;
     private int target;
     private boolean countUp;
@@ -345,7 +347,7 @@ public class SkillType {
      *
      * <p>The {@code costs} parameter is validated to ensure it contains exactly 11 entries,
      * corresponding to skill levels 0 through 10 inclusive. If the provided array is {@code null} or has fewer than 11
-     * elements, a new array will be created with missing entries filled with {@code ISABLED_SKILL_LEVEL}. If the array
+     * elements, a new array will be created with missing entries filled with {@code DISABLED_SKILL_LEVEL}. If the array
      * has more than 11 entries, it will be trimmed to size. Additionally, the input array is copied to prevent
      * accidental external changes to the internal state of the instance.</p>
      *

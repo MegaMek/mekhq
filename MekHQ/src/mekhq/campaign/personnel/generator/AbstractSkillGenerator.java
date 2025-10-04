@@ -45,6 +45,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 
 /**
  * Represents a class which can generate new {@link Skill} objects for a {@link Person}.
