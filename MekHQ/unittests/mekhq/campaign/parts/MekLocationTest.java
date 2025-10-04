@@ -83,6 +83,7 @@ import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
@@ -2339,7 +2340,7 @@ class MekLocationTest {
         assertTrue(mekLocation.getDesc().contains(mekLocation.getCurrentModeName()));
 
         // Breached, but too hard to handle
-        mekLocation.setSkillMin(EXP_LEGENDARY + 1);
+        mekLocation.setSkillMin(SkillUtilities.SKILL_LEVEL_LEGENDARY + 1);
         assertTrue(mekLocation.getDesc().contains("Impossible"));
     }
 }
