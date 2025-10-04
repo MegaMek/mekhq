@@ -180,7 +180,7 @@ public class SkillPrerequisite {
                 skillLvl = getExperienceLevelName(lvl) + ' ';
             }
             if (SkillTypeNew.getType(key) != null) {
-                toReturn.append(skillLvl).append(SkillTypeNew.getType(key).getName());
+                toReturn.append(skillLvl).append(SkillTypeNew.getType(key).name());
             }
             if (enumKeys.hasMoreElements()) {
                 toReturn.append("<br>OR ");

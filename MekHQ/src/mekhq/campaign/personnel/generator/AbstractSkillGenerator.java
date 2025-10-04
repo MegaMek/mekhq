@@ -129,13 +129,13 @@ public abstract class AbstractSkillGenerator {
             }
 
             // No double-dipping
-            if (person.hasSkill(skillType.getName())) {
+            if (person.hasSkill(skillType.name())) {
                 continue;
             }
 
             int roleplaySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getRoleplaySkillModifier());
             if (roleplaySkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
-                addSkill(person, skillType.getName(), roleplaySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
+                addSkill(person, skillType.name(), roleplaySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
         }
     }

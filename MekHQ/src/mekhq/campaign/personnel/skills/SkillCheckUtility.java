@@ -468,7 +468,7 @@ public class SkillCheckUtility {
      */
     public static TargetRoll determineTargetNumber(Person person, SkillTypeNew skillType, int miscModifier,
           boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
-        final String skillName = skillType.getName();
+        final String skillName = skillType.name();
         final Attributes characterAttributes = person.getATOWAttributes();
 
         boolean isUntrained = !person.hasSkill(skillName);

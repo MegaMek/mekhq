@@ -535,7 +535,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        String skillName = skillType.getName();
+        String skillName = skillType.name();
 
         // Get target
         Person target = getRandomTarget(isGuard);

@@ -1490,7 +1490,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         SkillTypeNew skillType;
         for (Entry<String, JSpinner> entry : skillLvls.entrySet()) {
             skillType = SkillTypeNew.getType(entry.getKey());
-            if (skillChecks.get(skillType.getName()).isSelected()) {
+            if (skillChecks.get(skillType.name()).isSelected()) {
                 int lvl = (Integer) entry.getValue().getModel().getValue();
                 totalCost = totalCost + skillType.getTotalCost(lvl);
             }

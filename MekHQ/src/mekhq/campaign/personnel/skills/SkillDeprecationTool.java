@@ -122,7 +122,7 @@ public class SkillDeprecationTool {
 
         final Skills skills = person.getSkills();
         for (SkillTypeNew skillType : DEPRECATED_SKILLS) {
-            final String skillName = skillType.getName();
+            final String skillName = skillType.name();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
 

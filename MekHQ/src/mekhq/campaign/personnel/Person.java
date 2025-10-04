@@ -3472,7 +3472,7 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
-                        person.skills.addSkill(s.getType().getName(), s);
+                        person.skills.addSkill(s.getType().name(), s);
                     }
                 } else if (nodeName.equalsIgnoreCase("techUnitIds")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -6761,7 +6761,7 @@ public class Person {
             SkillTypeNew skillType = skill.getType();
 
             if (skillType.isSubTypeOf(subType)) {
-                removeSkill(skillType.getName());
+                removeSkill(skillType.name());
             }
         }
     }

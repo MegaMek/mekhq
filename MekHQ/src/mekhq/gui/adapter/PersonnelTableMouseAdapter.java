@@ -655,9 +655,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String typeLabel = data[1];
                 SkillTypeNew skillType = SkillTypeNew.getType(typeLabel);
                 Skills skills = selectedPerson.getSkills();
-                int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.getName());
+                int refundValue = SkillDeprecationTool.getRefundValue(skills, skillType, skillType.name());
 
-                selectedPerson.removeSkill(skillType.getName());
+                selectedPerson.removeSkill(skillType.name());
                 selectedPerson.awardXP(getCampaign(), refundValue);
 
                 getCampaign().personUpdated(selectedPerson);

@@ -324,7 +324,7 @@ public class Skill {
 
         final boolean hasReligiousFanaticism = characterOptions.booleanOption(COMPULSION_RELIGIOUS_FANATICISM);
 
-        String name = type.getName();
+        String name = type.name();
         // Reputation and Alternate ID
         if (Objects.equals(name, SkillTypeNew.S_NEGOTIATION.name()) ||
                   Objects.equals(name, SkillTypeNew.S_PROTOCOLS.name()) ||
@@ -884,7 +884,7 @@ public class Skill {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skill");
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "agingModifier", agingModifier);
@@ -922,6 +922,6 @@ public class Skill {
     }
 
     public void updateType() {
-        type = SkillTypeNew.getType(type.getName());
+        type = SkillTypeNew.getType(type.name());
     }
 }

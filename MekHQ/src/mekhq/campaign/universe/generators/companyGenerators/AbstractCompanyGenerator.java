@@ -494,7 +494,7 @@ public abstract class AbstractCompanyGenerator {
                                                      && getOptions().isApplyOfficerStatBonusToWorstSkill()) ?
                                                     piloting :
                                                     gunnery)
-                                                   .getType().getName());
+                                                   .getType().name());
         }
 
         if (tracker.getPersonType().isMekWarriorCaptain()) {
