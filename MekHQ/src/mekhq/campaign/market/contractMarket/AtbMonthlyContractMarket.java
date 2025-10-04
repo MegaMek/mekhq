@@ -44,7 +44,6 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -71,6 +70,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -752,7 +752,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         int adminCommandExp = SKILL_LEVEL_NONE;
         if (adminCommand != null) {
-            Skill skill = adminCommand.getSkill(S_NEGOTIATION);
+            Skill skill = adminCommand.getSkill(SkillTypeNew.S_NEGOTIATION.name());
             if (skill != null) {
                 PersonnelOptions options = adminCommand.getOptions();
                 Attributes attributes = adminCommand.getATOWAttributes();
@@ -766,7 +766,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         int adminTransportExp = SKILL_LEVEL_NONE;
         if (adminTransport != null) {
-            Skill skill = adminTransport.getSkill(S_NEGOTIATION);
+            Skill skill = adminTransport.getSkill(SkillTypeNew.S_NEGOTIATION.name());
             if (skill != null) {
                 PersonnelOptions options = adminTransport.getOptions();
                 Attributes attributes = adminTransport.getATOWAttributes();
@@ -780,7 +780,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         int adminLogisticsExp = SKILL_LEVEL_NONE;
         if (adminLogistics != null) {
-            Skill skill = adminLogistics.getSkill(S_NEGOTIATION);
+            Skill skill = adminLogistics.getSkill(SkillTypeNew.S_NEGOTIATION.name());
             if (skill != null) {
                 PersonnelOptions options = adminLogistics.getOptions();
                 Attributes attributes = adminLogistics.getATOWAttributes();

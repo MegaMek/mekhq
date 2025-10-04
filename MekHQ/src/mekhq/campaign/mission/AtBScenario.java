@@ -85,7 +85,7 @@ import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
@@ -373,7 +373,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        Skill tactics = commander.getSkill(SkillType.S_TACTICS);
+        Skill tactics = commander.getSkill(SkillTypeNew.S_TACTICS.name());
         if (tactics == null) {
             rerollsRemaining = 0;
             return;

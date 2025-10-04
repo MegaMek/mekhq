@@ -51,7 +51,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -310,8 +310,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void updateTechSupportHours(Person tech) {
-        String[] skillNames = new String[] { SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_BA,
-                                             SkillType.S_TECH_VESSEL, SkillType.S_TECH_MECHANIC };
+        String[] skillNames = new String[] { SkillTypeNew.S_TECH_MEK.name(), SkillTypeNew.S_TECH_AERO.name(),
+                                             SkillTypeNew.S_TECH_BA.name(),
+                                             SkillTypeNew.S_TECH_VESSEL.name(), SkillTypeNew.S_TECH_MECHANIC.name() };
 
         // Get the highest tech skill this person has.
         int highestSkill = SKILL_LEVEL_ULTRA_GREEN;
@@ -335,7 +336,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void updateMedicalSupportHours(Person doctor) {
-        Skill doctorSkill = doctor.getSkill(SkillType.S_SURGERY);
+        Skill doctorSkill = doctor.getSkill(SkillTypeNew.S_SURGERY.name());
         if (doctorSkill == null) {
             return;
         }
@@ -349,7 +350,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void updateAdministrativeSupportHours(Person administrator) {
-        Skill adminSkill = administrator.getSkill(SkillType.S_ADMIN);
+        Skill adminSkill = administrator.getSkill(SkillTypeNew.S_ADMIN.name());
         if (adminSkill == null) {
             return;
         }
@@ -461,10 +462,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        int skillTotal = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
-        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
-        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
-        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_NEGOTIATION);
+        int skillTotal = getCommanderSkillLevelWithBonus(SkillTypeNew.S_LEADER.name());
+        skillTotal += getCommanderSkillLevelWithBonus(SkillTypeNew.S_TACTICS.name());
+        skillTotal += getCommanderSkillLevelWithBonus(SkillTypeNew.S_STRATEGY.name());
+        skillTotal += getCommanderSkillLevelWithBonus(SkillTypeNew.S_NEGOTIATION.name());
 
         /*
          * todo consider adding rpg traits in MekHQ (they would have no impact
@@ -632,13 +633,19 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
               .append("\n");
 
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3d";
-        out.append(String.format(TEMPLATE, "Leadership:", getCommanderSkillLevelWithBonus(SkillType.S_LEADER)))
+        out.append(String.format(TEMPLATE,
+                    "Leadership:",
+                    getCommanderSkillLevelWithBonus(SkillTypeNew.S_LEADER.name())))
               .append("\n");
-        out.append(String.format(TEMPLATE, "Negotiation:", getCommanderSkillLevelWithBonus(SkillType.S_NEGOTIATION)))
+        out.append(String.format(TEMPLATE,
+                    "Negotiation:",
+                    getCommanderSkillLevelWithBonus(SkillTypeNew.S_NEGOTIATION.name())))
               .append("\n");
-        out.append(String.format(TEMPLATE, "Strategy:", getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY)))
+        out.append(String.format(TEMPLATE,
+                    "Strategy:",
+                    getCommanderSkillLevelWithBonus(SkillTypeNew.S_STRATEGY.name())))
               .append("\n");
-        out.append(String.format(TEMPLATE, "Tactics:", getCommanderSkillLevelWithBonus(SkillType.S_TACTICS)));
+        out.append(String.format(TEMPLATE, "Tactics:", getCommanderSkillLevelWithBonus(SkillTypeNew.S_TACTICS.name())));
 
         return out.toString();
     }

@@ -45,7 +45,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingVeeSensor;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import org.w3c.dom.Node;
 
 /**
@@ -168,7 +168,7 @@ public class VeeSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECHANIC);
+        return skillType.equals(SkillTypeNew.S_TECH_MECHANIC.name());
     }
 
     @Override

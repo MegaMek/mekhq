@@ -36,7 +36,6 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -60,7 +59,7 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -208,11 +207,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private int findNegotiationSkill(Campaign campaign) {
         // TODO: have pirates use investigation skill instead when it is implemented per CamOps
-        Person negotiator = campaign.findBestAtSkill(SkillType.S_NEGOTIATION);
+        Person negotiator = campaign.findBestAtSkill(SkillTypeNew.S_NEGOTIATION.name());
         if (negotiator == null) {
             return 0;
         }
-        return negotiator.getSkillLevel(S_NEGOTIATION,
+        return negotiator.getSkillLevel(SkillTypeNew.S_NEGOTIATION.name(),
               campaign.getCampaignOptions().isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate());

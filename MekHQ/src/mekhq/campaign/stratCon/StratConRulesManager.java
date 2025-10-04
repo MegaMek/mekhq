@@ -53,8 +53,6 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementEligibilityType.AUXILIARY;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.DELAYED;
@@ -110,6 +108,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
@@ -1684,10 +1683,17 @@ public class StratConRulesManager {
 
         roll = d6(2);
         int targetNumber = 9;
-        Skill tactics = commander.getSkill(S_TACTICS);
+        Skill tactics = commander.getSkill(SkillTypeNew.S_TACTICS.name());
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false,
-              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate());
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander,
+              SkillTypeNew.S_TACTICS.name(),
+              null,
+              0,
+              true,
+              false,
+              campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
         campaign.addReport(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
@@ -1804,7 +1810,7 @@ public class StratConRulesManager {
         TargetRoll reinforcementTargetNumber = new TargetRoll(7, "Base Target Number");
 
         // Base Target Number
-        Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;
+        Skill skill = commandLiaison != null ? commandLiaison.getSkill(SkillTypeNew.S_ADMIN.name()) : null;
         int skillModifier;
         if (skill == null) {
             skillModifier = 0;
@@ -1896,7 +1902,7 @@ public class StratConRulesManager {
         }
 
         // set the # of rerolls based on the actual lance assigned.
-        int tactics = scenario.getBackingScenario().getLanceCommanderSkill(S_TACTICS, campaign);
+        int tactics = scenario.getBackingScenario().getLanceCommanderSkill(SkillTypeNew.S_TACTICS.name(), campaign);
         scenario.getBackingScenario().setRerolls(tactics);
         // The number of defensive points available to a force entering a scenario is
         // 2 x tactics. By default, those points are spent on conventional minefields.

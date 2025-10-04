@@ -62,7 +62,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
@@ -226,8 +226,8 @@ public class RetirementDefectionTracker {
 
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     Person commander = campaign.getCommander();
-                    if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
-                        modifier -= commander.getSkill(SkillType.S_LEADER)
+                    if (commander != null && commander.hasSkill((SkillTypeNew.S_LEADER.name()))) {
+                        modifier -= commander.getSkill(SkillTypeNew.S_LEADER.name())
                                           .getFinalSkillValue(commander.getOptions(),
                                                 commander.getATOWAttributes());
                     }
@@ -628,8 +628,8 @@ public class RetirementDefectionTracker {
      * @return the Leadership skill
      */
     private static int getIndividualCommanderLeadership(Person commander) {
-        if (commander.hasSkill(SkillType.S_LEADER)) {
-            return commander.getSkill(SkillType.S_LEADER)
+        if (commander.hasSkill(SkillTypeNew.S_LEADER.name())) {
+            return commander.getSkill(SkillTypeNew.S_LEADER.name())
                          .getFinalSkillValue(commander.getOptions(), commander.getATOWAttributes());
         } else {
             return 0;
@@ -655,7 +655,7 @@ public class RetirementDefectionTracker {
         int personnel = getHRStrain(campaign);
 
         int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
-                                  getCombinedSkillValues(campaign, SkillType.S_ADMIN);
+                                  getCombinedSkillValues(campaign, SkillTypeNew.S_ADMIN.name());
 
         if (maximumStrain != 0) {
             return personnel / maximumStrain;

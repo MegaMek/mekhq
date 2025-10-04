@@ -60,7 +60,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -341,7 +341,7 @@ public class NewContractDialog extends JDialog {
         cboNegotiator.setName("cboNegotiator");
         // Add negotiators
         for (Person p : campaign.getActivePersonnel(true)) {
-            if (p.hasSkill(SkillType.S_NEGOTIATION)) {
+            if (p.hasSkill(SkillTypeNew.S_NEGOTIATION.name())) {
                 cboNegotiator.addItem(p);
             }
         }

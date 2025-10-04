@@ -34,7 +34,6 @@ package mekhq.gui.stratCon;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.stratCon.StratConRulesManager.BASE_LEADERSHIP_BUDGET;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementEligibilityType;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType;
@@ -80,6 +79,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
@@ -228,7 +228,9 @@ public class StratConScenarioWizard extends JDialog {
         // Handle optional UI for eligible leadership, defensive points, etc.
         if (isPrimaryForce) {
             gbc.gridy++;
-            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
+            int leadershipSkill = currentScenario.getBackingScenario()
+                                        .getLanceCommanderSkill(SkillTypeNew.S_LEADER.name(),
+                                              campaign);
             eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 

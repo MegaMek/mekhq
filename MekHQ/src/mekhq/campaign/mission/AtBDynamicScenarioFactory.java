@@ -116,7 +116,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.campaign.stratCon.StratConCampaignState;
@@ -4074,7 +4074,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
+        int strategy = scenario.getLanceCommanderSkill(SkillTypeNew.S_STRATEGY.name(), campaign);
 
         setDeploymentTurnsStaggered(staggeredEntities, strategy);
     }
@@ -4156,7 +4156,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Make note of battle commander strategy
-        int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
+        int strategy = scenario.getLanceCommanderSkill(SkillTypeNew.S_STRATEGY.name(), campaign);
 
         // For player forces where there's an associated force template, we can set the
         // deployment turn explicitly or use a stagger algorithm.
@@ -4640,7 +4640,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Campaign in which the scenario is occurring
      */
     private static void setScenarioRerolls(AtBDynamicScenario scenario, Campaign campaign) {
-        int tacticsSkill = scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
+        int tacticsSkill = scenario.getLanceCommanderSkill(SkillTypeNew.S_TACTICS.name(), campaign);
 
         scenario.setRerolls(tacticsSkill);
     }

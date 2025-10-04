@@ -34,7 +34,6 @@
 package mekhq.campaign.againstTheBot;
 
 
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
 
@@ -62,7 +61,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
@@ -357,11 +356,12 @@ public class AtBConfiguration {
         }
 
         TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
-        Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
+        Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS,
+              SkillTypeNew.S_ADMIN.name());
 
         int experienceLevel = SKILL_LEVEL_ULTRA_GREEN;
-        if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
-            Skill skill = logisticsAdmin.getSkill(S_ADMIN);
+        if (logisticsAdmin != null && logisticsAdmin.hasSkill(SkillTypeNew.S_ADMIN.name())) {
+            Skill skill = logisticsAdmin.getSkill(SkillTypeNew.S_ADMIN.name());
             experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
         }
 

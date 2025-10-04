@@ -59,7 +59,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -274,7 +274,7 @@ public final class InjuryUtil {
     public static List<GameEffect> genMedicalTreatment(Campaign c, Person p, Person doc) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(p);
-        Skill skill = doc.getSkill(SkillType.S_SURGERY);
+        Skill skill = doc.getSkill(SkillTypeNew.S_SURGERY.name());
         int level = skill.getLevel();
         final int fumbleLimit = FUMBLE_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         final int critLimit = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];

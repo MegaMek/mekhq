@@ -83,7 +83,7 @@ import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
@@ -2047,8 +2047,8 @@ class MekLocationTest {
               false,
               mockCampaign);
 
-        assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MEK));
-        assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_MECHANIC));
+        assertTrue(centerTorso.isRightTechType(SkillTypeNew.S_TECH_MEK.name()));
+        assertFalse(centerTorso.isRightTechType(SkillTypeNew.S_TECH_MECHANIC.name()));
     }
 
     @Test

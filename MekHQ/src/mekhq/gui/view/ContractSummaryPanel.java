@@ -60,7 +60,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.enums.MHQTabType;
@@ -115,13 +115,13 @@ public class ContractSummaryPanel extends JPanel {
             } else {
                 commandNegotiator = campaign.getSeniorAdminPerson(COMMAND);
                 cmdRerolls = (commandNegotiator == null ||
-                                    commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
+                                    commandNegotiator.getSkill(SkillTypeNew.S_NEGOTIATION.name()) == null) ? 0 : 1;
                 logisticsNegotiator = campaign.getSeniorAdminPerson(LOGISTICS);
                 logRerolls = (logisticsNegotiator == null ||
-                                    logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
+                                    logisticsNegotiator.getSkill(SkillTypeNew.S_NEGOTIATION.name()) == null) ? 0 : 1;
                 transportNegotiator = campaign.getSeniorAdminPerson(TRANSPORT);
                 tranRerolls = (transportNegotiator == null ||
-                                     transportNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
+                                     transportNegotiator.getSkill(SkillTypeNew.S_NEGOTIATION.name()) == null) ? 0 : 1;
             }
         }
 

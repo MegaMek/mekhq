@@ -54,7 +54,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingEnginePart;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -438,9 +438,10 @@ public class EnginePart extends Part {
     @Override
     public boolean isRightTechType(String skillType) {
         if (getEngine().hasFlag(Engine.TANK_ENGINE)) {
-            return skillType.equals(SkillType.S_TECH_MECHANIC);
+            return skillType.equals(SkillTypeNew.S_TECH_MECHANIC.name());
         } else {
-            return skillType.equals(SkillType.S_TECH_MEK) || skillType.equals(SkillType.S_TECH_AERO);
+            return skillType.equals(SkillTypeNew.S_TECH_MEK.name()) ||
+                         skillType.equals(SkillTypeNew.S_TECH_AERO.name());
         }
     }
 

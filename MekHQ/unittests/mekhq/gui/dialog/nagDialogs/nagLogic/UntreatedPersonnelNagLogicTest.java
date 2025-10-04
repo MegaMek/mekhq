@@ -33,7 +33,6 @@
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
-import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,6 +47,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
@@ -91,7 +91,7 @@ class UntreatedPersonnelNagLogicTest {
         injuredPerson.setHits(1);
         uninjuredPerson = new Person(campaign);
         doctor = new Person(campaign);
-        doctor.addSkill(S_SURGERY, 5, 0);
+        doctor.addSkill(SkillTypeNew.S_SURGERY.name(), 5, 0);
         doctor.setPrimaryRole(campaign, DOCTOR);
     }
 

@@ -49,7 +49,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingSVEngine;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -324,15 +324,16 @@ public class SVEnginePart extends Part {
     public boolean isRightTechType(String skillType) {
         if (null != getUnit()) {
             if (getUnit().getEntity() instanceof Aero) {
-                return skillType.equals(SkillType.S_TECH_AERO);
+                return skillType.equals(SkillTypeNew.S_TECH_AERO.name());
             } else {
-                return skillType.equals(SkillType.S_TECH_MECHANIC);
+                return skillType.equals(SkillTypeNew.S_TECH_MECHANIC.name());
             }
         }
         // We're not tracking whether parts in the warehouse came from ground or
         // fixed-wing/airships,
         // so let either tech repair it.
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_MECHANIC));
+        return (skillType.equals(SkillTypeNew.S_TECH_AERO.name()) ||
+                      skillType.equals(SkillTypeNew.S_TECH_MECHANIC.name()));
     }
 
     @Override

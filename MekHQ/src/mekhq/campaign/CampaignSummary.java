@@ -59,7 +59,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -110,6 +110,7 @@ public class CampaignSummary {
 
     /**
      * Link this CampaignSummary to a Campaign instance and update state with information from it.
+     *
      * @param campaign Campaign to link
      */
     public void setCampaign(Campaign campaign) {
@@ -383,7 +384,7 @@ public class CampaignSummary {
      * @return the administrative capacity report in HTML format
      */
     public String getHRCapacityReport(Campaign campaign) {
-        int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
+        int combinedSkillValues = getCombinedSkillValues(campaign, SkillTypeNew.S_ADMIN.name());
 
         StringBuilder hrCapacityReport = new StringBuilder().append("<html>")
                                                .append(getHRStrain(campaign))

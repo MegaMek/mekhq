@@ -56,7 +56,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.ReportingUtilities;
@@ -365,11 +365,11 @@ public class PodSpace implements IPartWork {
     @Override
     public boolean isRightTechType(String skillType) {
         if (unit.getEntity() instanceof Mek) {
-            return skillType.equals(SkillType.S_TECH_MEK);
+            return skillType.equals(SkillTypeNew.S_TECH_MEK.name());
         } else if (unit.getEntity() instanceof Aero) {
-            return skillType.equals(SkillType.S_TECH_AERO);
+            return skillType.equals(SkillTypeNew.S_TECH_AERO.name());
         } else if (unit.getEntity() instanceof Tank) {
-            return skillType.equals(SkillType.S_TECH_MECHANIC);
+            return skillType.equals(SkillTypeNew.S_TECH_MECHANIC.name());
         }
         return false;
     }

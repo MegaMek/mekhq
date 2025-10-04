@@ -43,7 +43,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
@@ -57,11 +57,11 @@ public class TechTableModel extends DataTableModel<Person> {
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
-          SkillType.S_TECH_MEK,
-          SkillType.S_TECH_MECHANIC,
-          SkillType.S_TECH_BA,
-          SkillType.S_TECH_AERO,
-          SkillType.S_TECH_VESSEL,
+          SkillTypeNew.S_TECH_MEK.name(),
+          SkillTypeNew.S_TECH_MECHANIC.name(),
+          SkillTypeNew.S_TECH_BA.name(),
+          SkillTypeNew.S_TECH_AERO.name(),
+          SkillTypeNew.S_TECH_VESSEL.name(),
           };
 
     private final CampaignGUI tab;

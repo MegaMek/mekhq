@@ -66,6 +66,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.work.IPartWork;
@@ -177,7 +178,9 @@ public class MRMSServiceTest {
         when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
         when(mockTech.canTech(unit.getEntity())).thenReturn(true);
         when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(SkillLevel.VETERAN);
-        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK, 7, 0));
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillTypeNew.S_TECH_MEK.name(),
+              7,
+              0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
         when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
 
@@ -274,7 +277,7 @@ public class MRMSServiceTest {
                   targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech(SkillTypeNew.S_TECH_MEK.name(), SkillLevel.VETERAN);
 
             unit.getParts()
                   .stream()
@@ -534,7 +537,7 @@ public class MRMSServiceTest {
                   dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech(SkillTypeNew.S_TECH_MEK.name(), SkillLevel.VETERAN);
 
             unit.getParts()
                   .stream()

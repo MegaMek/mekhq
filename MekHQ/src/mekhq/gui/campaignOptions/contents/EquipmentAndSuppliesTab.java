@@ -53,7 +53,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -949,8 +949,8 @@ public class EquipmentAndSuppliesTab {
         DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
 
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
-        acquireSkillModel.addElement(SkillType.S_ADMIN);
-        acquireSkillModel.addElement(SkillType.S_NEGOTIATION);
+        acquireSkillModel.addElement(SkillTypeNew.S_ADMIN.name());
+        acquireSkillModel.addElement(SkillTypeNew.S_NEGOTIATION.name());
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
 
         return acquireSkillModel;
