@@ -692,6 +692,7 @@ public abstract class Part implements IPartWork, ITechnology {
             case "VeeStabiliser" -> VeeStabilizer.class.getSimpleName();
             case "MissingVeeStabiliser" -> MissingVeeStabilizer.class.getSimpleName();
             // <50.07 compatibility handlers
+            case "mekhq.campaign.parts.BaArmor" -> "mekhq.campaign.parts.BAArmor";
             case "mekhq.campaign.parts.MekLocation" -> "mekhq.campaign.parts.meks.MekLocation";
             case "mekhq.campaign.parts.MekGyro" -> "mekhq.campaign.parts.meks.MekGyro";
             case "mekhq.campaign.parts.MekLifeSupport" -> "mekhq.campaign.parts.meks.MekLifeSupport";
