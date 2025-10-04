@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -75,7 +77,6 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -272,8 +273,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         } else {
             // This seems to be overwritten completely and immediately by refresh
             String experienceString = "<html><b>" +
-                                            SkillType.getColoredExperienceLevelName(getCampaign().getReputation()
-                                                                                          .getAverageSkillLevel()) +
+                                            getColoredExperienceLevelName(getCampaign().getReputation()
+                                                                                .getAverageSkillLevel()) +
                                             "</b></html>";
             lblExperience.setText(experienceString);
         }
@@ -639,8 +640,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
             lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
         } else if (unitRatingMethod.isCampaignOperations()) {
             String experienceString = "<html><b>" +
-                                            SkillType.getColoredExperienceLevelName(campaign.getReputation()
-                                                                                          .getAverageSkillLevel()) +
+                                            getColoredExperienceLevelName(campaign.getReputation()
+                                                                                .getAverageSkillLevel()) +
                                             "</b></html>";
             lblExperience.setText(experienceString);
         }

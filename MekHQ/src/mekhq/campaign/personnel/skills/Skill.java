@@ -45,6 +45,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -114,7 +115,7 @@ public class Skill {
 
     public Skill(String type) {
         this.type = SkillType.getType(type);
-        this.level = this.type.getLevelFromExperience(SkillType.EXP_REGULAR);
+        this.level = this.type.getLevelFromExperience(SKILL_LEVEL_REGULAR);
     }
 
     public Skill(String type, int level, int bonus) {
@@ -182,7 +183,7 @@ public class Skill {
      * Creates a new {@link Skill} from the given experience level and bonus.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      * @param bonus           The bonus for the resulting {@link Skill}.
      *
      * @return A new {@link Skill} of the appropriate type, with a level based on {@code experienceLevel} and the bonus.
@@ -197,7 +198,7 @@ public class Skill {
      * Creates a new {@link Skill} with a randomized level.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      * @param bonus           The bonus for the resulting {@link Skill}.
      * @param rollModifier    The roll modifier on a 1D6.
      *
@@ -792,8 +793,8 @@ public class Skill {
      *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
      * </ul>
      *
-     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
-     * @param reputation The reputation value used in the calculation.
+     * @param options            The {@link PersonnelOptions} to use for calculating the final skill value.
+     * @param adjustedReputation The reputation value used in the calculation.
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
@@ -801,12 +802,21 @@ public class Skill {
      * @see #isCountUp()
      * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
      */
-    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
+    public String toString(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+        String display;
+
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, attributes, reputation);
+            display = "+" + getFinalSkillValue(options, attributes, adjustedReputation);
         } else {
-            return getFinalSkillValue(options, attributes, reputation) + "+";
+            display = getFinalSkillValue(options, attributes, adjustedReputation) + "+";
         }
+
+        if (type.isSkillLevelsMatter()) {
+            int totalSkillLevel = getTotalSkillLevel(options, attributes, adjustedReputation);
+            display += String.format(" (%d)", totalSkillLevel);
+        }
+
+        return display;
     }
 
     /**

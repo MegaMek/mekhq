@@ -46,7 +46,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 
 /**
  * Represents a class which can generate new {@link Person} objects for a {@link Campaign}.
@@ -122,7 +122,8 @@ public abstract class AbstractPersonnelGenerator {
      *
      * @param person The {@link Person} being generated.
      *
-     * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
+     * @return An integer value between {@link SkillUtilities#SKILL_LEVEL_ULTRA_GREEN} and
+     *       {@link SkillUtilities#SKILL_LEVEL_ELITE}.
      */
     public int generateExperienceLevel(Person person) {
         int bonus = rSkillPrefs.getOverallRecruitBonus() + rSkillPrefs.getRecruitmentBonus(person.getPrimaryRole());

@@ -33,8 +33,12 @@
  */
 package mekhq.campaign.market;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -209,7 +213,7 @@ public class PersonnelMarket {
             // Add details about the first personnel's experience, primary role, and name
             Person person = personnel.get(0);
             int experienceLevel = person.getExperienceLevel(campaign, false);
-            String expLevel = SkillType.getExperienceLevelName(experienceLevel);
+            String expLevel = getExperienceLevelName(experienceLevel);
 
             if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {
                 report.append("<br>An ");
@@ -218,7 +222,7 @@ public class PersonnelMarket {
             }
 
             report.append("<b>")
-                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                  .append(getColoredExperienceLevelName(experienceLevel))
                   .append(' ')
                   .append(person.getPrimaryRole())
                   .append("</b>")
@@ -548,13 +552,13 @@ public class PersonnelMarket {
         TargetRoll target = new TargetRoll(jumpship ? 12 : 10, "Base");
         Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
 
-        int experienceLevel = EXP_ULTRA_GREEN;
+        int experienceLevel = SKILL_LEVEL_ULTRA_GREEN;
         if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
             Skill skill = logisticsAdmin.getSkill(S_ADMIN);
             experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
         }
 
-        target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
+        target.addModifier(SKILL_LEVEL_REGULAR - experienceLevel, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }

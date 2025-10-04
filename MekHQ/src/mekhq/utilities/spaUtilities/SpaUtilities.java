@@ -32,10 +32,10 @@
  */
 package mekhq.utilities.spaUtilities;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
-import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
@@ -128,7 +128,7 @@ public class SpaUtilities {
             skillPrerequisiteString = orPattern.matcher(skillPrerequisiteString).replaceAll("");
 
             // Step 2: remove experience levels
-            for (int i = 0; i < EXP_LEGENDARY; i++) {
+            for (int i = 0; i < SKILL_LEVEL_LEGENDARY; i++) {
                 skillPrerequisiteString = skillPrerequisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
             }
 
