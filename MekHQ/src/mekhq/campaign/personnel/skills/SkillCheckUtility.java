@@ -55,6 +55,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -162,8 +163,7 @@ public class SkillCheckUtility {
             return;
         }
 
-        final SkillType skillType = SkillType.getType(skillName);
-        isCountUp = skillType.isCountUp();
+        final SkillTypeNew skillType = SkillTypeNew.getType(skillName);
         targetNumber = determineTargetNumber(person, skillType, miscModifier, isUseAgingEffects, isClanCampaign, today);
 
         if (externalModifiers != null) {
@@ -437,10 +437,10 @@ public class SkillCheckUtility {
     }
 
     /**
-     * Use {@link #determineTargetNumber(Person, SkillType, int, boolean, boolean, LocalDate)} instead
+     * Use {@link #determineTargetNumber(Person, SkillTypeNew, int, boolean, boolean, LocalDate)} instead
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
+    public static TargetRoll determineTargetNumber(Person person, SkillTypeNew skillType, int miscModifier) {
         return determineTargetNumber(person, skillType, miscModifier, false, false, LocalDate.of(3151, 1, 1));
     }
 
@@ -466,7 +466,7 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
-    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier,
+    public static TargetRoll determineTargetNumber(Person person, SkillTypeNew skillType, int miscModifier,
           boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         final String skillName = skillType.getName();
         final Attributes characterAttributes = person.getATOWAttributes();
@@ -497,11 +497,7 @@ public class SkillCheckUtility {
             targetNumber.addModifier(skillValue, skillName);
         }
 
-        if (skillType.isCountUp()) {
-            targetNumber.addModifier(-miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
-        } else {
-            targetNumber.addModifier(miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
-        }
+        targetNumber.addModifier(miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
 
         return targetNumber;
     }
@@ -614,7 +610,7 @@ public class SkillCheckUtility {
     /**
      * Applies attribute-based modifiers to a target roll and calculates the total attribute score for a given skill.
      *
-     * <p>This method retrieves the attributes linked to a specified {@link SkillType} and calculates
+     * <p>This method retrieves the attributes linked to a specified {@link SkillTypeNew} and calculates
      * their total contribution to both:</p>
      * <ul>
      *   <li>The target roll by applying modifiers (negative of the attribute values), and</li>
@@ -633,8 +629,8 @@ public class SkillCheckUtility {
      *                            based on the character's attribute values
      * @param characterAttributes the {@link Attributes} object representing the character's attributes that contribute
      *                            to the skill check
-     * @param skillType           the {@link SkillType} being assessed, whose linked attributes determine the modifiers
-     *                            to be applied
+     * @param skillType           the {@link SkillTypeNew} being assessed, whose linked attributes determine the
+     *                            modifiers to be applied
      *
      * @return the total attribute score summed from all relevant attributes linked to the skill. If any of the
      *       parameters are {@code null}, the method will log an error and return {@code 0}.
@@ -643,7 +639,7 @@ public class SkillCheckUtility {
      * @since 0.50.05
      */
     public static int getTotalAttributeScoreForSkill(TargetRoll targetNumber, final Attributes characterAttributes,
-          final SkillType skillType) {
+          final SkillTypeNew skillType) {
         // Validation
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             LOGGER.error("Null parameter passed into SkillCheckUtility.getTotalAttributeScoreForSkill." +

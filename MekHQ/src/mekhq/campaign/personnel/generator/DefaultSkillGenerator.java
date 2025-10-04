@@ -49,8 +49,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors
@@ -79,7 +79,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         bonus = 0;
 
         // roll small arms skill
-        if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
+        if (!person.getSkills().hasSkill(SkillTypeNew.S_SMALL_ARMS.name())) {
             int smallArmsLevel = Utilities.generateExpLevel((primaryRole.isSupport(true) ||
                                                                    secondaryRole.isSupport(true)) ?
                                                                   skillPreferences.getSupportSmallArmsBonus() :
@@ -90,7 +90,11 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
 
             if (smallArmsLevel > SKILL_LEVEL_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_SMALL_ARMS, smallArmsLevel, skillPreferences.randomizeSkill(), bonus);
+                addSkill(person,
+                      SkillTypeNew.S_SMALL_ARMS.name(),
+                      smallArmsLevel,
+                      skillPreferences.randomizeSkill(),
+                      bonus);
             }
         }
 
@@ -98,17 +102,29 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (primaryRole.isCombat()) {
             int leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
+                addSkill(person,
+                      SkillTypeNew.S_TACTICS.name(),
+                      leadershipSkillLevel,
+                      skillPreferences.randomizeSkill(),
+                      0);
             }
 
             leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
+                addSkill(person,
+                      SkillTypeNew.S_STRATEGY.name(),
+                      leadershipSkillLevel,
+                      skillPreferences.randomizeSkill(),
+                      0);
             }
 
             leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
+                addSkill(person,
+                      SkillTypeNew.S_LEADER.name(),
+                      leadershipSkillLevel,
+                      skillPreferences.randomizeSkill(),
+                      0);
             }
         }
 
@@ -125,34 +141,33 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll Negotiation skill
         if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+            addSkill(person, SkillTypeNew.S_NEGOTIATION.name(), expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Administration skill
         if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
-            addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+            addSkill(person, SkillTypeNew.S_ADMIN.name(), expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
-            addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+            addSkill(person, SkillTypeNew.S_ADMIN.name(), expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll random secondary skill
         if (Utilities.rollProbability(skillPreferences.getSecondSkillProb())) {
             boolean isUseArtillery = campaignOptions.isUseArtillery();
             List<String> possibleSkills = new ArrayList<>();
-            for (String skillType : SkillType.skillList) {
-                SkillType type = SkillType.getType(skillType);
-                if (!person.getSkills().hasSkill(skillType)
-                          && !DEPRECATED_SKILLS.contains(type)
+            for (SkillTypeNew skillType : SkillTypeNew.values()) {
+                if (!person.getSkills().hasSkill(skillType.name())
+                          && !DEPRECATED_SKILLS.contains(skillType)
                           // The next two are to prevent double-dipping
-                          && !type.isSubTypeOf(SUPPORT_COMMAND)
-                          && !type.isRoleplaySkill()) {
-                    if (SkillType.S_ARTILLERY.equals(type.getName()) && !isUseArtillery) {
+                          && !skillType.isSubTypeOf(SUPPORT_COMMAND)
+                          && !skillType.isRoleplaySkill()) {
+                    if (SkillTypeNew.S_ARTILLERY.name().equals(skillType.name()) && !isUseArtillery) {
                         continue;
                     }
 
-                    possibleSkills.add(skillType);
+                    possibleSkills.add(skillType.name());
                 }
             }
 

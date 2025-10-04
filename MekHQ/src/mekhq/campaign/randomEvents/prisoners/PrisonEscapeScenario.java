@@ -36,7 +36,6 @@ import static java.io.File.separator;
 import static megamek.common.board.Board.START_SW;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
@@ -64,6 +63,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConCoords;
 import mekhq.campaign.stratCon.StratConScenario;
@@ -141,8 +141,8 @@ public class PrisonEscapeScenario {
                 // If they don't have small arms, they're about to learn fast
                 // We need to give them the skill, as it's required for the SOLDIER role, which is
                 // required for serving in a CI unit, which mobs are.
-                if (!escapee.hasSkill(S_SMALL_ARMS)) {
-                    escapee.addSkill(S_SMALL_ARMS, 0, 0);
+                if (!escapee.hasSkill(SkillTypeNew.S_SMALL_ARMS.name())) {
+                    escapee.addSkill(SkillTypeNew.S_SMALL_ARMS.name(), 0, 0);
                 }
 
                 escapee.setPrimaryRole(campaign, SOLDIER);

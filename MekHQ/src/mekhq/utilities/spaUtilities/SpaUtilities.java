@@ -32,8 +32,6 @@
  */
 package mekhq.utilities.spaUtilities;
 
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillUtilities.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
@@ -51,6 +49,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
@@ -136,7 +135,7 @@ public class SpaUtilities {
             String[] parts = skillPrerequisiteString.split("<br>");
 
             // Step 4: Test each part
-            List<String> specialAbilitySkills = List.of(S_GUN_PROTO, S_GUN_BA);
+            List<String> specialAbilitySkills = List.of(SkillTypeNew.S_GUN_PROTO.name(), SkillTypeNew.S_GUN_BA.name());
             for (String part : parts) {
                 SkillType skillType = SkillType.getType(part);
                 if (part == null || skillType == null) {

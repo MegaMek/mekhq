@@ -50,7 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -170,7 +170,8 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                                                      (weapon.getType().getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
             final Set<Person> gunners = unit.getGunners();
             if (!gunners.isEmpty() &&
-                      gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
+                      gunners.stream()
+                            .noneMatch(person -> person.getSkills().hasSkill(SkillTypeNew.S_ARTILLERY.name()))) {
                 new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(ObjectUtility.getRandomItem(
                       gunners));
             }

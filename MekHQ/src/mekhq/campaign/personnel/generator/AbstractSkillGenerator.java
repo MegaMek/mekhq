@@ -118,7 +118,8 @@ public abstract class AbstractSkillGenerator {
     protected void generateArtillerySkill(final Person person, final int bonus) {
         final int experienceLevel = Utilities.generateExpLevel(randomSkillPreferences.getArtilleryBonus());
         if (experienceLevel > SKILL_LEVEL_ULTRA_GREEN) {
-            addSkill(person, SkillType.S_ARTILLERY, experienceLevel, randomSkillPreferences.randomizeSkill(), bonus);
+            addSkill(person, SkillTypeNew.S_ARTILLERY.name(), experienceLevel, randomSkillPreferences.randomizeSkill(),
+                  bonus);
         }
     }
 

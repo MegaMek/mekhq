@@ -33,7 +33,6 @@
 package mekhq.module.atb;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_NONE;
 
 import java.time.DayOfWeek;
@@ -62,7 +61,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -134,8 +133,8 @@ public record AtBEventProcessor(Campaign campaign) {
             modifier -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(ADMINISTRATOR_HR, S_ADMIN);
-        Skill adminSkill = adminHR.getSkill(S_ADMIN);
+        Person adminHR = campaign.findBestInRole(ADMINISTRATOR_HR, SkillTypeNew.S_ADMIN.name());
+        Skill adminSkill = adminHR.getSkill(SkillTypeNew.S_ADMIN.name());
         int adminExperienceLevel = SKILL_LEVEL_NONE;
         if (adminSkill != null) {
             adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes());
@@ -265,28 +264,28 @@ public record AtBEventProcessor(Campaign campaign) {
                           en.getMovementMode() == EntityMovementMode.HOVER ||
                           en.getMovementMode() == EntityMovementMode.WIGE) {
                     if (p.getPrimaryRole().isVTOLPilot()) {
-                        swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
+                        swapSkills(p, SkillTypeNew.S_PILOT_VTOL.name(), SkillTypeNew.S_PILOT_GVEE.name());
                         p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
                     } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
-                        swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_GVEE);
+                        swapSkills(p, SkillTypeNew.S_PILOT_NVEE.name(), SkillTypeNew.S_PILOT_GVEE.name());
                         p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.VTOL) {
                     if (p.getPrimaryRole().isGroundVehicleDriver()) {
-                        swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL);
+                        swapSkills(p, SkillTypeNew.S_PILOT_GVEE.name(), SkillTypeNew.S_PILOT_VTOL.name());
                         p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
-                        swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_VTOL);
+                        swapSkills(p, SkillTypeNew.S_PILOT_NVEE.name(), SkillTypeNew.S_PILOT_VTOL.name());
                         p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
                                  en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
                                  en.getMovementMode() == EntityMovementMode.SUBMARINE) {
                     if (p.getPrimaryRole().isGroundVehicleDriver()) {
-                        swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
+                        swapSkills(p, SkillTypeNew.S_PILOT_GVEE.name(), SkillTypeNew.S_PILOT_NVEE.name());
                         p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                     } else if (p.getPrimaryRole().isVTOLPilot()) {
-                        swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE);
+                        swapSkills(p, SkillTypeNew.S_PILOT_VTOL.name(), SkillTypeNew.S_PILOT_NVEE.name());
                         p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                     }
                 }

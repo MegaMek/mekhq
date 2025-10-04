@@ -37,9 +37,6 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTI
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
-import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BARTERING;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BREAKOUT;
@@ -64,6 +61,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.prisoners.records.EventResult;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
@@ -342,7 +340,7 @@ class EventEffectsManagerTest {
     @Test
     void testEventEffectSkill() {
         final int MAGNITUDE = 5;
-        final String skill = S_ADMIN;
+        final String skill = SkillTypeNew.S_ADMIN.name();
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
@@ -355,7 +353,7 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
 
-        EventResult eventResult = new EventResult(SKILL, false, MAGNITUDE, S_ADMIN);
+        EventResult eventResult = new EventResult(SKILL, false, MAGNITUDE, SkillTypeNew.S_ADMIN.name());
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
               List.of(eventResult),
               List.of(eventResult));
@@ -705,9 +703,9 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
 
         // Just some random skills, so we can get whether they were removed
-        prisoner.addSkill(S_ADMIN, 1, 0);
-        prisoner.addSkill(S_SMALL_ARMS, 1, 0);
-        prisoner.addSkill(S_SURGERY, 1, 0);
+        prisoner.addSkill(SkillTypeNew.S_ADMIN.name(), 1, 0);
+        prisoner.addSkill(SkillTypeNew.S_SMALL_ARMS.name(), 1, 0);
+        prisoner.addSkill(SkillTypeNew.S_SURGERY.name(), 1, 0);
 
         prisoner.setPrimaryRole(mockCampaign, SOLDIER);
         prisoner.setSecondaryRole(ADMINISTRATOR_LOGISTICS);
@@ -716,9 +714,9 @@ class EventEffectsManagerTest {
         new EventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
-        assertNull(prisoner.getSkill(S_ADMIN));
-        assertNull(prisoner.getSkill(S_SMALL_ARMS));
-        assertNull(prisoner.getSkill(S_SURGERY));
+        assertNull(prisoner.getSkill(SkillTypeNew.S_ADMIN.name()));
+        assertNull(prisoner.getSkill(SkillTypeNew.S_SMALL_ARMS.name()));
+        assertNull(prisoner.getSkill(SkillTypeNew.S_SURGERY.name()));
 
         assertSame(DEPENDENT, prisoner.getPrimaryRole());
         assertSame(NONE, prisoner.getSecondaryRole());
