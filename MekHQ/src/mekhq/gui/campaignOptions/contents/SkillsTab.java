@@ -72,6 +72,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -369,7 +370,7 @@ public class SkillsTab {
      * Copy and paste buttons are available for transferring configurations between skills.
      * </p>
      *
-     * @param skill the {@link SkillType} object representing the skill to be configured.
+     * @param skill the {@link SkillTypeNew} object representing the skill to be configured.
      *
      * @return a {@link JPanel} containing the UI components for the given skill.
      */
@@ -710,7 +711,7 @@ public class SkillsTab {
      * from the associated spinner component in the UI and is applied to the given {@link SkillType}.
      * </p>
      *
-     * @param type the {@link SkillType} object representing the skill whose target number needs to be updated.
+     * @param type the {@link SkillTypeNew} object representing the skill whose target number needs to be updated.
      */
     private void updateTargetNumber(SkillType type) {
         int targetNumber = (int) allTargetNumbers.get(type.getName()).getValue();
@@ -741,12 +742,12 @@ public class SkillsTab {
      * <p>
      * Milestones represent the thresholds required to reach certain skill levels (e.g., Green, Regular, Veteran,
      * Elite). The method processes these values from the associated combo boxes in the UI and applies them to the
-     * provided {@link SkillType}.
+     * provided {@link SkillTypeNew}.
      * <p>
      * The method ensures logical milestone progression and assigns default values if necessary.
      * </p>
      *
-     * @param type the {@link SkillType} object representing the skill whose milestones are to be updated.
+     * @param type the {@link SkillTypeNew} object representing the skill whose milestones are to be updated.
      */
     private void updateSkillMilestones(SkillType type) {
         List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type.getName());

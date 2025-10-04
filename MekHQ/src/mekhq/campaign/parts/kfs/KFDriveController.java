@@ -283,7 +283,7 @@ public class KFDriveController extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillTypeNew.S_TECH_VESSEL.name()L);
+        return skillType.equals(SkillTypeNew.S_TECH_VESSEL.name());
     }
 
     @Override

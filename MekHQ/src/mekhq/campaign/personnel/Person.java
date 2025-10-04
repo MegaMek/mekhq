@@ -58,7 +58,6 @@ import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ELITE;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_GREEN;
 import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_HEROIC;
@@ -132,7 +131,6 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -4834,7 +4832,7 @@ public class Person {
      */
     public int getCostToImprove(final String skillName) {
         final Skill skill = getSkill(skillName);
-        final SkillType skillType = getType(skillName);
+        final SkillTypeNew skillType = SkillTypeNew.getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
         double multiplier = 1.0;
@@ -7747,7 +7745,7 @@ public class Person {
      * Determines whether the character is considered illiterate.
      *
      * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
-     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
+     * their base level in the {@link SkillTypeNew#S_LANGUAGES} skill is below
      * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
      *
      * @return {@code true} if the person is considered illiterate; {@code false} otherwise.

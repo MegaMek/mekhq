@@ -84,7 +84,6 @@ import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
@@ -170,7 +169,7 @@ public class ResolverTest {
     public static void setupClass() throws IOException {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
-        SkillType.initializeTypes();
+
         Systems.setInstance(Systems.loadDefault());
     }
 

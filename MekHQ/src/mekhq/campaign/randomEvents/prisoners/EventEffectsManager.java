@@ -69,7 +69,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
@@ -529,7 +529,7 @@ public class EventEffectsManager {
         final int magnitude = result.magnitude();
 
         // Get skill
-        SkillType skillType = SkillType.getType(result.skillType());
+        SkillTypeNew skillType = SkillTypeNew.getType(result.skillType());
 
         if (skillType == null) {
             return "";

@@ -44,7 +44,6 @@ import java.util.Map;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
@@ -100,9 +99,9 @@ public class SkillPrerequisite {
      * Determines if the given {@link Skills} object qualifies based on the requirements in this object's skill set.
      *
      * <p>For each skill name in the required skill set, this method checks if the {@link Skills} object contains that
-     * skill. If it does, it retrieves the associated {@link SkillType}, calculates the experience level from the skill
-     * level, and compares it to the required minimum level for that skill. If any skill meets or exceeds the required
-     * experience level, this method returns {@code true}. If none do, it returns {@code false}.</p>
+     * skill. If it does, it retrieves the associated {@link SkillTypeNew}, calculates the experience level from the
+     * skill level, and compares it to the required minimum level for that skill. If any skill meets or exceeds the
+     * required experience level, this method returns {@code true}. If none do, it returns {@code false}.</p>
      *
      * @param skills the {@link Skills} object to evaluate
      *
@@ -112,7 +111,7 @@ public class SkillPrerequisite {
         for (String skillName : skillSet.keySet()) {
             Skill skill = skills.getSkill(skillName);
             if (skill != null) {
-                SkillType skillType = SkillType.getType(skillName);
+                SkillTypeNew skillType = SkillTypeNew.getType(skillName);
                 int skillLevel = skill.getLevel();
                 if (skillType.getExperienceLevel(skillLevel) >= skillSet.get(skillName)) {
                     return true;

@@ -177,14 +177,14 @@ public class Skill {
     /**
      * Creates a new {@link Skill} from the given experience level and bonus.
      *
-     * @param type            The {@link SkillType} name.
+     * @param typeName        The {@link SkillTypeNew} name.
      * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN).
      * @param bonus           The bonus for the resulting {@link Skill}.
      *
      * @return A new {@link Skill} of the appropriate type, with a level based on {@code experienceLevel} and the bonus.
      */
-    public static Skill createFromExperience(String type, int experienceLevel, int bonus) {
-        SkillTypeNew skillType = SkillTypeNew.getType(type);
+    public static Skill createFromExperience(String typeName, int experienceLevel, int bonus) {
+        SkillTypeNew skillType = SkillTypeNew.getType(typeName);
         int level = skillType.getLevelFromExperience(experienceLevel);
         return new Skill(skillType, level, bonus);
     }
@@ -192,7 +192,7 @@ public class Skill {
     /**
      * Creates a new {@link Skill} with a randomized level.
      *
-     * @param type            The {@link SkillType} name.
+     * @param type            The {@link SkillTypeNew} name.
      * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN).
      * @param bonus           The bonus for the resulting {@link Skill}.
      * @param rollModifier    The roll modifier on a 1D6.
@@ -454,7 +454,7 @@ public class Skill {
      * Calculates the total attribute modifier for a given skill type based on the character's attributes and applies
      * the modifiers to the target roll.
      *
-     * <p>This method retrieves the attributes linked to the specified {@link SkillType} and calculates
+     * <p>This method retrieves the attributes linked to the specified {@link SkillTypeNew} and calculates
      * the total contribution of their modifiers to the target roll. Each attribute's score is converted into an
      * individual modifier using {@link #getIndividualAttributeModifier(int)}, and the modifier is then added to
      * both:</p>
@@ -474,8 +474,8 @@ public class Skill {
      *                            based on the character's attribute modifiers
      * @param characterAttributes the {@link Attributes} object representing the character's raw attribute scores that
      *                            determine the skill check modifiers
-     * @param skillType           the {@link SkillType} being assessed, whose linked attributes contribute to the total
-     *                            modifier calculation
+     * @param skillType           the {@link SkillTypeNew} being assessed, whose linked attributes contribute to the
+     *                            total modifier calculation
      *
      * @return the total attribute modifier calculated for the given skill type, which is the sum of the individual
      *       modifiers for each linked attribute. If any of the parameters are {@code null} returns 0.

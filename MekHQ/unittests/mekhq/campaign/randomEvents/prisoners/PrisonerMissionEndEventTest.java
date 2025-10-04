@@ -49,7 +49,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
@@ -159,7 +158,6 @@ class PrisonerMissionEndEventTest {
 
         AtBContract contract = new AtBContract("TEST");
 
-        SkillType.initializeTypes();
 
         Person prisoner = new Person(mockCampaign);
         prisoner.addSkill(SkillTypeNew.S_GUN_MEK.name(), SKILL_LEVEL, 0);
@@ -192,7 +190,6 @@ class PrisonerMissionEndEventTest {
 
         AtBContract contract = new AtBContract("TEST");
 
-        SkillType.initializeTypes();
 
         Person prisoner = new Person(mockCampaign);
         prisoner.addSkill(SkillTypeNew.S_SMALL_ARMS.name(), SKILL_LEVEL, 0);

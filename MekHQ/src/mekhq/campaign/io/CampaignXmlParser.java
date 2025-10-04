@@ -126,7 +126,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyArc.StoryArc;
@@ -1091,14 +1091,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (wn2.getNodeName().startsWith("ability-")) {
                 continue;
             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
                 LOGGER.error("Unknown node type not loaded in Skill Type nodes: {}", wn2.getNodeName());
                 continue;
             }
 
-            // TODO: make SkillType a Campaign instance
-            SkillType.generateInstanceFromXML(wn2, version);
+            SkillTypeNew.generateInstanceFromXML(wn2);
         }
 
         LOGGER.info("Load Skill Type Nodes Complete!");

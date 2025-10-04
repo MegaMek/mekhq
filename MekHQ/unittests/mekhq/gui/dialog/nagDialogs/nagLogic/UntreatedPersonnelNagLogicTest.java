@@ -46,7 +46,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
@@ -70,7 +69,7 @@ class UntreatedPersonnelNagLogicTest {
     @BeforeAll
     public static void setup() {
         EquipmentType.initializeTypes();
-        SkillType.initializeTypes();
+
         Ranks.initializeRankSystems();
     }
 

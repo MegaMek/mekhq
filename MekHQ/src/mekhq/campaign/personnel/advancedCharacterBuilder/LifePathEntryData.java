@@ -51,8 +51,8 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
 /**
  * Represents a single piece of life path data for use in the advanced character builder, encapsulating an identifying
@@ -246,8 +246,9 @@ public record LifePathEntryData(
         }
 
         // Does the skillName correspond to an actual skill?
-        SkillType skillType = SkillType.getSkillHash().get(skillName);
-        if (skillType == null) {
+        try {
+            SkillTypeNew skillType = SkillTypeNew.valueOf(skillName);
+        } catch (IllegalArgumentException e) {
             return 0;
         }
 

@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
@@ -137,7 +136,7 @@ public class SpaUtilities {
             // Step 4: Test each part
             List<String> specialAbilitySkills = List.of(SkillTypeNew.S_GUN_PROTO.name(), SkillTypeNew.S_GUN_BA.name());
             for (String part : parts) {
-                SkillType skillType = SkillType.getType(part);
+                SkillTypeNew skillType = SkillTypeNew.getType(part);
                 if (part == null || skillType == null) {
                     LOGGER.warn("Invalid skill type in prerequisite: Invalid value={} - skillPrerequisiteString {}",
                           part, skillPrerequisiteString);

@@ -72,6 +72,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -422,8 +423,7 @@ public class CampaignPreset {
 
         if (!getSkills().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
-            for (final String name : SkillType.skillList) {
-                final SkillType type = getSkills().get(name);
+            for (final SkillTypeNew type : SkillTypeNew.values()) {
                 if (type != null) {
                     type.writeToXML(pw, indent);
                 }

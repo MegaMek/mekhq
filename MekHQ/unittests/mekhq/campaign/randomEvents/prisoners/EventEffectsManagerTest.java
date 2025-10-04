@@ -60,7 +60,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.randomEvents.prisoners.records.EventResult;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
@@ -362,7 +361,6 @@ class EventEffectsManagerTest {
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
 
-        SkillType.initializeTypes();
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -697,7 +695,6 @@ class EventEffectsManagerTest {
               List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(MISTAKE, List.of(responseEntry));
 
-        SkillType.initializeTypes();
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));

@@ -138,7 +138,7 @@ public class SkillDeprecationTool {
      * of the skill.
      *
      * @param skills    the {@link Skills} object containing details about the person's skills
-     * @param skillType the {@link SkillType} of the deprecated skill
+     * @param skillType the {@link SkillTypeNew} of the deprecated skill
      * @param skillName the name of the deprecated skill
      *
      * @return the total XP refund value for the deprecated skill

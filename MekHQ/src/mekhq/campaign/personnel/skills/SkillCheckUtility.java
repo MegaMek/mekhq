@@ -133,7 +133,7 @@ public class SkillCheckUtility {
      * streamlined approach.</p>
      *
      * @param person                      the {@link Person} performing the skill check
-     * @param skillName                   the name of the skill being used, corresponding to a {@link SkillType}
+     * @param skillName                   the name of the skill being used, corresponding to a {@link SkillTypeNew}
      * @param externalModifiers           an optional list of {@link TargetRollModifier}s that affect the target number
      * @param miscModifier                a miscellaneous modifier that affects the target number:
      *                                    <ul>
@@ -198,7 +198,7 @@ public class SkillCheckUtility {
      * success metrics, use the {@link SkillCheckUtility} constructor instead.</p>
      *
      * @param person            the {@link Person} performing the skill check
-     * @param skillName         the name of the skill to be checked, corresponding to a {@link SkillType}
+     * @param skillName         the name of the skill to be checked, corresponding to a {@link SkillTypeNew}
      * @param externalModifiers an optional list of {@link TargetRollModifier}s to apply additional adjustments to the
      *                          target number
      * @param miscModifier      a miscellaneous modifier that affects the target number:
@@ -452,7 +452,7 @@ public class SkillCheckUtility {
      * linked attributes. Otherwise, it is based on the final skill value and attribute modifiers.</p>
      *
      * @param person            the {@link Person} performing the skill check
-     * @param skillType         the associated {@link SkillType} for the {@link Skill} being used.
+     * @param skillType         the associated {@link SkillTypeNew} for the {@link Skill} being used.
      * @param miscModifier      any special modifiers, as an {@link Integer}. These values are subtracted from the
      *                          target number, if the associated skill is classified as 'count up', otherwise they are
      *                          added to the target number. This means negative values are bonuses, positive values are

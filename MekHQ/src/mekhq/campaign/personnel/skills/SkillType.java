@@ -73,6 +73,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -287,7 +288,7 @@ public class SkillType {
     /**
      * Retrieves a list of unique skill names that match any of the specified {@link SkillSubType}s.
      *
-     * <p>This method iterates through all known {@link SkillType} instances and collects the names of those whose
+     * <p>This method iterates through all known {@link SkillTypeNew} instances and collects the names of those whose
      * subtype is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
      * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
      *
@@ -376,10 +377,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                                                                                                                                                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                    </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                 Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                 SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                 SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                             </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -990,7 +991,7 @@ public class SkillType {
     }
 
     /**
-     * Generates an instance of {@link SkillType} from an XML node.
+     * Generates an instance of {@link SkillTypeNew} from an XML node.
      *
      * @param workingNode The XML node containing the skill data.
      * @param version     The current version.

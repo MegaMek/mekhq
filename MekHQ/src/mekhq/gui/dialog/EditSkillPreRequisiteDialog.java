@@ -52,7 +52,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrerequisite;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -81,10 +81,10 @@ public class EditSkillPreRequisiteDialog extends JDialog {
         JButton btnOK = new JButton();
         JButton btnClose = new JButton();
 
-        JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length, 2));
+        JPanel panMain = new JPanel(new GridLayout(SkillTypeNew.values().length, 2));
 
-        for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            final String type = SkillType.getSkillList()[i];
+        for (int i = 0; i < SkillTypeNew.values().length; i++) {
+            final String type = SkillTypeNew.values()[i].name();
             JCheckBox chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
             chkSkill.addItemListener(evt -> changeLevelEnabled(type));
@@ -146,9 +146,9 @@ public class EditSkillPreRequisiteDialog extends JDialog {
 
     private void done() {
         prereq = new SkillPrerequisite();
-        for (String type : SkillType.skillList) {
-            if (skillChecks.get(type).isSelected()) {
-                prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
+        for (SkillTypeNew type : SkillTypeNew.values()) {
+            if (skillChecks.get(type.name()).isSelected()) {
+                prereq.addPrereq(type.name(), skillLevels.get(type.name()).getSelectedIndex());
             }
         }
         this.setVisible(false);

@@ -43,7 +43,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 
@@ -98,7 +97,7 @@ public abstract class AbstractSkillGenerator {
      *
      * @param person       The {@link Person} to add default skills.
      * @param primaryRole  The primary role of the person
-     * @param expLvl       The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     * @param expLvl       The experience level of the person (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      * @param bonus        The bonus to use for the default skills.
      * @param rollModifier A roll modifier to apply to any randomization's.
      */

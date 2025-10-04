@@ -38,43 +38,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.stream.Stream;
-
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class SkillTypeNewTest {
-
-    static Stream<String> allSkillNames() {
-        return Stream.of(SkillType.getSkillList());
-    }
-
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetTarget_isValid(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
-
-        // Act
+    @EnumSource(SkillTypeNew.class)
+    void testGetTarget_isValid(SkillTypeNew skillType) {
         int target = skillType.getTarget();
 
-        // Assert
         assertTrue(target >= 2 && target <= 12,
               "Invalid target: " + target + " for skill: " + skillType.getName() + " must be >= 2 and <= 12");
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetSubType_isValid(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
-
+    @EnumSource(SkillTypeNew.class)
+    void testGetSubType_isValid(SkillTypeNew skillType) {
         // Act
         SkillSubType subType = skillType.getSubType();
 
@@ -85,12 +67,8 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetFirstAttribute_isValid(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetFirstAttribute_isValid(SkillTypeNew skillType) {
 
         // Act
         SkillAttribute attribute = skillType.getFirstAttribute();
@@ -103,12 +81,8 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetSecondAttribute_isValid(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetSecondAttribute_isValid(SkillTypeNew skillType) {
 
         // Act
         SkillAttribute attribute = skillType.getFirstAttribute();
@@ -120,12 +94,8 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetGreenLevel_isValid(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetGreenLevel_isValid(SkillTypeNew skillType) {
 
         // Act
         int greenLevel = skillType.getGreenLevel();
@@ -156,15 +126,11 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetCosts_isValid(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetCosts_isValid(SkillTypeNew skillType) {
 
         // Act
-        Integer[] costs = skillType.getCosts();
+        int[] costs = skillType.getCosts();
 
         // Assert
         for (int level = 0; level < 10; level++) {
@@ -173,30 +139,22 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetFlavorText_flavorTextExists(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetFlavorText_flavorTextExists(SkillTypeNew skillType) {
 
         // Act
-        String flavorText = skillType.getFlavorText(false, false);
+        String flavorText = skillType.getDescription(false, false);
 
         // Assert
         assertTrue(isResourceKeyValid(flavorText), "Invalid resource key: " + skillType.getName());
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetFlavorText_tagsIncludedWhenRequested(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetFlavorText_tagsIncludedWhenRequested(SkillTypeNew skillType) {
 
         // Act
-        String flavorText = skillType.getFlavorText(true, false);
+        String flavorText = skillType.getDescription(true, false);
 
         // Assert
         assertTrue(flavorText.contains("<html>"), "Did not include html opening tag: " + skillType.getName());
@@ -204,15 +162,10 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetFlavorText_allAttributesIncluded(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
-
+    @EnumSource(SkillTypeNew.class)
+    void testGetFlavorText_allAttributesIncluded(SkillTypeNew skillType) {
         // Act
-        String flavorText = skillType.getFlavorText(false, true);
+        String flavorText = skillType.getDescription(false, true);
 
         // Assert
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
@@ -236,15 +189,11 @@ class SkillTypeNewTest {
     }
 
     @ParameterizedTest
-    @MethodSource(value = "allSkillNames")
-    void testGetFlavorText_containsBothAttributesAndHtmlTags(String skillName) {
-        SkillType.initializeTypes();
-
-        // Setup
-        SkillType skillType = SkillType.getType(skillName);
+    @EnumSource(SkillTypeNew.class)
+    void testGetFlavorText_containsBothAttributesAndHtmlTags(SkillTypeNew skillType) {
 
         // Act
-        String flavorText = skillType.getFlavorText(true, true);
+        String flavorText = skillType.getDescription(true, true);
 
         // Assert
         assertTrue(flavorText.contains("<html>"), "Did not include html opening tag: " + skillType.getName());

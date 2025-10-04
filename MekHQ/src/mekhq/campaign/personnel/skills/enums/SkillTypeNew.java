@@ -19,12 +19,18 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.personnel.skills.SkillUtilities;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public enum SkillTypeNew {
     S_ACROBATICS(
@@ -1945,5 +1951,75 @@ public enum SkillTypeNew {
                      Objects.equals(this, S_STRATEGY) ||
                      Objects.equals(this, S_TACTICS) ||
                      Objects.equals(this, S_TRAINING);
+    }
+
+    public void writeToXML(final PrintWriter writer, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "skillTypeNew");
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "baseTargetNumber", baseTargetNumber);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "milestoneGreen", skillMilestoneGreen);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "milestoneRegular", skillMilestoneRegular);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "milestoneVeteran", skillMilestoneVeteran);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "milestoneElite", skillMilestoneElite);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "milestoneHeroic", skillMilestoneHeroic);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "milestoneLegendary", skillMilestoneLegendary);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "costs",
+              Arrays.stream(costs).mapToObj(String::valueOf).collect(Collectors.joining(","))
+        );
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillTypeNew");
+    }
+
+    public static void generateInstanceFromXML(Node workingNode) {
+        if (workingNode.getAttributes() == null) {
+            return;
+        }
+
+        Node nameAttr = workingNode.getAttributes().getNamedItem("name");
+        if (nameAttr == null) {
+            return;
+        }
+
+        String name = nameAttr.getNodeValue().trim();
+        SkillTypeNew type;
+
+        try {
+            type = SkillTypeNew.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            // Unknown type; skip
+            return;
+        }
+
+        NodeList nodeList = workingNode.getChildNodes();
+        for (int x = 0; x < nodeList.getLength(); x++) {
+            Node wn2 = nodeList.item(x);
+            String nodeName = wn2.getNodeName();
+            String content = wn2.getTextContent();
+
+            switch (nodeName) {
+                case "baseTargetNumber" ->
+                      type.setBaseTargetNumber(MathUtility.parseInt(content, type.getBaseTargetNumber()));
+                case "milestoneGreen" ->
+                      type.setSkillMilestoneGreen(MathUtility.parseInt(content, type.getSkillMilestoneGreen()));
+                case "milestoneRegular" ->
+                      type.setSkillMilestoneRegular(MathUtility.parseInt(content, type.getSkillMilestoneRegular()));
+                case "milestoneVeteran" ->
+                      type.setSkillMilestoneVeteran(MathUtility.parseInt(content, type.getSkillMilestoneVeteran()));
+                case "milestoneElite" ->
+                      type.setSkillMilestoneElite(MathUtility.parseInt(content, type.getSkillMilestoneElite()));
+                case "milestoneHeroic" ->
+                      type.setSkillMilestoneHeroic(MathUtility.parseInt(content, type.getSkillMilestoneHeroic()));
+                case "milestoneLegendary" ->
+                      type.setSkillMilestoneLegendary(MathUtility.parseInt(content, type.getSkillMilestoneLegendary()));
+                case "costs" -> {
+                    String[] values = content.split(",");
+                    for (int i = 0; i < Math.min(values.length, type.costs.length); i++) {
+                        try {
+                            type.costs[i] = Integer.parseInt(values[i].trim());
+                        } catch (NumberFormatException e) {
+                            // ignore bad numbers, leave value unchanged
+                        }
+                    }
+                }
+            }
+        }
     }
 }

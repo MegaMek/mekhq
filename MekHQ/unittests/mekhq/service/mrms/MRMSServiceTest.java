@@ -65,7 +65,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillTypeNew;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -102,7 +101,7 @@ public class MRMSServiceTest {
     public static void beforeAll() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
-        SkillType.initializeTypes();
+
 
         mockFaction = Mockito.mock(Faction.class);
         when(mockFaction.getShortName()).thenReturn("Faction");
