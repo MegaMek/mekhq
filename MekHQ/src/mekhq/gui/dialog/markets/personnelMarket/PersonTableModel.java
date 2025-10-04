@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.markets.personnelMarket;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
-import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
+import static mekhq.campaign.personnel.skills.SkillUtilities.getColoredExperienceLevelName;
 
 import java.util.Comparator;
 import java.util.List;

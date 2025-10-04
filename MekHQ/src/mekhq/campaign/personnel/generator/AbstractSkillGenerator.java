@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
+import static mekhq.campaign.personnel.skills.SkillUtilities.SKILL_LEVEL_ULTRA_GREEN;
 
 import java.util.Objects;
 
@@ -44,6 +45,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 
 /**
  * Represents a class which can generate new {@link Skill} objects for a {@link Person}.
@@ -78,7 +80,7 @@ public abstract class AbstractSkillGenerator {
      *
      * @param campaign The {@link Campaign} the person is a part of
      * @param person   The {@link Person} to add skills.
-     * @param expLvl   The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     * @param expLvl   The experience level of the person (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      */
     public abstract void generateSkills(Campaign campaign, Person person, int expLvl);
 
@@ -96,7 +98,7 @@ public abstract class AbstractSkillGenerator {
      *
      * @param person       The {@link Person} to add default skills.
      * @param primaryRole  The primary role of the person
-     * @param expLvl       The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     * @param expLvl       The experience level of the person (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      * @param bonus        The bonus to use for the default skills.
      * @param rollModifier A roll modifier to apply to any randomization's.
      */
@@ -115,7 +117,7 @@ public abstract class AbstractSkillGenerator {
 
     protected void generateArtillerySkill(final Person person, final int bonus) {
         final int experienceLevel = Utilities.generateExpLevel(randomSkillPreferences.getArtilleryBonus());
-        if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
+        if (experienceLevel > SKILL_LEVEL_ULTRA_GREEN) {
             addSkill(person, SkillType.S_ARTILLERY, experienceLevel, randomSkillPreferences.randomizeSkill(), bonus);
         }
     }
@@ -132,7 +134,7 @@ public abstract class AbstractSkillGenerator {
             }
 
             int roleplaySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getRoleplaySkillModifier());
-            if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+            if (roleplaySkillLevel > SKILL_LEVEL_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
         }
