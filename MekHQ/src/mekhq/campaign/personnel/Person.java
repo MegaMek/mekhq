@@ -132,6 +132,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.SkillUtilities;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -4321,7 +4322,7 @@ public class Person {
      *     </li>
      *     <li>
      *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation skills,
-     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillType#EXP_NONE}.
+     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillUtilities#SKILL_LEVEL_NONE}.
      *         Otherwise, returns the average, floored at 0.
      *     </li>
      *     <li>
@@ -4333,7 +4334,8 @@ public class Person {
      * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
      *                  role
      *
-     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     * @return the calculated experience level for the relevant role, or {@link SkillUtilities#SKILL_LEVEL_NONE} if not
+     *       qualified
      */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
@@ -4436,7 +4438,8 @@ public class Person {
      * method.
      *
      * <p>If the provided list of skill names is empty, this method returns {@link SkillType#EXP_REGULAR} by default.
-     * If any skill is missing or its type cannot be determined, {@link SkillType#EXP_NONE} is returned.</p>
+     * If any skill is missing or its type cannot be determined, {@link SkillUtilities#SKILL_LEVEL_NONE} is
+     * returned.</p>
      *
      * <ul>
      *     <li>
@@ -4455,8 +4458,8 @@ public class Person {
      * @param isAlternativeQualityAveraging if {@code true}, uses the alternative averaging method; if {@code false},
      *                                      uses standard averaging
      *
-     * @return the determined experience level, or {@link SkillType#EXP_NONE} if an error occurs or prerequisite skills
-     *       are missing
+     * @return the determined experience level, or {@link SkillUtilities#SKILL_LEVEL_NONE} if an error occurs or
+     *       prerequisite skills are missing
      *
      * @author Illiani
      * @since 0.50.06

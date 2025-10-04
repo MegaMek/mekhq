@@ -183,7 +183,7 @@ public class Skill {
      * Creates a new {@link Skill} from the given experience level and bonus.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      * @param bonus           The bonus for the resulting {@link Skill}.
      *
      * @return A new {@link Skill} of the appropriate type, with a level based on {@code experienceLevel} and the bonus.
@@ -198,7 +198,7 @@ public class Skill {
      * Creates a new {@link Skill} with a randomized level.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillUtilities#SKILL_LEVEL_GREEN}).
      * @param bonus           The bonus for the resulting {@link Skill}.
      * @param rollModifier    The roll modifier on a 1D6.
      *
