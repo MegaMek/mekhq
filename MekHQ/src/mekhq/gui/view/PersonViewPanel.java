@@ -73,6 +73,7 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -1015,8 +1016,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
         GridBagConstraints gridBagConstraints;
 
+        LocalDate today = campaign.getLocalDate();
+
         int bloodmarkLevel = person.getBloodmark();
-        if (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel()) {
+        boolean isChild = person.isChild(today, true);
+        if (!isChild && (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel())) {
             BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
             Money bounty = bloodmark.getBounty();
             String bountyText = String.format(resourceMap.getString("lblBounty.text"),
@@ -1103,7 +1107,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblOrigin1.setLabelFor(lblOrigin2);
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
-                String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());
+                String planetName = person.getOriginPlanet().getName(today);
                 lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
                 lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblOrigin2.addMouseListener(new MouseAdapter() {
@@ -1170,7 +1174,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblAge1, gridBagConstraints);
 
         lblAge2.setName("lblAge2");
-        lblAge2.setText(Integer.toString(person.getAge(campaign.getLocalDate())));
+        lblAge2.setText(Integer.toString(person.getAge(today)));
         lblAge1.setLabelFor(lblAge2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;

@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
@@ -167,6 +168,10 @@ public class Bloodmark {
      * @since 0.50.07
      */
     public static boolean checkForAssassinationAttempt(Person target, LocalDate today, boolean isCampaignPlanetside) {
+        if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
+            return false;
+        }
+
         List<LocalDate> bloodhuntSchedule = target.getBloodhuntSchedule();
         if (bloodhuntSchedule.isEmpty()) {
             return false;
@@ -263,11 +268,11 @@ public class Bloodmark {
     static int getWounds(int bountyHunterSkill) {
         int wounds = 0;
         int bountyHunterRoll = randomInt(bountyHunterSkill);
-        while (bountyHunterRoll == 0) { // Increase severity with each successful loop
+        while (bountyHunterRoll == 0 && wounds < 6) { // Increase severity with each successful loop
             wounds += d6(1);
             bountyHunterRoll = randomInt(bountyHunterSkill);
         }
-        return wounds;
+        return min(wounds, 6);
     }
 
     /**
