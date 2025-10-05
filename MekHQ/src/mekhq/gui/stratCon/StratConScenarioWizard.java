@@ -1001,15 +1001,18 @@ public class StratConScenarioWizard extends JDialog {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.isTrackFactionStanding()) {
-            double regardMultiplier = campaignOptions.getRegardMultiplier();
             FactionStandings factionStandings = campaign.getFactionStandings();
+            double regardMultiplier = campaignOptions.getRegardMultiplier();
+            // We double the regard multiplier for Batchall breaches as agreeing to a Batchall and then breaking it
+            // is far worse than if you never agreed to it in the first place.
+            regardMultiplier *= 2;
+
             List<String> reports = factionStandings.processRefusedBatchall(campaign.getFaction().getShortName(),
                   enemyCode, campaign.getGameYear(), regardMultiplier);
 
             for (String report : reports) {
                 campaign.addReport(report);
             }
-
         }
     }
 
