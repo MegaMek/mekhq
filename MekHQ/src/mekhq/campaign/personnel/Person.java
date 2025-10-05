@@ -6479,6 +6479,22 @@ public class Person {
               isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
+    /**
+     * Determines whether the person has any injuries, possibly filtering by permanence.
+     *
+     * <ul>
+     *     <li>If {@code permanentCheck} is {@code false}, this method returns {@code true} if the person has any
+     *     recorded injuries.</li>
+     *     <li>If {@code permanentCheck} is {@code true}, it will return {@code true} only if the person has at least
+     *     one injury that is either non-permanent or has a remaining recovery time greater than zero. Otherwise, it
+     *     returns {@code false}.</li>
+     * </ul>
+     *
+     * @param permanentCheck if {@code true}, only injuries that are not permanent or have time remaining are
+     *                       considered; if {@code false}, any injury will be counted
+     *
+     * @return {@code true} if the person has injuries matching the specified criteria; {@code false} otherwise
+     */
     public boolean hasInjuries(final boolean permanentCheck) {
         return !injuries.isEmpty() &&
                      (!permanentCheck ||
