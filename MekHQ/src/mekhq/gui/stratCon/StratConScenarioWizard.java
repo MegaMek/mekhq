@@ -75,8 +75,10 @@ import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
@@ -85,7 +87,11 @@ import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.StratConPanel;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
@@ -788,6 +794,21 @@ public class StratConScenarioWizard extends JDialog {
         // The -1 is due to the default cost for reinforcing
         int availableSupportPoints = currentCampaignState.getSupportPoints() - 1;
 
+        AtBContract contract = currentScenario.getBackingContract(campaign);
+        Faction enemy = contract.getEnemy();
+        boolean isClanEnemy = enemy.isClan();
+        boolean isBatchallAccepted = contract.isBatchallAccepted();
+
+        boolean brokeBatchallTerms = false;
+        if (isClanEnemy && isBatchallAccepted) {
+            boolean backoutOfReinforcements = processBatchallWarningDialog();
+            if (backoutOfReinforcements) {
+                return;
+            }
+
+            brokeBatchallTerms = true;
+        }
+
         StratConReinforcementsConfirmationDialog dialog = new StratConReinforcementsConfirmationDialog(campaign,
               targetNumber, availableSupportPoints);
         StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
@@ -800,6 +821,9 @@ public class StratConScenarioWizard extends JDialog {
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
                 currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1));
                 btnCommitClicked(finalTargetNumber, false, false);
+                if (brokeBatchallTerms) {
+                    processBatchallBreach(contract, enemy.getShortName());
+                }
             }
             case REINFORCE_INSTANTLY -> {
                 int supportPointsSpent = dialog.getSupportPoints();
@@ -807,6 +831,9 @@ public class StratConScenarioWizard extends JDialog {
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
                 currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1) * 2);
                 btnCommitClicked(finalTargetNumber, false, true);
+                if (brokeBatchallTerms) {
+                    processBatchallBreach(contract, enemy.getShortName());
+                }
             }
             case REINFORCE_GM -> btnCommitClicked(0, true, false);
             case REINFORCE_GM_INSTANTLY -> btnCommitClicked(0, true, true);
@@ -843,6 +870,7 @@ public class StratConScenarioWizard extends JDialog {
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
+
                     ReinforcementEligibilityType reinforcementType = getReinforcementType(force.getId(),
                           currentTrackState,
                           campaign,
@@ -918,6 +946,71 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         closeWizard();
+    }
+
+    /**
+     * Displays a warning dialog to the user regarding a Batchall breach and captures their decision.
+     *
+     * <p>The dialog presents an in-character and out-of-character message and allows the user to either cancel or
+     * continue. The dialog will repeat until the user confirms a decision. This method returns {@code true} if the user
+     * chose to continue (did not back out of Batchall), or {@code false} if the user canceled.</p>
+     *
+     * @return {@code true} if the user chose to continue with Batchall, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private boolean processBatchallWarningDialog() {
+        boolean dialogAccepted = false;
+        boolean backedOutOfBatchall = false;
+
+        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
+        String inCharacterMessage = String.format(resources.getString("batchallBreach.ic"),
+              campaign.getCommanderAddress());
+        String outOfCharacterMessage = resources.getString("batchallBreach.ooc");
+        String cancelButton = resources.getString("batchallBreach.button.cancel");
+        String continueButton = resources.getString("batchallBreach.button.continue");
+
+        while (!dialogAccepted) {
+            ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null,
+                  inCharacterMessage, List.of(cancelButton, continueButton), outOfCharacterMessage,
+                  null, true);
+            backedOutOfBatchall = dialog.getDialogChoice() == 1;
+
+            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
+            dialogAccepted = confirmation.wasConfirmed();
+        }
+
+        return !backedOutOfBatchall;
+    }
+
+    /**
+     * Processes the consequences of a Batchall breach for the given contract.
+     *
+     * <p>This method marks the Batchall as not accepted in the contract and, if the campaign is configured to track
+     * faction standing, adjusts regard accordingly and adds all relevant standing reports to the campaign log.</p>
+     *
+     * @param contract  the active {@link AtBContract} for which the Batchall was breached
+     * @param enemyCode the code representing the enemy faction involved in the breach
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void processBatchallBreach(AtBContract contract, String enemyCode) {
+        contract.setBatchallAccepted(false);
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isTrackFactionStanding()) {
+            double regardMultiplier = campaignOptions.getRegardMultiplier();
+            FactionStandings factionStandings = campaign.getFactionStandings();
+            List<String> reports = factionStandings.processRefusedBatchall(campaign.getFaction().getShortName(),
+                  enemyCode, campaign.getGameYear(), regardMultiplier);
+
+            for (String report : reports) {
+                campaign.addReport(report);
+            }
+
+        }
     }
 
     private void closeWizard() {
