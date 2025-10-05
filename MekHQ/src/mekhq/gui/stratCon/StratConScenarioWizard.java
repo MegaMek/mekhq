@@ -870,7 +870,6 @@ public class StratConScenarioWizard extends JDialog {
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-
                     ReinforcementEligibilityType reinforcementType = getReinforcementType(force.getId(),
                           currentTrackState,
                           campaign,
@@ -961,6 +960,8 @@ public class StratConScenarioWizard extends JDialog {
      * @since 0.50.07
      */
     private boolean processBatchallWarningDialog() {
+        final int CONTINUE_OPTION = 1;
+
         boolean dialogAccepted = false;
         boolean backedOutOfBatchall = false;
 
@@ -975,7 +976,7 @@ public class StratConScenarioWizard extends JDialog {
             ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null,
                   inCharacterMessage, List.of(cancelButton, continueButton), outOfCharacterMessage,
                   null, true);
-            backedOutOfBatchall = dialog.getDialogChoice() == 1;
+            backedOutOfBatchall = dialog.getDialogChoice() == CONTINUE_OPTION;
 
             ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
             dialogAccepted = confirmation.wasConfirmed();
