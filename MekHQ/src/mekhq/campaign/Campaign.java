@@ -8427,9 +8427,12 @@ public class Campaign implements ITechManager {
     public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech, int asTechsUsed) {
         int value = 10;
         String skillLevel = "Unmaintained";
-        PersonnelOptions options = tech.getOptions();
-        Attributes attributes = tech.getATOWAttributes();
+        PersonnelOptions options = null;
+        Attributes attributes = null;
         if (null != tech) {
+            options = tech.getOptions();
+            attributes = tech.getATOWAttributes();
+
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
                 value = skill.getFinalSkillValue(options, attributes);
@@ -8455,7 +8458,7 @@ public class Campaign implements ITechManager {
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
-                Skill zeroGSkill = tech.getSkill(S_ZERO_G_OPERATIONS);
+                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
                 int zeroGSkillLevel = 0;
                 if (zeroGSkill != null) {
                     zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(options, attributes);
