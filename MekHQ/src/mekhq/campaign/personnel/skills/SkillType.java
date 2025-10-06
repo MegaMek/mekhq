@@ -470,10 +470,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                       Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                       SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                       SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                   </pre>
+     *                                                                                                                                Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                            </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -1886,7 +1886,7 @@ public class SkillType {
               null,
               new Integer[] { 16, 8, 0, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL },
-              false);
+              true);
     }
 
     public static SkillType createMedTech() {
@@ -3254,7 +3254,7 @@ public class SkillType {
               null,
               null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 },
-              false);
+              true);
     }
 
     public static SkillType createMeleeWeapons() {
