@@ -432,6 +432,34 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
+        if (!person.getPatientLog().isEmpty()) {
+            JPanel pnlPatientLogHeader = new JPanel();
+            pnlPatientLogHeader.setName("pnlPatientLogHeader");
+            pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPatientLogHeader.title")));
+            pnlPatientLogHeader.setVisible(!campaignOptions.isDisplayPatientRecord());
+
+            JPanel pnlPatientLog = fillPatientLog();
+            pnlPatientLog.setName("pnlPatientLog");
+            pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPatientLog.title")));
+            pnlPatientLog.setVisible(campaignOptions.isDisplayPatientRecord());
+
+            pnlPatientLogHeader.addMouseListener(getSwitchListener(pnlPatientLogHeader, pnlPatientLog));
+            pnlPatientLog.addMouseListener(getSwitchListener(pnlPatientLog, pnlPatientLogHeader));
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlPatientLogHeader, gridBagConstraints);
+            add(pnlPatientLog, gridBagConstraints);
+            gridY++;
+        }
+
         if (!person.getAssignmentLog().isEmpty()) {
             JPanel pnlAssignmentsLogHeader = new JPanel();
             pnlAssignmentsLogHeader.setName("assignmentLogHeader");
@@ -2379,6 +2407,13 @@ public class PersonViewPanel extends JScrollablePanel {
         Collections.reverse(logs);
 
         return getLogPanel(logs, "Medical log for ", person.getFullName());
+    }
+
+    private JPanel fillPatientLog() {
+        List<LogEntry> logs = person.getPatientLog();
+        Collections.reverse(logs);
+
+        return getLogPanel(logs, "Patient log for ", person.getFullName());
     }
 
     private JPanel fillAssignmentLog() {

@@ -94,10 +94,14 @@ public class EditLogControl extends JPanel {
         PERSONAL_LOG,
 
         /**
-         * Medical logs record health-related events, treatments, injuries, and other medical information pertaining to
-         * the person.
+         * Medical logs record health-related events, injuries, and other medical information pertaining to the person.
          */
         MEDICAL_LOG,
+
+        /**
+         * Medical logs record health-related treatments performed by the character.
+         */
+        PATIENT_LOG,
 
         /**
          * Assignment logs track a person's positions, deployments, transfers, and other assignment-related information
@@ -127,6 +131,7 @@ public class EditLogControl extends JPanel {
         this.logModel = switch (logType) {
             case PERSONAL_LOG -> new LogTableModel(person.getPersonalLog());
             case MEDICAL_LOG -> new LogTableModel(person.getMedicalLog());
+            case PATIENT_LOG -> new LogTableModel(person.getPatientLog());
             case ASSIGNMENT_LOG -> new LogTableModel(person.getAssignmentLog());
             case PERFORMANCE_LOG -> new LogTableModel(person.getPerformanceLog());
         };
@@ -285,6 +290,7 @@ public class EditLogControl extends JPanel {
         switch (logType) {
             case PERSONAL_LOG -> person.getPersonalLog().remove(selectedRow);
             case MEDICAL_LOG -> person.getMedicalLog().remove(selectedRow);
+            case PATIENT_LOG -> person.getPatientLog().remove(selectedRow);
             case ASSIGNMENT_LOG -> person.getAssignmentLog().remove(selectedRow);
             case PERFORMANCE_LOG -> person.getPerformanceLog().remove(selectedRow);
         }
@@ -304,6 +310,7 @@ public class EditLogControl extends JPanel {
         switch (logType) {
             case PERSONAL_LOG -> person.getPersonalLog();
             case MEDICAL_LOG -> person.getMedicalLog();
+            case PATIENT_LOG -> person.getPatientLog();
             case ASSIGNMENT_LOG -> person.getAssignmentLog();
             case PERFORMANCE_LOG -> person.getPerformanceLog();
         }
