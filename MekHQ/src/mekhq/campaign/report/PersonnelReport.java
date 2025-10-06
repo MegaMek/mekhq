@@ -152,7 +152,7 @@ public class PersonnelReport extends AbstractReport {
         LocalDate today = getCampaign().getLocalDate();
 
         for (Person person : getCampaign().getPersonnel()) {
-            if (person.getStatus().isCampFollower() && person.getPrisonerStatus().isFree()) {
+            if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
                 campFollowers++;
                 continue;
             }
