@@ -65,6 +65,7 @@ import javax.swing.ImageIcon;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -929,7 +930,7 @@ public class FactionStandings {
             return "";
         }
 
-        return buildClimateReport(campaignFaction.isPirate(), today).toString();
+        return buildClimateReport(campaignFaction.isPirate(), campaignFaction.isClan(), today).toString();
     }
 
     /**
@@ -941,7 +942,8 @@ public class FactionStandings {
      *
      * <p>If any entries exist, an introductory line is inserted at the beginning.</p>
      *
-     * @param campaignIsPirate whether the faction is a pirate faction
+     * @param campaignIsPirate whether the campaign faction is a pirate faction
+     * @param campaignIsClan   whether the campaign faction is a Clan faction
      * @param today            the {@link LocalDate} used for retrieving year-specific faction names
      *
      * @return a {@link StringBuilder} containing the formatted climate regard report
@@ -949,7 +951,10 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    private StringBuilder buildClimateReport(boolean campaignIsPirate, LocalDate today) {
+    private StringBuilder buildClimateReport(boolean campaignIsPirate, boolean campaignIsClan, LocalDate today) {
+        // We minus a day as otherwise this will return false if today is the first day of the First Wave
+        boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
+
         StringBuilder report = new StringBuilder();
         String factionName;
         double regard;
@@ -970,6 +975,11 @@ public class FactionStandings {
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
                       climateRegard.get(factionCode));
+                continue;
+            }
+
+            // If the Clan Invasion First Wave hasn't occurred
+            if (!clanInvasionHasBegun && (campaignIsClan != faction.isClan())) {
                 continue;
             }
 
