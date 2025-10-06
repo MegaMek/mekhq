@@ -150,7 +150,7 @@ public class RandomDependents {
     int prepareData() {
         int activeNonDependents = 0;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (!person.isEmployed()) {
                 activeDependents.add(person);
                 continue;

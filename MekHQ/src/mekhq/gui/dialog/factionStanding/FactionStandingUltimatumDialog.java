@@ -229,7 +229,7 @@ public class FactionStandingUltimatumDialog {
      * @param secondInCommand     the second-in-command {@link Person}, may be {@code null}
      * @param thirdInCommand      the third-in-command {@link Person}, may be {@code null}
      * @param isMercenary         {@code true} if the campaign is changing to the mercenary faction; {@code false} if
-     *                                       the campaign is changing to the pirate faction
+     *                            the campaign is changing to the pirate faction
      *
      * @author Illiani
      * @since 0.50.07
@@ -324,7 +324,7 @@ public class FactionStandingUltimatumDialog {
     public @Nullable Person getThirdInCommand(Person commander, Person secondInCommand) {
         Person thirdInCommand = null;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.equals(commander) || person.equals(secondInCommand)) {
                 continue;
             }

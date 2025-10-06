@@ -1481,7 +1481,7 @@ public class Person {
             }
         }
 
-        if (status.isActive()) {
+        if (status.isActiveFlexible()) {
             // Check Pregnancy
             if (isPregnant() && getDueDate().isBefore(today)) {
                 campaign.getProcreation().birth(campaign, getDueDate(), this);
@@ -4898,7 +4898,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
+        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
     }
 
     /**
@@ -7290,7 +7290,7 @@ public class Person {
 
         if (hasBerserker && failedWillpowerCheck) {
             Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
+            List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
             if (isDeployed() && unit != null) {
                 getLocalVictims(allActivePersonnel, victims);
             } else {

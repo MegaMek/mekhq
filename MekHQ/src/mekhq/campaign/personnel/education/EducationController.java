@@ -313,17 +313,17 @@ public class EducationController {
 
         boolean hasActiveParent = false;
         if (spouse != null) {
-            if (spouse.getStatus().isActive() && (spouse.isDependent() || !spouse.isEmployed())) {
+            if (spouse.getStatus().isActiveFlexible() && (spouse.isDependent() || !spouse.isEmployed())) {
                 person.addEduTagAlong(spouse.getId());
                 spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
             }
 
-            hasActiveParent = spouse.getStatus().isActive();
+            hasActiveParent = spouse.getStatus().isActiveFlexible();
         }
 
         if (!hasActiveParent) {
             for (Person child : children) {
-                if (child.getStatus().isActive()) {
+                if (child.getStatus().isActiveFlexible()) {
                     if (child.isChild(campaign.getLocalDate())) {
                         person.addEduTagAlong(child.getId());
                         child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);

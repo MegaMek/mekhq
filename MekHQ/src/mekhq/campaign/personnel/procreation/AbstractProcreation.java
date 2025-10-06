@@ -237,7 +237,7 @@ public abstract class AbstractProcreation {
             return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.AlreadyPregnant.text");
         }
 
-        if (!person.getStatus().isActive()) {
+        if (!person.getStatus().isActiveFlexible()) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Inactive.text");
         }
 
@@ -284,7 +284,7 @@ public abstract class AbstractProcreation {
                     return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.SpouseNotTryingForABaby.text");
                 }
 
-                if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
+                if (!person.getGenealogy().getSpouse().getStatus().isActiveFlexible()) {
                     return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.InactiveSpouse.text");
                 }
 

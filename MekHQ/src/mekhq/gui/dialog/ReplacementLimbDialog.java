@@ -180,7 +180,7 @@ public class ReplacementLimbDialog {
     private Person getSpeaker() {
         Person seniorDoctor = null;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 if (person.outRanksUsingSkillTiebreaker(campaign, seniorDoctor)) {
                     seniorDoctor = person;

@@ -103,7 +103,7 @@ public class NagController {
             }
         }
 
-        final List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        final List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final int doctorCapacity = campaignOptions.getMaximumPatients();
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
