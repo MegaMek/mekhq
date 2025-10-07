@@ -58,25 +58,40 @@ public class Appraisal {
     private final static double MULTIPLIER_PER_MARGIN_OF_SUCCESS = 0.05;
 
     /**
+     * Performs an appraisal skill check for a given person on the specified date and calculates the appraisal cost
+     * multiplier based on the result.
+     *
+     * @param person     the {@link Person} performing the appraisal skill check
+     * @param currentDay the current date of the appraisal check
+     *
+     * @return the calculated appraisal cost multiplier as a {@code double}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static double performAppraisalMultiplierCheck(Person person, LocalDate currentDay) {
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, SkillType.S_APPRAISAL, List.of(), 0,
+              false, false, false, false, currentDay);
+        int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
+
+        return getAppraisalCostMultiplier(marginOfSuccessValue);
+    }
+
+    /**
      * Calculates the appraisal cost multiplier for a person on a given date.
      *
      * <p>The multiplier increases or decreases based on the negative margin of success from an appraisal skill
      * check.</p>
      *
-     * @param person     The {@link Person} performing the appraisal.
-     * @param currentDay The current date for the appraisal check.
+     * @param marginOfSuccessValue The return value of {@link MarginOfSuccess#getMarginValue(MarginOfSuccess)}
      *
      * @return The appraisal cost multiplier as a {@code double}.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static double getAppraisalCostMultiplier(Person person, LocalDate currentDay) {
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, SkillType.S_APPRAISAL, List.of(), 0,
-              true, false, false, false, currentDay);
-        int marginValue = -skillCheckUtility.getMarginOfSuccess();
-
-        return 1 + (marginValue * MULTIPLIER_PER_MARGIN_OF_SUCCESS);
+    static double getAppraisalCostMultiplier(int marginOfSuccessValue) {
+        return 1 - (marginOfSuccessValue * MULTIPLIER_PER_MARGIN_OF_SUCCESS);
     }
 
     /**
@@ -93,12 +108,7 @@ public class Appraisal {
      * @since 0.50.07
      */
     public static String getAppraisalReport(double appraisalCostMultiplier) {
-        LOGGER.debug("Appraisal report requested with multiplier: {}", appraisalCostMultiplier);
-
-        int normalizedMarginValue = (int) Math.round(-(appraisalCostMultiplier - 1) / MULTIPLIER_PER_MARGIN_OF_SUCCESS);
-        LOGGER.debug("Margin value: {}", normalizedMarginValue);
-
-        MarginOfSuccess marginOfSuccess = MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(normalizedMarginValue);
+        MarginOfSuccess marginOfSuccess = getMarginOfSuccess(appraisalCostMultiplier);
         String reportColor = MarginOfSuccess.getMarginOfSuccessColor(marginOfSuccess);
         String reportKey = "Appraisal.report." + marginOfSuccess.name();
 
@@ -106,5 +116,25 @@ public class Appraisal {
               reportKey,
               spanOpeningWithCustomColor(reportColor),
               CLOSING_SPAN_TAG);
+    }
+
+    /**
+     * Determines the {@link MarginOfSuccess} corresponding to the provided appraisal cost multiplier.
+     *
+     * <p>This converts the multiplier back to a margin value and looks up the appropriate result category.</p>
+     *
+     * @param appraisalCostMultiplier the appraisal cost multiplier to evaluate
+     *
+     * @return the {@link MarginOfSuccess} category for the given multiplier
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static MarginOfSuccess getMarginOfSuccess(double appraisalCostMultiplier) {
+        LOGGER.debug("Appraisal report requested with multiplier: {}", appraisalCostMultiplier);
+        int normalizedMarginValue = (int) Math.round(-(appraisalCostMultiplier - 1) / MULTIPLIER_PER_MARGIN_OF_SUCCESS);
+        LOGGER.debug("Margin value: {}", normalizedMarginValue);
+
+        return MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(normalizedMarginValue);
     }
 }

@@ -4428,7 +4428,7 @@ public class Campaign implements ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
-            double valueChange = Appraisal.getAppraisalCostMultiplier(person, currentDay);
+            double valueChange = Appraisal.performAppraisalMultiplierCheck(person, currentDay);
             String appraisalReport = Appraisal.getAppraisalReport(valueChange);
 
             if (transitDays < 0) {
