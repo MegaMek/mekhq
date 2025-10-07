@@ -55,7 +55,7 @@ public class Appraisal {
     private static final MMLogger LOGGER = MMLogger.create(Appraisal.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Appraisal";
 
-    private final static double MULTIPLIER_PER_MARGIN_OF_SUCCESS = 0.05;
+    private final static double MULTIPLIER_PER_MARGIN_OF_SUCCESS = 0.025;
 
     /**
      * Performs an appraisal skill check for a given person on the specified date and calculates the appraisal cost
