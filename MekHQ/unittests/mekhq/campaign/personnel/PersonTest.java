@@ -61,6 +61,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
@@ -803,6 +804,8 @@ public class PersonTest {
         assertEquals(before.getStoredSocialDescriptionIndex(), after.getSocialDescriptionIndex());
         assertEquals(before.getStoredPersonalityQuirk(), after.getPersonalityQuirk());
         assertEquals(before.getStoredPersonalityQuirkDescriptionIndex(), after.getPersonalityQuirkDescriptionIndex());
+        assertEquals(before.getStoredReasoning(), after.getReasoning());
+        assertEquals(before.getStoredReasoningDescriptionIndex(), after.getReasoningDescriptionIndex());
     }
 
     @Test
@@ -826,6 +829,8 @@ public class PersonTest {
         assertEquals(after.getStoredSocialDescriptionIndex(), before.getSocialDescriptionIndex());
         assertEquals(after.getStoredPersonalityQuirk(), before.getPersonalityQuirk());
         assertEquals(after.getStoredPersonalityQuirkDescriptionIndex(), before.getPersonalityQuirkDescriptionIndex());
+        assertEquals(after.getStoredReasoning(), before.getReasoning());
+        assertEquals(after.getStoredReasoningDescriptionIndex(), before.getReasoningDescriptionIndex());
     }
 
     @Test
@@ -850,6 +855,8 @@ public class PersonTest {
         assertEquals(before.getSocialDescriptionIndex(), after.getSocialDescriptionIndex());
         assertEquals(before.getPersonalityQuirk(), after.getPersonalityQuirk());
         assertEquals(before.getPersonalityQuirkDescriptionIndex(), after.getPersonalityQuirkDescriptionIndex());
+        assertEquals(before.getReasoning(), after.getReasoning());
+        assertEquals(before.getReasoningDescriptionIndex(), after.getReasoningDescriptionIndex());
 
         assertEquals(before.getStoredGivenName(), after.getStoredGivenName());
         assertEquals(before.getStoredSurname(), after.getStoredSurname());
@@ -866,6 +873,8 @@ public class PersonTest {
         assertEquals(before.getStoredPersonalityQuirk(), after.getStoredPersonalityQuirk());
         assertEquals(before.getStoredPersonalityQuirkDescriptionIndex(),
               after.getStoredPersonalityQuirkDescriptionIndex());
+        assertEquals(before.getStoredReasoning(), after.getStoredReasoning());
+        assertEquals(before.getStoredReasoningDescriptionIndex(), after.getStoredReasoningDescriptionIndex());
     }
 
     private Person createPersonality() {
@@ -892,6 +901,8 @@ public class PersonTest {
         personality.setSocialDescriptionIndex(1);
         personality.setPersonalityQuirk(PersonalityQuirk.ACROPHOBIA);
         personality.setPersonalityQuirkDescriptionIndex(1);
+        personality.setReasoning(Reasoning.BRAIN_DEAD);
+        personality.setReasoningDescriptionIndex(1);
 
         personality.setStoredGivenName("Mr.");
         personality.setStoredSurname("Flibble");
@@ -907,6 +918,8 @@ public class PersonTest {
         personality.setStoredSocialDescriptionIndex(0);
         personality.setStoredPersonalityQuirk(PersonalityQuirk.AMBUSH_LOVER);
         personality.setStoredPersonalityQuirkDescriptionIndex(0);
+        personality.setStoredReasoning(Reasoning.DIMWITTED);
+        personality.setStoredReasoningDescriptionIndex(0);
 
         return personality;
     }

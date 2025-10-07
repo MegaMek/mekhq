@@ -119,13 +119,17 @@ public class SkillDeprecationTool {
 
         final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
 
+        final boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
+        final double reasoningXpMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
+
         final Skills skills = person.getSkills();
         for (SkillType skillType : DEPRECATED_SKILLS) {
             final String skillName = skillType.getName();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
-
-                refundValue = (int) round(refundValue * xpCostMultiplier);
+                
+                // Reasoning cost changes should always take place before global changes
+                refundValue = (int) round(refundValue * reasoningXpMultiplier);
 
                 triggerDialog(skills, skillName, refundValue);
             }

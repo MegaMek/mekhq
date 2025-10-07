@@ -57,7 +57,6 @@ import mekhq.campaign.personnel.PronounData;
  * {@link Gender} to provide personalized and localized descriptions using gender-specific pronouns.
  * </p>
  */
-@Deprecated(since = "0.50.07", forRemoval = true)
 public enum Reasoning {
     // region Enum Declarations
     // Although we no longer use the descriptive names for Reasoning traits, we've kept them
@@ -214,7 +213,6 @@ public enum Reasoning {
      * @author Illiani
      * @since 0.50.06
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public String getExamResults() {
         final String RESOURCE_KEY = "examResults.text";
 
@@ -250,9 +248,8 @@ public enum Reasoning {
      *
      * @return The calculated Reasoning score.
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getReasoningScore() {
-        return 0;
+        return this.level - (Reasoning.values().length / 2);
     }
 
     /**
