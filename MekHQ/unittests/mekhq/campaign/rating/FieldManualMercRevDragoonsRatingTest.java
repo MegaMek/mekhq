@@ -161,7 +161,6 @@ public class FieldManualMercRevDragoonsRatingTest {
 
         when(mockCampaign.getPersonnel()).thenReturn(mockPersonnelList);
         when(mockCampaign.getActivePersonnel(false, false)).thenReturn(mockActivePersonnelList);
-        when(mockCampaign.getActivePersonnel(false, false)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getNumberMedics()).thenCallRealMethod();
         when(mockCampaign.getNumberAsTechs()).thenCallRealMethod();
         when(mockCampaign.getNumberPrimaryAsTechs()).thenCallRealMethod();
