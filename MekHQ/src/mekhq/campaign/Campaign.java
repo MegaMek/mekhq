@@ -4428,8 +4428,10 @@ public class Campaign implements ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
-            double valueChange = Appraisal.performAppraisalMultiplierCheck(person, currentDay);
-            String appraisalReport = Appraisal.getAppraisalReport(valueChange);
+            boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
+            double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
+                  currentDay) : 1.0;
+            String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
 
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());
