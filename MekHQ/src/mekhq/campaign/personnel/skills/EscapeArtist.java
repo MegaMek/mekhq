@@ -50,7 +50,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 
 /**
  * Provides utilities for handling escape attempts by prisoners with the "Escape Artist" skill.
@@ -73,25 +72,32 @@ public class EscapeArtist {
      * <p>The attempt outcome is determined by performing a skill check and processing the resulting margin of
      * success value.</p>
      *
-     * @param campaign   the active campaign
-     * @param person     the prisoner performing the escape attempt
-     * @param currentDay the calendar date of the attempt
+     * @param campaign the active campaign
+     * @param person   the prisoner performing the escape attempt
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static void performEscapeArtistEscapeAttemptCheck(Campaign campaign, Person person, LocalDate currentDay) {
+    public static void performEscapeArtistEscapeAttemptCheck(Campaign campaign, Person person) {
         // No attempt is made if the prisoner doesn't have the skill.
         if (person.getSkill(SkillType.S_ESCAPE_ARTIST) == null) {
             return;
         }
 
+        LocalDate today = campaign.getLocalDate();
         SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, SkillType.S_ESCAPE_ARTIST, List.of(), 0,
-              true, false, false, false, currentDay);
+              true, false, false, false, today);
         int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(marginOfSuccessValue);
 
-        processEscapeAttempt(campaign, person, marginOfSuccess);
+        // Nothing happens for these cases, so we can just early exit
+        List<MarginOfSuccess> noFurtherActionCases = List.of(MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT,
+              MarginOfSuccess.ALMOST);
+        if (noFurtherActionCases.contains(marginOfSuccess)) {
+            return;
+        }
+
+        processEscapeAttempt(campaign, person, marginOfSuccess, today);
     }
 
     /**
@@ -102,14 +108,16 @@ public class EscapeArtist {
      * @param campaign        the current campaign instance
      * @param prisoner        the {@link Person} attempting escape
      * @param marginOfSuccess the result of the skill check
+     * @param today           the current in-game date
      *
      * @author Illiani
      * @since 0.50.07
      */
-    static void processEscapeAttempt(Campaign campaign, Person prisoner, MarginOfSuccess marginOfSuccess) {
+    private static void processEscapeAttempt(Campaign campaign, Person prisoner, MarginOfSuccess marginOfSuccess,
+          LocalDate today) {
         switch (marginOfSuccess) {
             // Nothing happens for MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT, or MarginOfSuccess.ALMOST
-            case SPECTACULAR, EXTRAORDINARY, GOOD -> prisoner.setPrisonerStatus(campaign, PrisonerStatus.FREE, true);
+            case SPECTACULAR, EXTRAORDINARY, GOOD -> prisoner.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
             case BAD -> getEscapeAttemptReport(prisoner, MarginOfSuccess.BAD);
             case TERRIBLE, DISASTROUS -> {
                 boolean wasDisastrous = marginOfSuccess == MarginOfSuccess.DISASTROUS;
@@ -117,7 +125,6 @@ public class EscapeArtist {
             }
         }
 
-        // This method filters out the above three cited MarginOfSuccess cases.
         String report = getEscapeAttemptReport(prisoner, marginOfSuccess);
         if (!report.isBlank()) {
             campaign.addReport(report);
@@ -164,9 +171,6 @@ public class EscapeArtist {
     /**
      * Retrieves a formatted report for the given prisoner's escape attempt based on the result margin.
      *
-     * <p>No report is generated for {@link MarginOfSuccess#IT_WILL_DO}, {@link MarginOfSuccess#BARELY_MADE_IT}, or
-     * {@link MarginOfSuccess#ALMOST}.</p>
-     *
      * @param prisoner        the {@link Person} whose escape attempt is being reported
      * @param marginOfSuccess the margin of success result for the escape attempt
      *
@@ -175,15 +179,7 @@ public class EscapeArtist {
      * @author Illiani
      * @since 0.50.07
      */
-    public static String getEscapeAttemptReport(Person prisoner, MarginOfSuccess marginOfSuccess) {
-        // We don't generate a report for these cases. This ensures that we're not spamming the report with standard
-        // failures.
-        List<MarginOfSuccess> noReportCases = List.of(MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT,
-              MarginOfSuccess.ALMOST);
-        if (noReportCases.contains(marginOfSuccess)) {
-            return "";
-        }
-
+    private static String getEscapeAttemptReport(Person prisoner, MarginOfSuccess marginOfSuccess) {
         String reportColor = MarginOfSuccess.getMarginOfSuccessColor(marginOfSuccess);
         String reportKey = "EscapeArtist.report." + marginOfSuccess.name();
 
