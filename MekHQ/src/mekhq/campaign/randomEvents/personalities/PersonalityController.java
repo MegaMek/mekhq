@@ -95,12 +95,12 @@ public class PersonalityController {
         possibleTraits.add(PersonalityTraitType.SOCIAL);
         possibleTraits.add(PersonalityTraitType.PERSONALITY_QUIRK);
 
-        int interations = 2;
+        int iterations = 2;
 
-        while (interations != 0 && !possibleTraits.isEmpty()) {
+        while (iterations != 0 && !possibleTraits.isEmpty()) {
             PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
             possibleTraits.remove(pickedTrait);
-            interations--;
+            iterations--;
 
             switch (pickedTrait) {
                 case AGGRESSION -> {
