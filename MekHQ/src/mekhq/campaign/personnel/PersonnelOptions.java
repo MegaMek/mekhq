@@ -96,6 +96,9 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String FLAW_ILLITERATE = "flaw_illiterate";
     public static final String UNOFFICIAL_HOUDINI = "unofficial_houdini";
+    public static final String UNOFFICIAL_MASTER_IMPERSONATOR = "unofficial_master_impersonator";
+    public static final String UNOFFICIAL_COUNTERFEITER = "unofficial_counterfeiter";
+    public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -236,6 +239,9 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, FLAW_ILLITERATE, false);
         addOption(l3a, UNOFFICIAL_HOUDINI, false);
+        addOption(l3a, UNOFFICIAL_MASTER_IMPERSONATOR, false);
+        addOption(l3a, UNOFFICIAL_COUNTERFEITER, false);
+        addOption(l3a, UNOFFICIAL_NATURAL_THESPIAN, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
