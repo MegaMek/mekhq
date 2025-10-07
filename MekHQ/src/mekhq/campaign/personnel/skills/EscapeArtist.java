@@ -46,13 +46,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 
 /**
- * Provides utilities for handling escape attempts by prisoners with the "Escape Artist" skill.
+ * Provides utilities for handling escape attempts by prisoners with the "Escape Artist", "Disguise", or "Forgery"
+ * skill.
  *
  * <p>This class contains static methods to evaluate the results of escape attempts, apply the consequences (such as
  * altering prisoner status or inflicting injuries), and generate reports about the outcomes. Outcomes are determined
@@ -64,7 +66,7 @@ import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 public class EscapeArtist {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.EscapeArtist";
 
-    private final static double MULTIPLIER_PER_MARGIN_OF_SUCCESS = 0.025;
+    private final static int NO_SKILL_AVAILABLE = -1;
 
     /**
      * Performs an escape attempt skill check for the given person and processes the result.
@@ -79,13 +81,15 @@ public class EscapeArtist {
      * @since 0.50.07
      */
     public static void performEscapeArtistEscapeAttemptCheck(Campaign campaign, Person person) {
-        // No attempt is made if the prisoner doesn't have the skill.
-        if (person.getSkill(SkillType.S_ESCAPE_ARTIST) == null) {
+        String skillToUse = getHighestEscapeSkill(person);
+
+        // No attempt is made if the prisoner doesn't have any escape skills.
+        if (skillToUse.isBlank()) {
             return;
         }
 
         LocalDate today = campaign.getLocalDate();
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, SkillType.S_ESCAPE_ARTIST, List.of(), 0,
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, skillToUse, List.of(), 0,
               true, false, false, false, today);
         int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(marginOfSuccessValue);
@@ -98,6 +102,43 @@ public class EscapeArtist {
         }
 
         processEscapeAttempt(campaign, person, marginOfSuccess, today);
+    }
+
+    private static String getHighestEscapeSkill(Person person) {
+        PersonnelOptions options = person.getOptions();
+        Attributes attributes = person.getATOWAttributes();
+
+        int highestSkillLevel = NO_SKILL_AVAILABLE;
+        String skillToUse = "";
+
+        Skill escapeArtistSkill = person.getSkill(SkillType.S_ESCAPE_ARTIST);
+        if (escapeArtistSkill != null) {
+            int level = escapeArtistSkill.getTotalSkillLevel(options, attributes, 0);
+            if (level > highestSkillLevel) {
+                highestSkillLevel = level;
+                skillToUse = SkillType.S_ESCAPE_ARTIST;
+            }
+        }
+
+        Skill disguiseSkill = person.getSkill(SkillType.S_DISGUISE);
+        if (disguiseSkill != null) {
+            int level = disguiseSkill.getTotalSkillLevel(options, attributes, 0);
+            if (level > highestSkillLevel) {
+                highestSkillLevel = level;
+                skillToUse = SkillType.S_DISGUISE;
+            }
+        }
+
+        Skill forgerySkill = person.getSkill(SkillType.S_FORGERY);
+        if (forgerySkill != null) {
+            int level = forgerySkill.getTotalSkillLevel(options, attributes, 0);
+            if (level > highestSkillLevel) {
+                highestSkillLevel = level;
+                skillToUse = SkillType.S_FORGERY;
+            }
+        }
+
+        return skillToUse;
     }
 
     /**
