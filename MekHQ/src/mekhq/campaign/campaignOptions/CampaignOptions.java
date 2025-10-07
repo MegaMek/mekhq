@@ -166,6 +166,7 @@ public class CampaignOptions {
     // Acquisition
     private int waitingPeriod;
     private String acquisitionSkill;
+    private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
@@ -714,6 +715,7 @@ public class CampaignOptions {
         // Acquisition
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
+        useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
@@ -4172,6 +4174,14 @@ public class CampaignOptions {
 
     public void setAcquisitionSkill(final String acquisitionSkill) {
         this.acquisitionSkill = acquisitionSkill;
+    }
+
+    public boolean isUseFunctionalAppraisal() {
+        return useFunctionalAppraisal;
+    }
+
+    public void setUseFunctionalAppraisal(final boolean useFunctionalAppraisal) {
+        this.useFunctionalAppraisal = useFunctionalAppraisal;
     }
 
     /**
