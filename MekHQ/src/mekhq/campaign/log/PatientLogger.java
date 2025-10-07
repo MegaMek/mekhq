@@ -40,7 +40,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 /**
- * This class is responsible to control the logging of Service Log Entries.
+ * This class is responsible for controlling the logging of Patient Log Entries.
  *
  * @author Miguel Azevedo
  */
