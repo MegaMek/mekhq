@@ -36,8 +36,6 @@ package mekhq.campaign;
 import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 
 import java.io.File;
 import java.util.*;
@@ -65,6 +63,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -81,6 +80,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
 import mekhq.campaign.unit.TestUnit;
@@ -1585,6 +1585,9 @@ public class ResolveScenarioTracker {
         }
 
         // now lets update personnel
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         for (UUID pid : peopleStatus.keySet()) {
             Person person = campaign.getPerson(pid);
             PersonStatus status = peopleStatus.get(pid);
@@ -1593,30 +1596,12 @@ public class ResolveScenarioTracker {
             }
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
-            int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
             if (status.getHits() > person.getHits()) {
                 int statusHits = status.getHits();
                 int priorHits = person.getHits();
                 int newHits = statusHits - priorHits;
-                int adjustedHits = 0;
-
-                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
-                boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
-                boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
-
-                if (hasGlassJaw && !hasGlassJawAndToughness) {
-                    adjustedHits = newHits * 2;
-                } else if (hasToughness && !hasGlassJawAndToughness) {
-                    adjustedHits = (int) ceil(newHits * 0.75);
-                }
-
-                if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    int fatigueIncrease = fatigueRate * newHits;
-
-                    person.changeFatigue(fatigueIncrease);
-
-                    // The status update from this instance of changeFatigue is handled later
-                }
+                int adjustedHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
+                      fatigueRate, newHits);
 
                 person.setHitsPrior(priorHits);
                 person.setHits(statusHits + adjustedHits);
@@ -1650,12 +1635,12 @@ public class ResolveScenarioTracker {
             if (!status.isDead()) {
                 person.changeFatigue(fatigueRate);
 
-                if (campaign.getCampaignOptions().isUseFatigue()) {
+                if (campaignOptions.isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
                 }
             }
 
-            if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
+            if (campaignOptions.isUseAdvancedMedical()) {
                 person.diagnose(getCampaign(), status.getHits());
             }
 
@@ -1679,7 +1664,7 @@ public class ResolveScenarioTracker {
                     person.setHits(status.getHits());
                 }
 
-                if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                if (campaignOptions.isUseAdvancedMedical()) {
                     person.diagnose(getCampaign(), status.getHits());
                 }
 
@@ -1700,7 +1685,7 @@ public class ResolveScenarioTracker {
             }
             Entity en = unitStatus.getEntity();
             Money unitValue = unit.getBuyCost();
-            if (campaign.getCampaignOptions().isBLCSaleValue()) {
+            if (campaignOptions.isBLCSaleValue()) {
                 unitValue = unit.getSellValue();
             }
 
@@ -1748,7 +1733,7 @@ public class ResolveScenarioTracker {
                     blcValue = unitValue.minus(unit.getSellValue());
                     blcString = "battle loss compensation for " + unit.getName();
                 }
-                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                if (campaignOptions.isPayForRepairs()) {
                     for (Part p : unit.getParts()) {
                         if (p.needsFixing() && !(p instanceof Armor)) {
                             repairBLC = repairBLC.plus(p.getActualValue().multipliedBy(0.2));
@@ -1827,7 +1812,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseAtB() && isAtBContract) {
+        if (campaignOptions.isUseAtB() && isAtBContract) {
             final int unitRatingMod = campaign.getAtBUnitRatingMod();
             for (Unit unit : getUnits()) {
                 unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
