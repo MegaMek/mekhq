@@ -136,6 +136,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -4720,6 +4721,7 @@ public class Unit implements ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
+        boolean entityIsInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY);
         for (Person person : drivers) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
@@ -4749,8 +4751,17 @@ public class Unit implements ITechnology {
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
-            if (person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
+
+            String tempGunType = gunType;
+            if (entityIsInfantry) {
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                if (tempGunType == null) {
+                    tempGunType = SkillType.S_SMALL_ARMS;
+                }
+            }
+
+            if (person.hasSkill(tempGunType)) {
+                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(options, attributes);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&

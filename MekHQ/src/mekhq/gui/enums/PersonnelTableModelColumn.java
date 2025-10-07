@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -801,10 +802,9 @@ public enum PersonnelTableModelColumn {
                                                     .getFinalSkillValue(options, attributes)) :
                              "-";
             case SMALL_ARMS:
-                return person.hasSkill(SkillType.S_SMALL_ARMS) ?
-                             Integer.toString(person.getSkill(SkillType.S_SMALL_ARMS)
-                                                    .getFinalSkillValue(options, attributes)) :
-                             "-";
+                String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                return skillName == null ? "-" :
+                             Integer.toString(person.getSkill(skillName).getFinalSkillValue(options, attributes));
             case ARTILLERY:
                 return person.hasSkill(SkillType.S_ARTILLERY) ?
                              Integer.toString(person.getSkill(SkillType.S_ARTILLERY)

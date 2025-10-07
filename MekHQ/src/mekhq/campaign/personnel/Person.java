@@ -58,6 +58,7 @@ import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -1270,6 +1271,7 @@ public class Person {
                   S_COMMUNICATIONS,
                   S_SENSOR_OPERATIONS,
                   S_ART_COOKING).anyMatch(this::hasSkill);
+            case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
             case MEK_TECH -> hasSkill(S_TECH_MEK);
@@ -4393,6 +4395,23 @@ public class Person {
 
                 yield highestExperienceLevel;
             }
+            case SOLDIER -> {
+                int highestExperienceLevel = EXP_NONE;
+                for (String relevantSkill : INFANTRY_GUNNERY_SKILLS) {
+                    Skill skill = getSkill(relevantSkill);
+
+                    if (skill == null) {
+                        continue;
+                    }
+
+                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
+                    if (currentExperienceLevel > highestExperienceLevel) {
+                        highestExperienceLevel = currentExperienceLevel;
+                    }
+                }
+
+                yield highestExperienceLevel;
+            }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
                 int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
@@ -5157,7 +5176,15 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
+            if (isRole(PersonnelRole.SOLDIER)) {
+                for (String skill : INFANTRY_GUNNERY_SKILLS) {
+                    if (hasSkill(skill)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         } else if (entity instanceof ProtoMek) {
             return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
@@ -5198,7 +5225,15 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS) && isRole(PersonnelRole.SOLDIER);
+            if (isRole(PersonnelRole.SOLDIER)) {
+                for (String skill : INFANTRY_GUNNERY_SKILLS) {
+                    if (hasSkill(skill)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         } else if (entity instanceof ProtoMek) {
             return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
