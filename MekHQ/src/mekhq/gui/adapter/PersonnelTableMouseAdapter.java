@@ -2744,7 +2744,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     int baseCost = spa.getCost();
                     cost = (int) round(baseCost > 0 ? baseCost * reasoningXpCostMultiplier : baseCost);
                     cost = (int) round(cost * xpCostMultiplier);
-                    cost = (int) round(baseCost * xpCostMultiplier);
 
                     String costDesc = String.format(resources.getString("costValue.format"), cost);
                     boolean available = person.getXP() >= cost;
