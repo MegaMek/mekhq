@@ -69,7 +69,7 @@ public class PatientLogger {
 
     public static void successfullyTreated(Person doctor, Person patient, LocalDate date, int injuries) {
         String message = resources.getString("successfullyTreatedForXInjuries.text");
-        doctor.addPersonalLogEntry(new PatientLogEntry(date,
+        doctor.addPatientLogEntry(new PatientLogEntry(date,
               MessageFormat.format(message, patient.getFullName(), injuries)));
     }
 }
