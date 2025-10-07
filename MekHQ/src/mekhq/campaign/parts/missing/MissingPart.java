@@ -380,14 +380,14 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         // TODO: Move me to live with procurement functions?
         // Which shopping method is this used for?
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
         StringBuilder toReturn = new StringBuilder();
-        if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                         ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
                   .append(". It will be delivered in ")

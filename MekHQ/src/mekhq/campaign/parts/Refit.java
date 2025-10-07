@@ -2639,7 +2639,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return string for report explaining how it went
      */
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         if (campaign.getQuartermaster().buyPart(this, transitDays)) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                              .getFontColorPositiveHexColor(),

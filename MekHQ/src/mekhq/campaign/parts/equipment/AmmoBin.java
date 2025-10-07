@@ -361,7 +361,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         return "<font color='" +
                      ReportingUtilities.getNegativeColor() +
                      "'> You shouldn't be here (AmmoBin.find()).</font>";

@@ -599,7 +599,7 @@ public class AcquisitionsDialog extends JDialog {
                     campaignGUI.getCampaign()
                           .addReport(String.format("GM Acquiring %s. %s",
                                 actualWork.getAcquisitionName(),
-                                actualWork.find(0)));
+                                actualWork.find(0, 1.0)));
                 }
 
                 Unit unit = actualWork.getUnit();

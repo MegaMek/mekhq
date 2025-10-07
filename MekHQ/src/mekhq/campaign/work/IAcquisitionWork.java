@@ -64,7 +64,7 @@ public interface IAcquisitionWork extends IWork {
 
     void decrementDaysToWait();
 
-    String find(int transitDays);
+    String find(int transitDays, double timeMultiplier);
 
     String failToFind();
 
@@ -79,8 +79,8 @@ public interface IAcquisitionWork extends IWork {
     String getQuantityName(int quantity);
 
     /**
-     * Gets the true number of parts represented by this AcquisitionWork. An ammo part that
-     * contains six shots should return six, not one.
+     * Gets the true number of parts represented by this AcquisitionWork. An ammo part that contains six shots should
+     * return six, not one.
      */
     default int getTotalQuantity() {
         return getQuantity();
