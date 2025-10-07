@@ -5525,7 +5525,7 @@ public class Campaign implements ITechManager {
                     }
                 }
 
-                if (person.getStatus().isPoW()) {
+                if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
                     EscapeArtist.performEscapeArtistEscapeAttemptCheck(this, person);
                 }
             }
