@@ -2640,7 +2640,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public String find(int transitDays, double valueMultiplier) {
-        if (campaign.getQuartermaster().buyPart(this, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(this, valueMultiplier, transitDays)) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                              .getFontColorPositiveHexColor(),
                   "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");
