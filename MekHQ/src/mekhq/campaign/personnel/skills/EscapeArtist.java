@@ -104,6 +104,24 @@ public class EscapeArtist {
         processEscapeAttempt(campaign, person, marginOfSuccess, today);
     }
 
+    /**
+     * Determines which escape-related skill the given {@link Person} is best at.
+     *
+     * <p>This method examines the person's skill levels in Escape Artist, Disguise, and Forgery, and returns the
+     * skill type with the highest total skill level. Evaluation uses each skill's {@code getTotalSkillLevel} method,
+     * considering personnel options and ATOW attributes.</p>
+     *
+     * <p>If the person does not possess any of these skills, the method returns an empty string.</p>
+     *
+     * @param person the {@link Person} whose skills will be checked
+     *
+     * @return the skill type constant (one of {@link SkillType#S_ESCAPE_ARTIST}, {@link SkillType#S_DISGUISE}, or
+     *       {@link SkillType#S_FORGERY}) corresponding to the highest escape-related skill level, or an empty string if
+     *       none are present
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static String getHighestEscapeSkill(Person person) {
         PersonnelOptions options = person.getOptions();
         Attributes attributes = person.getATOWAttributes();
@@ -133,7 +151,6 @@ public class EscapeArtist {
         if (forgerySkill != null) {
             int level = forgerySkill.getTotalSkillLevel(options, attributes, 0);
             if (level > highestSkillLevel) {
-                highestSkillLevel = level;
                 skillToUse = SkillType.S_FORGERY;
             }
         }
