@@ -41,13 +41,13 @@ class AppraisalTest {
     @Test
     void testGetAppraisalCostMultiplier_withPositiveMargin() {
         double multiplier = Appraisal.getAppraisalCostMultiplier(4);
-        assertEquals(0.8, multiplier);
+        assertEquals(0.9, multiplier);
     }
 
     @Test
     void testGetAppraisalCostMultiplier_withNegativeMargin() {
         double multiplier = Appraisal.getAppraisalCostMultiplier(-2);
-        assertEquals(1.1, multiplier);
+        assertEquals(1.05, multiplier);
     }
 
     @Test
@@ -58,13 +58,13 @@ class AppraisalTest {
 
     @Test
     void testGetMarginOfSuccess_withPositiveMultiplier() {
-        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(0.8);
+        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(0.9);
         assertEquals(MarginOfSuccess.SPECTACULAR, marginOfSuccess);
     }
 
     @Test
     void testGetMarginOfSuccess_withNegativeMultiplier() {
-        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(1.1);
+        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(1.05);
         assertEquals(MarginOfSuccess.BAD, marginOfSuccess);
     }
 
