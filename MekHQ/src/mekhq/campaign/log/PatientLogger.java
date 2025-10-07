@@ -54,7 +54,7 @@ public class PatientLogger {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static void gainedXpFromMedWork(Person doctor, LocalDate date, int taskXP) {
         String message = resources.getString("gainedXpFromMedWork.text");
-        doctor.addPerformanceLogEntry(new PatientLogEntry(date, MessageFormat.format(message, taskXP)));
+        doctor.addPatientLogEntry(new PatientLogEntry(date, MessageFormat.format(message, taskXP)));
     }
 
     /**
