@@ -344,10 +344,9 @@ public class Person {
     private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
     private int personalityQuirkDescriptionIndex;
-    private Reasoning reasoning;
-    private int reasoningDescriptionIndex;
     private String personalityDescription;
     private String personalityInterviewNotes;
+    private Reasoning reasoning;
     // endregion Personality
 
     // region SPAs
@@ -366,7 +365,6 @@ public class Person {
     private PersonalityQuirk storedPersonalityQuirk;
     private int storedPersonalityQuirkDescriptionIndex;
     private Reasoning storedReasoning;
-    private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
     private boolean darkSecretRevealed;
     private LocalDate burnedConnectionsEndDate;
@@ -561,7 +559,6 @@ public class Person {
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         reasoning = Reasoning.AVERAGE;
-        reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
         personalityInterviewNotes = "";
         storedLoyalty = 0;
@@ -576,7 +573,6 @@ public class Person {
         storedPersonalityQuirk = PersonalityQuirk.NONE;
         storedPersonalityQuirkDescriptionIndex = 0;
         storedReasoning = Reasoning.AVERAGE;
-        storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
         darkSecretRevealed = false;
         burnedConnectionsEndDate = null;
@@ -2622,18 +2618,13 @@ public class Person {
         this.reasoning = reasoning;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getReasoningDescriptionIndex() {
-        return reasoningDescriptionIndex;
+        return 0;
     }
 
-    /**
-     * Sets the index value for the {@link Reasoning} description.
-     *
-     * @param reasoningDescriptionIndex The index value to set for the Reasoning description. It will be clamped to
-     *                                  ensure it remains within the valid range.
-     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setReasoningDescriptionIndex(final int reasoningDescriptionIndex) {
-        this.reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, Reasoning.MAXIMUM_VARIATIONS - 1);
     }
 
     Reasoning getStoredReasoning() {
@@ -2644,12 +2635,13 @@ public class Person {
         this.storedReasoning = storedReasoning;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     int getStoredReasoningDescriptionIndex() {
-        return storedReasoningDescriptionIndex;
+        return 0;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     void setStoredReasoningDescriptionIndex(int storedReasoningDescriptionIndex) {
-        this.storedReasoningDescriptionIndex = storedReasoningDescriptionIndex;
     }
 
     public String getPersonalityDescription() {
@@ -3168,8 +3160,6 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoningDescriptionIndex", reasoningDescriptionIndex);
-
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -3248,13 +3238,6 @@ public class Person {
 
             if (storedReasoning != Reasoning.AVERAGE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedReasoning", storedReasoning.name());
-            }
-
-            if (storedReasoningDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedReasoningDescriptionIndex",
-                      storedReasoningDescriptionIndex);
             }
 
             if (sufferingFromClinicalParanoia) {
@@ -3775,8 +3758,6 @@ public class Person {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
                     person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
-                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
-                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
@@ -3811,8 +3792,6 @@ public class Person {
                     person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
                     person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedReasoningDescriptionIndex")) {
-                    person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
@@ -7023,7 +7002,7 @@ public class Person {
             PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
             possibleTraits.remove(pickedTrait);
             interations--;
-            
+
             switch (pickedTrait) {
                 case AGGRESSION -> {
                     String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
@@ -7058,7 +7037,6 @@ public class Person {
         // Always generate Reasoning
         int reasoningRoll = randomInt(8346);
         storedReasoning = generateReasoning(reasoningRoll);
-        storedReasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
     }
 
     /**
@@ -7179,10 +7157,6 @@ public class Person {
         Reasoning transitionaryReasoning = reasoning;
         reasoning = storedReasoning;
         storedReasoning = transitionaryReasoning;
-
-        int transitionaryReasoningDescriptionIndex = reasoningDescriptionIndex;
-        reasoningDescriptionIndex = storedReasoningDescriptionIndex;
-        storedReasoningDescriptionIndex = transitionaryReasoningDescriptionIndex;
     }
 
     /**

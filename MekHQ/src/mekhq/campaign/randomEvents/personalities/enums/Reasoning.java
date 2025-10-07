@@ -113,8 +113,9 @@ public enum Reasoning {
     private final int level;
 
     /**
-     * Defines the number of individual description variants available for each trait.
+     * @deprecated only used in deprecated methods
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public final static int MAXIMUM_VARIATIONS = 25;
 
     /**
