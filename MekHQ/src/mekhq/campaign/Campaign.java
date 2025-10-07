@@ -8533,7 +8533,7 @@ public class Campaign implements ITechManager {
      *
      * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
      *                        gravityModifier
-     * @param gravityModifier the penalty gravityModifier to offset
+     * @param gravityModifier the penalty modifier value to offset
      * @param target          the {@link TargetRoll} instance to modify
      */
     private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
