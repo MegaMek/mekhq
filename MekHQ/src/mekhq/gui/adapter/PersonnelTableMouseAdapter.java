@@ -3881,6 +3881,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editPerformanceLog.text"));
+            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
         } else {
             menuItem = new JMenuItem(resources.getString("addSingleLogEntry.text"));
             menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
