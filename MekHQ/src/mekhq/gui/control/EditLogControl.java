@@ -249,6 +249,7 @@ public class EditLogControl extends JPanel {
         if (dialog.showDialog().isConfirmed()) {
             switch (logType) {
                 case PERSONAL_LOG -> person.addPersonalLogEntry(dialog.getEntry());
+                case PATIENT_LOG -> person.addPatientLogEntry(dialog.getEntry());
                 case MEDICAL_LOG -> person.addMedicalLogEntry(dialog.getEntry());
                 case ASSIGNMENT_LOG -> person.addAssignmentLogEntry(dialog.getEntry());
                 case PERFORMANCE_LOG -> person.addPerformanceLogEntry(dialog.getEntry());
