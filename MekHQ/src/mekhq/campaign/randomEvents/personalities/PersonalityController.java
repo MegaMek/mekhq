@@ -136,7 +136,6 @@ public class PersonalityController {
         // Always generate Reasoning
         int reasoningRoll = randomInt(8346);
         person.setReasoning(generateReasoning(reasoningRoll));
-        person.setReasoningDescriptionIndex(randomInt(Reasoning.MAXIMUM_VARIATIONS));
 
         // finally, write the description
         writePersonalityDescription(person);
