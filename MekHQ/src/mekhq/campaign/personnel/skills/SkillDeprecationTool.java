@@ -129,7 +129,7 @@ public class SkillDeprecationTool {
                 int refundValue = getRefundValue(skills, skillType, skillName);
                 
                 // Reasoning cost changes should always take place before global changes
-                refundValue = (int) round(refundValue * reasoningXpMultiplier);
+                refundValue = (int) round(refundValue * reasoningXpMultiplier * xpCostMultiplier);
 
                 triggerDialog(skills, skillName, refundValue);
             }
