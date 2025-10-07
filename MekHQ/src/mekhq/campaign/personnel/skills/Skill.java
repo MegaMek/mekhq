@@ -40,6 +40,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
+import static mekhq.campaign.personnel.skills.SkillType.S_ESCAPE_ARTIST;
 import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
@@ -347,6 +348,13 @@ public class Skill {
             }
 
             if (characterOptions.booleanOption(ATOW_ANIMAL_EMPATHY)) {
+                modifier += 2;
+            }
+        }
+
+        // Houdini
+        if (Objects.equals(name, S_ESCAPE_ARTIST)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_HOUDINI)) {
                 modifier += 2;
             }
         }
