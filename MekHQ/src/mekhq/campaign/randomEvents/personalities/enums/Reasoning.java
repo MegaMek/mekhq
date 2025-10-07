@@ -153,8 +153,7 @@ public enum Reasoning {
     // region Getters
     public String getLabel() {
         final String RESOURCE_KEY = name() + ".label";
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
     }
 
     /**

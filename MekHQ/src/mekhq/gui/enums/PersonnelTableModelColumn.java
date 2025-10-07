@@ -76,6 +76,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.ReasoningSorter;
 import mekhq.utilities.ReportingUtilities;
 
 public enum PersonnelTableModelColumn {
@@ -983,7 +984,7 @@ public enum PersonnelTableModelColumn {
                 return social + " (" + (social.isTraitMajor() ? sign + sign : sign) + ')';
             case REASONING:
                 Reasoning reasoning = person.getReasoning();
-                return String.valueOf(reasoning.getLevel());
+                return reasoning.getLabel();
             case STRENGTH:
                 currentAttributeValue = person.getAttributeScore(SkillAttribute.STRENGTH);
                 attributeCap = person.getAttributeCap(SkillAttribute.STRENGTH);
@@ -1274,9 +1275,9 @@ public enum PersonnelTableModelColumn {
                  EDGE,
                  SPA_COUNT,
                  IMPLANT_COUNT,
-                 REASONING,
                  LOYALTY -> new IntegerStringSorter();
             case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> new AttributeScoreSorter();
+            case REASONING -> new ReasoningSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
