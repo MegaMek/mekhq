@@ -115,6 +115,11 @@ public class EscapeArtist {
      */
     private static void processEscapeAttempt(Campaign campaign, Person prisoner, MarginOfSuccess marginOfSuccess,
           LocalDate today) {
+        String report = getEscapeAttemptReport(prisoner, marginOfSuccess);
+        if (!report.isBlank()) {
+            campaign.addReport(report);
+        }
+
         switch (marginOfSuccess) {
             // Nothing happens for MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT, or MarginOfSuccess.ALMOST
             case SPECTACULAR, EXTRAORDINARY, GOOD -> prisoner.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
@@ -123,11 +128,6 @@ public class EscapeArtist {
                 boolean wasDisastrous = marginOfSuccess == MarginOfSuccess.DISASTROUS;
                 processNotableFailure(campaign, prisoner, wasDisastrous);
             }
-        }
-
-        String report = getEscapeAttemptReport(prisoner, marginOfSuccess);
-        if (!report.isBlank()) {
-            campaign.addReport(report);
         }
     }
 
