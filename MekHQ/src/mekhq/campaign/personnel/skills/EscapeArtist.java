@@ -53,8 +53,8 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 
 /**
- * Provides utilities for handling escape attempts by prisoners with the "Escape Artist", "Disguise", or "Forgery"
- * skill.
+ * Provides utilities for handling escape attempts by prisoners with the "Acting", "Escape Artist", "Disguise", or
+ * "Forgery" skill.
  *
  * <p>This class contains static methods to evaluate the results of escape attempts, apply the consequences (such as
  * altering prisoner status or inflicting injuries), and generate reports about the outcomes. Outcomes are determined
@@ -115,9 +115,9 @@ public class EscapeArtist {
      *
      * @param person the {@link Person} whose skills will be checked
      *
-     * @return the skill type constant (one of {@link SkillType#S_ESCAPE_ARTIST}, {@link SkillType#S_DISGUISE}, or
-     *       {@link SkillType#S_FORGERY}) corresponding to the highest escape-related skill level, or an empty string if
-     *       none are present
+     * @return the skill type constant (one of {@link SkillType#S_ACTING}, {@link SkillType#S_ESCAPE_ARTIST},
+     *       {@link SkillType#S_DISGUISE}, or {@link SkillType#S_FORGERY}) corresponding to the highest escape-related
+     *       skill level, or an empty string if none are present
      *
      * @author Illiani
      * @since 0.50.07
@@ -151,7 +151,16 @@ public class EscapeArtist {
         if (forgerySkill != null) {
             int level = forgerySkill.getTotalSkillLevel(options, attributes, 0);
             if (level > highestSkillLevel) {
+                highestSkillLevel = level;
                 skillToUse = SkillType.S_FORGERY;
+            }
+        }
+
+        Skill actingSkill = person.getSkill(SkillType.S_ACTING);
+        if (actingSkill != null) {
+            int level = actingSkill.getTotalSkillLevel(options, attributes, 0);
+            if (level > highestSkillLevel) {
+                skillToUse = SkillType.S_ACTING;
             }
         }
 

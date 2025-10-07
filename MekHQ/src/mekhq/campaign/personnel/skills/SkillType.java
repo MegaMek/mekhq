@@ -139,10 +139,10 @@ public class SkillType {
     public static final String S_ESCAPE_ARTIST = "Escape Artist";
     public static final String S_DISGUISE = "Disguise";
     public static final String S_FORGERY = "Forgery";
+    public static final String S_ACTING = "Acting";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
-    public static final String S_ACTING = "Acting" + RP_ONLY_TAG;
     public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
     public static final String S_APPRAISAL = "Appraisal" + RP_ONLY_TAG;
     public static final String S_ARCHERY = "Archery" + RP_ONLY_TAG;
@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                             Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                             SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                             SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                    </pre>
+     *                                                                                                                    Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                    SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                           </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1054,6 +1054,7 @@ public class SkillType {
             case "escape artist (rp only)" -> "Escape Artist"; // <50.07
             case "disguise (rp only)" -> "Disguise"; // <50.07
             case "forgery (rp only)" -> "Forgery"; // <50.07
+            case "acting (rp only)" -> "Acting"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1349,7 +1350,7 @@ public class SkillType {
             case S_STRATEGY -> createStrategy();
             case S_TACTICS -> createTactics();
             case S_ACROBATICS -> createAcrobatics();
-            case S_ACTING -> createActing();
+            case S_ACTING, "Acting (RP Only)" -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
             case S_APPRAISAL -> createAppraisal();
             case S_ARCHERY -> createArchery();
@@ -1991,7 +1992,7 @@ public class SkillType {
         return new SkillType(S_ACTING,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               CHARISMA,
               NONE,
               null,
