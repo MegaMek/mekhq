@@ -275,6 +275,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", campaignOptions.isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", campaignOptions.isDisplayKillRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayMedicalRecord", campaignOptions.isDisplayMedicalRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPatientRecord", campaignOptions.isDisplayPatientRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "displayAssignmentRecord",

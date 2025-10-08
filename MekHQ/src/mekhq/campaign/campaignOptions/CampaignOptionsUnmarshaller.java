@@ -321,6 +321,7 @@ public class CampaignOptionsUnmarshaller {
             case "displayScenarioLog" -> campaignOptions.setDisplayScenarioLog(parseBoolean(nodeContents));
             case "displayKillRecord" -> campaignOptions.setDisplayKillRecord(parseBoolean(nodeContents));
             case "displayMedicalRecord" -> campaignOptions.setDisplayMedicalRecord(parseBoolean(nodeContents));
+            case "displayPatientRecord" -> campaignOptions.setDisplayPatientRecord(parseBoolean(nodeContents));
             case "displayAssignmentRecord" -> campaignOptions.setDisplayAssignmentRecord(parseBoolean(
                   nodeContents));
             case "displayPerformanceRecord" -> campaignOptions.setDisplayPerformanceRecord(parseBoolean(

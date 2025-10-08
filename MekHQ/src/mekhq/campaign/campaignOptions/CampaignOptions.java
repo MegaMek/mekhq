@@ -238,6 +238,7 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean displayMedicalRecord;
+    private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
 
@@ -800,6 +801,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setDisplayMedicalRecord(false);
+        displayPatientRecord = false;
         setRewardComingOfAgeAbilities(false);
         setRewardComingOfAgeRPSkills(false);
 
@@ -1695,6 +1697,14 @@ public class CampaignOptions {
 
     public void setDisplayMedicalRecord(final boolean displayMedicalRecord) {
         this.displayMedicalRecord = displayMedicalRecord;
+    }
+
+    public boolean isDisplayPatientRecord() {
+        return displayPatientRecord;
+    }
+
+    public void setDisplayPatientRecord(final boolean displayPatientRecord) {
+        this.displayPatientRecord = displayPatientRecord;
     }
 
     public boolean isDisplayAssignmentRecord() {

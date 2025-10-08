@@ -50,8 +50,7 @@ import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
@@ -350,8 +349,6 @@ public final class InjuryUtil {
                         if ((taskXP > 0) && (doc.getNTasks() >= c.getCampaignOptions().getNTasksXP())) {
                             doc.awardXP(c, taskXP);
                             doc.setNTasks(0);
-
-                            PerformanceLogger.gainedXpFromMedWork(doc, c.getLocalDate(), taskXP);
                         } else {
                             doc.setNTasks(doc.getNTasks() + 1);
                         }
@@ -400,10 +397,8 @@ public final class InjuryUtil {
             result.add(new GameEffect(treatmentSummary, rnd -> {
                 if (xp > 0) {
                     doc.awardXP(c, xp);
-                    PerformanceLogger.successfullyTreatedWithXp(doc, p, c.getLocalDate(), injuries, xp);
-                } else {
-                    ServiceLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
                 }
+                PatientLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
                 p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
             }));
         }
