@@ -815,8 +815,8 @@ public class Skill {
      *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
      * </ul>
      *
-     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
-     * @param reputation The reputation value used in the calculation.
+     * @param options            The {@link PersonnelOptions} to use for calculating the final skill value.
+     * @param adjustedReputation The reputation value used in the calculation.
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
@@ -824,12 +824,21 @@ public class Skill {
      * @see #isCountUp()
      * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
      */
-    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
+    public String toString(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+        String display;
+
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, attributes, reputation);
+            display = "+" + getFinalSkillValue(options, attributes, adjustedReputation);
         } else {
-            return getFinalSkillValue(options, attributes, reputation) + "+";
+            display = getFinalSkillValue(options, attributes, adjustedReputation) + "+";
         }
+
+        if (type.isSkillLevelsMatter()) {
+            int totalSkillLevel = getTotalSkillLevel(options, attributes, adjustedReputation);
+            display += String.format(" (%d)", totalSkillLevel);
+        }
+
+        return display;
     }
 
     /**
