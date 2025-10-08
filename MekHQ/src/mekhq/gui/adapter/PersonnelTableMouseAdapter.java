@@ -1776,7 +1776,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void replaceLimb(String selectedInjury, Person selectedPerson, Campaign campaign) {
         List<Person> suitableDoctors = new ArrayList<>();
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 Skill skill = person.getSkill(S_SURGERY);
 
@@ -2144,7 +2144,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if ((oneSelected) && (!person.isChild(getCampaign().getLocalDate()))) {
-            List<Person> orphans = getCampaign().getActivePersonnel(true)
+            List<Person> orphans = getCampaign().getActivePersonnel(true, true)
                                          .stream()
                                          .filter(child -> (child.isChild(getCampaign().getLocalDate())) &&
                                                                 (!child.getGenealogy().hasLivingParents()))
@@ -2271,7 +2271,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         // give C-Bill payment
-        if (oneSelected && person.getStatus().isActive()) {
+        if (oneSelected && person.getStatus().isActiveFlexible()) {
             menuItem = new JMenuItem(resources.getString("givePayment.text"));
             menuItem.setActionCommand(CMD_GIVE_PAYMENT);
             menuItem.addActionListener(this);
@@ -2305,7 +2305,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
 
-        if (oneSelected && person.getStatus().isActive()) {
+        if (oneSelected && person.getStatus().isActiveFlexible()) {
             if (getCampaignOptions().isUseManualMarriages() &&
                       (getCampaign().getMarriage().canMarry(getCampaign().getLocalDate(), person, false) == null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
@@ -2515,7 +2515,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // it every time
             Campaign campaign = getCampaign();
 
-            if (StaticChecks.areAllActive(selected)) {
+            if (StaticChecks.areAllActiveFlexible(selected)) {
                 if (Arrays.stream(selected).noneMatch(prospectiveStudent -> person.needsFixing())) {
                     // this next block preps variables for use by the menu & tooltip
                     List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
@@ -2703,7 +2703,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion Education Menu
 
         // region Spend XP Menu
-        if (oneSelected && person.getStatus().isActive()) {
+        if (oneSelected && person.getStatus().isActiveFlexible()) {
             final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
 
             menu = new JMenu(resources.getString("spendXP.text"));
@@ -3644,7 +3644,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // endregion Edge Triggers
 
             popup.add(menu);
-        } else if (StaticChecks.areAllActive(selected)) {
+        } else if (StaticChecks.areAllActiveFlexible(selected)) {
             if (getCampaignOptions().isUseEdge()) {
                 menu = new JMenu(resources.getString("setEdgeTriggers.text"));
                 submenu = new JMenu(resources.getString("On.text"));

@@ -96,7 +96,7 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);

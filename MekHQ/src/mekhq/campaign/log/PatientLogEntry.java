@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,14 +32,13 @@
  */
 package mekhq.campaign.log;
 
-public enum LogEntryType {
-    ASSIGNMENT,
-    AWARD,
-    CUSTOM,
-    HISTORICAL, //Used for historical daily log
-    MEDICAL,
-    PATIENT,
-    PERFORMANCE,
-    PERSONAL,
-    SERVICE
+import java.time.LocalDate;
+
+/**
+ * This class is a specific log entry related to performing medical aid on a character.
+ */
+public class PatientLogEntry extends LogEntry {
+    public PatientLogEntry(LocalDate date, String desc) {
+        super(date, desc, LogEntryType.PATIENT);
+    }
 }
